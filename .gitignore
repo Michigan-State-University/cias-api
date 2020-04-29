@@ -2,6 +2,7 @@
 !/storage/.keep
 !/tmp/.keep
 .byebug_history
+.env
 .idea/
 /.bundle
 /config/master.key
