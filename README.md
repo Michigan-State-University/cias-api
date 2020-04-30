@@ -1,12 +1,12 @@
 ## cias-api
 
 ## METADATA
-* Project name: CIAS 3.0 (Computerized Intervention Authoring  System);
-* Owner: [Wayne university](https://wayne.edu/);
-* License: It is a property of [Wayne university](https://wayne.edu/). All rights reserved.
+* Project name: CIAS 3.0 (Computerized Intervention Authoring System);
+* Owner: [Wayne State University](https://wayne.edu/);
+* License: It is a property of [Wayne State University](https://wayne.edu/). All rights reserved.
 
-## DECISIONS 
- 
+## DECISIONS
+
 #### CORE LOGIC
 
 * placeholder
@@ -22,7 +22,7 @@
     * ORM: ActiveRecord;
     * Databases:
       * RDBMS: PostgreSQL. Store for all data;
-      * In-memory: Redis store for background worker and cache. 
+      * In-memory: Redis store for background worker and cache.
   * View:
     * API: JSON serialized by: fast_jsonapi.
   * Controller:
