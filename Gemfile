@@ -9,8 +9,12 @@ gem 'pg', '~> 1.2'
 gem 'puma'
 
 gem 'bootsnap', '>= 1.4.2', require: false
+gem 'connection_pool'
+gem 'hiredis'
 gem 'pry-rails'
 gem 'rack-cors'
+gem 'redis'
+gem 'sidekiq'
 
 group :development, :test do
   gem 'dotenv-rails'

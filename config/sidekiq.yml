@@ -1,0 +1,5 @@
+---
+:concurrency: <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
+:queues:
+  - [default,1]
+  - [mailers,2]
