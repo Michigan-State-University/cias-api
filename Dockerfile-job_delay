@@ -1,0 +1,14 @@
+FROM ruby:2.7.1
+ENV RUBY_CONFIGURE_OPTS="--with-jemalloc"
+ENV RUBYOPT="--jit"
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev tmux libjemalloc2 && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+ENV LD_PRELOAD="/usr/lib/x86_64-linux-gnu/libjemalloc.so.2"
+RUN curl -sL --http2 https://dl.google.com/go/go1.14.2.linux-amd64.tar.gz | tar -xz -C /usr/local/
+ENV PATH="/root/go/bin:/usr/local/go/bin:${PATH}"
+RUN GO111MODULE=on go get -u github.com/DarthSim/overmind/v2
+RUN mkdir /api
+WORKDIR /api
+COPY Gemfile /api/Gemfile
+COPY Gemfile.lock /api/Gemfile.lock
+RUN gem install rake && gem install bundler -v "2.1.4" && bundle install
+COPY . /api

@@ -1,0 +1,10 @@
+.dockerignore
+.env*
+.git
+.idea
+.idea_modules/
+.vscode/*
+/public/assets
+/public/system
+log/*
+tmp/

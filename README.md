@@ -1,18 +1,17 @@
-# CIAS
+## cias-api
 
 ## METADATA
 * Project name: CIAS 3.0 (Computerized Intervention Authoring  System);
 * Owner: [Wayne university](https://wayne.edu/);
-* License: It is a property of [example.com](http://example.com). All rights reserved.
+* License: It is a property of [Wayne university](https://wayne.edu/). All rights reserved.
 
 ## DECISIONS 
-* placeholder
  
 #### CORE LOGIC
 
-## TECHNICAL STACK
+* placeholder
 
-#### API
+## TECHNICAL STACK
 
 * Ruby programming language:
   * OOP, SOLID, DI, design patterns.
@@ -23,7 +22,7 @@
     * ORM: ActiveRecord;
     * Databases:
       * RDBMS: PostgreSQL. Store for all data;
-      * In-memory: Redis. Store for background worker, cache. 
+      * In-memory: Redis store for background worker and cache. 
   * View:
     * API: JSON serialized by: fast_jsonapi.
   * Controller:
@@ -39,31 +38,12 @@
 * Code quaility:
   * Static code analyzer and formatter: Rubocop.
 
-#### FRONTEND
-
-* placeholder
-
-## DEPLOYMENT ENVIRONMENT
-
-* backend:
-  * environments:
-    * staging: ; 
-    * production: .
-  * external:
-    * [database visualisation] placeholder;
-    * [logs] placeholder;
-    * [mail] placeholder;
-    * [search engine] placeholder;
-    * [security] placeholder;
-    * [server] placeholder;
-    * [storage] placeholder;
-* frontend:
-  * placeholder.
- 
 ## LAUNCH
 
-#### API
-* `git clone git@github.com:htdevelopers/cias-api.git`
-* `cd cias-api`
-* `docker-compose up`
-* Open your favourite web browser, type: `localhost:3000`
+* `$ git clone git@github.com:htdevelopers/cias-api.git`
+* `$ cd cias-api`
+* `$ docker-compose up --build`
+* `$ docker-compose stop`
+* `$ docker-compose exec api bundle exec rails db:setup db:migrate db:seed`
+* `$ docker-compose up`
+* Open web browser and type: `localhost:3002`

@@ -1,9 +1,9 @@
 !/log/.keep
 !/storage/.keep
 !/tmp/.keep
-.byebug_history
 .env
 .idea/
+.vscode/*
 /.bundle
 /config/master.key
 /log/*
