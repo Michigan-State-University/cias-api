@@ -28,6 +28,9 @@ group :development, :test do
 end
 
 group :development do
+  gem 'brakeman'
+  gem 'bullet'
+  gem 'overcommit'
 end
 
 group :test do

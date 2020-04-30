@@ -13,7 +13,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile-api
+      dockerfile: Dockerfile
     environment: *default-environment
     env_file: *default-env_file
     depends_on:
@@ -25,7 +25,7 @@ services:
       - .:/api
     ports:
       - '3002:3000'
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb"
+    command: bash -c 'rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb'
 
   cache:
     image: redis:5.0.6
@@ -44,7 +44,7 @@ services:
   job_delay:
     build:
       context: .
-      dockerfile: Dockerfile-job_delay
+      dockerfile: Dockerfile
     environment: *default-environment
     env_file: *default-env_file
     depends_on:
@@ -54,7 +54,7 @@ services:
     tty: true
     volumes:
       - .:/api
-    command: 'overmind start -f ./Procfile-job_delay OVERMIND_AUTO_RESTART=default,mailers'
+    command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
 
 volumes:
   vol_database:

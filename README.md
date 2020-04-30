@@ -43,7 +43,5 @@
 * `$ git clone git@github.com:htdevelopers/cias-api.git`
 * `$ cd cias-api`
 * `$ docker-compose up --build`
-* `$ docker-compose stop`
 * `$ docker-compose exec api bundle exec rails db:setup db:migrate db:seed`
-* `$ docker-compose up`
 * Open web browser and type: `localhost:3002`

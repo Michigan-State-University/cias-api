@@ -1,2 +1,0 @@
-mailers: bundle exec sidekiq -C config/sidekiq.yml -c 10 -q mailers
-default: bundle exec sidekiq -C config/sidekiq.yml -c 10 -q default
