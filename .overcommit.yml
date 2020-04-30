@@ -1,0 +1,92 @@
+CommitMsg:
+  HardTabs:
+    enabled: true
+    description: 'Check for hard tabs'
+
+  SpellCheck:
+    enabled: true
+    description: 'Check for misspelled words'
+    required_executable: 'hunspell'
+    flags: ['-a', '-d', 'en_GB']
+
+PreCommit:
+  AuthorName:
+    enabled: false
+
+  AuthorEmail:
+    enabled: true
+    description: 'Check author email'
+    requires_files: false
+    required: true
+    quiet: true
+    pattern: '^[^@]+@.*$'
+
+  BrokenSymlinks:
+    enabled: true
+    description: 'Check for broken symlinks'
+    quiet: true
+
+  Brakeman:
+    enabled: true
+    description: 'Check for vulnerable versions of gems'
+    required_executable: 'brakeman'
+    install_command: 'gem install brakeman'
+
+  CaseConflicts:
+    enabled: true
+    description: 'Check for case-insensitivity conflicts'
+    quiet: true
+
+  Fasterer:
+    enabled: true
+    description: 'Analyzing for potential speed improvements'
+    required_executable: 'fasterer'
+    install_command: 'gem install fasterer'
+    include: '**/*.rb'
+
+  FixMe:
+    enabled: true
+    description: 'Check for "token" strings'
+    required_executable: 'grep'
+    flags: ['-IEHnw']
+    keywords: ['BROKEN', 'BUG', 'ERROR', 'FIXME', 'HACK', 'NOTE', 'OPTIMIZE', 'REVIEW', 'TODO', 'WTF', 'XXX']
+    exclude:
+      - '.overcommit.yml'
+
+  MergeConflicts:
+    enabled: true
+    description: 'Check for merge conflicts'
+    quiet: true
+    required_executable: 'grep'
+    flags: ['-IHn', "^<<<<<<<[ \t]"]
+
+  RailsBestPractices:
+    enabled: true
+    description: 'Analyze with RailsBestPractices'
+    required_executable: 'rails_best_practices'
+    flags: ['--without-color']
+    install_command: 'gem install rails_best_practices'
+
+  RuboCop:
+    enabled: true
+    description: 'Analyze with RuboCop'
+    required_executable: 'rubocop'
+    flags: ['--format=emacs', '--force-exclusion', '--display-cop-names']
+    install_command: 'gem install rubocop rubocop-performance rubocop-rails rubocop-rspec'
+    include:
+      - '**/*.gemspec'
+      - '**/*.rake'
+      - '**/*.rb'
+      - '**/*.ru'
+      - '**/Gemfile'
+      - '**/Rakefile'
+
+  LineEndings:
+    enabled: true
+    description: 'Check line endings'
+    eol: "\n"
+
+  TrailingWhitespace:
+    enabled: true
+    exclude:
+      - '**/db/structure.sql'
