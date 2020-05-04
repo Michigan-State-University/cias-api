@@ -44,5 +44,5 @@
 * `$ cd cias-api`
 * `$ cp .env.template .env`
 * `$ docker-compose up --build`
-* `$ docker-compose exec api bundle exec rails db:setup db:migrate db:seed`
+* `$ docker-compose exec api bundle exec rails db:reset`
 * Open web browser and type: `localhost:3002`
