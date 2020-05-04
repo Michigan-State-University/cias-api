@@ -9,7 +9,10 @@ gem 'pg', '~> 1.2'
 gem 'puma'
 
 gem 'bootsnap', '>= 1.4.2', require: false
+gem 'cancancan'
 gem 'connection_pool'
+gem 'devise-argon2'
+gem 'devise_token_auth'
 gem 'hiredis'
 gem 'pry-rails'
 gem 'rack-cors'

@@ -37,5 +37,14 @@ module CiasApi
     config.api_only = true
 
     config.active_job.queue_adapter = :sidekiq
+    config.middleware.use Rack::Cors do
+      allow do
+        origins '*'
+        resource '*',
+                 headers: :any,
+                 expose: %w[access-token expiry token-type uid client],
+                 methods: %i[get post options delete put]
+      end
+    end
   end
 end

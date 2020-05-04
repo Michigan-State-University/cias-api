@@ -43,6 +43,9 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Enabled: false
 
+Style/ClassAndModuleChildren:
+  Enabled: false
+
 Style/Documentation:
   Enabled: false
 
