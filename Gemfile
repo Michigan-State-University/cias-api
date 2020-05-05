@@ -22,18 +22,25 @@ gem 'rswag-ui'
 gem 'sidekiq'
 
 group :development, :test do
+  gem 'brakeman', require: false
   gem 'dotenv-rails'
-  gem 'factory_bot_rails'
+  gem 'fasterer', require: false
+  gem 'overcommit', require: false
   gem 'pry-byebug'
+  gem 'rails_best_practices', require: false
   gem 'rspec-rails'
   gem 'rswag-specs'
+  gem 'rubocop', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rails', require: false
+  gem 'rubocop-rspec', require: false
 end
 
 group :development do
   gem 'bullet'
-  gem 'overcommit', require: false
 end
 
 group :test do
+  gem 'factory_bot_rails'
   gem 'shoulda-matchers'
 end
