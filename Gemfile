@@ -17,6 +17,8 @@ gem 'hiredis'
 gem 'pry-rails'
 gem 'rack-cors'
 gem 'redis'
+gem 'rswag-api'
+gem 'rswag-ui'
 gem 'sidekiq'
 
 group :development, :test do
@@ -24,6 +26,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'pry-byebug'
   gem 'rspec-rails'
+  gem 'rswag-specs'
 end
 
 group :development do

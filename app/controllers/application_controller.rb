@@ -6,4 +6,8 @@ class ApplicationController < ActionController::API
   def current_ability
     @current_ability ||= current_user.ability
   end
+
+  def status
+    render json: 'all systems operational'
+  end
 end
