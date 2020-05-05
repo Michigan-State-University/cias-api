@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ability::ContentAdministrator < Ability::Interface
+class Ability::ContentAdministrator < Ability::Base
   def definition
     super
     content_administrator if role?('content_administrator')

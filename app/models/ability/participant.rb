@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ability::Participant < Ability::Interface
+class Ability::Participant < Ability::Base
   def definition
     super
     participant if role?('participant')

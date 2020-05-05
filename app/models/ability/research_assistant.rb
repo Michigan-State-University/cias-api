@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ability::ResearchAssistant < Ability::Interface
+class Ability::ResearchAssistant < Ability::Base
   def definition
     super
     research_assistant if role?('research_assistant')
