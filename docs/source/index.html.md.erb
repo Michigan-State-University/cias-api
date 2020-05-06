@@ -1,0 +1,202 @@
+---
+title: CIAS 3.0 API documentataion
+
+language_tabs: # must be one of https://git.io/vQNgJ
+  - http
+
+toc_footers:
+  - <a href='#'>Sign Up for a Developer Key</a>
+
+includes:
+  - errors
+
+search: true
+---
+
+# Introduction
+
+Welcome to the <%= ENV['APP_NAME_COMMENT'] %>
+
+> Base URL
+
+```http
+<%= ENV['DOMAIN_NAME'] %>
+```
+
+This describes the resources that make up the official [<%= ENV['DOMAIN_NAME'] %>](<%= "https://#{ENV['DOMAIN_NAME']}" %>) REST API. In order to use resources, You have to obtain an appropriate token.
+
+# Authentication
+
+
+## Create session
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/auth/sign_in`
+
+
+### URL parameters
+
+Parameter | Description
+--------- | -----------
+
+
+### Query String
+
+Parameter | Description
+--------- | -----------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+Key | Value
+--------- | -----------
+Content-Type | application/json; charset=utf-8
+
+
+### HTTP body
+
+{ "email": "email", "password": "password" }
+
+
+### Note
+
+1. For every new HTTP request to another reosource, we use:
+   1. New `access-token` retrieved from a HTTP response;
+   1. Rest reciveced headers which wer recived during the creating the session without modifing them. Read more [here](https://github.com/lynndylanhurley/devise_token_auth/blob/master/docs/security.md).
+
+> HTTP example request
+
+```http
+POST <%= ENV['DOMAIN_NAME'] %>/auth/sign_in
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+```
+
+```json
+{
+  "email": "user@<%= ENV['DOMAIN_NAME'] %>",
+  "password": "password"
+}
+```
+
+
+> HTTP response 200 OK
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: tzrxsp92jig88A7mUeUKlA
+token-type: Bearer
+client: VOSa5JraNO9_9fuuWUXs3w
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+  "data": {
+    "id": 1,
+    "deactivated": false,
+    "email": "user@<%= ENV['DOMAIN_NAME'] %>",
+    "provider": "email",
+    "roles": [
+      "administrator"
+    ],
+    "uid": "user@<%= ENV['DOMAIN_NAME'] %>",
+    "first_name": "admin",
+    "last_name": "1",
+    "login": "user",
+    "allow_password_change": false
+  }
+}
+```
+
+
+> HTTP response 401 Unauthorized
+
+```json
+{
+  "success": false,
+  "errors": [
+    "Invalid login credentials. Please try again."
+  ]
+}
+```
+
+
+## Destroy session
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/auth/sign_out`
+
+
+### URL parameters
+
+Parameter | Description
+--------- | -----------
+
+
+### Query String
+
+Parameter | Description
+--------- | -----------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+Key | Value
+--------- | -----------
+Content-Type | application/json; charset=utf-8
+access-token | xxxyyyzzz
+token-type | Bearer
+client | xxxyyyzzz
+uid | email
+
+
+### HTTP body
+
+
+> HTTP example request
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: tzrxsp92jig88A7mUeUKlA
+token-type: Bearer
+client: VOSa5JraNO9_9fuuWUXs3w
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+```json
+{
+  "success": true
+}
+```
+
+
+> HTTP response 404 Not Found
+
+```json
+{
+  "success": false,
+  "errors": [
+    "User was not found or was not logged in."
+  ]
+}
+```

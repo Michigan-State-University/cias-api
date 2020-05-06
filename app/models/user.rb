@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
-  include DeviseTokenAuth::Concerns::User
-  include EnumerateForConcern
-
-  # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable,
+  devise :confirmable,
+         :database_authenticatable,
          :recoverable,
          :registerable,
          :rememberable,
          :trackable,
          :validatable
+
+  include DeviseTokenAuth::Concerns::User
+  include EnumerateForConcern
 
   APP_ROLES = %w[administrator content_administrator group_coder participant research_assistant].freeze
 
@@ -33,5 +32,17 @@ class User < ApplicationRecord
 
   def to_s
     "#{first_name} #{last_name}"
+  end
+
+  def destroy
+    update(deactivated: true) unless deactivated
+  end
+
+  def active_for_authentication?
+    super && !deactivated
+  end
+
+  def send_devise_notification(notification, *args)
+    devise_mailer.send(notification, self, *args).deliver_later
   end
 end

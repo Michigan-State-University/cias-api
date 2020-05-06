@@ -8,5 +8,7 @@ class Ability::Administrator < Ability::Base
 
   private
 
-  def administrator; end
+  def administrator
+    can :manage, :all
+  end
 end

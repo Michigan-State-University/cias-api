@@ -3,7 +3,9 @@
 ## METADATA
 * Project name: CIAS 3.0 (Computerized Intervention Authoring System);
 * Owner: [Wayne State University](https://wayne.edu/);
-* Documentation is exposed without logging in the path `/api-docs`;
+* Documentation:
+  * Is exposed without logging in the path `/docs`;
+  * Technical details described in: `docs/README.md`.
 * License: It is a property of [Wayne State University](https://wayne.edu/). All rights reserved.
 
 ## DECISIONS
@@ -36,15 +38,15 @@
   * RSpec;
   * Shoulda Matchers;
   * factory_bot_rails.
-* API documentation: OpenAPI through rswag;
+* API documentation: Slate;
 * Code quaility:
   * Static code analyzer and formatter: Rubocop.
 
-## LAUNCH
+## LAUNCH DEVELOPMENT
 
 * `$ git clone git@github.com:htdevelopers/cias-api.git`
 * `$ cd cias-api`
 * `$ cp .env.template .env`
 * `$ docker-compose up --build`
 * `$ docker-compose exec api bundle exec rails db:reset`
-* Open web browser and type: `localhost:3002/api-docs`
+* Open web browser and type: `localhost:3000/`

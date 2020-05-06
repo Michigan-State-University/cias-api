@@ -7,8 +7,34 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       t.string :provider, null: false, default: 'email'
       t.string :uid, null: false, default: ''
 
+      ## User Info
+      t.string :first_name
+      t.string :last_name
+      t.string :login
+      t.string :email
+
+      ## Authorization
+      t.text :roles, default: [], array: true
+
+      ## Tokens
+      t.jsonb :tokens
+
+      ## Deactivate user instead of destroy
+      t.boolean :deactivated, null: false, default: false
+
+      ## Confirmable
+      t.string   :confirmation_token
+      t.datetime :confirmed_at
+      t.datetime :confirmation_sent_at
+      t.string   :unconfirmed_email # Only if using reconfirmable
+
       ## Database authenticatable
       t.string :encrypted_password, null: false, default: ''
+
+      ## Lockable
+      # t.integer  :failed_attempts, :default => 0, :null => false # Only if lock strategy is :failed_attempts
+      # t.string   :unlock_token # Only if unlock strategy is :email or :both
+      # t.datetime :locked_at
 
       ## Recoverable
       t.string   :reset_password_token
@@ -18,26 +44,12 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       ## Rememberable
       t.datetime :remember_created_at
 
-      ## Confirmable
-      t.string   :confirmation_token
-      t.datetime :confirmed_at
-      t.datetime :confirmation_sent_at
-      t.string   :unconfirmed_email # Only if using reconfirmable
-
-      ## Lockable
-      # t.integer  :failed_attempts, :default => 0, :null => false # Only if lock strategy is :failed_attempts
-      # t.string   :unlock_token # Only if unlock strategy is :email or :both
-      # t.datetime :locked_at
-
-      ## User Info
-      t.string :first_name
-      t.string :last_name
-      t.string :login
-      t.text :roles, default: [], array: true
-      t.string :email
-
-      ## Tokens
-      t.json :tokens
+      ## Trackable
+      t.integer  :sign_in_count, default: 0, null: false
+      t.datetime :current_sign_in_at
+      t.datetime :last_sign_in_at
+      t.inet     :current_sign_in_ip
+      t.inet     :last_sign_in_ip
 
       t.timestamps
     end

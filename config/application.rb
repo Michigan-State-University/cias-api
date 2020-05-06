@@ -26,6 +26,9 @@ module CiasApi
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
 
+    # NOTE: set Time Zone?
+    # config.time_zone
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
@@ -37,14 +40,6 @@ module CiasApi
     config.api_only = true
 
     config.active_job.queue_adapter = :sidekiq
-    config.middleware.use Rack::Cors do
-      allow do
-        origins '*'
-        resource '*',
-                 headers: :any,
-                 expose: %w[access-token expiry token-type uid client],
-                 methods: %i[get post options delete put]
-      end
-    end
+    # config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
   end
 end

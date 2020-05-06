@@ -8,6 +8,6 @@ class ApplicationController < ActionController::API
   end
 
   def status
-    render json: 'all systems operational'
+    render json: 'all-systems-operational'
   end
 end

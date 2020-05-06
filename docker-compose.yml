@@ -23,8 +23,9 @@ services:
     tty: true
     volumes:
       - .:/api
+      - vol_api_bundle:/usr/local/bundle
     ports:
-      - '3002:3000'
+      - '3000:3000'
     command: bash -c 'rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb'
 
   cache:
@@ -54,7 +55,9 @@ services:
     tty: true
     volumes:
       - .:/api
+      - vol_api_bundle:/usr/local/bundle
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
 
 volumes:
+  vol_api_bundle:
   vol_database:

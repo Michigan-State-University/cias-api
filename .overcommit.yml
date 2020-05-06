@@ -52,6 +52,7 @@ PreCommit:
     keywords: ['BROKEN', 'BUG', 'ERROR', 'FIXME', 'HACK', 'NOTE', 'OPTIMIZE', 'REVIEW', 'TODO', 'WTF', 'XXX']
     exclude:
       - '.overcommit.yml'
+      - 'docs/source/**/*'
 
   MergeConflicts:
     enabled: true
@@ -85,6 +86,9 @@ PreCommit:
     enabled: true
     description: 'Check line endings'
     eol: "\n"
+    exclude:
+      - 'docs/source/**/*'
+      - 'public/docs/**/*'
 
   TrailingWhitespace:
     enabled: true
