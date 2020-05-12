@@ -3,7 +3,7 @@
 class Ability::Participant < Ability::Base
   def definition
     super
-    participant if role?('participant')
+    participant if role?(class_name)
   end
 
   private

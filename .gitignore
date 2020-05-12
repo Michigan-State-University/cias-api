@@ -1,6 +1,7 @@
 !/log/.keep
 !/storage/.keep
 !/tmp/.keep
+.byebug_history
 .env
 .idea/
 .vscode/*
@@ -9,3 +10,4 @@
 /log/*
 /storage/*
 /tmp/*
+db/structure.sql

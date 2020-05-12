@@ -12,7 +12,8 @@ class User < ApplicationRecord
   include DeviseTokenAuth::Concerns::User
   include EnumerateForConcern
 
-  APP_ROLES = %w[administrator content_administrator group_coder participant research_assistant].freeze
+  # Order of roles is important because final authorization is the sum of all roles
+  APP_ROLES = %w[participant group_coder research_assistant content_administrator administrator].freeze
 
   enumerate_for :roles,
                 APP_ROLES,
@@ -21,6 +22,8 @@ class User < ApplicationRecord
 
   validates :email, presence: true
   validates :email, uniqueness: true
+
+  has_many :interventions, dependent: :restrict_with_exception
 
   def ability
     @ability ||= Ability.new(self)

@@ -36,6 +36,8 @@ end
 RSpec.configure do |config|
   config.order = :random
 
+  config.include Devise::Test::IntegrationHelpers, type: :feature
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
@@ -69,6 +71,17 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  if Bullet.enable?
+    config.before { Bullet.start_request }
+    config.after {  Bullet.end_request }
+  end
+end
+
+RSpec::Sidekiq.configure do |config|
+  config.clear_all_enqueued_jobs = true
+  config.enable_terminal_colours = true
+  config.warn_when_jobs_not_processed_by_sidekiq = false
 end
 
 Shoulda::Matchers.configure do |config|

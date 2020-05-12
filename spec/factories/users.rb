@@ -10,12 +10,12 @@ FactoryBot.define do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }
     end
 
-    trait :with_nickname do
-      nickname { Faker::Internet.username }
-    end
-
     trait :confirmed do
       after(:create, &:confirm)
+    end
+
+    trait :admin do
+      roles { %w[administrator] }
     end
 
     trait :unconfirmed do

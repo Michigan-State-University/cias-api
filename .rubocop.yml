@@ -8,13 +8,15 @@ AllCops:
   TargetRubyVersion: 2.7.1
   Exclude:
     - 'bin/*'
-    - 'db/schema.rb'
 
 Bundler/OrderedGems:
   Enabled: false
 
 Layout/DotPosition:
   Enabled: false
+
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
 
 Layout/LineLength:
   Enabled: false
@@ -62,6 +64,9 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Style/SlicingWithRange:
+  Enabled: true
+
 Style/StructInheritance:
   Exclude:
     - 'app/policies/**/*'
@@ -88,6 +93,13 @@ Rails/SkipsModelValidations:
 
 RSpec/ContextWording:
   Enabled: false
+
+RSpec/DescribeClass:
+  Exclude:
+    - 'spec/requests/**/*'
+
+RSpec/ImplicitExpect:
+  EnforcedStyle: should
 
 RSpec/InstanceVariable:
   AssignmentOnly: true

@@ -19,7 +19,7 @@
 * Ruby programming language:
   * OOP, SOLID, DI, design patterns.
 * Ruby on Rails (RoR) web-application framework:
-  * MVC, DRY, conventions over configurations.
+  * MVC, DRY, convention over configuration.
 * MVC:
   * Model:
     * ORM: ActiveRecord;
@@ -48,5 +48,6 @@
 * `$ cd cias-api`
 * `$ cp .env.template .env`
 * `$ docker-compose up --build`
-* `$ docker-compose exec api bundle exec rails db:reset`
+* `$ docker-compose exec api bundle exec rails db:environment:set RAILS_ENV=development`
+* `$ docker-compose exec api bundle exec rails db:reset db:seed:fake`
 * Open web browser and type: `localhost:3000/`

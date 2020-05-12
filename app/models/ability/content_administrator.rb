@@ -3,7 +3,7 @@
 class Ability::ContentAdministrator < Ability::Base
   def definition
     super
-    content_administrator if role?('content_administrator')
+    content_administrator if role?(class_name)
   end
 
   private

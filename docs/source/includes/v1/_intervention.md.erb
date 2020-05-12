@@ -1,0 +1,195 @@
+# Intervention
+
+
+## Get all interventions
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/interventions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['DOMAIN_NAME'] %>/v1/interventions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Show intervention
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Intervention ID | true
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['DOMAIN_NAME'] %>/v1/interventions/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Create intervention
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/interventions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"intervention": {
+		"type": "Intervention::Single",
+		"name": "Intervention example 1",
+		"settings": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+
+
+### Note
+Required keys:
+* `type`;
+* `name`.
+
+`type` key has to contains one of the following values:
+* `Intervention::Multiple`;
+* `Intervention::Single`.
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['DOMAIN_NAME'] %>/v1/interventions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"intervention": {
+		"type": "Intervention::Single",
+		"name": "Intervention example 1",
+		"settings": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+```
+
+
+> HTTP response 200 OK

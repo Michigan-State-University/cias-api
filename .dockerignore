@@ -1,4 +1,6 @@
+.byebug_history
 .dockerignore
+.editorconfig
 .env*
 .git
 .idea

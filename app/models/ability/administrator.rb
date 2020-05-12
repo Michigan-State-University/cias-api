@@ -3,7 +3,7 @@
 class Ability::Administrator < Ability::Base
   def definition
     super
-    administrator if role?('administrator')
+    administrator if role?(class_name)
   end
 
   private

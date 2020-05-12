@@ -1,0 +1,155 @@
+# Question
+
+## Get all questions
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:intervention_id/questions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['DOMAIN_NAME'] %>/v1/interventions/1/questions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Create question
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:intervention_id/questions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"question": {
+		"type": "Question::Name",
+		"title": "question example title",
+		"subtitle": "question example subtitle",
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+
+
+
+### Note
+Required keys:
+* `title`;
+* `type`.
+
+`type` key has to contains one of the following values:
+* `Question::AnalogueScale`;
+* `Question::BarGraph`;
+* `Question::Blank`;
+* `Question::Feedback`;
+* `Question::FollowUpContact`;
+* `Question::Grid`;
+* `Question::Multiple`;
+* `Question::Name`;
+* `Question::Number`;
+* `Question::Single`;
+* `Question::TextBox`;
+* `Question::Url`;
+* `Question::Url`.
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['DOMAIN_NAME'] %>/v1/interventions/1/questions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"question": {
+		"type": "Question::Name",
+		"title": "question example title",
+		"subtitle": "question example subtitle",
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+```
+
+
+> HTTP response 200 OK

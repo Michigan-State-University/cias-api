@@ -5,6 +5,7 @@ require 'middleman-core/renderers/redcarpet'
 
 class NestingUniqueHeadCounter < Middleman::Renderers::MiddlemanRedcarpetHTML
   attr_accessor :headers_history
+
   def initialize
     super
     @headers_history = {} unless defined?(@headers_history)

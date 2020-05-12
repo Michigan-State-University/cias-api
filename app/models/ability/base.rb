@@ -2,6 +2,7 @@
 
 class Ability::Base
   attr_reader :ability
+
   delegate :user, :can, :cannot, to: :ability
   delegate :role?, to: :user
 
@@ -14,6 +15,10 @@ class Ability::Base
   end
 
   private
+
+  def class_name
+    self.class.name.demodulize.underscore
+  end
 
   def default; end
 end

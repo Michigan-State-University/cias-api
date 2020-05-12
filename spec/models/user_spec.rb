@@ -5,5 +5,6 @@ require 'rails_helper'
 describe User do
   subject(:user) { build(:user) }
 
-  it { is_expected.to be_valid }
+  it { should be_valid }
+  it { should have_many(:interventions) }
 end
