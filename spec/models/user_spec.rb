@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe User do
+describe User, type: :model do
   subject(:user) { build(:user) }
 
   it { should be_valid }

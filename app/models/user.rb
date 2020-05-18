@@ -6,6 +6,7 @@ class User < ApplicationRecord
          :recoverable,
          :registerable,
          :rememberable,
+         :timeoutable,
          :trackable,
          :validatable
 
@@ -24,6 +25,7 @@ class User < ApplicationRecord
   validates :email, uniqueness: true
 
   has_many :interventions, dependent: :restrict_with_exception
+  has_many :user_logs_requests, dependent: :restrict_with_exception
 
   def ability
     @ability ||= Ability.new(self)

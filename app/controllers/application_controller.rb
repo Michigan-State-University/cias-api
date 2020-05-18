@@ -3,6 +3,7 @@
 class ApplicationController < ActionController::API
   include DeviseTokenAuth::Concerns::SetUserByToken
   include ExceptionHandler
+  include AdjustedLogger
   before_action :authenticate_user!, unless: :devise_controller?, except: :status
 
   def current_ability
