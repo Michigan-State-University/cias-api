@@ -3,7 +3,8 @@
 FactoryBot.define do
   factory :user do
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
-    sequence(:password) { |s| Argon2::Password.create(s.to_s) }
+    sequence(:password) { |s| "pass_#{s}" }
+    sequence(:username) { |s| "user_#{s}" }
     provider { 'email' }
 
     transient do
@@ -15,7 +16,8 @@ FactoryBot.define do
     end
 
     trait :admin do
-      roles { %w[administrator] }
+      roles { %w[admin] }
+      sequence(:username) { |s| "admin_#{s}" }
     end
 
     trait :unconfirmed do

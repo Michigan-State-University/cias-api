@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AdjustedLoggerJob::UserRequests < AdjustedLoggerJob
+class LogJob::UserRequest < LogJob
   def perform(request)
     UserLogRequest.create!(request)
   end

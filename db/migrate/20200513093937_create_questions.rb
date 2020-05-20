@@ -13,7 +13,9 @@ class CreateQuestions < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
+    add_index :questions, :type
     add_index :questions, :title
+    add_index :questions, %i[type title], using: :gin
 
     add_foreign_key :questions, :interventions
   end

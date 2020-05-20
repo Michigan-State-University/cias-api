@@ -4,6 +4,7 @@ class CreateUserLogRequests < ActiveRecord::Migration[6.0]
   def change
     create_table :user_log_requests do |t|
       t.belongs_to :user
+      t.string :controller
       t.string :action
       t.jsonb :query_string
       t.jsonb :params

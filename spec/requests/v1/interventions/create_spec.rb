@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
       intervention: {
         type: 'Intervention::Single',
         name: 'research_assistant test1',
-        settings: {
+        body: {
           a: 1,
           b: 2
         }

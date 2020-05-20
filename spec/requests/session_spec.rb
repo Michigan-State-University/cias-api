@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Session', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:params) do
-    { email: user.email, password: user.password }
+    { username: user.username, password: user.password }
   end
 
   describe 'POST /auth/sign_in' do

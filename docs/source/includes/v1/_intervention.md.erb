@@ -67,7 +67,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 Parameter | Description | Required
 --------- | ----------- | --------
-id | Intervention ID | true
+id | Intervention ID | yes
 
 
 ### Query String
@@ -146,7 +146,7 @@ Parameter | Description | Required
 	"intervention": {
 		"type": "Intervention::Single",
 		"name": "Intervention example 1",
-		"settings": {
+		"body": {
 			"key1": 1,
 			"key2": 2
 		}
@@ -183,7 +183,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 	"intervention": {
 		"type": "Intervention::Single",
 		"name": "Intervention example 1",
-		"settings": {
+		"body": {
 			"key1": 1,
 			"key2": 2
 		}

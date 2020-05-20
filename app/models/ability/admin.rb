@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-class Ability::Administrator < Ability::Base
+class Ability::Admin < Ability::Base
   def definition
     super
-    administrator if role?(class_name)
+    admin if role?(class_name)
   end
 
   private
 
-  def administrator
+  def admin
     can :manage, :all
   end
 end

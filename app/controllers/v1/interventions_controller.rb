@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-class V1::InterventionsController < ApplicationController
+class V1::InterventionsController < V1Controller
   def index
-    render json: InterventionSerializer.new(interventions_scope).serialized_json
+    render json: serialized_response(interventions_scope)
   end
 
   def show
-    render json: InterventionSerializer.new(intervention_load).serialized_json
+    render json: serialized_response(intervention_load)
   end
 
   def create
     intervention = current_user.interventions.create!(intervention_params)
-    render json: intervention, status: :created
+    render json: serialized_response(intervention), status: :created
   end
 
   private
@@ -25,6 +25,6 @@ class V1::InterventionsController < ApplicationController
   end
 
   def intervention_params
-    params.require(:intervention).permit(:type, :name, settings: {})
+    params.require(:intervention).permit(:type, :name, body: {})
   end
 end

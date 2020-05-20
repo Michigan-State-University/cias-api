@@ -2,56 +2,56 @@
 
 FactoryBot.define do
   factory :question do
-    intervention
-    factory :question_analogue_scale do
+    association :intervention, factory: :intervention_single
+    factory :question_analogue_scale, class: 'Question::AnalogueScale' do
       title { 'Analogue Scale' }
       type { Question::AnalogueScale }
     end
-    factory :question_bar_graph do
+    factory :question_bar_graph, class: 'Question::BarGraph' do
       title { 'Bar Graph' }
       type { Question::BarGraph }
     end
-    factory :question_blank do
+    factory :question_blank, class: 'Question::Blank' do
       title { 'Blank' }
       type { Question::Blank }
     end
-    factory :question_feedback do
+    factory :question_feedback, class: 'Question::Feedback' do
       title { 'Feedback' }
       type { Question::Feedback }
     end
-    factory :question_follow_up_contact do
+    factory :question_follow_up_contact, class: 'Question::FollowUpContact' do
       title { 'Follow-up contact' }
       type { Question::FollowUpContact }
     end
-    factory :question_grid do
+    factory :question_grid, class: 'Question::Grid' do
       title { 'Grid' }
       type { Question::Grid }
     end
-    factory :question_multiple do
+    factory :question_multiple, class: 'Question::Multiple' do
       title { 'Multiple' }
       type { Question::Multiple }
     end
-    factory :question_name do
+    factory :question_name, class: 'Question::Name' do
       title { 'Name' }
       type { Question::Name }
     end
-    factory :question_number do
+    factory :question_number, class: 'Question::Number' do
       title { 'Number' }
       type { Question::Number }
     end
-    factory :question_single do
+    factory :question_single, class: 'Question::Single' do
       title { 'Single' }
       type { Question::Single }
     end
-    factory :question_text_box do
+    factory :question_text_box, class: 'Question::TextBox' do
       title { 'TextBox' }
       type { Question::TextBox }
     end
-    factory :question_url do
+    factory :question_url, class: 'Question::Url' do
       title { 'Url' }
       type { Question::Url }
     end
-    factory :question_video do
+    factory :question_video, class: 'Question::Video' do
       title { 'Video' }
       type { Question::Video }
     end

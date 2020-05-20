@@ -1,0 +1,206 @@
+# Answer
+
+
+## Get all answers
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/questions/:question_id/answers`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+question_id | Question ID | yes
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/answers
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Show answer
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/questions/:question_id/answers/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+question_id | Question ID | yes
+id | Answer ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/answers/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Create answer
+
+
+### Resource
+
+`<%= ENV['DOMAIN_NAME'] %>/v1/questions/:question_id/answers`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+question_id | Question ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"answer": {
+		"type": "Question::Single",
+		"body": {
+			"yes": "Yes",
+			"no": "No"
+		}
+	}
+}
+
+
+### Note
+Required keys:
+* `type`;
+* `body`.
+
+`type` key has to contains one of the following values:
+* `Answer::AnalogueScale`;
+* `Answer::BarGraph`;
+* `Answer::Blank`;
+* `Answer::Feedback`;
+* `Answer::FollowUpContact`;
+* `Answer::Grid`;
+* `Answer::Multiple`;
+* `Answer::Name`;
+* `Answer::Number`;
+* `Answer::Single`;
+* `Answer::TextBox`;
+* `Answer::Url`;
+* `Answer::Video`.
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/answers
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"answer": {
+		"type": "Question::Single",
+		"body": {
+			"yes": "Yes",
+			"no": "No"
+		}
+	}
+}
+```
+
+
+> HTTP response 200 OK

@@ -1,11 +1,18 @@
 # frozen_string_literal: true
 
+# rubocop:disable Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
 class Fake
   class << self
+    mattr_accessor :intervention_types
+    mattr_accessor :user_ids
+    mattr_accessor :intervention_ids
+    mattr_accessor :subclass_types
+
     def exploit
       create_users
       create_interventions
       create_questions
+      create_answers
     end
 
     private
@@ -15,6 +22,7 @@ class Fake
         u = User.new(
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,
+          username: role,
           email: "#{role}@#{ENV['DOMAIN_NAME']}",
           password: 'qwerty1234',
           roles: [role]
@@ -26,6 +34,7 @@ class Fake
       u = User.new(
         first_name: 'all',
         last_name: 'roles',
+        username: 'all',
         email: "all_roles@#{ENV['DOMAIN_NAME']}",
         password: 'qwerty1234',
         roles: User::APP_ROLES
@@ -35,39 +44,36 @@ class Fake
     end
 
     def intervention_types
-      %w[Single Multiple]
+      @@intervention_types ||= %w[Single Multiple]
     end
 
     def user_ids
-      User.ids
+      @@user_ids ||= User.ids
     end
 
     def create_interventions
-      intervention_types
       user_ids
       (20..40).to_a.sample.times do
         Intervention.create(
           type: "Intervention::#{intervention_types.sample}",
           user_id: user_ids.sample,
           name: Faker::Name.name,
-          settings: { key1: 'intervention_key1_test', key2: 'intervention_value2_test' }
+          body: { key1: 'intervention_key1_test', key2: 'intervention_value2_test' }
         )
       end
     end
 
     def intervention_ids
-      Intervention.ids
+      @@intervention_ids ||= Intervention.ids
     end
 
-    def question_types
-      %w[AnalogueScale BarGraph Blank Feedback FollowUpContact Grid Multiple Name Number Single TextBox Url Video]
+    def subclass_types
+      @@subclass_types ||= %w[AnalogueScale BarGraph Blank Feedback FollowUpContact Grid Multiple Name Number Single TextBox Url Video]
     end
 
     def create_questions
-      intervention_ids
-      question_types
       (60..80).to_a.sample.times do
-        sample_type = question_types.sample
+        sample_type = subclass_types.sample
         Question.create(
           previous_id: nil,
           intervention_id: intervention_ids.sample,
@@ -78,7 +84,21 @@ class Fake
         )
       end
     end
+
+    def create_answers
+      (100..140).to_a.sample.times do
+        question = Question.order('RANDOM()').first
+        body = question.body.keys.product(['']).to_h
+        Answer.create(
+          user_id: user_ids.sample,
+          question: question,
+          type: "Answer::#{question.subclass_name}",
+          body: body
+        )
+      end
+    end
   end
 end
+# rubocop:enable Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
 
 Fake.exploit

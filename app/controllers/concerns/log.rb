@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module AdjustedLogger
+module Log
   extend ActiveSupport::Concern
-  include UserRequests
+  include UserRequest
 end

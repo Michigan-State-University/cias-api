@@ -83,7 +83,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
         post v1_intervention_questions_path(intervention.id), params: params, headers: headers
       end
 
-      it 'success to hash' do
+      it 'success to Hash' do
         parsed_response = JSON.parse(response.body)
         expect(parsed_response.class).to be(Hash)
       end

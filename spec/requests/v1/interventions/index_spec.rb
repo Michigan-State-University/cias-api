@@ -67,7 +67,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         get v1_interventions_path, params: {}, headers: headers
       end
 
-      it 'success to hash' do
+      it 'success to Hash' do
         parsed_response = JSON.parse(response.body)
         expect(parsed_response.class).to be(Hash)
       end

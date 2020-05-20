@@ -14,16 +14,32 @@
 
 ActiveRecord::Schema.define(version: 20_200_525_105_341) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension 'btree_gin'
+  enable_extension 'btree_gist'
+  enable_extension 'fuzzystrmatch'
+  enable_extension 'pg_trgm'
   enable_extension 'plpgsql'
+
+  create_table 'answers', force: :cascade do |t|
+    t.string 'type'
+    t.bigint 'question_id', null: false
+    t.bigint 'user_id'
+    t.jsonb 'body'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['question_id'], name: 'index_answers_on_question_id'
+    t.index ['type'], name: 'index_answers_on_type'
+    t.index ['user_id'], name: 'index_answers_on_user_id'
+  end
 
   create_table 'interventions', force: :cascade do |t|
     t.string 'type', null: false
     t.bigint 'user_id', null: false
     t.string 'name', null: false
-    t.jsonb 'settings'
+    t.jsonb 'body'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
-    t.index %w[type name], name: 'index_interventions_on_type_and_name'
+    t.index %w[type name], name: 'index_interventions_on_type_and_name', using: :gin
     t.index ['type'], name: 'index_interventions_on_type'
     t.index ['user_id'], name: 'index_interventions_on_user_id'
   end
@@ -40,10 +56,13 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.index ['intervention_id'], name: 'index_questions_on_intervention_id'
     t.index ['previous_id'], name: 'index_questions_on_previous_id'
     t.index ['title'], name: 'index_questions_on_title'
+    t.index %w[type title], name: 'index_questions_on_type_and_title', using: :gin
+    t.index ['type'], name: 'index_questions_on_type'
   end
 
   create_table 'user_log_requests', force: :cascade do |t|
     t.bigint 'user_id'
+    t.string 'controller'
     t.string 'action'
     t.jsonb 'query_string'
     t.jsonb 'params'
@@ -58,8 +77,9 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.string 'provider', default: 'email', null: false
     t.string 'uid', default: '', null: false
     t.string 'first_name'
+    t.string 'middle_name'
     t.string 'last_name'
-    t.string 'login'
+    t.string 'username'
     t.string 'email'
     t.text 'roles', default: [], array: true
     t.jsonb 'tokens'
@@ -83,9 +103,14 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.index ['confirmation_token'], name: 'index_users_on_confirmation_token', unique: true
     t.index ['email'], name: 'index_users_on_email', unique: true
     t.index ['reset_password_token'], name: 'index_users_on_reset_password_token', unique: true
+    t.index ['roles'], name: 'index_users_on_roles', using: :gin
     t.index %w[uid provider], name: 'index_users_on_uid_and_provider', unique: true
+    t.index %w[uid roles], name: 'index_users_on_uid_and_roles', using: :gin
+    t.index ['uid'], name: 'index_users_on_uid', unique: true
+    t.index ['username'], name: 'index_users_on_username', unique: true
   end
 
+  add_foreign_key 'answers', 'questions'
   add_foreign_key 'interventions', 'users'
   add_foreign_key 'questions', 'interventions'
   add_foreign_key 'user_log_requests', 'users'
