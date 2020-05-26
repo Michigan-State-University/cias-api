@@ -18,35 +18,40 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
   enable_extension 'btree_gist'
   enable_extension 'fuzzystrmatch'
   enable_extension 'pg_trgm'
+  enable_extension 'pgcrypto'
   enable_extension 'plpgsql'
+  enable_extension 'uuid-ossp'
 
-  create_table 'answers', force: :cascade do |t|
+  create_table 'answers', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type'
-    t.bigint 'question_id', null: false
-    t.bigint 'user_id'
+    t.uuid 'question_id', null: false
+    t.uuid 'user_id'
     t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['question_id'], name: 'index_answers_on_question_id'
+    t.index %w[type question_id user_id], name: 'index_answers_on_type_and_question_id_and_user_id', using: :gin
     t.index ['type'], name: 'index_answers_on_type'
     t.index ['user_id'], name: 'index_answers_on_user_id'
   end
 
-  create_table 'interventions', force: :cascade do |t|
+  create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
-    t.bigint 'user_id', null: false
+    t.uuid 'user_id', null: false
     t.string 'name', null: false
     t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
+    t.index ['name'], name: 'index_interventions_on_name'
     t.index %w[type name], name: 'index_interventions_on_type_and_name', using: :gin
+    t.index %w[type user_id name], name: 'index_interventions_on_type_and_user_id_and_name', using: :gin
     t.index ['type'], name: 'index_interventions_on_type'
     t.index ['user_id'], name: 'index_interventions_on_user_id'
   end
 
-  create_table 'questions', force: :cascade do |t|
+  create_table 'questions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
-    t.bigint 'intervention_id', null: false
+    t.uuid 'intervention_id', null: false
     t.bigint 'previous_id'
     t.string 'title', null: false
     t.string 'subtitle'
@@ -57,12 +62,13 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.index ['intervention_id'], name: 'index_questions_on_intervention_id'
     t.index ['previous_id'], name: 'index_questions_on_previous_id'
     t.index ['title'], name: 'index_questions_on_title'
+    t.index %w[type intervention_id title], name: 'index_questions_on_type_and_intervention_id_and_title', using: :gin
     t.index %w[type title], name: 'index_questions_on_type_and_title', using: :gin
     t.index ['type'], name: 'index_questions_on_type'
   end
 
-  create_table 'user_log_requests', force: :cascade do |t|
-    t.bigint 'user_id'
+  create_table 'user_log_requests', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.uuid 'user_id'
     t.string 'controller'
     t.string 'action'
     t.jsonb 'query_string'
@@ -71,10 +77,9 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.inet 'remote_ip'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
-    t.index ['user_id'], name: 'index_user_log_requests_on_user_id'
   end
 
-  create_table 'users', force: :cascade do |t|
+  create_table 'users', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'provider', default: 'email', null: false
     t.string 'uid', default: '', null: false
     t.string 'first_name'

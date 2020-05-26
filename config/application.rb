@@ -40,6 +40,6 @@ module CiasApi
     config.api_only = true
 
     config.active_job.queue_adapter = :sidekiq
-    # config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
+    config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
   end
 end
