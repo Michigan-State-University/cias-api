@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+return if Rails.env.production?
+
 # rubocop:disable Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
 class Fake
   class << self
@@ -58,7 +60,12 @@ class Fake
           type: "Intervention::#{intervention_types.sample}",
           user_id: user_ids.sample,
           name: Faker::Name.name,
-          body: { key1: 'intervention_key1_test', key2: 'intervention_value2_test' }
+          body: { data: [
+            {
+              payload: 'question_key1_test',
+              variable: 'question_value2_test'
+            }
+          ] }
         )
       end
     end
@@ -80,7 +87,12 @@ class Fake
           title: sample_type,
           subtitle: Faker::Job.position,
           type: "Question::#{sample_type}",
-          body: { key1: 'question_key1_test', key2: 'question_value2_test' }
+          body: { data: [
+            {
+              payload: 'question_key1_test',
+              variable: 'question_value2_test'
+            }
+          ] }
         )
       end
     end
@@ -88,12 +100,16 @@ class Fake
     def create_answers
       (100..140).to_a.sample.times do
         question = Question.order('RANDOM()').first
-        body = question.body.keys.product(['']).to_h
         Answer.create(
           user_id: user_ids.sample,
           question: question,
           type: "Answer::#{question.subclass_name}",
-          body: body
+          body: { data: [
+            {
+              payload: 'question_key1_test',
+              variable: 'question_value2_test'
+            }
+          ] }
         )
       end
     end

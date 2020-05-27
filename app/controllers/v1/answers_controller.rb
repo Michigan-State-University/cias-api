@@ -25,6 +25,6 @@ class V1::AnswersController < V1Controller
   end
 
   def answer_params
-    params.require(:answer).permit(:type, :body)
+    params.require(:answer).permit(:type, body: {})
   end
 end

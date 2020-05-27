@@ -30,6 +30,10 @@ FactoryBot.define do
     factory :question_multiple, class: 'Question::Multiple' do
       title { 'Multiple' }
       type { Question::Multiple }
+      body { { data: [{ payload: 1, variable: 1 }, { payload: 2, variable: 2 }] } }
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
     end
     factory :question_name, class: 'Question::Name' do
       title { 'Name' }
@@ -42,10 +46,18 @@ FactoryBot.define do
     factory :question_single, class: 'Question::Single' do
       title { 'Single' }
       type { Question::Single }
+      body { { data: [{ payload: 1, variable: 1 }] } }
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
     end
     factory :question_text_box, class: 'Question::TextBox' do
       title { 'TextBox' }
       type { Question::TextBox }
+      body { { data: [{ payload: 1, variable: 1 }] } }
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
     end
     factory :question_url, class: 'Question::Url' do
       title { 'Url' }

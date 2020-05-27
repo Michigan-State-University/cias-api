@@ -6,7 +6,7 @@ class CreateInterventions < ActiveRecord::Migration[6.0]
       t.string :type, null: false
       t.belongs_to :user, null: false
       t.string :name, null: false
-      t.jsonb :body
+      t.jsonb :body, default: { data: [] }
 
       t.timestamps
     end

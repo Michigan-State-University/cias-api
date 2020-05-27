@@ -6,7 +6,7 @@ class CreateAnswers < ActiveRecord::Migration[6.0]
       t.string :type
       t.belongs_to :question, null: false
       t.belongs_to :user
-      t.jsonb :body
+      t.jsonb :body, default: { data: [] }
 
       t.timestamps
     end

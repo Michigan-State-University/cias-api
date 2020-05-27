@@ -50,6 +50,12 @@ RSpec.describe Question, type: :model do
 
     it { should belong_to(:intervention) }
     it { should be_valid }
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:question_multiple, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
   end
 
   describe 'Question::Name' do
@@ -67,17 +73,33 @@ RSpec.describe Question, type: :model do
   end
 
   describe 'Question::Single' do
-    subject(:question_single) { build(:question_single) }
+    describe 'expected behaviour' do
+      subject(:question_single) { build(:question_single) }
 
-    it { should belong_to(:intervention) }
-    it { should be_valid }
+      it { should belong_to(:intervention) }
+      it { should be_valid }
+    end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:question_single, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
   end
 
   describe 'Question::TextBox' do
-    subject(:question_text_box) { build(:question_text_box) }
+    describe 'expected behaviour' do
+      subject(:question_text_box) { build(:question_text_box) }
 
-    it { should belong_to(:intervention) }
-    it { should be_valid }
+      it { should belong_to(:intervention) }
+      it { should be_valid }
+    end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:question_text_box, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
   end
 
   describe 'Question::Url' do

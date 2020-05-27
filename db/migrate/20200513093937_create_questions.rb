@@ -8,7 +8,8 @@ class CreateQuestions < ActiveRecord::Migration[6.0]
       t.references :previous
       t.string :title, null: false
       t.string :subtitle
-      t.jsonb :body
+      t.string :video
+      t.jsonb :body, default: { data: [] }
 
       t.timestamps
     end

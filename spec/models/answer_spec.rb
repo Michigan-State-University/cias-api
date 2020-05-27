@@ -113,6 +113,12 @@ RSpec.describe Answer, type: :model do
 
       it { expect(wrong_type.save).to eq false }
     end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:answer_multiple, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
   end
 
   describe 'Answer::Name' do
@@ -161,6 +167,12 @@ RSpec.describe Answer, type: :model do
 
       it { expect(wrong_type.save).to eq false }
     end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:answer_single, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
   end
 
   describe 'Answer::TextBox' do
@@ -176,6 +188,12 @@ RSpec.describe Answer, type: :model do
       let(:wrong_type) { build(:answer_text_box, :wrong_type) }
 
       it { expect(wrong_type.save).to eq false }
+    end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:answer_text_box, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
     end
   end
 

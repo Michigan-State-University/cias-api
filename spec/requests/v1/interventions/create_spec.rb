@@ -13,8 +13,12 @@ RSpec.describe 'POST /v1/interventions', type: :request do
         type: 'Intervention::Single',
         name: 'research_assistant test1',
         body: {
-          a: 1,
-          b: 2
+          data: [
+            {
+              payload: 1,
+              variable: '1'
+            }
+          ]
         }
       }
     }

@@ -11,14 +11,21 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
   let(:params) do
     {
       question: {
-        type: 'Question::TextBox',
+        type: 'Question::Multiple',
         previous_id: nil,
         title: 'Question Test 1',
         subtitle: 'test 1',
         body: {
-          a: 1,
-          b: '2',
-          c: true
+          data: [
+            {
+              payload: 'create1',
+              variable: 'create1'
+            },
+            {
+              payload: 'create2',
+              variable: 'create2'
+            }
+          ]
         }
       }
     }

@@ -45,11 +45,15 @@ FactoryBot.define do
         association :question, factory: :question_video
       end
     end
-    factory :answer_multiple do
+    factory :answer_multiple, class: 'Answer::Multiple' do
       type { Answer::Multiple }
+      body { { data: [{ payload: 1, variable: 1 }, { payload: 2, variable: 2 }] } }
       association :question, factory: :question_multiple
       trait :wrong_type do
         association :question, factory: :question_video
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
       end
     end
     factory :answer_name do
@@ -66,18 +70,26 @@ FactoryBot.define do
         association :question, factory: :question_video
       end
     end
-    factory :answer_single do
+    factory :answer_single, class: 'Answer::Single' do
       type { Answer::Single }
+      body { { data: [{ payload: 1, variable: 1 }] } }
       association :question, factory: :question_single
       trait :wrong_type do
         association :question, factory: :question_video
       end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
     end
-    factory :answer_text_box do
+    factory :answer_text_box, class: 'Answer::TextBox' do
       type { Answer::TextBox }
+      body { { data: [{ payload: 1, variable: 1 }] } }
       association :question, factory: :question_text_box
       trait :wrong_type do
         association :question, factory: :question_video
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
       end
     end
     factory :answer_url do

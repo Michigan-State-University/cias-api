@@ -40,3 +40,6 @@ reserved_words:
   - when
   - while
   - yield
+permitted_elements:
+- payload
+- variable

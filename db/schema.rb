@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.string 'type'
     t.bigint 'question_id', null: false
     t.bigint 'user_id'
-    t.jsonb 'body'
+    t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['question_id'], name: 'index_answers_on_question_id'
@@ -36,7 +36,7 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.string 'type', null: false
     t.bigint 'user_id', null: false
     t.string 'name', null: false
-    t.jsonb 'body'
+    t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index %w[type name], name: 'index_interventions_on_type_and_name', using: :gin
@@ -50,7 +50,8 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
     t.bigint 'previous_id'
     t.string 'title', null: false
     t.string 'subtitle'
-    t.jsonb 'body'
+    t.string 'video'
+    t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['intervention_id'], name: 'index_questions_on_intervention_id'

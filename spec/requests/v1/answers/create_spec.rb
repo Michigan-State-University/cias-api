@@ -14,9 +14,12 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       answer: {
         type: 'Answer::TextBox',
         body: {
-          a: 1,
-          b: '2',
-          c: true
+          data: [
+            {
+              payload: 1,
+              variable: '1'
+            }
+          ]
         }
       }
     }
@@ -28,9 +31,12 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
         type: 'Answer::TextBox',
         user_id: user.id,
         body: {
-          a: 1,
-          b: '2',
-          c: true
+          data: [
+            {
+              payload: 1,
+              variable: '1'
+            }
+          ]
         }
       }
     }

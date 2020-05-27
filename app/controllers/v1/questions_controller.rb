@@ -22,7 +22,7 @@ class V1::QuestionsController < V1Controller
   private
 
   def questions_scope
-    Question.includes(:intervention).accessible_by(current_ability).where(intervention_id: params[:intervention_id])
+    Question.accessible_by(current_ability).where(intervention_id: params[:intervention_id])
   end
 
   def question_load
@@ -30,6 +30,6 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :previous_id, :title, :subtitle, body: {})
+    params.require(:question).permit(:type, :previous_id, :title, :subtitle, :video, :image, body: {})
   end
 end

@@ -1,5 +1,6 @@
 ## cias-api
 
+
 ## METADATA
 * Project name: CIAS 3.0 (Computerized Intervention Authoring System);
 * Owner: [Wayne State University](https://wayne.edu/);
@@ -8,11 +9,23 @@
   * Technical details described in: `docs/README.md`.
 * License: It is a property of [Wayne State University](https://wayne.edu/). All rights reserved.
 
+
 ## DECISIONS
 
 #### CORE LOGIC
 
-* placeholder
+1. Intervention is the core object. It acts as metadata in the process of harvesting data;
+1. Questions are data for intervention. Therefore intervention has got many questions;
+1. The particular question contains a static fields and one dynamic data field;
+1. For every question, we create many answers which carry the same type and logic as question for which they are belonged to.
+
+
+#### PATTERNS
+
+1. To store dynamic data in Question and Answer, we are using JSON data-interchange format ([RFC 7158](https://tools.ietf.org/html/rfc7158), [RFC 7159](https://tools.ietf.org/html/rfc7159), [RFC 8259](https://tools.ietf.org/html/rfc8259));
+1. We inject identical pattern: `{ data: [] }` to `body` attribute;
+1. Key `data` contains a collection of JSON objects.
+
 
 ## TECHNICAL STACK
 

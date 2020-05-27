@@ -17,9 +17,12 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
         title: 'Question Test 1',
         subtitle: 'test 1',
         body: {
-          a: 1,
-          b: '2',
-          c: true
+          data: [
+            {
+              payload: 'update1',
+              variable: 'update1'
+            }
+          ]
         }
       }
     }
