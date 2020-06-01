@@ -35,22 +35,6 @@ RSpec.describe Answer, type: :model do
     end
   end
 
-  describe 'Answer::Blank' do
-    describe 'expected behaviour' do
-      subject { create(:answer_blank) }
-
-      it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
-      it { should be_valid }
-    end
-
-    describe 'mismatch type question and answer' do
-      let(:wrong_type) { build(:answer_blank, :wrong_type) }
-
-      it { expect(wrong_type.save).to eq false }
-    end
-  end
-
   describe 'Answer::Feedback' do
     describe 'expected behaviour' do
       subject { create(:answer_feedback) }
@@ -99,6 +83,22 @@ RSpec.describe Answer, type: :model do
     end
   end
 
+  describe 'Answer::Information' do
+    describe 'expected behaviour' do
+      subject { create(:answer_information) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_information, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
+
   describe 'Answer::Multiple' do
     describe 'expected behaviour' do
       subject { create(:answer_multiple) }
@@ -118,22 +118,6 @@ RSpec.describe Answer, type: :model do
       let(:with_empty) { build(:answer_multiple, :body_data_empty) }
 
       it { expect(with_empty.save).to eq false }
-    end
-  end
-
-  describe 'Answer::Name' do
-    describe 'expected behaviour' do
-      subject { create(:answer_name) }
-
-      it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
-      it { should be_valid }
-    end
-
-    describe 'mismatch type question and answer' do
-      let(:wrong_type) { build(:answer_name, :wrong_type) }
-
-      it { expect(wrong_type.save).to eq false }
     end
   end
 
@@ -208,22 +192,6 @@ RSpec.describe Answer, type: :model do
 
     describe 'mismatch type question and answer' do
       let(:wrong_type) { build(:answer_url, :wrong_type) }
-
-      it { expect(wrong_type.save).to eq false }
-    end
-  end
-
-  describe 'Answer::Video' do
-    describe 'expected behaviour' do
-      subject { create(:answer_video) }
-
-      it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
-      it { should be_valid }
-    end
-
-    describe 'mismatch type question and answer' do
-      let(:wrong_type) { build(:answer_video, :wrong_type) }
 
       it { expect(wrong_type.save).to eq false }
     end

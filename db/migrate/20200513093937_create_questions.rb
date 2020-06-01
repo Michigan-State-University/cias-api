@@ -5,10 +5,11 @@ class CreateQuestions < ActiveRecord::Migration[6.0]
     create_table :questions, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
       t.string :type, null: false
       t.uuid :intervention_id, null: false
-      t.references :previous
+      t.integer :order
       t.string :title, null: false
       t.string :subtitle
       t.string :video
+      t.string :formula
       t.jsonb :body, default: { data: [] }
 
       t.timestamps

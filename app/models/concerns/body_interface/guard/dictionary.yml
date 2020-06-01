@@ -41,5 +41,5 @@ reserved_words:
   - while
   - yield
 permitted_elements:
-- payload
-- variable
+  - payload
+  - variable

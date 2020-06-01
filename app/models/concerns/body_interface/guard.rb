@@ -11,10 +11,6 @@ module BodyInterface::Guard
 
   private
 
-  def body_data
-    body['data']
-  end
-
   def data_elements
     body_data&.each { |hash| yield(hash) }
   end
@@ -54,6 +50,6 @@ module BodyInterface::Guard
   end
 
   def dismiss_empty_elements
-    body_data&.delete_if { |hash| hash.empty? }
+    body_data&.delete_if(&:empty?)
   end
 end

@@ -52,15 +52,15 @@ ActiveRecord::Schema.define(version: 20_200_525_105_341) do
   create_table 'questions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
     t.uuid 'intervention_id', null: false
-    t.bigint 'previous_id'
+    t.integer 'order'
     t.string 'title', null: false
     t.string 'subtitle'
     t.string 'video'
+    t.string 'formula'
     t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['intervention_id'], name: 'index_questions_on_intervention_id'
-    t.index ['previous_id'], name: 'index_questions_on_previous_id'
     t.index ['title'], name: 'index_questions_on_title'
     t.index %w[type intervention_id title], name: 'index_questions_on_type_and_intervention_id_and_title', using: :gin
     t.index %w[type title], name: 'index_questions_on_type_and_title', using: :gin

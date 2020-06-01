@@ -16,6 +16,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           data: [
             {
               payload: 1,
+              target: '',
               variable: '1'
             }
           ]

@@ -2,7 +2,7 @@
 
 return if Rails.env.production?
 
-# rubocop:disable Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
+# rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
 class Fake
   class << self
     mattr_accessor :intervention_types
@@ -63,6 +63,7 @@ class Fake
           body: { data: [
             {
               payload: 'question_key1_test',
+              target: '',
               variable: 'question_value2_test'
             }
           ] }
@@ -75,22 +76,26 @@ class Fake
     end
 
     def subclass_types
-      @@subclass_types ||= %w[AnalogueScale BarGraph Blank Feedback FollowUpContact Grid Multiple Name Number Single TextBox Url Video]
+      @@subclass_types ||= begin
+        subklasses = Dir.entries(Rails.root.join('app/models/question/')) - %w[. ..]
+        subklasses.each { |file| file.gsub!(/\.rb/, '') }.map(&:classify)
+      end
     end
 
     def create_questions
       (60..80).to_a.sample.times do
         sample_type = subclass_types.sample
         Question.create(
-          previous_id: nil,
           intervention_id: intervention_ids.sample,
+          order: nil,
           title: sample_type,
           subtitle: Faker::Job.position,
           type: "Question::#{sample_type}",
           body: { data: [
             {
-              payload: 'question_key1_test',
-              variable: 'question_value2_test'
+              payload: 'question data',
+              target: 'point to another question',
+              variable: 'var for payload'
             }
           ] }
         )
@@ -106,8 +111,9 @@ class Fake
           type: "Answer::#{question.subclass_name}",
           body: { data: [
             {
-              payload: 'question_key1_test',
-              variable: 'question_value2_test'
+              payload: 'answer data',
+              target: 'shadow copy of answer',
+              variable: 'shadow copy of question'
             }
           ] }
         )
@@ -115,6 +121,6 @@ class Fake
     end
   end
 end
-# rubocop:enable Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
+# rubocop:enable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
 
 Fake.exploit

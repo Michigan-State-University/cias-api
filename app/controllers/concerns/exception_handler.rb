@@ -23,6 +23,10 @@ module ExceptionHandler
     rescue_from CanCan::AccessDenied do |exc|
       render json: msg(exc), status: :forbidden
     end
+
+    rescue_from Dentaku::Error do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
   end
 
   private

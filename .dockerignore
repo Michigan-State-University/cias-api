@@ -4,9 +4,13 @@
 .env*
 .git
 .idea
-.idea_modules/
+.rspec
 .vscode/*
 /public/assets
 /public/system
+docker-compose.yml
+Dockerfile
 log/*
+node_modules/
+spec/
 tmp/

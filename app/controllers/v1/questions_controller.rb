@@ -30,6 +30,6 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :previous_id, :title, :subtitle, :video, :image, body: {})
+    params.require(:question).permit(:type, :order, :title, :subtitle, :video, :image, :formula, body: {})
   end
 end

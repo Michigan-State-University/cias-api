@@ -147,10 +147,12 @@ Parameter | Description | Required
 {
 	"answer": {
 		"type": "Question::Single",
-		"body": {
-			"yes": "Yes",
-			"no": "No"
-		}
+		"body": [
+		  {
+		    "payload": "yes",
+		    "var": "1"
+		  }
+		]
 	}
 }
 
@@ -192,10 +194,12 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 {
 	"answer": {
 		"type": "Question::Single",
-		"body": {
-			"yes": "Yes",
-			"no": "No"
-		}
+		"body": [
+		  {
+		    "payload": "yes",
+		    "var": "1"
+		  }
+		]
 	}
 }
 ```

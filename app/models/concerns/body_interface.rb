@@ -8,4 +8,8 @@ module BodyInterface
   included do
     before_save :guard_protection
   end
+
+  def body_data
+    body['data']
+  end
 end

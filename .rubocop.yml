@@ -34,6 +34,9 @@ Lint/AmbiguousBlockAssociation:
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
 
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+
 Lint/RaiseException:
   Enabled: true
 
@@ -65,6 +68,12 @@ Style/HashTransformKeys:
   Enabled: true
 
 Style/HashTransformValues:
+  Enabled: true
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+
+Style/RedundantRegexpEscape:
   Enabled: true
 
 Style/SlicingWithRange:

@@ -11,10 +11,6 @@ FactoryBot.define do
       title { 'Bar Graph' }
       type { Question::BarGraph }
     end
-    factory :question_blank, class: 'Question::Blank' do
-      title { 'Blank' }
-      type { Question::Blank }
-    end
     factory :question_feedback, class: 'Question::Feedback' do
       title { 'Feedback' }
       type { Question::Feedback }
@@ -27,6 +23,10 @@ FactoryBot.define do
       title { 'Grid' }
       type { Question::Grid }
     end
+    factory :question_information, class: 'Question::Information' do
+      title { 'Information' }
+      type { Question::Information }
+    end
     factory :question_multiple, class: 'Question::Multiple' do
       title { 'Multiple' }
       type { Question::Multiple }
@@ -34,10 +34,6 @@ FactoryBot.define do
       trait :body_data_empty do
         body { { data: [] } }
       end
-    end
-    factory :question_name, class: 'Question::Name' do
-      title { 'Name' }
-      type { Question::Name }
     end
     factory :question_number, class: 'Question::Number' do
       title { 'Number' }
@@ -62,10 +58,6 @@ FactoryBot.define do
     factory :question_url, class: 'Question::Url' do
       title { 'Url' }
       type { Question::Url }
-    end
-    factory :question_video, class: 'Question::Video' do
-      title { 'Video' }
-      type { Question::Video }
     end
   end
 end

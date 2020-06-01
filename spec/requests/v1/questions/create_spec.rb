@@ -12,17 +12,19 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
     {
       question: {
         type: 'Question::Multiple',
-        previous_id: nil,
+        order: nil,
         title: 'Question Test 1',
         subtitle: 'test 1',
         body: {
           data: [
             {
               payload: 'create1',
+              target: '',
               variable: 'create1'
             },
             {
               payload: 'create2',
+              target: '',
               variable: 'create2'
             }
           ]

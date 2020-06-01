@@ -13,13 +13,14 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     {
       question: {
         type: question.type,
-        previous_id: nil,
+        order: nil,
         title: 'Question Test 1',
         subtitle: 'test 1',
         body: {
           data: [
             {
               payload: 'update1',
+              target: '',
               variable: 'update1'
             }
           ]

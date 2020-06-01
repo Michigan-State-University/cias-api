@@ -17,13 +17,6 @@ RSpec.describe Question, type: :model do
     it { should be_valid }
   end
 
-  describe 'Question::Blank' do
-    subject(:question_blank) { build(:question_blank) }
-
-    it { should belong_to(:intervention) }
-    it { should be_valid }
-  end
-
   describe 'Question::Feedback' do
     subject(:question_feedback) { build(:question_feedback) }
 
@@ -45,6 +38,13 @@ RSpec.describe Question, type: :model do
     it { should be_valid }
   end
 
+  describe 'Question::Information' do
+    subject(:question_information) { build(:question_information) }
+
+    it { should belong_to(:intervention) }
+    it { should be_valid }
+  end
+
   describe 'Question::Multiple' do
     subject(:question_multiple) { build(:question_multiple) }
 
@@ -56,13 +56,6 @@ RSpec.describe Question, type: :model do
 
       it { expect(with_empty.save).to eq false }
     end
-  end
-
-  describe 'Question::Name' do
-    subject(:question_name) { build(:question_name) }
-
-    it { should belong_to(:intervention) }
-    it { should be_valid }
   end
 
   describe 'Question::Number' do
@@ -104,13 +97,6 @@ RSpec.describe Question, type: :model do
 
   describe 'Question::Url' do
     subject(:question_url) { build(:question_url) }
-
-    it { should belong_to(:intervention) }
-    it { should be_valid }
-  end
-
-  describe 'Question::Video' do
-    subject(:question_video) { build(:question_video) }
 
     it { should belong_to(:intervention) }
     it { should be_valid }
