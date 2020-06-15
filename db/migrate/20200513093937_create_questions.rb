@@ -8,8 +8,8 @@ class CreateQuestions < ActiveRecord::Migration[6.0]
       t.integer :order
       t.string :title, null: false
       t.string :subtitle
-      t.string :video
-      t.string :formula
+      t.string :video_url
+      t.jsonb :formula, default: { payload: '', patterns: [] }
       t.jsonb :body, default: { data: [] }
 
       t.timestamps

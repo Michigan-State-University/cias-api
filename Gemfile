@@ -8,11 +8,13 @@ gem 'rails', '~> 6.0'
 gem 'pg', '~> 1.2'
 gem 'puma'
 
+gem 'activerecord_json_validator'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
 gem 'connection_pool'
 gem 'dentaku'
 gem 'devise-argon2'
+gem 'devise-pwned_password'
 gem 'devise_token_auth'
 gem 'fast_jsonapi'
 gem 'hiredis'

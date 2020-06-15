@@ -3,8 +3,8 @@
 module FormulaInterface
   extend ActiveSupport::Concern
 
-  def formula_processing
-    parser_runtime.evaluate!(formula_payload)
+  def formula_exploit
+    parser_runtime.evaluate!(formula['payload'], collected_variables)
   end
 
   private
@@ -13,6 +13,7 @@ module FormulaInterface
     @parser_runtime ||= Dentaku::Calculator.new
   end
 
-  # harvest variables and values
-  def formula_payload; end
+  def collected_variables
+    Variables.new(self).collect
+  end
 end

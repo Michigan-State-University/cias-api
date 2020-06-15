@@ -28,24 +28,24 @@ module BodyInterface::Guard
   end
 
   def prevent_flood_against_body
-    body&.keep_if { |k| k.eql?('data') }
+    body&.keep_if { |key| key.eql?('data') }
   end
 
   def prevent_flood_against_element
     data_elements do |hash|
-      hash.keep_if { |k| permitted_elements.include?(k) }
+      hash.keep_if { |key| permitted_elements.include?(key) }
     end
   end
 
   def prevent_name_error_exception
     data_elements do |hash|
-      hash.transform_keys! { |k| k.downcase.parameterize.underscore }
+      hash.transform_keys! { |key| key.downcase.parameterize.underscore }
     end
   end
 
   def prevent_instance_exploit
     data_elements do |hash|
-      hash.reject! { |k| reserved_words.include?(k) }
+      hash.reject! { |key| reserved_words.include?(key) }
     end
   end
 

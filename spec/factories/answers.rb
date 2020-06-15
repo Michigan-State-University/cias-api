@@ -3,6 +3,17 @@
 FactoryBot.define do
   factory :answer do
     user
+    body do
+      { data: [
+        {
+          payload: '',
+          variable: {
+            name: 'test',
+            value: '1'
+          }
+        }
+      ] }
+    end
     factory :answer_analogue_scale do
       type { Answer::AnalogueScale }
       association :question, factory: :question_analogue_scale
@@ -40,7 +51,6 @@ FactoryBot.define do
     end
     factory :answer_multiple, class: 'Answer::Multiple' do
       type { Answer::Multiple }
-      body { { data: [{ payload: 1, variable: 1 }, { payload: 2, variable: 2 }] } }
       association :question, factory: :question_multiple
       trait :wrong_type do
         association :question, factory: :question_grid
@@ -65,7 +75,6 @@ FactoryBot.define do
     end
     factory :answer_single, class: 'Answer::Single' do
       type { Answer::Single }
-      body { { data: [{ payload: 1, variable: 1 }] } }
       association :question, factory: :question_single
       trait :wrong_type do
         association :question, factory: :question_multiple
@@ -76,7 +85,6 @@ FactoryBot.define do
     end
     factory :answer_text_box, class: 'Answer::TextBox' do
       type { Answer::TextBox }
-      body { { data: [{ payload: 1, variable: 1 }] } }
       association :question, factory: :question_text_box
       trait :wrong_type do
         association :question, factory: :question_multiple

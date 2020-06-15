@@ -20,8 +20,10 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           data: [
             {
               payload: 'update1',
-              target: '',
-              variable: 'update1'
+              variable: {
+                name: 'test1',
+                value: '1'
+              }
             }
           ]
         }

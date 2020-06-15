@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :user do
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
-    sequence(:password) { |s| "pass_#{s}" }
+    sequence(:password) { |s| "GcAbAijoW_#{s}" }
     sequence(:username) { |s| "user_#{s}" }
     provider { 'email' }
 

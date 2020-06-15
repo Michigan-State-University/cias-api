@@ -15,17 +15,34 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
         order: nil,
         title: 'Question Test 1',
         subtitle: 'test 1',
+        formula: {
+          payload: 'test',
+          patterns: [
+            {
+              match: '= 5',
+              target: '1'
+            },
+            {
+              match: '> 5',
+              target: '7'
+            }
+          ]
+        },
         body: {
           data: [
             {
               payload: 'create1',
-              target: '',
-              variable: 'create1'
+              variable: {
+                name: 'test1',
+                value: '1'
+              }
             },
             {
               payload: 'create2',
-              target: '',
-              variable: 'create2'
+              variable: {
+                name: 'test2',
+                value: '2'
+              }
             }
           ]
         }
