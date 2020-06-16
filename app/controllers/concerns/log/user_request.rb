@@ -14,8 +14,7 @@ module Log::UserRequest
   private
 
   def request_scope
-    params[:user]&.delete(:password)
-    params[:user]&.delete(:password_confirmation)
+    erase_from_params
     {
       user_id: current_user.id,
       controller: params[:controller].to_s,
@@ -25,5 +24,11 @@ module Log::UserRequest
       user_agent: request.headers['HTTP_USER_AGENT'],
       remote_ip: request.remote_ip
     }
+  end
+
+  def erase_from_params
+    params[:user]&.delete(:password)
+    params[:user]&.delete(:password_confirmation)
+    params[:image]&.delete(:file)
   end
 end

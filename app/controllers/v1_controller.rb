@@ -12,8 +12,8 @@ class V1Controller < ApplicationController
     @current_ability ||= current_user.ability
   end
 
-  def serialized_response(collection)
-    "V1::#{controller_name.classify}Serializer".safe_constantize.
+  def serialized_response(collection, from_model = controller_name.classify)
+    "V1::#{from_model}Serializer".safe_constantize.
       new(collection).serialized_json
   end
 end

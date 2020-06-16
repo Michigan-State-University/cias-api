@@ -5,7 +5,7 @@
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:intervention_id/questions`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions`
 
 
 ### URL parameters
@@ -40,7 +40,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['DOMAIN_NAME'] %>/v1/interventions/1/questions
+GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions
 ```
 
 ```http
@@ -60,7 +60,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:intervention_id/questions/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id`
 
 
 ### URL parameters
@@ -116,7 +116,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:intervention_id/questions`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions`
 
 
 ### URL parameters
@@ -185,7 +185,7 @@ Required keys:
 > HTTP example request
 
 ```http
-POST <%= ENV['DOMAIN_NAME'] %>/v1/interventions/1/questions
+POST <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions
 ```
 
 ```http
@@ -229,7 +229,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/interventions/:intervention_id/questions/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id`
 
 
 ### URL parameters
@@ -294,7 +294,7 @@ Required keys:
 > HTTP example request
 
 ```http
-PATCH <%= ENV['DOMAIN_NAME'] %>/v1/interventions/1/questions/1
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions/1
 ```
 
 ```http

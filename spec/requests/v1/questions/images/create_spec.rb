@@ -1,0 +1,82 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
+  let(:user) { create(:user, :confirmed, :admin) }
+  let(:question) { create(:question_single) }
+  let(:headers) do
+    user.create_new_auth_token.
+      merge({ 'Content-Type' => 'multipart/form-data; boundary=something' })
+  end
+  let(:params) do
+    {
+      image: {
+        file: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+      }
+    }
+  end
+
+  context 'when endpoint is available' do
+    before { post v1_images_path(question.id) }
+
+    it { expect(response).to have_http_status(:unauthorized) }
+  end
+
+  context 'when auth' do
+    context 'is without credentials' do
+      before do
+        post v1_images_path(question.id)
+      end
+
+      it { expect(response).to have_http_status(:unauthorized) }
+
+      it 'response is without user token' do
+        expect(response.headers['access-token']).to be_nil
+      end
+    end
+
+    context 'is with invalid credentials' do
+      before do
+        headers.delete('access-token')
+        post v1_images_path(question.id), params: params, headers: headers
+      end
+
+      it { expect(response).to have_http_status(:unauthorized) }
+
+      it 'response is without user token' do
+        expect(response.headers['access-token']).to be_nil
+      end
+    end
+
+    context 'is valid' do
+      before do
+        post v1_images_path(question.id), params: params, headers: headers
+      end
+
+      it { expect(response).to have_http_status(:success) }
+
+      it 'and response contains user token' do
+        expect(response.headers['access-token']).not_to be_nil
+      end
+    end
+  end
+
+  context 'when response' do
+    context 'is appropriate Content-Type' do
+      before do
+        post v1_images_path(question.id), params: params, headers: headers
+      end
+
+      it { expect(response.headers['Content-Type']).to eq('text/html') }
+    end
+
+    context 'is success' do
+      before do
+        post v1_images_path(question.id), params: params, headers: headers
+      end
+
+      it { expect(response).to have_http_status(:created) }
+    end
+  end
+end

@@ -1,0 +1,129 @@
+# Image for Question
+
+## Create image for question
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/questions/:question_id/images`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+question_id | Question ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+Key | Value
+--------- | -----------
+Content-Type | multipart/form-data; boundary=something
+access-token | xxxyyyzzz
+token-type | Bearer
+client | xxxyyyzzz
+uid | email
+
+
+### HTTP body
+
+1. Provide file for multipart form;
+1. Attach file to field name: `image[file]`.
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/images
+```
+
+```http
+Content-Type: multipart/form-data; boundary=something
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```
+| (60.7 KB hidden)
+| (60.7 KB hidden)
+| (60.7 KB hidden)
+| (60.7 KB hidden)
+| (60.9 KB hidden)
+| (60.9 KB hidden)
+| (60.9 KB hidden)
+| (60.9 KB hidden)
+| (18.5 KB hidden)
+```
+
+> HTTP response 201 Created
+
+
+## Destroy image for question
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/questions/:question_id/images`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+question_id | Question ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/questions/1/images
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+> HTTP response 200 OK

@@ -6,7 +6,7 @@
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/questions/:question_id/answers`
+`<%= ENV['APP_HOSTNAME'] %>/v1/questions/:question_id/answers`
 
 
 ### URL parameters
@@ -40,7 +40,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/answers
+GET <%= ENV['APP_HOSTNAME'] %>/v1/questions/1/answers
 ```
 
 ```http
@@ -60,7 +60,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/questions/:question_id/answers/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/questions/:question_id/answers/:id`
 
 
 ### URL parameters
@@ -96,7 +96,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/answers/1
+GET <%= ENV['APP_HOSTNAME'] %>/v1/questions/1/answers/1
 ```
 
 ```http
@@ -116,7 +116,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['DOMAIN_NAME'] %>/v1/questions/:question_id/answers`
+`<%= ENV['APP_HOSTNAME'] %>/v1/questions/:question_id/answers`
 
 
 ### URL parameters
@@ -179,7 +179,7 @@ Required keys:
 > HTTP example request
 
 ```http
-POST <%= ENV['DOMAIN_NAME'] %>/v1/questions/1/answers
+POST <%= ENV['APP_HOSTNAME'] %>/v1/questions/1/answers
 ```
 
 ```http

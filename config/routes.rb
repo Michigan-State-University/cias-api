@@ -9,6 +9,9 @@ Rails.application.routes.draw do
     end
     scope 'questions/:question_id' do
       resources :answers, only: %i[index show create]
+      scope module: 'questions' do
+        resource :images, only: %i[create destroy]
+      end
     end
   end
 end
