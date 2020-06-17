@@ -25,6 +25,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:type, :name, body: {})
+    params.require(:intervention).permit(:type, :name, settings: {}, body: {})
   end
 end

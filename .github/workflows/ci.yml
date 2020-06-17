@@ -1,0 +1,54 @@
+name: CI
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ruby:2.7.1
+    services:
+      database:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: 7AU0lHRd5OglmKO
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      cache:
+        image: redis:6.0.5
+        ports: ['6379:6379']
+        options: --entrypoint redis-server
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7.1
+        env:
+          RUBYOPT: --jit
+      - run: cp .env.template .env
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Build
+        env:
+          BUNDLER_VERSION: 2.1.4
+          DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@database:5432/cias_test
+          GIT_AUTHOR_EMAIL: ci@ci.ci
+          RAILS_ENV: test
+          REDIS_URL: redis://localhost:6379/0
+        run: |
+          apt-get -yqq install libpq-dev
+          gem install bundler -v "2.1.4"
+          bundle config set path 'vendor/bundle'
+          bundle install
+          bundle exec rails db:create db:schema:load --trace
+      - name: Execute tests
+        run: bundle exec rspec

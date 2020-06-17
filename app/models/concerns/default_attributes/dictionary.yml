@@ -1,0 +1,4 @@
+question:
+  settings:
+    image: false
+    video: false

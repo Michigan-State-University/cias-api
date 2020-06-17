@@ -15,14 +15,14 @@ class V1::QuestionsController < V1Controller
   end
 
   def update
-    question_load.update(question_params)
+    question_load.update!(question_params.except(:type))
     render json: serialized_response(question_load)
   end
 
   private
 
   def questions_scope
-    Question.accessible_by(current_ability).where(intervention_id: params[:intervention_id])
+    Question.includes(image_attachment: :blob).accessible_by(current_ability).where(intervention_id: params[:intervention_id])
   end
 
   def question_load
@@ -30,6 +30,6 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :order, :title, :subtitle, :video_url, formula: {}, body: {})
+    params.require(:question).permit(:type, :order, :title, :subtitle, :video_url, settings: {}, formula: {}, body: {})
   end
 end

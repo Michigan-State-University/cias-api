@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class V1::InterventionSerializer < V1Serializer
-  attributes :type, :name, :body
+  attributes :type, :settings, :name, :body
 end

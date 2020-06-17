@@ -14,7 +14,7 @@ class Ability
 
   def inject_authorization
     User::APP_ROLES.each do |role|
-      "Ability::#{role.classify}".
+      "::Ability::#{role.classify}".
         safe_constantize.new(self).definition
     end
   end

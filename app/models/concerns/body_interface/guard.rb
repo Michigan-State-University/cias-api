@@ -15,16 +15,16 @@ module BodyInterface::Guard
     body_data&.each { |hash| yield(hash) }
   end
 
-  def dictionary
-    @dictionary ||= YAML.load_file(Rails.root.join('app/models/concerns/body_interface/guard/dictionary.yml'))
+  def guard_dictionary
+    @guard_dictionary ||= YAML.load_file(Rails.root.join('app/models/concerns/body_interface/guard/dictionary.yml'))
   end
 
   def reserved_words
-    @reserved_words ||= dictionary['reserved_words']
+    @reserved_words ||= guard_dictionary['reserved_words']
   end
 
   def permitted_elements
-    @permitted_elements ||= dictionary['permitted_elements']
+    @permitted_elements ||= guard_dictionary['permitted_elements']
   end
 
   def prevent_flood_against_body

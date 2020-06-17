@@ -5,7 +5,7 @@ class Answer < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :question
 
-  delegate :subclass_name, :order, :title, :subtitle, :formula, to: :question, allow_nil: true
+  delegate :subclass_name, :settings, :order, :title, :subtitle, :formula, to: :question, allow_nil: true
 
   validate :type_integrity_validator
 

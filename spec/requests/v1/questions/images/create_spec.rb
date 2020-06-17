@@ -68,7 +68,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
         post v1_images_path(question.id), params: params, headers: headers
       end
 
-      it { expect(response.headers['Content-Type']).to eq('text/html') }
+      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'is success' do

@@ -19,7 +19,10 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
         body: {
           data: [
             {
-              payload: 'update1',
+              payload: {
+                start_value: 'start',
+                end_value: 'end'
+              },
               variable: {
                 name: 'test1',
                 value: '1'

@@ -203,13 +203,14 @@ class Fake
                     variable: {
                       value: 'val1'
                     }
+                  },
+                  {
+                    payload: 'col2',
+                    variable: {
+                      value: 'val2'
+                    }
                   }
-
                 ]
-              },
-              variable: {
-                name: Faker::Alphanumeric.alpha(number: 6),
-                value: rand(1..10).to_s
               }
             }
           ]

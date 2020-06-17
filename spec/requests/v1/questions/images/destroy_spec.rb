@@ -60,7 +60,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
         delete v1_images_path(question.id), headers: headers
       end
 
-      it { expect(response.headers['Content-Type']).to eq('text/html') }
+      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'is success' do
@@ -68,7 +68,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
         delete v1_images_path(question.id), headers: headers
       end
 
-      it { expect(response).to have_http_status(:accepted) }
+      it { expect(response).to have_http_status(:ok) }
     end
   end
 end

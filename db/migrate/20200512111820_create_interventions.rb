@@ -5,6 +5,7 @@ class CreateInterventions < ActiveRecord::Migration[6.0]
     create_table :interventions, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
       t.string :type, null: false
       t.uuid :user_id, null: false
+      t.jsonb :settings, default: {}
       t.string :name, null: false
       t.jsonb :body, default: { data: [] }
 
