@@ -4,10 +4,10 @@ class Question < ApplicationRecord
   include BodyInterface
   include FormulaInterface
   include DefaultAttributes
-  belongs_to :intervention
-  has_many :answers, dependent: :restrict_with_exception
+  belongs_to :intervention, inverse_of: :questions
+  has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
-  after_initialize -> { assign_default_attributes(:settings) }
+  before_create -> { assign_default_attributes(:settings) }
 
   has_one_attached :image
 

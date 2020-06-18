@@ -16,6 +16,7 @@ class V1::QuestionsController < V1Controller
 
   def update
     question_load.update!(question_params.except(:type))
+    invalidate_cache(question_load)
     render json: serialized_response(question_load)
   end
 

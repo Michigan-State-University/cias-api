@@ -3,7 +3,7 @@
 class Answer < ApplicationRecord
   include BodyInterface
   belongs_to :user, optional: true
-  belongs_to :question
+  belongs_to :question, inverse_of: :answers
 
   delegate :subclass_name, :settings, :order, :title, :subtitle, :formula, to: :question, allow_nil: true
 

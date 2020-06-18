@@ -16,6 +16,10 @@ module ExceptionHandler
       render json: msg(exc), status: :not_found
     end
 
+    rescue_from ActiveRecord::RecordNotSaved do |exc|
+      render json: msg(exc), status: :not_found
+    end
+
     rescue_from ActiveRecord::SubclassNotFound do |exc|
       render json: msg(exc), status: :internal_server_error
     end

@@ -3,11 +3,13 @@
 class V1::Questions::ImagesController < V1Controller
   def create
     question_load.update!(image: question_params[:file])
+    invalidate_cache(question_load)
     render json: serialized_response(question_load, 'Question'), status: 201
   end
 
   def destroy
-    question_load.image.purge_later
+    question_load.image.purge
+    invalidate_cache(question_load)
     render json: serialized_response(question_load, 'Question')
   end
 
