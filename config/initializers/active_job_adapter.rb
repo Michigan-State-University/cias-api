@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-pool = ConnectionPool.new(size: ENV.fetch('REDIS_CONNECTIONS_POOL') { 12 }) do
+pool = ConnectionPool.new(size: ENV.fetch('REDIS_CONNECTIONS_POOL', 12)) do
   Redis.new(url: ENV['REDIS_URL'])
 end
 

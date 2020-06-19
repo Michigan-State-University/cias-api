@@ -6,7 +6,13 @@ class Intervention < ApplicationRecord
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :answers, dependent: :restrict_with_exception, through: :questions
 
-  validates :settings, json: { schema: -> { Rails.root.join('db/schema/intervention/settings.json').to_s }, message: ->(err) { err } }
+  validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
 
   validates :type, :name, presence: true
+
+  private
+
+  def json_schema_path
+    @json_schema_path ||= 'db/schema/intervention'
+  end
 end

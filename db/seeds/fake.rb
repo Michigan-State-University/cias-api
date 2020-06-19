@@ -239,7 +239,7 @@ class Fake
       (2..5).to_a.sample.times do
         patterns.push(
           {
-            match: "#{arithmetic_logic_operators.sample} #{rand(1..20)}",
+            match: "#{comparison.sample} #{rand(1..20)}",
             target: rand(1..10).to_s
           }
         )
@@ -254,8 +254,20 @@ class Fake
       @@images_files ||= Dir[Rails.root.join('spec/factories/images/*.jpg')]
     end
 
-    def arithmetic_logic_operators
-      @@arithmetic_logic_operators ||= %w[=> > <= < = AND OR]
+    def arithmetic
+      @@arithmetic ||= %w[+ - * /]
+    end
+
+    def assignment
+      @@assignment ||= %w[=]
+    end
+
+    def comparison
+      @@comparison ||= %w[< <= > >= == !=]
+    end
+
+    def logical
+      @@logical ||= %w[AND OR NOT]
     end
   end
 end

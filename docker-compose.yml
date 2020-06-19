@@ -28,7 +28,10 @@ services:
       - vol_api_tmp:/tmp
     ports:
       - '3000:3000'
-    command: bash -c 'rm -f tmp/pids/server.pid && bundle exec puma -C config/puma.rb'
+    command: >
+      bash -c 'rm -f tmp/pids/server.pid
+      && touch tmp/caching-dev.txt
+      && bundle exec puma -C config/puma.rb'
 
   cache:
     image: redis:6.0.5
