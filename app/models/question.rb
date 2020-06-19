@@ -7,7 +7,7 @@ class Question < ApplicationRecord
   belongs_to :intervention, inverse_of: :questions
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
-  before_create -> { assign_default_attributes(:settings) }
+  before_validation -> { assign_default_attributes(:settings, :narrator) }, if: :new_record?
 
   has_one_attached :image
 
@@ -16,6 +16,7 @@ class Question < ApplicationRecord
 
   validates :title, :type, presence: true
   validates :settings, json: { schema: -> { Rails.root.join('db/schema/question/settings.json').to_s }, message: ->(err) { err } }
+  validates :narrator, json: { schema: -> { Rails.root.join('db/schema/question/narrator.json').to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join('db/schema/question/formula.json').to_s }, message: ->(err) { err } }
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
 

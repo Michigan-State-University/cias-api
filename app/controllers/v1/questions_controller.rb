@@ -31,6 +31,6 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :order, :title, :subtitle, :video_url, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :order, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
   end
 end

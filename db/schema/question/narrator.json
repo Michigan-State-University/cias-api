@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "settings": {
+      "type": "object",
+      "properties": {
+        "voice": {
+          "type": "boolean"
+        },
+        "animation": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "voice",
+        "animation"
+      ]
+    },
+    "blocks": {
+      "type": "array",
+      "items": {}
+    }
+  },
+  "required": [
+    "settings",
+    "blocks"
+  ],
+  "additionalProperties": false
+}

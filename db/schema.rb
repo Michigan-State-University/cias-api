@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
     t.integer 'order'
     t.string 'title', null: false
     t.string 'subtitle'
+    t.jsonb 'narrator', default: {}
     t.string 'video_url'
     t.jsonb 'formula', default: { 'payload' => '', 'patterns' => [] }
     t.jsonb 'body', default: { 'data' => [] }

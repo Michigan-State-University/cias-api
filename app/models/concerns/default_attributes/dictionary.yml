@@ -2,3 +2,8 @@ question:
   settings:
     image: false
     video: false
+  narrator:
+    settings:
+      voice: true
+      animation: true
+    blocks: []
