@@ -20,6 +20,11 @@ class V1::QuestionsController < V1Controller
     render json: serialized_response(question_load)
   end
 
+  def destroy
+    question_load.destroy
+    head :ok
+  end
+
   private
 
   def questions_scope

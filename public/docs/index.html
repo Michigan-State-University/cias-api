@@ -261,6 +261,9 @@
                   <li>
                     <a href="#update-question" class="toc-h2 toc-link" data-title="Update question">Update question</a>
                   </li>
+                  <li>
+                    <a href="#destroy-question" class="toc-h2 toc-link" data-title="Destroy question">Destroy question</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -979,7 +982,7 @@ uid: user@cias-api.herokuapp.com
 <td>yes</td>
 </tr>
 <tr>
-<td>question_id</td>
+<td>id</td>
 <td>Question ID</td>
 <td>yes</td>
 </tr>
@@ -1075,6 +1078,80 @@ uid: user@cias-api.herokuapp.com
         </span><span class="p">]</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<h2 id='destroy-question'>Destroy question</h2><h3 id='resource-5'>Resource</h3>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
+<h3 id='url-parameters-5'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>Question ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-5'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-5'>HTTP request method</h3>
+<p><code>DELETE</code></p>
+<h3 id='http-headers-5'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-5'>HTTP body</h3><h3 id='note-5'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/interventions/1/questions/1
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@cias-api.herokuapp.com
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>

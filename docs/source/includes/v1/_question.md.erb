@@ -237,7 +237,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 Parameter | Description | Required
 --------- | ----------- | --------
 intervention_id | Intervention ID | yes
-question_id | Question ID | yes
+id | Question ID | yes
 
 
 ### Query String
@@ -320,5 +320,66 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 }
 ```
 
+
+> HTTP response 200 OK
+
+
+
+
+
+
+
+
+## Destroy question
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+id | Question ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
 
 > HTTP response 200 OK
