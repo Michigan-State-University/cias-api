@@ -11,34 +11,34 @@
             "payload": {
               "type": "string"
             },
-            "variable": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "value"
-              ],
-              "additionalProperties": false
+            "value": {
+              "type": "string"
             }
           },
           "required": [
             "payload",
-            "variable"
+            "value"
           ],
           "additionalProperties": false
         }
       ]
+    },
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
-    "data"
+    "data",
+    "variable"
   ],
   "additionalProperties": false
 }

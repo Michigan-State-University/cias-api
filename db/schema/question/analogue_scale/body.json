@@ -13,47 +13,43 @@
             "payload": {
               "type": "object",
               "properties": {
-                "start_value": {
-                  "type": "string"
-                },
                 "end_value": {
                   "type": "string"
-                }
-              },
-              "required": [
-                "start_value",
-                "end_value"
-              ],
-              "additionalProperties": false
-            },
-            "variable": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
                 },
-                "value": {
+                "start_value": {
                   "type": "string"
                 }
               },
               "required": [
-                "name",
-                "value"
+                "end_value",
+                "start_value"
               ],
               "additionalProperties": false
             }
           },
           "required": [
-            "payload",
-            "variable"
+            "payload"
           ],
           "additionalProperties": false
         }
       ]
+    },
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
-    "data"
+    "data",
+    "variable"
   ],
   "additionalProperties": false
 }

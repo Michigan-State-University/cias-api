@@ -20,15 +20,14 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           data: [
             {
               payload: {
-                start_value: 'start',
-                end_value: 'end'
-              },
-              variable: {
-                name: 'test1',
-                value: '1'
+                start_value: 'test 1',
+                end_value: 'test 1'
               }
             }
-          ]
+          ],
+          "variable": {
+            "name": 'var test 1'
+          }
         }
       }
     }

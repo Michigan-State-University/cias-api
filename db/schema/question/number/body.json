@@ -4,41 +4,39 @@
   "properties": {
     "data": {
       "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
       "items": [
         {
           "type": "object",
           "properties": {
             "payload": {
               "type": "string"
-            },
-            "variable": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "value": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "name",
-                "value"
-              ],
-              "additionalProperties": false
             }
           },
           "required": [
-            "payload",
-            "variable"
+            "payload"
           ],
           "additionalProperties": false
         }
       ]
+    },
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
-    "data"
+    "data",
+    "variable"
   ],
   "additionalProperties": false
 }

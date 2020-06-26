@@ -124,32 +124,47 @@ class Fake
               payload: {
                 start_value: 'start',
                 end_value: 'end'
-              },
-              variable: {
-                name: 'test',
-                value: 'val1'
+              }
+            }
+          ],
+          "variable": {
+            "name": 'var_1'
+          }
+        }
+      in 'Grid'
+        {
+          data: [
+            {
+              payload: {
+                rows: [
+                  {
+                    payload: 'test',
+                    variable: {
+                      name: 'test'
+                    }
+                  }
+                ],
+                columns: [
+                  {
+                    payload: 'col1',
+                    variable: {
+                      value: 'val1'
+                    }
+                  },
+                  {
+                    payload: 'col2',
+                    variable: {
+                      value: 'val2'
+                    }
+                  }
+                ]
               }
             }
           ]
         }
-      in 'Single'
+      in 'Information'
         {
-          data: [
-            {
-              payload: 'yes',
-              variable: {
-                name: 'single_yes',
-                value: rand(1..10).to_s
-              }
-            },
-            {
-              payload: 'no',
-              variable: {
-                name: 'single_no',
-                value: rand(1..10).to_s
-              }
-            }
-          ]
+          data: []
         }
       in 'Multiple'
         {
@@ -184,36 +199,38 @@ class Fake
             }
           ]
         }
-      in 'Grid'
+      in 'Number'
         {
           data: [
             {
-              payload: {
-                rows: [
-                  {
-                    payload: 'test',
-                    variable: {
-                      name: 'test'
-                    }
-                  }
-                ],
-                columns: [
-                  {
-                    payload: 'col1',
-                    variable: {
-                      value: 'val1'
-                    }
-                  },
-                  {
-                    payload: 'col2',
-                    variable: {
-                      value: 'val2'
-                    }
-                  }
-                ]
-              }
+              payload: Faker::Creature::Dog.name
             }
-          ]
+          ],
+          variable: {
+            name: Faker::Alphanumeric.alpha(number: 6)
+          }
+        }
+      in 'TextBox'
+        {
+          data: [
+            {
+              payload: Faker::Creature::Dog.name
+            }
+          ],
+          variable: {
+            name: Faker::Alphanumeric.alpha(number: 6)
+          }
+        }
+      in 'Url'
+        {
+          data: [
+            {
+              payload: Faker::Creature::Dog.name
+            }
+          ],
+          variable: {
+            name: Faker::Alphanumeric.alpha(number: 6)
+          }
         }
       else
         body_data_base
@@ -225,12 +242,16 @@ class Fake
         data: [
           {
             payload: Faker::Creature::Dog.name,
-            variable: {
-              name: Faker::Alphanumeric.alpha(number: 6),
-              value: rand(1..10).to_s
-            }
+            value: rand(1..10).to_s
+          },
+          {
+            payload: 'example2',
+            value: rand(1..10).to_s
           }
-        ]
+        ],
+        variable: {
+          name: Faker::Alphanumeric.alpha(number: 6)
+        }
       }
     end
 

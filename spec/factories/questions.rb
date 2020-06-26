@@ -3,33 +3,40 @@
 FactoryBot.define do
   factory :question do
     body do
-      { data: [
-        {
-          payload: '',
-          variable: {
-            name: 'test',
-            value: '1'
+      {
+        data: [
+          {
+            payload: '',
+            value: ''
+          },
+          {
+            payload: 'example2',
+            value: ''
           }
+        ],
+        variable: {
+          name: ''
         }
-      ] }
+      }
     end
     association :intervention, factory: :intervention_single
     factory :question_analogue_scale, class: 'Question::AnalogueScale' do
       title { 'Analogue Scale' }
       type { Question::AnalogueScale }
       body do
-        { data: [
-          {
-            payload: {
-              start_value: 'start value',
-              end_value: 'end value'
-            },
-            variable: {
-              name: 'test',
-              value: '1'
+        {
+          data: [
+            {
+              payload: {
+                start_value: 'start',
+                end_value: 'end'
+              }
             }
+          ],
+          "variable": {
+            "name": 'var_1'
           }
-        ] }
+        }
       end
     end
     factory :question_bar_graph, class: 'Question::BarGraph' do
@@ -83,16 +90,67 @@ FactoryBot.define do
     factory :question_information, class: 'Question::Information' do
       title { 'Information' }
       type { Question::Information }
+      body do
+        {
+          data: []
+        }
+      end
     end
     factory :question_multiple, class: 'Question::Multiple' do
       title { 'Multiple' }
       type { Question::Multiple }
+      body do
+        {
+          data: [
+            {
+              payload: '',
+              variable: {
+                name: '',
+                value: ''
+              }
+            },
+            {
+              payload: '',
+              variable: {
+                name: '',
+                value: ''
+              }
+            },
+            {
+              payload: '',
+              variable: {
+                name: '',
+                value: ''
+              }
+            },
+            {
+              payload: '',
+              variable: {
+                name: '',
+                value: ''
+              }
+            }
+          ]
+        }
+      end
       trait :body_data_empty do
         body { { data: [] } }
       end
     end
     factory :question_number, class: 'Question::Number' do
       title { 'Number' }
+      body do
+        {
+          data: [
+            {
+              payload: ''
+            }
+          ],
+          variable: {
+            name: ''
+          }
+        }
+      end
       type { Question::Number }
     end
     factory :question_single, class: 'Question::Single' do
@@ -106,6 +164,18 @@ FactoryBot.define do
     factory :question_text_box, class: 'Question::TextBox' do
       title { 'TextBox' }
       type { Question::TextBox }
+      body do
+        {
+          data: [
+            {
+              payload: ''
+            }
+          ],
+          variable: {
+            name: ''
+          }
+        }
+      end
       trait :body_data_empty do
         body { { data: [] } }
       end
@@ -113,6 +183,18 @@ FactoryBot.define do
     factory :question_url, class: 'Question::Url' do
       title { 'Url' }
       type { Question::Url }
+      body do
+        {
+          data: [
+            {
+              payload: ''
+            }
+          ],
+          variable: {
+            name: ''
+          }
+        }
+      end
     end
   end
 end

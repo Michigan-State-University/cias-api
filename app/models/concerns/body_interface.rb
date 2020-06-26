@@ -3,7 +3,6 @@
 module BodyInterface
   extend ActiveSupport::Concern
   include BodyInterface::Guard
-  include BodyInterface::Validations
 
   included do
     before_save :guard_protection
@@ -11,5 +10,9 @@ module BodyInterface
 
   def body_data
     body['data']
+  end
+
+  def body_variable
+    body['variable']
   end
 end
