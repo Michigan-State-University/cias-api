@@ -2,15 +2,16 @@
 
 require 'rails_helper'
 
-RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
+RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:question) { create(:question_information) }
+  let(:question) { create(:question_single) }
+  let(:intervention) { question.intervention }
   let(:headers) do
     user.create_new_auth_token
   end
 
   context 'when endpoint is available' do
-    before { delete v1_images_path(question.id) }
+    before { get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -18,7 +19,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        delete v1_images_path(question.id)
+        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -31,7 +32,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        delete v1_images_path(question.id), headers: headers
+        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -43,7 +44,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
 
     context 'is valid' do
       before do
-        delete v1_images_path(question.id), headers: headers
+        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -55,20 +56,24 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
   end
 
   context 'when response' do
-    context 'is appropriate Content-Type' do
+    context 'is JSON' do
       before do
-        delete v1_images_path(question.id), headers: headers
+        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
       end
 
+      it { expect(response).to have_http_status(:created) }
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
-    context 'is success' do
+    context 'is JSON and parse' do
       before do
-        delete v1_images_path(question.id), headers: headers
+        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
       end
 
-      it { expect(response).to have_http_status(:ok) }
+      it 'success to Hash' do
+        parsed_response = JSON.parse(response.body)
+        expect(parsed_response.class).to be(Hash)
+      end
     end
   end
 end

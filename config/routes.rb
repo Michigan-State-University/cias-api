@@ -5,7 +5,11 @@ Rails.application.routes.draw do
   root 'application#status'
   namespace :v1 do
     resources :interventions, only: %i[index show create] do
-      resources :questions, only: %i[index show create update destroy]
+      resources :questions, only: %i[index show create update destroy] do
+        member do
+          get 'clone'
+        end
+      end
     end
     scope 'questions/:question_id' do
       resources :answers, only: %i[index show create]

@@ -2,11 +2,11 @@
 
 class Question < ApplicationRecord
   include BodyInterface
-  include DefaultAttributes
+  include DefaultValues
   belongs_to :intervention, inverse_of: :questions
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
-  before_validation -> { assign_default_attributes(:settings, :narrator) }, if: :new_record?
+  before_validation :assign_default_values
 
   has_one_attached :image
 
@@ -29,6 +29,11 @@ class Question < ApplicationRecord
 
   def questions_order_up_to_equal
     questions_same_intervention.where('questions.order <= ?', order).order(:order)
+  end
+
+  def assign_default_values
+    self.settings ||= retrive_default_values('settings')
+    self.narrator ||= retrive_default_values('narrator')
   end
 
   private

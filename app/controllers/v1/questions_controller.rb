@@ -14,6 +14,13 @@ class V1::QuestionsController < V1Controller
     render json: serialized_response(question), status: :created
   end
 
+  def clone
+    question = question_load.dup
+    question.image.attach(question_load.image.blob)
+    question.save!
+    render json: serialized_response(question), status: :created
+  end
+
   def update
     question_load.update!(question_params.except(:type))
     invalidate_cache(question_load)

@@ -259,6 +259,9 @@
                     <a href="#create-question" class="toc-h2 toc-link" data-title="Create question">Create question</a>
                   </li>
                   <li>
+                    <a href="#clone-question" class="toc-h2 toc-link" data-title="Clone question">Clone question</a>
+                  </li>
+                  <li>
                     <a href="#update-question" class="toc-h2 toc-link" data-title="Update question">Update question</a>
                   </li>
                   <li>
@@ -964,10 +967,10 @@ uid: user@cias-api.herokuapp.com
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
 <blockquote>
-<p>HTTP response 200 OK</p>
+<p>HTTP response 201 Created</p>
 </blockquote>
-<h2 id='update-question'>Update question</h2><h3 id='resource-4'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
+<h2 id='clone-question'>Clone question</h2><h3 id='resource-4'>Resource</h3>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id/clone</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -997,7 +1000,7 @@ uid: user@cias-api.herokuapp.com
 </thead><tbody>
 </tbody></table>
 <h3 id='http-request-method-4'>HTTP request method</h3>
-<p><code>PATCH</code>, <code>PUT</code></p>
+<p><code>GET</code></p>
 <h3 id='http-headers-4'>HTTP headers</h3>
 <table><thead>
 <tr>
@@ -1026,7 +1029,81 @@ uid: user@cias-api.herokuapp.com
 <td>email</td>
 </tr>
 </tbody></table>
-<h3 id='http-body-4'>HTTP body</h3>
+<h3 id='http-body-4'>HTTP body</h3><h3 id='note-4'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000v1/interventions/1/questions/1/clone
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@cias-api.herokuapp.com
+</span></code></pre>
+<blockquote>
+<p>HTTP response 201 Created</p>
+</blockquote>
+<h2 id='update-question'>Update question</h2><h3 id='resource-5'>Resource</h3>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
+<h3 id='url-parameters-5'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>Question ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-5'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-5'>HTTP request method</h3>
+<p><code>PATCH</code>, <code>PUT</code></p>
+<h3 id='http-headers-5'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-5'>HTTP body</h3>
 <p>{
     &quot;question&quot;: {
         &quot;title&quot;: &quot;question example title&quot;,
@@ -1039,7 +1116,7 @@ uid: user@cias-api.herokuapp.com
         ]
     }
 }</p>
-<h3 id='note-4'>Note</h3>
+<h3 id='note-5'>Note</h3>
 <p>Required keys:
 * <code>title</code>;
 * <code>type</code>.</p>
@@ -1082,9 +1159,9 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
-<h2 id='destroy-question'>Destroy question</h2><h3 id='resource-5'>Resource</h3>
+<h2 id='destroy-question'>Destroy question</h2><h3 id='resource-6'>Resource</h3>
 <p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
-<h3 id='url-parameters-5'>URL parameters</h3>
+<h3 id='url-parameters-6'>URL parameters</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -1103,7 +1180,7 @@ uid: user@cias-api.herokuapp.com
 <td>yes</td>
 </tr>
 </tbody></table>
-<h3 id='query-string-5'>Query String</h3>
+<h3 id='query-string-6'>Query String</h3>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -1112,9 +1189,9 @@ uid: user@cias-api.herokuapp.com
 </tr>
 </thead><tbody>
 </tbody></table>
-<h3 id='http-request-method-5'>HTTP request method</h3>
+<h3 id='http-request-method-6'>HTTP request method</h3>
 <p><code>DELETE</code></p>
-<h3 id='http-headers-5'>HTTP headers</h3>
+<h3 id='http-headers-6'>HTTP headers</h3>
 <table><thead>
 <tr>
 <th>Key</th>
@@ -1142,7 +1219,7 @@ uid: user@cias-api.herokuapp.com
 <td>email</td>
 </tr>
 </tbody></table>
-<h3 id='http-body-5'>HTTP body</h3><h3 id='note-5'>Note</h3>
+<h3 id='http-body-6'>HTTP body</h3><h3 id='note-6'>Note</h3>
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
