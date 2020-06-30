@@ -193,3 +193,92 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 
 > HTTP response 200 OK
+
+
+## Update intervention
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH, PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"intervention": {
+		"type": "Intervention::Single",
+		"name": "Intervention example 1",
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+
+
+### Note
+Required keys:
+* `type`;
+* `name`.
+
+`type` key has to contains one of the following values:
+* `Intervention::Multiple`;
+* `Intervention::Single`.
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:id
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"intervention": {
+		"type": "Intervention::Single",
+		"name": "Intervention example 1",
+    "settings": {
+      "example": 1
+    },
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+```
+
+
+> HTTP response 200 OK

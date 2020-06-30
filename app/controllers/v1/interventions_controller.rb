@@ -14,6 +14,12 @@ class V1::InterventionsController < V1Controller
     render json: serialized_response(intervention), status: :created
   end
 
+  def update
+    intervention_load.update!(intervention_params.except(:type))
+    invalidate_cache(intervention_load)
+    render json: serialized_response(intervention_load)
+  end
+
   private
 
   def interventions_scope
