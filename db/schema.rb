@@ -105,9 +105,9 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
   create_table 'users', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'provider', default: 'email', null: false
     t.string 'uid', default: '', null: false
-    t.string 'first_name'
+    t.string 'first_name', default: '', null: false
     t.string 'middle_name'
-    t.string 'last_name'
+    t.string 'last_name', default: '', null: false
     t.string 'username'
     t.string 'email'
     t.text 'roles', default: [], array: true

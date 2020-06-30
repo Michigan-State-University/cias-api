@@ -2,6 +2,8 @@
 
 FactoryBot.define do
   factory :user do
+    sequence(:first_name) { |s| "first_name_#{s}" }
+    sequence(:last_name) { |s| "last_name_#{s}" }
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
     sequence(:username) { |s| "user_#{s}" }

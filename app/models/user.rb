@@ -22,8 +22,9 @@ class User < ApplicationRecord
                 multiple: true,
                 allow_blank: true
 
-  validates :email, presence: true
-  validates :email, :username, uniqueness: true
+  validates :first_name, :last_name, :email, :username, presence: true
+  validates :uid, :email, :username, uniqueness: true
+  validates :uid, uniqueness: { scope: :provider }
 
   has_many :interventions, dependent: :restrict_with_exception
   has_many :answers, dependent: :restrict_with_exception

@@ -8,9 +8,9 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       t.string :uid, null: false, default: ''
 
       ## User Info
-      t.string :first_name
+      t.string :first_name, null: false, default: ''
       t.string :middle_name
-      t.string :last_name
+      t.string :last_name, null: false, default: ''
       t.string :username
       t.string :email
 

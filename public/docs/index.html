@@ -233,6 +233,14 @@
               </ul>
           </li>
           <li>
+            <a href="#registration" class="toc-h1 toc-link" data-title="Registration">Registration</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#create-user" class="toc-h2 toc-link" data-title="Create user">Create user</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#intervention" class="toc-h1 toc-link" data-title="Intervention">Intervention</a>
               <ul class="toc-list-h2">
                   <li>
@@ -484,7 +492,68 @@ uid: user@cias-api.herokuapp.com
     </span><span class="s2">"User was not found or was not logged in."</span><span class="w">
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre><h1 id='intervention'>Intervention</h1><h2 id='get-all-interventions'>Get all interventions</h2><h3 id='resource'>Resource</h3>
+</span></code></pre><h1 id='registration'>Registration</h1><h2 id='create-user'>Create user</h2><h3 id='resource'>Resource</h3>
+<p><code>localhost:3000/auth</code></p>
+<h3 id='url-parameters'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='query-string'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method'>HTTP request method</h3>
+<p><code>POST</code></p>
+<h3 id='http-headers'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>multipart/form-data</td>
+</tr>
+</tbody></table>
+<h3 id='http-body'>HTTP body</h3>
+<p>Mandatory form fields:</p>
+
+<ul>
+<li><code>first_name</code>;</li>
+<li><code>last_name</code>;</li>
+<li><code>username</code>;</li>
+<li><code>email</code>;</li>
+<li><code>password</code>;</li>
+<li><code>confirm_success_url</code>.</li>
+</ul>
+<h3 id='note'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/auth
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: multipart/form-data
+</span></code></pre><pre class="highlight shell tab-shell"><code>  first_name <span class="o">=</span> first
+  last_name <span class="o">=</span> last
+  username <span class="o">=</span> username1
+  email <span class="o">=</span> username1@example.com
+  password <span class="o">=</span> hh41yW6J62CuaFeANuDYcOWkH
+  confirm_success_url <span class="o">=</span> https://example.com
+</code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<h1 id='intervention'>Intervention</h1><h2 id='get-all-interventions'>Get all interventions</h2><h3 id='resource'>Resource</h3>
 <p><code>localhost:3000/v1/interventions</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
@@ -679,13 +748,19 @@ uid: user@cias-api.herokuapp.com
     }
 }</p>
 <h3 id='note-3'>Note</h3>
-<p>Required keys:
-* <code>type</code>;
-* <code>name</code>.</p>
+<p>Required keys:</p>
 
-<p><code>type</code> key has to contains one of the following values:
-* <code>Intervention::Multiple</code>;
-* <code>Intervention::Single</code>.</p>
+<ul>
+<li><code>type</code>;</li>
+<li><code>name</code>.</li>
+</ul>
+
+<p><code>type</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>Intervention::Multiple</code>;</li>
+<li><code>Intervention::Single</code>.</li>
+</ul>
 
 <blockquote>
 <p>HTTP example request</p>
@@ -777,13 +852,19 @@ uid: user@cias-api.herokuapp.com
     }
 }</p>
 <h3 id='note-4'>Note</h3>
-<p>Required keys:
-* <code>type</code>;
-* <code>name</code>.</p>
+<p>Required keys:</p>
 
-<p><code>type</code> key has to contains one of the following values:
-* <code>Intervention::Multiple</code>;
-* <code>Intervention::Single</code>.</p>
+<ul>
+<li><code>type</code>;</li>
+<li><code>name</code>.</li>
+</ul>
+
+<p><code>type</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>Intervention::Multiple</code>;</li>
+<li><code>Intervention::Single</code>.</li>
+</ul>
 
 <blockquote>
 <p>HTTP example request</p>
@@ -1027,22 +1108,28 @@ uid: user@cias-api.herokuapp.com
     }
 }</p>
 <h3 id='note-3'>Note</h3>
-<p>Required keys:
-* <code>title</code>;
-* <code>type</code>.</p>
+<p>Required keys:</p>
 
-<p><code>type</code> key has to contains one of the following values:
-* <code>Question::AnalogueScale</code>;
-* <code>Question::BarGraph</code>;
-* <code>Question::Feedback</code>;
-* <code>Question::FollowUpContact</code>;
-* <code>Question::Grid</code>;
-* <code>Question::Information</code>;
-* <code>Question::Multiple</code>;
-* <code>Question::Number</code>;
-* <code>Question::Single</code>;
-* <code>Question::TextBox</code>;
-* <code>Question::Url</code>.</p>
+<ul>
+<li><code>title</code>;</li>
+<li><code>type</code>.</li>
+</ul>
+
+<p><code>type</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>Question::AnalogueScale</code>;</li>
+<li><code>Question::BarGraph</code>;</li>
+<li><code>Question::Feedback</code>;</li>
+<li><code>Question::FollowUpContact</code>;</li>
+<li><code>Question::Grid</code>;</li>
+<li><code>Question::Information</code>;</li>
+<li><code>Question::Multiple</code>;</li>
+<li><code>Question::Number</code>;</li>
+<li><code>Question::Single</code>;</li>
+<li><code>Question::TextBox</code>;</li>
+<li><code>Question::Url</code>.</li>
+</ul>
 
 <blockquote>
 <p>HTTP example request</p>
@@ -1221,22 +1308,28 @@ uid: user@cias-api.herokuapp.com
     }
 }</p>
 <h3 id='note-5'>Note</h3>
-<p>Required keys:
-* <code>title</code>;
-* <code>type</code>.</p>
+<p>Required keys:</p>
 
-<p><code>type</code> key has to contains one of the following values:
-* <code>Question::AnalogueScale</code>;
-* <code>Question::BarGraph</code>;
-* <code>Question::Feedback</code>;
-* <code>Question::FollowUpContact</code>;
-* <code>Question::Grid</code>;
-* <code>Question::Information</code>;
-* <code>Question::Multiple</code>;
-* <code>Question::Number</code>;
-* <code>Question::Single</code>;
-* <code>Question::TextBox</code>;
-* <code>Question::Url</code>.</p>
+<ul>
+<li><code>title</code>;</li>
+<li><code>type</code>.</li>
+</ul>
+
+<p><code>type</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>Question::AnalogueScale</code>;</li>
+<li><code>Question::BarGraph</code>;</li>
+<li><code>Question::Feedback</code>;</li>
+<li><code>Question::FollowUpContact</code>;</li>
+<li><code>Question::Grid</code>;</li>
+<li><code>Question::Information</code>;</li>
+<li><code>Question::Multiple</code>;</li>
+<li><code>Question::Number</code>;</li>
+<li><code>Question::Single</code>;</li>
+<li><code>Question::TextBox</code>;</li>
+<li><code>Question::Url</code>.</li>
+</ul>
 
 <blockquote>
 <p>HTTP example request</p>
@@ -1700,22 +1793,28 @@ uid: user@cias-api.herokuapp.com
     }
 }</p>
 <h3 id='note-3'>Note</h3>
-<p>Required keys:
-* <code>type</code>;
-* <code>body</code>.</p>
+<p>Required keys:</p>
 
-<p><code>type</code> key has to contains one of the following values:
-* <code>Answer::AnalogueScale</code>;
-* <code>Answer::BarGraph</code>;
-* <code>Answer::Feedback</code>;
-* <code>Answer::FollowUpContact</code>;
-* <code>Answer::Grid</code>;
-* <code>Answer::Information</code>;
-* <code>Answer::Multiple</code>;
-* <code>Answer::Number</code>;
-* <code>Answer::Single</code>;
-* <code>Answer::TextBox</code>;
-* <code>Answer::Url</code>.</p>
+<ul>
+<li><code>type</code>;</li>
+<li><code>body</code>.</li>
+</ul>
+
+<p><code>type</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>Answer::AnalogueScale</code>;</li>
+<li><code>Answer::BarGraph</code>;</li>
+<li><code>Answer::Feedback</code>;</li>
+<li><code>Answer::FollowUpContact</code>;</li>
+<li><code>Answer::Grid</code>;</li>
+<li><code>Answer::Information</code>;</li>
+<li><code>Answer::Multiple</code>;</li>
+<li><code>Answer::Number</code>;</li>
+<li><code>Answer::Single</code>;</li>
+<li><code>Answer::TextBox</code>;</li>
+<li><code>Answer::Url</code>.</li>
+</ul>
 
 <blockquote>
 <p>HTTP example request</p>

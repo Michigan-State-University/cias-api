@@ -1,0 +1,70 @@
+# Registration
+
+
+## Create user
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/auth`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+Key | Value
+--------- | -----------
+Content-Type | multipart/form-data
+
+
+### HTTP body
+
+Mandatory form fields:
+
+ * `first_name`;
+ * `last_name`;
+ * `username`;
+ * `email`;
+ * `password`;
+ * `confirm_success_url`.
+
+
+### Note
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/auth
+```
+
+```http
+Content-Type: multipart/form-data
+```
+
+```shell
+  first_name = first
+  last_name = last
+  username = username1
+  email = username1@example.com
+  password = hh41yW6J62CuaFeANuDYcOWkH
+  confirm_success_url = https://example.com
+```
+
+
+> HTTP response 200 OK
