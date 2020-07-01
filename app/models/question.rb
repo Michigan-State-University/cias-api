@@ -31,12 +31,12 @@ class Question < ApplicationRecord
     questions_same_intervention.where('questions.order <= ?', order).order(:order)
   end
 
+  private
+
   def assign_default_values
     self.settings ||= retrive_default_values('settings')
     self.narrator ||= retrive_default_values('narrator')
   end
-
-  private
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/question'

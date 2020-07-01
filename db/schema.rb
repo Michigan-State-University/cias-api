@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
   create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
     t.uuid 'user_id', null: false
-    t.jsonb 'settings', default: {}
+    t.jsonb 'settings'
     t.string 'name', null: false
     t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
