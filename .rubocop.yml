@@ -145,11 +145,20 @@ Style/StructInheritance:
   Exclude:
     - 'app/policies/**/*'
 
+Rails/ActiveRecordCallbacksOrder:
+  Enabled: true
+
 Rails/BulkChangeTable:
   Enabled: false
 
+Rails/FindById:
+  Enabled: true
+
 Rails/HasAndBelongsToMany:
-  Enabled: false
+  Enabled: true
+
+Rails/Inquiry:
+  Enabled: true
 
 Rails/InverseOf:
   Enabled: false
@@ -157,13 +166,40 @@ Rails/InverseOf:
 Rails/LexicallyScopedActionFilter:
   Enabled: false
 
+Rails/MailerName:
+  Enabled: true
+
+Rails/MatchRoute:
+  Enabled: true
+
+Rails/NegateInclude:
+  Enabled: true
+
 Rails/Output:
   Exclude:
     - 'db/seeds.rb'
 
+Rails/Pluck:
+  Enabled: true
+
+Rails/PluckInWhere:
+  Enabled: true
+
+Rails/RenderInline:
+  Enabled: true
+
+Rails/RenderPlainText:
+  Enabled: true
+
+Rails/ShortI18n:
+  Enabled: true
+
 Rails/SkipsModelValidations:
   Exclude:
     - 'spec/**/*'
+
+Rails/WhereExists:
+  Enabled: true
 
 RSpec/ContextWording:
   Enabled: false

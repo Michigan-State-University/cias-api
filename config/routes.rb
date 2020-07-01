@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'sidekiq/web' if Rails.env.development?
+
 Rails.application.routes.draw do
   mount LetterOpenerWeb::Engine, at: '/rails/browse_emails' if Rails.env.development?
   mount_devise_token_auth_for 'User', at: 'auth'
@@ -21,4 +23,5 @@ Rails.application.routes.draw do
       end
     end
   end
+  mount Sidekiq::Web => '/rails/workers' if Rails.env.development?
 end

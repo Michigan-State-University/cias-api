@@ -35,7 +35,7 @@ services:
       && bundle exec puma -C config/puma.rb'
 
   cache:
-    image: redis:6.0.5
+    image: redis:6.0.6
     command: 'redis-server'
     tmpfs:
       - /data

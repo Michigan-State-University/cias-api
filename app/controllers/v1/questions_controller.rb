@@ -33,9 +33,12 @@ class V1::QuestionsController < V1Controller
   end
 
   def update
-    question_load.update!(question_params.except(:type))
+    question = question_load
+    question.assign_attributes(question_params.except(:type))
+    question.execute_narrator
+    question.save!
     invalidate_cache(question_load)
-    render json: serialized_response(question_load)
+    render json: serialized_response(question)
   end
 
   def destroy

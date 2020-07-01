@@ -2,7 +2,7 @@
 
 return if Rails.env.production?
 
-# rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
+# rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod
 class Fake
   class << self
     mattr_accessor :intervention_types
@@ -105,7 +105,19 @@ class Fake
     end
 
     def subclass_types
-      @@subclass_types ||= define_subclasses('app/models/question/')
+      @@subclass_types ||= define_subclasses('app/models/question/') - %w[Narrator]
+    end
+
+    def quotas
+      @quotas ||= [Faker::Games::Fallout, Faker::Games::WorldOfWarcraft, Faker::Games::WarhammerFantasy]
+    end
+
+    def narrator_blocks_text
+      text = []
+      (1..5).to_a.sample.times do
+        text.push(quotas.sample.quote)
+      end
+      text
     end
 
     def create_questions
@@ -122,6 +134,32 @@ class Fake
           formula: formula_data_base,
           body: body_data_by_type(sample_type)
         )
+        question.narrator = {}
+        question.narrator['settings'] = {
+          voice: true,
+          animation: true
+        }
+        question.narrator['blocks'] = [
+          {
+            type: 'Speech',
+            text: narrator_blocks_text,
+            sha256: [],
+            audio_urls: [],
+            animation: ''
+          },
+          {
+            type: 'Speech',
+            text: narrator_blocks_text,
+            sha256: [],
+            audio_urls: [],
+            animation: ''
+          }
+        ]
+        question.narrator['from_question'] = {
+          text: narrator_blocks_text,
+          sha256: [],
+          audio_urls: []
+        }
         question.image.attach(io: File.open(image_sample), filename: image_sample.split('/').last)
         question.save
       end
@@ -328,6 +366,6 @@ class Fake
     end
   end
 end
-# rubocop:enable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes
+# rubocop:enable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod
 
 Fake.exploit

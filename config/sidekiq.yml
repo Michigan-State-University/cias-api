@@ -4,3 +4,5 @@
   - [default,1]
   - [mailers,2]
   - [log,3]
+  - [active_storage_purge,4]
+  - [active_storage_analysis,5]

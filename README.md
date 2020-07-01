@@ -73,3 +73,4 @@
 * `localhost:3000/rails/browse_emails`
 * `localhost:3000/rails/info/properties`
 * `localhost:3000/rails/info/routes`
+* `localhost:3000/rails/workers`
