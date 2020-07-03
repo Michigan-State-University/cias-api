@@ -7,6 +7,8 @@ question:
   settings:
     image: false
     video: false
+    title: true
+    subtitle: true
   narrator:
     settings:
       voice: true
