@@ -15,8 +15,10 @@ class V1::InterventionsController < V1Controller
   end
 
   def update
-    intervention_load.update!(intervention_params.except(:type))
-    invalidate_cache(intervention_load)
+    intervention = intervention_load
+    intervention.assign_attributes(intervention_params.except(:type))
+    intervention.propagate_settings
+    intervention.save!
     render json: serialized_response(intervention_load)
   end
 
@@ -31,6 +33,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:type, :name, settings: {}, body: {})
+    params.require(:intervention).permit(:type, :name, narrator: {}, settings: {}, body: {})
   end
 end

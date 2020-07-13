@@ -10,8 +10,17 @@ class Intervention < ApplicationRecord
   before_validation :assign_default_values
 
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
-
   validates :type, :name, presence: true
+
+  def propagate_settings
+    if settings_changed?
+      narrator = Hash[settings['narrator'].to_a - settings_was['narrator'].to_a]
+      questions.each do |question|
+        question.narrator['settings'].merge!(narrator)
+        question.save!
+      end
+    end
+  end
 
   private
 
