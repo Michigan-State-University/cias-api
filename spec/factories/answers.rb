@@ -49,7 +49,7 @@ FactoryBot.define do
         association :question, factory: :question_multiple
       end
     end
-    factory :answer_multiple, class: 'Answer::Multiple' do
+    factory :answer_multiple, class: Answer::Multiple do
       type { Answer::Multiple }
       association :question, factory: :question_multiple
       trait :wrong_type do
@@ -73,7 +73,7 @@ FactoryBot.define do
         association :question, factory: :question_multiple
       end
     end
-    factory :answer_single, class: 'Answer::Single' do
+    factory :answer_single, class: Answer::Single do
       type { Answer::Single }
       association :question, factory: :question_single
       trait :wrong_type do
@@ -83,7 +83,7 @@ FactoryBot.define do
         body { { data: [] } }
       end
     end
-    factory :answer_text_box, class: 'Answer::TextBox' do
+    factory :answer_text_box, class: Answer::TextBox do
       type { Answer::TextBox }
       association :question, factory: :question_text_box
       trait :wrong_type do

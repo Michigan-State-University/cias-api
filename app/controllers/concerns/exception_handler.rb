@@ -20,6 +20,10 @@ module ExceptionHandler
       render json: msg(exc), status: :not_found
     end
 
+    rescue_from ActiveRecord::Rollback do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
+
     rescue_from ActiveRecord::SubclassNotFound do |exc|
       render json: msg(exc), status: :internal_server_error
     end

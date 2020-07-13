@@ -24,6 +24,7 @@ gem 'pry-rails'
 gem 'rack-cors'
 gem 'redis'
 gem 'sidekiq'
+gem 'sql_query'
 
 group :development, :test do
   gem 'brakeman', require: false

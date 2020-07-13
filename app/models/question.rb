@@ -14,6 +14,7 @@ class Question < ApplicationRecord
   has_one :image_blob, through: :image_attachment, class_name: 'ActiveStorage::Blob', source: :blob
 
   validates :title, :type, presence: true
+  validates :position, numericality: { greater_than_or_equal_to: 0 }
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :narrator, json: { schema: -> { Rails.root.join("#{json_schema_path}/narrator.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
@@ -27,15 +28,16 @@ class Question < ApplicationRecord
     @questions_same_intervention ||= intervention.questions
   end
 
-  def questions_order_up_to_equal
-    questions_same_intervention.where('questions.order <= ?', order).order(:order)
+  def questions_position_up_to_equal
+    questions_same_intervention.where('questions.position <= ?', position).order(:position)
   end
 
   private
 
   def assign_default_values
-    self.settings ||= retrive_default_values('settings')
     self.narrator ||= retrive_default_values('narrator')
+    self.position ||= 0
+    self.settings ||= retrive_default_values('settings')
   end
 
   def json_schema_path

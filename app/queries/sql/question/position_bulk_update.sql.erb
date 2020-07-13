@@ -1,0 +1,14 @@
+UPDATE
+  questions
+SET
+  position = nv.position
+FROM
+  (
+    VALUES
+      <% @values.each do |value| %>
+        ('<%= value[:id] %>', <%= value[:position] %>)
+          <%= ',' if value[:id] != @values.last[:id] %>
+      <% end %>
+    ) AS nv (id, position)
+WHERE
+  questions.id = nv.id::uuid;

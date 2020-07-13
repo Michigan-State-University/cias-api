@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
     {
       question: {
         type: 'Question::Multiple',
-        order: nil,
+        position: 99,
         title: 'Question Test 1',
         subtitle: 'test 1',
         formula: {

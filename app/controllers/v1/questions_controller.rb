@@ -10,7 +10,9 @@ class V1::QuestionsController < V1Controller
   end
 
   def create
-    question = questions_scope.create!(question_params)
+    question = questions_scope.new(question_params)
+    question.position = questions_scope.last&.position.to_i + 1
+    question.save!
     render json: serialized_response(question), status: :created
   end
 
@@ -19,6 +21,15 @@ class V1::QuestionsController < V1Controller
     question.image.attach(question_load.image.blob)
     question.save!
     render json: serialized_response(question), status: :created
+  end
+
+  def position
+    SqlQuery.new(
+      'question/position_bulk_update',
+      values: question_position_params[:position]
+    ).execute
+    invalidate_cache(questions_scope)
+    render json: serialized_response(questions_scope)
   end
 
   def update
@@ -35,7 +46,7 @@ class V1::QuestionsController < V1Controller
   private
 
   def questions_scope
-    Question.includes(image_attachment: :blob).accessible_by(current_ability).where(intervention_id: params[:intervention_id])
+    Question.includes(image_attachment: :blob).accessible_by(current_ability).where(intervention_id: params[:intervention_id]).order(:position)
   end
 
   def question_load
@@ -43,6 +54,10 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :order, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+  end
+
+  def question_position_params
+    params.require(:question).permit(position: %i[id position])
   end
 end

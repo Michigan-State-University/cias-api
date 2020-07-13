@@ -22,9 +22,7 @@
 
 #### PATTERNS
 
-1. To store dynamic data in Question and Answer, we are using JSON data-interchange format ([RFC 7158](https://tools.ietf.org/html/rfc7158), [RFC 7159](https://tools.ietf.org/html/rfc7159), [RFC 8259](https://tools.ietf.org/html/rfc8259));
-1. We inject identical pattern: `{ data: [] }` to `body` attribute;
-1. Key `data` contains a collection of JSON objects.
+1. To store dynamic data in Question and Answer, we are using JSON data-interchange format ([RFC 7158](https://tools.ietf.org/html/rfc7158), [RFC 7159](https://tools.ietf.org/html/rfc7159), [RFC 8259](https://tools.ietf.org/html/rfc8259)).
 
 
 ## TECHNICAL STACK
@@ -54,6 +52,7 @@
 * API documentation: Slate;
 * Code quaility:
   * Static code analyzer and formatter: Rubocop.
+
 
 ## LAUNCH DEVELOPMENT
 

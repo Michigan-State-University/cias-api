@@ -24,6 +24,7 @@ services:
     volumes:
       - .:/api
       - vol_api_bundle:/usr/local/bundle
+      - vol_api_log:/log
       - vol_api_storage:/storage
       - vol_api_tmp:/tmp
     ports:
@@ -81,12 +82,14 @@ services:
     volumes:
       - .:/api
       - vol_api_bundle:/usr/local/bundle
+      - vol_api_log:/log
       - vol_api_storage:/storage
       - vol_api_tmp:/tmp
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
 
 volumes:
   vol_api_bundle:
+  vol_api_log:
   vol_api_storage:
   vol_api_tmp:
   vol_database:

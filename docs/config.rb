@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'dotenv/load'
-require './lib/unique_head.rb'
+require './lib/unique_head'
 
 set :markdown_engine, :redcarpet
 set :markdown,
@@ -22,7 +22,7 @@ set :fonts_dir, 'fonts'
 
 activate :syntax
 ready do
-  require './lib/multilang.rb'
+  require './lib/multilang'
 end
 
 activate :sprockets
@@ -51,5 +51,5 @@ set :build_dir, '../public/docs/'
 set :port, 3002
 
 helpers do
-  require './lib/toc_data.rb'
+  require './lib/toc_data'
 end

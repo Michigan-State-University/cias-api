@@ -12,6 +12,9 @@ AllCops:
 Bundler/OrderedGems:
   Enabled: false
 
+FactoryBot/FactoryClassName:
+  Enabled: false
+
 Layout/DotPosition:
   Enabled: false
 
@@ -34,6 +37,9 @@ Lint/AmbiguousBlockAssociation:
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
 
+Lint/DuplicateElsifCondition:
+  Enabled: true
+
 Lint/MixedRegexpCaptureTypes:
   Enabled: true
 
@@ -52,6 +58,42 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Enabled: false
 
+Performance/AncestorsInclude:
+  Enabled: true
+
+Performance/BigDecimalWithNumericArgument:
+  Enabled: true
+
+Performance/RedundantSortBlock:
+  Enabled: true
+
+Performance/RedundantStringChars:
+  Enabled: true
+
+Performance/ReverseFirst:
+  Enabled: true
+
+Performance/SortReverse:
+  Enabled: true
+
+Performance/Squeeze:
+  Enabled: true
+
+Performance/StringInclude:
+  Enabled: true
+
+Style/AccessorGrouping:
+  Enabled: true
+
+Style/ArrayCoercion:
+  Enabled: true
+
+Style/BisectedAttrAccessor:
+  Enabled: true
+
+Style/CaseLikeIf:
+  Enabled: true
+
 Style/ClassAndModuleChildren:
   Enabled: false
 
@@ -61,7 +103,18 @@ Style/Documentation:
 Style/ExponentialNotation:
   Enabled: true
 
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  Exclude:
+    - 'db/schema.rb'
+
+Style/HashAsLastArrayItem:
+  Enabled: true
+
 Style/HashEachMethods:
+  Enabled: true
+
+Style/HashLikeCase:
   Enabled: true
 
 Style/HashTransformKeys:
@@ -70,7 +123,13 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Style/RedundantAssignment:
+  Enabled: true
+
 Style/RedundantFetchBlock:
+  Enabled: true
+
+Style/RedundantFileExtensionInRequire:
   Enabled: true
 
 Style/RedundantRegexpCharacterClass:

@@ -6,8 +6,8 @@ class CreateQuestions < ActiveRecord::Migration[6.0]
       t.string :type, null: false
       t.uuid :intervention_id, null: false
       t.jsonb :settings
-      t.integer :order
-      t.string :title, null: false
+      t.integer :position, null: false, default: 0
+      t.string :title, null: false, default: ''
       t.string :subtitle
       t.jsonb :narrator
       t.string :video_url

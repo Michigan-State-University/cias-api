@@ -147,7 +147,7 @@ Parameter | Description | Required
 {
 	"question": {
 		"type": "Question::Name",
-		"order": 12,
+		"position": 12,
 		"title": "question example title",
 		"subtitle": "question example subtitle",
 		"image": "File",
@@ -203,7 +203,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 {
 	"question": {
 		"type": "Question::Name",
-		"order": 12,
+		"position": 12,
 		"title": "question example title",
 		"subtitle": "question example subtitle",
 		"image": "File",
@@ -220,9 +220,6 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 
 > HTTP response 201 Created
-
-
-
 
 
 ## Clone question
@@ -282,10 +279,94 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 > HTTP response 201 Created
 
 
+## Position questions
+
+Resource for update position of questions.
 
 
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/position`
 
 
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+  "question": {
+    "position": [
+      {
+        "id": "blah",
+        "position": 1
+      },
+      {
+        "id": "foo",
+        "position": 2
+      }
+    ]
+  }
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/position
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+  "question": {
+    "position": [
+      {
+        "id": "blah",
+        "order": 1
+      },
+      {
+        "id": "foo",
+        "order": 2
+      }
+    ]
+  }
+}
+
+```
+
+
+> HTTP response 200 OK
 
 
 ## Update question
@@ -389,12 +470,6 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 
 > HTTP response 200 OK
-
-
-
-
-
-
 
 
 ## Destroy question

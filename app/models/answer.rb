@@ -6,12 +6,12 @@ class Answer < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :question, inverse_of: :answers
 
-  delegate :subclass_name, :settings, :order, :title, :subtitle, :formula, to: :question, allow_nil: true
+  delegate :subclass_name, :settings, :position, :title, :subtitle, :formula, to: :question, allow_nil: true
 
   validate :type_integrity_validator
 
   def retrive_previous_answers
-    Answer.where(question_id: question.questions_order_up_to_equal.ids, user_id: user_id)
+    Answer.where(question_id: question.questions_position_up_to_equal.ids, user_id: user_id)
   end
 
   def collect_variables

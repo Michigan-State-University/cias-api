@@ -2,39 +2,38 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :request do
+RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/position', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:question) { create(:question_analogue_scale) }
-  let(:intervention) { question.intervention }
+  let(:intervention) { create(:intervention_single) }
+  let(:question_1) { create(:question_analogue_scale, intervention_id: intervention.id) }
+  let(:question_2) { create(:question_bar_graph, intervention_id: intervention.id) }
+  let(:question_3) { create(:question_information, intervention_id: intervention.id) }
   let(:headers) do
     user.create_new_auth_token
   end
   let(:params) do
     {
       question: {
-        type: question.type,
-        position: 999,
-        title: 'Question Test 1',
-        subtitle: 'test 1',
-        body: {
-          data: [
-            {
-              payload: {
-                start_value: 'test 1',
-                end_value: 'test 1'
-              }
-            }
-          ],
-          "variable": {
-            "name": 'var test 1'
+        position: [
+          {
+            id: question_1.id,
+            position: 11
+          },
+          {
+            id: question_2.id,
+            position: 22
+          },
+          {
+            id: question_3.id,
+            position: 33
           }
-        }
+        ]
       }
     }
   end
 
   context 'when endpoint is available' do
-    before { patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id) }
+    before { patch v1_intervention_questions_position_path(intervention_id: intervention.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -42,7 +41,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   context 'when auth' do
     context 'is without credentials' do
       before do
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id)
+        patch v1_intervention_questions_position_path(intervention_id: intervention.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -55,7 +54,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        patch v1_intervention_questions_position_path(intervention_id: intervention.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -67,7 +66,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
     context 'is valid' do
       before do
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), params: params, headers: headers
+        patch v1_intervention_questions_position_path(intervention_id: intervention.id), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -81,7 +80,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   context 'when response' do
     context 'is JSON' do
       before do
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        patch v1_intervention_questions_position_path(intervention_id: intervention.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -89,7 +88,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
     context 'contains' do
       before do
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), params: params, headers: headers
+        patch v1_intervention_questions_position_path(intervention_id: intervention.id), params: params, headers: headers
       end
 
       it 'to hash success' do
@@ -99,7 +98,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
       it 'key question' do
         parsed_response = JSON.parse(response.body)
-        expect(parsed_response['data']['type']).to eq('question')
+        expect(parsed_response['data'].first['type']).to eq('question')
       end
     end
   end

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -74,8 +72,8 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
     t.string 'type', null: false
     t.uuid 'intervention_id', null: false
     t.jsonb 'settings'
-    t.integer 'order'
-    t.string 'title', null: false
+    t.integer 'position', default: 0, null: false
+    t.string 'title', default: '', null: false
     t.string 'subtitle'
     t.jsonb 'narrator'
     t.string 'video_url'

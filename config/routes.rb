@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   root 'application#status'
   namespace :v1 do
     resources :interventions, only: %i[index show create update] do
+      patch 'questions/position', to: 'questions#position'
       resources :questions, only: %i[index show create update destroy] do
         member do
           get 'clone'

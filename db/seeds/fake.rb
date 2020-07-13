@@ -91,7 +91,7 @@ class Fake
         question = Question.new(
           type: "Question::#{sample_type}",
           intervention_id: intervention_ids.sample,
-          order: rand(1..100),
+          position: rand(1..100),
           title: sample_type,
           subtitle: Faker::Job.position,
           video_url: Faker::Internet.url(host: 'youtube.com'),
