@@ -7,5 +7,6 @@ class Question::Grid < Question
 
   def assign_custom_values
     settings['proceed_button'] ||= settings['proceed_button'] = true
+    settings['required'] ||= settings['required'] = true
   end
 end
