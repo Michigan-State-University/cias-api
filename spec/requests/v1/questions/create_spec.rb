@@ -20,11 +20,17 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
           patterns: [
             {
               match: '= 5',
-              target: '1'
+              target: {
+                type: 'Intervention',
+                id: ''
+              }
             },
             {
               match: '> 5',
-              target: '7'
+              target: {
+                type: 'Question',
+                id: ''
+              }
             }
           ]
         },

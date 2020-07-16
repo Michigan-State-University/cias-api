@@ -101,6 +101,15 @@ class Fake
         question.image.attach(io: File.open(image_sample), filename: image_sample.split('/').last)
         question.save
       end
+      intervention_question_type_id = Intervention.pluck(:type, :id) + Question.pluck(:type, :id)
+      Question.all.each do |question|
+        question.formula['patterns'].each do |pattern|
+          target = intervention_question_type_id.sample
+          pattern['target']['type'] = target.first.deconstantize
+          pattern['target']['id'] = target.last
+        end
+        question.save
+      end
     end
 
     def create_answers
@@ -261,7 +270,10 @@ class Fake
         patterns.push(
           {
             match: "#{comparison.sample} #{rand(1..20)}",
-            target: rand(1..10).to_s
+            target: {
+              type: '',
+              id: ''
+            }
           }
         )
       end
