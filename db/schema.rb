@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_200_610_070_113) do
+ActiveRecord::Schema.define(version: 20_200_716_184_141) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'btree_gin'
   enable_extension 'btree_gist'
@@ -53,15 +53,33 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
     t.index ['user_id'], name: 'index_answers_on_user_id'
   end
 
+  create_table 'friendly_id_slugs', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.string 'slug', null: false
+    t.uuid 'sluggable_id', null: false
+    t.string 'sluggable_type', limit: 50
+    t.string 'scope'
+    t.datetime 'created_at'
+    t.index %w[slug sluggable_type scope], name: 'index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope', unique: true
+    t.index %w[slug sluggable_type], name: 'index_friendly_id_slugs_on_slug_and_sluggable_type', using: :gin
+    t.index %w[sluggable_type sluggable_id], name: 'index_friendly_id_slugs_on_sluggable_type_and_sluggable_id', using: :gin
+  end
+
   create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
     t.uuid 'user_id', null: false
     t.jsonb 'settings'
+    t.boolean 'allow_guests', default: false, null: false
+    t.string 'status'
     t.string 'name', null: false
+    t.string 'slug'
     t.jsonb 'body', default: { 'data' => [] }
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
+    t.index %w[allow_guests status], name: 'index_interventions_on_allow_guests_and_status', using: :gin
+    t.index ['allow_guests'], name: 'index_interventions_on_allow_guests'
     t.index ['name'], name: 'index_interventions_on_name'
+    t.index ['slug'], name: 'index_interventions_on_slug', unique: true
+    t.index ['status'], name: 'index_interventions_on_status'
     t.index %w[type name], name: 'index_interventions_on_type_and_name', using: :gin
     t.index %w[type user_id name], name: 'index_interventions_on_type_and_user_id_and_name', using: :gin
     t.index ['type'], name: 'index_interventions_on_type'

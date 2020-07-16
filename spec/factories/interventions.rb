@@ -6,6 +6,9 @@ FactoryBot.define do
     factory :intervention_single, class: Intervention::Single do
       name { 'Single' }
       type { Intervention::Single }
+      trait :slug do
+        name { 'Intervention Single with slug' }
+      end
     end
 
     factory :intervention_multiple, class: Intervention::Multiple do

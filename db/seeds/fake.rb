@@ -87,6 +87,17 @@ class Fake
           ] }
         )
       end
+      Intervention.order('RANDOM()').first((10..20).to_a.sample).each do |intervention|
+        intervention.broadcast
+        intervention.save!
+      end
+      intervention_published_ids = Intervention.published.ids
+      (5..10).to_a.sample.times do
+        intervention_id = intervention_published_ids.sample
+        intervention = Intervention.find(intervention_id)
+        intervention.update(allow_guests: true)
+        intervention_published_ids.delete(intervention_id)
+      end
     end
 
     def intervention_ids

@@ -7,7 +7,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   let(:headers) do
     user.create_new_auth_token
   end
-  let(:intervention) { create(:intervention_single) }
+  let(:intervention) { create(:intervention_single, :slug) }
   let(:params) do
     {
       intervention: {
@@ -22,7 +22,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   end
 
   context 'when endpoint is available' do
-    before { patch v1_intervention_path(intervention) }
+    before { patch v1_intervention_path(intervention.slug) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -30,7 +30,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        patch v1_intervention_path(intervention), params: params
+        patch v1_intervention_path(intervention.slug), params: params
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -44,7 +44,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       before do
         headers.delete('access-token')
 
-        patch v1_intervention_path(intervention), params: params, headers: headers
+        patch v1_intervention_path(intervention.slug), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -56,7 +56,8 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
 
     context 'is valid' do
       before do
-        patch v1_intervention_path(intervention), params: params, headers: headers
+        intervention.reload
+        patch v1_intervention_path(intervention.slug), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -70,7 +71,8 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   context 'when params' do
     context 'valid' do
       before do
-        patch v1_intervention_path(intervention), params: params, headers: headers
+        intervention.reload
+        patch v1_intervention_path(intervention.slug), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -80,7 +82,8 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       context 'params' do
         before do
           invalid_params = { intervention: {} }
-          patch v1_intervention_path(intervention), params: invalid_params, headers: headers
+          intervention.reload
+          patch v1_intervention_path(intervention.slug), params: invalid_params, headers: headers
         end
 
         it { expect(response).to have_http_status(:bad_request) }
@@ -89,7 +92,8 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       context 'whitelist intervention type correctly' do
         before do
           invalid_params = { intervention: { type: 'test' } }
-          patch v1_intervention_path(intervention), params: invalid_params, headers: headers
+          intervention.reload
+          patch v1_intervention_path(intervention.slug), params: invalid_params, headers: headers
         end
 
         it { expect(response).to have_http_status(:ok) }

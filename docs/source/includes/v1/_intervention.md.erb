@@ -19,6 +19,7 @@ Parameter | Description | Required
 
 Parameter | Description | Required
 --------- | ----------- | --------
+allow_guests=true | Intervention with guest user access | no
 
 
 ### HTTP request method
@@ -245,15 +246,10 @@ Parameter | Description | Required
 
 ### Note
 
-Required keys:
+Key `status_event` possible values:
 
- * `type`;
- * `name`.
-
-`type` key has to contains one of the following values:
-
- * `Intervention::Multiple`;
- * `Intervention::Single`.
+ * `broadcast`;
+ * `close`.
 
 
 > HTTP example request

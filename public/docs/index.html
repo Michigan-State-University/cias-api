@@ -872,6 +872,11 @@ uid: user@cias-api.herokuapp.com
 <th>Required</th>
 </tr>
 </thead><tbody>
+<tr>
+<td>allow_guests=true</td>
+<td>Intervention with guest user access</td>
+<td>no</td>
+</tr>
 </tbody></table>
 <h3 id='http-request-method'>HTTP request method</h3>
 <p><code>GET</code></p>
@@ -1152,18 +1157,11 @@ uid: user@cias-api.herokuapp.com
     }
 }</p>
 <h3 id='note-4'>Note</h3>
-<p>Required keys:</p>
+<p>Key <code>status_event</code> possible values:</p>
 
 <ul>
-<li><code>type</code>;</li>
-<li><code>name</code>.</li>
-</ul>
-
-<p><code>type</code> key has to contains one of the following values:</p>
-
-<ul>
-<li><code>Intervention::Multiple</code>;</li>
-<li><code>Intervention::Single</code>.</li>
+<li><code>broadcast</code>;</li>
+<li><code>close</code>.</li>
 </ul>
 
 <blockquote>

@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
 class V1::InterventionsController < V1Controller
+  skip_before_action :authenticate_user!, on: :index, if: -> { params[:allow_guests] }
+
   def index
-    render json: serialized_response(interventions_scope)
+    if params[:allow_guests]
+      render json: serialized_response(Intervention.published.allow_guests)
+    else
+      render json: serialized_response(interventions_scope)
+    end
   end
 
   def show
@@ -17,15 +23,14 @@ class V1::InterventionsController < V1Controller
   def update
     intervention = intervention_load
     intervention.assign_attributes(intervention_params.except(:type))
-    intervention.propagate_settings
-    intervention.save!
-    render json: serialized_response(intervention_load)
+    intervention.integral_update
+    render json: serialized_response(intervention)
   end
 
   private
 
   def interventions_scope
-    Intervention.accessible_by(current_ability)
+    Intervention.friendly.accessible_by(current_ability)
   end
 
   def intervention_load
@@ -33,6 +38,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:type, :name, narrator: {}, settings: {}, body: {})
+    params.require(:intervention).permit(:type, :status_event, :allow_guests, :name, narrator: {}, settings: {}, body: {})
   end
 end

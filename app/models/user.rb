@@ -15,14 +15,13 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[participant researcher admin].freeze
+  APP_ROLES = %w[guest participant researcher admin].freeze
 
   enumerate_for :roles,
                 APP_ROLES,
                 multiple: true,
                 allow_blank: true
 
-  validates :first_name, :last_name, :email, presence: true
   validates :uid, :email, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :uid, uniqueness: { scope: :provider }

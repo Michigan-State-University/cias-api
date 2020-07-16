@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    aasm (5.0.8)
+      concurrent-ruby (~> 1.0)
     actioncable (6.0.3.2)
       actionpack (= 6.0.3.2)
       nio4r (~> 2.0)
@@ -128,6 +130,8 @@ GEM
       ffi (>= 1.0.0)
       rake
     formatador (0.2.5)
+    friendly_id (5.3.0)
+      activerecord (>= 4.0.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     guard (2.16.2)
@@ -342,6 +346,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aasm
   activerecord_json_validator
   bootsnap (>= 1.4)
   brakeman
@@ -357,6 +362,7 @@ DEPENDENCIES
   faker
   fast_jsonapi
   fasterer
+  friendly_id
   guard-rake
   guard-rspec
   hiredis
