@@ -15,7 +15,7 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[participant group_coder research_assistant content_admin admin].freeze
+  APP_ROLES = %w[participant researcher admin].freeze
 
   enumerate_for :roles,
                 APP_ROLES,
