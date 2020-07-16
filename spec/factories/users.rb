@@ -6,7 +6,6 @@ FactoryBot.define do
     sequence(:last_name) { |s| "last_name_#{s}" }
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
-    sequence(:username) { |s| "user_#{s}" }
     provider { 'email' }
 
     transient do
@@ -19,7 +18,6 @@ FactoryBot.define do
 
     trait :admin do
       roles { %w[admin] }
-      sequence(:username) { |s| "admin_#{s}" }
     end
 
     trait :unconfirmed do

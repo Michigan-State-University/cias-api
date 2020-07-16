@@ -29,7 +29,6 @@ class Fake
         u = User.new(
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,
-          username: role,
           email: "#{role}@#{ENV['DOMAIN_NAME']}",
           password: 'qwerty1234',
           roles: [role]
@@ -41,13 +40,27 @@ class Fake
       u = User.new(
         first_name: 'all',
         last_name: 'roles',
-        username: 'all',
         email: "all_roles@#{ENV['DOMAIN_NAME']}",
         password: 'qwerty1234',
         roles: User::APP_ROLES
       )
       u.confirm
       u.save
+
+      participant_research_assistant = User::APP_ROLES.values_at(0, 2)
+      (6..12).to_a.sample.times do
+        name = Faker::Name.name
+        u = User.new(
+          first_name: name,
+          last_name: name.reverse,
+          email: "#{name.parameterize.underscore}@#{ENV['DOMAIN_NAME']}",
+          phone: Faker::PhoneNumber.phone_number,
+          password: 'B1XBBeYzJkaOu4J6',
+          roles: [participant_research_assistant.sample]
+        )
+        u.confirm
+        u.save
+      end
     end
 
     def intervention_types
@@ -60,7 +73,7 @@ class Fake
 
     def create_interventions
       user_ids
-      (20..40).to_a.sample.times do
+      (40..60).to_a.sample.times do
         Intervention.create(
           type: "Intervention::#{intervention_types.sample}",
           user_id: user_ids.sample,
@@ -85,7 +98,7 @@ class Fake
     end
 
     def create_questions
-      (60..80).to_a.sample.times do
+      (80..100).to_a.sample.times do
         sample_type = subclass_types.sample
         image_sample = images_files.sample
         question = Question.new(

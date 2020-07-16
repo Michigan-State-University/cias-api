@@ -22,8 +22,9 @@ class User < ApplicationRecord
                 multiple: true,
                 allow_blank: true
 
-  validates :first_name, :last_name, :email, :username, presence: true
-  validates :uid, :email, :username, uniqueness: true
+  validates :first_name, :last_name, :email, presence: true
+  validates :uid, :email, uniqueness: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :uid, uniqueness: { scope: :provider }
 
   has_many :interventions, dependent: :restrict_with_exception
@@ -38,7 +39,7 @@ class User < ApplicationRecord
     roles.include?(name)
   end
 
-  def to_s
+  def full_name
     "#{first_name} #{last_name}"
   end
 

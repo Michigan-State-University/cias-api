@@ -1,0 +1,233 @@
+# User
+
+## Get all users
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/users`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/users
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Show user
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/users/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | User ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/users/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Update user
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/users/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | User ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`, `PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"user": {
+		"first_name": "user example first name"
+	}
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/users/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+  "user": {
+    "first_name": "John",
+    "last_name": "Kowalski"
+  }
+}
+```
+
+
+> HTTP response 200 OK
+
+
+## Destroy user
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/users/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | User ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/users/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+> HTTP response 200 OK

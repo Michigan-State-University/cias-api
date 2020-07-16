@@ -104,10 +104,9 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
     t.string 'provider', default: 'email', null: false
     t.string 'uid', default: '', null: false
     t.string 'first_name', default: '', null: false
-    t.string 'middle_name'
     t.string 'last_name', default: '', null: false
-    t.string 'username'
     t.string 'email'
+    t.string 'phone'
     t.text 'roles', default: [], array: true
     t.jsonb 'tokens'
     t.boolean 'deactivated', default: false, null: false
@@ -134,7 +133,6 @@ ActiveRecord::Schema.define(version: 20_200_610_070_113) do
     t.index %w[uid provider], name: 'index_users_on_uid_and_provider', unique: true
     t.index %w[uid roles], name: 'index_users_on_uid_and_roles', using: :gin
     t.index ['uid'], name: 'index_users_on_uid', unique: true
-    t.index ['username'], name: 'index_users_on_username', unique: true
   end
 
   add_foreign_key 'active_storage_attachments', 'active_storage_blobs', column: 'blob_id'

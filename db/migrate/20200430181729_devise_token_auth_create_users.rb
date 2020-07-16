@@ -9,10 +9,9 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
 
       ## User Info
       t.string :first_name, null: false, default: ''
-      t.string :middle_name
       t.string :last_name, null: false, default: ''
-      t.string :username
       t.string :email
+      t.string :phone
 
       ## Authorization
       t.text :roles, default: [], array: true
@@ -57,7 +56,6 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
 
     add_index :users, :uid, unique: true
     add_index :users, :email, unique: true
-    add_index :users, :username, unique: true
     add_index :users, :roles, using: :gin
     add_index :users, %i[uid provider], unique: true
     add_index :users, %i[uid roles], using: :gin
