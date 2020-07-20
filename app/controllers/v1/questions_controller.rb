@@ -18,7 +18,7 @@ class V1::QuestionsController < V1Controller
 
   def clone
     question = question_load.dup
-    question.image.attach(question_load.image.blob)
+    question.image.attach(question_load.image.blob) if question_load.image.attachment
     question.save!
     render json: serialized_response(question), status: :created
   end
