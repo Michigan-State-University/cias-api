@@ -54,7 +54,9 @@
   * Static code analyzer and formatter: Rubocop.
 
 
-## LAUNCH DEVELOPMENT
+## DEVELOPMENT
+
+### LAUNCH
 
 * `$ git clone git@github.com:htdevelopers/cias-api.git`
 * `$ cd cias-api`
@@ -63,3 +65,11 @@
 * `$ docker-compose exec api bundle exec rails db:environment:set RAILS_ENV=development`
 * `$ docker-compose exec api bundle exec rails db:reset db:seed:fake`
 * Open web browser and type: `localhost:3000/`
+
+
+### HELPERS
+
+* `localhost:3000/docs`
+* `localhost:3000/rails/browse_emails`
+* `localhost:3000/rails/info/properties`
+* `localhost:3000/rails/info/routes`

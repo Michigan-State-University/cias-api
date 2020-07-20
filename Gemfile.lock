@@ -148,7 +148,7 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hiredis (0.6.3)
-    i18n (1.8.3)
+    i18n (1.8.4)
       concurrent-ruby (~> 1.0)
     iniparse (1.5.0)
     json (2.3.1)
@@ -158,6 +158,10 @@ GEM
       addressable (~> 2.7)
     letter_opener (1.7.0)
       launchy (~> 2.2)
+    letter_opener_web (1.4.0)
+      actionmailer (>= 3.2)
+      letter_opener (~> 1.0)
+      railties (>= 3.2)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -289,9 +293,9 @@ GEM
       rubocop-ast (>= 0.1.0, < 1.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 2.0)
-    rubocop-ast (0.1.0)
+    rubocop-ast (0.2.0)
       parser (>= 2.7.0.1)
-    rubocop-performance (1.7.0)
+    rubocop-performance (1.7.1)
       rubocop (>= 0.82.0)
     rubocop-rails (2.6.0)
       activesupport (>= 4.2.0)
@@ -356,7 +360,7 @@ DEPENDENCIES
   guard-rake
   guard-rspec
   hiredis
-  letter_opener
+  letter_opener_web
   oj
   overcommit
   pg (~> 1.2)
