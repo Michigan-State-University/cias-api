@@ -6,7 +6,7 @@ class Question::Grid < Question
   private
 
   def assign_custom_values
-    settings['proceed_button'] ||= settings['proceed_button'] = true
-    settings['required'] ||= settings['required'] = true
+    settings['proceed_button'] = true if settings['proceed_button'].nil?
+    settings['required'] = true if settings['required'].nil?
   end
 end

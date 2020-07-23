@@ -6,6 +6,6 @@ class Question::Number < Question
   private
 
   def assign_custom_values
-    settings['required'] ||= settings['required'] = true
+    settings['required'] = true if settings['required'].nil?
   end
 end
