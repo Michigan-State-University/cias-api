@@ -56,3 +56,7 @@ group :test do
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
 end
+
+group :production do
+  gem 'aws-sdk-s3'
+end
