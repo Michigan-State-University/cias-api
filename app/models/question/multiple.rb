@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Question::Multiple < Question
-  before_validation :assign_custom_values
+  attribute :settings, :json, default: -> { assign_default_values('settings') }
 
-  private
-
-  def assign_custom_values
-    settings['required'] = true if settings['required'].nil?
+  def self.assign_default_values(attr)
+    super(attr).merge(
+      { 'required' => true }
+    )
   end
 end

@@ -4,14 +4,14 @@ class Intervention < ApplicationRecord
   extend FriendlyId
   include AASM
   include BodyInterface
-  include DefaultValues
+  extend DefaultValues
   belongs_to :user
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :answers, dependent: :restrict_with_exception, through: :questions
 
   friendly_id :name, use: :slugged
 
-  before_validation :assign_default_values
+  attribute :settings, :json, default: assign_default_values('settings')
 
   attr_accessor :status_event
 
@@ -51,17 +51,13 @@ class Intervention < ApplicationRecord
     save!
   end
 
-  private
-
-  def assign_default_values
-    self.settings ||= retrive_default_values('settings')
+  def should_generate_new_friendly_id?
+    slug.blank? || name_changed?
   end
+
+  private
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/intervention'
-  end
-
-  def should_generate_new_friendly_id?
-    slug.blank? || name_changed?
   end
 end

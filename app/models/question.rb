@@ -2,11 +2,12 @@
 
 class Question < ApplicationRecord
   include BodyInterface
-  include DefaultValues
+  extend DefaultValues
   belongs_to :intervention, inverse_of: :questions
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
-  before_validation :assign_default_values
+  attribute :narrator, :json, default: assign_default_values('narrator')
+  attribute :position, :integer, default: 0
 
   has_one_attached :image
 
@@ -33,12 +34,6 @@ class Question < ApplicationRecord
   end
 
   private
-
-  def assign_default_values
-    self.narrator ||= retrive_default_values('narrator')
-    self.position ||= 0
-    self.settings ||= retrive_default_values('settings')
-  end
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/question'
