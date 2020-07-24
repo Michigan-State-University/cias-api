@@ -38,6 +38,6 @@ module CiasApi
 
     config.active_job.queue_adapter = :sidekiq
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
-    routes.default_url_options = { host: ENV['APP_HOSTNAME'] }
+    routes.default_url_options = { host: ENV['DOMAIN_NAME'] }
   end
 end
