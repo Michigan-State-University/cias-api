@@ -1,2 +1,10 @@
 en:
   hello: Hello world
+  problems:
+    answers:
+      index:
+        csv: The request to send the CSV file has been successfully created. We will soon send a CSV file to your email address.
+  csv_mailer:
+    answers:
+      subject: "[CSV] Answers for: %{problem_name}"
+      body: You ordered the preparation of a CSV file with intervention data, therefore you receive this message. In the attachment, we are sending a file with complete data.

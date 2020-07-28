@@ -3,16 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Intervention, type: :model do
-  describe 'Intervention::Single' do
-    subject { create(:intervention_single) }
-
-    it { should belong_to(:user) }
-    it { should have_many(:questions) }
-    it { should be_valid }
-  end
-
-  describe 'Intervention::Multiple' do
-    subject { create(:intervention_multiple) }
+  describe 'Intervention' do
+    subject { create(:intervention) }
 
     it { should belong_to(:user) }
     it { should have_many(:questions) }

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Question::PositionBulkUpdate', type: :model do
-  let(:intervention) { create(:intervention_single) }
+  let(:intervention) { create(:intervention) }
   let(:question_1) { create(:question_analogue_scale, intervention_id: intervention.id, position: 1) }
   let(:question_2) { create(:question_bar_graph, intervention_id: intervention.id, position: 2) }
   let(:question_3) { create(:question_information, intervention_id: intervention.id, position: 3) }

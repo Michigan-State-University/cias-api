@@ -8,4 +8,8 @@ class Question::AnalogueScale < Question
       { 'required' => true, 'show_number' => true }
     )
   end
+
+  def harvest_body_variables
+    [body_variable['name']]
+  end
 end

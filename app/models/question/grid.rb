@@ -8,4 +8,8 @@ class Question::Grid < Question
       { 'proceed_button' => true, 'required' => true }
     )
   end
+
+  def harvest_body_variables
+    body_data.first['payload']['rows'].map { |row| row['variable']['name'] }
+  end
 end

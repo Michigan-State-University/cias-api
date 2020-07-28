@@ -3,18 +3,19 @@
 FactoryBot.define do
   factory :intervention do
     user
-    name { 'Intervention' }
-    type { Intervention::Single }
-    factory :intervention_single, class: Intervention::Single do
-      name { 'Single' }
-      trait :slug do
-        name { 'Intervention Single with slug' }
-      end
+    sequence(:name) { |s| "intervention_#{s}" }
+    sequence(:position) { |s| s }
+    association :problem
+    trait :slug do
+      name { 'Intervention' }
     end
 
-    factory :intervention_multiple, class: Intervention::Multiple do
-      name { 'Multiple' }
-      type { Intervention::Multiple }
+    trait :with_questions do
+      question { create_list(:question, 5) }
+    end
+
+    trait :with_answers do
+      answers { create_list(:answer, 5) }
     end
   end
 end

@@ -25,11 +25,14 @@ class User < ApplicationRecord
   validates :uid, :email, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :uid, uniqueness: { scope: :provider }
+  validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
 
   has_many :problems, dependent: :restrict_with_exception
   has_many :interventions, dependent: :restrict_with_exception
   has_many :answers, dependent: :restrict_with_exception
   has_many :user_logs_requests, dependent: :restrict_with_exception
+
+  attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'Eastern Time (US & Canada)')
 
   def ability
     @ability ||= Ability.new(self)
@@ -45,6 +48,10 @@ class User < ApplicationRecord
 
   def destroy
     update(deactivated: true) unless deactivated
+  end
+
+  def to_s
+    "#{first_name} #{last_name}"
   end
 
   def active_for_authentication?

@@ -34,19 +34,46 @@ Lint/AmbiguousBlockAssociation:
   Exclude:
     - 'spec/**/*'
 
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+
 Lint/DeprecatedOpenSSLConstant:
   Enabled: true
 
 Lint/DuplicateElsifCondition:
   Enabled: true
 
+Lint/DuplicateRescueException:
+  Enabled: true
+
+Lint/EmptyConditionalBody:
+  Enabled: true
+
+Lint/FloatComparison:
+  Enabled: true
+
+Lint/MissingSuper:
+  Enabled: true
+
 Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+
+Lint/OutOfRangeRegexpRef:
   Enabled: true
 
 Lint/RaiseException:
   Enabled: true
 
+Lint/SelfAssignment:
+  Enabled: true
+
 Lint/StructNewOverride:
+  Enabled: true
+
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+
+Lint/UnreachableLoop:
   Enabled: true
 
 Metrics/AbcSize:
@@ -100,6 +127,9 @@ Style/ClassAndModuleChildren:
 Style/Documentation:
   Enabled: false
 
+Style/ExplicitBlockArgument:
+  Enabled: false
+
 Style/ExponentialNotation:
   Enabled: true
 
@@ -107,6 +137,9 @@ Style/FrozenStringLiteralComment:
   Enabled: true
   Exclude:
     - 'db/schema.rb'
+
+Style/GlobalStdStream:
+  Enabled: true
 
 Style/HashAsLastArrayItem:
   Enabled: true
@@ -121,6 +154,9 @@ Style/HashTransformKeys:
   Enabled: true
 
 Style/HashTransformValues:
+  Enabled: true
+
+Style/OptionalBooleanParameter:
   Enabled: true
 
 Style/RedundantAssignment:
@@ -138,8 +174,15 @@ Style/RedundantRegexpCharacterClass:
 Style/RedundantRegexpEscape:
   Enabled: true
 
+Style/SingleArgumentDig:
+  Enabled: true
+
 Style/SlicingWithRange:
   Enabled: true
+
+Style/StringConcatenation:
+  Enabled: true
+
 
 Style/StructInheritance:
   Exclude:

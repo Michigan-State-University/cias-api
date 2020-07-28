@@ -23,14 +23,16 @@ class V1::ProblemsController < V1Controller
   end
 
   def update
-    problem_load.update!(problem_params)
-    render json: serialized_response(problem_load)
+    problem = problem_load
+    problem.assign_attributes(problem_params)
+    problem.integral_update
+    render json: serialized_response(problem)
   end
 
   private
 
   def problems_scope
-    Problem.accessible_by(current_ability)
+    Problem.includes(:interventions).accessible_by(current_ability)
   end
 
   def problem_load
@@ -38,6 +40,6 @@ class V1::ProblemsController < V1Controller
   end
 
   def problem_params
-    params.require(:problem).permit(:name, :allow_guests, :status)
+    params.require(:problem).permit(:name, :allow_guests, :status_event)
   end
 end

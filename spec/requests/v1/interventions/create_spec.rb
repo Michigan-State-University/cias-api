@@ -89,15 +89,6 @@ RSpec.describe 'POST /v1/interventions', type: :request do
 
         it { expect(response).to have_http_status(:bad_request) }
       end
-
-      context 'intervention type is wrong' do
-        before do
-          invalid_params = { intervention: { type: 'test' } }
-          post v1_interventions_path, params: invalid_params, headers: headers
-        end
-
-        it { expect(response).to have_http_status(:internal_server_error) }
-      end
     end
   end
 end

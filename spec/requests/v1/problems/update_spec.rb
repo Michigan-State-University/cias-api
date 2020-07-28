@@ -15,7 +15,7 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
       problem: {
         allow_guests: true,
         name: 'New Problem',
-        status: 'published'
+        status_event: 'broadcast'
       }
     }
   end

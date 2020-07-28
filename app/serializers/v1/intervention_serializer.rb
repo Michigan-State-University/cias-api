@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class V1::InterventionSerializer < V1Serializer
-  attributes :type, :settings, :status, :allow_guests, :name, :slug, :body, :problem_id
+  attributes :settings, :status, :position, :allow_guests, :name, :slug, :body, :problem_id
 end

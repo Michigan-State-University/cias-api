@@ -12,6 +12,7 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       t.string :last_name, null: false, default: ''
       t.string :email
       t.string :phone
+      t.string :time_zone
 
       ## Authorization
       t.text :roles, default: [], array: true

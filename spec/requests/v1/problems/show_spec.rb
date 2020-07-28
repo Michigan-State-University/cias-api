@@ -11,7 +11,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
 
   let(:allow_guests) { false }
   let(:problem_user) { admin }
-  let(:interventions) { create_list(:intervention_single, 2) }
+  let(:interventions) { create_list(:intervention, 2) }
   let!(:problem) { create(:problem, name: 'Some problem', user: problem_user, interventions: interventions, allow_guests: allow_guests) }
 
   context 'when endpoint is available' do

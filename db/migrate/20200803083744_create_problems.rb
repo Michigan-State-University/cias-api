@@ -4,7 +4,7 @@ class CreateProblems < ActiveRecord::Migration[6.0]
   def change
     create_table :problems, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
       t.string :name
-      t.uuid :user_id
+      t.uuid :user_id, null: false
       t.boolean :allow_guests, null: false, default: false
       t.string :status
 

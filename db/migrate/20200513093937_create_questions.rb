@@ -11,8 +11,8 @@ class CreateQuestions < ActiveRecord::Migration[6.0]
       t.string :subtitle
       t.jsonb :narrator
       t.string :video_url
-      t.jsonb :formula, default: { payload: '', patterns: [] }
-      t.jsonb :body, default: { data: [] }
+      t.jsonb :formula
+      t.jsonb :body
 
       t.timestamps
     end

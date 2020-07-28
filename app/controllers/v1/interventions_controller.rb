@@ -22,7 +22,7 @@ class V1::InterventionsController < V1Controller
 
   def update
     intervention = intervention_load
-    intervention.assign_attributes(intervention_params.except(:type))
+    intervention.assign_attributes(intervention_params)
     intervention.integral_update
     render json: serialized_response(intervention)
   end
@@ -38,6 +38,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:type, :status_event, :allow_guests, :name, :problem_id, narrator: {}, settings: {}, body: {})
+    params.require(:intervention).permit(:status_event, :allow_guests, :name, :position, :problem_id, narrator: {}, settings: {}, body: {})
   end
 end

@@ -3,10 +3,6 @@
 class ApplicationController < ActionController::API
   before_action :user_params, if: :devise_controller?
 
-  def status
-    render json: { message: 'all systems operational' }
-  end
-
   protected
 
   def user_params

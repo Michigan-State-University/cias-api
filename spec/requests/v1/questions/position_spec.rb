@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/position', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention_single) }
+  let(:intervention) { create(:intervention) }
   let(:question_1) { create(:question_analogue_scale, intervention_id: intervention.id) }
   let(:question_2) { create(:question_bar_graph, intervention_id: intervention.id) }
   let(:question_3) { create(:question_information, intervention_id: intervention.id) }

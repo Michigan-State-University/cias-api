@@ -8,4 +8,8 @@ class Question::Multiple < Question
       { 'required' => true }
     )
   end
+
+  def harvest_body_variables
+    body_data.map { |payload| payload['variable']['name'] }
+  end
 end

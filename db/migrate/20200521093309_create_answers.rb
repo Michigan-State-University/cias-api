@@ -6,7 +6,7 @@ class CreateAnswers < ActiveRecord::Migration[6.0]
       t.string :type
       t.uuid :question_id, null: false
       t.uuid :user_id
-      t.jsonb :body, default: { data: [] }
+      t.jsonb :body
 
       t.timestamps
     end
@@ -14,8 +14,9 @@ class CreateAnswers < ActiveRecord::Migration[6.0]
     add_index :answers, :type
     add_index :answers, :question_id
     add_index :answers, :user_id
-    add_index :answers, %i[type question_id user_id], using: :gin
+    add_index :answers, %i[type question_id user_id], unique: true
 
+    add_foreign_key :answers, :users
     add_foreign_key :answers, :questions
   end
 end

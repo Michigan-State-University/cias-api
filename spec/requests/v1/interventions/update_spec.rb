@@ -7,7 +7,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   let(:headers) do
     user.create_new_auth_token
   end
-  let(:intervention) { create(:intervention_single, :slug) }
+  let(:intervention) { create(:intervention, :slug) }
   let(:params) do
     {
       intervention: {
@@ -87,22 +87,6 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         end
 
         it { expect(response).to have_http_status(:bad_request) }
-      end
-
-      context 'whitelist intervention type correctly' do
-        before do
-          invalid_params = { intervention: { type: 'test' } }
-          intervention.reload
-          patch v1_intervention_path(intervention.slug), params: invalid_params, headers: headers
-        end
-
-        it { expect(response).to have_http_status(:ok) }
-
-        it 'before and after request, type is the same ' do
-          outcome_type = json_response['data']['attributes']['type']
-
-          expect(outcome_type).to eq(intervention.type)
-        end
       end
     end
   end

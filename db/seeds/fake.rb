@@ -3,6 +3,7 @@
 require 'faker'
 
 return if Rails.env.production?
+return if User.count.zero?
 
 # rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod
 class Fake
@@ -13,7 +14,7 @@ class Fake
     mattr_accessor :subclass_types
 
     def exploit
-      create_users
+      create_problems
       create_interventions
       create_questions
       create_answers
@@ -21,64 +22,36 @@ class Fake
 
     private
 
+    def user_ids
+      @@user_ids ||= User.ids
+    end
+
     def define_subclasses(path)
       subclasses = Dir.entries(Rails.root.join(path)) - %w[. ..]
       subclasses.each { |file| file.gsub!(/\.rb/, '') }.map(&:classify)
     end
 
-    def create_users
-      User::APP_ROLES.each do |role|
-        u = User.new(
-          first_name: role,
-          last_name: Faker::GreekPhilosophers.name,
-          email: "#{role}@#{ENV['DOMAIN_NAME']}",
-          password: 'qwerty1234',
-          roles: [role]
+    def create_problems
+      user_ids
+      (4..14).to_a.sample.times do
+        Problem.create(
+          name: Faker::University.name,
+          user_id: user_ids.sample,
+          allow_guests: true_or_false.sample
         )
-        u.confirm
-        u.save
-      end
-
-      u = User.new(
-        first_name: 'all',
-        last_name: 'roles',
-        email: "all_roles@#{ENV['DOMAIN_NAME']}",
-        password: 'qwerty1234',
-        roles: User::APP_ROLES
-      )
-      u.confirm
-      u.save
-
-      participant_research_assistant = User::APP_ROLES.values_at(0, 2)
-      (6..12).to_a.sample.times do
-        name = Faker::Name.name
-        u = User.new(
-          first_name: name,
-          last_name: name.reverse,
-          email: "#{name.parameterize.underscore}@#{ENV['DOMAIN_NAME']}",
-          phone: Faker::PhoneNumber.phone_number,
-          password: 'B1XBBeYzJkaOu4J6',
-          roles: [participant_research_assistant.sample]
-        )
-        u.confirm
-        u.save
       end
     end
 
-    def intervention_types
-      @@intervention_types ||= define_subclasses('app/models/intervention/')
-    end
-
-    def user_ids
-      @@user_ids ||= User.ids
+    def problem_ids
+      @@problem_ids ||= Problem.ids
     end
 
     def create_interventions
-      user_ids
+      problem_ids
       (40..60).to_a.sample.times do
         Intervention.create(
-          type: "Intervention::#{intervention_types.sample}",
           user_id: user_ids.sample,
+          problem_id: problem_ids.sample,
           name: Faker::Name.name,
           body: { data: [
             {
@@ -88,10 +61,6 @@ class Fake
             }
           ] }
         )
-      end
-      Intervention.order('RANDOM()').first((10..20).to_a.sample).each do |intervention|
-        intervention.broadcast
-        intervention.save!
       end
       intervention_published_ids = Intervention.published.ids
       (5..10).to_a.sample.times do
@@ -107,7 +76,7 @@ class Fake
     end
 
     def subclass_types
-      @@subclass_types ||= define_subclasses('app/models/question/') - %w[Narrator]
+      @@subclass_types ||= define_subclasses('app/models/question/') - %w[Narrator Csv]
     end
 
     def quotas
@@ -155,12 +124,42 @@ class Fake
             sha256: [],
             audio_urls: [],
             animation: ''
+          },
+          {
+            type: 'Reflection',
+            reflections: [
+              {
+                text: narrator_blocks_text,
+                sha256: [],
+                audio_urls: [],
+                animation: '',
+                variable: '',
+                value: '',
+                question_id: ''
+              },
+              {
+                text: narrator_blocks_text,
+                sha256: [],
+                audio_urls: [],
+                animation: '',
+                variable: '',
+                value: '',
+                question_id: ''
+              }
+            ]
+          },
+          {
+            type: 'Speech',
+            text: narrator_blocks_text,
+            sha256: [],
+            audio_urls: [],
+            animation: ''
           }
         ]
         question.image.attach(io: File.open(image_sample), filename: image_sample.split('/').last)
         question.save
       end
-      intervention_question_type_id = Intervention.pluck(:type, :id) + Question.pluck(:type, :id)
+      intervention_question_type_id = Intervention.pluck(:id).map { |i| ['Intervention', i] } + Question.pluck(:type, :id)
       Question.all.each do |question|
         question.formula['patterns'].each do |pattern|
           target = intervention_question_type_id.sample
@@ -174,12 +173,15 @@ class Fake
     def create_answers
       (100..140).to_a.sample.times do
         question = Question.order('RANDOM()').first
-        Answer.create(
+        answer = Answer.new(
           user_id: user_ids.sample,
           question: question,
-          type: "Answer::#{question.subclass_name}",
-          body: body_data_base
+          type: "Answer::#{question.subclass_name}"
         )
+        answer.save
+        var_name = answer.question.harvest_body_variables&.sample
+        answer.body = answer_body_data(var_name)
+        answer.save
       end
     end
 
@@ -323,6 +325,18 @@ class Fake
       }
     end
 
+    def answer_body_data(var_name)
+      {
+        data: [
+          {
+            var: var_name,
+            value: rand(1..10).to_s
+          }
+        ]
+
+      }
+    end
+
     def formula_data_base
       patterns = []
       (2..5).to_a.sample.times do
@@ -360,6 +374,10 @@ class Fake
 
     def logical
       @@logical ||= %w[AND OR NOT]
+    end
+
+    def true_or_false
+      @@true_or_false ||= [true, false]
     end
   end
 end

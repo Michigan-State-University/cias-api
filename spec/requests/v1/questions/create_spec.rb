@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention_single) }
+  let(:intervention) { create(:intervention) }
   let(:headers) do
     user.create_new_auth_token
   end

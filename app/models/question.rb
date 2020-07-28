@@ -8,6 +8,8 @@ class Question < ApplicationRecord
 
   attribute :narrator, :json, default: assign_default_values('narrator')
   attribute :position, :integer, default: 0
+  attribute :formula, :json, default: { payload: '', patterns: [] }
+  attribute :body, :json, default: { data: [] }
 
   has_one_attached :image
   has_many_attached :speeches
@@ -34,8 +36,8 @@ class Question < ApplicationRecord
     questions_same_intervention.where('questions.position <= ?', position).order(:position)
   end
 
-  def body_text_harvester
-    raise NotImplementedError, 'subclass did not define #body_text_harvester'
+  def harvest_body_variables
+    [nil]
   end
 
   def execute_narrator

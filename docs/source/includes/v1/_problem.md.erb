@@ -111,6 +111,63 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 > HTTP response 200 OK
 
 
+## Get problem answers
+
+Get all answers as a CSV file which belong to the problem.
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/answers`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/answers
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
 ## Create problem
 
 

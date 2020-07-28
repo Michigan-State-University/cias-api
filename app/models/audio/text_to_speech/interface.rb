@@ -6,6 +6,6 @@ module Audio::TextToSpeech::Interface
   include Rails.application.routes.url_helpers
 
   def synthesize
-    raise NotImplementedError, 'subclass did not define #synthesize'
+    raise NotImplementedError, "subclass did not define #{__method__}"
   end
 end

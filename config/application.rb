@@ -35,7 +35,7 @@ module CiasApi
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
-
+    config.i18n.default_locale = :en
     config.active_job.queue_adapter = :sidekiq
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
     routes.default_url_options = { host: ENV['DOMAIN_NAME'] }
