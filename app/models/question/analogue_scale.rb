@@ -5,7 +5,7 @@ class Question::AnalogueScale < Question
 
   def self.assign_default_values(attr)
     super(attr).merge(
-      { 'required' => true }
+      { 'required' => true, 'show_number' => true }
     )
   end
 end
