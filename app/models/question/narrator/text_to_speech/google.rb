@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class Question::Narrator::Speech::Google
-  include Question::Narrator::Speech::Interface
+class Question::Narrator::TextToSpeech::Google
+  include Question::Narrator::TextToSpeech::Interface
 
   attr_reader :text
 
@@ -31,6 +31,16 @@ class Question::Narrator::Speech::Google
   end
 
   def client
-    @client ||= Google::Cloud::TextToSpeech.text_to_speech
+    @client ||= Google::Cloud::TextToSpeech.text_to_speech do |tts|
+      tts.credentials = credentials
+    end
+  end
+
+  def credentials
+    @credentials ||= begin
+                       Oj.load(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
+                     rescue Oj::ParseError
+                       ENV['GOOGLE_APPLICATION_CREDENTIALS']
+                     end
   end
 end

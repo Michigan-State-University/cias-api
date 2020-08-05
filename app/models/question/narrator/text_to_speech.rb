@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Question::Narrator::Speech < SimpleDelegator
+class Question::Narrator::TextToSpeech < SimpleDelegator
   attr_accessor :question, :mp3_file, :audio_url
   attr_reader :target
 
@@ -25,12 +25,12 @@ class Question::Narrator::Speech < SimpleDelegator
 
   def provider
     @provider ||= begin
-      "Question::Narrator::Speech::#{require_provider.classify}".safe_constantize
+      "Question::Narrator::TextToSpeech::#{require_provider.classify}".safe_constantize
     end
   end
 
   def block
-    @block ||= narrator[target[:speech_scope]][target[:index_processing]]
+    @block ||= narrator[target[:speech_source]][target[:index_processing]]
   end
 
   def text

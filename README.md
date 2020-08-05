@@ -2,6 +2,7 @@
 
 
 ## METADATA
+
 * Project name: CIAS 3.0 (Computerized Intervention Authoring System);
 * Owner: [Wayne State University](https://wayne.edu/);
 * Documentation:
@@ -61,6 +62,8 @@
 * `$ git clone git@github.com:htdevelopers/cias-api.git`
 * `$ cd cias-api`
 * `$ cp .env.template .env`
+* Retrieve and save credentials file in order to use:
+  * Google Cloud Platform: `./cias-api-50c1a8455413.json`.
 * `$ docker-compose up --build`
 * `$ docker-compose exec api bundle exec rails db:environment:set RAILS_ENV=development`
 * `$ docker-compose exec api bundle exec rails db:reset db:seed:fake`

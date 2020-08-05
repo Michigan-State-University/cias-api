@@ -15,6 +15,8 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+require 'google/cloud/text_to_speech/v1/text_to_speech'
+require 'google/cloud/text_to_speech/v1/version'
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

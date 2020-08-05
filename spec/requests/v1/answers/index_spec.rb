@@ -69,14 +69,12 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
         get v1_answers_path(question.id), params: {}, headers: headers
       end
 
-      let(:parsed_response) { JSON.parse(response.body) }
-
       it 'success to Hash' do
-        expect(parsed_response.class).to be(Hash)
+        expect(json_response.class).to be(Hash)
       end
 
       it 'key data return collection' do
-        expect(parsed_response['data'].class).to eq(Array)
+        expect(json_response['data'].class).to eq(Array)
       end
     end
   end

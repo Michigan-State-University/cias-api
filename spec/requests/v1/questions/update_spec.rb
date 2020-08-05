@@ -93,13 +93,11 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
       end
 
       it 'to hash success' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response.class).to be(Hash)
+        expect(json_response.class).to be(Hash)
       end
 
       it 'key question' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response['data']['type']).to eq('question')
+        expect(json_response['data']['type']).to eq('question')
       end
     end
   end

@@ -69,8 +69,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/questions', type: :reques
       end
 
       it 'success to Hash' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response.class).to be(Hash)
+        expect(json_response.class).to be(Hash)
       end
     end
   end

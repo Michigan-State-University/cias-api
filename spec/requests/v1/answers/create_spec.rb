@@ -104,8 +104,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       it { expect(response).to have_http_status(:success) }
 
       it 'success to Hash' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response.class).to be(Hash)
+        expect(json_response.class).to be(Hash)
       end
     end
 
@@ -117,8 +116,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       it { expect(response).to have_http_status(:success) }
 
       it 'success to Hash' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response.class).to be(Hash)
+        expect(json_response.class).to be(Hash)
       end
     end
   end

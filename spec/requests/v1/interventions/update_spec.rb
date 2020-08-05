@@ -99,7 +99,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         it { expect(response).to have_http_status(:ok) }
 
         it 'before and after request, type is the same ' do
-          outcome_type = JSON.parse(response.body)['data']['attributes']['type']
+          outcome_type = json_response['data']['attributes']['type']
 
           expect(outcome_type).to eq(intervention.type)
         end

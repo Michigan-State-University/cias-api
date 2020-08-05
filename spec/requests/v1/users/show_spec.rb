@@ -69,13 +69,11 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
       end
 
       it 'to hash success' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response.class).to be(Hash)
+        expect(json_response.class).to be(Hash)
       end
 
       it 'key question' do
-        parsed_response = JSON.parse(response.body)
-        expect(parsed_response['data']['type']).to eq('user')
+        expect(json_response['data']['type']).to eq('user')
       end
     end
   end
