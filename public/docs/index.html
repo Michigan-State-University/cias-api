@@ -258,6 +258,23 @@
               </ul>
           </li>
           <li>
+            <a href="#problem" class="toc-h1 toc-link" data-title="Problem">Problem</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-all-problems" class="toc-h2 toc-link" data-title="Get all problems">Get all problems</a>
+                  </li>
+                  <li>
+                    <a href="#show-problem" class="toc-h2 toc-link" data-title="Show problem">Show problem</a>
+                  </li>
+                  <li>
+                    <a href="#create-problem" class="toc-h2 toc-link" data-title="Create problem">Create problem</a>
+                  </li>
+                  <li>
+                    <a href="#update-problem" class="toc-h2 toc-link" data-title="Update problem">Update problem</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#intervention" class="toc-h1 toc-link" data-title="Intervention">Intervention</a>
               <ul class="toc-list-h2">
                   <li>
@@ -337,16 +354,16 @@
       <div class="dark-box"></div>
       <div class="content">
         <h1 id='introduction'>Introduction</h1>
-<p>Welcome to the CIAS 3.0 (Computerized Intervention Authoring System)</p>
+<p>Welcome to the </p>
 
 <blockquote>
 <p>Base URL</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">localhost:3000
+<pre class="highlight http tab-http"><code><span class="err">
 </span></code></pre>
-<p>This describes the resources that make up the official <a href="https://cias-api.herokuapp.com">cias-api.herokuapp.com</a> REST API. In order to use resources, You have to obtain an appropriate token.</p>
+<p>This describes the resources that make up the official <a href="https://"></a> REST API. In order to use resources, You have to obtain an appropriate token.</p>
 <h1 id='authentication'>Authentication</h1><h2 id='create-session'>Create session</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/auth/sign_in</code></p>
+<p><code>/auth/sign_in</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -394,10 +411,10 @@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/auth/sign_in
+<pre class="highlight http tab-http"><code><span class="err">POST /auth/sign_in
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@cias-api.herokuapp.com"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
@@ -408,17 +425,17 @@
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
     </span><span class="s2">"deactivated"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@cias-api.herokuapp.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"provider"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
       </span><span class="s2">"admin"</span><span class="w">
     </span><span class="p">],</span><span class="w">
-    </span><span class="s2">"uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@cias-api.herokuapp.com"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"allow_password_change"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
@@ -435,7 +452,7 @@ uid: user@cias-api.herokuapp.com
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre><h2 id='destroy-session'>Destroy session</h2><h3 id='resource-2'>Resource</h3>
-<p><code>localhost:3000/auth/sign_out</code></p>
+<p><code>/auth/sign_out</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -488,12 +505,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/auth/sign_out
+<pre class="highlight http tab-http"><code><span class="err">DELETE /auth/sign_out
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
@@ -512,7 +529,7 @@ uid: user@cias-api.herokuapp.com
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre><h1 id='registration'>Registration</h1><h2 id='create-user'>Create user</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/auth</code></p>
+<p><code>/auth</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -559,7 +576,7 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/auth
+<pre class="highlight http tab-http"><code><span class="err">POST /auth
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: multipart/form-data
 </span></code></pre><pre class="highlight shell tab-shell"><code>  first_name <span class="o">=</span> first
   last_name <span class="o">=</span> last
@@ -571,7 +588,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='user'>User</h1><h2 id='get-all-users'>Get all users</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/v1/users</code></p>
+<p><code>/v1/users</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -624,18 +641,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/users
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/users
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-user'>Show user</h2><h3 id='resource-2'>Resource</h3>
-<p><code>localhost:3000/v1/users/:id</code></p>
+<p><code>/v1/users/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -693,18 +710,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/users/1
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-user'>Update user</h2><h3 id='resource-3'>Resource</h3>
-<p><code>localhost:3000/v1/users/:id</code></p>
+<p><code>/v1/users/:id</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -768,12 +785,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/users/1
+<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John"</span><span class="p">,</span><span class="w">
@@ -785,7 +802,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='destroy-user'>Destroy user</h2><h3 id='resource-4'>Resource</h3>
-<p><code>localhost:3000/v1/users/:id</code></p>
+<p><code>/v1/users/:id</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -843,18 +860,360 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/users/1
+<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
-<h1 id='intervention'>Intervention</h1><h2 id='get-all-interventions'>Get all interventions</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/v1/interventions</code></p>
+<h1 id='problem'>Problem</h1><h2 id='get-all-problems'>Get all problems</h2><h3 id='resource'>Resource</h3>
+<p><code>/v1/problems</code></p>
+<h3 id='url-parameters'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='query-string'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>allow_guests=true</td>
+<td>Problem with guest user access</td>
+<td>no</td>
+</tr>
+</tbody></table>
+<h3 id='http-request-method'>HTTP request method</h3>
+<p><code>GET</code></p>
+<h3 id='http-headers'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body'>HTTP body</h3><h3 id='note'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<h2 id='show-problem'>Show problem</h2><h3 id='resource-2'>Resource</h3>
+<p><code>/v1/problems/:id</code></p>
+<h3 id='url-parameters-2'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>Problem ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-2'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-2'>HTTP request method</h3>
+<p><code>GET</code></p>
+<h3 id='http-headers-2'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-2'>HTTP body</h3><h3 id='note-2'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems/1
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<h2 id='create-problem'>Create problem</h2><h3 id='resource-3'>Resource</h3>
+<p><code>/v1/problems</code></p>
+<h3 id='url-parameters-3'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='query-string-3'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-3'>HTTP request method</h3>
+<p><code>POST</code></p>
+<h3 id='http-headers-3'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">POST /v1/problems
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Problem example 1"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"allow_guests"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='note-3'>Note</h3>
+<p>Required keys:</p>
+
+<ul>
+<li><code>name</code>;</li>
+<li><code>allow_guests</code>.</li>
+</ul>
+
+<p>Optional keys:</p>
+
+<ul>
+<li><code>status</code>.</li>
+</ul>
+
+<p><code>status</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>draft</code>;</li>
+<li><code>published</code>;</li>
+<li><code>closed</code>.</li>
+</ul>
+
+<blockquote>
+<p>HTTP response 200 OK</p>
+
+<p>HTTP response body</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Problem example 1"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"allow_guests"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"interventions"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='update-problem'>Update problem</h2><h3 id='resource-4'>Resource</h3>
+<p><code>/v1/problems/:id</code></p>
+<h3 id='url-parameters-4'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>Problem ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-4'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-4'>HTTP request method</h3>
+<p><code>PATCH, PUT</code></p>
+<h3 id='http-headers-4'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/problems/:id
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Problem updated example 1"</span><span class="p">,</span><span class="w">
+     </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"published"</span><span class="p">,</span><span class="w">
+     </span><span class="s2">"allow_guests"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='note-4'>Note</h3>
+<p>Possible keys:</p>
+
+<ul>
+<li><code>name</code>;</li>
+<li><code>allow_guests</code>;</li>
+<li><code>status</code>.</li>
+</ul>
+
+<p><code>status</code> key has to contains one of the following values:</p>
+
+<ul>
+<li><code>draft</code>;</li>
+<li><code>published</code>;</li>
+<li><code>closed</code>.</li>
+</ul>
+
+<blockquote>
+<p>HTTP response 200 OK</p>
+
+<p>HTTP response body</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Problem updated example 1"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"published"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"allow_guests"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"interventions"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h1 id='intervention'>Intervention</h1><h2 id='get-all-interventions'>Get all interventions</h2><h3 id='resource'>Resource</h3>
+<p><code>/v1/interventions</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -912,18 +1271,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/interventions
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-intervention'>Show intervention</h2><h3 id='resource-2'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:id</code></p>
+<p><code>/v1/interventions/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -981,18 +1340,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/interventions/1
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-intervention'>Create intervention</h2><h3 id='resource-3'>Resource</h3>
-<p><code>localhost:3000/v1/interventions</code></p>
+<p><code>/v1/interventions</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1070,12 +1429,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/interventions
+<pre class="highlight http tab-http"><code><span class="err">POST /v1/interventions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"intervention"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Intervention::Single"</span><span class="p">,</span><span class="w">
@@ -1091,7 +1450,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-intervention'>Update intervention</h2><h3 id='resource-4'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:id</code></p>
+<p><code>/v1/interventions/:id</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1167,12 +1526,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/interventions/:id
+<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/interventions/:id
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"intervention"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Intervention::Single"</span><span class="p">,</span><span class="w">
@@ -1191,7 +1550,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='question'>Question</h1><h2 id='get-all-questions'>Get all questions</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions</code></p>
+<p><code>/v1/interventions/:intervention_id/questions</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1249,18 +1608,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/interventions/1/questions
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/1/questions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-question'>Show question</h2><h3 id='resource-2'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
+<p><code>/v1/interventions/:intervention_id/questions/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1323,18 +1682,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/interventions/1/questions/1
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/1/questions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-question'>Create question</h2><h3 id='resource-3'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions</code></p>
+<p><code>/v1/interventions/:intervention_id/questions</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1432,12 +1791,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/interventions/1/questions
+<pre class="highlight http tab-http"><code><span class="err">POST /v1/interventions/1/questions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::Name"</span><span class="p">,</span><span class="w">
@@ -1459,7 +1818,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='clone-question'>Clone question</h2><h3 id='resource-4'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id/clone</code></p>
+<p><code>/v1/interventions/:intervention_id/questions/:id/clone</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1522,12 +1881,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000v1/interventions/1/questions/1/clone
+<pre class="highlight http tab-http"><code><span class="err">GET v1/interventions/1/questions/1/clone
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 201 Created</p>
@@ -1535,7 +1894,7 @@ uid: user@cias-api.herokuapp.com
 <h2 id='position-questions'>Position questions</h2>
 <p>Resource for update position of questions.</p>
 <h3 id='resource-5'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions/position</code></p>
+<p><code>/v1/interventions/:intervention_id/questions/position</code></p>
 <h3 id='url-parameters-5'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1608,12 +1967,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/interventions/:intervention_id/questions/position
+<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/interventions/:intervention_id/questions/position
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -1634,7 +1993,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-question'>Update question</h2><h3 id='resource-6'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
+<p><code>/v1/interventions/:intervention_id/questions/:id</code></p>
 <h3 id='url-parameters-6'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1733,12 +2092,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/interventions/1/questions/1
+<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/interventions/1/questions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"question example title"</span><span class="p">,</span><span class="w">
@@ -1756,7 +2115,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='destroy-question'>Destroy question</h2><h3 id='resource-7'>Resource</h3>
-<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
+<p><code>/v1/interventions/:intervention_id/questions/:id</code></p>
 <h3 id='url-parameters-7'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1819,18 +2178,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/interventions/1/questions/1
+<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/interventions/1/questions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='image-for-question'>Image for Question</h1><h2 id='create-image-for-question'>Create image for question</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/v1/questions/:question_id/images</code></p>
+<p><code>/v1/questions/:question_id/images</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1893,12 +2252,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/questions/1/images
+<pre class="highlight http tab-http"><code><span class="err">POST /v1/questions/1/images
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: multipart/form-data; boundary=something
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight plaintext"><code>| (60.7 KB hidden)
 | (60.7 KB hidden)
 | (60.7 KB hidden)
@@ -1913,7 +2272,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='destroy-image-for-question'>Destroy image for question</h2><h3 id='resource-2'>Resource</h3>
-<p><code>localhost:3000/v1/questions/:question_id/images</code></p>
+<p><code>/v1/questions/:question_id/images</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1971,18 +2330,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/questions/1/images
+<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/questions/1/images
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='answer'>Answer</h1><h2 id='get-all-answers'>Get all answers</h2><h3 id='resource'>Resource</h3>
-<p><code>localhost:3000/v1/questions/:question_id/answers</code></p>
+<p><code>/v1/questions/:question_id/answers</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2040,18 +2399,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/questions/1/answers
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/questions/1/answers
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-answer'>Show answer</h2><h3 id='resource-2'>Resource</h3>
-<p><code>localhost:3000/v1/questions/:question_id/answers/:id</code></p>
+<p><code>/v1/questions/:question_id/answers/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2114,18 +2473,18 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/questions/1/answers/1
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/questions/1/answers/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-answer'>Create answer</h2><h3 id='resource-3'>Resource</h3>
-<p><code>localhost:3000/v1/questions/:question_id/answers</code></p>
+<p><code>/v1/questions/:question_id/answers</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2218,12 +2577,12 @@ uid: user@cias-api.herokuapp.com
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/questions/1/answers
+<pre class="highlight http tab-http"><code><span class="err">POST /v1/questions/1/answers
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@cias-api.herokuapp.com
+uid: user@
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"answer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::Single"</span><span class="p">,</span><span class="w">
@@ -2240,7 +2599,7 @@ uid: user@cias-api.herokuapp.com
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='errors'>Errors</h1>
-<p>The CIAS 3.0 uses the following error codes:</p>
+<p>The  uses the following error codes:</p>
 
 <table><thead>
 <tr>

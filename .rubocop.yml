@@ -216,3 +216,6 @@ RSpec/InstanceVariable:
 
 RSpec/NestedGroups:
   Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false

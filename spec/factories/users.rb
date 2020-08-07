@@ -20,6 +20,18 @@ FactoryBot.define do
       roles { %w[admin] }
     end
 
+    trait :guest do
+      roles { %w[guest] }
+    end
+
+    trait :participant do
+      roles { %w[participant] }
+    end
+
+    trait :researcher do
+      roles { %w[researcher] }
+    end
+
     trait :unconfirmed do
       after(:create) do |user, evaluator|
         user.update_attribute(:confirmation_sent_at, evaluator.allow_unconfirmed_period - 1.day)

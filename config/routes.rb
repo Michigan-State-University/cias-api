@@ -7,6 +7,7 @@ Rails.application.routes.draw do
   mount_devise_token_auth_for 'User', at: 'auth'
   root 'application#status'
   namespace :v1 do
+    resources :problems, only: %i[index show create update]
     resources :users, only: %i[index show update destroy]
     resources :interventions, only: %i[index show create update] do
       patch 'questions/position', to: 'questions#position'

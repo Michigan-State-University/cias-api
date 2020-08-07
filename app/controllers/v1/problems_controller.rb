@@ -1,0 +1,43 @@
+# frozen_string_literal: true
+
+class V1::ProblemsController < V1Controller
+  skip_before_action :authenticate_user!, on: :index, if: -> { params[:allow_guests] }
+
+  load_and_authorize_resource only: %i[create update]
+
+  def index
+    if params[:allow_guests]
+      render json: serialized_response(Problem.published.allow_guests)
+    else
+      render json: serialized_response(problems_scope)
+    end
+  end
+
+  def show
+    render json: serialized_response(problem_load)
+  end
+
+  def create
+    problem = current_user.problems.create!(problem_params)
+    render json: serialized_response(problem), status: :created
+  end
+
+  def update
+    problem_load.update!(problem_params)
+    render json: serialized_response(problem_load)
+  end
+
+  private
+
+  def problems_scope
+    Problem.accessible_by(current_ability)
+  end
+
+  def problem_load
+    problems_scope.find(params[:id])
+  end
+
+  def problem_params
+    params.require(:problem).permit(:name, :allow_guests, :status)
+  end
+end

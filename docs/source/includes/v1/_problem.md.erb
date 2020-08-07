@@ -1,0 +1,284 @@
+# Problem
+
+
+## Get all problems
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+allow_guests=true | Problem with guest user access | no
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/problems
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Show problem
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/problems/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Create problem
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/problems
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"problem": {
+    "name": "Problem example 1",
+    "status": "draft",
+    "allow_guests": false
+	}
+}
+```
+
+
+### Note
+
+Required keys:
+
+ * `name`;
+ * `allow_guests`.
+
+ Optional keys:
+
+ * `status`.
+
+ `status` key has to contains one of the following values:
+
+ * `draft`;
+ * `published`;
+ * `closed`.
+
+
+> HTTP response 200 OK
+
+> HTTP response body
+
+```json
+{
+	"problem": {
+		"name": "Problem example 1",
+		"status": "draft",
+		"allow_guests": false,
+		"interventions": []
+	}
+}
+```
+
+
+## Update problem
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH, PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/problems/:id
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"problem": {
+		"name": "Problem updated example 1",
+     "status": "published",
+     "allow_guests": true
+	}
+}
+```
+
+### Note
+
+Possible keys:
+
+ * `name`;
+ * `allow_guests`;
+ * `status`.
+
+ `status` key has to contains one of the following values:
+
+ * `draft`;
+ * `published`;
+ * `closed`.
+
+
+> HTTP response 200 OK
+
+> HTTP response body
+
+```json
+{
+	"problem": {
+		"name": "Problem updated example 1",
+		"status": "published",
+		"allow_guests": true,
+		"interventions": []
+	}
+}
+```

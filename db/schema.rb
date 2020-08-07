@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_200_716_184_141) do
+ActiveRecord::Schema.define(version: 20_200_803_083_744) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'btree_gin'
   enable_extension 'btree_gist'
@@ -67,6 +67,7 @@ ActiveRecord::Schema.define(version: 20_200_716_184_141) do
   create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
     t.uuid 'user_id', null: false
+    t.uuid 'problem_id'
     t.jsonb 'settings'
     t.boolean 'allow_guests', default: false, null: false
     t.string 'status'
@@ -78,12 +79,25 @@ ActiveRecord::Schema.define(version: 20_200_716_184_141) do
     t.index %w[allow_guests status], name: 'index_interventions_on_allow_guests_and_status', using: :gin
     t.index ['allow_guests'], name: 'index_interventions_on_allow_guests'
     t.index ['name'], name: 'index_interventions_on_name'
+    t.index ['problem_id'], name: 'index_interventions_on_problem_id'
     t.index ['slug'], name: 'index_interventions_on_slug', unique: true
     t.index ['status'], name: 'index_interventions_on_status'
     t.index %w[type name], name: 'index_interventions_on_type_and_name', using: :gin
     t.index %w[type user_id name], name: 'index_interventions_on_type_and_user_id_and_name', using: :gin
     t.index ['type'], name: 'index_interventions_on_type'
     t.index ['user_id'], name: 'index_interventions_on_user_id'
+  end
+
+  create_table 'problems', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.string 'name'
+    t.uuid 'user_id'
+    t.boolean 'allow_guests', default: false, null: false
+    t.string 'status'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['allow_guests'], name: 'index_problems_on_allow_guests'
+    t.index ['status'], name: 'index_problems_on_status'
+    t.index ['user_id'], name: 'index_problems_on_user_id'
   end
 
   create_table 'questions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
@@ -156,6 +170,7 @@ ActiveRecord::Schema.define(version: 20_200_716_184_141) do
   add_foreign_key 'active_storage_attachments', 'active_storage_blobs', column: 'blob_id'
   add_foreign_key 'answers', 'questions'
   add_foreign_key 'interventions', 'users'
+  add_foreign_key 'problems', 'users'
   add_foreign_key 'questions', 'interventions'
   add_foreign_key 'user_log_requests', 'users'
 end

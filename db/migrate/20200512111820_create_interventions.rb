@@ -5,6 +5,7 @@ class CreateInterventions < ActiveRecord::Migration[6.0]
     create_table :interventions, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
       t.string :type, null: false
       t.uuid :user_id, null: false
+      t.uuid :problem_id
       t.jsonb :settings
       t.boolean :allow_guests, null: false, default: false
       t.string :status
@@ -17,6 +18,7 @@ class CreateInterventions < ActiveRecord::Migration[6.0]
 
     add_index :interventions, :type
     add_index :interventions, :user_id
+    add_index :interventions, :problem_id
     add_index :interventions, :allow_guests
     add_index :interventions, :status
     add_index :interventions, %i[allow_guests status], using: :gin

@@ -26,6 +26,7 @@ class User < ApplicationRecord
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :uid, uniqueness: { scope: :provider }
 
+  has_many :problems, dependent: :restrict_with_exception
   has_many :interventions, dependent: :restrict_with_exception
   has_many :answers, dependent: :restrict_with_exception
   has_many :user_logs_requests, dependent: :restrict_with_exception

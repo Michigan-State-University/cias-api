@@ -9,8 +9,9 @@ class Ability::Guest < Ability::Base
   private
 
   def guest
-    can :read, Intervention, allow_guests: true, status: 'published'
-    can :read, Question, intervention: { allow_guests: true, status: 'published' }
-    can :create, Answer, question: { intervention: { allow_guests: true, status: 'published' } }
+    can :read, Problem, allow_guests: true, status: 'published'
+    can :read, Intervention, allow_guests: true, problem: { status: 'published' }
+    can :read, Question, intervention: { allow_guests: true, problem: { status: 'published' } }
+    can :create, Answer, question: { intervention: { allow_guests: true, problem: { status: 'published' } } }
   end
 end

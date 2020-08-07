@@ -6,6 +6,7 @@ class Intervention < ApplicationRecord
   include BodyInterface
   extend DefaultValues
   belongs_to :user
+  belongs_to :problem, optional: true
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :answers, dependent: :restrict_with_exception, through: :questions
 
@@ -21,8 +22,8 @@ class Intervention < ApplicationRecord
 
   aasm.attribute_name :status
   aasm do
-    state :draft, initial: true
-    state :published, :finished
+    state :draft, :finished
+    state :published, initial: true
 
     event :broadcast do
       transitions from: :draft, to: :published
