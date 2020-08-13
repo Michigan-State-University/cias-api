@@ -9,7 +9,7 @@ class Question::Narrator::SpeechSource
 
   def execute
     narrator['blocks'].each do |block|
-      return 'blocks' if block['type'].eql?('Speech')
+      return 'blocks' if block['type'].eql?('Speech') || block['type'].eql?('Reflection')
     end
     'from_question'
   end

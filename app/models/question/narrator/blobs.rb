@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Question::Narrator::Blobs
+  include BlockHelper
+
   attr_accessor :ids
   attr_reader :narrator
 
@@ -30,8 +32,8 @@ class Question::Narrator::Blobs
     url.split('/').last
   end
 
-  def extract_filenames(block)
-    block.map { |i| split_url(i) }
+  def extract_filenames(audio_urls)
+    audio_urls.map { |url| split_url(url) }
   end
 
   def body(block)
@@ -39,14 +41,20 @@ class Question::Narrator::Blobs
   end
 
   def blocks
-    narrator['blocks'].each { |b| body(b) if speech?(b) }
+    narrator['blocks'].each do |b|
+      if speech?(b)
+        body(b)
+      elsif reflection?(b)
+        reflection_block(b)
+      end
+    end
+  end
+
+  def reflection_block(block)
+    block['reflections'].each { |ref| body(ref) }
   end
 
   def from_question
     narrator['from_question'].each { |b| body(b) }
-  end
-
-  def speech?(block)
-    block['type'].eql?('Speech')
   end
 end

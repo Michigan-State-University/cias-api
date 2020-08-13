@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Question::Narrator
+  include BlockHelper
+
   attr_accessor :question, :outdated_files, :speech_source
 
   def initialize(question)
@@ -21,62 +23,24 @@ class Question::Narrator
 
   private
 
-  def speech?(block)
-    block['type'].eql?('Speech')
-  end
-
-  def blocks_sha256_digest(extend = nil)
-    question.public_send("narrator#{extend}")[speech_source].each do |block|
-      next unless speech?(block)
-
-      block['sha256'] = block['text'].map do |text|
-        Digest::SHA256.hexdigest(text)
+  def blocks_processing
+    question.narrator['blocks'].each_with_index do |block, index|
+      if speech?(block)
+        processing(block, index)
+      elsif reflection?(block)
+        reflection_processing(block, index)
       end
     end
-  end
-
-  def blocks_collection
-    @blocks_collection ||= blocks_sha256_digest
-  end
-
-  def was_blocks_collection
-    @was_blocks_collection ||= blocks_sha256_digest(:_was)
-  end
-
-  def was_sha256(index_processing)
-    was_blocks_collection[index_processing]&.fetch('sha256', [])
-  end
-
-  def was_audio_url(index_processing, index)
-    return nil if index.nil?
-
-    was_blocks_collection[index_processing]['audio_urls'][index]
   end
 
   def processing(block, index_processing)
-    new_audio_urls = block['sha256'].map.with_index(0) do |digest, index_block|
-      if was_blocks_collection.present?
-        was_at_index = was_sha256(index_processing)&.index(digest)
-        was_audio_url_result = was_audio_url(index_processing, was_at_index)
-      end
-      new_audio_url = if was_at_index.nil? || was_audio_url_result.nil?
-                        TextToSpeech.new(
-                          question,
-                          speech_source: speech_source,
-                          index_processing: index_processing,
-                          index_block: index_block
-                        ).execute
-                      else
-                        was_audio_url_result
-                      end
-
-      outdated_files.remove(new_audio_url)
-      new_audio_url
-    end
-    question.narrator[speech_source][index_processing]['audio_urls'] = new_audio_urls
+    old_block = question.narrator_was[speech_source][index_processing]
+    speech = Block::Speech.new(self, index_processing, block, old_block).build
+    question.narrator[speech_source][index_processing] = speech
   end
 
-  def blocks_processing
-    blocks_collection.each_with_index { |block, index| processing(block, index) if speech?(block) }
+  def reflection_processing(block, index_processing)
+    reflection = Block::Reflection.new(self, index_processing, block).build
+    question.narrator[speech_source][index_processing] = reflection
   end
 end

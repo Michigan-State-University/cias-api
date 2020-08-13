@@ -2,10 +2,11 @@
 
 class Question::Narrator::TextToSpeech < SimpleDelegator
   attr_accessor :question, :mp3_file, :audio_url
-  attr_reader :target
+  attr_reader :sha256, :text
 
-  def initialize(question, **target)
-    @target = target
+  def initialize(question, sha256:, text:)
+    @sha256 = sha256
+    @text = text
     super(question)
   end
 
@@ -29,20 +30,8 @@ class Question::Narrator::TextToSpeech < SimpleDelegator
     end
   end
 
-  def block
-    @block ||= narrator[target[:speech_source]][target[:index_processing]]
-  end
-
-  def text
-    @text ||= block['text'][target[:index_block]]
-  end
-
   def fetch_speech_from_text
     provider.new(text).synthesize
-  end
-
-  def sha256
-    block['sha256'][target[:index_block]]
   end
 
   def mp3_filename
