@@ -3,9 +3,10 @@
 FactoryBot.define do
   factory :intervention do
     user
+    name { 'Intervention' }
+    type { Intervention::Single }
     factory :intervention_single, class: Intervention::Single do
       name { 'Single' }
-      type { Intervention::Single }
       trait :slug do
         name { 'Intervention Single with slug' }
       end

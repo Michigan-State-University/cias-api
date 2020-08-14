@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'faker'
+
 return if Rails.env.production?
 
 # rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod

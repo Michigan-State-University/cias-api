@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::AnswersController < V1Controller
+  authorize_resource only: :create
+
   def index
     render json: serialized_response(answers_scope)
   end
@@ -25,6 +27,6 @@ class V1::AnswersController < V1Controller
   end
 
   def answer_params
-    params.require(:answer).permit(:type, body: {})
+    params.require(:answer).permit(:type, :user_id, body: {})
   end
 end
