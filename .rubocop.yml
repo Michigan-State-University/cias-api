@@ -196,6 +196,7 @@ Rails/ShortI18n:
 
 Rails/SkipsModelValidations:
   Exclude:
+    - 'app/models/question/narrator/**/*'
     - 'spec/**/*'
 
 Rails/WhereExists:

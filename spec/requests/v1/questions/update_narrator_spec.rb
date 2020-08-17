@@ -37,15 +37,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: false,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
@@ -59,15 +51,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
@@ -81,15 +65,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
@@ -101,21 +77,14 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
         narrator: {
           blocks: [
             {
+              type: 'Speech',
               text: ['Farewell.'],
               sha256: ['52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87'],
               animation: '',
               audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3']
             }
           ],
-          settings: { voice: true, animation: true },
-          from_question: [
-            {
-              text: ['That chip of yours', 'Mission: the liberation of Anchorage, Alaska.'],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          settings: { voice: true, animation: true }
         }
       }
     }
@@ -135,21 +104,13 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
   end
 
-  let(:params_speech_speech) do
+  let(:params_speech_read_question) do
     {
       question: {
         narrator: {
@@ -163,7 +124,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
             },
             {
               text: ["That chip of yours, I wouldn't wager it on Blackjack...Unless the dealer has a five of six showing."],
-              type: 'Speech',
+              type: 'ReadQuestion',
               sha256: [],
               animation: '',
               audio_urls: []
@@ -172,15 +133,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
@@ -209,15 +162,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
@@ -229,6 +174,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
         narrator: {
           blocks: [
             {
+              type: 'Speech',
               text: ['Farewell.'],
               sha256: ['52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87'],
               animation: '',
@@ -245,21 +191,13 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: ['I would not wager it on Blackjack', 'Voice module online. Audio functionality test initialized.'],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
   end
 
-  let(:params_speech_another_speech) do
+  let(:params_speech_another_read_question) do
     {
       question: {
         narrator: {
@@ -280,7 +218,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
             },
             {
               text: ["That chip of yours, I wouldn't wager it on Blackjack...Unless the dealer has a five of six showing."],
-              type: 'Speech',
+              type: 'ReadQuestion',
               sha256: [],
               animation: '',
               audio_urls: []
@@ -289,21 +227,13 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
   end
 
-  let(:params_another_speech_another) do
+  let(:params_another_reflection_another) do
     {
       question: {
         narrator: {
@@ -316,11 +246,39 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
               audio_urls: []
             },
             {
-              text: ['Farewell.', 'Mind yourself.'],
-              type: 'Speech',
-              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87 7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
-              animation: '',
-              audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
+              question_id: 'ac97ab0d-4182-477b-8204-a347ca17012c',
+              type: 'Reflection',
+              reflections: [
+                {
+                  variable: 'var_multi_1',
+                  value: 1,
+                  payload: 'Answer 1',
+                  text: [],
+                  sha256: [],
+                  audio_urls: []
+                },
+                {
+                  variable: 'var_multi_2',
+                  value: 2,
+                  payload: 'Answer 2',
+                  text: [
+                    'Hello'
+                  ],
+                  sha256: [],
+                  audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
+                }
+              ],
+              "animation": "rest",
+              "position": {
+                "posFrom": {
+                  "x": 0,
+                  "y": 0
+                },
+                "posTo": {
+                  "x": 0,
+                  "y": 0
+                }
+              }
             },
             {
               text: [],
@@ -333,15 +291,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
           settings: {
             voice: true,
             animation: true
-          },
-          from_question: [
-            {
-              text: [],
-              type: 'Speech',
-              sha256: [],
-              audio_urls: []
-            }
-          ]
+          }
         }
       }
     }
@@ -423,7 +373,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
       end
 
       context 'first speech block, another type, speech block' do
-        let(:params) { params_speech_another_speech }
+        let(:params) { params_speech_another_read_question }
 
         it 'will contains blocks' do
           expect(narrator['blocks']).to be_present
@@ -447,7 +397,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
       end
 
       context 'another type, then speech block, another' do
-        let(:params) { params_another_speech_another }
+        let(:params) { params_another_reflection_another }
 
         it 'will contains blocks' do
           expect(narrator['blocks']).to be_present
@@ -486,7 +436,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
       end
 
       context 'first speech block, another type, speech block' do
-        let(:params) { params_speech_another_speech }
+        let(:params) { params_speech_another_read_question }
 
         it 'will contains blocks' do
           expect(narrator['blocks']).to be_present
@@ -510,7 +460,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
       end
 
       context 'another type, then speech block, another ' do
-        let(:params) { params_another_speech_another }
+        let(:params) { params_another_reflection_another }
 
         it 'will contains blocks' do
           expect(narrator['blocks']).to be_present
@@ -540,7 +490,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     end
 
     context 'more blocks' do
-      let(:params) { params_speech_another_speech }
+      let(:params) { params_speech_another_read_question }
 
       it 'will contains blocks' do
         expect(narrator['blocks']).to be_present

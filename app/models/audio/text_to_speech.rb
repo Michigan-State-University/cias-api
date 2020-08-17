@@ -1,21 +1,19 @@
 # frozen_string_literal: true
 
-class Question::Narrator::TextToSpeech < SimpleDelegator
-  attr_accessor :question, :mp3_file, :audio_url
-  attr_reader :sha256, :text
+class Audio::TextToSpeech < SimpleDelegator
+  attr_accessor :mp3_file
+  attr_reader :text
 
-  def initialize(question, sha256:, text:)
-    @sha256 = sha256
+  def initialize(audio, text:)
     @text = text
-    super(question)
+    super(audio)
   end
 
   def execute
     mp3_create
     mp3_upload
-    mp3_retrieve_url
     mp3_remove_file
-    audio_url
+    url
   end
 
   private
@@ -26,7 +24,7 @@ class Question::Narrator::TextToSpeech < SimpleDelegator
 
   def provider
     @provider ||= begin
-      "Question::Narrator::TextToSpeech::#{require_provider.classify}".safe_constantize
+      "Audio::TextToSpeech::#{require_provider.classify}".safe_constantize
     end
   end
 
@@ -46,17 +44,12 @@ class Question::Narrator::TextToSpeech < SimpleDelegator
   end
 
   def mp3_upload
-    speeches.attach(
+    mp3.attach(
       io: File.open(mp3_file),
       filename: mp3_filename,
       content_type: 'audio/mpeg'
     )
     save!
-  end
-
-  def mp3_retrieve_url
-    file = speeches.blobs.find_by(filename: mp3_filename)
-    self.audio_url = Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
   end
 
   def mp3_remove_file

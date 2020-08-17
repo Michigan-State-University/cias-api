@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_200_803_083_744) do
+ActiveRecord::Schema.define(version: 20_200_814_133_748) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'btree_gin'
   enable_extension 'btree_gist'
@@ -51,6 +51,14 @@ ActiveRecord::Schema.define(version: 20_200_803_083_744) do
     t.index %w[type question_id user_id], name: 'index_answers_on_type_and_question_id_and_user_id', using: :gin
     t.index ['type'], name: 'index_answers_on_type'
     t.index ['user_id'], name: 'index_answers_on_user_id'
+  end
+
+  create_table 'audios', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.string 'sha256', null: false
+    t.integer 'usage_counter', default: 1
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['sha256'], name: 'index_audios_on_sha256', unique: true
   end
 
   create_table 'friendly_id_slugs', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|

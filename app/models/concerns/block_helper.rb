@@ -5,6 +5,10 @@ module BlockHelper
     block['type'].eql?('Speech')
   end
 
+  def read_question?(block)
+    block['type'].eql?('ReadQuestion')
+  end
+
   def reflection?(block)
     block['type'].eql?('Reflection')
   end

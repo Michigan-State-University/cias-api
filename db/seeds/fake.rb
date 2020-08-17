@@ -157,14 +157,6 @@ class Fake
             animation: ''
           }
         ]
-        question.narrator['from_question'] = [
-          {
-            type: 'Speech',
-            text: narrator_blocks_text,
-            sha256: [],
-            audio_urls: []
-          }
-        ]
         question.image.attach(io: File.open(image_sample), filename: image_sample.split('/').last)
         question.save
       end

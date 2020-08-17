@@ -20,42 +20,10 @@
     "blocks": {
       "type": "array",
       "items": {}
-    },
-    "from_question": {
-      "type": "array",
-      "items": [
-        {
-          "type": "object",
-          "properties": {
-            "text": {
-              "type": "array",
-              "items": {}
-            },
-            "type": {
-              "type": "string"
-            },
-            "sha256": {
-              "type": "array",
-              "items": {}
-            },
-            "audio_urls": {
-              "type": "array",
-              "items": {}
-            }
-          },
-          "required": [
-            "text",
-            "type",
-            "sha256",
-            "audio_urls"
-          ]
-        }
-      ]
     }
   },
   "required": [
     "settings",
-    "blocks",
-    "from_question"
+    "blocks"
   ]
 }

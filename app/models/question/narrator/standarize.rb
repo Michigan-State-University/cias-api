@@ -7,7 +7,6 @@ class Question::Narrator::Standarize < SimpleDelegator
 
   def execute
     standarize_blocks
-    standarize_from_question
     self
   end
 
@@ -19,12 +18,6 @@ class Question::Narrator::Standarize < SimpleDelegator
       standarize_block(block) if block['type'].eql?('Speech')
       standarize_reflections(block) if block['type'].eql?('Reflection')
     end
-  end
-
-  def standarize_from_question
-    narrator['from_question'][0]['text'].reject!(&:empty?)
-    narrator['from_question'][0]['sha256'].reject!(&:empty?)
-    narrator['from_question'][0]['audio_urls'].reject!(&:empty?)
   end
 
   def standarize_reflections(block)

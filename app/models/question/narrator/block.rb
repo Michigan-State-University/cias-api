@@ -1,15 +1,14 @@
 # frozen_string_literal: true
 
-class Question::Narrator::Block::Interface < SimpleDelegator
+class Question::Narrator::Block < SimpleDelegator
   include BlockHelper
 
-  attr_accessor :block, :old_block
-  attr_reader :index_processing, :narrator
+  attr_accessor :block
+  attr_reader :index_processing
 
-  def initialize(narrator, index_processing, block, old_block = nil)
+  def initialize(narrator, index_processing, block)
     @index_processing = index_processing
     @block = block
-    @old_block = old_block
     super(narrator)
   end
 

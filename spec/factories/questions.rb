@@ -267,10 +267,7 @@ FactoryBot.define do
             voice: false,
             animation: true
           },
-          blocks: [],
-          from_question: [
-            { text: [], type: 'Speech', sha256: [], audio_urls: [] }
-          ]
+          blocks: []
         }
       end
     end
@@ -282,10 +279,7 @@ FactoryBot.define do
             voice: true,
             animation: true
           },
-          blocks: [],
-          from_question: [
-            { text: [], type: 'Speech', sha256: [], audio_urls: [] }
-          ]
+          blocks: []
         }
       end
     end
@@ -304,9 +298,6 @@ FactoryBot.define do
               sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
               audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3']
             }
-          ],
-          from_question: [
-            { text: [], type: 'Speech', sha256: [], audio_urls: [] }
           ]
         }
       end
@@ -326,9 +317,6 @@ FactoryBot.define do
               sha256: [],
               audio_urls: []
             }
-          ],
-          from_question: [
-            { text: [], type: 'Speech', sha256: [], audio_urls: [] }
           ]
         }
       end
@@ -353,9 +341,6 @@ FactoryBot.define do
               sha256: [],
               audio_urls: []
             }
-          ],
-          from_question: [
-            { text: [], type: 'Speech', sha256: [], audio_urls: [] }
           ]
         }
       end
@@ -380,9 +365,6 @@ FactoryBot.define do
               sha256: [],
               audio_urls: []
             }
-          ],
-          from_question: [
-            { text: [], type: 'Speech', sha256: [], audio_urls: [] }
           ]
         }
       end

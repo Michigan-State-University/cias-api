@@ -13,36 +13,29 @@ class Question::Narrator::Blobs
 
   def execute
     blocks
-    from_question
     ids.compact!
     self
   end
 
-  def remove(audio_url)
-    ids.delete(split_url(audio_url))
+  def remove(digest)
+    digest_index = ids.index(digest)
+    ids.delete_at(digest_index) if digest_index
   end
 
   def purification
-    ::CleanJob::Blobs.perform_later(ids)
+    counts = ids.tally
+    Audio.where(sha256: ids).find_each { |audio| audio.decrement!(:usage_counter, counts[audio.sha256]) }
   end
 
   private
 
-  def split_url(url)
-    url.split('/').last
-  end
-
-  def extract_filenames(audio_urls)
-    audio_urls.map { |url| split_url(url) }
-  end
-
   def body(block)
-    ids.concat(extract_filenames(block['audio_urls']))
+    ids.concat(block['sha256'])
   end
 
   def blocks
     narrator['blocks'].each do |b|
-      if speech?(b)
+      if speech?(b) || read_question?(b)
         body(b)
       elsif reflection?(b)
         reflection_block(b)
@@ -52,9 +45,5 @@ class Question::Narrator::Blobs
 
   def reflection_block(block)
     block['reflections'].each { |ref| body(ref) }
-  end
-
-  def from_question
-    narrator['from_question'].each { |b| body(b) }
   end
 end

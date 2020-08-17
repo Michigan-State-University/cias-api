@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class Question::Narrator::TextToSpeech::Google
-  include Question::Narrator::TextToSpeech::Interface
+class Audio::TextToSpeech::Google
+  include Audio::TextToSpeech::Interface
 
   attr_reader :text
 

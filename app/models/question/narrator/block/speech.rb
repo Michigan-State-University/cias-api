@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
-class Question::Narrator::Block::Speech < Question::Narrator::Block::Interface
+class Question::Narrator::Block::Speech < Question::Narrator::Block
   def build
     prepare_sha256_for(block)
-    prepare_old_block
     replace_urls
 
     block
@@ -17,31 +16,28 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block::Interface
     end
   end
 
-  def prepare_old_block
-    prepare_sha256_for(old_block) if old_block
-  end
-
   def replace_urls
     block['audio_urls'] = block['sha256'].map.with_index(0) do |digest, index_block|
       was_audio_url_result = was_audio_url(digest)
       new_audio_url = was_audio_url_result || create_audio_url(digest, index_block, block)
 
-      outdated_files.remove(new_audio_url)
+      outdated_files.remove(digest)
       new_audio_url
     end
   end
 
   def was_audio_url(digest)
-    was_at_index = old_block&.fetch('sha256', [])&.index(digest)
-    return nil unless was_at_index
+    audio = Audio.find_by(sha256: digest)
+    return nil unless audio
 
-    old_block['audio_urls'][was_at_index]
+    audio.increment!(:usage_counter)
+    audio.url
   end
 
   def create_audio_url(digest, index_block, context)
-    Question::Narrator::TextToSpeech.new(
-      question,
-      sha256: digest,
+    audio = Audio.create!(sha256: digest)
+    Audio::TextToSpeech.new(
+      audio,
       text: context['text'][index_block]
     ).execute
   end
