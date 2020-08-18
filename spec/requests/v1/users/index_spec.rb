@@ -4,9 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/users', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
+  let(:researcher_user) { create(:user, :confirmed, :researcher) }
   let(:alter_user) { create(:user, :confirmed) }
   let(:headers) do
     user.create_new_auth_token
+  end
+  let(:researcher_headers) do
+    researcher_user.create_new_auth_token
   end
 
   context 'when endpoint is available' do
@@ -70,6 +74,56 @@ RSpec.describe 'GET /v1/users', type: :request do
 
       it 'success to Hash' do
         expect(json_response.class).to be(Hash)
+      end
+    end
+  end
+
+  context 'with specific roles' do
+    context 'one role' do
+      before do
+        get v1_users_path, params: { roles: 'admin' }, headers: headers
+      end
+
+      let(:admin_role) do
+        role = []
+        json_response['data'].each do |user|
+          role.push(user['attributes']['roles'])
+        end
+        role.flatten!
+        role.uniq!
+        role
+      end
+
+      it 'include admin role' do
+        expect(admin_role).to include('admin')
+      end
+
+      it 'roles size 1' do
+        expect(admin_role.size).to eq(1)
+      end
+    end
+
+    context 'researcher role' do
+      before do
+        get v1_users_path, params: { roles: 'researcher,admin' }, headers: researcher_headers
+      end
+
+      let(:researcher_role) do
+        role = []
+        json_response['data'].each do |user|
+          role.push(user['attributes']['roles'])
+        end
+        role.flatten!
+        role.uniq!
+        role
+      end
+
+      it 'include researcher role' do
+        expect(researcher_role).to include('researcher')
+      end
+
+      it 'roles size 1' do
+        expect(researcher_role.size).to eq(1)
       end
     end
   end

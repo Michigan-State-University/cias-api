@@ -9,12 +9,12 @@ class Problem < ApplicationRecord
   attr_accessor :status_event
 
   validates :name, presence: true
-  validates :status_event, inclusion: { in: %w[broadcast close] }, allow_nil: true
+  validates :status_event, inclusion: { in: %w[broadcast close to_archive] }, allow_nil: true
 
   aasm.attribute_name :status
   aasm do
     state :draft, initial: true
-    state :published, :closed
+    state :published, :closed, :archived
 
     event :broadcast do
       transitions from: :draft, to: :published
@@ -22,6 +22,10 @@ class Problem < ApplicationRecord
 
     event :close do
       transitions from: :published, to: :closed
+    end
+
+    event :to_archive do
+      transitions from: :closed, to: :archived
     end
   end
 

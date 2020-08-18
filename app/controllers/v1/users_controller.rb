@@ -2,7 +2,7 @@
 
 class V1::UsersController < V1Controller
   def index
-    render json: serialized_response(users_scope)
+    render json: serialized_response(users_scope.detailed_search(params))
   end
 
   def show
@@ -31,6 +31,6 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :email, :phone, :deactivated, roles: [])
+    params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :deactivated, roles: [])
   end
 end

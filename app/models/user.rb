@@ -34,6 +34,14 @@ class User < ApplicationRecord
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'Eastern Time (US & Canada)')
 
+  scope :limit_to_roles, ->(roles) { where('ARRAY[?]::text[] && roles', roles) }
+
+  def self.detailed_search(params)
+    scope = all
+    scope = scope.limit_to_roles(params[:roles].split(',')) if params[:roles].present?
+    scope
+  end
+
   def ability
     @ability ||= Ability.new(self)
   end
