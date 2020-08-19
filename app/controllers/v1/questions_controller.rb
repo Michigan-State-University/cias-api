@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::QuestionsController < V1Controller
+  include Resource::Clone
+
   def index
     render json: serialized_response(questions_scope)
   end
@@ -12,13 +14,6 @@ class V1::QuestionsController < V1Controller
   def create
     question = questions_scope.new(question_params)
     question.position = questions_scope.last&.position.to_i + 1
-    question.save!
-    render json: serialized_response(question), status: :created
-  end
-
-  def clone
-    question = question_load.dup
-    question.image.attach(question_load.image.blob) if question_load.image.attachment
     question.save!
     render json: serialized_response(question), status: :created
   end

@@ -2,6 +2,7 @@
 
 class Problem < ApplicationRecord
   include AASM
+  include Clone
 
   belongs_to :user
   has_many :interventions, dependent: :restrict_with_exception

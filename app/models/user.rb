@@ -28,7 +28,6 @@ class User < ApplicationRecord
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
 
   has_many :problems, dependent: :restrict_with_exception
-  has_many :interventions, dependent: :restrict_with_exception
   has_many :answers, dependent: :restrict_with_exception
   has_many :user_logs_requests, dependent: :restrict_with_exception
 
@@ -38,7 +37,7 @@ class User < ApplicationRecord
 
   def self.detailed_search(params)
     scope = all
-    scope = scope.limit_to_roles(params[:roles].split(',')) if params[:roles].present?
+    scope = scope.limit_to_roles(params[:roles]) if params[:roles].present?
     scope
   end
 

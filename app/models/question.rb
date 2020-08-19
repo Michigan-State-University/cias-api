@@ -3,6 +3,8 @@
 class Question < ApplicationRecord
   include BodyInterface
   extend DefaultValues
+  include Clone
+
   belongs_to :intervention, inverse_of: :questions
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 

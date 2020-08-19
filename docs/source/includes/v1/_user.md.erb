@@ -35,7 +35,7 @@ Parameter | Description | Required
 
 ### Note
 
-You can add query string with key `roles` with one or more roles name divided by comma in order to get users who contain provided roles.
+You can add query string with key `roles[]` with one role. If you would like to get many roles just multiple same key `roles[]` and assign a different value to it. Example: `roles[]=guest&roles[]=participant`.
 
 
 > HTTP example request

@@ -13,7 +13,7 @@ class SummonUsers
     private
 
     def passwords_harvester
-      @@passwords_harvester ||= ENV.fetch('USER_CREDENTIALS') { raise ArgumentError, 'There is no provided credentials for users' }.split(',')
+      @@passwords_harvester ||= ENV.fetch('USER_CREDENTIALS') { raise ArgumentError, 'There are no provided credentials for users' }.split(',')
     end
 
     def summon_many

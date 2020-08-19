@@ -2,7 +2,6 @@
 
 FactoryBot.define do
   factory :intervention do
-    user
     sequence(:name) { |s| "intervention_#{s}" }
     sequence(:position) { |s| s }
     association :problem

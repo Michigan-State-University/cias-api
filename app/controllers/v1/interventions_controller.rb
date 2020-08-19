@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::InterventionsController < V1Controller
+  include Resource::Clone
   skip_before_action :authenticate_user!, on: :index, if: -> { params[:allow_guests] }
 
   def index

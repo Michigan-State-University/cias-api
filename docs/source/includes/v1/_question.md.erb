@@ -227,14 +227,13 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id/clone`
+`<%= ENV['APP_HOSTNAME'] %>/v1/questions/:id/clone`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
 id | Question ID | yes
 
 
@@ -246,7 +245,7 @@ Parameter | Description | Required
 
 ### HTTP request method
 
-`GET`
+`POST`
 
 
 ### HTTP headers
@@ -263,7 +262,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['APP_HOSTNAME'] %>v1/interventions/1/questions/1/clone
+POST <%= ENV['APP_HOSTNAME'] %>/v1/questions/1/clone
 ```
 
 ```http
@@ -273,7 +272,6 @@ token-type: Bearer
 client: xxxyyyzzz
 uid: user@<%= ENV['DOMAIN_NAME'] %>
 ```
-
 
 
 > HTTP response 201 Created

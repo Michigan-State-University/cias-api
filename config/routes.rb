@@ -6,16 +6,20 @@ Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
   mount_devise_token_auth_for 'User', at: 'auth'
   namespace :v1 do
-    resources :problems, only: %i[index show create update]
-    resources :users, only: %i[index show update destroy]
-    resources :interventions, only: %i[index show create update] do
-      patch 'questions/position', to: 'questions#position'
-      resources :questions, only: %i[index show create update destroy] do
-        member do
-          get 'clone'
-        end
+    resources :problems, only: %i[index show create update] do
+      member do
+        post 'clone'
       end
     end
+    resources :users, only: %i[index show update destroy]
+    resources :interventions, only: %i[index show create update] do
+      member do
+        post 'clone'
+      end
+      patch 'questions/position', to: 'questions#position'
+      resources :questions, only: %i[index show create update destroy]
+    end
+    post 'questions/:id/clone', to: 'questions#clone', as: :clone_question
     scope 'questions/:question_id' do
       resources :answers, only: %i[index show create]
       scope module: 'questions' do

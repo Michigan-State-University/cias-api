@@ -12,4 +12,10 @@ class Question::Grid < Question
   def harvest_body_variables
     body_data.first['payload']['rows'].map { |row| row['variable']['name'] }
   end
+
+  def variable_clone_prefix
+    body_data[0]['payload']['rows']&.each do |row|
+      row['variable']['name'] = "clone_#{row['variable']['name']}"
+    end
+  end
 end

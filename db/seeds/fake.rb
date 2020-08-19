@@ -2,8 +2,9 @@
 
 require 'faker'
 
-return if Rails.env.production?
-return if User.count.zero?
+msg_template = 'Will not pollute database by fake data'
+return puts "\n#{msg_template} in production environment" if Rails.env.production?
+return puts "\n#{msg_template} where there are no created users" if User.count.zero?
 
 # rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod
 class Fake
@@ -50,7 +51,6 @@ class Fake
       problem_ids
       (40..60).to_a.sample.times do
         Intervention.create(
-          user_id: user_ids.sample,
           problem_id: problem_ids.sample,
           name: Faker::Name.name,
           body: { data: [

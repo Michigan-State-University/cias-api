@@ -11,9 +11,10 @@ class CreateProblems < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
+    add_index :problems, :name
     add_index :problems, :user_id
-    add_index :problems, :allow_guests
     add_index :problems, :status
+    add_index :problems, %i[name user_id], using: :gin
 
     add_foreign_key :problems, :users
   end

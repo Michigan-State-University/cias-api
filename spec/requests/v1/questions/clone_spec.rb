@@ -2,16 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
+  let(:user) { create(:user, :confirmed, :researcher) }
   let(:question) { create(:question_single) }
-  let(:intervention) { question.intervention }
   let(:headers) do
     user.create_new_auth_token
   end
 
   context 'when endpoint is available' do
-    before { get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id) }
+    before { post v1_clone_question_path(id: question.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -19,7 +18,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', ty
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id)
+        post v1_clone_question_path(id: question.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -32,7 +31,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', ty
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        post v1_clone_question_path(id: question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -44,7 +43,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', ty
 
     context 'is valid' do
       before do
-        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        post v1_clone_question_path(id: question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -58,7 +57,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', ty
   context 'when response' do
     context 'is JSON' do
       before do
-        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        post v1_clone_question_path(id: question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:created) }
@@ -67,11 +66,42 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions/:id/clone', ty
 
     context 'is JSON and parse' do
       before do
-        get clone_v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        post v1_clone_question_path(id: question.id), headers: headers
       end
 
       it 'success to Hash' do
         expect(json_response.class).to be(Hash)
+      end
+    end
+
+    context 'cloned' do
+      before do
+        post v1_clone_question_path(id: question.id), headers: headers
+      end
+      let(:question_was) do
+        question.attributes.except('id', 'created_at', 'updated_at', 'image_url')
+      end
+      let(:question_cloned) do
+        json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'image_url')
+      end
+
+      let(:question_was_without_body) do
+        question.attributes.except('id', 'created_at', 'updated_at', 'image_url', 'body')
+      end
+      let(:question_cloned_without_body) do
+        json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'image_url', 'body')
+      end
+
+      it 'origin and outcome same' do
+        expect(question_was_without_body).to eq(question_cloned_without_body)
+      end
+
+      it 'cloned contain variable name with prefix' do
+        expect(question_cloned['body']['variable']['name']).to include('clone_')
+      end
+
+      it 'formula name is empty' do
+        expect(question_cloned['formula']['payload']).to be_empty
       end
     end
   end

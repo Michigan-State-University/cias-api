@@ -12,4 +12,8 @@ class Question::FollowUpContact < Question
   def harvest_body_variables
     [body_variable['name']]
   end
+
+  def variable_clone_prefix
+    body['variable']['name'] = "clone_#{body['variable']['name']}"
+  end
 end

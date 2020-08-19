@@ -199,6 +199,61 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 > HTTP response 200 OK
 
 
+## Clone intervention
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:id/clone`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/clone
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 201 Created
+
+
 ## Update intervention
 
 

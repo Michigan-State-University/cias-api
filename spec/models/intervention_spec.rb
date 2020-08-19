@@ -6,7 +6,7 @@ RSpec.describe Intervention, type: :model do
   describe 'Intervention' do
     subject { create(:intervention) }
 
-    it { should belong_to(:user) }
+    it { should belong_to(:problem) }
     it { should have_many(:questions) }
     it { should be_valid }
   end
