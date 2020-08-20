@@ -7,11 +7,13 @@ RSpec.describe 'Csv' do
   let(:interventions) { create_list(:intervention, 5, problem_id: problem.id) }
   let(:answers) { create_list(:intervention, 5, problem_id: problem.id) }
 
-  context 'Retrive participants' do
-    context 'order particpants list' do
+  xcontext 'Retrieve participants' do
+    context 'order participants list' do
+      it 'order participants list ' do
+      end
     end
 
-    xit 'order particpants list ' do
+    it 'order participants list ' do
     end
   end
 end

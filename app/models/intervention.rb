@@ -45,6 +45,7 @@ class Intervention < ApplicationRecord
     narrator = Hash[settings['narrator'].to_a - settings_was['narrator'].to_a]
     questions.each do |question|
       question.narrator['settings'].merge!(narrator)
+      question.execute_narrator
       question.save!
     end
   end

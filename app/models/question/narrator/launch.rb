@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
 class Question::Narrator::Launch
+  include BlockHelper
   attr_reader :question, :outdated_files
+  attr_accessor :narrator
 
   def initialize(question, outdated_files)
     @question = question
+    @narrator = question.narrator
     @outdated_files = outdated_files
   end
 
   def execute
-    unless question.narrator['settings']['voice']
+    unless narrator['settings']['voice']
       outdated_files.purification
-      false
+      narrator['blocks'].reject!(&method(:voice_block?))
     end
-    question.narrator['settings']['voice'] && question.narrator_changed?
+    narrator['blocks'].reject!(&method(:animation_block?)) unless narrator['settings']['animation']
+    narrator['settings']['voice'] && question.narrator_changed?
   end
 end

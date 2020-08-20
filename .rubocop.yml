@@ -252,14 +252,18 @@ RSpec/DescribeClass:
   Exclude:
     - 'spec/requests/**/*'
 
+RSpec/ExampleLength:
+  Enabled: false
+
 RSpec/ImplicitExpect:
   EnforcedStyle: should
 
 RSpec/InstanceVariable:
   AssignmentOnly: true
 
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 RSpec/NestedGroups:
   Enabled: false
 
-RSpec/ExampleLength:
-  Enabled: false

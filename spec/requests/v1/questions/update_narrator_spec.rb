@@ -33,7 +33,20 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     {
       question: {
         narrator: {
-          blocks: [],
+          blocks: [
+            {
+              text: ['Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.', 'Working together as an interdisciplinary team, many highly trained health professionals'],
+              sha256: %w[80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2 cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046],
+              audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3', 'spec/factories/audio/cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046.mp3'],
+              type: 'Speech'
+            },
+            {
+              text: [],
+              type: 'BodyAnimation',
+              sha256: [],
+              audio_urls: []
+            }
+          ],
           settings: {
             voice: false,
             animation: true
@@ -328,6 +341,26 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
       it 'switched' do
         expect(narrator['settings']['voice']).to be false
+      end
+
+      context 'when narrator has voice blocks' do
+        let(:intervention_id) { i_narrator_blocks_types.id }
+        let(:question_id) { q_narrator_blocks_types.id }
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'switched' do
+          expect(narrator['settings']['voice']).to be false
+        end
+
+        it 'removes voice blocks' do
+          expect(narrator['blocks']).to eq([{
+                                             'text' => [],
+                                             'type' => 'BodyAnimation',
+                                             'sha256' => [],
+                                             'audio_urls' => []
+                                           }])
+        end
       end
     end
   end
