@@ -105,7 +105,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'researcher role' do
       before do
-        get v1_users_path, params: { roles: 'researcher,admin' }, headers: researcher_headers
+        get v1_users_path, params: { roles: 'researcher' }, headers: researcher_headers
       end
 
       let(:researcher_role) do

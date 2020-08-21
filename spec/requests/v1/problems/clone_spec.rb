@@ -79,6 +79,7 @@ RSpec.describe 'POST /v1/problems/:id/clone', type: :request do
     before do
       post clone_v1_problem_path(id: problem.id), headers: headers
     end
+
     let(:problem_was) do
       problem.attributes.except('id', 'created_at', 'updated_at')
     end

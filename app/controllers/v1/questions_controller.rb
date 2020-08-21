@@ -44,7 +44,7 @@ class V1::QuestionsController < V1Controller
   private
 
   def questions_scope
-    Intervention.friendly.accessible_by(current_ability).find(params[:intervention_id]).questions.order(:position)
+    Intervention.friendly.accessible_by(current_ability).find(params[:intervention_id]).questions.includes(%i[image_attachment image_blob]).order(:position)
   end
 
   def question_load

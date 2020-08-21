@@ -2,16 +2,18 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
+RSpec.describe 'GET /v1/problems/:id/answers', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:answer) { create(:answer_text_box) }
-  let(:question) { answer.question }
+  let(:problem) { create(:problem) }
+  let(:interventions) { create_list(:intervention, 2, problem_id: problem.id) }
+  let(:questions) { create_list(:question_single, 4, intervention_id: intervention.id) }
+  let(:answers) { create_list(:intervention, 6, question_id: question.id) }
   let(:headers) do
     user.create_new_auth_token
   end
 
   context 'when endpoint is available' do
-    before { get v1_answers_path(question.id) }
+    before { get v1_problem_answers_path(problem.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -19,7 +21,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_answers_path(question.id)
+        get v1_problem_answers_path(problem.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -32,7 +34,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_problem_answers_path(problem.id), params: {}, headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -44,7 +46,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
 
     context 'is valid' do
       before do
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_problem_answers_path(problem.id), params: {}, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -58,7 +60,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_problem_answers_path(problem.id), params: {}, headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -66,7 +68,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
 
     context 'is JSON and parse' do
       before do
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_problem_answers_path(problem.id), params: {}, headers: headers
       end
 
       let(:parsed_response) { JSON.parse(response.body) }
@@ -75,8 +77,8 @@ RSpec.describe 'GET /v1/questions/:question_id/answers.csv', type: :request do
         expect(parsed_response.class).to be(Hash)
       end
 
-      it 'key data return collection' do
-        expect(parsed_response['data'].class).to eq(Array)
+      it 'success message' do
+        expect(json_response['message']).to eq 'The request to send the CSV file has been successfully created. We will soon send a CSV file to your email address.'
       end
     end
   end

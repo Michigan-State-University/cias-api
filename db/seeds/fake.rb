@@ -2,9 +2,12 @@
 
 require 'faker'
 
+# rubocop:disable Lint/TopLevelReturnWithArgument, Rails/Output
 msg_template = 'Will not pollute database by fake data'
 return puts "\n#{msg_template} in production environment" if Rails.env.production?
 return puts "\n#{msg_template} where there are no created users" if User.count.zero?
+
+# rubocop:enable Lint/TopLevelReturnWithArgument, Rails/Output
 
 # rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod
 class Fake

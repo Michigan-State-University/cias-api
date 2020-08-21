@@ -115,7 +115,7 @@ GEM
       devise-encryptable (>= 0.2.0)
     devise-encryptable (0.2.0)
       devise (>= 2.1.0)
-    devise-pwned_password (0.1.8)
+    devise-pwned_password (0.1.9)
       devise (~> 4)
       pwned (~> 2.0.0)
     devise_token_auth (1.1.4)

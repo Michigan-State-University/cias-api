@@ -73,7 +73,7 @@ ActiveRecord::Schema.define(version: 20_200_814_133_748) do
   end
 
   create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
-    t.uuid 'problem_id'
+    t.uuid 'problem_id', null: false
     t.jsonb 'settings'
     t.boolean 'allow_guests', default: false, null: false
     t.string 'status'

@@ -10,7 +10,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   end
 
   context 'when endpoint is available' do
-    before { post clone_v1_intervention_path(id: intervention.id) }
+    before { post v1_clone_intervention_path(id: intervention.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -18,7 +18,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        post clone_v1_intervention_path(id: intervention.id)
+        post v1_clone_intervention_path(id: intervention.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -31,7 +31,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        post clone_v1_intervention_path(id: intervention.id), headers: headers
+        post v1_clone_intervention_path(id: intervention.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -43,7 +43,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
 
     context 'is valid' do
       before do
-        post clone_v1_intervention_path(id: intervention.id), headers: headers
+        post v1_clone_intervention_path(id: intervention.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -57,7 +57,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        post clone_v1_intervention_path(id: intervention.id), headers: headers
+        post v1_clone_intervention_path(id: intervention.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:created) }
@@ -66,7 +66,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
 
     context 'is JSON and parse' do
       before do
-        post clone_v1_intervention_path(id: intervention.id), headers: headers
+        post v1_clone_intervention_path(id: intervention.id), headers: headers
       end
 
       it 'success to Hash' do
@@ -77,8 +77,9 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
 
   context 'cloned' do
     before do
-      post clone_v1_intervention_path(id: intervention.id), headers: headers
+      post v1_clone_intervention_path(id: intervention.id), headers: headers
     end
+
     let(:intervention_was) do
       intervention.attributes.except('id', 'created_at', 'updated_at', 'slug')
     end

@@ -7,7 +7,7 @@ class Intervention < ApplicationRecord
   extend DefaultValues
   include Clone
 
-  belongs_to :problem, optional: true
+  belongs_to :problem, inverse_of: :interventions
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :answers, dependent: :restrict_with_exception, through: :questions
 

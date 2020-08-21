@@ -2,15 +2,16 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/interventions/:id', type: :request do
+RSpec.describe 'GET /v1/problems/:problem_id/interventions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention) }
+  let(:problem) { create(:problem) }
+  let(:intervention) { create(:intervention, problem_id: problem.id) }
   let(:headers) do
     user.create_new_auth_token
   end
 
   context 'when endpoint is available' do
-    before { get v1_intervention_path(intervention.id) }
+    before { get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -18,7 +19,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_intervention_path(intervention.id)
+        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -31,7 +32,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        get v1_intervention_path(intervention.id), headers: headers
+        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -43,7 +44,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
     context 'is valid' do
       before do
-        get v1_intervention_path(intervention.id), headers: headers
+        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -57,7 +58,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_intervention_path(intervention.id), headers: headers
+        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -65,7 +66,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
     context 'contains' do
       before do
-        get v1_intervention_path(intervention.id), headers: headers
+        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers
       end
 
       it 'to hash success' do

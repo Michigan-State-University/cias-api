@@ -43,7 +43,7 @@ class Question < ApplicationRecord
   end
 
   def execute_narrator
-    Question::Narrator.new(self).execute
+    Narrator.new(self).execute
   end
 
   private

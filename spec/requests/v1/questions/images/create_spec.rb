@@ -18,7 +18,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
   end
 
   context 'when endpoint is available' do
-    before { post v1_images_path(question.id) }
+    before { post v1_question_images_path(question.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -26,7 +26,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        post v1_images_path(question.id)
+        post v1_question_images_path(question.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -39,7 +39,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        post v1_images_path(question.id), params: params, headers: headers
+        post v1_question_images_path(question.id), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -51,7 +51,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
 
     context 'is valid' do
       before do
-        post v1_images_path(question.id), params: params, headers: headers
+        post v1_question_images_path(question.id), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -65,7 +65,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
   context 'when response' do
     context 'is appropriate Content-Type' do
       before do
-        post v1_images_path(question.id), params: params, headers: headers
+        post v1_question_images_path(question.id), params: params, headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -73,7 +73,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
 
     context 'is success' do
       before do
-        post v1_images_path(question.id), params: params, headers: headers
+        post v1_question_images_path(question.id), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:created) }

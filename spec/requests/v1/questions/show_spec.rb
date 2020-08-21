@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET v1/interventions/:intervention_id/questions/:id', type: :request do
+RSpec.describe 'GET /v1/interventions/:intervention_id/questions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:question) { create(:question_analogue_scale) }
   let(:intervention) { question.intervention }
@@ -19,7 +19,7 @@ RSpec.describe 'GET v1/interventions/:intervention_id/questions/:id', type: :req
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_intervention_path(intervention_id: intervention.id, id: question.id)
+        get v1_intervention_question_path(intervention_id: intervention.id, id: question.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }

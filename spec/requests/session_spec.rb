@@ -8,10 +8,10 @@ RSpec.describe 'Session', type: :request do
     { email: user.email, password: user.password }
   end
 
-  describe 'POST /auth/sign_in' do
+  describe 'POST /v1/auth/sign_in' do
     context 'when login params is valid' do
       before do
-        post '/auth/sign_in', params: params
+        post '/v1/auth/sign_in', params: params
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -34,7 +34,7 @@ RSpec.describe 'Session', type: :request do
     end
 
     context 'when login params is invalid' do
-      before { post '/auth/sign_in' }
+      before { post '/v1/auth/sign_in' }
 
       it 'returns http unathorized' do
         expect(response).to have_http_status(:unauthorized)
@@ -42,11 +42,11 @@ RSpec.describe 'Session', type: :request do
     end
   end
 
-  describe 'DELETE /auth/sign_out' do
+  describe 'DELETE /v1/auth/sign_out' do
     it 'returns status 200' do
       headers = user.create_new_auth_token
       headers['Content-Type'] = 'application/json; charset=utf-8'
-      delete '/auth/sign_out', headers: headers
+      delete '/v1/auth/sign_out', headers: headers
       expect(response).to have_http_status(:success)
     end
   end

@@ -2,7 +2,7 @@
 
 class V1::InterventionsController < V1Controller
   include Resource::Clone
-  skip_before_action :authenticate_user!, on: :index, if: -> { params[:allow_guests] }
+  skip_before_action :authenticate_v1_user!, on: :index, if: -> { params[:allow_guests] }
 
   def index
     if params[:allow_guests]
@@ -17,7 +17,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def create
-    intervention = current_user.interventions.create!(intervention_params)
+    intervention = interventions_scope.create!(intervention_params)
     render json: serialized_response(intervention), status: :created
   end
 
@@ -31,7 +31,7 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.friendly.accessible_by(current_ability)
+    Problem.includes(:interventions).accessible_by(current_ability).find(params[:problem_id]).interventions
   end
 
   def intervention_load

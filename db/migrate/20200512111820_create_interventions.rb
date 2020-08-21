@@ -3,7 +3,7 @@
 class CreateInterventions < ActiveRecord::Migration[6.0]
   def change
     create_table :interventions, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
-      t.uuid :problem_id
+      t.uuid :problem_id, null: false
       t.jsonb :settings
       t.boolean :allow_guests, null: false, default: false
       t.string :status

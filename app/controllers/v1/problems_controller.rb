@@ -2,7 +2,7 @@
 
 class V1::ProblemsController < V1Controller
   include Resource::Clone
-  skip_before_action :authenticate_user!, on: :index, if: -> { params[:allow_guests] }
+  skip_before_action :authenticate_v1_user!, on: :index, if: -> { params[:allow_guests] }
 
   load_and_authorize_resource only: %i[create update]
 
@@ -19,7 +19,7 @@ class V1::ProblemsController < V1Controller
   end
 
   def create
-    problem = current_user.problems.create!(problem_params)
+    problem = current_v1_user.problems.create!(problem_params)
     render json: serialized_response(problem), status: :created
   end
 

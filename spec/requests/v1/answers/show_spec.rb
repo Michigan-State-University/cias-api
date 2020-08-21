@@ -11,7 +11,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
   end
 
   context 'when endpoint is available' do
-    before { get v1_answer_path(question_id: question.id, id: answer.id) }
+    before { get v1_question_answer_path(question_id: question.id, id: answer.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -19,7 +19,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_intervention_path(question_id: question.id, id: answer.id)
+        get v1_question_answer_path(question_id: question.id, id: answer.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -32,7 +32,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        get v1_answer_path(question_id: question.id, id: answer.id), headers: headers
+        get v1_question_answer_path(question_id: question.id, id: answer.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -44,7 +44,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
 
     context 'is valid' do
       before do
-        get v1_answer_path(question_id: question.id, id: answer.id), headers: headers
+        get v1_question_answer_path(question_id: question.id, id: answer.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -58,7 +58,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_answer_path(question_id: question.id, id: answer.id), headers: headers
+        get v1_question_answer_path(question_id: question.id, id: answer.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -66,7 +66,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
 
     context 'contains' do
       before do
-        get v1_answer_path(question_id: question.id, id: answer.id), headers: headers
+        get v1_question_answer_path(question_id: question.id, id: answer.id), headers: headers
       end
 
       it 'to hash success' do

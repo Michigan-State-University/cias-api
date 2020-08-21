@@ -4,10 +4,10 @@ class V1Controller < ApplicationController
   include DeviseTokenAuth::Concerns::SetUserByToken
   include ExceptionHandler
   include Log
-  before_action :authenticate_user!, unless: :devise_controller?
+  before_action :authenticate_v1_user!, unless: :devise_controller?
 
-  def current_user
-    @current_user ||= begin
+  def current_v1_user
+    @current_v1_user ||= begin
       if request.headers['guest'].eql?('create')
         create_guest_user
       else
@@ -29,7 +29,7 @@ class V1Controller < ApplicationController
   end
 
   def current_ability
-    @current_ability ||= current_user.ability
+    @current_ability ||= current_v1_user.ability
   end
 
   def serialized_response(collection, from_model = controller_name.classify)

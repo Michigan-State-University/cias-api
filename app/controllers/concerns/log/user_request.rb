@@ -8,7 +8,7 @@ module Log::UserRequest
   end
 
   def leave_footprint
-    LogJob::UserRequest.perform_later(request_scope) if current_user
+    LogJob::UserRequest.perform_later(request_scope) if current_v1_user
   end
 
   private
@@ -16,7 +16,7 @@ module Log::UserRequest
   def request_scope
     erase_from_params
     {
-      user_id: current_user.id,
+      user_id: current_v1_user.id,
       controller: params[:controller].to_s,
       action: params[:action].to_s,
       query_string: request.query_parameters,

@@ -4,8 +4,8 @@ class Problem < ApplicationRecord
   include AASM
   include Clone
 
-  belongs_to :user
-  has_many :interventions, dependent: :restrict_with_exception
+  belongs_to :user, inverse_of: :problems
+  has_many :interventions, dependent: :restrict_with_exception, inverse_of: :problem
 
   attr_accessor :status_event
 

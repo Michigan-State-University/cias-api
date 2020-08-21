@@ -11,7 +11,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
   end
 
   context 'when endpoint is available' do
-    before { get v1_answers_path(question.id) }
+    before { get v1_question_answers_path(question.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -19,7 +19,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_answers_path(question.id)
+        get v1_question_answers_path(question.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -32,7 +32,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_question_answers_path(question.id), params: {}, headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -44,7 +44,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
 
     context 'is valid' do
       before do
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_question_answers_path(question.id), params: {}, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -58,7 +58,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_question_answers_path(question.id), params: {}, headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -66,7 +66,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
 
     context 'is JSON and parse' do
       before do
-        get v1_answers_path(question.id), params: {}, headers: headers
+        get v1_question_answers_path(question.id), params: {}, headers: headers
       end
 
       it 'success to Hash' do

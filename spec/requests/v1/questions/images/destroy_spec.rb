@@ -10,7 +10,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
   end
 
   context 'when endpoint is available' do
-    before { delete v1_images_path(question.id) }
+    before { delete v1_question_images_path(question.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -18,7 +18,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        delete v1_images_path(question.id)
+        delete v1_question_images_path(question.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -31,7 +31,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        delete v1_images_path(question.id), headers: headers
+        delete v1_question_images_path(question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -43,7 +43,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
 
     context 'is valid' do
       before do
-        delete v1_images_path(question.id), headers: headers
+        delete v1_question_images_path(question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -57,7 +57,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
   context 'when response' do
     context 'is appropriate Content-Type' do
       before do
-        delete v1_images_path(question.id), headers: headers
+        delete v1_question_images_path(question.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -65,7 +65,7 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
 
     context 'is success' do
       before do
-        delete v1_images_path(question.id), headers: headers
+        delete v1_question_images_path(question.id), headers: headers
       end
 
       it { expect(response).to have_http_status(:ok) }

@@ -13,7 +13,7 @@ class Question::Multiple < Question
     body_data.map { |payload| payload['variable']['name'] }
   end
 
-  def variable_clone_prefix!
+  def variable_clone_prefix
     body_data&.each do |payload|
       payload['variable']['name'] = "clone_#{payload['variable']['name']}"
     end

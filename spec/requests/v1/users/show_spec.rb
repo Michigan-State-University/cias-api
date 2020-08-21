@@ -18,7 +18,7 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_intervention_path(id: alter_user.id)
+        get v1_user_path(id: alter_user.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }

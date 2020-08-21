@@ -2,14 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/interventions', type: :request do
+RSpec.describe 'GET /v1/problems/:problem_id/interventions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
+  let(:problem) { create(:problem) }
   let(:headers) do
     user.create_new_auth_token
   end
 
   context 'when endpoint is available' do
-    before { get v1_interventions_path }
+    before { get v1_problem_interventions_path(problem.id) }
 
     it { expect(response).to have_http_status(:unauthorized) }
   end
@@ -17,7 +18,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   context 'when auth' do
     context 'is without credentials' do
       before do
-        get v1_interventions_path
+        get v1_problem_interventions_path(problem.id)
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -30,7 +31,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     context 'is with invalid credentials' do
       before do
         headers.delete('access-token')
-        get v1_interventions_path, params: {}, headers: headers
+        get v1_problem_interventions_path(problem.id), params: {}, headers: headers
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
@@ -42,7 +43,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
     context 'is valid' do
       before do
-        get v1_interventions_path, params: {}, headers: headers
+        get v1_problem_interventions_path(problem.id), params: {}, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -56,7 +57,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_interventions_path, params: {}, headers: headers
+        get v1_problem_interventions_path(problem.id), params: {}, headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -64,7 +65,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
     context 'is JSON and parse' do
       before do
-        get v1_interventions_path, params: {}, headers: headers
+        get v1_problem_interventions_path(problem.id), params: {}, headers: headers
       end
 
       it 'success to Hash' do

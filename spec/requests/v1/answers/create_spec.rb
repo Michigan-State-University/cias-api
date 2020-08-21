@@ -42,9 +42,9 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     }
   end
 
-  before { post v1_answers_path(question.id), params: params, headers: user.create_new_auth_token }
+  before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
 
-  context 'current_user is admin' do
+  context 'current_v1_user is admin' do
     let(:user) { admin }
 
     context 'when params' do
@@ -102,12 +102,13 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
   end
 
-  context 'current_user is researcher' do
+  context 'current_v1_user is researcher' do
     let(:user) { researcher }
 
     context 'intervention belongs to researcher' do
-      let!(:intervention) { create(:intervention, user: researcher) }
-      let!(:question) { create(:question_text_box, intervention: intervention) }
+      let!(:problem) { create(:problem, user: researcher) }
+      let!(:intervention) { create(:intervention, problem_id: problem.id) }
+      let!(:question) { create(:question_text_box, intervention_id: intervention.id) }
 
       context 'when params' do
         context 'are VALID' do
@@ -176,7 +177,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
   end
 
-  context 'current_user is participant' do
+  context 'current_v1_user is participant' do
     let(:user) { participant }
     let(:params) { params_without_user }
 
@@ -187,7 +188,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
   end
 
-  context 'current_user is guest' do
+  context 'current_v1_user is guest' do
     let(:user) { guest }
 
     context 'when params' do
