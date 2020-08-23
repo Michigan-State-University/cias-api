@@ -2,10 +2,12 @@
 
 namespace :docs do
   desc 'Build API documentation'
-  task build: :environment do
-    Bundler.with_unbundled_env do
-      Dir.chdir 'docs' do
-        `bundle exec middleman build --clean`
+  namespace :build do
+    task v1: :environment do
+      Bundler.with_unbundled_env do
+        Dir.chdir 'docs/v1' do
+          `bundle exec middleman build --clean`
+        end
       end
     end
   end

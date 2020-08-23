@@ -5,10 +5,14 @@
 
 * Project name: CIAS 3.0 (Computerized Intervention Authoring System);
 * Owner: [Wayne State University](https://wayne.edu/);
-* Documentation:
-  * Is exposed without logging in the path `/docs`;
-  * Technical details described in: `docs/README.md`.
 * License: It is a property of [Wayne State University](https://wayne.edu/). All rights reserved.
+
+
+## DOCUMENTATION
+
+#### V1
+* Is exposed without logging in the path `/v1/docs`;
+* Technical details described in: `docs/v1/README.md`.
 
 
 ## DECISIONS
@@ -72,7 +76,7 @@
 
 ### HELPERS
 
-* `localhost:3000/docs`
+* `localhost:3000/v1/docs`
 * `localhost:3000/rails/browse_emails`
 * `localhost:3000/rails/info/properties`
 * `localhost:3000/rails/info/routes`

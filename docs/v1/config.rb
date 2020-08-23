@@ -47,8 +47,8 @@ configure :build do
   # activate :gzip
 end
 
-set :build_dir, '../public/docs/'
-set :port, 3002
+set :build_dir, '../../public/v1/docs'
+set :port, 3000
 
 helpers do
   require './lib/toc_data'

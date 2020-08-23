@@ -57,10 +57,6 @@ class User < ApplicationRecord
     update(deactivated: true) unless deactivated
   end
 
-  def to_s
-    "#{first_name} #{last_name}"
-  end
-
   def active_for_authentication?
     super && !deactivated
   end

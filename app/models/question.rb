@@ -42,6 +42,10 @@ class Question < ApplicationRecord
     [nil]
   end
 
+  def variable_clone_prefix
+    nil
+  end
+
   def execute_narrator
     Narrator.new(self).execute
   end

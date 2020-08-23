@@ -6,7 +6,7 @@
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/auth/sign_in`
+`<%= ENV['APP_HOSTNAME'] %>/v1/auth/sign_in`
 
 
 ### URL parameters
@@ -45,7 +45,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-POST <%= ENV['APP_HOSTNAME'] %>/auth/sign_in
+POST <%= ENV['APP_HOSTNAME'] %>/v1/auth/sign_in
 ```
 
 ```http
@@ -106,7 +106,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/auth/sign_out`
+`<%= ENV['APP_HOSTNAME'] %>/v1/auth/sign_out`
 
 
 ### URL parameters
@@ -137,7 +137,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/auth/sign_out
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/auth/sign_out
 ```
 
 ```http
