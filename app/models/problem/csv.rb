@@ -18,7 +18,7 @@ class Problem::Csv
   private
 
   def data_scope(problem)
-    Question.joins(:intervention, :answers).
+    Question.joins(:intervention, answers: :user).
       where(interventions: { problem_id: problem.id }).
       group('interventions.position, interventions.updated_at, questions.position, questions.updated_at, questions.id').
       order(

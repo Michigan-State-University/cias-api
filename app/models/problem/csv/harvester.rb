@@ -2,12 +2,13 @@
 
 class Problem::Csv::Harvester
   attr_reader :questions
-  attr_accessor :header, :rows, :user_column
+  attr_accessor :header, :rows, :users, :user_column
 
   def initialize(questions)
     @questions = questions
     @header = []
     @rows = []
+    @users = {}
     @user_column = []
   end
 
@@ -24,6 +25,7 @@ class Problem::Csv::Harvester
     if locate.nil?
       rows.insert(-1, [])
       user_column.insert(-1, answer.user_id)
+      users[answer.user_id] = { id: answer.user_id, email: answer.user.email }
       -1
     else
       rows[locate].insert(index, [])
@@ -47,10 +49,12 @@ class Problem::Csv::Harvester
 
   def post_processing
     rows.each(&:flatten!)
-    user_column.each_with_index do |user, index|
-      rows[index].unshift(user)
+    user_column.each_with_index do |user_id, index|
+      rows[index].unshift(users[user_id][:email])
+      rows[index].unshift(users[user_id][:id])
     end
-    header.unshift('user_id')
+    header.unshift(:email)
+    header.unshift(:user_id)
     header.flatten!
   end
 end
