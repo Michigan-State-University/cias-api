@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_200_814_133_748) do
+ActiveRecord::Schema.define(version: 20_200_825_085_324) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'btree_gin'
   enable_extension 'btree_gist'
@@ -38,6 +38,22 @@ ActiveRecord::Schema.define(version: 20_200_814_133_748) do
     t.string 'checksum', null: false
     t.datetime 'created_at', null: false
     t.index ['key'], name: 'index_active_storage_blobs_on_key', unique: true
+  end
+
+  create_table 'addresses', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.uuid 'user_id'
+    t.string 'name'
+    t.string 'country'
+    t.string 'state'
+    t.string 'state_abbreviation'
+    t.string 'city'
+    t.string 'zip_code'
+    t.string 'street'
+    t.string 'building_address'
+    t.string 'apartment_number'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['user_id'], name: 'index_addresses_on_user_id'
   end
 
   create_table 'answers', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
@@ -143,7 +159,7 @@ ActiveRecord::Schema.define(version: 20_200_814_133_748) do
     t.string 'first_name', default: '', null: false
     t.string 'last_name', default: '', null: false
     t.string 'email'
-    t.string 'phone'
+    t.text 'phones', default: [], array: true
     t.string 'time_zone'
     t.text 'roles', default: [], array: true
     t.jsonb 'tokens'
@@ -174,6 +190,7 @@ ActiveRecord::Schema.define(version: 20_200_814_133_748) do
   end
 
   add_foreign_key 'active_storage_attachments', 'active_storage_blobs', column: 'blob_id'
+  add_foreign_key 'addresses', 'users'
   add_foreign_key 'answers', 'questions'
   add_foreign_key 'answers', 'users'
   add_foreign_key 'interventions', 'problems'

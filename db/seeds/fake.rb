@@ -18,6 +18,7 @@ class Fake
     mattr_accessor :subclass_types
 
     def exploit
+      add_address_to_user
       create_problems
       create_interventions
       create_questions
@@ -28,6 +29,22 @@ class Fake
 
     def user_ids
       @@user_ids ||= User.ids
+    end
+
+    def add_address_to_user
+      User.all.each do |user|
+        user.create_address(
+          name: '',
+          country: 'United States of America',
+          state: Faker::Address.state,
+          state_abbreviation: Faker::Address.state_abbr,
+          city: Faker::Address.city,
+          zip_code: Faker::Address.zip_code,
+          street: Faker::Address.street_name,
+          building_address: Faker::Address.building_number,
+          apartment_number: Faker::Address.secondary_address
+        )
+      end
     end
 
     def define_subclasses(path)

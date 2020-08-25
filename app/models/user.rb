@@ -27,9 +27,12 @@ class User < ApplicationRecord
   validates :uid, uniqueness: { scope: :provider }
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
 
-  has_many :problems, dependent: :restrict_with_exception
-  has_many :answers, dependent: :restrict_with_exception
+  has_many :problems, dependent: :restrict_with_exception, inverse_of: :user
+  has_many :answers, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_logs_requests, dependent: :restrict_with_exception
+  has_one :address, dependent: :destroy, inverse_of: :user
+
+  accepts_nested_attributes_for :address
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'Eastern Time (US & Canada)')
 
