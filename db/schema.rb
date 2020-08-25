@@ -64,7 +64,6 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['question_id'], name: 'index_answers_on_question_id'
-    t.index %w[type question_id user_id], name: 'index_answers_on_type_and_question_id_and_user_id', unique: true
     t.index ['type'], name: 'index_answers_on_type'
     t.index ['user_id'], name: 'index_answers_on_user_id'
   end

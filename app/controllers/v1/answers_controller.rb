@@ -12,8 +12,9 @@ class V1::AnswersController < V1Controller
   end
 
   def create
-    answer = answers_scope.create!(answer_params)
-    render json: serialized_response(answer), status: :created
+    answer = answers_scope.create!(user_id: current_v1_user.id, **answer_params)
+    response = answer.processing_answering
+    render json: serialized_response(response)
   end
 
   private
@@ -27,6 +28,6 @@ class V1::AnswersController < V1Controller
   end
 
   def answer_params
-    params.require(:answer).permit(:type, :user_id, body: {})
+    params.require(:answer).permit(:type, body: {})
   end
 end

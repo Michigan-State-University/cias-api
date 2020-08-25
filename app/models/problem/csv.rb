@@ -20,6 +20,7 @@ class Problem::Csv
   def data_scope(problem)
     Question.joins(:intervention, answers: :user).
       where(interventions: { problem_id: problem.id }).
+      where.not(type: 'Question::Feedback').
       group('interventions.position, interventions.updated_at, questions.position, questions.updated_at, questions.id').
       order(
         'interventions.position' => :asc,

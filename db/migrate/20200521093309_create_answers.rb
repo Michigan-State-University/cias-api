@@ -14,7 +14,7 @@ class CreateAnswers < ActiveRecord::Migration[6.0]
     add_index :answers, :type
     add_index :answers, :question_id
     add_index :answers, :user_id
-    add_index :answers, %i[type question_id user_id], unique: true
+    # add_index :answers, %i[type question_id user_id], unique: true
 
     add_foreign_key :answers, :users
     add_foreign_key :answers, :questions

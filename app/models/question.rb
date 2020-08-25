@@ -30,12 +30,8 @@ class Question < ApplicationRecord
     self.class.to_s.demodulize
   end
 
-  def questions_same_intervention
-    @questions_same_intervention ||= intervention.questions
-  end
-
   def questions_position_up_to_equal
-    questions_same_intervention.where('questions.position <= ?', position).order(:position)
+    intervention.questions.where('questions.position <= ?', position).order(:position)
   end
 
   def harvest_body_variables
