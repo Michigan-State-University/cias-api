@@ -78,7 +78,7 @@ RSpec.describe 'GET /v1/problems/:id/answers', type: :request do
       end
 
       it 'success message' do
-        expect(json_response['message']).to eq 'The request to send the CSV file has been successfully created. We will soon send a CSV file to your email address.'
+        expect(json_response['message']).to eq 'The request to send the CSV file has been successfully created. We will soon send an email to you with the request status.'
       end
     end
   end

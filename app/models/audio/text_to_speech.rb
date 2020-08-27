@@ -10,9 +10,10 @@ class Audio::TextToSpeech < SimpleDelegator
   end
 
   def execute
-    mp3_create
-    mp3_upload
-    mp3_remove_file
+    MetaOperations::FilesKeeper.new(
+      stream: fetch_speech_from_text, add_to: self,
+      filename: sha256, macro: :mp3, ext: :mp3, type: 'audio/mpeg'
+    ).execute
     url
   end
 
@@ -30,29 +31,5 @@ class Audio::TextToSpeech < SimpleDelegator
 
   def fetch_speech_from_text
     provider.new(text).synthesize
-  end
-
-  def mp3_filename
-    @mp3_filename ||= "#{sha256}.mp3"
-  end
-
-  def mp3_create
-    self.mp3_file = File.open(Rails.root.join('tmp', mp3_filename), 'wb') do |file|
-      file.write(fetch_speech_from_text)
-      file.path
-    end
-  end
-
-  def mp3_upload
-    mp3.attach(
-      io: File.open(mp3_file),
-      filename: mp3_filename,
-      content_type: 'audio/mpeg'
-    )
-    save!
-  end
-
-  def mp3_remove_file
-    File.delete(mp3_create) if File.exist?(mp3_create)
   end
 end

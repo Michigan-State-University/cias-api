@@ -9,6 +9,8 @@ class Problem < ApplicationRecord
   has_many :user_problems, dependent: :restrict_with_exception, inverse_of: :problem
   has_many :users, dependent: :restrict_with_exception, through: :user_problems
 
+  has_many_attached :reports
+
   attr_accessor :status_event
 
   attribute :shared_to, :string, default: 'anyone'
