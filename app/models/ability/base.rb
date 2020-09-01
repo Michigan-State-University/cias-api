@@ -20,5 +20,8 @@ class Ability::Base
     self.class.name.demodulize.underscore
   end
 
-  def default; end
+  def default
+    can %i[read update], User, id: user.id
+    cannot :update, User, :deactivated, :roles
+  end
 end
