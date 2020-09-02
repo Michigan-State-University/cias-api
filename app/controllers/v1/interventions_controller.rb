@@ -40,6 +40,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:status_event, :allow_guests, :name, :position, :problem_id, narrator: {}, settings: {}, body: {})
+    params.require(:intervention).permit(:status_event, :allow_guests, :name, :position, :problem_id, narrator: {}, settings: {}, formula: {}, body: {})
   end
 end

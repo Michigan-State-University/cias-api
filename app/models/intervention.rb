@@ -15,12 +15,14 @@ class Intervention < ApplicationRecord
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 0
+  attribute :formula, :json, default: { payload: '', patterns: [] }
   attribute :body, :json, default: { data: [] }
 
   attr_accessor :status_event
 
   validates :name, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
+  validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validates :status_event, inclusion: { in: %w[broadcast close] }, allow_nil: true
 

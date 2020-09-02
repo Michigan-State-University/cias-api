@@ -96,6 +96,7 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.integer 'position', default: 0, null: false
     t.string 'name', null: false
     t.string 'slug'
+    t.jsonb 'formula'
     t.jsonb 'body'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false

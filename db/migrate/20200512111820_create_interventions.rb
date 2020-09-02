@@ -10,6 +10,7 @@ class CreateInterventions < ActiveRecord::Migration[6.0]
       t.integer :position, null: false, default: 0
       t.string :name, null: false
       t.string :slug
+      t.jsonb :formula
       t.jsonb :body
 
       t.timestamps
