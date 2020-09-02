@@ -2,6 +2,7 @@
 
 class V1::InterventionsController < V1Controller
   include Resource::Clone
+  include Resource::Position
   skip_before_action :authenticate_v1_user!, on: :index, if: -> { params[:allow_guests] }
 
   def index

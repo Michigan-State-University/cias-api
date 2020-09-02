@@ -1,5 +1,5 @@
 UPDATE
-  questions
+ <%= @table %>
 SET
   position = nv.position
 FROM
@@ -11,4 +11,4 @@ FROM
       <% end %>
     ) AS nv (id, position)
 WHERE
-  questions.id = nv.id::uuid;
+  <%= @table %>.id = nv.id::uuid;

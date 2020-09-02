@@ -2,6 +2,7 @@
 
 class V1::QuestionsController < V1Controller
   include Resource::Clone
+  include Resource::Position
 
   def index
     render json: serialized_response(questions_scope)
@@ -16,15 +17,6 @@ class V1::QuestionsController < V1Controller
     question.position = questions_scope.last&.position.to_i + 1
     question.save!
     render json: serialized_response(question), status: :created
-  end
-
-  def position
-    SqlQuery.new(
-      'question/position_bulk_update',
-      values: question_position_params[:position]
-    ).execute
-    invalidate_cache(questions_scope)
-    render json: serialized_response(questions_scope)
   end
 
   def update
@@ -53,9 +45,5 @@ class V1::QuestionsController < V1Controller
 
   def question_params
     params.require(:question).permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
-  end
-
-  def question_position_params
-    params.require(:question).permit(position: %i[id position])
   end
 end

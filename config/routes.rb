@@ -17,6 +17,7 @@ Rails.application.routes.draw do
           resources :answers, only: %i[index], as: :problem_answers
         end
       end
+      patch 'interventions/position', to: 'interventions#position'
       resources :interventions, only: %i[index show create update]
     end
 
