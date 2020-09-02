@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 class Question < ApplicationRecord
-  include BodyInterface
   extend DefaultValues
+  include BodyInterface
   include Clone
+  include FormulaInterface
 
   belongs_to :intervention, inverse_of: :questions
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
@@ -31,7 +32,26 @@ class Question < ApplicationRecord
   end
 
   def questions_position_up_to_equal
-    intervention.questions.where('questions.position <= ?', position).order(:position)
+    intervention.questions.where('questions.position >= ?', position).order(:position)
+  end
+
+  def next_intervention_or_question(answers_var_values)
+    if id.eql?(questions_position_up_to_equal.last.id)
+      nil
+    elsif formula['payload'].present?
+      obj_src = exploit_formula(answers_var_values)
+      next_obj = obj_src['type'].safe_constantize.find(obj_src['id'])
+      return next_obj unless next_obj.is_a?(::Question::Feedback)
+
+      next_obj.apply_formula(answers_var_values)
+      next_obj
+    else
+      next_obj = questions_position_up_to_equal[1]
+      return next_obj unless next_obj.is_a?(::Question::Feedback)
+
+      next_obj.apply_formula(answers_var_values)
+      next_obj
+    end
   end
 
   def harvest_body_variables

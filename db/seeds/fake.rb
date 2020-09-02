@@ -74,6 +74,7 @@ class Fake
         Intervention.create(
           problem_id: problem_ids.sample,
           name: Faker::Name.name,
+          position: rand(1..100),
           body: { data: [
             {
               payload: 'question_key1_test',

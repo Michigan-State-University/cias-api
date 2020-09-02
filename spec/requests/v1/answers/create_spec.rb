@@ -9,240 +9,116 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:question) { create(:question_text_box) }
 
-  let(:params_without_user) do
-    {
-      answer: {
-        type: 'Answer::TextBox',
-        body: {
-          data: [
-            {
-              payload: '1',
-              variable: '1'
-            }
-          ]
-        }
-      }
-    }
-  end
-
-  let(:params_with_user) do
-    {
-      answer: {
-        type: 'Answer::TextBox',
-        user_id: user.id,
-        body: {
-          data: [
-            {
-              payload: '1',
-              variable: '1'
-            }
-          ]
-        }
-      }
-    }
-  end
-
   before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
 
-  context 'current_v1_user is admin' do
-    let(:user) { admin }
-
-    context 'when params' do
-      context 'are VALID' do
-        context 'is without user' do
-          let(:params) { params_without_user }
-
-          it { expect(response).to have_http_status(:created) }
-
-          it 'returns proper attributes' do
-            expect(json_response['data']['attributes']).to include(
-              'type' => 'Answer::TextBox',
-              'question' => include(
-                'id' => question.id
-              ),
-              'user' => nil,
-              'body' => {
-                'data' => [
-                  {
-                    'payload' => '1',
-                    'variable' => '1'
-                  }
-                ]
-              }
-            )
-          end
-        end
-
-        context 'is with user' do
-          let(:params) { params_with_user }
-
-          it { expect(response).to have_http_status(:created) }
-
-          it 'returns proper attributes' do
-            expect(json_response['data']['attributes']).to include(
-              'type' => 'Answer::TextBox',
-              'question' => include(
-                'id' => question.id
-              ),
-              'user' => include(
-                'id' => user.id
-              ),
-              'body' => {
-                'data' => [
-                  {
-                    'payload' => '1',
-                    'variable' => '1'
-                  }
-                ]
-              }
-            )
-          end
-        end
-      end
-    end
-  end
-
-  context 'current_v1_user is researcher' do
+  context 'branching logic' do
     let(:user) { researcher }
+    let(:intervention) { create(:intervention) }
+    let(:params) { params_branching }
+    let(:params_branching) do
+      {
+        answer: {
+          type: 'Answer::Single',
+          user_id: user.id,
+          body: {
+            data: [
+              {
+                var: 'a1',
+                value: '1'
+              }
+            ]
+          }
+        }
+      }
+    end
 
-    context 'intervention belongs to researcher' do
-      let!(:problem) { create(:problem, user: researcher) }
-      let!(:intervention) { create(:intervention, problem_id: problem.id) }
-      let!(:question) { create(:question_text_box, intervention_id: intervention.id) }
+    context 'to nil because last' do
+      let(:question) { create(:question_single, :branching_to_question) }
 
-      context 'when params' do
-        context 'are VALID' do
-          context 'is without user' do
-            let(:params) { params_without_user }
+      it { expect(json_response['data']).to be_nil }
+    end
 
-            it { expect(response).to have_http_status(:created) }
-
-            it 'returns proper attributes' do
-              expect(json_response['data']['attributes']).to include(
-                'type' => 'Answer::TextBox',
-                'question' => include(
-                  'id' => question.id
-                ),
-                'user' => nil,
-                'body' => {
-                  'data' => [
-                    {
-                      'payload' => '1',
-                      'variable' => '1'
-                    }
-                  ]
-                }
-              )
-            end
-          end
-
-          context 'is with user' do
-            let(:params) { params_with_user }
-
-            it { expect(response).to have_http_status(:created) }
-
-            it 'returns proper attributes' do
-              expect(json_response['data']['attributes']).to include(
-                'type' => 'Answer::TextBox',
-                'question' => include(
-                  'id' => question.id
-                ),
-                'user' => include(
-                  'id' => user.id
-                ),
-                'body' => {
-                  'data' => [
-                    {
-                      'payload' => '1',
-                      'variable' => '1'
-                    }
-                  ]
-                }
-              )
-            end
-          end
-        end
+    context 'response with question' do
+      let(:questions) { create_list(:question_single, 4, intervention_id: intervention.id) }
+      let(:question) do
+        question = questions.first
+        question.formula = { 'payload' => 'a1',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => questions[1].id, 'type' => 'Question' }
+                               }
+                             ] }
+        question
       end
+
+      it { expect(json_response['data']['id']).to eq questions[1].id }
     end
 
-    context 'intervention does not belong to researcher' do
-      let(:user) { participant }
-      let(:params) { params_without_user }
-
-      it { expect(response).to have_http_status(:forbidden) }
-
-      it 'response contains proper error message' do
-        expect(json_response['message']).to eq 'You are not authorized to access this page.'
-      end
-    end
-  end
-
-  context 'current_v1_user is participant' do
-    let(:user) { participant }
-    let(:params) { params_without_user }
-
-    it { expect(response).to have_http_status(:forbidden) }
-
-    it 'response contains proper error message' do
-      expect(json_response['message']).to eq 'You are not authorized to access this page.'
-    end
-  end
-
-  context 'current_v1_user is guest' do
-    let(:user) { guest }
-
-    context 'when params' do
-      context 'are VALID' do
-        context 'is without user' do
-          let(:params) { params_without_user }
-
-          it { expect(response).to have_http_status(:created) }
-
-          it 'returns proper attributes' do
-            expect(json_response['data']['attributes']).to include(
-              'type' => 'Answer::TextBox',
-              'question' => include(
-                'id' => question.id
-              ),
-              'user' => nil,
-              'body' => {
-                'data' => [
+    context 'response with feedback' do
+      let(:question_feedback) do
+        question_feedback = build(:question_feedback, intervention_id: intervention.id, position: 2)
+        question_feedback.body = {
+          data: [
+            {
+              payload: {
+                start_value: '',
+                end_value: '',
+                target_value: ''
+              },
+              spectrum: {
+                payload: 'a1',
+                patterns: [
                   {
-                    'payload' => '1',
-                    'variable' => '1'
+                    match: '=1',
+                    target: '111'
                   }
                 ]
               }
-            )
-          end
-        end
-      end
-
-      context 'is with user' do
-        let(:params) { params_with_user }
-
-        it { expect(response).to have_http_status(:created) }
-
-        it 'returns proper attributes' do
-          expect(json_response['data']['attributes']).to include(
-            'type' => 'Answer::TextBox',
-            'question' => include(
-              'id' => question.id
-            ),
-            'user' => include(
-              'id' => user.id
-            ),
-            'body' => {
-              'data' => [
-                {
-                  'payload' => '1',
-                  'variable' => '1'
-                }
-              ]
             }
-          )
-        end
+          ]
+        }
+        question_feedback.save
+        question_feedback
       end
+
+      let(:question) do
+        question = build(:question_single, intervention_id: intervention.id, position: 1)
+        question.formula = { 'payload' => 'a1',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => question_feedback.id, 'type' => 'Question' }
+                               }
+                             ] }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'a1' } }
+        question.save
+        question
+      end
+
+      it { expect(json_response['data']['id']).to eq question_feedback.id }
+    end
+
+    context 'response with intervention' do
+      let(:problem) { create(:problem) }
+      let(:intervention_response) { create(:intervention, problem_id: problem.id, position: 2) }
+
+      let(:questions) { create_list(:question_single, 3, intervention_id: intervention.id) }
+      let(:question) do
+        question = questions.first
+        question.formula = { 'payload' => 'a1',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => intervention_response.id, 'type' => 'Intervention' }
+                               }
+                             ] }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'a1' } }
+        question.save
+        question
+      end
+
+      it { expect(json_response['data']['id']).to eq intervention_response.id }
     end
   end
 end

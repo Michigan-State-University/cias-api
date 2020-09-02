@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class Intervention < ApplicationRecord
+  extend DefaultValues
   extend FriendlyId
   include AASM
   include BodyInterface
-  extend DefaultValues
   include Clone
+  include FormulaInterface
 
   belongs_to :problem, inverse_of: :interventions
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention

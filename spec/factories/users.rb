@@ -7,7 +7,7 @@ FactoryBot.define do
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
     provider { 'email' }
-    phone { Faker::PhoneNumber.cell_phone }
+    roles { %w[guest] }
 
     transient do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }

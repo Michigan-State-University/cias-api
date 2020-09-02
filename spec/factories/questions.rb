@@ -76,17 +76,22 @@ FactoryBot.define do
       {
         data: [
           {
-            payload: '',
-            value: ''
-          },
-          {
-            payload: 'example2',
-            value: ''
+            payload: {
+              start_value: '',
+              end_value: '',
+              target_value: ''
+            },
+            spectrum: {
+              payload: '1',
+              patterns: [
+                {
+                  match: '1',
+                  target: '1'
+                }
+              ]
+            }
           }
-        ],
-        variable: {
-          name: ''
-        }
+        ]
       }
     end
     sequence(:position) { |s| s }
@@ -268,6 +273,70 @@ FactoryBot.define do
             animation: true
           },
           blocks: []
+        }
+      end
+    end
+
+    trait :branching_to_question do
+      formula do
+        {
+          payload: 'a1',
+          patterns: [
+            {
+              match: '=1',
+              target: {
+                id: '',
+                type: 'Question::Single'
+              }
+            }
+          ]
+        }
+      end
+      body do
+        {
+          data: [
+            {
+              value: '1',
+              payload: ''
+            },
+            {
+              value: '2',
+              payload: ''
+            }
+          ],
+          variable: {
+            name: 'a1'
+          }
+        }
+      end
+    end
+
+    trait :branching_to_intervention do
+      formula do
+        {
+          payload: 'a1',
+          patterns: [
+            { match: '=2',
+              target: {
+                id: '',
+                type: 'Intervention'
+              } }
+          ]
+        }
+      end
+      body do
+        {
+          data: [
+            {
+              value: '1',
+              payload: ''
+            },
+            {
+              value: '2',
+              payload: ''
+            }
+          ],
+          variable: { name: 'a1' }
         }
       end
     end

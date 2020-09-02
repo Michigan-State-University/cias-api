@@ -9,13 +9,9 @@ module FormulaInterface
     formula['payload']
   end
 
-  def exploit_variables
-    parser_runtime.evaluate!(formula_payload, collect_variables)
-  end
-
-  def exploit_patterns
-    cache_exploit_variables = exploit_variables
-    formula_patterns.each do |pattern|
+  def exploit_formula(var_values, payload = formula_payload, patterns = formula_patterns)
+    cache_exploit_variables = parser_runtime.evaluate!(payload, **var_values)
+    patterns.each do |pattern|
       matched_pattern = parser_runtime.evaluate!("#{cache_exploit_variables} #{pattern['match']}")
       return pattern['target'] if matched_pattern
     end

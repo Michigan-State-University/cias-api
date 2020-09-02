@@ -38,7 +38,6 @@ group :development, :test do
   gem 'fasterer', require: false
   gem 'overcommit', require: false
   gem 'pry-byebug'
-  gem 'rails_best_practices', require: false
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false

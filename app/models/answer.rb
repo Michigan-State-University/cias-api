@@ -2,7 +2,7 @@
 
 class Answer < ApplicationRecord
   include BodyInterface
-  include FormulaInterface
+
   belongs_to :user, optional: true
   belongs_to :question, inverse_of: :answers
 
@@ -11,13 +11,20 @@ class Answer < ApplicationRecord
   delegate :subclass_name, :settings, :position, :title, :subtitle, :formula, to: :question, allow_nil: true
 
   validate :type_integrity_validator
-  validates :type, uniqueness: { scope: %i[user question] }, unless: -> { user.role?('researcher') }
+
+  scope :user_answers, lambda { |user_id, intervention_id_or_ids|
+    joins(:question).
+    where(user_id: user_id, questions: { intervention_id: intervention_id_or_ids })
+  }
 
   def retrive_previous_answers
-    Answer.where(question_id: question.questions_position_up_to_equal.ids, user_id: user_id)
+    previous_interventions_ids = question.intervention.problem.interventions.where('interventions.position < ?', question.intervention.position).ids
+    previous_answers = Answer.user_answers(user_id, previous_interventions_ids)
+    current_answers = Answer.joins(:question).where(questions: { position: ..question.position }).user_answers(user_id, question.intervention)
+    previous_answers + current_answers
   end
 
-  def collect_variables
+  def collect_var_values
     retrive_previous_answers.each_with_object({}) do |collection, hash|
       collection.body_data.each do |obj|
         hash[obj['var']] = obj['value']
@@ -25,19 +32,8 @@ class Answer < ApplicationRecord
     end
   end
 
-  def processing_answering
-    if question.id.eql?(question.questions_position_up_to_equal.last.id)
-      nil
-    elsif question.formula['payload'].present?
-      pointo_to = exploit_patterns
-      pointo_to['target']['type'].safe_constantize.find(pointo_to['target']['id'])
-    else
-      next_question = question.questions_position_up_to_equal[1]
-      return next_question unless next_question.type.eql?('Question::Feedback')
-
-      next_question.body['target_value']['target_value'] = exploit_patterns
-      next_question
-    end
+  def perform_response
+    question.next_intervention_or_question(collect_var_values)
   end
 
   private

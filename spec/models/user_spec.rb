@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 describe User, type: :model do
-  describe 'user' do
-    subject { create(:user) }
+  describe 'participant' do
+    subject { create(:user, :confirmed, :participant) }
 
     it { should be_valid }
     it { should have_many(:problems) }

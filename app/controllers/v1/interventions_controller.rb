@@ -18,7 +18,9 @@ class V1::InterventionsController < V1Controller
   end
 
   def create
-    intervention = interventions_scope.create!(intervention_params)
+    intervention = interventions_scope.new(intervention_params)
+    intervention.position = interventions_scope.last&.position.to_i + 1
+    intervention.save!
     render json: serialized_response(intervention), status: :created
   end
 
@@ -32,7 +34,7 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Problem.includes(:interventions).accessible_by(current_ability).find(params[:problem_id]).interventions
+    Problem.includes(:interventions).accessible_by(current_ability).find(params[:problem_id]).interventions.order(:position)
   end
 
   def intervention_load
