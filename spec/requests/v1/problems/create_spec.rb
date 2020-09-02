@@ -13,7 +13,6 @@ RSpec.describe 'POST /v1/problems', type: :request do
   let(:params) do
     {
       problem: {
-        allow_guests: true,
         name: 'New Problem'
       }
     }
@@ -74,18 +73,18 @@ RSpec.describe 'POST /v1/problems', type: :request do
 
       it 'response contains proper attributes' do
         expect(json_response['data']['attributes']).to include(
-          'allow_guests' => true,
           'name' => 'New Problem',
-          'status' => 'draft'
+          'status' => 'draft',
+          'shared_to' => 'anyone'
         )
       end
 
       it 'creates a problem object' do
         expect(Problem.last.attributes).to include(
-          'allow_guests' => true,
           'name' => 'New Problem',
           'user_id' => admin.id,
-          'status' => 'draft'
+          'status' => 'draft',
+          'shared_to' => 'anyone'
         )
       end
     end
@@ -94,7 +93,6 @@ RSpec.describe 'POST /v1/problems', type: :request do
       let(:params) do
         {
           problem: {
-            allow_guests: false,
             name: ''
           }
         }
@@ -122,18 +120,18 @@ RSpec.describe 'POST /v1/problems', type: :request do
 
       it 'response contains proper attributes' do
         expect(json_response['data']['attributes']).to include(
-          'allow_guests' => true,
           'name' => 'New Problem',
-          'status' => 'draft'
+          'status' => 'draft',
+          'shared_to' => 'anyone'
         )
       end
 
       it 'creates a problem object' do
         expect(Problem.last.attributes).to include(
-          'allow_guests' => true,
           'name' => 'New Problem',
           'user_id' => researcher.id,
-          'status' => 'draft'
+          'status' => 'draft',
+          'shared_to' => 'anyone'
         )
       end
     end
@@ -142,7 +140,6 @@ RSpec.describe 'POST /v1/problems', type: :request do
       let(:params) do
         {
           problem: {
-            allow_guests: false,
             name: ''
           }
         }

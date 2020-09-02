@@ -9,9 +9,9 @@ RSpec.describe 'GET /v1/problems', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
 
-  let!(:admin_problems) { create_list(:problem, 3, user: admin) }
-  let!(:researcher_problems) { create_list(:problem, 3, user: researcher) }
-  let!(:problems_for_guests) { create_list(:problem, 2, allow_guests: true) }
+  let!(:admin_problems) { create_list(:problem, 3, user: admin, shared_to: :registered) }
+  let!(:researcher_problems) { create_list(:problem, 3, user: researcher, shared_to: :invited) }
+  let!(:problems_for_guests) { create_list(:problem, 2) }
 
   context 'when endpoint is available' do
     before { get v1_problems_path }

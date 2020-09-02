@@ -9,10 +9,10 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
 
-  let(:allow_guests) { false }
+  let(:shared_to) { :registered }
   let(:problem_user) { admin }
   let(:interventions) { create_list(:intervention, 2) }
-  let!(:problem) { create(:problem, name: 'Some problem', user: problem_user, interventions: interventions, allow_guests: allow_guests) }
+  let!(:problem) { create(:problem, name: 'Some problem', user: problem_user, interventions: interventions, shared_to: shared_to) }
 
   context 'when endpoint is available' do
     before { get v1_problem_path(problem.id) }
@@ -68,7 +68,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
       it 'contains proper attributes' do
         expect(json_response['data']['attributes']).to include(
           'name' => 'Some problem',
-          'allow_guests' => false
+          'shared_to' => 'registered'
         )
       end
 
@@ -100,7 +100,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         it 'contains proper attributes' do
           expect(json_response['data']['attributes']).to include(
             'name' => 'Some problem',
-            'allow_guests' => false
+            'shared_to' => 'registered'
           )
         end
 
@@ -113,19 +113,19 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
     context 'has role guest' do
       let(:user) { guest }
 
-      context 'problem is not allowed for guests' do
+      context 'problem is not allowed for anyone' do
         it 'contains empty data' do
           expect(json_response['data']).not_to be_present
         end
       end
 
       context 'problem is allowed for guests' do
-        let(:allow_guests) { true }
+        let(:shared_to) { 'anyone' }
 
         it 'contains proper attributes' do
           expect(json_response['data']['attributes']).to include(
             'name' => 'Some problem',
-            'allow_guests' => true
+            'shared_to' => 'anyone'
           )
         end
 

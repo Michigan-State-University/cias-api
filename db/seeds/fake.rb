@@ -55,11 +55,12 @@ class Fake
     def create_problems
       user_ids
       (4..14).to_a.sample.times do
-        Problem.create(
+        problem = Problem.create(
           name: Faker::University.name,
           user_id: user_ids.sample,
-          allow_guests: true_or_false.sample
+          shared_to: Problem.shared_tos.keys.sample
         )
+        problem.users << User.limit_to_roles('participant').sample(2)
       end
     end
 

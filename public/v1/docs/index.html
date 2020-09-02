@@ -330,6 +330,20 @@
               </ul>
           </li>
           <li>
+            <a href="#userproblem" class="toc-h1 toc-link" data-title="UserProblem">UserProblem</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-users-belongs-to-problem" class="toc-h2 toc-link" data-title="Get users belongs to problem">Get users belongs to problem</a>
+                  </li>
+                  <li>
+                    <a href="#create-associations-between-users-and-problem" class="toc-h2 toc-link" data-title="Create associations between users and problem">Create associations between users and problem</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-association-between-given-users-and-given-problem" class="toc-h2 toc-link" data-title="Destroy association between given users and given problem">Destroy association between given users and given problem</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#image-for-question" class="toc-h1 toc-link" data-title="Image for Question">Image for Question</a>
               <ul class="toc-list-h2">
                   <li>
@@ -2516,6 +2530,293 @@ uid: user@interventionauthoring.org
 <p>HTTP example request</p>
 </blockquote>
 <pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/interventions/1/questions/1
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@interventionauthoring.org
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<h1 id='userproblem'>UserProblem</h1><h2 id='get-users-belongs-to-problem'>Get users belongs to problem</h2><h3 id='resource'>Resource</h3>
+<p><code>localhost:3000/v1/problems/:problem_id/users</code></p>
+<h3 id='url-parameters'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>problem_id</td>
+<td>Problem ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method'>HTTP request method</h3>
+<p><code>GET</code></p>
+<h3 id='http-headers'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems/1/users
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@interventionauthoring.org
+</span></code></pre>
+<blockquote>
+<p>HTTP response body</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user_problem"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"participant2"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Socrates"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a@p.com"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"phones"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+          </span><span class="s2">"time_zone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Eastern Time (US &amp; Canada)"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="s2">"participant"</span><span class="w">
+          </span><span class="p">]</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New e-Intervention"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"user_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"shared_to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"anyone"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<h2 id='create-associations-between-users-and-problem'>Create associations between users and problem</h2><h3 id='resource-2'>Resource</h3>
+<p><code>localhost:3000/v1/problems/:problem_id/users</code></p>
+<h3 id='url-parameters-2'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>problem_id</td>
+<td>Problem ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-2'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-2'>HTTP request method</h3>
+<p><code>POST</code></p>
+<h3 id='http-headers-2'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='note'>Note</h3>
+<p>Required keys:</p>
+
+<ul>
+<li><code>&quot;user_problem&quot;: { &quot;emails&quot;: [] }</code>.</li>
+</ul>
+
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/problems
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@interventionauthoring.org
+</span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"user_problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"emails"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"t@p.com"</span><span class="p">,</span><span class="w"> </span><span class="s2">"t@p.com"</span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>HTTP response body</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user_problem"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"attributes"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"participant2"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Socrates"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"a@p.com"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"phones"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+          </span><span class="s2">"time_zone"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Eastern Time (US &amp; Canada)"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+            </span><span class="s2">"participant"</span><span class="w">
+          </span><span class="p">]</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New e-Intervention"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"user_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"draft"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"shared_to"</span><span class="p">:</span><span class="w"> </span><span class="s2">"anyone"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre>
+<blockquote>
+<p>HTTP response 201 Created</p>
+</blockquote>
+<h2 id='destroy-association-between-given-users-and-given-problem'>Destroy association between given users and given problem</h2><h3 id='resource-3'>Resource</h3>
+<p><code>localhost:3000/v1/interventions/:problem_id/users/:id</code></p>
+<h3 id='url-parameters-3'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>problem_id</td>
+<td>Problem ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>User ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-3'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-3'>HTTP request method</h3>
+<p><code>DELETE</code></p>
+<h3 id='http-headers-3'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/problems/1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer

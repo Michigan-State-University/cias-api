@@ -1,0 +1,15 @@
+{
+  "addons": [
+    "heroku-postgresql",
+    "heroku-redis"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/ruby"
+    }
+  ],
+  "name": "cias-api",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}

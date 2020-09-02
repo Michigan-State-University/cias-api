@@ -13,7 +13,6 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
   let(:params) do
     {
       problem: {
-        allow_guests: true,
         name: 'New Problem',
         status_event: 'broadcast'
       }
@@ -21,7 +20,7 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
   end
 
   let(:problem_user) { admin }
-  let!(:problem) { create(:problem, name: 'Old Problem', user: problem_user, allow_guests: false, status: 'draft') }
+  let!(:problem) { create(:problem, name: 'Old Problem', user: problem_user, status: 'draft') }
   let(:problem_id) { problem.id }
 
   context 'when endpoint is available' do
@@ -79,17 +78,17 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
       it 'response contains proper attributes' do
         expect(json_response['data']['attributes']).to include(
-          'allow_guests' => true,
           'name' => 'New Problem',
-          'status' => 'published'
+          'status' => 'published',
+          'shared_to' => 'anyone'
         )
       end
 
       it 'updates a problem object' do
         expect(problem.reload.attributes).to include(
-          'allow_guests' => true,
           'name' => 'New Problem',
-          'status' => 'published'
+          'status' => 'published',
+          'shared_to' => 'anyone'
         )
       end
     end
@@ -98,7 +97,6 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
       let(:params) do
         {
           problem: {
-            allow_guests: false,
             name: ''
           }
         }
@@ -112,9 +110,9 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
       it 'does not update a problem object' do
         expect(problem.reload.attributes).to include(
-          'allow_guests' => false,
           'name' => 'Old Problem',
-          'status' => 'draft'
+          'status' => 'draft',
+          'shared_to' => 'anyone'
         )
       end
     end
@@ -126,11 +124,7 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
     before { patch v1_problem_path(problem_id), params: params, headers: headers }
 
     context 'problem does not belong to him' do
-      it { expect(response).to have_http_status(:forbidden) }
-
-      it 'response contains proper error message' do
-        expect(json_response['message']).to eq 'You are not authorized to access this page.'
-      end
+      it { expect(response).to have_http_status(:not_found) }
     end
 
     context 'problem belongs to him' do
@@ -141,17 +135,17 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
         it 'response contains proper attributes' do
           expect(json_response['data']['attributes']).to include(
-            'allow_guests' => true,
             'name' => 'New Problem',
-            'status' => 'published'
+            'status' => 'published',
+            'shared_to' => 'anyone'
           )
         end
 
         it 'updates a problem object' do
           expect(problem.reload.attributes).to include(
-            'allow_guests' => true,
             'name' => 'New Problem',
-            'status' => 'published'
+            'status' => 'published',
+            'shared_to' => 'anyone'
           )
         end
       end
@@ -160,7 +154,6 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
         let(:params) do
           {
             problem: {
-              allow_guests: false,
               name: ''
             }
           }
@@ -174,9 +167,9 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
         it 'does not update a problem object' do
           expect(problem.reload.attributes).to include(
-            'allow_guests' => false,
             'name' => 'Old Problem',
-            'status' => 'draft'
+            'status' => 'draft',
+            'shared_to' => 'anyone'
           )
         end
       end
@@ -188,11 +181,7 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
     before { patch v1_problem_path(problem_id), params: params, headers: headers }
 
-    it { expect(response).to have_http_status(:forbidden) }
-
-    it 'response contains proper error message' do
-      expect(json_response['message']).to eq 'You are not authorized to access this page.'
-    end
+    it { expect(response).to have_http_status(:not_found) }
   end
 
   context 'when user has role guest' do
@@ -200,10 +189,6 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
     before { patch v1_problem_path(problem_id), params: params, headers: headers }
 
-    it { expect(response).to have_http_status(:forbidden) }
-
-    it 'response contains proper error message' do
-      expect(json_response['message']).to eq 'You are not authorized to access this page.'
-    end
+    it { expect(response).to have_http_status(:not_found) }
   end
 end

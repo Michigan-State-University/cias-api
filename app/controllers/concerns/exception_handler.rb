@@ -20,6 +20,10 @@ module ExceptionHandler
       render json: msg(exc), status: :not_found
     end
 
+    rescue_from ActiveRecord::RecordNotUnique do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
+
     rescue_from ActiveRecord::RecordNotSaved do |exc|
       render json: msg(exc), status: :not_found
     end
@@ -29,7 +33,7 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::SubclassNotFound do |exc|
-      render json: msg(exc), status: :internal_server_error
+      render json: msg(exc), status: :bad_request
     end
 
     rescue_from CanCan::AccessDenied do |exc|
@@ -38,6 +42,10 @@ module ExceptionHandler
 
     rescue_from Dentaku::Error do |exc|
       render json: msg(exc), status: :unprocessable_entity
+    end
+
+    rescue_from NameError do |exc|
+      render json: msg(exc), status: :bad_request
     end
 
     rescue_from NoMethodError do |exc|

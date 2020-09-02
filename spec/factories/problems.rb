@@ -3,8 +3,8 @@
 FactoryBot.define do
   factory :problem do
     user
-    allow_guests { false }
     name { 'Problem' }
     status { 'published' }
+    shared_to { 'anyone' }
   end
 end

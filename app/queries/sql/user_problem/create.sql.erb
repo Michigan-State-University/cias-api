@@ -1,0 +1,7 @@
+INSERT INTO
+  user_problems ("user_id", "problem_id", "created_at", "updated_at")
+VALUES
+  <% @users.each do |user| %>
+    ('<%= user.id %>', '<%= @problem_id %>', '<%= Time.current.iso8601 %>', '<%= Time.current.iso8601 %>')
+    <%= ',' if user[:id] != @users.last[:id] %>
+  <% end %>

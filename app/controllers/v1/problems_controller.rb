@@ -4,11 +4,11 @@ class V1::ProblemsController < V1Controller
   include Resource::Clone
   skip_before_action :authenticate_v1_user!, on: :index, if: -> { params[:allow_guests] }
 
-  load_and_authorize_resource only: %i[create update]
+  authorize_resource only: :create
 
   def index
     if params[:allow_guests]
-      render json: serialized_response(Problem.published.allow_guests)
+      render json: serialized_response(Problem.published.shared_to_anyone)
     else
       render json: serialized_response(problems_scope)
     end
@@ -41,6 +41,6 @@ class V1::ProblemsController < V1Controller
   end
 
   def problem_params
-    params.require(:problem).permit(:name, :allow_guests, :status_event)
+    params.require(:problem).permit(:name, :status_event, :shared_to)
   end
 end

@@ -111,12 +111,13 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
   create_table 'problems', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'name'
     t.uuid 'user_id', null: false
-    t.boolean 'allow_guests', default: false, null: false
     t.string 'status'
+    t.string 'shared_to', null: false
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index %w[name user_id], name: 'index_problems_on_name_and_user_id', using: :gin
     t.index ['name'], name: 'index_problems_on_name'
+    t.index ['shared_to'], name: 'index_problems_on_shared_to'
     t.index ['status'], name: 'index_problems_on_status'
     t.index ['user_id'], name: 'index_problems_on_user_id'
   end
@@ -151,6 +152,16 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.inet 'remote_ip'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
+  end
+
+  create_table 'user_problems', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.uuid 'user_id', null: false
+    t.uuid 'problem_id', null: false
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['problem_id'], name: 'index_user_problems_on_problem_id'
+    t.index %w[user_id problem_id], name: 'index_user_problems_on_user_id_and_problem_id', unique: true
+    t.index ['user_id'], name: 'index_user_problems_on_user_id'
   end
 
   create_table 'users', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
@@ -197,4 +208,6 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
   add_foreign_key 'problems', 'users'
   add_foreign_key 'questions', 'interventions'
   add_foreign_key 'user_log_requests', 'users'
+  add_foreign_key 'user_problems', 'problems'
+  add_foreign_key 'user_problems', 'users'
 end

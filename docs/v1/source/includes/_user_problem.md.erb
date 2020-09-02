@@ -1,0 +1,227 @@
+# UserProblem
+
+
+## Get users belongs to problem
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/users`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+> HTTP response body
+
+```json
+{
+  "data": [
+    {
+      "id": "2",
+      "type": "user_problem",
+      "attributes": {
+        "user": {
+          "id": "2",
+          "first_name": "participant2",
+          "last_name": "Socrates",
+          "email": "a@p.com",
+          "phones": [],
+          "time_zone": "Eastern Time (US & Canada)",
+          "roles": [
+            "participant"
+          ]
+        },
+        "problem": {
+          "id": "1",
+          "name": "New e-Intervention",
+          "user_id": "2",
+          "status": "draft",
+          "shared_to": "anyone"
+        }
+      }
+    }
+  ]
+}
+```
+
+> HTTP response 200 OK
+
+
+## Create associations between users and problem
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/users`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### Note
+
+Required keys:
+
+ * `"user_problem": { "emails": [] }`.
+
+
+ > HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/problems
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"user_problem": {
+    "emails": ["t@p.com", "t@p.com"]
+	}
+}
+```
+
+> HTTP response body
+
+```json
+{
+  "data": [
+    {
+      "id": "2",
+      "type": "user_problem",
+      "attributes": {
+        "user": {
+          "id": "2",
+          "first_name": "participant2",
+          "last_name": "Socrates",
+          "email": "a@p.com",
+          "phones": [],
+          "time_zone": "Eastern Time (US & Canada)",
+          "roles": [
+            "participant"
+          ]
+        },
+        "problem": {
+          "id": "1",
+          "name": "New e-Intervention",
+          "user_id": "2",
+          "status": "draft",
+          "shared_to": "anyone"
+        }
+      }
+    }
+  ]
+}
+```
+
+> HTTP response 201 Created
+
+
+## Destroy association between given users and given problem
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:problem_id/users/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+id | User ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+> HTTP response 200 OK

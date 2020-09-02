@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
-  let(:user) { create(:user, :confirmed, :researcher) }
+  let(:user) { create(:user, :confirmed, :admin) }
   let(:question) { create(:question_single) }
   let(:headers) do
     user.create_new_auth_token

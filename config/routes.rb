@@ -11,11 +11,10 @@ Rails.application.routes.draw do
     resources :users, only: %i[index show update destroy]
 
     resources :problems, only: %i[index show create update] do
-      member do
-        post 'clone'
-        scope module: 'problems' do
-          resources :answers, only: %i[index], as: :problem_answers
-        end
+      post 'clone', on: :member
+      scope module: 'problems' do
+        resources :answers, only: %i[index]
+        resources :users, only: %i[index create destroy]
       end
       patch 'interventions/position', to: 'interventions#position'
       resources :interventions, only: %i[index show create update]
