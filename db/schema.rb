@@ -171,7 +171,7 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.string 'first_name', default: '', null: false
     t.string 'last_name', default: '', null: false
     t.string 'email'
-    t.text 'phones', default: [], array: true
+    t.string 'phone'
     t.string 'time_zone'
     t.text 'roles', default: [], array: true
     t.jsonb 'tokens'

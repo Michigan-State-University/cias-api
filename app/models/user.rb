@@ -24,6 +24,7 @@ class User < ApplicationRecord
 
   validates :uid, :email, uniqueness: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :phone, phone: true, allow_blank: true
   validates :uid, uniqueness: { scope: :provider }
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
 
