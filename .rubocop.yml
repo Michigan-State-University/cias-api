@@ -5,6 +5,7 @@ require:
   - rubocop-thread_safety
 
 AllCops:
+  NewCops: enable
   TargetRubyVersion: 2.7.1
   Exclude:
     - 'bin/*'

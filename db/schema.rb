@@ -95,6 +95,8 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.integer 'position', default: 0, null: false
     t.string 'name', null: false
     t.string 'slug'
+    t.string 'schedule'
+    t.string 'schedule_at'
     t.jsonb 'formula'
     t.jsonb 'body'
     t.datetime 'created_at', precision: 6, null: false
@@ -104,6 +106,8 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.index ['name'], name: 'index_interventions_on_name'
     t.index %w[problem_id name], name: 'index_interventions_on_problem_id_and_name', using: :gin
     t.index ['problem_id'], name: 'index_interventions_on_problem_id'
+    t.index ['schedule'], name: 'index_interventions_on_schedule'
+    t.index ['schedule_at'], name: 'index_interventions_on_schedule_at'
     t.index ['slug'], name: 'index_interventions_on_slug', unique: true
     t.index ['status'], name: 'index_interventions_on_status'
   end
