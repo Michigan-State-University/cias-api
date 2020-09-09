@@ -55,6 +55,23 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       it { expect(json_response['data']['id']).to eq questions[1].id }
     end
 
+    context 'match nothing, return next' do
+      let(:questions) { create_list(:question_single, 4, intervention_id: intervention.id) }
+      let(:question) do
+        question = questions.first
+        question.formula = { 'payload' => 'a1',
+                             'patterns' => [
+                               {
+                                 'match' => '=2',
+                                 'target' => { 'id' => questions[1].id, 'type' => 'Question' }
+                               }
+                             ] }
+        question
+      end
+
+      it { expect(json_response['data']['id']).to eq questions[1].id }
+    end
+
     context 'response with feedback' do
       let(:question_feedback) do
         question_feedback = build(:question_feedback, intervention_id: intervention.id, position: 2)

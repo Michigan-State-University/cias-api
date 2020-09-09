@@ -35,23 +35,26 @@ class Question < ApplicationRecord
     intervention.questions.where('questions.position >= ?', position).order(:position)
   end
 
+  def another_or_feedback(next_obj, answers_var_values)
+    return next_obj unless next_obj.is_a?(::Question::Feedback)
+
+    next_obj.apply_formula(answers_var_values)
+    next_obj
+  end
+
   def next_intervention_or_question(answers_var_values)
-    if id.eql?(questions_position_up_to_equal.last.id)
-      nil
-    elsif formula['payload'].present?
+    return nil if id.eql?(questions_position_up_to_equal.last.id)
+
+    if formula['payload'].present?
       obj_src = exploit_formula(answers_var_values)
-      next_obj = obj_src['type'].safe_constantize.find(obj_src['id'])
-      return next_obj unless next_obj.is_a?(::Question::Feedback)
 
-      next_obj.apply_formula(answers_var_values)
-      next_obj
-    else
-      next_obj = questions_position_up_to_equal[1]
-      return next_obj unless next_obj.is_a?(::Question::Feedback)
-
-      next_obj.apply_formula(answers_var_values)
-      next_obj
+      if obj_src.is_a?(Hash)
+        next_obj = obj_src['type'].safe_constantize.find(obj_src['id'])
+        return another_or_feedback(next_obj, answers_var_values)
+      end
     end
+    next_obj = questions_position_up_to_equal[1]
+    another_or_feedback(next_obj, answers_var_values)
   end
 
   def harvest_body_variables
