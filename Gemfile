@@ -60,4 +60,5 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
+  gem 'sentry-raven'
 end
