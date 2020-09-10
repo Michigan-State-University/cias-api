@@ -193,6 +193,139 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 > HTTP response 200 OK
 
 
+## Update user email
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/auth`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`, `PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"email": "user@example.com",
+	"current_password": "SomeCurrentPassword"
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/auth
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+  "email": "new-email@example.com",
+	"current_password": "MyCurrentPassword"
+}
+```
+
+
+> HTTP response 200 OK
+
+
+## Update user password
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/auth/password`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`, `PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"current_password": "SomeCurrentPassword",
+  "password": "NewPassword",
+  "password_confirmation": "NewPassword"
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/auth/password
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"current_password": "MyCurrentPassword",
+  "password": "MyNewPassword",
+  "password_confirmation": "MyNewPassword"
+}
+```
+
+
+> HTTP response 200 OK
+
 ## Destroy user
 
 
@@ -245,3 +378,4 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 ```
 
 > HTTP response 200 OK
+

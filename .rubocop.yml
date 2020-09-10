@@ -137,6 +137,8 @@ Style/CaseLikeIf:
 Style/ClassAndModuleChildren:
   Enabled: true
   EnforcedStyle: compact
+  Exclude:
+    - 'config/application.rb'
 
 Style/CombinableLoops:
   Enabled: true

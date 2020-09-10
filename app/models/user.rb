@@ -22,11 +22,10 @@ class User < ApplicationRecord
                 multiple: true,
                 allow_blank: true
 
-  validates :uid, :email, uniqueness: true
-  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :phone, phone: true, allow_blank: true
-  validates :uid, uniqueness: { scope: :provider }
   validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
+
+  has_one_attached :avatar
 
   has_many :problems, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_problems, dependent: :restrict_with_exception, inverse_of: :user

@@ -4,6 +4,7 @@ class V1Controller < ApplicationController
   include DeviseTokenAuth::Concerns::SetUserByToken
   include ExceptionHandler
   include Log
+  include Resource
   before_action :authenticate_v1_user!, unless: :devise_controller?
 
   def current_v1_user
@@ -30,11 +31,6 @@ class V1Controller < ApplicationController
 
   def current_ability
     @current_ability ||= current_v1_user.ability
-  end
-
-  def serialized_response(collection, from_model = controller_name.classify)
-    "V1::#{from_model}Serializer".safe_constantize.
-      new(collection).serialized_json
   end
 
   def invalidate_cache(obj)

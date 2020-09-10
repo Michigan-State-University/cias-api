@@ -2,12 +2,9 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/users/:id', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
-  let(:alter_user) { create(:user, :confirmed) }
-  let(:headers) do
-    user.create_new_auth_token
-  end
+describe 'PATCH /v1/users/:id', type: :request do
+  let(:current_user) { create(:user, :admin, first_name: 'Smith', last_name: 'Wazowski') }
+  let(:other_user) { create(:user, :confirmed) }
   let(:params) do
     {
       user: {
@@ -16,73 +13,250 @@ RSpec.describe 'PATCH /v1/users/:id', type: :request do
       }
     }
   end
+  let(:user_id) { current_user.id }
 
-  context 'when endpoint is available' do
-    before { patch v1_user_path(id: alter_user.id) }
+  before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
 
-    it { expect(response).to have_http_status(:unauthorized) }
+  context 'when current_user is admin' do
+    context 'when current_user updates itself' do
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski',
+          'email' => current_user.email,
+          'avatar_url' => nil
+        )
+      end
+
+      it 'updates user attributes' do
+        expect(current_user.reload.attributes).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski'
+        )
+      end
+
+      context 'when current_user tries to update deactivated and roles attributes' do
+        let(:params) do
+          {
+            user: {
+              roles: %w[admin guest],
+              deactivated: true
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'JSON response contains proper attributes' do
+          expect(json_response['data']['attributes']).to include(
+            'roles' => %w[admin guest],
+            'deactivated' => true
+          )
+        end
+
+        it 'updates user attributes' do
+          expect(current_user.reload.attributes).to include(
+            'roles' => %w[admin guest],
+            'deactivated' => true
+          )
+        end
+      end
+    end
+
+    context 'when current_user updates other user' do
+      let(:user_id) { other_user.id }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski',
+          'email' => other_user.email,
+          'avatar_url' => nil
+        )
+      end
+
+      it 'updates user attributes' do
+        expect(other_user.reload.attributes).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski'
+        )
+      end
+
+      context 'when current_user tries to update deactivated and roles attributes' do
+        let(:params) do
+          {
+            user: {
+              roles: %w[admin guest],
+              deactivated: true
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'JSON response contains proper attributes' do
+          expect(json_response['data']['attributes']).to include(
+            'roles' => %w[admin guest],
+            'deactivated' => true
+          )
+        end
+
+        it 'updates user attributes' do
+          expect(other_user.reload.attributes).to include(
+            'roles' => %w[admin guest],
+            'deactivated' => true
+          )
+        end
+      end
+    end
   end
 
-  context 'when auth' do
-    context 'is without credentials' do
-      before do
-        patch v1_user_path(id: alter_user.id)
+  context 'when current_user is researcher' do
+    let(:current_user) { create(:user, :confirmed, :researcher, first_name: 'Smith', last_name: 'Wazowski') }
+
+    context 'when current_user updates itself' do
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski',
+          'email' => current_user.email,
+          'avatar_url' => nil
+        )
       end
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it 'updates user attributes' do
+        expect(current_user.reload.attributes).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski'
+        )
+      end
 
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
+      context 'when current_user tries to update deactivated and roles attributes' do
+        let(:params) do
+          {
+            user: {
+              roles: %w[admin guest],
+              deactivated: true
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:forbidden) }
+
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        end
       end
     end
 
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        patch v1_user_path(id: alter_user.id), headers: headers
-      end
+    context 'when current_user updates other user' do
+      let(:user_id) { other_user.id }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it { expect(response).to have_http_status(:forbidden) }
 
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is valid' do
-      before do
-        patch v1_user_path(id: alter_user.id), params: params, headers: headers
-      end
-
-      it { expect(response).to have_http_status(:success) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
+      it 'response contains proper error message' do
+        expect(json_response['message']).to eq 'You are not authorized to access this page.'
       end
     end
   end
 
-  context 'when response' do
-    context 'is JSON' do
-      before do
-        patch v1_user_path(id: alter_user.id), headers: headers
+  context 'when current_user is participant' do
+    let(:current_user) { create(:user, :confirmed, :participant, first_name: 'Smith', last_name: 'Wazowski') }
+
+    context 'when current_user updates itself' do
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski',
+          'email' => current_user.email,
+          'avatar_url' => nil
+        )
       end
 
-      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
+      it 'updates user attributes' do
+        expect(current_user.reload.attributes).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski'
+        )
+      end
+
+      context 'when current_user tries to update deactivated and roles attributes' do
+        let(:params) do
+          {
+            user: {
+              roles: %w[admin guest],
+              deactivated: true
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:forbidden) }
+
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        end
+      end
     end
 
-    context 'contains' do
-      before do
-        patch v1_user_path(id: alter_user.id), params: params, headers: headers
+    context 'when current_user updates other user' do
+      let(:user_id) { other_user.id }
+
+      it { expect(response).to have_http_status(:not_found) }
+    end
+  end
+
+  context 'when current_user is guest' do
+    let(:current_user) { create(:user, :confirmed, :guest, first_name: 'Smith', last_name: 'Wazowski') }
+
+    context 'when current_user updates itself' do
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski',
+          'email' => current_user.email,
+          'avatar_url' => nil
+        )
       end
 
-      it 'to hash success' do
-        expect(json_response.class).to be(Hash)
+      it 'updates user attributes' do
+        expect(current_user.reload.attributes).to include(
+          'first_name' => 'John',
+          'last_name' => 'Kowalski'
+        )
       end
 
-      it 'key question' do
-        expect(json_response['data']['type']).to eq('user')
+      context 'when current_user tries to update deactivated and roles attributes' do
+        let(:params) do
+          {
+            user: {
+              roles: %w[admin guest],
+              deactivated: true
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:forbidden) }
+
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        end
       end
+    end
+
+    context 'when current_user updates other user' do
+      let(:user_id) { other_user.id }
+
+      it { expect(response).to have_http_status(:not_found) }
     end
   end
 end

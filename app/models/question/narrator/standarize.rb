@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class Question::Narrator::Standarize < SimpleDelegator
-  def initialize(question)
-    super(question)
-  end
-
   def execute
     standarize_blocks
     self
