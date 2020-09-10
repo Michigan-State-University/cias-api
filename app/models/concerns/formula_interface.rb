@@ -13,7 +13,7 @@ module FormulaInterface
     cache_exploit_variables = parser_runtime.evaluate!(payload, **var_values)
     patterns.each do |pattern|
       matched_pattern = parser_runtime.evaluate!("#{cache_exploit_variables} #{pattern['match']}")
-      return pattern['target'] if matched_pattern
+      return pattern if matched_pattern
     end
   end
 

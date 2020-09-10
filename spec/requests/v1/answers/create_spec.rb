@@ -137,5 +137,71 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
 
       it { expect(json_response['data']['id']).to eq intervention.id }
     end
+
+    context 'response with question with calculated target_value' do
+      let(:question_with_reflection_formula) do
+        question_single = build(:question_single, intervention_id: intervention.id, position: 2)
+        question_single.narrator = {
+          blocks: [
+            {
+              action: 'SHOW_USER_VALUE',
+              payload: 'a1',
+              reflections: [
+                {
+                  match: '=1',
+                  text: [
+                    'Good your value is 20.'
+                  ],
+                  audio_urls: [],
+                  sha256: []
+                },
+                {
+                  match: '=2',
+                  text: [
+                    'Bad.'
+                  ],
+                  audio_urls: [],
+                  sha256: []
+                }
+              ],
+              animation: 'pointUp',
+              type: 'ReflectionFormula',
+              endPosition: {
+                x: 0,
+                y: 600
+              }
+            }
+          ],
+          settings: {
+            voice: true,
+            animation: true
+          }
+        }
+        question_single.save
+        question_single
+      end
+
+      let(:question) do
+        question = build(:question_single, intervention_id: intervention.id, position: 1)
+        question.formula = { 'payload' => 'a1',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => question_with_reflection_formula.id, 'type' => 'Question' }
+                               }
+                             ] }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'a1' } }
+        question.save
+        question
+      end
+
+      it { expect(json_response['data']['id']).to eq question_with_reflection_formula.id }
+
+      it 'response contains target_value' do
+        expect(json_response['data']['attributes']['narrator']['blocks'].first).to include(
+          'target_value' => { 'text' => ['Good your value is 20.'], 'match' => '=1', 'sha256' => [], 'audio_urls' => [] }
+        )
+      end
+    end
   end
 end

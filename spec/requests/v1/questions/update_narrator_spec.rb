@@ -352,6 +352,71 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     }
   end
 
+  let(:params_reflection_formula) do
+    {
+      question: {
+        narrator: {
+          blocks: [
+            {
+              text: [],
+              type: 'BodyAnimation',
+              sha256: [],
+              animation: [],
+              audio_urls: []
+            },
+            {
+              type: 'Pause',
+              position: {
+                posTo: {
+                  x: 600,
+                  y: 597
+                },
+                posFrom: {
+                  x: 0,
+                  y: 600
+                }
+              },
+              animation: 'rest',
+              pauseDuration: 1
+            },
+            {
+              action: 'SHOW_USER_VALUE',
+              payload: 'q1',
+              reflections: [
+                {
+                  match: '=1',
+                  text: [
+                    'Good your value is 20.'
+                  ],
+                  audio_urls: [],
+                  sha256: []
+                },
+                {
+                  match: '=2',
+                  text: [
+                    'Bad.'
+                  ],
+                  audio_urls: [],
+                  sha256: []
+                }
+              ],
+              animation: 'pointUp',
+              type: 'ReflectionFormula',
+              endPosition: {
+                x: 0,
+                y: 600
+              }
+            }
+          ],
+          settings: {
+            voice: true,
+            animation: true
+          }
+        }
+      }
+    }
+  end
+
   let(:params) { params_turn_on }
   let(:intervention_id) { i_narrator_turn_off.id }
   let(:question_id) { q_narrator_turn_off.id }
@@ -560,6 +625,18 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
       context 'pause block ' do
         let(:params) { params_pause }
+
+        it 'will contains blocks' do
+          expect(narrator['blocks']).to be_present
+        end
+
+        it 'will have same blocks as from params' do
+          expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
+        end
+      end
+
+      context 'reflection_formula block' do
+        let(:params) { params_reflection_formula }
 
         it 'will contains blocks' do
           expect(narrator['blocks']).to be_present

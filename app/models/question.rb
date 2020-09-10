@@ -42,6 +42,15 @@ class Question < ApplicationRecord
     next_obj
   end
 
+  def perform_narrator_reflection(answers_var_values)
+    narrator['blocks']&.each_with_index do |block, index|
+      next unless block['type'].eql?('ReflectionFormula')
+
+      narrator['blocks'][index]['target_value'] = exploit_formula(answers_var_values, block['payload'], block['reflections'])
+      break
+    end
+  end
+
   def next_intervention_or_question(answers_var_values)
     return nil if id.eql?(questions_position_up_to_equal.last.id)
 
@@ -49,11 +58,13 @@ class Question < ApplicationRecord
       obj_src = exploit_formula(answers_var_values)
 
       if obj_src.is_a?(Hash)
-        next_obj = obj_src['type'].safe_constantize.find(obj_src['id'])
+        next_obj = obj_src['target']['type'].safe_constantize.find(obj_src['target']['id'])
+        next_obj&.perform_narrator_reflection(answers_var_values)
         return another_or_feedback(next_obj, answers_var_values)
       end
     end
     next_obj = questions_position_up_to_equal[1]
+    next_obj&.perform_narrator_reflection(answers_var_values)
     another_or_feedback(next_obj, answers_var_values)
   end
 

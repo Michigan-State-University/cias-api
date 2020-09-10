@@ -403,16 +403,16 @@
       <div class="dark-box"></div>
       <div class="content">
         <h1 id='introduction'>Introduction</h1>
-<p>Welcome to the </p>
+<p>Welcome to the CIAS (Computerized Intervention Authoring System)</p>
 
 <blockquote>
 <p>Base URL</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">
+<pre class="highlight http tab-http"><code><span class="err">localhost:3000
 </span></code></pre>
-<p>This describes the resources that make up the official <a href="https://"></a> REST API. In order to use resources, You have to obtain an appropriate token.</p>
+<p>This describes the resources that make up the official <a href="https://interventionauthoring.org">interventionauthoring.org</a> REST API. In order to use resources, You have to obtain an appropriate token.</p>
 <h1 id='authentication'>Authentication</h1><h2 id='create-session'>Create session</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/auth/sign_in</code></p>
+<p><code>localhost:3000/v1/auth/sign_in</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -460,10 +460,10 @@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/auth/sign_in
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/auth/sign_in
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@interventionauthoring.org"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre>
@@ -474,17 +474,17 @@
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
     </span><span class="s2">"deactivated"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
-    </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@interventionauthoring.org"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"provider"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
       </span><span class="s2">"admin"</span><span class="w">
     </span><span class="p">],</span><span class="w">
-    </span><span class="s2">"uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@interventionauthoring.org"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"last_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"allow_password_change"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
@@ -501,7 +501,7 @@ uid: user@
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre><h2 id='destroy-session'>Destroy session</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/auth/sign_out</code></p>
+<p><code>localhost:3000/v1/auth/sign_out</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -554,12 +554,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/auth/sign_out
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/auth/sign_out
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
@@ -578,7 +578,7 @@ uid: user@
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre><h1 id='registration'>Registration</h1><h2 id='create-user'>Create user</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/auth</code></p>
+<p><code>localhost:3000/v1/auth</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -625,7 +625,7 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/auth
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/auth
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: multipart/form-data
 </span></code></pre><pre class="highlight shell tab-shell"><code>  first_name <span class="o">=</span> first
   last_name <span class="o">=</span> last
@@ -637,7 +637,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='user'>User</h1><h2 id='get-all-users'>Get all users</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/users</code></p>
+<p><code>localhost:3000/v1/users</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -712,18 +712,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/users
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/users
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-user'>Show user</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/users/:id</code></p>
+<p><code>localhost:3000/v1/users/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -781,18 +781,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/users/1
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-user'>Update user</h2><h3 id='resource-3'>Resource</h3>
-<p><code>/v1/users/:id</code></p>
+<p><code>localhost:3000/v1/users/:id</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -870,12 +870,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/users/1
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"first_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"John"</span><span class="p">,</span><span class="w">
@@ -887,7 +887,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-user-email'>Update user email</h2><h3 id='resource-4'>Resource</h3>
-<p><code>/v1/auth</code></p>
+<p><code>localhost:3000/v1/auth</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -945,12 +945,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/auth
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/auth
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"new-email@example.com"</span><span class="p">,</span><span class="w">
     </span><span class="s2">"current_password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyCurrentPassword"</span><span class="w">
@@ -960,7 +960,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-user-password'>Update user password</h2><h3 id='resource-5'>Resource</h3>
-<p><code>/v1/auth/password</code></p>
+<p><code>localhost:3000/v1/auth/password</code></p>
 <h3 id='url-parameters-5'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1019,12 +1019,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/auth/password
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/auth/password
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"current_password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyCurrentPassword"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MyNewPassword"</span><span class="p">,</span><span class="w">
@@ -1035,7 +1035,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='destroy-user'>Destroy user</h2><h3 id='resource-6'>Resource</h3>
-<p><code>/v1/users/:id</code></p>
+<p><code>localhost:3000/v1/users/:id</code></p>
 <h3 id='url-parameters-6'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1093,18 +1093,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/users/1
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='avatar-for-user'>Avatar for User</h1><h2 id='create-avatar-for-question'>Create avatar for question</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/users/:user_id/avatars</code></p>
+<p><code>localhost:3000/v1/users/:user_id/avatars</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1173,12 +1173,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/users/1/avatars
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/users/1/avatars
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: multipart/form-data; boundary=something
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight plaintext"><code>| (60.7 KB hidden)
 | (60.7 KB hidden)
 | (60.7 KB hidden)
@@ -1198,7 +1198,7 @@ uid: user@
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='remove-avatar'>Remove avatar</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/user/:user_id/avatars</code></p>
+<p><code>localhost:3000/v1/user/:user_id/avatars</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1256,18 +1256,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/users/1/avatars
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/users/1/avatars
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='problem'>Problem</h1><h2 id='get-all-problems'>Get all problems</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/problems</code></p>
+<p><code>localhost:3000/v1/problems</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1320,18 +1320,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-problem'>Show problem</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/problems/:id</code></p>
+<p><code>localhost:3000/v1/problems/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1389,12 +1389,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems/1
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
@@ -1402,7 +1402,7 @@ uid: user@
 <h2 id='get-problem-answers'>Get problem answers</h2>
 <p>Get all answers as a CSV file which belong to the problem.</p>
 <h3 id='resource-3'>Resource</h3>
-<p><code>/v1/problems/:id/answers</code></p>
+<p><code>localhost:3000/v1/problems/:id/answers</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1460,18 +1460,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems/1/answers
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems/1/answers
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-problem'>Create problem</h2><h3 id='resource-4'>Resource</h3>
-<p><code>/v1/problems</code></p>
+<p><code>localhost:3000/v1/problems</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1524,12 +1524,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/problems
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/problems
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Problem example 1"</span><span class="w">
@@ -1555,7 +1555,7 @@ uid: user@
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre><h2 id='clone-problem'>Clone problem</h2><h3 id='resource-5'>Resource</h3>
-<p><code>/v1/problems/:id/clone</code></p>
+<p><code>localhost:3000/v1/problems/:id/clone</code></p>
 <h3 id='url-parameters-5'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1622,18 +1622,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/problems/1/clone
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/problems/1/clone
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='update-problem'>Update problem</h2><h3 id='resource-6'>Resource</h3>
-<p><code>/v1/problems/:id</code></p>
+<p><code>localhost:3000/v1/problems/:id</code></p>
 <h3 id='url-parameters-6'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1691,12 +1691,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/problems/1
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/problems/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Problem updated example 1"</span><span class="p">,</span><span class="w">
@@ -1732,7 +1732,7 @@ uid: user@
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre><h1 id='userproblem'>UserProblem</h1><h2 id='get-users-belongs-to-problem'>Get users belongs to problem</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/problems/:problem_id/users</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/users</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1790,12 +1790,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems/1/users
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems/1/users
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response body</p>
@@ -1833,7 +1833,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-associations-between-users-and-problem'>Create associations between users and problem</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/problems/:problem_id/users</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/users</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -1897,12 +1897,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/problems
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/problems
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"user_problem"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"emails"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"t@p.com"</span><span class="p">,</span><span class="w"> </span><span class="s2">"t@p.com"</span><span class="p">]</span><span class="w">
@@ -1945,7 +1945,7 @@ uid: user@
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='destroy-association-between-given-users-and-given-problem'>Destroy association between given users and given problem</h2><h3 id='resource-3'>Resource</h3>
-<p><code>/v1/interventions/:problem_id/users/:id</code></p>
+<p><code>localhost:3000/v1/interventions/:problem_id/users/:id</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2008,18 +2008,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/problems/1/users/1
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/problems/1/users/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='intervention'>Intervention</h1><h2 id='get-all-interventions'>Get all interventions</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/problems/:problem_id/interventions</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/interventions</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2077,18 +2077,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems/1/interventions
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems/1/interventions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-intervention'>Show intervention</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/problems/:problem_id/interventions/:id</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/interventions/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2151,18 +2151,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/problems/1/interventions/1
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/problems/1/interventions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-intervention'>Create intervention</h2><h3 id='resource-3'>Resource</h3>
-<p><code>/v1/problems/:problem_id/interventions</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/interventions</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2236,12 +2236,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/problems/1/interventions
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/problems/1/interventions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"intervention"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Intervention example 1"</span><span class="p">,</span><span class="w">
@@ -2256,7 +2256,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='clone-intervention'>Clone intervention</h2><h3 id='resource-4'>Resource</h3>
-<p><code>/v1/interventions/:id/clone</code></p>
+<p><code>localhost:3000/v1/interventions/:id/clone</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2314,12 +2314,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/interventions/1/clone
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/interventions/1/clone
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 201 Created</p>
@@ -2327,7 +2327,7 @@ uid: user@
 <h2 id='position-interventions'>Position interventions</h2>
 <p>Resource for update position of interventions.</p>
 <h3 id='resource-5'>Resource</h3>
-<p><code>/v1/problems/:problem_id/interventions/position</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/interventions/position</code></p>
 <h3 id='url-parameters-5'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2400,12 +2400,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/problems/1/interventions/position
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/problems/1/interventions/position
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -2426,7 +2426,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-intervention'>Update intervention</h2><h3 id='resource-6'>Resource</h3>
-<p><code>/v1/problems/:problem_id/interventions/:id</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/interventions/:id</code></p>
 <h3 id='url-parameters-6'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2499,12 +2499,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/problems/1/interventions/1
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/problems/1/interventions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"intervention"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Intervention example 1"</span><span class="p">,</span><span class="w">
@@ -2522,7 +2522,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='send-invitation-to-fill-intervention'>Send invitation to fill intervention</h2><h3 id='resource-7'>Resource</h3>
-<p><code>/v1/problems/:problem_id/interventions/:id/invite</code></p>
+<p><code>localhost:3000/v1/problems/:problem_id/interventions/:id/invite</code></p>
 <h3 id='url-parameters-7'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2589,12 +2589,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/problems/1/interventions/1/invite
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/problems/1/interventions/1/invite
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"emails"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"email1@email.com"</span><span class="p">,</span><span class="w"> </span><span class="s2">"email2@email.com"</span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
@@ -2603,7 +2603,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='question'>Question</h1><h2 id='get-all-questions'>Get all questions</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/interventions/:intervention_id/questions</code></p>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2661,18 +2661,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/1/questions
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/interventions/1/questions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='show-question'>Show question</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/interventions/:intervention_id/questions/:id</code></p>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2735,18 +2735,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/1/questions/1
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/interventions/1/questions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-question'>Create question</h2><h3 id='resource-3'>Resource</h3>
-<p><code>/v1/interventions/:intervention_id/questions</code></p>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2844,12 +2844,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/interventions/1/questions
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/interventions/1/questions
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::Name"</span><span class="p">,</span><span class="w">
@@ -2871,7 +2871,7 @@ uid: user@
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='clone-question'>Clone question</h2><h3 id='resource-4'>Resource</h3>
-<p><code>/v1/questions/:id/clone</code></p>
+<p><code>localhost:3000/v1/questions/:id/clone</code></p>
 <h3 id='url-parameters-4'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -2929,12 +2929,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/questions/1/clone
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/questions/1/clone
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 201 Created</p>
@@ -2942,7 +2942,7 @@ uid: user@
 <h2 id='position-questions'>Position questions</h2>
 <p>Resource for update position of questions.</p>
 <h3 id='resource-5'>Resource</h3>
-<p><code>/v1/interventions/:intervention_id/questions/position</code></p>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/position</code></p>
 <h3 id='url-parameters-5'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3015,12 +3015,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/interventions/1/questions/position
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/interventions/1/questions/position
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -3041,7 +3041,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='update-question'>Update question</h2><h3 id='resource-6'>Resource</h3>
-<p><code>/v1/interventions/:intervention_id/questions/:id</code></p>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
 <h3 id='url-parameters-6'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3140,12 +3140,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/interventions/1/questions/1
+<pre class="highlight http tab-http"><code><span class="err">PATCH localhost:3000/v1/interventions/1/questions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"question example title"</span><span class="p">,</span><span class="w">
@@ -3163,7 +3163,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='destroy-question'>Destroy question</h2><h3 id='resource-7'>Resource</h3>
-<p><code>/v1/interventions/:intervention_id/questions/:id</code></p>
+<p><code>localhost:3000/v1/interventions/:intervention_id/questions/:id</code></p>
 <h3 id='url-parameters-7'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3226,18 +3226,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/interventions/1/questions/1
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/interventions/1/questions/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='image-for-question'>Image for Question</h1><h2 id='create-image-for-question'>Create image for question</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/questions/:question_id/images</code></p>
+<p><code>localhost:3000/v1/questions/:question_id/images</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3300,12 +3300,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/questions/1/images
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/questions/1/images
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: multipart/form-data; boundary=something
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight plaintext"><code>| (60.7 KB hidden)
 | (60.7 KB hidden)
 | (60.7 KB hidden)
@@ -3320,7 +3320,7 @@ uid: user@
 <p>HTTP response 201 Created</p>
 </blockquote>
 <h2 id='destroy-image-for-question'>Destroy image for question</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/questions/:question_id/images</code></p>
+<p><code>localhost:3000/v1/questions/:question_id/images</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3378,18 +3378,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/questions/1/images
+<pre class="highlight http tab-http"><code><span class="err">DELETE localhost:3000/v1/questions/1/images
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='answer'>Answer</h1><h2 id='get-all-answers'>Get all answers</h2><h3 id='resource'>Resource</h3>
-<p><code>/v1/questions/:question_id/answers</code></p>
+<p><code>localhost:3000/v1/questions/:question_id/answers</code></p>
 <h3 id='url-parameters'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3447,12 +3447,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/questions/1/answers
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/questions/1/answers
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
@@ -3460,7 +3460,7 @@ uid: user@
 <h2 id='get-all-answers-as-a-csv'>Get all answers as a CSV</h2>
 <p>You can retrieve all answers which belong to the problem as a CSV file. Please check the: &#39;Get problem answers&#39; in the Problem section.</p>
 <h2 id='show-answer'>Show answer</h2><h3 id='resource-2'>Resource</h3>
-<p><code>/v1/questions/:question_id/answers/:id</code></p>
+<p><code>localhost:3000/v1/questions/:question_id/answers/:id</code></p>
 <h3 id='url-parameters-2'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3523,18 +3523,18 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">GET /v1/questions/1/answers/1
+<pre class="highlight http tab-http"><code><span class="err">GET localhost:3000/v1/questions/1/answers/1
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h2 id='create-answer'>Create answer</h2><h3 id='resource-3'>Resource</h3>
-<p><code>/v1/questions/:question_id/answers</code></p>
+<p><code>localhost:3000/v1/questions/:question_id/answers</code></p>
 <h3 id='url-parameters-3'>URL parameters</h3>
 <table><thead>
 <tr>
@@ -3627,12 +3627,12 @@ uid: user@
 <blockquote>
 <p>HTTP example request</p>
 </blockquote>
-<pre class="highlight http tab-http"><code><span class="err">POST /v1/questions/1/answers
+<pre class="highlight http tab-http"><code><span class="err">POST localhost:3000/v1/questions/1/answers
 </span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
 access-token: xxxyyyzzz
 token-type: Bearer
 client: xxxyyyzzz
-uid: user@
+uid: user@interventionauthoring.org
 </span></code></pre><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"answer"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::Single"</span><span class="p">,</span><span class="w">
@@ -3649,7 +3649,7 @@ uid: user@
 <p>HTTP response 200 OK</p>
 </blockquote>
 <h1 id='errors'>Errors</h1>
-<p>The  uses the following error codes:</p>
+<p>The CIAS uses the following error codes:</p>
 
 <table><thead>
 <tr>

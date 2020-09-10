@@ -46,6 +46,10 @@ class Intervention < ApplicationRecord
     slug.blank? || name_changed?
   end
 
+  def perform_narrator_reflection(_placeholder)
+    nil
+  end
+
   private
 
   def json_schema_path
