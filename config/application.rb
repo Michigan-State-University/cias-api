@@ -37,7 +37,7 @@ module CiasApi
     config.api_only = true
     config.i18n.default_locale = :en
     config.active_job.queue_adapter = :sidekiq
-    config.filter_parameters << %i[password password_confirmation]
+    config.filter_parameters << :password_confirmation
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
     routes.default_url_options = { host: ENV['DOMAIN_NAME'] }
   end

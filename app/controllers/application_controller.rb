@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  before_action :error_beacon_context, if: -> { Rails.env.production? }
+  before_action :error_beacon_context
   before_action :user_params, if: :devise_controller?
 
   protected
