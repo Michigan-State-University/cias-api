@@ -31,7 +31,7 @@ module MetaOperations
     private
 
     def provide_time_zone
-      options[:user]&.time_zone || ENV.fetch('USER_DEFAULT_TIME_ZONE', 'Eastern Time (US & Canada)')
+      options[:user]&.time_zone || ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
     end
 
     def timestamp

@@ -8,6 +8,7 @@ FactoryBot.define do
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
     provider { 'email' }
     roles { %w[guest] }
+    time_zone { 'Europe/Warsaw' }
 
     transient do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }

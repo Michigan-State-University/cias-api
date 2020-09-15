@@ -17,13 +17,15 @@ class User < ApplicationRecord
   # Order of roles is important because final authorization is the sum of all roles
   APP_ROLES = %w[guest participant researcher admin].freeze
 
+  TIME_ZONES = ActiveSupport::TimeZone::MAPPING.values.uniq.sort.freeze
+
   enumerate_for :roles,
                 APP_ROLES,
                 multiple: true,
                 allow_blank: true
 
   validates :phone, phone: true, allow_blank: true
-  validates :time_zone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }
+  validates :time_zone, inclusion: { in: TIME_ZONES }
 
   has_one_attached :avatar
 
@@ -35,7 +37,7 @@ class User < ApplicationRecord
 
   accepts_nested_attributes_for :address
 
-  attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'Eastern Time (US & Canada)')
+  attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
 
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::text[] && roles', roles) }
 
