@@ -2,7 +2,9 @@
 
 class V1::UsersController < V1Controller
   def index
-    render json: serialized_response(users_scope.detailed_search(params))
+    collection = users_scope.detailed_search(params).order(created_at: :desc)
+    paginated_collection = paginate(collection, params)
+    render json: serialized_response(paginated_collection)
   end
 
   def show

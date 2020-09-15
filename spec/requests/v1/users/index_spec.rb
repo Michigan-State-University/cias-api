@@ -3,11 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/users', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
-  let(:researcher_user) { create(:user, :confirmed, :researcher) }
-  let(:alter_user) { create(:user, :confirmed) }
+  let!(:user) { create(:user, :confirmed, :admin, first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
+  let!(:researcher) { create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'john.Wazowski@test.com', created_at: 4.days.ago) }
+  let!(:participant_1) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com', created_at: 3.days.ago) }
+  let!(:participant_2) { create(:user, :confirmed, :participant, first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@test.com', created_at: 2.days.ago) }
+  let!(:participant_3) { create(:user, :confirmed, :participant, first_name: 'Mark', last_name: 'Smith', email: 'mark.smith@test.com', created_at: 1.day.ago) }
   let(:headers) { user.create_new_auth_token }
-  let(:researcher_headers) { researcher_user.create_new_auth_token }
 
   context 'when auth' do
     context 'is invalid' do
@@ -31,72 +32,104 @@ RSpec.describe 'GET /v1/users', type: :request do
     end
   end
 
-  context 'when response' do
-    context 'is JSON' do
-      before do
-        get v1_users_path, headers: headers
+  context 'when current_user is admin' do
+    let(:current_user) { user }
+
+    before { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
+
+    context 'without params' do
+      let(:params) { {} }
+      let(:users) { [participant_3, participant_2, participant_1, researcher, user] }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'returns whole available users' do
+        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
       end
 
-      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
+      it 'returns proper number of available users' do
+        expect(json_response['data'].size).to eq 5
+      end
     end
 
-    context 'is JSON and parse' do
-      before do
-        get v1_users_path, headers: headers
+    context 'with pagination params' do
+      let(:params) { { page: 1, per_page: 2 } }
+      let(:users) { [participant_3, participant_2] }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'returns proper users' do
+        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
       end
 
-      it 'success to Hash' do
-        expect(json_response.class).to be(Hash)
+      it 'returns proper number of users' do
+        expect(json_response['data'].size).to eq 2
+      end
+    end
+
+    context 'with filters params' do
+      let(:params) { { name: 'John', roles: %w[admin participant] } }
+      let(:users) { [participant_1, user] }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'returns proper users' do
+        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
+      end
+
+      it 'returns proper number of users' do
+        expect(json_response['data'].size).to eq 2
       end
     end
   end
 
-  context 'with specific roles' do
-    context 'one role' do
-      before do
-        get v1_users_path, params: { roles: 'admin' }, headers: headers
+  context 'when current_user is researcher' do
+    let(:current_user) { researcher }
+
+    before { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
+
+    context 'without params' do
+      let(:params) { {} }
+      let(:users) { [participant_3, participant_2, participant_1, researcher] }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'returns whole available users' do
+        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
       end
 
-      let(:admin_role) do
-        role = []
-        json_response['data'].each do |user|
-          role.push(user['attributes']['roles'])
-        end
-        role.flatten!
-        role.uniq!
-        role
-      end
-
-      it 'include admin role' do
-        expect(admin_role).to include('admin')
-      end
-
-      it 'roles size 1' do
-        expect(admin_role.size).to eq(1)
+      it 'returns proper number of available users' do
+        expect(json_response['data'].size).to eq 4
       end
     end
 
-    context 'researcher role' do
-      before do
-        get v1_users_path, params: { roles: 'researcher' }, headers: researcher_headers
+    context 'with pagination params' do
+      let(:params) { { page: 1, per_page: 2 } }
+      let(:users) { [participant_3, participant_2] }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'returns proper users' do
+        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
       end
 
-      let(:researcher_role) do
-        role = []
-        json_response['data'].each do |user|
-          role.push(user['attributes']['roles'])
-        end
-        role.flatten!
-        role.uniq!
-        role
+      it 'returns proper number of users' do
+        expect(json_response['data'].size).to eq 2
+      end
+    end
+
+    context 'with filters params' do
+      let(:params) { { name: 'John', roles: %w[admin participant] } }
+      let(:users) { [participant_1] }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'returns proper users' do
+        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
       end
 
-      it 'include researcher role' do
-        expect(researcher_role).to include('researcher')
-      end
-
-      it 'roles size 1' do
-        expect(researcher_role.size).to eq(1)
+      it 'returns proper number of users' do
+        expect(json_response['data'].size).to eq 1
       end
     end
   end

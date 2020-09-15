@@ -4,8 +4,8 @@ class V1Controller < ApplicationController
   include DeviseTokenAuth::Concerns::SetUserByToken
   include ExceptionHandler
   include Log
+  include Pagination
   include Resource
-  # before_action :authenticate_v1_user!, unless: :devise_controller?
 
   def current_v1_user
     @current_v1_user ||= super || create_guest_user

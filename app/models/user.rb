@@ -39,12 +39,13 @@ class User < ApplicationRecord
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
 
-  scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) }
+  scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
+  scope :name_contains, lambda { |substring|
+    where("CONCAT(first_name, ' ', last_name) ILIKE :substring OR email ILIKE :substring", substring: "%#{substring.downcase}%") if substring.present?
+  }
 
   def self.detailed_search(params)
-    scope = all
-    scope = scope.limit_to_roles(params[:roles]) if params[:roles].present?
-    scope
+    all.limit_to_roles(params[:roles]).name_contains(params[:name])
   end
 
   def ability
