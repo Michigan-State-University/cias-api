@@ -26,7 +26,9 @@ Rails.application.routes.draw do
         resources :users, only: %i[index create destroy]
       end
       patch 'interventions/position', to: 'interventions#position'
-      resources :interventions, only: %i[index show create update]
+      resources :interventions, only: %i[index show create update] do
+        post :invite, on: :member
+      end
     end
 
     post 'interventions/:id/clone', to: 'interventions#clone', as: :clone_intervention

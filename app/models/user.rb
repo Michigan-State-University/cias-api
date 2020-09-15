@@ -39,7 +39,7 @@ class User < ApplicationRecord
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
 
-  scope :limit_to_roles, ->(roles) { where('ARRAY[?]::text[] && roles', roles) }
+  scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) }
 
   def self.detailed_search(params)
     scope = all

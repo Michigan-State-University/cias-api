@@ -25,9 +25,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   let(:i_narrator_blocks_types) { q_narrator_blocks_types.intervention }
   let(:i_narrator_blocks_with_speech_empty) { q_narrator_blocks_with_speech_empty.intervention }
 
-  let(:headers) do
-    user.create_new_auth_token
-  end
+  let(:headers) { user.create_new_auth_token }
 
   let(:params_turn_off) do
     {

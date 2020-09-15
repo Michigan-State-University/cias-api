@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :intervention do
     sequence(:name) { |s| "intervention_#{s}" }
     sequence(:position) { |s| s }
+    emails { [] }
     association :problem
     trait :slug do
       name { 'Intervention' }

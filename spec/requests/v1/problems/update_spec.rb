@@ -23,43 +23,24 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
   let!(:problem) { create(:problem, name: 'Old Problem', user: problem_user, status: 'draft') }
   let(:problem_id) { problem.id }
 
-  context 'when endpoint is available' do
-    before { patch v1_problem_path(problem_id) }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
-
   context 'when auth' do
-    context 'is without credentials' do
+    context 'is invalid' do
       before { patch v1_problem_path(problem_id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        patch v1_problem_path(problem_id), params: params, headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => include('@guest.true')
+        )
       end
     end
 
     context 'is valid' do
       before { patch v1_problem_path(problem_id), params: params, headers: headers }
 
-      it { expect(response).to have_http_status(:ok) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => user.email
+        )
       end
     end
   end
@@ -181,7 +162,7 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
     before { patch v1_problem_path(problem_id), params: params, headers: headers }
 
-    it { expect(response).to have_http_status(:not_found) }
+    it { expect(response).to have_http_status(:forbidden) }
   end
 
   context 'when user has role guest' do
@@ -189,6 +170,6 @@ RSpec.describe 'PATCH /v1/problems', type: :request do
 
     before { patch v1_problem_path(problem_id), params: params, headers: headers }
 
-    it { expect(response).to have_http_status(:not_found) }
+    it { expect(response).to have_http_status(:forbidden) }
   end
 end

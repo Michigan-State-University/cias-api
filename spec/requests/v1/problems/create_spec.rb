@@ -18,43 +18,24 @@ RSpec.describe 'POST /v1/problems', type: :request do
     }
   end
 
-  context 'when endpoint is available' do
-    before { post v1_problems_path }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
-
   context 'when auth' do
-    context 'is without credentials' do
+    context 'is invalid' do
       before { post v1_problems_path }
 
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        post v1_problems_path, params: params, headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => include('@guest.true')
+        )
       end
     end
 
     context 'is valid' do
       before { post v1_problems_path, params: params, headers: headers }
 
-      it { expect(response).to have_http_status(:created) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => user.email
+        )
       end
     end
   end

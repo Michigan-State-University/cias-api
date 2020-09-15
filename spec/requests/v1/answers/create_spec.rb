@@ -7,13 +7,14 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:guest) { create(:user, :guest) }
-  let(:question) { create(:question_text_box) }
+  let(:problem) { create(:problem, user_id: researcher.id) }
+  let(:intervention) { create(:intervention, problem_id: problem.id) }
+  let(:question) { create(:question_text_box, intervention_id: intervention.id) }
 
   before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
 
   context 'branching logic' do
     let(:user) { researcher }
-    let(:intervention) { create(:intervention) }
     let(:params) { params_branching }
     let(:params_branching) do
       {
@@ -117,8 +118,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
 
     context 'response with intervention' do
-      let(:problem) { create(:problem) }
-      let(:intervention_response) { create(:intervention, problem_id: problem.id, position: 2) }
+      let(:intervention) { create(:intervention, problem_id: problem.id, position: 2) }
 
       let(:questions) { create_list(:question_single, 3, intervention_id: intervention.id) }
       let(:question) do
@@ -127,7 +127,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => intervention_response.id, 'type' => 'Intervention' }
+                                 'target' => { 'id' => intervention.id, 'type' => 'Intervention' }
                                }
                              ] }
         question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'a1' } }
@@ -135,7 +135,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
         question
       end
 
-      it { expect(json_response['data']['id']).to eq intervention_response.id }
+      it { expect(json_response['data']['id']).to eq intervention.id }
     end
   end
 end

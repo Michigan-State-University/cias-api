@@ -18,6 +18,11 @@ class Problem < ApplicationRecord
   validates :name, :shared_to, presence: true
   validates :status_event, inclusion: { in: %w[broadcast close to_archive] }, allow_nil: true
 
+  scope :available_for_participant, lambda { |participant_id|
+    left_joins(:user_problems).published.not_shared_to_invited
+      .or(left_joins(:user_problems).published.where(user_problems: { user_id: participant_id }))
+  }
+
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
 
   aasm.attribute_name :status

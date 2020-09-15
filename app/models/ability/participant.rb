@@ -9,8 +9,9 @@ class Ability::Participant < Ability::Base
   private
 
   def participant
-    can :read, Problem, Problem.joins(:user_problems).not_shared_to_invited.or(Problem.joins(:user_problems).where(user_problems: { user_id: user.id })) do |problem|
-      !problem.shared_to_invited? || problem.user_problems.where(user_id: user.id).any?
-    end
+    can :read, Problem, Problem.available_for_participant(user.id)
+    can :read, Intervention, problem_id: Problem.available_for_participant(user.id)
+    can :read, Question, intervention: { problem_id: Problem.available_for_participant(user.id) }
+    can :manage, Answer, question: { intervention: { problem_id: Problem.available_for_participant(user.id) } }
   end
 end

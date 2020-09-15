@@ -6,51 +6,26 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/questions/:id', type: 
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention) }
   let(:question) { create(:question_analogue_scale, intervention_id: intervention.id) }
-  let(:headers) do
-    user.create_new_auth_token
-  end
-
-  context 'when endpoint is available' do
-    before { delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id) }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
+  let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do
-    context 'is without credentials' do
-      before do
-        delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id)
-      end
+    context 'is invalid' do
+      before { delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => include('@guest.true')
+        )
       end
     end
 
     context 'is valid' do
-      before do
-        delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
-      end
+      before { delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers }
 
-      it { expect(response).to have_http_status(:success) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => user.email
+        )
       end
     end
   end

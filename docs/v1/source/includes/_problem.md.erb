@@ -19,8 +19,6 @@ Parameter | Description | Required
 
 Parameter | Description | Required
 --------- | ----------- | --------
-allow_guests=true | Problem with guest user access | no
-
 
 ### HTTP request method
 
@@ -214,8 +212,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 ```json
 {
 	"problem": {
-    "name": "Problem example 1",
-    "allow_guests": false
+    "name": "Problem example 1"
 	}
 }
 ```
@@ -236,8 +233,7 @@ Required keys:
 {
 	"problem": {
 		"name": "Problem example 1",
-		"status": "draft",
-		"allow_guests": false,
+		"status": "draft"
 		"interventions": []
 	}
 }
@@ -355,8 +351,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 {
 	"problem": {
 		"name": "Problem updated example 1",
-     "status": "published",
-     "allow_guests": true
+     "status": "published"
 	}
 }
 ```
@@ -366,7 +361,6 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 Possible keys:
 
  * `name`;
- * `allow_guests`;
  * `status_event`.
 
  `status_event` key has to contains one of the following values:
@@ -384,8 +378,7 @@ Possible keys:
 {
 	"problem": {
 		"name": "Problem updated example 1",
-		"status": "published",
-		"allow_guests": true,
+		"status": "published"
 		"interventions": []
 	}
 }

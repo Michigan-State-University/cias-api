@@ -8,3 +8,8 @@ en:
     answers:
       subject: "[CSV] Answers for: %{problem_name}"
       body: You ordered the preparation of a CSV file with intervention data, therefore you receive this message. Your order is finished successfully. Please log in to the application, report file is ready to download.
+  invitation_mailer:
+    participant:
+      subject: You have been invited to complete an intervention!
+      body: You have been invited to complete %{intervention_name}. Please click in the link to fill the intervention.
+      invitation_link: "%{domain}/interventions/%{problem_id}/sessions/%{intervention_id}/fill"

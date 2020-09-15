@@ -13,66 +13,6 @@ RSpec.describe 'GET /v1/problems', type: :request do
   let!(:researcher_problems) { create_list(:problem, 3, user: researcher, shared_to: :invited) }
   let!(:problems_for_guests) { create_list(:problem, 2) }
 
-  context 'when endpoint is available' do
-    before { get v1_problems_path }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
-
-  context 'when auth' do
-    let(:headers) { user.create_new_auth_token }
-
-    context 'is without credentials' do
-      let(:params) { {} }
-
-      before { get v1_problems_path, params: params }
-
-      context 'without params' do
-        it { expect(response).to have_http_status(:unauthorized) }
-
-        it 'response is without user token' do
-          expect(response.headers['access-token']).to be_nil
-        end
-      end
-
-      context 'with allow_guests parameter' do
-        let(:params) { { allow_guests: 'true' } }
-        let(:problems_scope) { problems_for_guests }
-
-        it { expect(response).to have_http_status(:ok) }
-
-        it 'returns proper problems' do
-          expect(json_response['data'].pluck('id')).to match_array problems_scope.map(&:id)
-        end
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        get v1_problems_path, headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is valid' do
-      before do
-        get v1_problems_path, headers: headers
-      end
-
-      it { expect(response).to have_http_status(:success) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
-      end
-    end
-  end
-
   context 'when user' do
     before { get v1_problems_path, headers: user.create_new_auth_token }
 
@@ -86,9 +26,10 @@ RSpec.describe 'GET /v1/problems', type: :request do
 
     context 'has role participant' do
       let(:user) { participant }
+      let(:problems_scope) { admin_problems + problems_for_guests }
 
       it 'returns proper error message' do
-        expect(json_response['data']).to eq []
+        expect(json_response['data'].pluck('id')).to match_array problems_scope.map(&:id)
       end
     end
 

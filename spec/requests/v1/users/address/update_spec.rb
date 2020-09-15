@@ -5,9 +5,7 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/users/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:alter_user) { create(:user, :confirmed) }
-  let(:headers) do
-    user.create_new_auth_token
-  end
+  let(:headers) { user.create_new_auth_token }
   let(:params_address_attributes_blank) do
     { user: {
       last_name: 'test',

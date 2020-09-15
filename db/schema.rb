@@ -90,8 +90,6 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
   create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.uuid 'problem_id', null: false
     t.jsonb 'settings'
-    t.boolean 'allow_guests', default: false, null: false
-    t.string 'status'
     t.integer 'position', default: 0, null: false
     t.string 'name', null: false
     t.string 'slug'
@@ -99,17 +97,15 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.string 'schedule_at'
     t.jsonb 'formula'
     t.jsonb 'body'
+    t.text 'emails', default: [], array: true
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
-    t.index %w[allow_guests status], name: 'index_interventions_on_allow_guests_and_status', using: :gin
-    t.index ['allow_guests'], name: 'index_interventions_on_allow_guests'
     t.index ['name'], name: 'index_interventions_on_name'
     t.index %w[problem_id name], name: 'index_interventions_on_problem_id_and_name', using: :gin
     t.index ['problem_id'], name: 'index_interventions_on_problem_id'
     t.index ['schedule'], name: 'index_interventions_on_schedule'
     t.index ['schedule_at'], name: 'index_interventions_on_schedule_at'
     t.index ['slug'], name: 'index_interventions_on_slug', unique: true
-    t.index ['status'], name: 'index_interventions_on_status'
   end
 
   create_table 'problems', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
@@ -176,7 +172,7 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.string 'email'
     t.string 'phone'
     t.string 'time_zone'
-    t.text 'roles', default: [], array: true
+    t.string 'roles', default: [], array: true
     t.jsonb 'tokens'
     t.boolean 'deactivated', default: false, null: false
     t.string 'confirmation_token'

@@ -6,54 +6,27 @@ RSpec.describe 'GET /v1/users', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:researcher_user) { create(:user, :confirmed, :researcher) }
   let(:alter_user) { create(:user, :confirmed) }
-  let(:headers) do
-    user.create_new_auth_token
-  end
-  let(:researcher_headers) do
-    researcher_user.create_new_auth_token
-  end
-
-  context 'when endpoint is available' do
-    before { get v1_users_path }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
+  let(:headers) { user.create_new_auth_token }
+  let(:researcher_headers) { researcher_user.create_new_auth_token }
 
   context 'when auth' do
-    context 'is without credentials' do
-      before do
-        get v1_users_path
-      end
+    context 'is invalid' do
+      before { get v1_users_path }
 
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        get v1_users_path, params: {}, headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => include('@guest.true')
+        )
       end
     end
 
     context 'is valid' do
-      before do
-        get v1_users_path, params: {}, headers: headers
-      end
+      before { get v1_users_path, headers: headers }
 
-      it { expect(response).to have_http_status(:success) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => user.email
+        )
       end
     end
   end
@@ -61,7 +34,7 @@ RSpec.describe 'GET /v1/users', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_users_path, params: {}, headers: headers
+        get v1_users_path, headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -69,7 +42,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'is JSON and parse' do
       before do
-        get v1_users_path, params: {}, headers: headers
+        get v1_users_path, headers: headers
       end
 
       it 'success to Hash' do

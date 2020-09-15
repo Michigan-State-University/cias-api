@@ -12,54 +12,8 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
   let(:shared_to) { :registered }
   let(:problem_user) { admin }
   let(:interventions) { create_list(:intervention, 2) }
-  let!(:problem) { create(:problem, name: 'Some problem', user: problem_user, interventions: interventions, shared_to: shared_to) }
-
-  context 'when endpoint is available' do
-    before { get v1_problem_path(problem.id) }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
-
-  context 'when auth' do
-    let(:headers) { user.create_new_auth_token }
-
-    context 'is without credentials' do
-      before do
-        get v1_problem_path(problem.id)
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        get v1_problem_path(problem.id), headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is valid' do
-      before do
-        get v1_problem_path(problem.id), headers: headers
-      end
-
-      it { expect(response).to have_http_status(:success) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
-      end
-    end
-  end
+  let(:users) { [] }
+  let!(:problem) { create(:problem, name: 'Some problem', user: problem_user, interventions: interventions, shared_to: shared_to, users: users) }
 
   context 'when user' do
     before { get v1_problem_path(problem.id), headers: user.create_new_auth_token }
@@ -80,8 +34,44 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
     context 'has role participant' do
       let(:user) { participant }
 
-      it 'contains empty data' do
-        expect(json_response['data']).not_to be_present
+      context 'problem is allowed for anyone or registered users' do
+        let(:shared_to) { %w[anyone registered].sample }
+
+        it 'contains proper attributes' do
+          expect(json_response['data']['attributes']).to include(
+            'name' => 'Some problem',
+            'shared_to' => shared_to
+          )
+        end
+
+        it 'contains proper interventions collection' do
+          expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+        end
+      end
+
+      context 'problem is allowed for invited users' do
+        let(:shared_to) { 'invited' }
+
+        context 'user does not have an access' do
+          it 'contains empty data' do
+            expect(json_response['data']).not_to be_present
+          end
+        end
+
+        context 'user has an access' do
+          let(:users) { [participant] }
+
+          it 'contains proper attributes' do
+            expect(json_response['data']['attributes']).to include(
+              'name' => 'Some problem',
+              'shared_to' => shared_to
+            )
+          end
+
+          it 'contains proper interventions collection' do
+            expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          end
+        end
       end
     end
 

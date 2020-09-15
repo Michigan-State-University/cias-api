@@ -20,7 +20,6 @@ problem_id | Problem ID | yes
 
 Parameter | Description | Required
 --------- | ----------- | --------
-allow_guests=true | Intervention with guest user access | no
 
 
 ### HTTP request method
@@ -386,11 +385,6 @@ Parameter | Description | Required
 
 ### Note
 
-Key `status_event` possible values:
-
- * `broadcast`;
- * `close`.
-
 
 > HTTP example request
 
@@ -423,3 +417,70 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 
 > HTTP response 200 OK
+
+
+## Send invitation to fill intervention
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/interventions/:id/invite`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"emails": ["email1@email.com", "email2@email.com"]
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/interventions/1/invite
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"emails": ["email1@email.com", "email2@email.com"]
+}
+```
+
+
+> HTTP response 200 OK
+>

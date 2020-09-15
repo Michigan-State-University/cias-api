@@ -3,14 +3,11 @@
 class V1::InterventionsController < V1Controller
   include Resource::Clone
   include Resource::Position
-  skip_before_action :authenticate_v1_user!, on: :index, if: -> { params[:allow_guests] }
+
+  authorize_resource only: %i[create update]
 
   def index
-    if params[:allow_guests]
-      render json: serialized_response(Intervention.published.allow_guests)
-    else
-      render json: serialized_response(interventions_scope)
-    end
+    render json: serialized_response(interventions_scope)
   end
 
   def show
@@ -31,6 +28,15 @@ class V1::InterventionsController < V1Controller
     render json: serialized_response(intervention)
   end
 
+  def invite
+    authorize! :update, intervention_load
+
+    emails = (invite_params[:emails] + intervention_load.emails.dup).uniq
+    InvitationJob::Participant::Intervention.perform_later(invite_params[:emails], intervention_load.id)
+    intervention_load.update(emails: emails)
+    render json: serialized_response(intervention_load)
+  end
+
   private
 
   def interventions_scope
@@ -41,7 +47,11 @@ class V1::InterventionsController < V1Controller
     interventions_scope.find(params[:id])
   end
 
+  def invite_params
+    params.require(:intervention).permit(emails: [])
+  end
+
   def intervention_params
-    params.require(:intervention).permit(:status_event, :allow_guests, :name, :schedule, :schedule_at, :position, :problem_id, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:intervention).permit(:name, :schedule, :schedule_at, :position, :problem_id, narrator: {}, settings: {}, formula: {}, body: {})
   end
 end

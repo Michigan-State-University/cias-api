@@ -19,31 +19,12 @@ class Intervention < ApplicationRecord
   attribute :formula, :json, default: { payload: '', patterns: [] }
   attribute :body, :json, default: { data: [] }
 
-  attr_accessor :status_event
-
   enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date' }, _prefix: :schedule
 
   validates :name, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
-  validates :status_event, inclusion: { in: %w[broadcast close] }, allow_nil: true
-
-  aasm.attribute_name :status
-  aasm do
-    state :draft, :finished
-    state :published, initial: true
-
-    event :broadcast do
-      transitions from: :draft, to: :published
-    end
-
-    event :close do
-      transitions from: :published, to: :finished
-    end
-  end
-
-  scope :allow_guests, -> { where(allow_guests: true) }
 
   def propagate_settings
     return unless settings_changed?
@@ -58,7 +39,6 @@ class Intervention < ApplicationRecord
 
   def integral_update
     propagate_settings
-    public_send(status_event) unless status_event.nil?
     save!
   end
 

@@ -6,51 +6,26 @@ RSpec.describe 'GET /v1/problems/:problem_id/interventions/:id', type: :request 
   let(:user) { create(:user, :confirmed, :admin) }
   let(:problem) { create(:problem) }
   let(:intervention) { create(:intervention, problem_id: problem.id) }
-  let(:headers) do
-    user.create_new_auth_token
-  end
-
-  context 'when endpoint is available' do
-    before { get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id) }
-
-    it { expect(response).to have_http_status(:unauthorized) }
-  end
+  let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do
-    context 'is without credentials' do
-      before do
-        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id)
-      end
+    context 'is invalid' do
+      before { get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
-      end
-    end
-
-    context 'is with invalid credentials' do
-      before do
-        headers.delete('access-token')
-        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers
-      end
-
-      it { expect(response).to have_http_status(:unauthorized) }
-
-      it 'response is without user token' do
-        expect(response.headers['access-token']).to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => include('@guest.true')
+        )
       end
     end
 
     context 'is valid' do
-      before do
-        get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers
-      end
+      before { get v1_problem_intervention_path(problem_id: problem.id, id: intervention.id), headers: headers }
 
-      it { expect(response).to have_http_status(:success) }
-
-      it 'and response contains user token' do
-        expect(response.headers['access-token']).not_to be_nil
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => user.email
+        )
       end
     end
   end

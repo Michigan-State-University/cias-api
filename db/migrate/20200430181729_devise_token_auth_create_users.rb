@@ -15,7 +15,7 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       t.string :time_zone
 
       ## Authorization
-      t.text :roles, default: [], array: true
+      t.string :roles, default: [], array: true
 
       ## Tokens
       t.jsonb :tokens
