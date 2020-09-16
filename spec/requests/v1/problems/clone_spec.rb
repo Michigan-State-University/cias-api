@@ -64,7 +64,11 @@ RSpec.describe 'POST /v1/problems/:id/clone', type: :request do
     end
 
     it 'origin and outcome same' do
-      expect(problem_was).to eq(problem_cloned)
+      expect(problem_was.delete(['status'])).to eq(problem_cloned.delete(['status']))
+    end
+
+    it 'status to draft' do
+      expect(problem_cloned['status']).to eq('draft')
     end
   end
 end

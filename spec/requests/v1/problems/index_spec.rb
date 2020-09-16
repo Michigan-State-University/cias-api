@@ -9,9 +9,9 @@ RSpec.describe 'GET /v1/problems', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
 
-  let!(:admin_problems) { create_list(:problem, 3, user: admin, shared_to: :registered) }
-  let!(:researcher_problems) { create_list(:problem, 3, user: researcher, shared_to: :invited) }
-  let!(:problems_for_guests) { create_list(:problem, 2) }
+  let!(:admin_problems) { create_list(:problem, 3, :published, user: admin, shared_to: :registered) }
+  let!(:researcher_problems) { create_list(:problem, 3, :published, user: researcher, shared_to: :invited) }
+  let!(:problems_for_guests) { create_list(:problem, 2, :published) }
 
   context 'when user' do
     before { get v1_problems_path, headers: user.create_new_auth_token }

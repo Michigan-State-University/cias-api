@@ -4,7 +4,15 @@ FactoryBot.define do
   factory :problem do
     user
     name { 'Problem' }
-    status { 'published' }
+    trait :published do
+      status { 'published' }
+    end
+    trait :closed do
+      status { 'closed' }
+    end
+    trait :archived do
+      status { 'archived' }
+    end
     shared_to { 'anyone' }
   end
 end

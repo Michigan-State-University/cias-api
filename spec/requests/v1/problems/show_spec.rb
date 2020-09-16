@@ -13,7 +13,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
   let(:problem_user) { admin }
   let(:interventions) { create_list(:intervention, 2) }
   let(:users) { [] }
-  let!(:problem) { create(:problem, name: 'Some problem', user: problem_user, interventions: interventions, shared_to: shared_to, users: users) }
+  let!(:problem) { create(:problem, :published, name: 'Some problem', user: problem_user, interventions: interventions, shared_to: shared_to, users: users) }
 
   context 'when user' do
     before { get v1_problem_path(problem.id), headers: user.create_new_auth_token }

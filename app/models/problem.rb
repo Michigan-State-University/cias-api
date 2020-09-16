@@ -41,6 +41,10 @@ class Problem < ApplicationRecord
     event :to_archive do
       transitions from: :closed, to: :archived
     end
+
+    event :to_initial do
+      transitions from: %i[draft published closed archived], to: :draft
+    end
   end
 
   def export_answers_as(type:)

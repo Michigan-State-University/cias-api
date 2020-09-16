@@ -19,7 +19,7 @@ RSpec.describe 'POST /v1/problems/:problem_id/interventions/:id/invite', type: :
   end
 
   let(:problem_user) { admin }
-  let(:problem) { create(:problem, user: problem_user) }
+  let(:problem) { create(:problem, :published, user: problem_user) }
   let(:intervention) { create(:intervention, problem_id: problem.id, emails: ['first@email.com']) }
   let(:problem_id) { problem.id }
   let(:intervention_id) { intervention.id }

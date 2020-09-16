@@ -2,6 +2,8 @@
 
 class Clone::Problem < Clone::Base
   def execute
+    outcome.to_initial
+    outcome.save!
     create_interventions
     outcome
   end
