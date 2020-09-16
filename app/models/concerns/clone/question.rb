@@ -4,7 +4,7 @@ class Clone::Question < Clone::Base
   def execute
     attach_image
     outcome.variable_clone_prefix
-    outcome.formula['payload'] = ''
+    outcome.formula = Question.assign_default_values('formula')
     outcome.save!
     outcome
   end

@@ -76,8 +76,8 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
         expect(question_cloned['body']['variable']['name']).to include('clone_')
       end
 
-      it 'formula name is empty' do
-        expect(question_cloned['formula']['payload']).to be_empty
+      it 'formula is empty' do
+        expect(question_cloned['formula']).to include({ 'payload' => '', 'patterns' => [] })
       end
     end
   end

@@ -11,8 +11,8 @@ class Question < ApplicationRecord
 
   attribute :narrator, :json, default: assign_default_values('narrator')
   attribute :position, :integer, default: 0
-  attribute :formula, :json, default: { payload: '', patterns: [] }
-  attribute :body, :json, default: { data: [] }
+  attribute :formula, :json, default: assign_default_values('formula')
+  attribute :body, :json, default: assign_default_values('body')
 
   has_one_attached :image
   has_many_attached :speeches
