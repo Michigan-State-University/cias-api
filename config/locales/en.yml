@@ -4,6 +4,9 @@ en:
     answers:
       index:
         csv: The request to send the CSV file has been successfully created. We will soon send an email to you with the request status.
+  users:
+    invite:
+      researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
   csv_mailer:
     answers:
       subject: "[CSV] Answers for: %{problem_name}"

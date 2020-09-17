@@ -13,6 +13,11 @@ Rails.application.routes.draw do
       sessions: 'v1/auth_controller/sessions'
     }
 
+    scope :users do
+      scope module: 'users' do
+        post 'invite/researcher', to: 'invite#researcher'
+      end
+    end
     resources :users, only: %i[index show update destroy] do
       scope module: 'users' do
         resource :avatars, only: %i[create destroy]

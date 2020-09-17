@@ -179,6 +179,14 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.datetime 'confirmed_at'
     t.datetime 'confirmation_sent_at'
     t.string 'unconfirmed_email'
+    t.string 'invitation_token'
+    t.datetime 'invitation_created_at'
+    t.datetime 'invitation_sent_at'
+    t.datetime 'invitation_accepted_at'
+    t.integer 'invitation_limit'
+    t.string 'invited_by_type'
+    t.bigint 'invited_by_id'
+    t.integer 'invitations_count', default: 0
     t.string 'encrypted_password', default: '', null: false
     t.string 'reset_password_token'
     t.datetime 'reset_password_sent_at'
@@ -193,6 +201,9 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['confirmation_token'], name: 'index_users_on_confirmation_token', unique: true
     t.index ['email'], name: 'index_users_on_email', unique: true
+    t.index ['invitation_token'], name: 'index_users_on_invitation_token', unique: true
+    t.index ['invitations_count'], name: 'index_users_on_invitations_count'
+    t.index %w[invited_by_type invited_by_id], name: 'index_users_on_invited_by_type_and_invited_by_id'
     t.index ['reset_password_token'], name: 'index_users_on_reset_password_token', unique: true
     t.index ['roles'], name: 'index_users_on_roles', using: :gin
     t.index %w[uid provider], name: 'index_users_on_uid_and_provider', unique: true
