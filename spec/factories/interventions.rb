@@ -4,7 +4,6 @@ FactoryBot.define do
   factory :intervention do
     sequence(:name) { |s| "intervention_#{s}" }
     sequence(:position) { |s| s }
-    emails { [] }
     association :problem
     trait :slug do
       name { 'Intervention' }
@@ -16,6 +15,20 @@ FactoryBot.define do
 
     trait :with_answers do
       answers { create_list(:answer, 5) }
+    end
+
+    trait :days_after do
+      schedule { 'days_after' }
+      schedule_payload { 7 }
+    end
+
+    trait :days_after_fill do
+      schedule { 'days_after_fill' }
+    end
+
+    trait :exact_date do
+      schedule { 'exact_date' }
+      schedule_at { Date.current + 7 }
     end
   end
 end

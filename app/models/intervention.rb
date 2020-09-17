@@ -11,20 +11,34 @@ class Intervention < ApplicationRecord
   belongs_to :problem, inverse_of: :interventions, touch: true
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :answers, dependent: :restrict_with_exception, through: :questions
+  has_many :intervention_invitations, dependent: :restrict_with_exception, inverse_of: :intervention
+
+  has_many :user_interventions, dependent: :restrict_with_exception, inverse_of: :intervention
+  has_many :users, dependent: :restrict_with_exception, through: :user_interventions
 
   friendly_id :name, use: :slugged
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 0
-  attribute :formula, :json, default: { payload: '', patterns: [] }
-  attribute :body, :json, default: { data: [] }
+  attribute :formula, :json, default: assign_default_values('formula')
+  attribute :body, :json, default: assign_default_values('body')
 
   enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date' }, _prefix: :schedule
+
+  delegate :published?, to: :problem
 
   validates :name, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
+
+  def position_less_than
+    @position_less_than ||= problem.interventions.where(position: ...position).order(:position)
+  end
+
+  def position_grather_than
+    @position_grather_than ||= problem.interventions.where('position > ?', position).order(:position)
+  end
 
   def propagate_settings
     return unless settings_changed?
@@ -38,8 +52,26 @@ class Intervention < ApplicationRecord
   end
 
   def integral_update
+    return if published?
+
     propagate_settings
     save!
+  end
+
+  def add_user_interventions
+    return if problem.user_interventions.empty?
+
+    bulk = []
+    problem.user_interventions.pluck(:user_id).each do |user_id|
+      h = {}
+      h[:user_id] = user_id
+      h[:intervention_id] = id
+      timestamp = Time.current
+      h[:created_at] = timestamp
+      h[:updated_at] = timestamp
+      bulk.push(h)
+    end
+    UserIntervention.insert_all(bulk)
   end
 
   def should_generate_new_friendly_id?
@@ -48,6 +80,26 @@ class Intervention < ApplicationRecord
 
   def perform_narrator_reflection(_placeholder)
     nil
+  end
+
+  def invite_by_email(emails)
+    users_exists = ::User.where(email: emails)
+    (emails - users_exists.pluck(:email)).each do |email|
+      User.invite!(email: email)
+    end
+
+    bulk = []
+    User.where(email: emails).find_each do |user|
+      h = {}
+      h[:intervention_id] = id
+      h[:email] = user.email
+      timestamp = Time.current
+      h[:created_at] = timestamp
+      h[:updated_at] = timestamp
+      bulk.push(h)
+    end
+    InterventionInvitation.insert_all(bulk)
+    InterventionJob::Invitation.perform_later(id, emails)
   end
 
   private

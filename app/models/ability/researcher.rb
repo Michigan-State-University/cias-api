@@ -11,7 +11,8 @@ class Ability::Researcher < Ability::Base
   def researcher
     can :read, User, User.limit_to_roles(roles_without_admin), active: true
     can :manage, Problem, user_id: user.id
-    can :manage, UserProblem, problem: { user_id: user.id }
+    can :manage, UserIntervention, intervention: { problem: { user_id: user.id } }
+    can :manage, InterventionInvitation, intervention: { problem: { user_id: user.id } }
     can :manage, Intervention, problem: { user_id: user.id }
     can :manage, Question, intervention: { user_id: user.id }
     can :manage, Answer, question: { intervention: { user_id: user.id } }

@@ -2,160 +2,49 @@
 
 require 'rails_helper'
 
-describe 'POST /v1/problems/:problem_id/users', type: :request do
-  let!(:participants) { create_list(:user, 2, :confirmed, :participant) }
-  let!(:guests) { create_list(:user, 2, :confirmed, :guest) }
-
-  let(:emails) { participants.pluck(:email) + guests.pluck(:email) }
-  let(:problem) { create(:problem, user_id: current_user.id) }
-  let(:problem_id) { problem.id }
-
+RSpec.describe 'POST /v1/problems/:problem_id/users', type: :request do
+  let(:user) { create(:user, :confirmed, :admin) }
+  let(:user_admin_1) { create(:user, :confirmed, :admin, first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
+  let(:user_admin_2) { create(:user, :confirmed, :participant, created_at: 4.days.ago) }
+  let(:problem) { create(:problem, user_id: user.id) }
+  let(:interventions) { create_list(:intervention, 2, problem_id: problem.id) }
+  let(:not_add_user_by_email) { 'a@a.com' }
   let(:params) do
     {
-      user_problem: {
-        emails: emails
+      user_intervention: {
+        emails: [user_admin_1.email, not_add_user_by_email]
       }
     }
   end
 
-  before { post v1_problem_users_path(problem_id: problem_id), params: params, headers: current_user.create_new_auth_token }
+  let(:request) { post v1_problem_users_path(problem_id: problem.id), params: params, headers: user.create_new_auth_token }
 
-  context 'when current_user is admin' do
-    let(:current_user) { create(:user, :confirmed, :admin) }
-
-    context 'when params are VALID' do
-      it { expect(response).to have_http_status(:created) }
-
-      it 'adds participants to problems' do
-        expect(problem.reload.users.pluck(:id)).to match_array(participants.pluck(:id))
-      end
-
-      it 'JSON response contains records related to participants' do
-        expect(json_response['data'].size).to eq 2
-      end
-
-      it 'JSON response contains proper associations with users' do
-        expect(json_response['data'].pluck('attributes')).to match_array(
-          [
-            {
-              'user' => include(
-                'id' => participants[0].id
-              ),
-              'problem' => include(
-                'id' => problem_id
-              )
-            },
-            {
-              'user' => include(
-                'id' => participants[1].id
-              ),
-              'problem' => include(
-                'id' => problem_id
-              )
-            }
-          ]
-        )
-      end
+  context 'create users' do
+    let(:params) do
+      {
+        user_intervention: {
+          emails: [user_admin_1.email, user_admin_2.email]
+        }
+      }
     end
 
-    context 'when problem does not exist' do
-      let(:problem_id) { problem.id.reverse }
+    it 'user to all interventions' do
+      interventions
+      request
 
-      it { expect(response).to have_http_status(:not_found) }
-
-      it 'does not add participants to problems' do
-        expect(problem.reload.users.pluck(:id)).not_to include(participants.pluck(:id))
-      end
-    end
-  end
-
-  context 'when current_user is researcher' do
-    let(:current_user) { create(:user, :confirmed, :researcher) }
-
-    context 'problem belongs to him' do
-      context 'when params are VALID' do
-        it { expect(response).to have_http_status(:created) }
-
-        it 'adds participants to problems' do
-          expect(problem.reload.users.pluck(:id)).to match_array(participants.pluck(:id))
-        end
-
-        it 'JSON response contains records related to participants' do
-          expect(json_response['data'].size).to eq 2
-        end
-
-        it 'JSON response contains proper associations with users' do
-          expect(json_response['data'].pluck('attributes')).to match_array(
-            [
-              {
-                'user' => include(
-                  'id' => participants[0].id
-                ),
-                'problem' => include(
-                  'id' => problem_id
-                )
-              },
-              {
-                'user' => include(
-                  'id' => participants[1].id
-                ),
-                'problem' => include(
-                  'id' => problem_id
-                )
-              }
-            ]
-          )
-        end
-      end
-
-      context 'when problem does not exist' do
-        let(:problem_id) { problem.id.reverse }
-
-        it { expect(response).to have_http_status(:not_found) }
-
-        it 'does not add participants to problems' do
-          expect(problem.reload.users.pluck(:id)).not_to include(*participants.pluck(:id))
-        end
-      end
+      expect(response).to have_http_status(:created)
+      expect(json_response['user_interventions'].size).to eq 2
+      expect(json_response['user_interventions'].pluck('user_id').uniq).to match_array([user_admin_1.id, user_admin_2.id])
+      expect(User.find_by(email: not_add_user_by_email)).to be nil
     end
 
-    context 'problem does not belong to him' do
-      let(:other_problem) { create(:problem, user_id: create(:user).id) }
-      let(:problem_id) { other_problem.id }
+    it 'many users to many interventions' do
+      interventions
+      request
 
-      it { expect(response).to have_http_status(:not_found) }
-
-      it 'does not add participants to problems' do
-        expect(other_problem.reload.users.pluck(:id)).not_to include(*participants.pluck(:id))
-      end
-    end
-  end
-
-  context 'when current_user is participant' do
-    let(:current_user) { create(:user, :participant) }
-
-    it { expect(response).to have_http_status(:forbidden) }
-
-    it 'does not add participants to problems' do
-      expect(problem.reload.users.pluck(:id)).not_to include(*participants.pluck(:id))
-    end
-
-    it 'response contains proper error message' do
-      expect(json_response['message']).to eq 'You are not authorized to access this page.'
-    end
-  end
-
-  context 'when current_user is guest' do
-    let(:current_user) { create(:user, :confirmed, :guest) }
-
-    it { expect(response).to have_http_status(:forbidden) }
-
-    it 'does not add participants to problems' do
-      expect(problem.reload.users.pluck(:id)).not_to include(*participants.pluck(:id))
-    end
-
-    it 'response contains proper error message' do
-      expect(json_response['message']).to eq 'You are not authorized to access this page.'
+      expect(response).to have_http_status(:created)
+      expect(json_response['user_interventions'].size).to eq 2
+      expect(json_response['user_interventions'].pluck('user_id').uniq).to match_array([user_admin_1.id, user_admin_2.id])
     end
   end
 end

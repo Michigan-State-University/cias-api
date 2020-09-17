@@ -3,6 +3,11 @@ intervention:
     narrator:
       voice: true
       animation: true
+  formula:
+    payload: ''
+    patterns: [ ]
+  body:
+    data: [ ]
 question:
   settings:
     image: false

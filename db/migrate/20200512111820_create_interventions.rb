@@ -9,10 +9,10 @@ class CreateInterventions < ActiveRecord::Migration[6.0]
       t.string :name, null: false
       t.string :slug
       t.string :schedule
-      t.string :schedule_at
+      t.integer :schedule_payload
+      t.date :schedule_at
       t.jsonb :formula
       t.jsonb :body
-      t.text :emails, default: [], array: true
 
       t.timestamps
     end

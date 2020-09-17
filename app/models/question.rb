@@ -31,8 +31,8 @@ class Question < ApplicationRecord
     self.class.to_s.demodulize
   end
 
-  def questions_position_up_to_equal
-    intervention.questions.where('questions.position >= ?', position).order(:position)
+  def position_equal_or_higher
+    @position_equal_or_higher ||= intervention.questions.where(position: position..).order(:position)
   end
 
   def another_or_feedback(next_obj, answers_var_values)
@@ -52,7 +52,7 @@ class Question < ApplicationRecord
   end
 
   def next_intervention_or_question(answers_var_values)
-    return nil if id.eql?(questions_position_up_to_equal.last.id)
+    return nil if id.eql?(position_equal_or_higher.last.id)
 
     if formula['payload'].present?
       obj_src = exploit_formula(answers_var_values)
@@ -63,7 +63,7 @@ class Question < ApplicationRecord
         return another_or_feedback(next_obj, answers_var_values)
       end
     end
-    next_obj = questions_position_up_to_equal[1]
+    next_obj = position_equal_or_higher[1]
     next_obj&.perform_narrator_reflection(answers_var_values)
     another_or_feedback(next_obj, answers_var_values)
   end

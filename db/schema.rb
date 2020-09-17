@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_200_825_085_324) do
+ActiveRecord::Schema.define(version: 20_201_007_072_628) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'btree_gin'
   enable_extension 'btree_gist'
@@ -87,6 +87,14 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.index %w[sluggable_type sluggable_id], name: 'index_friendly_id_slugs_on_sluggable_type_and_sluggable_id', using: :gin
   end
 
+  create_table 'intervention_invitations', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.uuid 'intervention_id', null: false
+    t.string 'email'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index %w[intervention_id email], name: 'index_intervention_invitations_on_intervention_id_and_email', unique: true
+  end
+
   create_table 'interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.uuid 'problem_id', null: false
     t.jsonb 'settings'
@@ -94,10 +102,10 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.string 'name', null: false
     t.string 'slug'
     t.string 'schedule'
-    t.string 'schedule_at'
+    t.integer 'schedule_payload'
+    t.date 'schedule_at'
     t.jsonb 'formula'
     t.jsonb 'body'
-    t.text 'emails', default: [], array: true
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['name'], name: 'index_interventions_on_name'
@@ -111,6 +119,7 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
   create_table 'problems', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'name'
     t.uuid 'user_id', null: false
+    t.datetime 'published_at'
     t.string 'status'
     t.string 'shared_to', null: false
     t.datetime 'created_at', precision: 6, null: false
@@ -142,6 +151,18 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.index ['type'], name: 'index_questions_on_type'
   end
 
+  create_table 'user_interventions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.uuid 'user_id', null: false
+    t.uuid 'intervention_id', null: false
+    t.datetime 'submitted_at'
+    t.date 'schedule_at'
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['intervention_id'], name: 'index_user_interventions_on_intervention_id'
+    t.index %w[user_id intervention_id], name: 'index_user_interventions_on_user_id_and_intervention_id', unique: true
+    t.index ['user_id'], name: 'index_user_interventions_on_user_id'
+  end
+
   create_table 'user_log_requests', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.uuid 'user_id'
     t.string 'controller'
@@ -152,16 +173,6 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.inet 'remote_ip'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
-  end
-
-  create_table 'user_problems', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
-    t.uuid 'user_id', null: false
-    t.uuid 'problem_id', null: false
-    t.datetime 'created_at', precision: 6, null: false
-    t.datetime 'updated_at', precision: 6, null: false
-    t.index ['problem_id'], name: 'index_user_problems_on_problem_id'
-    t.index %w[user_id problem_id], name: 'index_user_problems_on_user_id_and_problem_id', unique: true
-    t.index ['user_id'], name: 'index_user_problems_on_user_id'
   end
 
   create_table 'users', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
@@ -215,10 +226,11 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
   add_foreign_key 'addresses', 'users'
   add_foreign_key 'answers', 'questions'
   add_foreign_key 'answers', 'users'
+  add_foreign_key 'intervention_invitations', 'interventions'
   add_foreign_key 'interventions', 'problems'
   add_foreign_key 'problems', 'users'
   add_foreign_key 'questions', 'interventions'
+  add_foreign_key 'user_interventions', 'interventions'
+  add_foreign_key 'user_interventions', 'users'
   add_foreign_key 'user_log_requests', 'users'
-  add_foreign_key 'user_problems', 'problems'
-  add_foreign_key 'user_problems', 'users'
 end

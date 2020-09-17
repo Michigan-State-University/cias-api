@@ -23,10 +23,11 @@ services:
     tty: true
     volumes:
       - .:/api
+      - ./config/database.docker.yml:/api/config/database.yml
       - vol_api_bundle:/usr/local/bundle
-      - vol_api_log:/log
-      - vol_api_storage:/storage
-      - vol_api_tmp:/tmp
+      - vol_api_log:/api/log
+      - vol_api_storage:/api/storage
+      - vol_api_tmp:/api/tmp
     ports:
       - '3000:3000'
     command: >
@@ -61,10 +62,11 @@ services:
     tty: true
     volumes:
       - .:/api
+      - ./config/database.docker.yml:/api/config/database.yml
       - vol_api_bundle:/usr/local/bundle
-      - vol_api_log:/log
-      - vol_api_storage:/storage
-      - vol_api_tmp:/tmp
+      - vol_api_log:/api/log
+      - vol_api_storage:/api/storage
+      - vol_api_tmp:/api/tmp
     command: ['bundle', 'exec', 'sidekiq', '-C', 'config/sidekiq.yml']
 
 volumes:

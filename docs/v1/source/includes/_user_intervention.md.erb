@@ -1,7 +1,7 @@
-# UserProblem
+# Users for Intervention
 
 
-## Get users belongs to problem
+## Get all users associated to interventions
 
 
 ### Resource
@@ -32,6 +32,12 @@ Parameter | Description | Required
 <%= partial 'includes/http/headers/auth' %>
 
 
+### HTTP body
+
+
+### Note
+
+
 > HTTP example request
 
 ```http
@@ -46,43 +52,11 @@ client: xxxyyyzzz
 uid: user@<%= ENV['DOMAIN_NAME'] %>
 ```
 
-> HTTP response body
-
-```json
-{
-  "data": [
-    {
-      "id": "2",
-      "type": "user_problem",
-      "attributes": {
-        "user": {
-          "id": "2",
-          "first_name": "participant2",
-          "last_name": "Socrates",
-          "email": "a@p.com",
-          "phones": [],
-          "time_zone": "Eastern Time (US & Canada)",
-          "roles": [
-            "participant"
-          ]
-        },
-        "problem": {
-          "id": "1",
-          "name": "New e-Intervention",
-          "user_id": "2",
-          "status": "draft",
-          "shared_to": "anyone"
-        }
-      }
-    }
-  ]
-}
-```
 
 > HTTP response 200 OK
 
 
-## Create associations between users and problem
+## Create user intervention
 
 
 ### Resource
@@ -113,17 +87,24 @@ Parameter | Description | Required
 <%= partial 'includes/http/headers/auth' %>
 
 
+### HTTP body
+
+{
+	"user_intervention": {
+		"emails": [
+		  "a@a.com", "b@b.com"
+		 ]
+	}
+}
+
+
 ### Note
 
-Required keys:
 
- * `"user_problem": { "emails": [] }`.
-
-
- > HTTP example request
+> HTTP example request
 
 ```http
-POST <%= ENV['APP_HOSTNAME'] %>/v1/problems
+POST <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users
 ```
 
 ```http
@@ -136,54 +117,24 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ```json
 {
-	"user_problem": {
-    "emails": ["t@p.com", "t@p.com"]
+	"user_intervention": {
+		"emails": [
+		  "a@a.com", "b@b.com"
+		 ]
 	}
 }
 ```
 
-> HTTP response body
-
-```json
-{
-  "data": [
-    {
-      "id": "2",
-      "type": "user_problem",
-      "attributes": {
-        "user": {
-          "id": "2",
-          "first_name": "participant2",
-          "last_name": "Socrates",
-          "email": "a@p.com",
-          "phones": [],
-          "time_zone": "Eastern Time (US & Canada)",
-          "roles": [
-            "participant"
-          ]
-        },
-        "problem": {
-          "id": "1",
-          "name": "New e-Intervention",
-          "user_id": "2",
-          "status": "draft",
-          "shared_to": "anyone"
-        }
-      }
-    }
-  ]
-}
-```
 
 > HTTP response 201 Created
 
 
-## Destroy association between given users and given problem
+## Destroy user intervention
 
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:problem_id/users/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/users`
 
 
 ### URL parameters
@@ -210,10 +161,20 @@ Parameter | Description | Required
 <%= partial 'includes/http/headers/auth' %>
 
 
+### HTTP body
+
+
+### Note
+
+
 > HTTP example request
 
 ```http
 DELETE <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users/1
+```
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/users/1
 ```
 
 ```http
@@ -224,4 +185,4 @@ client: xxxyyyzzz
 uid: user@<%= ENV['DOMAIN_NAME'] %>
 ```
 
-> HTTP response 200 OK
+> HTTP response 204 No Content

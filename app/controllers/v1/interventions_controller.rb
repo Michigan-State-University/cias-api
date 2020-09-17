@@ -18,6 +18,7 @@ class V1::InterventionsController < V1Controller
     intervention = interventions_scope.new(intervention_params)
     intervention.position = interventions_scope.last&.position.to_i + 1
     intervention.save!
+    intervention.add_user_interventions
     render json: serialized_response(intervention), status: :created
   end
 
@@ -26,15 +27,6 @@ class V1::InterventionsController < V1Controller
     intervention.assign_attributes(intervention_params)
     intervention.integral_update
     render json: serialized_response(intervention)
-  end
-
-  def invite
-    authorize! :update, intervention_load
-
-    emails = (invite_params[:emails] + intervention_load.emails.dup).uniq
-    InvitationJob::Participant::Intervention.perform_later(invite_params[:emails], intervention_load.id)
-    intervention_load.update(emails: emails)
-    render json: serialized_response(intervention_load)
   end
 
   private
@@ -47,11 +39,7 @@ class V1::InterventionsController < V1Controller
     interventions_scope.find(params[:id])
   end
 
-  def invite_params
-    params.require(:intervention).permit(emails: [])
-  end
-
   def intervention_params
-    params.require(:intervention).permit(:name, :schedule, :schedule_at, :position, :problem_id, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:intervention).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :problem_id, narrator: {}, settings: {}, formula: {}, body: {})
   end
 end

@@ -1,0 +1,3 @@
+<%= I18n.t('intervention_mailer.inform_to_an_email.body', intervention_name: @intervention.name) %>
+
+<%= I18n.t('intervention_mailer.inform_to_an_email.invitation_link', domain: ENV['WEB_URL'], problem_id: @intervention.problem_id, intervention_id: @intervention.id) %>

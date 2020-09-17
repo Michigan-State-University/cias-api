@@ -17,8 +17,10 @@ RSpec.describe Problem, type: :model do
   context 'change states' do
     context 'draft to published' do
       let(:problem) { create(:problem) }
+      let(:interventions) { create_list(:intervention, 4, problem_id: problem.id) }
 
       it 'sucess event' do
+        interventions
         problem.broadcast
         problem.save
         expect(problem.published?).to be true

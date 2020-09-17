@@ -13,6 +13,7 @@ class V1::Problems::Show < BaseSerializer
       shared_to: @problem.shared_to,
       created_at: @problem.created_at,
       updated_at: @problem.updated_at,
+      published_at: @problem.published_at,
       user: {
         email: @problem.user.email,
         first_name: @problem.user.first_name,

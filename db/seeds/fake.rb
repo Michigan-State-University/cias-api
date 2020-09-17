@@ -21,6 +21,8 @@ class Fake
       add_address_to_user
       create_problems
       create_interventions
+      # create_user_interventions
+      create_intervention_invitations
       create_questions
       create_answers
     end
@@ -60,7 +62,6 @@ class Fake
           user_id: user_ids.sample,
           shared_to: Problem.shared_tos.keys.sample
         )
-        problem.users << User.limit_to_roles('participant').sample(2)
       end
     end
 
@@ -88,6 +89,24 @@ class Fake
 
     def intervention_ids
       @@intervention_ids ||= Intervention.ids
+    end
+
+    def create_user_interventions
+      intervention_ids
+      (40..60).to_a.sample.times do
+        UserIntervention.create(
+          intervention_id: intervention_ids.sample,
+          user_id: user_ids.sample
+        )
+      end
+    end
+
+    def create_intervention_invitations
+      Intervention.all.each do |intervention|
+        (1..4).to_a.sample.times do
+          intervention.intervention_invitations.create(email: Faker::Internet.email)
+        end
+      end
     end
 
     def subclass_types

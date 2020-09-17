@@ -5,6 +5,7 @@ class CreateProblems < ActiveRecord::Migration[6.0]
     create_table :problems, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
       t.string :name
       t.uuid :user_id, null: false
+      t.datetime :published_at
       t.string :status
       t.string :shared_to, null: false
 
