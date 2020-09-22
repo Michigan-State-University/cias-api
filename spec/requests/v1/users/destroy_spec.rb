@@ -35,7 +35,7 @@ RSpec.describe 'DELETE /v1/users/:id', type: :request do
         delete v1_user_path(id: alter_user.id), headers: headers
       end
 
-      it { expect(response).to have_http_status(:ok) }
+      it { expect(response).to have_http_status(:no_content) }
     end
   end
 end

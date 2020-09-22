@@ -15,7 +15,6 @@ class V1Controller < ApplicationController
 
   def guest_user
     @guest_user ||= User.new.tap do |u|
-      u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@guest.true"
       u.roles.push('guest')
       u.skip_confirmation!
     end
@@ -23,6 +22,7 @@ class V1Controller < ApplicationController
 
   def create_guest_user
     user = guest_user
+    user.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@guest.true"
     user.save(validate: false)
     response.headers.merge!(user.create_new_auth_token)
     user
@@ -41,6 +41,6 @@ class V1Controller < ApplicationController
     action = params[:action].presence || action_name
     serializer = [path, '/', action].join.classify.constantize
 
-    render json: serializer.new(params.except(:path, :action)).cached_render
+    render json: serializer.new(params.except(:path, :action, :status)).cached_render, status: params[:status]
   end
 end

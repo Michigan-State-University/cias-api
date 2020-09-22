@@ -24,6 +24,8 @@ require 'rspec/rails'
 #
 # Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
 Dir[Rails.root.join('spec/support/**/*.rb')].sort.each(&method(:require))
+# Temporary fix for missing cancancan classes in RSpec
+Dir[Rails.root.join('app/models/ability/*.rb')].sort.each(&method(:require))
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -35,6 +37,8 @@ rescue ActiveRecord::PendingMigrationError => e
 end
 RSpec.configure do |config|
   config.order = :random
+  config.filter_run :focus
+  config.run_all_when_everything_filtered = true
 
   config.include Devise::Test::IntegrationHelpers, type: :feature
   config.include ApiHelpers

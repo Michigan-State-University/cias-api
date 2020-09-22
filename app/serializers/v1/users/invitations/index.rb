@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+class V1::Users::Invitations::Index < BaseSerializer
+  def cache_key
+    "invitations/#{@users.count}-#{@users.maximum(:updated_at)}"
+  end
+
+  def to_json
+    {
+      invitations: invitations
+    }
+  end
+
+  private
+
+  def invitations
+    @users.map { |user| V1::Users::Invitations::Show.new(user: user).to_json }
+  end
+end

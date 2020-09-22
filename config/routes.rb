@@ -15,7 +15,7 @@ Rails.application.routes.draw do
 
     scope :users do
       scope module: 'users' do
-        post 'invite/researcher', to: 'invite#researcher'
+        resources :invitations, only: %i[index create destroy]
       end
     end
     resources :users, only: %i[index show update destroy] do

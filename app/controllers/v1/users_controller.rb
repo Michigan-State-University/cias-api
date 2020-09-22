@@ -21,7 +21,7 @@ class V1::UsersController < V1Controller
 
   def destroy
     user_load.destroy
-    head :ok
+    head :no_content
   end
 
   private

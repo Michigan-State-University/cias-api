@@ -15,7 +15,7 @@ class V1::Problems::UsersController < V1Controller
   def destroy
     user_problem = user_problems_scope.find_by!(user_id: params[:id])
     user_problem.destroy!
-    head :ok
+    head :no_content
   end
 
   private

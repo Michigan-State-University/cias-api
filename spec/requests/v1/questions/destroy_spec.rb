@@ -36,7 +36,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/questions/:id', type: 
         delete v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
       end
 
-      it { expect(response).to have_http_status(:ok) }
+      it { expect(response).to have_http_status(:no_content) }
     end
   end
 end

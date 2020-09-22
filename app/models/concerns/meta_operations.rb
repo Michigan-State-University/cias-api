@@ -48,7 +48,7 @@ module MetaOperations
       end
     end
 
-    def tmp_file
+    def tmp_file # rubocop:disable Lint/DuplicateMethods
       @tmp_file ||= begin
         File.open(Rails.root.join('tmp', filename), 'wb') do |file|
           file.write(stream)

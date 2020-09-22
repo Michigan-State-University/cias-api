@@ -60,7 +60,7 @@ Lint/FloatComparison:
   Enabled: true
 
 Lint/MissingSuper:
-  Enabled: true
+  Enabled: false
 
 Lint/MixedRegexpCaptureTypes:
   Enabled: true
@@ -291,7 +291,16 @@ RSpec/ImplicitExpect:
 RSpec/InstanceVariable:
   AssignmentOnly: true
 
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
 RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NamedSubject:
   Enabled: false
 
 RSpec/NestedGroups:

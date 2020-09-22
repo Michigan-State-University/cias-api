@@ -30,7 +30,7 @@ class V1::QuestionsController < V1Controller
 
   def destroy
     question_load.destroy
-    head :ok
+    head :no_content
   end
 
   private

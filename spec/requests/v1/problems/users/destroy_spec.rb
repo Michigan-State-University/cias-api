@@ -15,7 +15,7 @@ describe 'DELETE /v1/problems/:problem_id/users/:id', type: :request do
     let(:current_user) { create(:user, :confirmed, :admin) }
 
     context 'when params are VALID' do
-      it { expect(response).to have_http_status(:ok) }
+      it { expect(response).to have_http_status(:no_content) }
 
       it 'removes participant from problems' do
         expect(problem.reload.users.pluck(:id)).not_to include(user_id)
@@ -41,7 +41,7 @@ describe 'DELETE /v1/problems/:problem_id/users/:id', type: :request do
 
     context 'problem belongs to him' do
       context 'when params are VALID' do
-        it { expect(response).to have_http_status(:ok) }
+        it { expect(response).to have_http_status(:no_content) }
 
         it 'removes participant from problems' do
           expect(problem.reload.users.pluck(:id)).not_to include(user_id)
