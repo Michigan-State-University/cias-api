@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/interventions/:intervention_id/questions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:question) { create(:question_analogue_scale) }
+  let(:question) { create(:question_slider) }
   let(:intervention) { question.intervention }
   let(:headers) { user.create_new_auth_token }
 

@@ -9,7 +9,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:problem) { create(:problem, user_id: researcher.id) }
   let(:intervention) { create(:intervention, problem_id: problem.id) }
-  let(:question) { create(:question_text_box, intervention_id: intervention.id) }
+  let(:question) { create(:question_free_response, intervention_id: intervention.id) }
 
   before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
 

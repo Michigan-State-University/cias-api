@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-class Answer::Url < Answer
+class Answer::Slider < Answer
 end

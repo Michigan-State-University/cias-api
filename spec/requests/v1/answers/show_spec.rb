@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/questions/:question_id/answers/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:answer) { create(:answer_text_box) }
+  let(:answer) { create(:answer_free_response) }
   let(:question) { answer.question }
   let(:headers) { user.create_new_auth_token }
 

@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Answer, type: :model do
-  describe 'Answer::AnalogueScale' do
+  describe 'Answer::Slider' do
     describe 'expected behaviour' do
-      subject { create(:answer_analogue_scale) }
+      subject { create(:answer_slider) }
 
       it { should belong_to(:question) }
       it { should belong_to(:user).optional(true) }
@@ -13,7 +13,7 @@ RSpec.describe Answer, type: :model do
     end
 
     describe 'mismatch type question and answer' do
-      let(:wrong_type) { build(:answer_analogue_scale, :wrong_type) }
+      let(:wrong_type) { build(:answer_slider, :wrong_type) }
 
       it { expect(wrong_type.save).to eq false }
     end
@@ -159,9 +159,9 @@ RSpec.describe Answer, type: :model do
     end
   end
 
-  describe 'Answer::TextBox' do
+  describe 'Answer::FreeResponse' do
     describe 'expected behaviour' do
-      subject { create(:answer_text_box) }
+      subject { create(:answer_free_response) }
 
       it { should belong_to(:question) }
       it { should belong_to(:user).optional(true) }
@@ -169,21 +169,21 @@ RSpec.describe Answer, type: :model do
     end
 
     describe 'mismatch type question and answer' do
-      let(:wrong_type) { build(:answer_text_box, :wrong_type) }
+      let(:wrong_type) { build(:answer_free_response, :wrong_type) }
 
       it { expect(wrong_type.save).to eq false }
     end
 
     describe 'fails when body is empty' do
-      let(:with_empty) { build(:answer_text_box, :body_data_empty) }
+      let(:with_empty) { build(:answer_free_response, :body_data_empty) }
 
       xit { expect(with_empty.save).to eq false }
     end
   end
 
-  describe 'Answer::Url' do
+  describe 'Answer::ExternalLink' do
     describe 'expected behaviour' do
-      subject { create(:answer_url) }
+      subject { create(:answer_external_link) }
 
       it { should belong_to(:question) }
       it { should belong_to(:user).optional(true) }
@@ -191,7 +191,7 @@ RSpec.describe Answer, type: :model do
     end
 
     describe 'mismatch type question and answer' do
-      let(:wrong_type) { build(:answer_url, :wrong_type) }
+      let(:wrong_type) { build(:answer_external_link, :wrong_type) }
 
       it { expect(wrong_type.save).to eq false }
     end

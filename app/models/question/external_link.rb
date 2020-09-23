@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Question::Url < Question
+class Question::ExternalLink < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
   def variable_clone_prefix

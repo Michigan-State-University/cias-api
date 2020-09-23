@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention) }
-  let(:question) { create(:question_analogue_scale, intervention_id: intervention.id) }
+  let(:question) { create(:question_slider, intervention_id: intervention.id) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {

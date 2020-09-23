@@ -202,7 +202,7 @@ class Fake
 
     def body_data_by_type(type)
       case type
-      in 'AnalogueScale'
+      in 'Slider'
         {
           data: [
             {
@@ -295,7 +295,7 @@ class Fake
             name: Faker::Alphanumeric.alpha(number: 6)
           }
         }
-      in 'TextBox'
+      in 'FreeResponse'
         {
           data: [
             {
@@ -306,7 +306,7 @@ class Fake
             name: Faker::Alphanumeric.alpha(number: 6)
           }
         }
-      in 'Url'
+      in 'ExternalLink'
         {
           data: [
             {

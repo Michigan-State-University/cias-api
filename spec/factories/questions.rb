@@ -23,9 +23,9 @@ FactoryBot.define do
     association :intervention
   end
 
-  factory :question_analogue_scale, class: Question::AnalogueScale do
-    title { 'Analogue Scale' }
-    type { Question::AnalogueScale }
+  factory :question_slider, class: Question::Slider do
+    title { 'Slider' }
+    type { Question::Slider }
     body do
       {
         data: [
@@ -441,9 +441,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_text_box, class: Question::TextBox do
-    title { 'TextBox' }
-    type { Question::TextBox }
+  factory :question_free_response, class: Question::FreeResponse do
+    title { 'Free Response' }
+    type { Question::FreeResponse }
     body do
       {
         data: [
@@ -464,9 +464,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_url, class: Question::Url do
-    title { 'Url' }
-    type { Question::Url }
+  factory :question_external_link, class: Question::ExternalLink do
+    title { 'External Link' }
+    type { Question::ExternalLink }
     body do
       {
         data: [

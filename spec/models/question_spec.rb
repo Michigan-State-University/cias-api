@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Question, type: :model do
-  describe 'Question::AnalogueScale' do
-    subject(:question_analogue_scale) { build(:question_analogue_scale) }
+  describe 'Question::Slider' do
+    subject(:question_slider) { build(:question_slider) }
 
     it { should belong_to(:intervention) }
     it { should be_valid }
@@ -80,23 +80,23 @@ RSpec.describe Question, type: :model do
     end
   end
 
-  describe 'Question::TextBox' do
+  describe 'Question::FreeResponse' do
     describe 'expected behaviour' do
-      subject(:question_text_box) { build(:question_text_box) }
+      subject(:question_free_response) { build(:question_free_response) }
 
       it { should belong_to(:intervention) }
       it { should be_valid }
     end
 
     describe 'fails when body is empty' do
-      let(:with_empty) { build(:question_text_box, :body_data_empty) }
+      let(:with_empty) { build(:question_free_response, :body_data_empty) }
 
       it { expect(with_empty.save).to eq false }
     end
   end
 
-  describe 'Question::Url' do
-    subject(:question_url) { build(:question_url) }
+  describe 'Question::ExternalLink' do
+    subject(:question_external_link) { build(:question_external_link) }
 
     it { should belong_to(:intervention) }
     it { should be_valid }

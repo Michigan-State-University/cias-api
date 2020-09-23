@@ -14,9 +14,9 @@ FactoryBot.define do
         }
       ] }
     end
-    factory :answer_analogue_scale do
-      type { Answer::AnalogueScale }
-      association :question, factory: :question_analogue_scale
+    factory :answer_slider do
+      type { Answer::Slider }
+      association :question, factory: :question_slider
       trait :wrong_type do
         association :question, factory: :question_multiple
       end
@@ -83,9 +83,9 @@ FactoryBot.define do
         body { { data: [] } }
       end
     end
-    factory :answer_text_box, class: Answer::TextBox do
-      type { Answer::TextBox }
-      association :question, factory: :question_text_box
+    factory :answer_free_response, class: Answer::FreeResponse do
+      type { Answer::FreeResponse }
+      association :question, factory: :question_free_response
       trait :wrong_type do
         association :question, factory: :question_multiple
       end
@@ -93,9 +93,9 @@ FactoryBot.define do
         body { { data: [] } }
       end
     end
-    factory :answer_url do
-      type { Answer::Url }
-      association :question, factory: :question_url
+    factory :answer_external_link do
+      type { Answer::ExternalLink }
+      association :question, factory: :question_external_link
       trait :wrong_type do
         association :question, factory: :question_multiple
       end
