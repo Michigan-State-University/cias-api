@@ -174,7 +174,7 @@ ActiveRecord::Schema.define(version: 20_200_825_085_324) do
     t.string 'time_zone'
     t.string 'roles', default: [], array: true
     t.jsonb 'tokens'
-    t.boolean 'deactivated', default: false, null: false
+    t.boolean 'active', default: true, null: false
     t.string 'confirmation_token'
     t.datetime 'confirmed_at'
     t.datetime 'confirmation_sent_at'

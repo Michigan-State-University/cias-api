@@ -9,7 +9,7 @@ class Ability::Researcher < Ability::Base
   private
 
   def researcher
-    can :read, User, User.limit_to_roles(roles_without_admin), deactivated: false
+    can :read, User, User.limit_to_roles(roles_without_admin), active: true
     can :manage, Problem, user_id: user.id
     can :manage, UserProblem, problem: { user_id: user.id }
     can :manage, Intervention, problem: { user_id: user.id }

@@ -42,7 +42,7 @@ describe 'PATCH /v1/users/:id', type: :request do
           {
             user: {
               roles: %w[admin guest],
-              deactivated: true
+              active: false
             }
           }
         end
@@ -52,14 +52,14 @@ describe 'PATCH /v1/users/:id', type: :request do
         it 'JSON response contains proper attributes' do
           expect(json_response['data']['attributes']).to include(
             'roles' => %w[admin guest],
-            'deactivated' => true
+            'active' => false
           )
         end
 
         it 'updates user attributes' do
           expect(current_user.reload.attributes).to include(
             'roles' => %w[admin guest],
-            'deactivated' => true
+            'active' => false
           )
         end
       end
@@ -91,7 +91,7 @@ describe 'PATCH /v1/users/:id', type: :request do
           {
             user: {
               roles: %w[admin guest],
-              deactivated: true
+              active: false
             }
           }
         end
@@ -101,14 +101,14 @@ describe 'PATCH /v1/users/:id', type: :request do
         it 'JSON response contains proper attributes' do
           expect(json_response['data']['attributes']).to include(
             'roles' => %w[admin guest],
-            'deactivated' => true
+            'active' => false
           )
         end
 
         it 'updates user attributes' do
           expect(other_user.reload.attributes).to include(
             'roles' => %w[admin guest],
-            'deactivated' => true
+            'active' => false
           )
         end
       end

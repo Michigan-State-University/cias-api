@@ -40,13 +40,22 @@ class User < ApplicationRecord
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
 
+  scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
   scope :name_contains, lambda { |substring|
     where("CONCAT(first_name, ' ', last_name) ILIKE :substring OR email ILIKE :substring", substring: "%#{substring.downcase}%") if substring.present?
   }
 
   def self.detailed_search(params)
-    all.limit_to_roles(params[:roles]).name_contains(params[:name])
+    scope = all
+    if params.has_key?(:active)
+      scope = scope.where(active: params[:active])
+    else
+      scope = scope.limit_to_active
+    end
+    scope = scope.limit_to_roles(params[:roles])
+    scope = scope.name_contains(params[:name])
+    scope
   end
 
   def ability
@@ -62,11 +71,11 @@ class User < ApplicationRecord
   end
 
   def destroy
-    update(deactivated: true) unless deactivated
+    update!(active: false) if active
   end
 
   def active_for_authentication?
-    super && !deactivated
+    super && active
   end
 
   def send_devise_notification(notification, *args)

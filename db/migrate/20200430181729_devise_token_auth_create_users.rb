@@ -21,7 +21,7 @@ class DeviseTokenAuthCreateUsers < ActiveRecord::Migration[6.0]
       t.jsonb :tokens
 
       ## Deactivate user instead of destroy
-      t.boolean :deactivated, null: false, default: false
+      t.boolean :active, null: false, default: true
 
       ## Confirmable
       t.string   :confirmation_token

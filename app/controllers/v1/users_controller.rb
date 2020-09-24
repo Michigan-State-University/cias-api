@@ -35,12 +35,12 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :deactivated, roles: [], address_attributes: %i[name country state state_abbreviation city zip_code street building_address apartment_number])
+    params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :active, roles: [], address_attributes: %i[name country state state_abbreviation city zip_code street building_address apartment_number])
   end
 
   def authorize_update_abilities
     authorize! :update, user_load
-    %i[deactivated roles].each do |attr|
+    %i[active roles].each do |attr|
       authorize! :update, attr unless user_params[attr].nil?
     end
   end

@@ -22,6 +22,6 @@ class Ability::Base
 
   def default
     can %i[read update], User, id: user.id
-    cannot :update, User, %i[deactivated roles]
+    cannot :update, User, %i[active roles]
   end
 end

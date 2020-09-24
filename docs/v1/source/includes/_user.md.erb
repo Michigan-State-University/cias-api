@@ -22,6 +22,7 @@ page | Number of page | false
 per_page | Number of users per age | false
 name | Name or email of searched users | false
 roles | Array of roles of searched users | false
+active | The collection contains the scope of activated, deactivated users | false
 
 ### HTTP request method
 
@@ -38,7 +39,11 @@ roles | Array of roles of searched users | false
 
 ### Note
 
-You can add query string with key `roles[]` with one role. If you would like to get many roles just multiple same key `roles[]` and assign a different value to it. Example: `roles[]=guest&roles[]=participant`.
+You can add query string with key:
+
+* `roles[]` with one role. If you would like to get many roles just multiple same key `roles[]` and assign a different value to it. Example: `roles[]=guest&roles[]=participant`;
+
+* `active` as a single query string with `true` or `false` values. You can also add `active[]` as a an array as in example above. For instance `active[]=true&active[]=false`.
 
 
 > HTTP example request

@@ -675,6 +675,11 @@ uid: user@interventionauthoring.org
 <td>Array of roles of searched users</td>
 <td>false</td>
 </tr>
+<tr>
+<td>active</td>
+<td>The collection contains the scope of activated, deactivated users</td>
+<td>false</td>
+</tr>
 </tbody></table>
 <h3 id='http-request-method'>HTTP request method</h3>
 <p><code>GET</code></p>
@@ -707,7 +712,12 @@ uid: user@interventionauthoring.org
 </tr>
 </tbody></table>
 <h3 id='http-body'>HTTP body</h3><h3 id='note'>Note</h3>
-<p>You can add query string with key <code>roles[]</code> with one role. If you would like to get many roles just multiple same key <code>roles[]</code> and assign a different value to it. Example: <code>roles[]=guest&amp;roles[]=participant</code>.</p>
+<p>You can add query string with key:</p>
+
+<ul>
+<li><p><code>roles[]</code> with one role. If you would like to get many roles just multiple same key <code>roles[]</code> and assign a different value to it. Example: <code>roles[]=guest&amp;roles[]=participant</code>;</p></li>
+<li><p><code>active</code> as a single query string with <code>true</code> or <code>false</code> values. You can also add <code>active[]</code> as a an array as in example above. For instance <code>active[]=true&amp;active[]=false</code>.</p></li>
+</ul>
 
 <blockquote>
 <p>HTTP example request</p>
