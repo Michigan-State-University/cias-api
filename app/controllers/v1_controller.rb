@@ -35,4 +35,12 @@ class V1Controller < ApplicationController
   def invalidate_cache(obj)
     Rails.cache.delete(obj.cache_key)
   end
+
+  def render_json(**params)
+    path   = params[:path].presence || controller_path
+    action = params[:action].presence || action_name
+    serializer = [path, '/', action].join.classify.constantize
+
+    render json: serializer.new(params.except(:path, :action)).cached_render
+  end
 end

@@ -3,6 +3,12 @@
 class BaseSerializer
   Oj.default_options = { mode: :rails }
 
+  def initialize(obj)
+    obj.each_pair do |key, value|
+      instance_variable_set(:"@#{key}", value)
+    end
+  end
+
   def render
     Oj.dump(to_json)
   end
@@ -11,11 +17,11 @@ class BaseSerializer
     Rails.cache.fetch(cache_key) { render }
   end
 
-  def to_json # rubocop:disable Lint/ToJSON
-    raise NotImplementedError, "subclass did not define #{__method__}"
+  def to_json
+    raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 
   def cache_key
-    raise NotImplementedError, "subclass did not define #{__method__}"
+    raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 end
