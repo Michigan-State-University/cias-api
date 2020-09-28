@@ -2,7 +2,7 @@
 
 class V1::Users::Invitations::Index < BaseSerializer
   def cache_key
-    "invitations/#{@users.count}-#{@users.maximum(:updated_at)}"
+    "users/invitations/#{@users.count}-#{@users.maximum(:updated_at)}"
   end
 
   def to_json

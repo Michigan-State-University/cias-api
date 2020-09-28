@@ -172,7 +172,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/v1/invitations/:id
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/users/invitations/:id
 ```
 
 ```http
@@ -184,3 +184,67 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 ```
 
 > HTTP response 204 NO_CONTENT
+
+## Accept pending invitation
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/users/invitations`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`,`PUT
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/user/invitations
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+  "id": "2",
+  "full_name": "Peter Parker"
+  "first_name": "participant2",
+  "last_name": "Socrates",
+  "email": "a@p.com",
+  "time_zone": "Eastern Time (US & Canada)",
+  "active": true
+}
+```
+
+> HTTP response 200 OK

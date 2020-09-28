@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
       confirmations: 'v1/auth_controller/confirmations',
+      invitations: 'v1/users/invitations',
       passwords: 'v1/auth/passwords',
       registrations: 'v1/auth_controller/registrations',
       sessions: 'v1/auth_controller/sessions'
@@ -15,6 +16,7 @@ Rails.application.routes.draw do
 
     scope :users do
       scope module: 'users' do
+        resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]
       end
     end

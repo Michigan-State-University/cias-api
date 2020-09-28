@@ -2,7 +2,7 @@
 
 class V1::Users::Invitations::Show < BaseSerializer
   def cache_key
-    "invitation/#{@user.id}-#{@user.updated_at}"
+    "users/invitation/#{@user.id}-#{@user.updated_at}"
   end
 
   def to_json

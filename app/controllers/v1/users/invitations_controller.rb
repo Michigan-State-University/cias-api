@@ -19,6 +19,29 @@ class V1::Users::InvitationsController < V1Controller
     end
   end
 
+  # This endpoint will be hit from mailer link, thus it needs to be public
+  def edit
+    user = User.where.not(invitation_token: nil).find_by_invitation_token(params[:invitation_token], true) # rubocop:disable Rails/DynamicFindBy
+
+    # Unfortunetly find_by_invitation_token method doesn't raise exception when there is no user
+    # and there is no version with !
+    raise ActiveRecord::RecordNotFound if user.blank?
+
+    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}"
+  end
+
+  # This endpoint is hit from registration page to register new user from invitation
+  # link, thus there is no need for authorization
+  def update
+    user = User.accept_invitation!(accept_invitation_params)
+
+    if user.persisted?
+      render_json user: user, status: :ok
+    else
+      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     user_load.update!(invitation_token: nil)
     head :no_content
@@ -36,5 +59,9 @@ class V1::Users::InvitationsController < V1Controller
 
   def invitation_params
     params.require(:invitation).permit(:email)
+  end
+
+  def accept_invitation_params
+    params.require(:invitation).permit(:invitation_token, :password, :password_confirmation, :first_name, :last_name, :time_zone)
   end
 end
