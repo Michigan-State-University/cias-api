@@ -12,15 +12,17 @@ class Answer < ApplicationRecord
 
   validate :type_integrity_validator
 
-  scope :user_answers, lambda { |user_id, intervention_id_or_ids|
-    joins(:question).
-    where(user_id: user_id, questions: { intervention_id: intervention_id_or_ids })
+  scope :user_answers, lambda { |user_id, intervention_ids|
+    relation = joins(question: :question_group).where(user_id: user_id)
+    relation.where('question_groups.intervention_id IN(?)', intervention_ids.join(',')) if intervention_ids.any?
+    relation
   }
 
   def retrive_previous_answers
     previous_interventions_ids = question.intervention.problem.interventions.where('interventions.position < ?', question.intervention.position).ids
     previous_answers = Answer.user_answers(user_id, previous_interventions_ids)
-    current_answers = Answer.joins(:question).where(questions: { position: ..question.position }).user_answers(user_id, question.intervention)
+    current_answers = Answer.joins(question: :question_group).where(questions: { position: ..question.position }).user_answers(user_id, [question.intervention.id])
+
     previous_answers + current_answers
   end
 

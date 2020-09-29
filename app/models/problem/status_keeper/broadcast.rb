@@ -28,8 +28,8 @@ class Problem::StatusKeeper::Broadcast
   end
 
   def delete_draft_answers
-    Answer.joins(question: :intervention).where(
-      questions: { interventions: { problem_id: problem.id } }
+    Answer.joins(question: { question_group: :intervention }).where(
+      questions: { question_groups: { interventions: { problem_id: problem.id } } }
     ).destroy_all
   end
 

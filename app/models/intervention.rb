@@ -9,7 +9,9 @@ class Intervention < ApplicationRecord
   include FormulaInterface
 
   belongs_to :problem, inverse_of: :interventions, touch: true
-  has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
+  has_many :question_groups, dependent: :restrict_with_exception, inverse_of: :intervention
+  has_one :default_question_group, ->(intervention) { where(intervention: intervention, default: true) }, class_name: 'QuestionGroup', inverse_of: :intervention
+  has_many :questions, dependent: :restrict_with_exception, through: :question_groups
   has_many :answers, dependent: :restrict_with_exception, through: :questions
   has_many :intervention_invitations, dependent: :restrict_with_exception, inverse_of: :intervention
 
@@ -31,6 +33,8 @@ class Intervention < ApplicationRecord
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
+
+  after_commit :create_default_question_group, on: :create
 
   def position_less_than
     @position_less_than ||= problem.interventions.where(position: ...position).order(:position)
@@ -103,6 +107,10 @@ class Intervention < ApplicationRecord
   end
 
   private
+
+  def create_default_question_group
+    question_groups.find_or_create_by!(default: true)
+  end
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/intervention'

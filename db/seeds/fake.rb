@@ -119,9 +119,12 @@ class Fake
       (80..100).to_a.sample.times do
         sample_type = subclass_types.sample
         image_sample = images_files.sample
+        intervention = Intervention.find(intervention_ids.sample)
+        default_question_group = intervention.default_question_group
+
         question = Question.new(
           type: "Question::#{sample_type}",
-          intervention_id: intervention_ids.sample,
+          question_group: default_question_group,
           position: rand(1..100),
           title: sample_type,
           subtitle: Faker::Job.position,

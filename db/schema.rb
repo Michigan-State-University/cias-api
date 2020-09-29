@@ -131,9 +131,22 @@ ActiveRecord::Schema.define(version: 20_201_007_072_628) do
     t.index ['user_id'], name: 'index_problems_on_user_id'
   end
 
+  create_table 'question_groups', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
+    t.uuid 'intervention_id', null: false
+    t.string 'title', null: false
+    t.boolean 'default', default: false, null: false
+    t.bigint 'position', default: 0, null: false
+    t.datetime 'created_at', precision: 6, null: false
+    t.datetime 'updated_at', precision: 6, null: false
+    t.index ['default'], name: 'index_question_groups_on_default'
+    t.index %w[intervention_id title], name: 'index_question_groups_on_intervention_id_and_title', using: :gin
+    t.index ['intervention_id'], name: 'index_question_groups_on_intervention_id'
+    t.index ['title'], name: 'index_question_groups_on_title'
+  end
+
   create_table 'questions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.string 'type', null: false
-    t.uuid 'intervention_id', null: false
+    t.uuid 'question_group_id', null: false
     t.jsonb 'settings'
     t.integer 'position', default: 0, null: false
     t.string 'title', default: '', null: false
@@ -144,9 +157,9 @@ ActiveRecord::Schema.define(version: 20_201_007_072_628) do
     t.jsonb 'body'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
-    t.index ['intervention_id'], name: 'index_questions_on_intervention_id'
+    t.index ['question_group_id'], name: 'index_questions_on_question_group_id'
     t.index ['title'], name: 'index_questions_on_title'
-    t.index %w[type intervention_id title], name: 'index_questions_on_type_and_intervention_id_and_title', using: :gin
+    t.index %w[type question_group_id title], name: 'index_questions_on_type_and_question_group_id_and_title', using: :gin
     t.index %w[type title], name: 'index_questions_on_type_and_title', using: :gin
     t.index ['type'], name: 'index_questions_on_type'
   end
@@ -229,7 +242,8 @@ ActiveRecord::Schema.define(version: 20_201_007_072_628) do
   add_foreign_key 'intervention_invitations', 'interventions'
   add_foreign_key 'interventions', 'problems'
   add_foreign_key 'problems', 'users'
-  add_foreign_key 'questions', 'interventions'
+  add_foreign_key 'question_groups', 'interventions'
+  add_foreign_key 'questions', 'question_groups'
   add_foreign_key 'user_interventions', 'interventions'
   add_foreign_key 'user_interventions', 'users'
   add_foreign_key 'user_log_requests', 'users'

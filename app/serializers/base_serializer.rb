@@ -24,4 +24,12 @@ class BaseSerializer
   def cache_key
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
+
+  protected
+
+  def url_for_image(resource, attribute = :image)
+    image = resource.public_send(attribute)
+
+    polymorphic_url(image) if image.attached?
+  end
 end

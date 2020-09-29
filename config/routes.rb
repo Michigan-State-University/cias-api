@@ -40,12 +40,22 @@ Rails.application.routes.draw do
 
     post 'interventions/:id/clone', to: 'interventions#clone', as: :clone_intervention
     scope 'interventions/:intervention_id', as: 'intervention' do
-      patch 'questions/position', to: 'questions#position'
-      resources :questions, only: %i[index show create update destroy]
       scope module: 'interventions' do
         resources :invitations, only: %i[index create destroy] do
           get 'resend', on: :member
         end
+      end
+      resources :question_groups, only: %i[index show create update destroy] do
+        member do
+          patch :questions_change
+          delete :remove_questions
+        end
+      end
+    end
+
+    resources :question_groups, only: [] do
+      resources :questions, only: %i[index show create update destroy] do
+        patch :position, on: :collection
       end
     end
 

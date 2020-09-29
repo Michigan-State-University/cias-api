@@ -9,7 +9,8 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:problem) { create(:problem, user_id: researcher.id) }
   let(:intervention) { create(:intervention, problem_id: problem.id) }
-  let(:question) { create(:question_free_response, intervention_id: intervention.id) }
+  let(:question_group) { create(:question_group, intervention: intervention) }
+  let(:question) { create(:question_free_response, question_group: question_group) }
 
   before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
 
@@ -40,7 +41,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
 
     context 'response with question' do
-      let(:questions) { create_list(:question_single, 4, intervention_id: intervention.id) }
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let(:question) do
         question = questions.first
         question.formula = { 'payload' => 'a1',
@@ -57,7 +58,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
 
     context 'match nothing, return next' do
-      let(:questions) { create_list(:question_single, 4, intervention_id: intervention.id) }
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let(:question) do
         question = questions.first
         question.formula = { 'payload' => 'a1',
@@ -75,7 +76,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
 
     context 'response with feedback' do
       let(:question_feedback) do
-        question_feedback = build(:question_feedback, intervention_id: intervention.id, position: 2)
+        question_feedback = build(:question_feedback, question_group: question_group, position: 2)
         question_feedback.body = {
           data: [
             {
@@ -101,7 +102,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       end
 
       let(:question) do
-        question = build(:question_single, intervention_id: intervention.id, position: 1)
+        question = build(:question_single, question_group: question_group, position: 1)
         question.formula = { 'payload' => 'a1',
                              'patterns' => [
                                {
@@ -120,7 +121,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     context 'response with intervention' do
       let(:intervention) { create(:intervention, problem_id: problem.id, position: 2) }
 
-      let(:questions) { create_list(:question_single, 3, intervention_id: intervention.id) }
+      let(:questions) { create_list(:question_single, 3, question_group: question_group) }
       let(:question) do
         question = questions.first
         question.formula = { 'payload' => 'a1',
@@ -140,7 +141,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
 
     context 'response with question with calculated target_value' do
       let(:question_with_reflection_formula) do
-        question_single = build(:question_single, intervention_id: intervention.id, position: 2)
+        question_single = build(:question_single, question_group: question_group, position: 2)
         question_single.narrator = {
           blocks: [
             {
@@ -182,7 +183,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       end
 
       let(:question) do
-        question = build(:question_single, intervention_id: intervention.id, position: 1)
+        question = build(:question_single, question_group: question_group, position: 1)
         question.formula = { 'payload' => 'a1',
                              'patterns' => [
                                {

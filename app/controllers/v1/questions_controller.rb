@@ -36,7 +36,7 @@ class V1::QuestionsController < V1Controller
   private
 
   def questions_scope
-    Intervention.friendly.accessible_by(current_ability).find(params[:intervention_id]).questions.includes(%i[image_attachment image_blob]).order(:position)
+    QuestionGroup.accessible_by(current_ability).find(params[:question_group_id]).questions.includes(%i[image_attachment image_blob]).order(:position)
   end
 
   def question_load
@@ -44,6 +44,6 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :title, :subtitle, :video_url, :question_group_id, :position, narrator: {}, settings: {}, formula: {}, body: {})
   end
 end

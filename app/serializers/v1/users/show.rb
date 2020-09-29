@@ -16,16 +16,12 @@ class V1::Users::Show < BaseSerializer
       time_zone: @user.time_zone,
       active: @user.active,
       roles: @user.roles,
-      avatar_url: provide_avatar_url,
+      avatar_url: url_for_image(@user, :avatar),
       address_attributes: provide_address_attributes
     }
   end
 
   private
-
-  def provide_avatar_url
-    polymorphic_url(@user.avatar) if @user.avatar.attached?
-  end
 
   def provide_address_attributes
     address = @user.address || ::NullAddress.new

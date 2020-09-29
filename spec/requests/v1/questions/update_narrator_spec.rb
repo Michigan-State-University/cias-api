@@ -8,7 +8,7 @@ class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   end
 end
 
-RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :request do
+RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
 
   let(:q_narrator_turn_off) { create(:question_single, :narrator_turn_off) }
@@ -18,12 +18,12 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   let(:q_narrator_blocks_types) { create(:question_single, :narrator_blocks_types) }
   let(:q_narrator_blocks_with_speech_empty) { create(:question_single, :narrator_blocks_with_speech_empty) }
 
-  let(:i_narrator_turn_off) { q_narrator_turn_off.intervention }
-  let(:i_narrator_blocks_empty) { q_narrator_blocks_empty.intervention }
-  let(:i_narrator_block_one) { q_narrator_block_one.intervention }
-  let(:i_narrator_block_one_another_type) { q_narrator_block_one_another_type.intervention }
-  let(:i_narrator_blocks_types) { q_narrator_blocks_types.intervention }
-  let(:i_narrator_blocks_with_speech_empty) { q_narrator_blocks_with_speech_empty.intervention }
+  let(:qg_narrator_turn_off) { q_narrator_turn_off.question_group }
+  let(:qg_narrator_blocks_empty) { q_narrator_blocks_empty.question_group }
+  let(:qg_narrator_block_one) { q_narrator_block_one.question_group }
+  let(:qg_narrator_block_one_another_type) { q_narrator_block_one_another_type.question_group }
+  let(:qg_narrator_blocks_types) { q_narrator_blocks_types.question_group }
+  let(:qg_narrator_blocks_with_speech_empty) { q_narrator_blocks_with_speech_empty.question_group }
 
   let(:headers) { user.create_new_auth_token }
 
@@ -418,7 +418,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   end
 
   let(:params) { params_turn_on }
-  let(:intervention_id) { i_narrator_turn_off.id }
+  let(:question_group_id) { qg_narrator_turn_off.id }
   let(:question_id) { q_narrator_turn_off.id }
   let(:narrator) { json_response['data']['attributes']['narrator'] }
 
@@ -429,7 +429,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     allow(Google::Cloud::TextToSpeech).to receive(:text_to_speech).and_return(tts_instance)
     allow(tts_instance).to receive(:synthesize_speech).and_return(speech_response_instance)
 
-    patch v1_intervention_question_path(intervention_id: intervention_id, id: question_id), headers: headers, params: params, as: :json
+    patch v1_question_group_question_path(question_group_id: question_group_id, id: question_id), headers: headers, params: params, as: :json
   end
 
   context 'switching narrator' do
@@ -451,7 +451,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
       end
 
       context 'when narrator has voice blocks' do
-        let(:intervention_id) { i_narrator_blocks_types.id }
+        let(:question_group_id) { qg_narrator_blocks_types.id }
         let(:question_id) { q_narrator_blocks_types.id }
 
         it { expect(response).to have_http_status(:ok) }
@@ -474,7 +474,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
   context 'was no block' do
     context 'params without block' do
-      let(:intervention_id) { i_narrator_blocks_empty.id }
+      let(:question_group_id) { qg_narrator_blocks_empty.id }
       let(:question_id) { q_narrator_blocks_empty.id }
       let(:params) { params_empty_block }
 
@@ -563,7 +563,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   end
 
   context 'was block' do
-    let(:intervention_id) { i_narrator_block_one.id }
+    let(:question_group_id) { qg_narrator_block_one.id }
     let(:question_id) { q_narrator_block_one.id }
 
     context 'params without block' do
@@ -650,7 +650,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   end
 
   context 'was blocks, params with' do
-    let(:intervention_id) { i_narrator_blocks_types.id }
+    let(:question_group_id) { qg_narrator_blocks_types.id }
     let(:question_id) { q_narrator_blocks_types.id }
 
     context 'less blocks' do

@@ -2,10 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :request do
+RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention) }
-  let(:question) { create(:question_slider, intervention_id: intervention.id) }
+  let(:question_group) { create(:question_group) }
+  let(:question) { create(:question_slider, question_group: question_group) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
@@ -33,7 +33,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
   context 'when auth' do
     context 'is invalid' do
-      before { patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id) }
+      before { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id) }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -43,7 +43,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
     end
 
     context 'is valid' do
-      before { patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), params: params, headers: headers }
+      before { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params, headers: headers }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -56,7 +56,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
   context 'when response' do
     context 'is JSON' do
       before do
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), headers: headers
+        patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -64,7 +64,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/questions/:id', type: :
 
     context 'contains' do
       before do
-        patch v1_intervention_question_path(intervention_id: intervention.id, id: question.id), params: params, headers: headers
+        patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params, headers: headers
       end
 
       it 'to hash success' do

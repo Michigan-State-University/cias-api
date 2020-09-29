@@ -4,7 +4,7 @@ module DefaultValues
   include MetaOperations
 
   def assign_default_values(attr)
-    default_values_dictionary[de_constantize_modulize_name.downcase][attr.to_s]
+    default_values_dictionary[de_constantize_modulize_name.underscore][attr.to_s]
   end
 
   private

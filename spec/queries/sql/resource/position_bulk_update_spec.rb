@@ -7,9 +7,10 @@ RSpec.describe 'PositionBulkUpdate', type: :model do
   let(:interventions) { create_list(:intervention, 3, problem_id: problem.id) }
 
   let(:intervention) { create(:intervention) }
-  let(:question_1) { create(:question_slider, intervention_id: intervention.id, position: 1) }
-  let(:question_2) { create(:question_bar_graph, intervention_id: intervention.id, position: 2) }
-  let(:question_3) { create(:question_information, intervention_id: intervention.id, position: 3) }
+  let(:question_group) { create(:question_group, intervention: intervention) }
+  let(:question_1) { create(:question_slider, question_group_id: question_group.id, position: 1) }
+  let(:question_2) { create(:question_bar_graph, question_group_id: question_group.id, position: 2) }
+  let(:question_3) { create(:question_information, question_group_id: question_group.id, position: 3) }
   let(:question_position_params) do
     {
       position: [

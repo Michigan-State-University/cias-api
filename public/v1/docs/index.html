@@ -355,6 +355,32 @@
               </ul>
           </li>
           <li>
+            <a href="#QuestionGroup" class="toc-h1 toc-link" data-title="QuestionGroup">QuestionGroup</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-all-questions-groups-from-single-intervention" class="toc-h2 toc-link" data-title="Get all questions groups from single intervention">Get all questions groups from single intervention</a>
+                  </li>
+                  <li>
+                    <a href="#get-single-questions-group" class="toc-h2 toc-link" data-title="Get single questions group">Get single questions group</a>
+                  </li>
+                  <li>
+                    <a href="#create-new-questions-group" class="toc-h2 toc-link" data-title="Create new questions group">Create new questions group</a>
+                  </li>
+                  <li>
+                    <a href="#update-questions-group" class="toc-h2 toc-link" data-title="Update questions group">Update questions group</a>
+                  </li>
+                  <li>
+                    <a href="#remove-questions-group" class="toc-h2 toc-link" data-title="Remove questions group">Remove questions group</a>
+                  </li>
+                  <li>
+                    <a href="#add-new-questions-to-questions-group" class="toc-h2 toc-link" data-title="Add new questions to questions group">Add new questions to questions group</a>
+                  </li>
+                  <li>
+                    <a href="#remove-questions-from-questions-group" class="toc-h2 toc-link" data-title="Remove questions from questions group">Remove questions from questions group</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#question" class="toc-h1 toc-link" data-title="Question">Question</a>
               <ul class="toc-list-h2">
                   <li>
@@ -2887,6 +2913,704 @@ uid: user@interventionauthoring.org
 </span></code></pre>
 <blockquote>
 <p>HTTP response 200 OK</p>
+</blockquote>
+<h1 id='QuestionGroup'>QuestionGroup</h1><h2 id='get-all-questions-groups-from-single-intervention'>Get all questions groups from single intervention</h2><h3 id='resource'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups</code></p>
+<h3 id='url-parameters'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method'>HTTP request method</h3>
+<p><code>GET</code></p>
+<h3 id='http-headers'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body'>HTTP body</h3><h3 id='note'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/:intervention_idquestion_groups
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"question_groups"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"intervention_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::FreeResponse"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"image"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"video"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Title"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Subtitle"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"narrator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"voice"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"animation"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"image_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"video_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"formula"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"payload"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"patterns"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Body"</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='get-single-questions-group'>Get single questions group</h2><h3 id='resource-2'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups/:id</code></p>
+<h3 id='url-parameters-2'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>QuestionGroup ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-2'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-2'>HTTP request method</h3>
+<p><code>GET</code></p>
+<h3 id='http-headers-2'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-2'>HTTP body</h3><h3 id='note-2'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">GET /v1/interventions/:intervention_id/question_groups/:id
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Title"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"intervention_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::FreeResponse"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"image"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"video"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Subtitle"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"narrator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"voice"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"animation"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"image_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"video_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"formula"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"payload"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"patterns"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Body"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='create-new-questions-group'>Create new questions group</h2><h3 id='resource-3'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups</code></p>
+<h3 id='url-parameters-3'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-3'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-3'>HTTP request method</h3>
+<p><code>POST</code></p>
+<h3 id='http-headers-3'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-3'>HTTP body</h3><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"question_group"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="mi">2</span><span class="p">,</span><span class="w">
+      </span><span class="mi">3</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='note-3'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">POST /v1/interventions/:intervention_id/question_groups
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 201 CREATED</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Title"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"intervention_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::FreeResponse"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"image"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"video"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Subtitle"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"narrator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"voice"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"animation"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"image_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"video_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"formula"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"payload"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"patterns"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Body"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='update-questions-group'>Update questions group</h2><h3 id='resource-4'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups/:id</code></p>
+<h3 id='url-parameters-4'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>QuestionGroup ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-4'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-4'>HTTP request method</h3>
+<p><code>PATCH</code> | <code>PUT</code></p>
+<h3 id='http-headers-4'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-4'>HTTP body</h3><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"question_group"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"intervention_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='note-4'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">PATCH /v1/interventions/:intervention_id/question_groups/:id
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Title"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"intervention_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::FreeResponse"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"image"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"video"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Subtitle"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"narrator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"voice"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"animation"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"image_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"video_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"formula"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"payload"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"patterns"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Body"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='remove-questions-group'>Remove questions group</h2><h3 id='resource-5'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups/:id</code></p>
+<h3 id='url-parameters-5'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>QuestionGroup ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-5'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-5'>HTTP request method</h3>
+<p><code>DELETE</code></p>
+<h3 id='http-headers-5'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-5'>HTTP body</h3><h3 id='note-5'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/interventions/:intervention_id/question_groups/:id
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 204 NO_CONTENT</p>
+</blockquote>
+<h2 id='add-new-questions-to-questions-group'>Add new questions to questions group</h2><h3 id='resource-6'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups/:id/add_questions</code></p>
+<h3 id='url-parameters-6'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>QuestionGroup ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-6'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-6'>HTTP request method</h3>
+<p><code>PATCH</code></p>
+<h3 id='http-headers-6'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-6'>HTTP body</h3><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"question_group"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='note-6'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/interventions/:intervention_id/question_groups/:id/add_questions
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 200 OK</p>
+</blockquote>
+<pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Title"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"intervention_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question::FreeResponse"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"image"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"video"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"position"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"subtitle"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Subtitle"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"narrator"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"blocks"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"settings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"voice"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"animation"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"image_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"video_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"formula"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"payload"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"patterns"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"body"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Question Body"</span><span class="w">
+  </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h2 id='remove-questions-from-questions-group'>Remove questions from questions group</h2><h3 id='resource-7'>Resource</h3>
+<p><code>/v1/interventions/:intervention_id/question_groups/:id/remove_questions</code></p>
+<h3 id='url-parameters-7'>URL parameters</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>intervention_id</td>
+<td>Intervention ID</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>id</td>
+<td>QuestionGroup ID</td>
+<td>yes</td>
+</tr>
+</tbody></table>
+<h3 id='query-string-7'>Query String</h3>
+<table><thead>
+<tr>
+<th>Parameter</th>
+<th>Description</th>
+<th>Required</th>
+</tr>
+</thead><tbody>
+</tbody></table>
+<h3 id='http-request-method-7'>HTTP request method</h3>
+<p><code>DELETE</code></p>
+<h3 id='http-headers-7'>HTTP headers</h3>
+<table><thead>
+<tr>
+<th>Key</th>
+<th>Value</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Content-Type</td>
+<td>application/json; charset=utf-8</td>
+</tr>
+<tr>
+<td>access-token</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>token-type</td>
+<td>Bearer</td>
+</tr>
+<tr>
+<td>client</td>
+<td>xxxyyyzzz</td>
+</tr>
+<tr>
+<td>uid</td>
+<td>email</td>
+</tr>
+</tbody></table>
+<h3 id='http-body-7'>HTTP body</h3><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"question_group"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"questions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre><h3 id='note-7'>Note</h3>
+<blockquote>
+<p>HTTP example request</p>
+</blockquote>
+<pre class="highlight http tab-http"><code><span class="err">DELETE /v1/interventions/:intervention_id/question_groups/:id/remove_questions
+</span></code></pre><pre class="highlight http tab-http"><code><span class="err">Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@
+</span></code></pre>
+<blockquote>
+<p>HTTP response 204 NO_CONTENT</p>
 </blockquote>
 <h1 id='question'>Question</h1><h2 id='get-all-questions'>Get all questions</h2><h3 id='resource'>Resource</h3>
 <p><code>localhost:3000/v1/interventions/:intervention_id/questions</code></p>

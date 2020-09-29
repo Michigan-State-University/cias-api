@@ -7,8 +7,21 @@ RSpec.describe Intervention, type: :model do
     subject { create(:intervention) }
 
     it { should belong_to(:problem) }
+    it { should have_many(:question_groups) }
     it { should have_many(:questions) }
     it { should be_valid }
+
+    describe '#create_default_question_group' do
+      let(:new_intervention)   { build(:intervention) }
+      let(:new_question_group) { new_intervention.question_groups.first }
+
+      it 'creates new default question group' do
+        expect { new_intervention.save! }.to change(QuestionGroup, :count).by(1)
+
+        expect(new_question_group.title).to eq 'Default Screen Group'
+        expect(new_question_group.position).to eq 0
+      end
+    end
   end
 
   context 'calc schedule' do

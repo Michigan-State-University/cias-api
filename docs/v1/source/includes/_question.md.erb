@@ -5,14 +5,14 @@
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions`
+`<%= ENV['APP_HOSTNAME'] %>/v1/question_groups/:question_group_id/questions`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+question_group_id | QuestionGroup ID | yes
 
 
 ### Query String
@@ -40,7 +40,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions
+GET <%= ENV['APP_HOSTNAME'] %>/v1/question_groups/1/questions
 ```
 
 ```http
@@ -60,14 +60,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/question_groups/:question_group/questions/:id`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+question_group_id | QuestionGroup ID | yes
 id | Question ID | yes
 
 
@@ -96,7 +96,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions/1
+GET <%= ENV['APP_HOSTNAME'] %>/v1/question_groups/1/questions/1
 ```
 
 ```http
@@ -116,14 +116,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions`
+`<%= ENV['APP_HOSTNAME'] %>/v1/question_groups/:question_group_id/questions`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+question_group_id | QuestionGroup ID | yes
 
 
 ### Query String
@@ -188,7 +188,7 @@ Required keys:
 > HTTP example request
 
 ```http
-POST <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions
+POST <%= ENV['APP_HOSTNAME'] %>/v1/question_groups/1/questions
 ```
 
 ```http
@@ -284,14 +284,14 @@ Resource for update position of questions.
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/position`
+`<%= ENV['APP_HOSTNAME'] %>/v1/question_groups/:question_group_id/questions/position`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+question_group_id | QuestionGroup ID | yes
 
 
 ### Query String
@@ -334,7 +334,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions/position
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/question_groups/1/questions/position
 ```
 
 ```http
@@ -372,14 +372,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/question_groups/:question_group_id/questions/:id`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+question_group_id | QuestionGroup ID | yes
 id | Question ID | yes
 
 
@@ -440,7 +440,7 @@ Required keys:
 > HTTP example request
 
 ```http
-PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions/1
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/question_groups/1/questions/1
 ```
 
 ```http
@@ -475,14 +475,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/questions/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/question_groups/:question_group_id/questions/:id`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+question_group_id | QuestionGroup ID | yes
 id | Question ID | yes
 
 
@@ -511,7 +511,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/questions/1
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/question_groups/1/questions/1
 ```
 
 ```http

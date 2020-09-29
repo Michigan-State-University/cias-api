@@ -20,7 +20,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_slider, class: Question::Slider do
@@ -42,7 +42,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_bar_graph, class: Question::BarGraph do
@@ -66,7 +66,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_feedback, class: Question::Feedback do
@@ -95,7 +95,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_follow_up_contact, class: Question::FollowUpContact do
@@ -119,7 +119,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_grid, class: Question::Grid do
@@ -158,7 +158,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_information, class: Question::Information do
@@ -170,7 +170,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_multiple, class: Question::Multiple do
@@ -211,7 +211,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
 
     trait :body_data_empty do
       body { { data: [] } }
@@ -234,7 +234,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 
   factory :question_single, class: Question::Single do
@@ -259,7 +259,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
 
     trait :body_data_empty do
       body { { data: [] } }
@@ -457,7 +457,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
 
     trait :body_data_empty do
       body { { data: [] } }
@@ -480,6 +480,6 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :intervention
+    association :question_group
   end
 end

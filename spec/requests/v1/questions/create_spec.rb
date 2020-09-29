@@ -2,9 +2,9 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :request do
+RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention) }
+  let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
@@ -56,7 +56,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_intervention_questions_path(intervention.id) }
+      before { post v1_question_group_questions_path(question_group.id) }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -66,7 +66,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
     end
 
     context 'is valid' do
-      before { post v1_intervention_questions_path(intervention.id), params: params, headers: headers }
+      before { post v1_question_group_questions_path(question_group.id), params: params, headers: headers }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -79,7 +79,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
   context 'when response' do
     context 'is JSON' do
       before do
-        post v1_intervention_questions_path(intervention.id), params: params, headers: headers
+        post v1_question_group_questions_path(question_group.id), params: params, headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -87,7 +87,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/questions', type: :reque
 
     context 'is JSON and parse' do
       before do
-        post v1_intervention_questions_path(intervention.id), params: params, headers: headers
+        post v1_question_group_questions_path(question_group.id), params: params, headers: headers
       end
 
       it 'success to Hash' do

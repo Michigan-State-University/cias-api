@@ -6,7 +6,7 @@ class Question < ApplicationRecord
   include Clone
   include FormulaInterface
 
-  belongs_to :intervention, inverse_of: :questions, touch: true
+  belongs_to :question_group, inverse_of: :questions, touch: true
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
   attribute :narrator, :json, default: assign_default_values('narrator')
@@ -26,6 +26,8 @@ class Question < ApplicationRecord
   validates :narrator, json: { schema: -> { Rails.root.join("#{json_schema_path}/narrator.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
+
+  delegate :intervention, to: :question_group
 
   def subclass_name
     self.class.to_s.demodulize

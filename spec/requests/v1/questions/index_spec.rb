@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/interventions/:intervention_id/questions', type: :request do
+RSpec.describe 'GET /v1/interventions/:qusetion_group_id/questions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention) }
+  let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_intervention_questions_path(intervention.id) }
+      before { get v1_question_group_questions_path(question_group.id) }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -19,7 +19,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/questions', type: :reques
     end
 
     context 'is valid' do
-      before { get v1_intervention_questions_path(intervention.id), headers: headers }
+      before { get v1_question_group_questions_path(question_group.id), headers: headers }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -32,7 +32,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/questions', type: :reques
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_intervention_questions_path(intervention.id), headers: headers
+        get v1_question_group_questions_path(question_group.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -40,7 +40,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/questions', type: :reques
 
     context 'is JSON and parse' do
       before do
-        get v1_intervention_questions_path(intervention.id), headers: headers
+        get v1_question_group_questions_path(question_group.id), headers: headers
       end
 
       it 'success to Hash' do

@@ -1,0 +1,595 @@
+# QuestionGroup
+
+
+## Get all question groups from single intervention
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_idquestion_groups
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+```json
+{
+  "question_groups": [
+    "id": 1,
+    "title": "Title",
+    "position": 1,
+    "intervention_id": 1,
+    "questions": [
+      "type": "Question::FreeResponse",
+      "settings": {
+        "image": false,
+        "video": false,
+        "required": true,
+        "subtitle": true
+      },
+      "position": 1,
+      "title": "Question Title",
+      "subtitle": "Question Subtitle",
+      "narrator": {
+        "blocks": [],
+        "settings": {
+          "voice": true,
+          "animation": true
+        }
+      },
+      "image_url": "",
+      "video_url": "",
+      "formula": {
+        "payload": "",
+        "patterns": []
+      },
+      "body": "Question Body"
+    ]
+  ]
+}
+```
+
+## Get single question group
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+id | QuestionGroup ID | yes
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+```json
+{
+  "id": 1,
+  "title": "Title",
+  "position": 1,
+  "intervention_id": 1,
+  "questions": [
+    "type": "Question::FreeResponse",
+    "settings": {
+      "image": false,
+      "video": false,
+      "required": true,
+      "subtitle": true
+    },
+    "position": 1,
+    "title": "Question Title",
+    "subtitle": "Question Subtitle",
+    "narrator": {
+      "blocks": [],
+      "settings": {
+        "voice": true,
+        "animation": true
+      }
+    },
+    "image_url": "",
+    "video_url": "",
+    "formula": {
+      "payload": "",
+      "patterns": []
+    },
+    "body": "Question Body"
+  ]
+}
+```
+
+## Create new question group
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+```json
+{
+  "question_group": {
+    "title": "Title",
+    "position": 1,
+    "questions": [
+      1,
+      2,
+      3
+    ]
+  }
+}
+```
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 201 CREATED
+
+```json
+{
+  "id": 1,
+  "title": "Title",
+  "position": 1,
+  "intervention_id": 1,
+  "questions": [
+    "type": "Question::FreeResponse",
+    "settings": {
+      "image": false,
+      "video": false,
+      "required": true,
+      "subtitle": true
+    },
+    "position": 1,
+    "title": "Question Title",
+    "subtitle": "Question Subtitle",
+    "narrator": {
+      "blocks": [],
+      "settings": {
+        "voice": true,
+        "animation": true
+      }
+    },
+    "image_url": "",
+    "video_url": "",
+    "formula": {
+      "payload": "",
+      "patterns": []
+    },
+    "body": "Question Body"
+  ]
+}
+```
+
+## Update question group
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+id | QuestionGroup ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH` | `PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+```json
+{
+  "question_group": {
+    "title": "New Title",
+    "position": 2,
+    "intervention_id": 1
+  }
+}
+```
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+```json
+{
+  "id": 1,
+  "title": "Title",
+  "position": 1,
+  "intervention_id": 1,
+  "questions": [
+    "type": "Question::FreeResponse",
+    "settings": {
+      "image": false,
+      "video": false,
+      "required": true,
+      "subtitle": true
+    },
+    "position": 1,
+    "title": "Question Title",
+    "subtitle": "Question Subtitle",
+    "narrator": {
+      "blocks": [],
+      "settings": {
+        "voice": true,
+        "animation": true
+      }
+    },
+    "image_url": "",
+    "video_url": "",
+    "formula": {
+      "payload": "",
+      "patterns": []
+    },
+    "body": "Question Body"
+  ]
+}
+```
+
+## Remove question group
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+id | QuestionGroup ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 204 NO_CONTENT
+
+## Add new questions to question group
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/add_questions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+id | QuestionGroup ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+```json
+{
+  "question_group": {
+    "questions": [1, 2]
+  }
+}
+```
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/add_questions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+```json
+{
+  "id": 1,
+  "title": "Title",
+  "position": 1,
+  "intervention_id": 1,
+  "questions": [
+    "type": "Question::FreeResponse",
+    "settings": {
+      "image": false,
+      "video": false,
+      "required": true,
+      "subtitle": true
+    },
+    "position": 1,
+    "title": "Question Title",
+    "subtitle": "Question Subtitle",
+    "narrator": {
+      "blocks": [],
+      "settings": {
+        "voice": true,
+        "animation": true
+      }
+    },
+    "image_url": "",
+    "video_url": "",
+    "formula": {
+      "payload": "",
+      "patterns": []
+    },
+    "body": "Question Body"
+  ]
+}
+```
+
+## Remove questions from question group
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/remove_questions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+intervention_id | Intervention ID | yes
+id | QuestionGroup ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+```json
+{
+  "question_group": {
+    "questions": [1, 2]
+  }
+}
+```
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/remove_questions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 204 NO_CONTENT
