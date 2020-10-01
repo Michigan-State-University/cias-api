@@ -12,6 +12,7 @@ class User < ApplicationRecord
          :trackable,
          :validatable
 
+  extend DefaultValues
   include DeviseTokenAuth::Concerns::User
   include EnumerateForConcern
 
@@ -39,6 +40,7 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :address
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
+  attribute :roles, :string, array: true, default: assign_default_values('roles')
 
   scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }

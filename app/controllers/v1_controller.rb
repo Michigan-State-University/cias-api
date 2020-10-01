@@ -15,7 +15,7 @@ class V1Controller < ApplicationController
 
   def guest_user
     @guest_user ||= User.new.tap do |u|
-      u.roles.push('guest')
+      u.roles = %w[guest]
       u.skip_confirmation!
     end
   end

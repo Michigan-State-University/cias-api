@@ -11,17 +11,13 @@ class Ability::Base
   end
 
   def definition
-    default if user.roles.present?
+    can %i[read update], User, id: user.id
+    cannot :update, User, %i[deactivated roles]
   end
 
   private
 
   def class_name
     self.class.name.demodulize.underscore
-  end
-
-  def default
-    can %i[read update], User, id: user.id
-    cannot :update, User, %i[active roles]
   end
 end
