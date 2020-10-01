@@ -20,7 +20,7 @@ class V1::UsersController < V1Controller
   end
 
   def destroy
-    user_load.destroy
+    user_load.deactivate!
     head :no_content
   end
 

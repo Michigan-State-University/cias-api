@@ -38,6 +38,17 @@ describe 'POST /v1/users/invitations', type: :request do
       end
     end
 
+    context 'when email that already exists in system provided' do
+      let!(:existing_user) { create(:user, :researcher, email: 'test@example.com') }
+
+      it 'returns unprocessable_entity status' do
+        request
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(json_response['error']).to eq 'Email already exists in system.'
+      end
+    end
+
     context 'when invalid params provided' do
       let(:params) do
         {

@@ -27,7 +27,7 @@ describe 'DELETE /v1/users/invitations', type: :request do
       request
 
       expect(response).to have_http_status(:no_content)
-      expect(user_with_pending_invitation.reload.invitation_token).to eq nil
+      expect(User.find_by(email: 'test@example.com')).to eq nil
     end
   end
 end

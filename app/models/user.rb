@@ -34,7 +34,7 @@ class User < ApplicationRecord
   has_many :problems, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_problems, dependent: :restrict_with_exception, inverse_of: :user
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :user
-  has_many :user_logs_requests, dependent: :restrict_with_exception
+  has_many :user_log_requests, dependent: :destroy
   has_one :address, dependent: :destroy, inverse_of: :user
 
   accepts_nested_attributes_for :address
@@ -72,7 +72,7 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
-  def destroy
+  def deactivate!
     update!(active: false) if active
   end
 
