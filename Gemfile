@@ -6,7 +6,7 @@ ruby '2.7.1'
 
 gem 'rails', '~> 6.0'
 gem 'pg', '~> 1.2'
-gem 'puma', github: 'puma/puma', tag: 'v5.0.0.beta2'
+gem 'puma', '~> 5.0'
 
 gem 'aasm'
 gem 'activerecord_json_validator'
