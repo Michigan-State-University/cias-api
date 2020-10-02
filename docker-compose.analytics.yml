@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+
+  database_data_visualisation:
+    image: metabase/metabase
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
+    depends_on:
+      - database
+    volumes:
+      - vol_database_data_visualisation:/metabase-data
+    ports:
+      - '3002:3000'
+
+  database_ddl_inspect:
+    image: ankane/pghero
+    environment:
+      - DATABASE_URL=postgres://postgres:7AU0lHRd5OglmKO@database:5432/cias_development
+    depends_on:
+      - database
+    ports:
+      - '3004:8080'
+
+volumes:
+  vol_database_data_visualisation:

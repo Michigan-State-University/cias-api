@@ -1,6 +1,7 @@
 FROM ruby:2.7.1
 ENV RUBYOPT="--jit"
-RUN apt-get update -qq && apt-get install -y build-essential libpq-dev && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+RUN apt-get update -qq && apt-get install -y build-essential libpq-dev libjemalloc2 && apt-get clean autoclean && apt-get autoremove -y && rm -rf /var/lib/apt /var/lib/dpkg /var/lib/cache /var/lib/log
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 RUN mkdir /api
 WORKDIR /api
 COPY Gemfile /api/Gemfile

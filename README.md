@@ -70,8 +70,8 @@
 * Retrieve and save credentials file in order to use:
   * Google Cloud Platform: `./cias-api-50c1a8455413.json`.
 * `$ docker-compose up --build`
+* `$ docker-compose exec api bundle exec rails db:reset`
 * `$ docker-compose exec api bundle exec rails db:environment:set RAILS_ENV=development`
-* `$ docker-compose exec api bundle exec rails db:reset db:seed`
 * If you would like to seed your database by:
   * Role based users: `$ docker-compose exec api bundle exec rails db:seed`
   * Fake data: `$ docker-compose exec api bundle exec rails db:seed:fake`
@@ -85,3 +85,6 @@
 * `localhost:3000/rails/info/properties`
 * `localhost:3000/rails/info/routes`
 * `localhost:3000/rails/workers`
+
+You can inspect the database. We're providing additional containers. Just execute:
+* `$ docker-compose -f docker-compose.yml -f docker-compose.analytics.yml up --build`

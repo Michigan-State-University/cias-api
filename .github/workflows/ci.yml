@@ -7,7 +7,7 @@ jobs:
       image: ruby:2.7.1
     services:
       database:
-        image: postgres:13
+        image: postgres:13.0-alpine
         env:
           POSTGRES_PASSWORD: 7AU0lHRd5OglmKO
         ports: ['5432:5432']
@@ -17,7 +17,7 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       cache:
-        image: redis:6.0.6
+        image: redis:6.0.8-alpine
         ports: ['6379:6379']
         options: --entrypoint redis-server
 
