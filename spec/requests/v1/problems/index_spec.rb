@@ -20,7 +20,7 @@ RSpec.describe 'GET /v1/problems', type: :request do
       let(:problems_scope) { admin_problems + researcher_problems + problems_for_guests }
 
       it 'returns proper problems' do
-        expect(json_response['data'].pluck('id')).to match_array problems_scope.map(&:id)
+        expect(json_response['problems'].pluck('id')).to match_array problems_scope.map(&:id)
       end
     end
 
@@ -29,7 +29,7 @@ RSpec.describe 'GET /v1/problems', type: :request do
       let(:problems_scope) { admin_problems + problems_for_guests }
 
       it 'returns proper error message' do
-        expect(json_response['data'].pluck('id')).to match_array problems_scope.map(&:id)
+        expect(json_response['problems'].pluck('id')).to match_array problems_scope.map(&:id)
       end
     end
 
@@ -38,7 +38,7 @@ RSpec.describe 'GET /v1/problems', type: :request do
       let(:problems_scope) { researcher_problems }
 
       it 'returns proper problems' do
-        expect(json_response['data'].pluck('id')).to match_array problems_scope.map(&:id)
+        expect(json_response['problems'].pluck('id')).to match_array problems_scope.map(&:id)
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe 'GET /v1/problems', type: :request do
       let(:problems_scope) { problems_for_guests }
 
       it 'returns proper problems' do
-        expect(json_response['data'].pluck('id')).to match_array problems_scope.map(&:id)
+        expect(json_response['problems'].pluck('id')).to match_array problems_scope.map(&:id)
       end
     end
   end

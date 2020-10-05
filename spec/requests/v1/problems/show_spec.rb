@@ -20,14 +20,14 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
 
     context 'has role admin' do
       it 'contains proper attributes' do
-        expect(json_response['data']['attributes']).to include(
+        expect(json_response).to include(
           'name' => 'Some problem',
           'shared_to' => 'registered'
         )
       end
 
       it 'contains proper interventions collection' do
-        expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+        expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
       end
     end
 
@@ -38,14 +38,14 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         let(:shared_to) { %w[anyone registered].sample }
 
         it 'contains proper attributes' do
-          expect(json_response['data']['attributes']).to include(
+          expect(json_response).to include(
             'name' => 'Some problem',
             'shared_to' => shared_to
           )
         end
 
         it 'contains proper interventions collection' do
-          expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
         end
       end
 
@@ -62,14 +62,14 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
           let(:users) { [participant] }
 
           it 'contains proper attributes' do
-            expect(json_response['data']['attributes']).to include(
+            expect(json_response).to include(
               'name' => 'Some problem',
               'shared_to' => shared_to
             )
           end
 
           it 'contains proper interventions collection' do
-            expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+            expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
           end
         end
       end
@@ -88,14 +88,14 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         let(:problem_user) { researcher }
 
         it 'contains proper attributes' do
-          expect(json_response['data']['attributes']).to include(
+          expect(json_response).to include(
             'name' => 'Some problem',
             'shared_to' => 'registered'
           )
         end
 
         it 'contains proper interventions collection' do
-          expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
         end
       end
     end
@@ -113,14 +113,14 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         let(:shared_to) { 'anyone' }
 
         it 'contains proper attributes' do
-          expect(json_response['data']['attributes']).to include(
+          expect(json_response).to include(
             'name' => 'Some problem',
             'shared_to' => 'anyone'
           )
         end
 
         it 'contains proper interventions collection' do
-          expect(json_response['data']['attributes']['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
         end
       end
     end

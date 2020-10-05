@@ -6,11 +6,11 @@ class V1::ProblemsController < V1Controller
   authorize_resource only: %i[create update]
 
   def index
-    render json: serialized_response(problems_scope)
+    render_json problems: problems_scope
   end
 
   def show
-    render json: serialized_response(problem_load)
+    render_json problem: problem_load
   end
 
   def create
