@@ -3,7 +3,7 @@
 class Address < ApplicationRecord
   belongs_to :user, inverse_of: :address
 
-  def formatted
+  def formatted_usa
     %(
       #{user.full_name}
       #{street} #{apartment_number} #{building_address}

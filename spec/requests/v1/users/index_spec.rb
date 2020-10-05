@@ -48,8 +48,8 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
-        expect(json_response['data'].size).to eq 5
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+        expect(json_response['users'].size).to eq 5
       end
     end
 
@@ -63,8 +63,8 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
-        expect(json_response['data'].size).to eq 2
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+        expect(json_response['users'].size).to eq 2
       end
     end
 
@@ -78,8 +78,8 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
-        expect(json_response['data'].size).to eq 2
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+        expect(json_response['users'].size).to eq 2
       end
     end
 
@@ -93,7 +93,7 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].size).to eq 0
+        expect(json_response['users'].size).to eq 0
       end
     end
 
@@ -107,7 +107,7 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].size).to eq 2
+        expect(json_response['users'].size).to eq 2
       end
     end
   end
@@ -126,8 +126,8 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
-        expect(json_response['data'].size).to eq 4
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+        expect(json_response['users'].size).to eq 4
       end
     end
 
@@ -141,8 +141,8 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
-        expect(json_response['data'].size).to eq 2
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+        expect(json_response['users'].size).to eq 2
       end
     end
 
@@ -156,8 +156,8 @@ RSpec.describe 'GET /v1/users', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
-        expect(json_response['data'].size).to eq 1
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+        expect(json_response['users'].size).to eq 1
       end
     end
   end

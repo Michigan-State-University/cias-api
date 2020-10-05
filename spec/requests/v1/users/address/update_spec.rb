@@ -51,7 +51,7 @@ RSpec.describe 'PATCH /v1/users/:id', type: :request do
       end
 
       it 'address is empty' do
-        expect(json_response['data']['attributes']['address_attributes'].compact.empty?).to be true
+        expect(json_response['address_attributes'].compact.empty?).to be true
       end
     end
 
@@ -61,7 +61,7 @@ RSpec.describe 'PATCH /v1/users/:id', type: :request do
       end
 
       it 'returns nil in every address attribute' do
-        expect(json_response['data']['attributes']['address_attributes'].compact.empty?).to be true
+        expect(json_response['address_attributes'].compact.empty?).to be true
       end
     end
 
@@ -71,7 +71,7 @@ RSpec.describe 'PATCH /v1/users/:id', type: :request do
       end
 
       it 'address containst one key' do
-        expect(json_response['data']['attributes']['address_attributes']).to have_key('name')
+        expect(json_response['address_attributes']).to have_key('name')
       end
     end
 
@@ -81,10 +81,12 @@ RSpec.describe 'PATCH /v1/users/:id', type: :request do
       end
 
       it 'address keys assigned' do
-        expect(json_response['data']['attributes']['address_attributes']).to include('name' => 'name',
-                                                                                     'country' => 'United States of America', 'state' => 'state', 'state_abbreviation' => 'state_abbr',
-                                                                                     'city' => 'city', 'zip_code' => 'zip_code', 'street' => 'street_name', 'building_address' => 'building_number',
-                                                                                     'apartment_number' => 'apartment_number')
+        expect(json_response['address_attributes']).to include(
+          'name' => 'name',
+          'country' => 'United States of America', 'state' => 'state', 'state_abbreviation' => 'state_abbr',
+          'city' => 'city', 'zip_code' => 'zip_code', 'street' => 'street_name', 'building_address' => 'building_number',
+          'apartment_number' => 'apartment_number'
+        )
       end
     end
   end

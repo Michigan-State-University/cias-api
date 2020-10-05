@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/users/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:alter_user) { create(:user, :confirmed) }
+  let(:alter_user) { create(:user, :confirmed, :participant) }
   let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do
@@ -35,20 +35,11 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
         get v1_user_path(id: alter_user.id), headers: headers
       end
 
-      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
-    end
-
-    context 'contains' do
-      before do
-        get v1_user_path(id: alter_user.id), headers: headers
-      end
-
-      it 'to hash success' do
+      it 'return User' do
+        expect(response).to have_http_status(:ok)
+        expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
         expect(json_response.class).to be(Hash)
-      end
-
-      it 'key question' do
-        expect(json_response['data']['type']).to eq('user')
+        expect(json_response['email']).to eq(alter_user.email)
       end
     end
   end

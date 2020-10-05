@@ -4,11 +4,11 @@ class V1::UsersController < V1Controller
   def index
     collection = users_scope.detailed_search(params).order(created_at: :desc)
     paginated_collection = paginate(collection, params)
-    render json: serialized_response(paginated_collection)
+    render_json users: paginated_collection
   end
 
   def show
-    render json: serialized_response(user_load)
+    render_json user: user_load
   end
 
   def update
@@ -16,7 +16,7 @@ class V1::UsersController < V1Controller
 
     user_load.update!(user_params)
     invalidate_cache(user_load)
-    render json: serialized_response(user_load)
+    render_json user: user_load, action: :show
   end
 
   def destroy

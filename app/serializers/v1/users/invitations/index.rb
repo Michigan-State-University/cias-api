@@ -7,13 +7,13 @@ class V1::Users::Invitations::Index < BaseSerializer
 
   def to_json
     {
-      invitations: invitations
+      invitations: collect_invitations
     }
   end
 
   private
 
-  def invitations
+  def collect_invitations
     @users.map { |user| V1::Users::Invitations::Show.new(user: user).to_json }
   end
 end

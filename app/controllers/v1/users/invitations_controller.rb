@@ -10,9 +10,7 @@ class V1::Users::InvitationsController < V1Controller
   def create
     authorize! :create, User
 
-    if User.exists?(email: invitation_params[:email])
-      return render json: { error: I18n.t('devise.failure.email_already_exists') }, status: :unprocessable_entity
-    end
+    return render json: { error: I18n.t('devise.failure.email_already_exists') }, status: :unprocessable_entity if User.exists?(email: invitation_params[:email])
 
     user = User.invite!(email: invitation_params[:email], roles: %w[researcher])
 
