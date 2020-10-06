@@ -2,7 +2,7 @@
 
 class V1::Problems::Show < BaseSerializer
   def cache_key
-    "problem/#{@problem.id}-#{@problem.updated_at}"
+    "problem/#{@problem.id}-#{@problem.updated_at&.to_s(:number)}"
   end
 
   def to_json

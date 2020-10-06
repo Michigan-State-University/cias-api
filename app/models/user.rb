@@ -50,14 +50,14 @@ class User < ApplicationRecord
 
   def self.detailed_search(params)
     scope = all
-    if params.key?(:active)
-      scope = scope.where(active: params[:active])
-    else
-      scope = scope.limit_to_active
-    end
+    scope = if params.key?(:active)
+              scope.where(active: params[:active])
+            else
+              scope.limit_to_active
+            end
     scope = scope.limit_to_roles(params[:roles])
-
-    scope.name_contains(params[:name])
+    scope = scope.name_contains(params[:name])
+    scope
   end
 
   def ability

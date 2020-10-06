@@ -4,7 +4,7 @@ class V1::UsersController < V1Controller
   def index
     collection = users_scope.detailed_search(params).order(created_at: :desc)
     paginated_collection = paginate(collection, params)
-    render_json users: paginated_collection
+    render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
   end
 
   def show
@@ -36,6 +36,10 @@ class V1::UsersController < V1Controller
 
   def user_params
     params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :active, roles: [], address_attributes: %i[name country state state_abbreviation city zip_code street building_address apartment_number])
+  end
+
+  def query_string_digest
+    Digest::SHA1.hexdigest("#{params[:page]}#{params[:per_page]}#{params[:name]}#{params[:roles]&.join}#{params[:active]}")
   end
 
   def authorize_update_abilities

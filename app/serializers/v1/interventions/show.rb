@@ -2,7 +2,7 @@
 
 class V1::Interventions::Show < BaseSerializer
   def cache_key
-    "intervention/#{@intervention.id}-#{@intervention.updated_at}"
+    "intervention/#{@intervention.id}-#{@intervention.updated_at&.to_s(:number)}"
   end
 
   def to_json

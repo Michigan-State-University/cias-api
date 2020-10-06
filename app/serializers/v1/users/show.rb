@@ -2,7 +2,7 @@
 
 class V1::Users::Show < BaseSerializer
   def cache_key
-    "user/#{@user.id}-#{@user.updated_at}"
+    "user/#{@user.id}-#{@user.updated_at&.to_s(:number)}"
   end
 
   def to_json

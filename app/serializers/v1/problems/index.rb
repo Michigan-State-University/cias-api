@@ -2,7 +2,7 @@
 
 class V1::Problems::Index < BaseSerializer
   def cache_key
-    "problems/#{@problems.count}-#{@problems.maximum(:updated_at)}"
+    "problems/#{@problems.count}-#{@problems.maximum(:updated_at)&.to_s(:number)}"
   end
 
   def to_json
