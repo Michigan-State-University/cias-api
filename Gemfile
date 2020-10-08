@@ -15,7 +15,6 @@ gem 'cancancan'
 gem 'connection_pool'
 gem 'dentaku'
 gem 'devise-argon2'
-gem 'devise-pwned_password'
 gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
