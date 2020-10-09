@@ -11,7 +11,7 @@ Rails.application.routes.draw do
       invitations: 'v1/users/invitations',
       passwords: 'v1/auth/passwords',
       registrations: 'v1/auth_controller/registrations',
-      sessions: 'v1/auth_controller/sessions'
+      sessions: 'v1/auth/sessions'
     }
 
     scope :users do
