@@ -8,7 +8,7 @@ class Intervention < ApplicationRecord
   include Clone
   include FormulaInterface
 
-  belongs_to :problem, inverse_of: :interventions
+  belongs_to :problem, inverse_of: :interventions, touch: true
   has_many :questions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :answers, dependent: :restrict_with_exception, through: :questions
 

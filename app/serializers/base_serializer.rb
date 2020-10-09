@@ -10,7 +10,7 @@ class BaseSerializer
   end
 
   def render
-    Oj.dump(to_json)
+    Oj.generate(to_json)
   end
 
   def cached_render

@@ -27,7 +27,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
       end
 
       it 'contains proper interventions collection' do
-        expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+        expect(json_response['interventions_size']).to eq interventions.size
       end
     end
 
@@ -45,7 +45,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         end
 
         it 'contains proper interventions collection' do
-          expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          expect(json_response['interventions_size']).to eq interventions.size
         end
       end
 
@@ -69,7 +69,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
           end
 
           it 'contains proper interventions collection' do
-            expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+            expect(json_response['interventions_size']).to eq interventions.size
           end
         end
       end
@@ -95,7 +95,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         end
 
         it 'contains proper interventions collection' do
-          expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          expect(json_response['interventions_size']).to eq 2
         end
       end
     end
@@ -120,7 +120,7 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         end
 
         it 'contains proper interventions collection' do
-          expect(json_response['interventions'].pluck('id')).to match_array(interventions.pluck(:id))
+          expect(json_response['interventions_size']).to eq interventions.size
         end
       end
     end

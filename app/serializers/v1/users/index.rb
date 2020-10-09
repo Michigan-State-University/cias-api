@@ -2,7 +2,7 @@
 
 class V1::Users::Index < BaseSerializer
   def cache_key
-    "users/#{@users.count}-#{@users.maximum(:updated_at)&.to_s(:number)}-#{@query_string}"
+    "users/#{@users_size}-#{@users.offset(0).maximum(:updated_at)&.to_s(:number)}-#{@query_string}"
   end
 
   def to_json

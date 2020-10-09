@@ -18,13 +18,7 @@ class V1::Problems::Show < BaseSerializer
         first_name: @problem.user.first_name,
         last_name: @problem.user.last_name
       },
-      interventions: collect_interventions
+      interventions_size: @problem.interventions.size
     }
-  end
-
-  private
-
-  def collect_interventions
-    @problem.interventions.map { |intervention| V1::Interventions::Show.new(intervention: intervention).to_json }
   end
 end

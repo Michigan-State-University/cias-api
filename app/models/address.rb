@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Address < ApplicationRecord
-  belongs_to :user, inverse_of: :address
+  belongs_to :user, inverse_of: :address, touch: true
 
   def formatted_usa
     %(

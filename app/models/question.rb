@@ -6,7 +6,7 @@ class Question < ApplicationRecord
   include Clone
   include FormulaInterface
 
-  belongs_to :intervention, inverse_of: :questions
+  belongs_to :intervention, inverse_of: :questions, touch: true
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
   attribute :narrator, :json, default: assign_default_values('narrator')
