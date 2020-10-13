@@ -1,8 +1,15 @@
-development:
+default: &default
   adapter: postgresql
   host: database
   pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 4 } %>
   encoding: unicode
-  database: cias_development
   username: postgres
   password: <%= ENV['POSTGRES_PASSWORD'] %>
+
+development:
+  <<: *default
+  database: cias_development
+
+test:
+  <<: *default
+  database: cias_test

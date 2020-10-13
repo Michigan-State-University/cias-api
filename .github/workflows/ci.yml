@@ -31,6 +31,7 @@ jobs:
         env:
           RUBYOPT: --jit
       - run: cp .env.template .env
+      - run: cp ./config/database.docker.yml ./config/database.yml
       - uses: actions/cache@v2
         with:
           path: vendor/bundle

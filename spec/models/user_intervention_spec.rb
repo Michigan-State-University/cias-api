@@ -12,7 +12,7 @@ RSpec.describe UserIntervention, type: :model do
   end
 
   context 'proper alter_schedule result' do
-    let(:problem) { create(:problem, published_at: Time.current) }
+    let(:problem) { create(:problem) }
     let(:user) { create(:user, :participant) }
     let(:interventions) do
       interventions = create_list(:intervention, 3, problem_id: problem.id, schedule: 'days_after_fill', schedule_payload: 7)
@@ -28,8 +28,9 @@ RSpec.describe UserIntervention, type: :model do
       user_intervention_1
       user_intervention_2
       user_intervention_1.update(submitted_at: Date.current)
+      user_intervention_2.reload
 
-      expect(UserIntervention.last.schedule_at).to eq(Date.current + 7)
+      expect(user_intervention_2.schedule_at).to eq(Date.current + 7)
     end
   end
 end

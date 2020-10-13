@@ -61,14 +61,14 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         context 'user has an access' do
           let(:users) { [participant] }
 
-          it 'contains proper attributes' do
+          xit 'contains proper attributes' do
             expect(json_response).to include(
               'name' => 'Some problem',
               'shared_to' => shared_to
             )
           end
 
-          it 'contains proper interventions collection' do
+          xit 'contains proper interventions collection' do
             expect(json_response['interventions_size']).to eq interventions.size
           end
         end

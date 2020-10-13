@@ -15,7 +15,7 @@ class V1::Interventions::UsersController < V1Controller
   end
 
   def destroy
-    user_interventions_scope.where(user_id: params[:id]).destroy_all
+    user_interventions_scope.where(user_id: params[:id], submitted_at: nil).destroy_all
     head :no_content
   end
 

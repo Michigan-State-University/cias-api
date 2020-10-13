@@ -44,7 +44,7 @@
       * RDBMS: PostgreSQL. Store for all data;
       * In-memory: Redis store for background worker and cache.
   * View:
-    * API: JSON serialized by: fast_jsonapi.
+    * API: JSON serialized by [Oj](https://github.com/ohler55/oj) in custom classes.
   * Controller:
     * Default RoR controller.
 * Identity user:

@@ -21,9 +21,9 @@ class Fake
       add_address_to_user
       create_problems
       create_interventions
-      # create_user_interventions
       create_intervention_invitations
       create_questions
+      create_user_interventions
       create_answers
     end
 
@@ -89,16 +89,6 @@ class Fake
 
     def intervention_ids
       @@intervention_ids ||= Intervention.ids
-    end
-
-    def create_user_interventions
-      intervention_ids
-      (40..60).to_a.sample.times do
-        UserIntervention.create(
-          intervention_id: intervention_ids.sample,
-          user_id: user_ids.sample
-        )
-      end
     end
 
     def create_intervention_invitations
@@ -201,6 +191,16 @@ class Fake
           pattern['target']['id'] = target.last
         end
         question.save
+      end
+    end
+
+    def create_user_interventions
+      problems = Problem.order('RANDOM()').limit(4)
+      problems.each do |problem|
+        problem.broadcast
+      end
+      Intervention.where(problem_id: problems.ids).each do |intervention|
+        intervention.user_interventions.create(user_id: user_ids.sample)
       end
     end
 
