@@ -1,0 +1,24 @@
+UPDATE
+  questions
+SET
+  question_group_id = nv.question_group_id::uuid,
+  position = nv.position,
+  updated_at = nv.updated_at::timestamp
+FROM
+  (
+    VALUES
+      <% @values.each do |value| %>
+        ('<%= value[:id] %>', '<%= value[:question_group_id] %>', <%= value[:position] %>, '<%= Time.current.iso8601 %>')
+        <%= ',' if value[:id] != @values.last[:id] %>
+      <% end %>
+  ) AS nv (id, question_group_id, position, updated_at)
+WHERE
+  questions.id = nv.id::uuid;
+UPDATE
+  question_groups
+SET
+  updated_at = now()
+WHERE
+  id
+IN
+  (<%= @values.map { |item| "'#{item[:question_group_id]}'" }.join(', ') %>)

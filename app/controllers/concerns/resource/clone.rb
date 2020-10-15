@@ -4,10 +4,8 @@ module Resource::Clone
   extend ActiveSupport::Concern
   included do
     def clone
-      cloned_resource = controller_name.
-        classify.
-        demodulize.
-        safe_constantize.
+      authorize! :update, model_constant
+      cloned_resource = model_constant.
         find(params[:id]).
         clone(clone_params)
       render json: serialized_response(cloned_resource), status: :created

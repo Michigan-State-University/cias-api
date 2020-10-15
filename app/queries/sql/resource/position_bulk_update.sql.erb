@@ -1,14 +1,15 @@
 UPDATE
  <%= @table %>
 SET
-  position = nv.position
+  position = nv.position,
+  updated_at = nv.updated_at::timestamp
 FROM
   (
     VALUES
       <% @values.each do |value| %>
-        ('<%= value[:id] %>', <%= value[:position] %>)
+        ('<%= value[:id] %>', <%= value[:position] %>, '<%= Time.current.iso8601 %>')
           <%= ',' if value[:id] != @values.last[:id] %>
       <% end %>
-    ) AS nv (id, position)
+    ) AS nv (id, position, updated_at)
 WHERE
   <%= @table %>.id = nv.id::uuid;

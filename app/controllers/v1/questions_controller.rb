@@ -2,7 +2,6 @@
 
 class V1::QuestionsController < V1Controller
   include Resource::Clone
-  include Resource::Position
 
   def index
     render json: serialized_response(questions_scope)
@@ -33,7 +32,22 @@ class V1::QuestionsController < V1Controller
     head :no_content
   end
 
+  def move
+    authorize! :update, Question
+
+    SqlQuery.new(
+      'resource/question_bulk_update',
+      values: position_params[:position]
+    ).execute
+    invalidate_cache(question_groups_scope)
+    render_json question_groups: question_groups_scope, path: 'v1/question_groups', action: :index
+  end
+
   private
+
+  def question_groups_scope
+    Intervention.includes(%i[question_groups questions]).accessible_by(current_ability).find(params[:intervention_id]).question_groups
+  end
 
   def questions_scope
     QuestionGroup.accessible_by(current_ability).find(params[:question_group_id]).questions.includes(%i[image_attachment image_blob]).order(:position)
@@ -44,6 +58,10 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :title, :subtitle, :video_url, :question_group_id, :position, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+  end
+
+  def position_params
+    params.require(:question).permit(position: %i[id position question_group_id])
   end
 end

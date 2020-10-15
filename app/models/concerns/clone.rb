@@ -2,7 +2,7 @@
 
 module Clone
   include MetaOperations
-  def clone(params)
+  def clone(params = {})
     if params[:user_ids].present?
       problems = []
       user_ids = User.where(id: params[:user_ids]).limit_to_roles('researcher').pluck(:id)

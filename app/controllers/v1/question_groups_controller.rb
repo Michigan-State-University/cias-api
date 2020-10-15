@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroupsController < V1Controller
+  include Resource::Position
+
   def index
     question_groups = question_groups_scope.includes(:questions).order(:position).all
 
@@ -58,10 +60,22 @@ class V1::QuestionGroupsController < V1Controller
     head :no_content
   end
 
+  def clone
+    authorize! :create, QuestionGroup
+
+    cloned_question_group = question_group_load.clone(params)
+
+    render_json question_group: cloned_question_group, action: :show, status: :ok
+  end
+
+  def share # TODO: Implement business logic
+    authorize! :create, QuestionGroup
+  end
+
   private
 
   def question_groups_scope
-    QuestionGroup.accessible_by(current_ability).includes(:questions).where(intervention_id: params[:intervention_id])
+    QuestionGroup.includes(:intervention, :questions).accessible_by(current_ability).where(intervention_id: params[:intervention_id])
   end
 
   def question_group_load
@@ -78,5 +92,9 @@ class V1::QuestionGroupsController < V1Controller
 
   def question_group_params
     params.require(:question_group).permit(:title, :position, :intervention_id)
+  end
+
+  def question_groups_positions_params
+    params.require(:question_groups).permit(positions: %i[id position])
   end
 end

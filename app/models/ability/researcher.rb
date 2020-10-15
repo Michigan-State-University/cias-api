@@ -14,8 +14,8 @@ class Ability::Researcher < Ability::Base
     can :manage, UserIntervention, intervention: { problem: { user_id: user.id } }
     can :manage, InterventionInvitation, intervention: { problem: { user_id: user.id } }
     can :manage, Intervention, problem: { user_id: user.id }
-    can :manage, QuestionGroup, intervention: { user_id: user.id }
-    can :manage, Question, question_group: { intervention: { user_id: user.id } }
+    can :manage, QuestionGroup, intervention: { problem: { user_id: user.id } }
+    can :manage, Question, question_group: { intervention: { problem: { user_id: user.id } } }
     can :manage, Answer, question: { question_group: { intervention: { user_id: user.id } } }
   end
 
