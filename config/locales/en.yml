@@ -1,5 +1,20 @@
 en:
   hello: Hello world
+  question:
+    finish:
+      subtitle: Finish Screen
+      title: Finish Screen
+  question_group:
+    default:
+      title: Default Group
+    finish:
+      title: Finish Group
+    plain:
+      title: Next Group
+  activerecord:
+    errors:
+      messages:
+        undestroyable: Forbidden operation
   problems:
     answers:
       index:

@@ -1,0 +1,16 @@
+DELETE FROM
+  question_groups
+WHERE
+  question_groups.type
+NOT IN
+  ('QuestionGroup::Default', 'QuestionGroup::Finish')
+AND
+  question_groups.id
+IN
+  (
+    SELECT qg.id
+    FROM question_groups AS qg
+    LEFT JOIN questions AS q ON qg.id = q.question_group_id
+    GROUP BY qg.id
+    HAVING count(q.id) = 0
+  );

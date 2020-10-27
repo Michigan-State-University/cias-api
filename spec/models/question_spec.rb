@@ -24,6 +24,13 @@ RSpec.describe Question, type: :model do
     it { should be_valid }
   end
 
+  describe 'Question::Finish' do
+    subject(:question_finish) { build(:question_finish) }
+
+    it { should belong_to(:question_group) }
+    it { should be_valid }
+  end
+
   describe 'Question::FollowUpContact' do
     subject(:question_follow_up_contact) { build(:question_follow_up_contact) }
 

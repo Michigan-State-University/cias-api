@@ -29,6 +29,7 @@ class V1::QuestionsController < V1Controller
 
   def destroy
     question_load.destroy!
+    question_group_load.destroy! if questions_scope.empty?
     head :no_content
   end
 
@@ -46,11 +47,15 @@ class V1::QuestionsController < V1Controller
   private
 
   def question_groups_scope
-    Intervention.includes(%i[question_groups questions]).accessible_by(current_ability).find(params[:intervention_id]).question_groups
+    Intervention.includes(%i[question_groups questions]).accessible_by(current_ability).find(params[:intervention_id]).question_groups.order(:position)
+  end
+
+  def question_group_load
+    QuestionGroup.accessible_by(current_ability).find(params[:question_group_id])
   end
 
   def questions_scope
-    QuestionGroup.accessible_by(current_ability).find(params[:question_group_id]).questions.includes(%i[image_attachment image_blob]).order(:position)
+    question_group_load.questions.includes(%i[image_attachment image_blob]).order(:position)
   end
 
   def question_load

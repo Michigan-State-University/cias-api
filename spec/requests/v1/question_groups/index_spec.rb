@@ -16,7 +16,7 @@ describe 'GET /v1/interventions/:intervention_id/question_groups', type: :reques
       request
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['question_groups'].size).to eq 4
+      expect(json_response['question_groups'].size).to eq 5
     end
   end
 end

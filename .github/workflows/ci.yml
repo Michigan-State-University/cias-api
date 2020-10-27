@@ -4,7 +4,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     container:
-      image: ruby:2.7.1
+      image: ruby:2.7.2
     services:
       database:
         image: postgres:13.0-alpine
@@ -27,7 +27,7 @@ jobs:
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: 2.7.1
+          ruby-version: 2.7.2
         env:
           RUBYOPT: --jit
       - run: cp .env.template .env

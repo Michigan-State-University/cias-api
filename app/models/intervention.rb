@@ -9,8 +9,11 @@ class Intervention < ApplicationRecord
   include FormulaInterface
 
   belongs_to :problem, inverse_of: :interventions, touch: true
+
   has_many :question_groups, dependent: :restrict_with_exception, inverse_of: :intervention
-  has_one :default_question_group, ->(intervention) { where(intervention: intervention, default: true) }, class_name: 'QuestionGroup', inverse_of: :intervention
+  has_many :question_group_plains, dependent: :restrict_with_exception, inverse_of: :intervention, class_name: 'QuestionGroup::Plain'
+  has_one :question_group_default, dependent: :restrict_with_exception, inverse_of: :intervention, class_name: 'QuestionGroup::Default'
+  has_one :question_group_finish, dependent: :restrict_with_exception, inverse_of: :intervention, class_name: 'QuestionGroup::Finish'
   has_many :questions, dependent: :restrict_with_exception, through: :question_groups
   has_many :answers, dependent: :restrict_with_exception, through: :questions
   has_many :intervention_invitations, dependent: :restrict_with_exception, inverse_of: :intervention
@@ -34,7 +37,7 @@ class Intervention < ApplicationRecord
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
 
-  after_commit :create_default_question_group, on: :create
+  after_commit :create_core_childs, on: :create
 
   def position_less_than
     @position_less_than ||= problem.interventions.where(position: ...position).order(:position)
@@ -108,8 +111,15 @@ class Intervention < ApplicationRecord
 
   private
 
-  def create_default_question_group
-    question_groups.find_or_create_by!(default: true)
+  def create_core_childs
+    if question_group_default.nil?
+      ::QuestionGroup::Default.create!(intervention_id: id)
+    end
+    if question_group_finish.nil?
+      qg_finish = ::QuestionGroup::Finish.new(intervention_id: id)
+      qg_finish.save!
+      ::Question::Finish.create!(question_group_id: qg_finish.id)
+    end
   end
 
   def json_schema_path

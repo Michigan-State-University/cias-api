@@ -100,7 +100,7 @@ class Fake
     end
 
     def subclass_types
-      @@subclass_types ||= define_subclasses('app/models/question/') - %w[Narrator Csv]
+      @@subclass_types ||= define_subclasses('app/models/question/') - %w[Csv Finish Narrator]
     end
 
     def quotas
@@ -120,11 +120,10 @@ class Fake
         sample_type = subclass_types.sample
         image_sample = images_files.sample
         intervention = Intervention.find(intervention_ids.sample)
-        default_question_group = intervention.default_question_group
 
         question = Question.new(
           type: "Question::#{sample_type}",
-          question_group: default_question_group,
+          question_group: intervention.question_group_plains.first,
           position: rand(1..100),
           title: sample_type,
           subtitle: Faker::Job.position,
@@ -209,7 +208,7 @@ class Fake
 
     def create_answers
       (100..140).to_a.sample.times do
-        question = Question.order('RANDOM()').first
+        question = Question.where.not(type: 'Question::Finish').order('RANDOM()').first
         answer = Answer.new(
           user_id: user_ids.sample,
           question: question,

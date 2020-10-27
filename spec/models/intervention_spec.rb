@@ -11,15 +11,14 @@ RSpec.describe Intervention, type: :model do
     it { should have_many(:questions) }
     it { should be_valid }
 
-    describe '#create_default_question_group' do
-      let(:new_intervention)   { build(:intervention) }
-      let(:new_question_group) { new_intervention.question_groups.first }
+    describe '#create with question groups' do
+      let(:new_intervention) { build(:intervention) }
 
       it 'creates new default question group' do
-        expect { new_intervention.save! }.to change(QuestionGroup, :count).by(1)
-
-        expect(new_question_group.title).to eq 'Default Screen Group'
-        expect(new_question_group.position).to eq 0
+        expect { new_intervention.save! }.to change(QuestionGroup, :count).by(2)
+        expect(new_intervention.reload.question_group_plains.model_name.name).to eq 'QuestionGroup::Plain'
+        expect(new_intervention.reload.question_group_finish.model_name.name).to eq 'QuestionGroup::Finish'
+        expect(new_intervention.reload.question_groups.size).to eq 2
       end
     end
   end

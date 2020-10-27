@@ -37,7 +37,7 @@ describe 'PATCH /v1/interventions/:intervention_id/question_groups/position', ty
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['question_groups'].size).to eq 4
+        expect(json_response['question_groups'].size).to eq 5
         expect(question_group_1.reload.position).to eq 6
         expect(question_group_2.reload.position).to eq 7
         expect(question_group_3.reload.position).to eq 8

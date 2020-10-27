@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_201_007_072_628) do
+ActiveRecord::Schema.define(version: 20_201_027_181_844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension 'btree_gin'
   enable_extension 'btree_gist'
@@ -134,14 +134,14 @@ ActiveRecord::Schema.define(version: 20_201_007_072_628) do
   create_table 'question_groups', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|
     t.uuid 'intervention_id', null: false
     t.string 'title', null: false
-    t.boolean 'default', default: false, null: false
     t.bigint 'position', default: 0, null: false
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
-    t.index ['default'], name: 'index_question_groups_on_default'
+    t.string 'type'
     t.index %w[intervention_id title], name: 'index_question_groups_on_intervention_id_and_title', using: :gin
     t.index ['intervention_id'], name: 'index_question_groups_on_intervention_id'
     t.index ['title'], name: 'index_question_groups_on_title'
+    t.index ['type'], name: 'index_question_groups_on_type'
   end
 
   create_table 'questions', id: :uuid, default: -> { 'uuid_generate_v4()' }, force: :cascade do |t|

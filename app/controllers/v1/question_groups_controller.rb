@@ -4,9 +4,7 @@ class V1::QuestionGroupsController < V1Controller
   include Resource::Position
 
   def index
-    question_groups = question_groups_scope.includes(:questions).order(:position).all
-
-    render_json question_groups: question_groups
+    render_json question_groups: question_groups_scope
   end
 
   def show
@@ -16,14 +14,13 @@ class V1::QuestionGroupsController < V1Controller
   def create
     authorize! :create, QuestionGroup
 
-    question_group = ActiveRecord::Base.transaction do
-      question_group = intervention_load.question_groups.create!(question_group_params)
-      questions_scope.update_all(question_group_id: question_group.id) # rubocop:disable Rails/SkipsModelValidations
+    qg_plain = QuestionGroup::Plain.new(intervention_id: params[:intervention_id], **question_group_params)
+    qg_plain.position = question_groups_scope.where(type: %w[QuestionGroup::Default QuestionGroup::Plain]).last.position.to_i + 1
+    qg_plain.save!
+    questions_scope.update_all(question_group_id: qg_plain.id) # rubocop:disable Rails/SkipsModelValidations
+    SqlQuery.new('question_group/question_group_pure_empty').execute
 
-      question_group
-    end
-
-    render_json question_group: question_group.reload, action: :show, status: :created
+    render_json question_group: question_groups_scope.find(qg_plain.id).reload, action: :show, status: :created
   end
 
   def update
@@ -75,7 +72,7 @@ class V1::QuestionGroupsController < V1Controller
   private
 
   def question_groups_scope
-    QuestionGroup.includes(:intervention, :questions).accessible_by(current_ability).where(intervention_id: params[:intervention_id])
+    QuestionGroup.includes(:intervention, :questions).accessible_by(current_ability).where(intervention_id: params[:intervention_id]).order(:position)
   end
 
   def question_group_load
@@ -91,7 +88,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_params
-    params.require(:question_group).permit(:title, :position, :intervention_id)
+    params.require(:question_group).permit(:title, :intervention_id)
   end
 
   def question_groups_positions_params

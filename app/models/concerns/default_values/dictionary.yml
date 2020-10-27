@@ -24,10 +24,6 @@ question:
     patterns: []
   body:
     data: []
-question_group:
-  title: 'Default Screen Group'
-  position: 0
-  default: false
 user:
   roles:
     - participant

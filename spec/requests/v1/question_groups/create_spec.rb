@@ -3,7 +3,10 @@
 require 'rails_helper'
 
 describe 'POST /v1/interventions/:intervention_id/question_groups', type: :request do
-  let(:request) { post v1_intervention_question_groups_path(intervention_id: intervention.id), params: params, headers: headers }
+  let!(:user) { create(:user, :researcher) }
+  let!(:intervention) { create(:intervention, problem: create(:problem, user: user)) }
+  let(:questions) { create_list(:question_free_response, 3, title: 'Question Title', question_group_id: intervention.question_group_default.id) }
+  let(:request) { post v1_intervention_question_groups_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
   let(:params) do
     {
       question_group: {
@@ -14,26 +17,11 @@ describe 'POST /v1/interventions/:intervention_id/question_groups', type: :reque
     }
   end
 
-  let!(:intervention) { create(:intervention, problem: create(:problem, :published)) }
-  let!(:questions)    { create_list(:question_free_response, 3, title: 'Question Title') }
-
-  context 'when authenticated as guest user' do
-    let(:guest_user) { create(:user, :guest) }
-    let(:headers)    { guest_user.create_new_auth_token }
-
-    it 'returns forbidden status' do
-      request
-
-      expect(response).to have_http_status(:forbidden)
-    end
-  end
-
-  context 'when authenticated as admin user' do
-    let(:admin_user) { create(:user, :admin) }
-    let(:headers)    { admin_user.create_new_auth_token }
-
+  context 'when authenticated as researcher user' do
     it 'returns serialized question_group' do
-      expect { request }.to change(QuestionGroup, :count).by(1)
+      intervention.reload
+      questions
+      request
 
       expect(response).to have_http_status(:created)
       expect(json_response['title']).to eq 'QuestionGroup Title'

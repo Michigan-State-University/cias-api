@@ -98,6 +98,16 @@ FactoryBot.define do
     association :question_group
   end
 
+  factory :question_finish, class: Question::Finish do
+    type { Question::Finish }
+    body do
+      {
+        data: []
+      }
+    end
+    association :question_group
+  end
+
   factory :question_follow_up_contact, class: Question::FollowUpContact do
     title { 'Follow-up contact' }
     type { Question::FollowUpContact }

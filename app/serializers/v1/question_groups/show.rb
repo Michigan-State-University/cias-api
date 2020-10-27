@@ -8,8 +8,8 @@ class V1::QuestionGroups::Show < BaseSerializer
   def to_json
     {
       id: question_group.id,
+      type: question_group.type,
       title: question_group.title,
-      default: question_group.default,
       position: question_group.position,
       intervention_id: question_group.intervention_id,
       questions: collect_questions
