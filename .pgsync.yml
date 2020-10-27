@@ -1,0 +1,4 @@
+from: $(heroku config:get DATABASE_URL -a cias-api-production)?sslmode=require
+to: postgres://localhost:5432/cias_development
+exclude:
+  - ar_internal_metadata

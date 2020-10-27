@@ -51,6 +51,7 @@ group :development do
   gem 'guard-rake', require: false
   gem 'guard-rspec', require: false
   gem 'letter_opener_web'
+  gem 'pgsync'
 end
 
 group :test do

@@ -75,6 +75,7 @@
 * If you would like to seed your database by:
   * Role based users: `$ docker-compose exec api bundle exec rails db:seed`
   * Fake data: `$ docker-compose exec api bundle exec rails db:seed:fake`
+  * Production data: set `postgres` protocol and `$ pgsync --defer-constraints-v2`
 * Open web browser and type: `localhost:3000/`
 
 
