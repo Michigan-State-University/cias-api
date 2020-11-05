@@ -26,12 +26,6 @@ PreCommit:
     description: 'Check for broken symlinks'
     quiet: true
 
-  Brakeman:
-    enabled: true
-    description: 'Check for vulnerable versions of gems'
-    required_executable: 'brakeman'
-    install_command: 'gem install brakeman'
-
   CaseConflicts:
     enabled: true
     description: 'Check for case-insensitivity conflicts'

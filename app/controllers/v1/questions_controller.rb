@@ -29,7 +29,7 @@ class V1::QuestionsController < V1Controller
 
   def destroy
     question_load.destroy!
-    question_group_load.destroy! if questions_scope.empty?
+    question_group_load.destroy! if questions_scope.empty? && !question_group_load.default?
     head :no_content
   end
 

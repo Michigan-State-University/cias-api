@@ -8,6 +8,10 @@ RSpec.describe QuestionGroup, type: :model do
 
     it { should belong_to(:intervention) }
     it { should be_valid }
+
+    it 'responds to message default? and should be true' do
+      expect(subject.default?).to be true
+    end
   end
 
   describe 'QuestionGroup::Plain' do
@@ -15,6 +19,10 @@ RSpec.describe QuestionGroup, type: :model do
 
     it { should belong_to(:intervention) }
     it { should be_valid }
+
+    it 'responds to message default? and should be false' do
+      expect(subject.default?).to be false
+    end
   end
 
   describe 'QuestionGroup::Finish' do

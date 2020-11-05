@@ -7,4 +7,8 @@ class QuestionGroup < ApplicationRecord
   has_many :questions, dependent: :destroy, inverse_of: :question_group, class_name: 'Question'
   belongs_to :intervention, inverse_of: :question_groups, touch: true
   validates :title, :position, presence: true
+
+  def default?
+    type == 'QuestionGroup::Default'
+  end
 end
