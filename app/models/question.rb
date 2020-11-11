@@ -29,13 +29,16 @@ class Question < ApplicationRecord
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
 
   delegate :intervention, to: :question_group
+  default_scope { order(:position) }
 
   def subclass_name
     self.class.to_s.demodulize
   end
 
   def position_equal_or_higher
-    @position_equal_or_higher ||= intervention.questions.where(position: position..).order(:position)
+    questionnaire = intervention.question_groups.includes([:questions]).map(&:questions).flatten
+    current_position = questionnaire.map(&:id).find_index id
+    @position_equal_or_higher ||= questionnaire.drop(current_position)
   end
 
   def another_or_feedback(next_obj, answers_var_values)
