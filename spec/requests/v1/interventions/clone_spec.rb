@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let(:intervention) { create(:intervention) }
   let(:headers) { user.create_new_auth_token }
 
-  xcontext 'when auth' do
+  context 'when auth' do
     context 'is invalid' do
       before { post v1_clone_intervention_path(id: intervention.id) }
 
@@ -29,7 +29,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
     end
   end
 
-  xcontext 'when response' do
+  context 'when response' do
     context 'is JSON' do
       before do
         post v1_clone_intervention_path(id: intervention.id), headers: headers
@@ -50,20 +50,48 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
     end
   end
 
-  xcontext 'cloned' do
+  context 'not found' do
+    let(:invalid_intervention_id) { '1' }
+
+    before do
+      post v1_clone_intervention_path(id: invalid_intervention_id), headers: headers
+    end
+
+    it 'has correct failure http status' do
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'has correct failure message' do
+      expect(json_response['message']).to eq("Couldn't find Intervention with 'id'=#{invalid_intervention_id}")
+    end
+  end
+
+  context 'cloned' do
     before do
       post v1_clone_intervention_path(id: intervention.id), headers: headers
     end
 
     let(:intervention_was) do
-      intervention.attributes.except('id', 'created_at', 'updated_at', 'slug')
+      intervention.attributes.except('id', 'created_at', 'updated_at', 'slug', 'position')
     end
     let(:intervention_cloned) do
-      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'slug')
+      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'slug', 'position')
+    end
+
+    it 'has correct http code' do
+      expect(response).to have_http_status(:created)
     end
 
     it 'origin and outcome same' do
       expect(intervention_was).to eq(intervention_cloned)
+    end
+
+    it 'has correct position' do
+      expect(json_response['data']['attributes']['position']).to eq(2)
+    end
+
+    it 'has correct number of interventions' do
+      expect(intervention.problem.interventions.size).to eq(2)
     end
   end
 end
