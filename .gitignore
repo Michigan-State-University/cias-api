@@ -13,3 +13,6 @@
 /config/master.key
 cias-api-50c1a8455413.json
 db/structure.sql
+coverage/
+.ruby-gemset
+.generators

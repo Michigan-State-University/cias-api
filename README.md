@@ -63,6 +63,24 @@
 
 ## DEVELOPMENT
 
+### Spellchecker for RoR developers (or anyone who plan to commit)
+
+One of the checks, starting by overcommit on pre-commit hook (at least right now) is a spellchecker.
+Our spellchecker based on tool `hunspell`
+* Installation on Mac: `$ brew install hspell`
+* How-to check `PATH` where `hunspell` looking for dictionaries: `$ hunspell -D`
+* Dictionaries can be found here: `docs/dictionaries/spell.tar.bz2`. Unpack and put
+them to one of `PATH` folders. For example `/Library/Spelling/`
+
+At the end it should looks like:
+```
+$ hunspell -D
+...
+AVAILABLE DICTIONARIES (path is not mandatory for -d option):
+/Library/Spelling/en_GB
+/Library/Spelling/en_US
+```
+
 ### LAUNCH
 
 * `$ git clone git@github.com:htdevelopers/cias-api.git`

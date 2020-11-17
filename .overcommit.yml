@@ -7,7 +7,7 @@ CommitMsg:
     enabled: true
     description: 'Check for misspelled words'
     required_executable: 'hunspell'
-    flags: ['-a', '-d', 'en_GB']
+    flags: ['-a', '-d', 'en_US']
 
 PreCommit:
   AuthorName:

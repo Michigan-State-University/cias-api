@@ -34,6 +34,7 @@ gem 'sidekiq'
 gem 'sql_query'
 
 group :development, :test do
+  gem 'bundler-audit'
   gem 'brakeman', require: false
   gem 'bullet'
   gem 'dotenv-rails'
@@ -48,9 +49,11 @@ group :development, :test do
 end
 
 group :development do
+  gem 'bump'
   gem 'guard-rake', require: false
   gem 'guard-rspec', require: false
   gem 'letter_opener_web'
+  gem 'license_finder'
   gem 'pgsync'
 end
 
@@ -59,6 +62,7 @@ group :test do
   gem 'rspec-rails'
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
+  gem 'simplecov', require: false
 end
 
 group :production do
