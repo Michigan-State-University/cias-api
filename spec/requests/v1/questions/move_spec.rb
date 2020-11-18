@@ -6,8 +6,8 @@ describe 'PATCH /v1/interventions/:intervention_id/questions/move', type: :reque
   let(:request) { patch v1_intervention_move_question_path(intervention_id: intervention.id), params: params, headers: headers }
 
   let!(:intervention)     { create(:intervention, problem: create(:problem, user: user)) }
-  let!(:question_group_1) { create(:question_group, title: 'Question Group 1 Title', intervention: intervention) }
-  let!(:question_group_2) { create(:question_group, title: 'Question Group 2 Title', intervention: intervention) }
+  let!(:question_group_1) { create(:question_group, title: 'Question Group 1 Title', intervention: intervention, position: 1) }
+  let!(:question_group_2) { create(:question_group, title: 'Question Group 2 Title', intervention: intervention, position: 2) }
   let!(:question_1)       { create(:question_free_response, question_group: question_group_1, position: 0) }
   let!(:question_2)       { create(:question_free_response, question_group: question_group_1, position: 1) }
   let!(:question_3)       { create(:question_free_response, question_group: question_group_1, position: 2) }
