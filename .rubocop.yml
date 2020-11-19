@@ -298,6 +298,9 @@ RSpec/InstanceVariable:
 RSpec/LetSetup:
   Enabled: false
 
+RSpec/MessageSpies:
+  Enabled: false
+
 RSpec/MultipleExpectations:
   Enabled: false
 

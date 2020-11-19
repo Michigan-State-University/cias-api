@@ -2,4 +2,4 @@ log:
   level: debug
 
 sidekiq:
-  retries: 1
+  retries: 2
