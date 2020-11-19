@@ -72,6 +72,15 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.index ["user_id"], name: "index_interventions_on_user_id"
   end
 
+  create_table "invitations", force: :cascade do |t|
+    t.string "email"
+    t.uuid "invitable_id"
+    t.string "invitable_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
+  end
+
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "session_id", null: false
     t.string "title", null: false
@@ -103,14 +112,6 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
     t.index ["type", "title"], name: "index_questions_on_type_and_title", using: :gin
     t.index ["type"], name: "index_questions_on_type"
-  end
-
-  create_table "session_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "session_id", null: false
-    t.string "email"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["session_id", "email"], name: "index_session_invitations_on_session_id_and_email", unique: true
   end
 
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -209,7 +210,6 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
   add_foreign_key "interventions", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
-  add_foreign_key "session_invitations", "sessions"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "sessions"

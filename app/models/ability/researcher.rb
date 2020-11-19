@@ -12,7 +12,7 @@ class Ability::Researcher < Ability::Base
     can :read, User, User.limit_to_roles(roles_without_admin), active: true
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
-    can :manage, SessionInvitation, session: { intervention: { user_id: user.id } }
+    can :manage, Invitation, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }
     can :manage, QuestionGroup, session: { intervention: { user_id: user.id } }
     can :manage, Question, question_group: { session: { intervention: { user_id: user.id } } }
