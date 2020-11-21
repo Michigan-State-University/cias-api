@@ -72,8 +72,8 @@ Rails.application.routes.draw do
 
   if Rails.env.development?
     scope 'rails' do
-      mount LetterOpenerWeb::Engine, at: 'browse_emails'
-      mount Sidekiq::Web => 'workers'
+      mount LetterOpenerWeb::Engine, at: '/browse_emails'
+      mount Sidekiq::Web => '/workers'
     end
   end
 end
