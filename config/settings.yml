@@ -1,0 +1,16 @@
+# NOTE
+#
+# If a new setting is added which does not have a sane default for production (e.g. credentials,
+# usernames, URLs, IDs, etc.), please add the setting here, and leave the value empty. Then configure
+# the `Config` gem (in `config/initializers/config.rb`) to require it (using `config.schema`)
+# in order to avoid silent and/or obscure failures of the application caused by `nil` values.
+# The required setting should then be set using one of the overriding methods which are documented
+# in the section "Settings" of the file `README.md`.
+
+default_locale: :en
+
+log:
+  level: info
+
+sidekiq:
+  retries: 10
