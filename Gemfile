@@ -12,6 +12,7 @@ gem 'aasm'
 gem 'activerecord_json_validator'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
+gem 'config'
 gem 'connection_pool'
 gem 'dentaku'
 gem 'devise-argon2'
