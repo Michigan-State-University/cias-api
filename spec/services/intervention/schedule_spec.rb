@@ -11,7 +11,7 @@ RSpec.describe Intervention::Schedule do
     interventions
   end
 
-  let(:execute_days_after) { Intervention::Schedule.new(interventions, problem.published_at).days_after }
+  let(:execute_days_after) { described_class.new(interventions, problem.published_at).days_after }
 
   context 'days_after' do
     it 'are days_after' do
@@ -29,14 +29,14 @@ RSpec.describe Intervention::Schedule do
       execute_days_after
 
       expect(interventions.first.schedule_at).to eq Date.current
-      expect(interventions[1..-1].pluck(:schedule_at).uniq).to match_array([nil])
+      expect(interventions[1..].pluck(:schedule_at).uniq).to match_array([nil])
     end
 
     it 'mix after is_day_after no schedule_at' do
       interventions[-2].update(schedule: 'days_after_fill', schedule_payload: 5)
       execute_days_after
 
-      expect(interventions[-2..-1].pluck(:schedule_at).uniq).to match_array([nil])
+      expect(interventions[-2..].pluck(:schedule_at).uniq).to match_array([nil])
     end
   end
 end
