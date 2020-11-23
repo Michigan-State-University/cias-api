@@ -112,14 +112,12 @@ class Intervention < ApplicationRecord
   private
 
   def create_core_childs
-    if question_group_default.nil?
-      ::QuestionGroup::Default.create!(intervention_id: id)
-    end
-    if question_group_finish.nil?
-      qg_finish = ::QuestionGroup::Finish.new(intervention_id: id)
-      qg_finish.save!
-      ::Question::Finish.create!(question_group_id: qg_finish.id)
-    end
+    ::QuestionGroup::Default.create!(intervention_id: id) if question_group_default.nil?
+    return unless question_group_finish.nil?
+
+    qg_finish = ::QuestionGroup::Finish.new(intervention_id: id)
+    qg_finish.save!
+    ::Question::Finish.create!(question_group_id: qg_finish.id)
   end
 
   def json_schema_path

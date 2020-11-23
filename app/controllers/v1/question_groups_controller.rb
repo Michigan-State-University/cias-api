@@ -65,7 +65,8 @@ class V1::QuestionGroupsController < V1Controller
     render_json question_group: cloned_question_group, action: :show, status: :ok
   end
 
-  def share # TODO: Implement business logic
+  # TODO: Implement business logic
+  def share
     authorize! :create, QuestionGroup
   end
 

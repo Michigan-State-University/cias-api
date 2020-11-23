@@ -57,7 +57,7 @@ class Fake
     def create_problems
       user_ids
       (4..14).to_a.sample.times do
-        problem = Problem.create(
+        Problem.create(
           name: Faker::University.name,
           user_id: user_ids.sample,
           shared_to: Problem.shared_tos.keys.sample
@@ -198,9 +198,7 @@ class Fake
 
     def create_user_interventions
       problems = Problem.order('RANDOM()').limit(4)
-      problems.each do |problem|
-        problem.broadcast
-      end
+      problems.each(&:broadcast)
       Intervention.where(problem_id: problems.ids).each do |intervention|
         intervention.user_interventions.create(user_id: user_ids.sample)
       end
