@@ -35,9 +35,6 @@ class User < ApplicationRecord
   has_many :interventions, through: :user_interventions, dependent: :restrict_with_exception
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_log_requests, dependent: :destroy
-  has_one :address, dependent: :destroy, inverse_of: :user
-
-  accepts_nested_attributes_for :address
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')

@@ -27,7 +27,7 @@ class V1::UsersController < V1Controller
   private
 
   def users_scope
-    User.includes(:address).accessible_by(current_ability)
+    User.accessible_by(current_ability)
   end
 
   def user_load
@@ -35,7 +35,7 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :active, roles: [], address_attributes: %i[name country state state_abbreviation city zip_code street building_address apartment_number])
+    params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :active, roles: [])
   end
 
   def query_string_digest
