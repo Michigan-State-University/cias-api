@@ -8,8 +8,6 @@ describe User, type: :model do
 
     it { should be_valid }
     it { should have_many(:problems) }
-    it { should have_one(:address) }
-    it { should accept_nested_attributes_for(:address) }
   end
 
   describe 'admin' do
@@ -17,7 +15,5 @@ describe User, type: :model do
 
     it { should be_valid }
     it { should have_many(:problems) }
-    it { should have_one(:address) }
-    it { should accept_nested_attributes_for(:address) }
   end
 end

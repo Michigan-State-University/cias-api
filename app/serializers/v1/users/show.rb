@@ -16,26 +16,7 @@ class V1::Users::Show < BaseSerializer
       time_zone: @user.time_zone,
       active: @user.active,
       roles: @user.roles,
-      avatar_url: url_for_image(@user, :avatar),
-      address_attributes: provide_address_attributes
-    }
-  end
-
-  private
-
-  def provide_address_attributes
-    address = @user.address || ::NullAddress.new
-    {
-      name: address.name,
-      country: address.country,
-      state: address.state,
-      state_abbreviation: address.state_abbreviation,
-      city: address.city,
-      zip_code: address.zip_code,
-      street: address.street,
-      building_address: address.building_address,
-      apartment_number: address.apartment_number,
-      formatted_usa: address.formatted_usa
+      avatar_url: url_for_image(@user, :avatar)
     }
   end
 end
