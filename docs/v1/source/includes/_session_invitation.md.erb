@@ -1,0 +1,239 @@
+# Invitation for Session
+
+
+## Get all emails associated to sessions
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/invitations`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+session_id | Session ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/sessions/1/invitations
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Create session invitations
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/invitations`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+session_id | Session ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"session_invitation": {
+		"emails": [
+		  "a@a.com", "b@b.com"
+		 ]
+	}
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/sessions/1/invitations
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"user_session": {
+		"emails": [
+		  "a@a.com", "b@b.com"
+		 ]
+	}
+}
+```
+
+
+> HTTP response 201 Created
+
+
+## Destroy session invitation
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/invitations/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+session_id | Session ID | yes
+id | User ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`DELETE`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/sessions/1/invitations/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+> HTTP response 204 No Content
+
+
+## Resend
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/invitations/:id/resend`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+session_id | Session ID | yes
+id | User ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/sessions/1/invitations/1/resend
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+> HTTP response 200 OK

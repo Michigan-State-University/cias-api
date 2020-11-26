@@ -1,19 +1,19 @@
 # QuestionGroup
 
 
-## Get all question groups from single intervention
+## Get all question groups from single session
 
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 
 ### Query String
 
@@ -40,7 +40,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_idquestion_groups
+GET <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_idquestion_groups
 ```
 
 ```http
@@ -60,7 +60,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
     "id": 1,
     "title": "Title",
     "position": 1,
-    "intervention_id": 1,
+    "session_id": 1,
     "questions": [
       "type": "Question::FreeResponse",
       "settings": {
@@ -96,14 +96,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 id | QuestionGroup ID | yes
 
 ### Query String
@@ -131,7 +131,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id
+GET <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id
 ```
 
 ```http
@@ -150,7 +150,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
   "id": 1,
   "title": "Title",
   "position": 1,
-  "intervention_id": 1,
+  "session_id": 1,
   "questions": [
     "type": "Question::FreeResponse",
     "settings": {
@@ -185,14 +185,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 
 
 ### Query String
@@ -233,7 +233,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-POST <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups
+POST <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups
 ```
 
 ```http
@@ -252,7 +252,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
   "id": 1,
   "title": "Title",
   "position": 1,
-  "intervention_id": 1,
+  "session_id": 1,
   "questions": [
     "type": "Question::FreeResponse",
     "settings": {
@@ -287,14 +287,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 id | QuestionGroup ID | yes
 
 
@@ -321,7 +321,7 @@ Parameter | Description | Required
   "question_group": {
     "title": "New Title",
     "position": 2,
-    "intervention_id": 1
+    "session_id": 1
   }
 }
 ```
@@ -332,7 +332,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-PATCH <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id
 ```
 
 ```http
@@ -351,7 +351,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
   "id": 1,
   "title": "Title",
   "position": 1,
-  "intervention_id": 1,
+  "session_id": 1,
   "questions": [
     "type": "Question::FreeResponse",
     "settings": {
@@ -386,14 +386,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 id | QuestionGroup ID | yes
 
 
@@ -421,7 +421,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id
 ```
 
 ```http
@@ -440,14 +440,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/add_questions`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id/add_questions`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 id | QuestionGroup ID | yes
 
 
@@ -483,7 +483,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/add_questions
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id/add_questions
 ```
 
 ```http
@@ -502,7 +502,7 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
   "id": 1,
   "title": "Title",
   "position": 1,
-  "intervention_id": 1,
+  "session_id": 1,
   "questions": [
     "type": "Question::FreeResponse",
     "settings": {
@@ -537,14 +537,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/remove_questions`
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id/remove_questions`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-intervention_id | Intervention ID | yes
+session_id | Intervention ID | yes
 id | QuestionGroup ID | yes
 
 
@@ -580,7 +580,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/question_groups/:id/remove_questions
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/sessions/:session_id/question_groups/:id/remove_questions
 ```
 
 ```http

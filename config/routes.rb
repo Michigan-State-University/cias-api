@@ -31,17 +31,17 @@ Rails.application.routes.draw do
       scope module: 'problems' do
         resources :answers, only: %i[index]
       end
-      patch 'interventions/position', to: 'interventions#position'
-      resources :interventions, only: %i[index show create update]
-      scope module: 'interventions' do
+      patch 'sessions/position', to: 'sessions#position'
+      resources :sessions, only: %i[index show create update]
+      scope module: 'sessions' do
         resources :users, only: %i[index create destroy]
       end
     end
 
-    post 'interventions/:id/clone', to: 'interventions#clone', as: :clone_intervention
-    scope 'interventions/:intervention_id', as: 'intervention' do
+    post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
+    scope 'sessions/:session_id', as: 'session' do
       patch 'questions/move', to: 'questions#move', as: :move_question
-      scope module: 'interventions' do
+      scope module: 'sessions' do
         resources :invitations, only: %i[index create destroy] do
           get 'resend', on: :member
         end

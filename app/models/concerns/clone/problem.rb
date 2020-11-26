@@ -4,15 +4,15 @@ class Clone::Problem < Clone::Base
   def execute
     outcome.to_initial
     outcome.save!
-    create_interventions
+    create_sessions
     outcome
   end
 
   private
 
-  def create_interventions
-    source.interventions.each do |intervention|
-      Clone::Intervention.new(intervention, problem_id: outcome.id).execute
+  def create_sessions
+    source.sessions.each do |session|
+      Clone::Session.new(session, problem_id: outcome.id).execute
     end
   end
 end

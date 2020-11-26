@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-describe 'DELETE /v1/interventions/:intervention_id/question_groups/:id/remove_questions', type: :request do
-  let(:request) { delete remove_questions_v1_intervention_question_group_path(intervention_id: intervention.id, id: question_group.id), params: params, headers: headers }
+describe 'DELETE /v1/sessions/:session_id/question_groups/:id/remove_questions', type: :request do
+  let(:request) { delete remove_questions_v1_session_question_group_path(session_id: session.id, id: question_group.id), params: params, headers: headers }
   let(:params) do
     {
       question_group: {
@@ -12,8 +12,8 @@ describe 'DELETE /v1/interventions/:intervention_id/question_groups/:id/remove_q
     }
   end
 
-  let!(:intervention)   { create(:intervention, problem: create(:problem, :published)) }
-  let!(:question_group) { create(:question_group, intervention: intervention) }
+  let!(:session) { create(:session, problem: create(:problem, :published)) }
+  let!(:question_group) { create(:question_group, session: session) }
   let!(:questions)      { create_list(:question_free_response, 2, question_group: question_group) }
 
   context 'when authenticated as guest user' do

@@ -8,8 +8,8 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:guest) { create(:user, :guest) }
   let(:problem) { create(:problem, user_id: researcher.id) }
-  let(:intervention) { create(:intervention, problem_id: problem.id) }
-  let(:question_group) { create(:question_group, intervention: intervention) }
+  let(:session) { create(:session, problem_id: problem.id) }
+  let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_free_response, question_group: question_group) }
 
   before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
@@ -118,8 +118,8 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       it { expect(json_response['data']['id']).to eq question_feedback.id }
     end
 
-    context 'response with intervention' do
-      let(:intervention) { create(:intervention, problem_id: problem.id, position: 2) }
+    context 'response with session' do
+      let(:session) { create(:session, problem_id: problem.id, position: 2) }
 
       let(:questions) { create_list(:question_single, 3, question_group: question_group) }
       let(:question) do
@@ -128,7 +128,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => intervention.id, 'type' => 'Intervention' }
+                                 'target' => { 'id' => session.id, 'type' => 'Session' }
                                }
                              ] }
         question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'a1' } }
@@ -136,7 +136,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
         question
       end
 
-      it { expect(json_response['data']['id']).to eq intervention.id }
+      it { expect(json_response['data']['id']).to eq session.id }
     end
 
     context 'response with question with calculated target_value' do

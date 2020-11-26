@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_25_210316) do
+ActiveRecord::Schema.define(version: 2020_11_25_220910) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -67,35 +67,6 @@ ActiveRecord::Schema.define(version: 2020_11_25_210316) do
     t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id", using: :gin
   end
 
-  create_table "intervention_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "intervention_id", null: false
-    t.string "email"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["intervention_id", "email"], name: "index_intervention_invitations_on_intervention_id_and_email", unique: true
-  end
-
-  create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "problem_id", null: false
-    t.jsonb "settings"
-    t.integer "position", default: 0, null: false
-    t.string "name", null: false
-    t.string "slug"
-    t.string "schedule"
-    t.integer "schedule_payload"
-    t.date "schedule_at"
-    t.jsonb "formula"
-    t.jsonb "body"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_interventions_on_name"
-    t.index ["problem_id", "name"], name: "index_interventions_on_problem_id_and_name", using: :gin
-    t.index ["problem_id"], name: "index_interventions_on_problem_id"
-    t.index ["schedule"], name: "index_interventions_on_schedule"
-    t.index ["schedule_at"], name: "index_interventions_on_schedule_at"
-    t.index ["slug"], name: "index_interventions_on_slug", unique: true
-  end
-
   create_table "problems", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "user_id", null: false
@@ -112,14 +83,14 @@ ActiveRecord::Schema.define(version: 2020_11_25_210316) do
   end
 
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "intervention_id", null: false
+    t.uuid "session_id", null: false
     t.string "title", null: false
     t.bigint "position", default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "type"
-    t.index ["intervention_id", "title"], name: "index_question_groups_on_intervention_id_and_title", using: :gin
-    t.index ["intervention_id"], name: "index_question_groups_on_intervention_id"
+    t.index ["session_id", "title"], name: "index_question_groups_on_session_id_and_title", using: :gin
+    t.index ["session_id"], name: "index_question_groups_on_session_id"
     t.index ["title"], name: "index_question_groups_on_title"
     t.index ["type"], name: "index_question_groups_on_type"
   end
@@ -144,16 +115,33 @@ ActiveRecord::Schema.define(version: 2020_11_25_210316) do
     t.index ["type"], name: "index_questions_on_type"
   end
 
-  create_table "user_interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.uuid "intervention_id", null: false
-    t.datetime "submitted_at"
-    t.date "schedule_at"
+  create_table "session_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "session_id", null: false
+    t.string "email"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
-    t.index ["user_id", "intervention_id"], name: "index_user_interventions_on_user_id_and_intervention_id", unique: true
-    t.index ["user_id"], name: "index_user_interventions_on_user_id"
+    t.index ["session_id", "email"], name: "index_session_invitations_on_session_id_and_email", unique: true
+  end
+
+  create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "problem_id", null: false
+    t.jsonb "settings"
+    t.integer "position", default: 0, null: false
+    t.string "name", null: false
+    t.string "slug"
+    t.string "schedule"
+    t.integer "schedule_payload"
+    t.date "schedule_at"
+    t.jsonb "formula"
+    t.jsonb "body"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_sessions_on_name"
+    t.index ["problem_id", "name"], name: "index_sessions_on_problem_id_and_name", using: :gin
+    t.index ["problem_id"], name: "index_sessions_on_problem_id"
+    t.index ["schedule"], name: "index_sessions_on_schedule"
+    t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
+    t.index ["slug"], name: "index_sessions_on_slug", unique: true
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -166,6 +154,18 @@ ActiveRecord::Schema.define(version: 2020_11_25_210316) do
     t.inet "remote_ip"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "user_sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "session_id", null: false
+    t.datetime "submitted_at"
+    t.date "schedule_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["session_id"], name: "index_user_sessions_on_session_id"
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
+    t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -218,12 +218,12 @@ ActiveRecord::Schema.define(version: 2020_11_25_210316) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "users"
-  add_foreign_key "intervention_invitations", "interventions"
-  add_foreign_key "interventions", "problems"
   add_foreign_key "problems", "users"
-  add_foreign_key "question_groups", "interventions"
+  add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
-  add_foreign_key "user_interventions", "interventions"
-  add_foreign_key "user_interventions", "users"
+  add_foreign_key "session_invitations", "sessions"
+  add_foreign_key "sessions", "problems"
   add_foreign_key "user_log_requests", "users"
+  add_foreign_key "user_sessions", "sessions"
+  add_foreign_key "user_sessions", "users"
 end

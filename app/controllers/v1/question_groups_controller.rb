@@ -14,7 +14,7 @@ class V1::QuestionGroupsController < V1Controller
   def create
     authorize! :create, QuestionGroup
 
-    qg_plain = QuestionGroup::Plain.new(intervention_id: params[:intervention_id], **question_group_params)
+    qg_plain = QuestionGroup::Plain.new(session_id: params[:session_id], **question_group_params)
     qg_plain.position = question_groups_scope.where(type: %w[QuestionGroup::Default QuestionGroup::Plain]).last.position.to_i + 1
     qg_plain.save!
     questions_scope.update_all(question_group_id: qg_plain.id) # rubocop:disable Rails/SkipsModelValidations
@@ -73,15 +73,15 @@ class V1::QuestionGroupsController < V1Controller
   private
 
   def question_groups_scope
-    QuestionGroup.includes(:intervention, :questions).accessible_by(current_ability).where(intervention_id: params[:intervention_id]).order(:position)
+    QuestionGroup.includes(:session, :questions).accessible_by(current_ability).where(session_id: params[:session_id]).order(:position)
   end
 
   def question_group_load
     question_groups_scope.find(params[:id])
   end
 
-  def intervention_load
-    question_groups_scope.first.intervention
+  def session_load
+    question_groups_scope.first.session
   end
 
   def questions_scope
@@ -89,7 +89,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_params
-    params.require(:question_group).permit(:title, :intervention_id)
+    params.require(:question_group).permit(:title, :session_id)
   end
 
   def question_groups_positions_params

@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Csv' do
   let(:problem) { create(:problem) }
-  let(:interventions) { create_list(:intervention, 5, problem_id: problem.id) }
-  let(:answers) { create_list(:intervention, 5, problem_id: problem.id) }
+  let(:sessions) { create_list(:session, 5, problem_id: problem.id) }
+  let(:answers) { create_list(:session, 5, problem_id: problem.id) }
 
   xcontext 'Retrieve participants' do
     context 'order participants list' do

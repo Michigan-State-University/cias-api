@@ -1,4 +1,4 @@
-intervention:
+session:
   settings:
     narrator:
       voice: true

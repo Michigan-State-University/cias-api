@@ -19,7 +19,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
             {
               match: '= 5',
               target: {
-                type: 'Intervention',
+                type: 'Session',
                 id: ''
               }
             },

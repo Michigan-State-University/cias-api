@@ -9,7 +9,7 @@ RSpec.describe Problem, type: :model do
     let(:initial_status) { subject }
 
     it { should belong_to(:user) }
-    it { should have_many(:interventions) }
+    it { should have_many(:sessions) }
     it { should be_valid }
     it { expect(initial_status.draft?).to be true }
   end
@@ -17,10 +17,10 @@ RSpec.describe Problem, type: :model do
   context 'change states' do
     context 'draft to published' do
       let(:problem) { create(:problem) }
-      let(:interventions) { create_list(:intervention, 4, problem_id: problem.id) }
+      let(:sessions) { create_list(:session, 4, problem_id: problem.id) }
 
-      it 'sucess event' do
-        interventions
+      it 'success event' do
+        sessions
         problem.broadcast
         problem.save
         expect(problem.published?).to be true
@@ -30,7 +30,7 @@ RSpec.describe Problem, type: :model do
     context 'published to closed' do
       let(:problem) { create(:problem, :published) }
 
-      it 'sucess event' do
+      it 'success event' do
         problem.close
         problem.save
         expect(problem.closed?).to be true
@@ -40,7 +40,7 @@ RSpec.describe Problem, type: :model do
     context 'closed to archived' do
       let(:problem) { create(:problem, :closed) }
 
-      it 'sucess event' do
+      it 'success event' do
         problem.to_archive
         problem.save
         expect(problem.archived?).to be true
@@ -50,7 +50,7 @@ RSpec.describe Problem, type: :model do
     context 'draft to draft' do
       let(:problem) { create(:problem) }
 
-      it 'sucess event' do
+      it 'success event' do
         problem.to_initial
         problem.save
         expect(problem.draft?).to be true
@@ -60,7 +60,7 @@ RSpec.describe Problem, type: :model do
     context 'published to draft' do
       let(:problem) { create(:problem, :published) }
 
-      it 'sucess event' do
+      it 'success event' do
         problem.to_initial
         problem.save
         expect(problem.draft?).to be true
@@ -70,7 +70,7 @@ RSpec.describe Problem, type: :model do
     context 'closed to draft' do
       let(:problem) { create(:problem, :closed) }
 
-      it 'sucess event' do
+      it 'success event' do
         problem.to_initial
         problem.save
         expect(problem.draft?).to be true
@@ -80,7 +80,7 @@ RSpec.describe Problem, type: :model do
     context 'archived to draft' do
       let(:problem) { create(:problem, :archived) }
 
-      it 'sucess event' do
+      it 'success event' do
         problem.to_initial
         problem.save
         expect(problem.draft?).to be true

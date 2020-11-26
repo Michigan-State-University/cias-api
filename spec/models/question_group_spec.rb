@@ -6,7 +6,7 @@ RSpec.describe QuestionGroup, type: :model do
   describe 'QuestionGroup::Default' do
     subject(:question_group_default) { build(:question_group_default) }
 
-    it { should belong_to(:intervention) }
+    it { should belong_to(:session) }
     it { should be_valid }
 
     it 'responds to message default? and should be true' do
@@ -17,7 +17,7 @@ RSpec.describe QuestionGroup, type: :model do
   describe 'QuestionGroup::Plain' do
     subject(:question_group_plain) { build(:question_group_plain) }
 
-    it { should belong_to(:intervention) }
+    it { should belong_to(:session) }
     it { should be_valid }
 
     it 'responds to message default? and should be false' do
@@ -29,7 +29,7 @@ RSpec.describe QuestionGroup, type: :model do
     describe 'model definition' do
       subject(:question_group_finish) { build(:question_group_finish) }
 
-      it { should belong_to(:intervention) }
+      it { should belong_to(:session) }
       it { should be_valid }
     end
   end

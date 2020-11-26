@@ -1,0 +1,486 @@
+# Session
+
+
+## Get all sessions
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/sessions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/sessions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Show session
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/sessions/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+id | Session ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`GET`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+GET <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/sessions/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 200 OK
+
+
+## Create session
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/sessions`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"session": {
+		"name": "Session example 1",
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+
+
+### Note
+
+Required keys:
+
+ * `name`.
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/sessions
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"session": {
+		"name": "Session example 1",
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+```
+
+
+> HTTP response 200 OK
+
+
+## Clone session
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/sessions/:id/clone`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+id | Session ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/sessions/1/clone
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+
+> HTTP response 201 Created
+
+
+## Position sessions
+
+Resource for update position of sessions.
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/sessions/position`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+  "session": {
+    "position": [
+      {
+        "id": "blah",
+        "position": 1
+      },
+      {
+        "id": "foo",
+        "position": 2
+      }
+    ]
+  }
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/sessions/position
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+  "question": {
+    "position": [
+      {
+        "id": "blah",
+        "position": 1
+      },
+      {
+        "id": "foo",
+        "position": 2
+      }
+    ]
+  }
+}
+
+```
+
+
+> HTTP response 200 OK
+
+
+## Update session
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/sessions/:id`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+id | Session ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`PATCH, PUT`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"session": {
+		"name": "Session example 1",
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+PATCH <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/sessions/1
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"session": {
+		"name": "Session example 1",
+    "settings": {
+      "example": 1
+    },
+		"body": {
+			"key1": 1,
+			"key2": 2
+		}
+	}
+}
+```
+
+
+> HTTP response 200 OK
+
+
+## Send invitation to fill session
+
+
+### Resource
+
+`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/sessions/:id/invite`
+
+
+### URL parameters
+
+Parameter | Description | Required
+--------- | ----------- | --------
+problem_id | Problem ID | yes
+id | Session ID | yes
+
+
+### Query String
+
+Parameter | Description | Required
+--------- | ----------- | --------
+
+
+### HTTP request method
+
+`POST`
+
+
+### HTTP headers
+
+<%= partial 'includes/http/headers/auth' %>
+
+
+### HTTP body
+
+{
+	"emails": ["email1@email.com", "email2@email.com"]
+}
+
+
+### Note
+
+
+> HTTP example request
+
+```http
+POST <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/sessions/1/invite
+```
+
+```http
+Content-Type: application/json; charset=utf-8
+access-token: xxxyyyzzz
+token-type: Bearer
+client: xxxyyyzzz
+uid: user@<%= ENV['DOMAIN_NAME'] %>
+```
+
+```json
+{
+	"emails": ["email1@email.com", "email2@email.com"]
+}
+```
+
+
+> HTTP response 200 OK
+>

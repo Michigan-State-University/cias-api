@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-describe 'PATCH /v1/interventions/:intervention_id/question_groups/:id', type: :request do
-  let(:request) { patch v1_intervention_question_group_path(intervention_id: intervention.id, id: question_group_default.id), params: params, headers: headers }
+describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
+  let(:request) { patch v1_session_question_group_path(session_id: session.id, id: question_group_default.id), params: params, headers: headers }
   let(:params) do
     {
       question_group: {
@@ -12,8 +12,8 @@ describe 'PATCH /v1/interventions/:intervention_id/question_groups/:id', type: :
     }
   end
 
-  let!(:intervention) { create(:intervention, problem: create(:problem, :published)) }
-  let!(:question_group_default) { create(:question_group_default, title: 'Old Title', intervention: intervention) }
+  let!(:session) { create(:session, problem: create(:problem, :published)) }
+  let!(:question_group_default) { create(:question_group_default, title: 'Old Title', session: session) }
 
   context 'when authenticated as guest user' do
     let(:guest_user) { create(:user, :guest) }
@@ -39,12 +39,12 @@ describe 'PATCH /v1/interventions/:intervention_id/question_groups/:id', type: :
       end
     end
 
-    context 'when new intervention_id is provided in params' do
-      let(:new_intervention) { create(:intervention) }
+    context 'when new session_id is provided in params' do
+      let(:new_session) { create(:session) }
       let(:params) do
         {
           question_group: {
-            intervention_id: new_intervention.id
+            session_id: new_session.id
           }
         }
       end
@@ -53,7 +53,7 @@ describe 'PATCH /v1/interventions/:intervention_id/question_groups/:id', type: :
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['intervention_id']).to eq new_intervention.id
+        expect(json_response['session_id']).to eq new_session.id
       end
     end
   end

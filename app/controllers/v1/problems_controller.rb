@@ -28,7 +28,7 @@ class V1::ProblemsController < V1Controller
   private
 
   def problems_scope
-    Problem.includes(:interventions).accessible_by(current_ability)
+    Problem.includes(:sessions).accessible_by(current_ability)
   end
 
   def problem_load

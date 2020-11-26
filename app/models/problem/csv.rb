@@ -18,13 +18,13 @@ class Problem::Csv
   private
 
   def data_scope(problem)
-    Question.joins(:intervention, answers: :user).
-      where(interventions: { problem_id: problem.id }).
+    Question.joins(:session, answers: :user).
+      where(sessions: { problem_id: problem.id }).
       where.not(type: 'Question::Feedback').
-      group('interventions.position, interventions.updated_at, questions.position, questions.updated_at, questions.id').
+      group('sessions.position, sessions.updated_at, questions.position, questions.updated_at, questions.id').
       order(
-        'interventions.position' => :asc,
-        'interventions.updated_at' => :asc,
+        'sessions.position' => :asc,
+        'sessions.updated_at' => :asc,
         'questions.position' => :asc,
         'questions.updated_at' => :asc
       )

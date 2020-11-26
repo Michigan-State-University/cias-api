@@ -6,7 +6,7 @@ class Problem::StatusKeeper
   end
 
   def broadcast
-    InterventionJob::Broadcast.perform_later(problem_id)
+    SessionJob::Broadcast.perform_later(problem_id)
   end
 
   private

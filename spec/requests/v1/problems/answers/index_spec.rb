@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe 'GET /v1/problems/:id/answers', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:problem) { create(:problem) }
-  let(:interventions) { create_list(:intervention, 2, problem_id: problem.id) }
-  let(:questions) { create_list(:question_single, 4, intervention_id: intervention.id) }
-  let(:answers) { create_list(:intervention, 6, question_id: question.id) }
+  let(:sessions) { create_list(:session, 2, problem_id: problem.id) }
+  let(:questions) { create_list(:question_single, 4, session_id: session.id) }
+  let(:answers) { create_list(:session, 6, question_id: question.id) }
   let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do

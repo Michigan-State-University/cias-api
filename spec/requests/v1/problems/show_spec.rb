@@ -11,9 +11,9 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
 
   let(:shared_to) { :registered }
   let(:problem_user) { admin }
-  let(:interventions) { create_list(:intervention, 2) }
+  let(:sessions) { create_list(:session, 2) }
   let(:users) { [] }
-  let!(:problem) { create(:problem, :published, name: 'Some problem', user: problem_user, interventions: interventions, shared_to: shared_to) }
+  let!(:problem) { create(:problem, :published, name: 'Some problem', user: problem_user, sessions: sessions, shared_to: shared_to) }
 
   context 'when user' do
     before { get v1_problem_path(problem.id), headers: user.create_new_auth_token }
@@ -26,8 +26,8 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
         )
       end
 
-      it 'contains proper interventions collection' do
-        expect(json_response['interventions_size']).to eq interventions.size
+      it 'contains proper sessions collection' do
+        expect(json_response['sessions_size']).to eq sessions.size
       end
     end
 
@@ -44,8 +44,8 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
           )
         end
 
-        it 'contains proper interventions collection' do
-          expect(json_response['interventions_size']).to eq interventions.size
+        it 'contains proper sessions collection' do
+          expect(json_response['sessions_size']).to eq sessions.size
         end
       end
 
@@ -68,8 +68,8 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
             )
           end
 
-          xit 'contains proper interventions collection' do
-            expect(json_response['interventions_size']).to eq interventions.size
+          xit 'contains proper sessions collection' do
+            expect(json_response['sessions_size']).to eq sessions.size
           end
         end
       end
@@ -94,8 +94,8 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
           )
         end
 
-        it 'contains proper interventions collection' do
-          expect(json_response['interventions_size']).to eq 2
+        it 'contains proper sessions collection' do
+          expect(json_response['sessions_size']).to eq 2
         end
       end
     end
@@ -119,8 +119,8 @@ RSpec.describe 'GET /v1/problems/:id', type: :request do
           )
         end
 
-        it 'contains proper interventions collection' do
-          expect(json_response['interventions_size']).to eq interventions.size
+        it 'contains proper sessions collection' do
+          expect(json_response['sessions_size']).to eq sessions.size
         end
       end
     end
