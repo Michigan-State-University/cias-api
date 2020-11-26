@@ -63,18 +63,12 @@ class Problem < ApplicationRecord
     users_granted_access_ids = User.where(email: emails).ids
     return if users_granted_access_ids.empty?
 
-    bulk = []
-    interventions.ids.each do |intervention_id|
-      users_granted_access_ids.each do |user_id|
-        h = {}
-        h[:user_id] = user_id
-        h[:intervention_id] = intervention_id
-        timestamp = Time.current
-        h[:created_at] = timestamp
-        h[:updated_at] = timestamp
-        bulk.push(h)
+    UserIntervention.transaction do
+      interventions.ids.each do |intervention_id|
+        users_granted_access_ids.each do |user_id|
+          UserIntervention.create!(user_id: user_id, intervention_id: intervention_id)
+        end
       end
     end
-    UserIntervention.insert_all(bulk)
   end
 end
