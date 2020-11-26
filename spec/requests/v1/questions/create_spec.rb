@@ -6,6 +6,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   let(:user) { create(:user, :confirmed, :admin) }
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
+  let(:blocks) { [] }
   let(:params) do
     {
       question: {
@@ -49,6 +50,13 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
               }
             }
           ]
+        },
+        narrator: {
+          blocks: blocks,
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -66,7 +74,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     end
 
     context 'is valid' do
-      before { post v1_question_group_questions_path(question_group.id), params: params, headers: headers }
+      before { post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -79,19 +87,64 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   context 'when response' do
     context 'is JSON' do
       before do
-        post v1_question_group_questions_path(question_group.id), params: params, headers: headers
+        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
       end
 
-      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
+      it {
+        expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
+      }
     end
 
     context 'is JSON and parse' do
       before do
-        post v1_question_group_questions_path(question_group.id), params: params, headers: headers
+        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
       end
 
       it 'success to Hash' do
         expect(json_response.class).to be(Hash)
+      end
+    end
+  end
+
+  context 'when blocks' do
+    context 'has not been passed' do
+      before do
+        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
+      end
+
+      it 'do not create narrator blocks' do
+        expect(json_response['data']['attributes']['narrator']['blocks'].size).to be(0)
+      end
+    end
+
+    context 'has been passed' do
+      let(:blocks) do
+        [
+          {
+            action: 'NO_ACTION',
+            animation: 'rest',
+            audio_urls: [],
+            end_position: {
+              x: 600,
+              y: 600
+            },
+            sha256: [],
+            text: ['Enter main text/question for screen here'],
+            type: 'ReadQuestion'
+          }
+        ]
+      end
+
+      before do
+        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
+      end
+
+      it('has correct blocks size') do
+        expect(json_response['data']['attributes']['narrator']['blocks'].size).to be(1)
+      end
+
+      it('creates audio url correctly') do
+        expect(json_response['data']['attributes']['narrator']['blocks'][0]['audio_urls'].size).to be(1)
       end
     end
   end

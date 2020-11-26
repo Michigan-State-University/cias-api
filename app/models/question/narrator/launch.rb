@@ -17,6 +17,6 @@ class Question::Narrator::Launch
       narrator['blocks'].reject!(&method(:voice_block?))
     end
     narrator['blocks'].reject!(&method(:animation_block?)) unless narrator['settings']['animation']
-    narrator['settings']['voice'] && question.narrator_changed?
+    narrator['settings']['voice']
   end
 end

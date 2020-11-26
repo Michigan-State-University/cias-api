@@ -5,6 +5,7 @@ class Question < ApplicationRecord
   include BodyInterface
   include Clone
   include FormulaInterface
+  include BlockHelper
 
   belongs_to :question_group, inverse_of: :questions, touch: true
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
@@ -29,6 +30,7 @@ class Question < ApplicationRecord
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
 
   delegate :session, to: :question_group
+  after_create :initialize_narrator
   default_scope { order(:position) }
 
   def subclass_name
@@ -87,6 +89,11 @@ class Question < ApplicationRecord
   end
 
   private
+
+  def initialize_narrator
+    narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish'
+    execute_narrator
+  end
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/question'
