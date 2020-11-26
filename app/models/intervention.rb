@@ -68,17 +68,11 @@ class Intervention < ApplicationRecord
   def add_user_interventions
     return if problem.user_interventions.empty?
 
-    bulk = []
-    problem.user_interventions.pluck(:user_id).each do |user_id|
-      h = {}
-      h[:user_id] = user_id
-      h[:intervention_id] = id
-      timestamp = Time.current
-      h[:created_at] = timestamp
-      h[:updated_at] = timestamp
-      bulk.push(h)
+    UserIntervention.transaction do
+      problem.user_interventions.pluck(:user_id).each do |user_id|
+        UserIntervention.create!(user_id: user_id, intervention_id: id)
+      end
     end
-    UserIntervention.insert_all(bulk)
   end
 
   def should_generate_new_friendly_id?
@@ -95,17 +89,12 @@ class Intervention < ApplicationRecord
       User.invite!(email: email)
     end
 
-    bulk = []
-    User.where(email: emails).find_each do |user|
-      h = {}
-      h[:intervention_id] = id
-      h[:email] = user.email
-      timestamp = Time.current
-      h[:created_at] = timestamp
-      h[:updated_at] = timestamp
-      bulk.push(h)
+    InterventionInvitation.transaction do
+      User.where(email: emails).find_each do |user|
+        InterventionInvitation.create!(intervention_id: id, email: user.email)
+      end
     end
-    InterventionInvitation.insert_all(bulk)
+
     InterventionJob::Invitation.perform_later(id, emails)
   end
 
