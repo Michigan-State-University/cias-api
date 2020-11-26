@@ -202,7 +202,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
 
       it 'response contains target_value' do
         expect(json_response['data']['attributes']['narrator']['blocks'].first).to include(
-          'target_value' => include('text' => ['Good your value is 20.'], 'match' => '=1' )
+          'target_value' => include('text' => ['Good your value is 20.'], 'match' => '=1')
         )
       end
     end
