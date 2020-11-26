@@ -19,7 +19,7 @@ class V1::Problems::Show < BaseSerializer
         first_name: @problem.user.first_name,
         last_name: @problem.user.last_name
       },
-      interventions_size: @problem.interventions.size
+      sessions_size: @problem.sessions.size
     }
   end
 end

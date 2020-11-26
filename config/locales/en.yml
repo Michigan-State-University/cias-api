@@ -25,13 +25,13 @@ en:
   csv_mailer:
     answers:
       subject: "[CSV] Answers for: %{problem_name}"
-      body: You ordered the preparation of a CSV file with intervention data, therefore you receive this message. Your order is finished successfully. Please log in to the application, report file is ready to download.
-  intervention_mailer:
+      body: You ordered the preparation of a CSV file with session data, therefore you receive this message. Your order is finished successfully. Please log in to the application, report file is ready to download.
+  session_mailer:
     grant_access_to_a_user:
-      subject: You got access and the intervention is available for completion!
-      body: You got access to intervention %{intervention_name}. Please click in the link to fill the intervention.
-      invitation_link: "%{domain}/interventions/%{problem_id}/sessions/%{intervention_id}/fill"
+      subject: You got access and the session is available for completion!
+      body: You got access to session %{session_name}. Please click in the link to fill the session.
+      invitation_link: "%{domain}/sessions/%{problem_id}/sessions/%{session_id}/fill"
     inform_to_an_email:
-      subject: You have been invited to complete an intervention.
-      body: You have been invited to complete %{intervention_name}. Please click in the link to get more information.
-      invitation_link: "%{domain}/interventions/%{problem_id}/sessions/%{intervention_id}/fill"
+      subject: You have been invited to complete an session.
+      body: You have been invited to complete %{session_name}. Please click in the link to get more information.
+      invitation_link: "%{domain}/sessions/%{problem_id}/sessions/%{session_id}/fill"

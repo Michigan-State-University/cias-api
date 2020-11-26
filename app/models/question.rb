@@ -28,7 +28,7 @@ class Question < ApplicationRecord
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
 
-  delegate :intervention, to: :question_group
+  delegate :session, to: :question_group
   default_scope { order(:position) }
 
   def subclass_name
@@ -36,7 +36,7 @@ class Question < ApplicationRecord
   end
 
   def position_equal_or_higher
-    questionnaire = intervention.question_groups.includes([:questions]).map(&:questions).flatten
+    questionnaire = session.question_groups.includes([:questions]).map(&:questions).flatten
     current_position = questionnaire.map(&:id).find_index id
     @position_equal_or_higher ||= questionnaire.drop(current_position)
   end
@@ -57,7 +57,7 @@ class Question < ApplicationRecord
     end
   end
 
-  def next_intervention_or_question(answers_var_values)
+  def next_session_or_question(answers_var_values)
     return nil if id.eql?(position_equal_or_higher.last.id)
 
     if formula['payload'].present?

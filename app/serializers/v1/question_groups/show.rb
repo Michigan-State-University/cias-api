@@ -11,7 +11,7 @@ class V1::QuestionGroups::Show < BaseSerializer
       type: question_group.type,
       title: question_group.title,
       position: question_group.position,
-      intervention_id: question_group.intervention_id,
+      session_id: question_group.session_id,
       questions: collect_questions
     }
   end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/interventions/:qusetion_group_id/questions', type: :request do
+RSpec.describe 'GET /v1/sessions/:qusetion_group_id/questions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }

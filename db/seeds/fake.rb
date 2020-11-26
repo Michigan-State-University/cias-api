@@ -12,17 +12,17 @@ return puts "\n#{msg_template} where there are no created users" if User.count.z
 # rubocop:disable Metrics/ClassLength, Style/ClassVars, ThreadSafety/ClassAndModuleAttributes, ThreadSafety/InstanceVariableInClassMethod
 class Fake
   class << self
-    mattr_accessor :intervention_types
+    mattr_accessor :session_types
     mattr_accessor :user_ids
-    mattr_accessor :intervention_ids
+    mattr_accessor :session_ids
     mattr_accessor :subclass_types
 
     def exploit
       create_problems
-      create_interventions
-      create_intervention_invitations
+      create_sessions
+      create_session_invitations
       create_questions
-      create_user_interventions
+      create_user_sessions
       create_answers
     end
 
@@ -52,10 +52,10 @@ class Fake
       @@problem_ids ||= Problem.ids
     end
 
-    def create_interventions
+    def create_sessions
       problem_ids
       (40..60).to_a.sample.times do
-        Intervention.create(
+        Session.create(
           problem_id: problem_ids.sample,
           name: Faker::Name.name,
           position: rand(1..100),
@@ -70,14 +70,14 @@ class Fake
       end
     end
 
-    def intervention_ids
-      @@intervention_ids ||= Intervention.ids
+    def session_ids
+      @@session_ids ||= Session.ids
     end
 
-    def create_intervention_invitations
-      Intervention.all.each do |intervention|
+    def create_session_invitations
+      Session.all.each do |session|
         (1..4).to_a.sample.times do
-          intervention.intervention_invitations.create(email: Faker::Internet.email)
+          session.session_invitations.create(email: Faker::Internet.email)
         end
       end
     end
@@ -102,11 +102,11 @@ class Fake
       (80..100).to_a.sample.times do
         sample_type = subclass_types.sample
         image_sample = images_files.sample
-        intervention = Intervention.find(intervention_ids.sample)
+        session = Session.find(session_ids.sample)
 
         question = Question.new(
           type: "Question::#{sample_type}",
-          question_group: intervention.question_group_plains.first,
+          question_group: session.question_group_plains.first,
           position: rand(1..100),
           title: sample_type,
           subtitle: Faker::Job.position,
@@ -168,10 +168,10 @@ class Fake
         question.image.attach(io: File.open(image_sample), filename: image_sample.split('/').last)
         question.save
       end
-      intervention_question_type_id = Intervention.pluck(:id).map { |i| ['Intervention', i] } + Question.pluck(:type, :id)
+      session_question_type_id = Session.pluck(:id).map { |i| ['Session', i] } + Question.pluck(:type, :id)
       Question.all.each do |question|
         question.formula['patterns'].each do |pattern|
-          target = intervention_question_type_id.sample
+          target = session_question_type_id.sample
           pattern['target']['type'] = target.first.deconstantize
           pattern['target']['id'] = target.last
         end
@@ -179,11 +179,11 @@ class Fake
       end
     end
 
-    def create_user_interventions
+    def create_user_sessions
       problems = Problem.order('RANDOM()').limit(4)
       problems.each(&:broadcast)
-      Intervention.where(problem_id: problems.ids).each do |intervention|
-        intervention.user_interventions.create(user_id: user_ids.sample)
+      Session.where(problem_id: problems.ids).each do |session|
+        session.user_sessions.create(user_id: user_ids.sample)
       end
     end
 

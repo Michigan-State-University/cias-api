@@ -3,7 +3,7 @@
 class Problem::StatusKeeper::Broadcast
   def initialize(problem)
     @problem = problem
-    @sessions = problem.interventions.order(:position)
+    @sessions = problem.sessions.order(:position)
   end
 
   def execute
@@ -24,7 +24,7 @@ class Problem::StatusKeeper::Broadcast
   end
 
   def calculate_schedule_days_after
-    ::Intervention::Schedule.new(
+    ::Session::Schedule.new(
       sessions,
       problem.published_at
     ).days_after
@@ -37,20 +37,20 @@ class Problem::StatusKeeper::Broadcast
     end
     sessions_to_publish.compact.each do |session|
       publish_at = DateTime.parse "#{session.schedule_at} #{time}"
-      InterventionJob::Publish.set(wait_until: publish_at).perform_later(session.id)
+      SessionJob::Publish.set(wait_until: publish_at).perform_later(session.id)
     end
   end
 
   def delete_draft_answers
-    Answer.joins(question: { question_group: :intervention }).where(
-      questions: { question_groups: { interventions: { problem_id: problem.id } } }
+    Answer.joins(question: { question_group: :session }).where(
+      questions: { question_groups: { sessions: { problem_id: problem.id } } }
     ).destroy_all
   end
 
   def mails_grant_access_to_a_user
-    problem.user_interventions.each do |user_inter|
-      InterventionMailer.grant_access_to_a_user(
-        user_inter.intervention,
+    problem.user_sessions.each do |user_inter|
+      SessionMailer.grant_access_to_a_user(
+        user_inter.session,
         user_inter.email
       ).deliver_now
     end

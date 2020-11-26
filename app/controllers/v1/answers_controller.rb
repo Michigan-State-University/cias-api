@@ -13,10 +13,10 @@ class V1::AnswersController < V1Controller
 
   def create
     answer = answers_scope.create!(user_id: current_v1_user.id, **answer_params)
-    intervention_or_question = answer.perform_response
+    session_or_question = answer.perform_response
     render json: serialized_response(
-      intervention_or_question,
-      intervention_or_question&.de_constantize_modulize_name || NilClass
+      session_or_question,
+      session_or_question&.de_constantize_modulize_name || NilClass
     )
   end
 

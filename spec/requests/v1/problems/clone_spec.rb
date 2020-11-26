@@ -60,7 +60,7 @@ RSpec.describe 'POST /v1/problems/:id/clone', type: :request do
     end
 
     let(:problem_cloned) do
-      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'interventions')
+      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'sessions')
     end
 
     it 'origin and outcome same' do

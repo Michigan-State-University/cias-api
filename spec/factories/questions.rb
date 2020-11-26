@@ -321,7 +321,7 @@ FactoryBot.define do
       end
     end
 
-    trait :branching_to_intervention do
+    trait :branching_to_session do
       formula do
         {
           payload: 'a1',
@@ -329,7 +329,7 @@ FactoryBot.define do
             { match: '=2',
               target: {
                 id: '',
-                type: 'Intervention'
+                type: 'Session'
               } }
           ]
         }

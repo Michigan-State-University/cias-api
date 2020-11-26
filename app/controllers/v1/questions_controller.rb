@@ -47,7 +47,7 @@ class V1::QuestionsController < V1Controller
   private
 
   def question_groups_scope
-    Intervention.includes(%i[question_groups questions]).accessible_by(current_ability).find(params[:intervention_id]).question_groups.order(:position)
+    Session.includes(%i[question_groups questions]).accessible_by(current_ability).find(params[:session_id]).question_groups.order(:position)
   end
 
   def question_group_load

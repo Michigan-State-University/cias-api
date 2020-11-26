@@ -7,11 +7,11 @@ RSpec.describe LogJob::UserRequest, type: :job do
   let(:params) do
     {
       user_id: user.id,
-      controller: 'v1/interventions',
+      controller: 'v1/sessions',
       action: 'index',
       query_string: {},
       params: {
-        'intervention' => {}
+        'session' => {}
       },
       user_agent: 'insomnia/7.1.1',
       remote_ip: '::1'

@@ -5,9 +5,9 @@ class Problem < ApplicationRecord
   include Clone
 
   belongs_to :user, inverse_of: :problems
-  has_many :interventions, dependent: :restrict_with_exception, inverse_of: :problem
-  has_many :user_interventions, dependent: :restrict_with_exception, through: :interventions
-  has_many :intervention_invitations, dependent: :restrict_with_exception, through: :interventions
+  has_many :sessions, dependent: :restrict_with_exception, inverse_of: :problem
+  has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
+  has_many :session_invitations, dependent: :restrict_with_exception, through: :sessions
 
   has_many_attached :reports
 
@@ -19,8 +19,8 @@ class Problem < ApplicationRecord
   validates :status_event, inclusion: { in: %w[broadcast close to_archive] }, allow_nil: true
 
   scope :available_for_participant, lambda { |participant_id|
-    left_joins(:user_interventions).published.not_shared_to_invited
-      .or(left_joins(:user_interventions).published.where(user_interventions: { user_id: participant_id }))
+    left_joins(:user_sessions).published.not_shared_to_invited
+      .or(left_joins(:user_sessions).published.where(user_sessions: { user_id: participant_id }))
   }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
@@ -59,14 +59,14 @@ class Problem < ApplicationRecord
     save!
   end
 
-  def create_user_interventions(emails)
+  def create_user_sessions(emails)
     users_granted_access_ids = User.where(email: emails).ids
     return if users_granted_access_ids.empty?
 
-    UserIntervention.transaction do
-      interventions.ids.each do |intervention_id|
+    UserSession.transaction do
+      sessions.ids.each do |session_id|
         users_granted_access_ids.each do |user_id|
-          UserIntervention.create!(user_id: user_id, intervention_id: intervention_id)
+          UserSession.create!(user_id: user_id, session_id: session_id)
         end
       end
     end
