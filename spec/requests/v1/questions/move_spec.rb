@@ -5,7 +5,7 @@ require 'rails_helper'
 describe 'PATCH /v1/sessions/:session_id/questions/move', type: :request do
   let(:request) { patch v1_session_move_question_path(session_id: session.id), params: params, headers: headers }
 
-  let!(:session) { create(:session, problem: create(:problem, user: user)) }
+  let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group_1) { create(:question_group, title: 'Question Group 1 Title', session: session, position: 1) }
   let!(:question_group_2) { create(:question_group, title: 'Question Group 2 Title', session: session, position: 2) }
   let!(:question_1)       { create(:question_free_response, question_group: question_group_1, position: 0) }

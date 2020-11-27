@@ -6,16 +6,16 @@ RSpec.describe UserSession, type: :model do
   context 'UserSession' do
     subject { create(:session) }
 
-    it { should belong_to(:problem) }
+    it { should belong_to(:intervention) }
     it { should have_many(:questions) }
     it { should be_valid }
   end
 
   context 'proper alter_schedule result' do
-    let(:problem) { create(:problem) }
+    let(:intervention) { create(:intervention) }
     let(:user) { create(:user, :participant) }
     let(:sessions) do
-      sessions = create_list(:session, 3, problem_id: problem.id, schedule: 'days_after_fill', schedule_payload: 7)
+      sessions = create_list(:session, 3, intervention_id: intervention.id, schedule: 'days_after_fill', schedule_payload: 7)
       first_inter = sessions.first
       first_inter.update(schedule: nil, schedule_payload: nil)
       sessions

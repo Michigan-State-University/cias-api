@@ -3,7 +3,7 @@
 class SessionJob::Publish < SessionJob
   def perform(id)
     session = Session.find(id)
-    all_sessions = session.problem.sessions.order(:position).includes([:session_invitations])
+    all_sessions = session.intervention.sessions.order(:position).includes([:session_invitations])
     current_index = all_sessions.find_index session
     operational_sessions = all_sessions.slice(0..current_index)
     emails = operational_sessions.map { |s| s.session_invitations.map(&:email) }.flatten.uniq

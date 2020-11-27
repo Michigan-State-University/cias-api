@@ -3,8 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'PositionBulkUpdate', type: :model do
-  let(:problem) { create(:problem) }
-  let(:sessions) { create_list(:session, 3, problem_id: problem.id) }
+  let(:intervention) { create(:intervention) }
+  let(:sessions) { create_list(:session, 3, intervention_id: intervention.id) }
 
   let(:session) { create(:session) }
   let(:question_group) { create(:question_group, session: session) }

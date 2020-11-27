@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Controller returns all users who have got grant access to all session associated with the problem;
-# Check also Problem::StatusKeeper::Broadcast.
+# Controller returns all users who have got grant access to all session associated with the intervention;
+# Check also Intervention::StatusKeeper::Broadcast.
 class V1::Sessions::UsersController < V1Controller
   def index
     render_json user_sessions: user_sessions_scope, action: :index_users_uniq
@@ -10,7 +10,7 @@ class V1::Sessions::UsersController < V1Controller
   def create
     authorize! :create, UserSession
 
-    problem_load.create_user_sessions(user_session_params[:emails])
+    intervention_load.create_user_sessions(user_session_params[:emails])
     render_json user_sessions: user_sessions_scope, action: :index_users_uniq, status: :created
   end
 
@@ -21,12 +21,12 @@ class V1::Sessions::UsersController < V1Controller
 
   private
 
-  def problem_load
-    Problem.includes(:sessions, :user_sessions).accessible_by(current_ability).find(params[:problem_id])
+  def intervention_load
+    Intervention.includes(:sessions, :user_sessions).accessible_by(current_ability).find(params[:intervention_id])
   end
 
   def user_sessions_scope
-    problem_load.user_sessions
+    intervention_load.user_sessions
   end
 
   def user_session_params

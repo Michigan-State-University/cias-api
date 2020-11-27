@@ -1,0 +1,175 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'PATCH /v1/interventions', type: :request do
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:participant) { create(:user, :confirmed, :participant) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:guest) { create(:user, :guest) }
+  let(:user) { admin }
+  let(:headers) { user.create_new_auth_token }
+
+  let(:params) do
+    {
+      intervention: {
+        name: 'New Intervention',
+        status_event: 'broadcast'
+      }
+    }
+  end
+
+  let(:intervention_user) { admin }
+  let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
+  let(:intervention_id) { intervention.id }
+
+  context 'when auth' do
+    context 'is invalid' do
+      before { patch v1_intervention_path(intervention_id) }
+
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => include('@guest.true')
+        )
+      end
+    end
+
+    context 'is valid' do
+      before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'uid' => user.email
+        )
+      end
+    end
+  end
+
+  context 'is response header Content-Type eq JSON' do
+    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
+    it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
+  end
+
+  context 'when user has role admin' do
+    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
+    context 'when params are VALID' do
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'name' => 'New Intervention',
+          'status' => 'published',
+          'shared_to' => 'anyone'
+        )
+      end
+
+      it 'updates a intervention object' do
+        expect(intervention.reload.attributes).to include(
+          'name' => 'New Intervention',
+          'status' => 'published',
+          'shared_to' => 'anyone'
+        )
+      end
+    end
+
+    context 'when params are INVALID' do
+      let(:params) do
+        {
+          intervention: {
+            name: ''
+          }
+        }
+      end
+
+      it { expect(response).to have_http_status(:unprocessable_entity) }
+
+      it 'response contains proper error message' do
+        expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+      end
+
+      it 'does not update a intervention object' do
+        expect(intervention.reload.attributes).to include(
+          'name' => 'Old Intervention',
+          'status' => 'draft',
+          'shared_to' => 'anyone'
+        )
+      end
+    end
+  end
+
+  context 'when user has role researcher' do
+    let(:user) { researcher }
+
+    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
+    context 'intervention does not belong to him' do
+      it { expect(response).to have_http_status(:not_found) }
+    end
+
+    context 'intervention belongs to him' do
+      let(:intervention_user) { researcher }
+
+      context 'when params are VALID' do
+        it { expect(response).to have_http_status(:ok) }
+
+        it 'response contains proper attributes' do
+          expect(json_response['data']['attributes']).to include(
+            'name' => 'New Intervention',
+            'status' => 'published',
+            'shared_to' => 'anyone'
+          )
+        end
+
+        it 'updates a intervention object' do
+          expect(intervention.reload.attributes).to include(
+            'name' => 'New Intervention',
+            'status' => 'published',
+            'shared_to' => 'anyone'
+          )
+        end
+      end
+
+      context 'when params are INVALID' do
+        let(:params) do
+          {
+            intervention: {
+              name: ''
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:unprocessable_entity) }
+
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+        end
+
+        it 'does not update a intervention object' do
+          expect(intervention.reload.attributes).to include(
+            'name' => 'Old Intervention',
+            'status' => 'draft',
+            'shared_to' => 'anyone'
+          )
+        end
+      end
+    end
+  end
+
+  context 'when user has role participant' do
+    let(:user) { participant }
+
+    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
+    it { expect(response).to have_http_status(:forbidden) }
+  end
+
+  context 'when user has role guest' do
+    let(:user) { guest }
+
+    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
+    it { expect(response).to have_http_status(:forbidden) }
+  end
+end

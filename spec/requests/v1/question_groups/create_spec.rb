@@ -4,7 +4,7 @@ require 'rails_helper'
 
 describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
   let!(:user) { create(:user, :researcher) }
-  let!(:session) { create(:session, problem: create(:problem, user: user)) }
+  let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let(:questions) { create_list(:question_free_response, 3, title: 'Question Title', question_group_id: session.question_group_default.id) }
   let(:request) { post v1_session_question_groups_path(session_id: session.id), params: params, headers: user.create_new_auth_token }
   let(:params) do

@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :session do
     sequence(:name) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
-    association :problem
+    association :intervention
     trait :slug do
       name { 'Session' }
     end

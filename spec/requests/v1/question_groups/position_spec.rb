@@ -4,7 +4,7 @@ require 'rails_helper'
 
 describe 'PATCH /v1/sessions/:session_id/question_groups/position', type: :request do
   let(:user) { create(:user, :researcher) }
-  let!(:session) { create(:session, problem: create(:problem, user: user)) }
+  let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group_1) { create(:question_group, session: session, position: 3) }
   let!(:question_group_2) { create(:question_group, session: session, position: 4) }
   let!(:question_group_3) { create(:question_group, session: session, position: 5) }

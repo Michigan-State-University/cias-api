@@ -8,7 +8,7 @@ class Session < ApplicationRecord
   include Clone
   include FormulaInterface
 
-  belongs_to :problem, inverse_of: :sessions, touch: true
+  belongs_to :intervention, inverse_of: :sessions, touch: true
 
   has_many :question_groups, dependent: :restrict_with_exception, inverse_of: :session
   has_many :question_group_plains, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Plain'
@@ -30,7 +30,7 @@ class Session < ApplicationRecord
 
   enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date' }, _prefix: :schedule
 
-  delegate :published?, to: :problem
+  delegate :published?, to: :intervention
 
   validates :name, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
@@ -40,11 +40,11 @@ class Session < ApplicationRecord
   after_commit :create_core_childs, on: :create
 
   def position_less_than
-    @position_less_than ||= problem.sessions.where(position: ...position).order(:position)
+    @position_less_than ||= intervention.sessions.where(position: ...position).order(:position)
   end
 
   def position_grather_than
-    @position_grather_than ||= problem.sessions.where('position > ?', position).order(:position)
+    @position_grather_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end
 
   def propagate_settings
@@ -66,10 +66,10 @@ class Session < ApplicationRecord
   end
 
   def add_user_sessions
-    return if problem.user_sessions.empty?
+    return if intervention.user_sessions.empty?
 
     UserSession.transaction do
-      problem.user_sessions.pluck(:user_id).each do |user_id|
+      intervention.user_sessions.pluck(:user_id).each do |user_id|
         UserSession.create!(user_id: user_id, session_id: id)
       end
     end

@@ -91,7 +91,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
 
     it 'has correct number of sessions' do
-      expect(session.problem.sessions.size).to eq(2)
+      expect(session.intervention.sessions.size).to eq(2)
     end
   end
 end

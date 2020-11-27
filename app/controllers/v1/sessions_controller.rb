@@ -32,7 +32,7 @@ class V1::SessionsController < V1Controller
   private
 
   def sessions_scope
-    Problem.includes(:sessions).accessible_by(current_ability).find(params[:problem_id]).sessions.order(:position)
+    Intervention.includes(:sessions).accessible_by(current_ability).find(params[:intervention_id]).sessions.order(:position)
   end
 
   def session_load
@@ -40,6 +40,6 @@ class V1::SessionsController < V1Controller
   end
 
   def session_params
-    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :problem_id, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :intervention_id, narrator: {}, settings: {}, formula: {}, body: {})
   end
 end

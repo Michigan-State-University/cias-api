@@ -1,0 +1,41 @@
+# frozen_string_literal: true
+
+class V1::InterventionsController < V1Controller
+  include Resource::Clone
+
+  authorize_resource only: %i[create update]
+
+  def index
+    render_json interventions: interventions_scope
+  end
+
+  def show
+    render_json intervention: intervention_load
+  end
+
+  def create
+    intervention = current_v1_user.interventions.create!(intervention_params)
+    render json: serialized_response(intervention), status: :created
+  end
+
+  def update
+    intervention = intervention_load
+    intervention.assign_attributes(intervention_params)
+    intervention.integral_update
+    render json: serialized_response(intervention)
+  end
+
+  private
+
+  def interventions_scope
+    Intervention.includes(:sessions).accessible_by(current_ability)
+  end
+
+  def intervention_load
+    interventions_scope.find(params[:id])
+  end
+
+  def intervention_params
+    params.require(:intervention).permit(:name, :status_event, :shared_to)
+  end
+end

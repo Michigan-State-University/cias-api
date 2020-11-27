@@ -5,7 +5,7 @@ require 'rails_helper'
 describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
   let(:request) { get v1_session_question_groups_path(session_id: session.id), headers: headers }
 
-  let!(:session) { create(:session, problem: create(:problem, :published)) }
+  let!(:session) { create(:session, intervention: create(:intervention, :published)) }
   let!(:question_groups) { create_list(:question_group, 3, session: session) }
 
   context 'when authenticated as guest user' do

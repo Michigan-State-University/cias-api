@@ -26,9 +26,9 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :problems, only: %i[index show create update] do
+    resources :interventions, only: %i[index show create update] do
       post 'clone', on: :member
-      scope module: 'problems' do
+      scope module: 'interventions' do
         resources :answers, only: %i[index]
       end
       patch 'sessions/position', to: 'sessions#position'

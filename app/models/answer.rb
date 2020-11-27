@@ -19,7 +19,7 @@ class Answer < ApplicationRecord
   }
 
   def retrive_previous_answers
-    previous_sessions_ids = question.session.problem.sessions.where('sessions.position < ?', question.session.position).ids
+    previous_sessions_ids = question.session.intervention.sessions.where('sessions.position < ?', question.session.position).ids
     previous_answers = Answer.user_answers(user_id, previous_sessions_ids)
     current_answers = Answer.joins(question: :question_group).where(questions: { position: ..question.position }).user_answers(user_id, [question.session.id])
 

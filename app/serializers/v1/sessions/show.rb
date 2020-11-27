@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Sessions::Show < BaseSerializer
+  attr_reader :session
+
   def cache_key
     "session/#{session.id}-#{session.updated_at&.to_s(:number)}"
   end
@@ -8,7 +10,7 @@ class V1::Sessions::Show < BaseSerializer
   def to_json
     {
       id: session.id,
-      problem_id: session.problem.id,
+      intervention_id: session.intervention.id,
       settings: session.settings,
       position: session.position,
       name: session.name,
@@ -21,8 +23,4 @@ class V1::Sessions::Show < BaseSerializer
       updated_at: session.updated_at
     }
   end
-
-  private
-
-  attr_reader :session
 end

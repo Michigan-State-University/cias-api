@@ -30,7 +30,7 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
-  has_many :problems, dependent: :restrict_with_exception, inverse_of: :user
+  has_many :interventions, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :user
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :user

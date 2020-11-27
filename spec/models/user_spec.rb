@@ -7,13 +7,13 @@ describe User, type: :model do
     subject { create(:user, :confirmed, :participant) }
 
     it { should be_valid }
-    it { should have_many(:problems) }
+    it { should have_many(:interventions) }
   end
 
   describe 'admin' do
     subject { create(:user, :confirmed, :admin) }
 
     it { should be_valid }
-    it { should have_many(:problems) }
+    it { should have_many(:interventions) }
   end
 end
