@@ -2,7 +2,6 @@
 
 class Session < ApplicationRecord
   extend DefaultValues
-  extend FriendlyId
   include AASM
   include BodyInterface
   include Clone
@@ -20,8 +19,6 @@ class Session < ApplicationRecord
 
   has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :session
   has_many :users, dependent: :restrict_with_exception, through: :user_sessions
-
-  friendly_id :name, use: :slugged
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 0
@@ -73,10 +70,6 @@ class Session < ApplicationRecord
         UserSession.create!(user_id: user_id, session_id: id)
       end
     end
-  end
-
-  def should_generate_new_friendly_id?
-    slug.blank? || name_changed?
   end
 
   def perform_narrator_reflection(_placeholder)

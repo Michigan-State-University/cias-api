@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_27_123404) do
+ActiveRecord::Schema.define(version: 2020_11_27_213051) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -54,17 +54,6 @@ ActiveRecord::Schema.define(version: 2020_11_27_123404) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
-  end
-
-  create_table "friendly_id_slugs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "slug", null: false
-    t.uuid "sluggable_id", null: false
-    t.string "sluggable_type", limit: 50
-    t.string "scope"
-    t.datetime "created_at"
-    t.index ["slug", "sluggable_type", "scope"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type_and_scope", unique: true
-    t.index ["slug", "sluggable_type"], name: "index_friendly_id_slugs_on_slug_and_sluggable_type", using: :gin
-    t.index ["sluggable_type", "sluggable_id"], name: "index_friendly_id_slugs_on_sluggable_type_and_sluggable_id", using: :gin
   end
 
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -128,7 +117,6 @@ ActiveRecord::Schema.define(version: 2020_11_27_123404) do
     t.jsonb "settings"
     t.integer "position", default: 0, null: false
     t.string "name", null: false
-    t.string "slug"
     t.string "schedule"
     t.integer "schedule_payload"
     t.date "schedule_at"
@@ -141,7 +129,6 @@ ActiveRecord::Schema.define(version: 2020_11_27_123404) do
     t.index ["name"], name: "index_sessions_on_name"
     t.index ["schedule"], name: "index_sessions_on_schedule"
     t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
-    t.index ["slug"], name: "index_sessions_on_slug", unique: true
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

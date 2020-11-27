@@ -20,7 +20,6 @@ gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
 gem 'fast_jsonapi'
-gem 'friendly_id'
 gem 'google-cloud-text_to_speech'
 gem 'hiredis'
 gem 'oj'

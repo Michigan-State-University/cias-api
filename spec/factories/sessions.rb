@@ -5,9 +5,6 @@ FactoryBot.define do
     sequence(:name) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
     association :intervention
-    trait :slug do
-      name { 'Session' }
-    end
 
     trait :with_questions do
       question { create_list(:question, 5) }
