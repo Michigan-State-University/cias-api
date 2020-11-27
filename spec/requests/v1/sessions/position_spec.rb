@@ -2,12 +2,12 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/problems/:problem_id/sessions/position', type: :request do
+RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
-  let(:problem) { create(:problem, user: user) }
-  let(:session_1) { create(:session, position: 4, problem: problem) }
-  let(:session_2) { create(:session, position: 5, problem: problem) }
-  let(:session_3) { create(:session, position: 6, problem: problem) }
+  let(:intervention) { create(:intervention, user: user) }
+  let(:session_1) { create(:session, position: 4, intervention: intervention) }
+  let(:session_2) { create(:session, position: 5, intervention: intervention) }
+  let(:session_3) { create(:session, position: 6, intervention: intervention) }
   let(:params) do
     {
       session: {
@@ -31,7 +31,7 @@ RSpec.describe 'PATCH /v1/problems/:problem_id/sessions/position', type: :reques
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { patch v1_problem_sessions_position_path(problem_id: problem.id), params: params }
+      let(:request) { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params }
 
       it 'response contains generated uid token' do
         request
@@ -43,7 +43,7 @@ RSpec.describe 'PATCH /v1/problems/:problem_id/sessions/position', type: :reques
     end
 
     context 'is valid' do
-      before { patch v1_problem_sessions_position_path(problem_id: problem.id), params: params, headers: user.create_new_auth_token }
+      before { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -56,7 +56,7 @@ RSpec.describe 'PATCH /v1/problems/:problem_id/sessions/position', type: :reques
   context 'when response' do
     context 'is JSON' do
       before do
-        patch v1_problem_sessions_position_path(problem_id: problem.id), params: params, headers: user.create_new_auth_token
+        patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -64,7 +64,7 @@ RSpec.describe 'PATCH /v1/problems/:problem_id/sessions/position', type: :reques
 
     context 'contains' do
       before do
-        patch v1_problem_sessions_position_path(problem_id: problem.id), params: params, headers: user.create_new_auth_token
+        patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token
       end
 
       it 'to hash success' do

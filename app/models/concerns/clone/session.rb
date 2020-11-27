@@ -3,7 +3,7 @@
 class Clone::Session < Clone::Base
   def execute
     create_question_groups
-    outcome.position = outcome.problem.sessions.size
+    outcome.position = outcome.intervention.sessions.size
     outcome.save!
     outcome
   end

@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/sessions/:session_id/invitations', type: :request do
   let(:user) { create(:user, :confirmed, :researcher, created_at: 1.day.ago) }
-  let(:problem) { create(:problem, user_id: user.id) }
-  let(:session) { create(:session, problem_id: problem.id) }
+  let(:intervention) { create(:intervention, user_id: user.id) }
+  let(:session) { create(:session, intervention_id: intervention.id) }
   let(:session_invitation) { create_list(:session_invitation, 2, session_id: session.id) }
 
   let(:request) { get v1_session_invitations_path(session_id: session.id), headers: user.create_new_auth_token }

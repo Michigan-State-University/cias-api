@@ -22,7 +22,7 @@ module Resource::Clone
   def to_permit
     @to_permit ||= begin
       {
-        problem: [{ user_ids: [] }],
+        intervention: [{ user_ids: [] }],
         session: [],
         question: []
       }

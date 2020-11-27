@@ -3,15 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe Session::Schedule do
-  let(:problem) { create(:problem, published_at: Time.current) }
+  let(:intervention) { create(:intervention, published_at: Time.current) }
   let(:sessions) do
-    sessions = create_list(:session, 4, problem_id: problem.id, schedule: 'days_after', schedule_payload: 7)
+    sessions = create_list(:session, 4, intervention_id: intervention.id, schedule: 'days_after', schedule_payload: 7)
     first_inter = sessions.first
     first_inter.update(schedule: nil, schedule_payload: nil)
     sessions
   end
 
-  let(:execute_days_after) { described_class.new(sessions, problem.published_at).days_after }
+  let(:execute_days_after) { described_class.new(sessions, intervention.published_at).days_after }
 
   context 'days_after' do
     it 'are days_after' do

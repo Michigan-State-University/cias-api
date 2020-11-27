@@ -26,8 +26,8 @@ describe SessionJob::Publish, type: :job do
   end
 
   describe '#perform' do
-    let(:intervention) { create :problem, :published }
-    let(:session) { create :session, problem: intervention }
+    let(:intervention) { create :intervention, :published }
+    let(:session) { create :session, intervention: intervention }
 
     it 'belongs to correct class' do
       expect(subject).to be_an_instance_of(described_class)

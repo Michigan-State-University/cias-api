@@ -5,7 +5,7 @@ require 'rails_helper'
 describe 'GET /v1/sessions/:session_id/question_groups/:id', type: :request do
   let(:request) { get v1_session_question_group_path(session_id: session.id, id: question_group.id), headers: headers }
 
-  let!(:session) { create(:session, problem: create(:problem, :published)) }
+  let!(:session) { create(:session, intervention: create(:intervention, :published)) }
   let!(:question_group) { create(:question_group, session: session, title: 'QuestionGroup Title') }
   let!(:questions)      { create_list(:question_free_response, 3, title: 'Question Title', question_group: question_group) }
 

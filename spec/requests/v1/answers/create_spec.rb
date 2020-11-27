@@ -7,8 +7,8 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:guest) { create(:user, :guest) }
-  let(:problem) { create(:problem, user_id: researcher.id) }
-  let(:session) { create(:session, problem_id: problem.id) }
+  let(:intervention) { create(:intervention, user_id: researcher.id) }
+  let(:session) { create(:session, intervention_id: intervention.id) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_free_response, question_group: question_group) }
 
@@ -119,7 +119,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
     end
 
     context 'response with session' do
-      let(:session) { create(:session, problem_id: problem.id, position: 2) }
+      let(:session) { create(:session, intervention_id: intervention.id, position: 2) }
 
       let(:questions) { create_list(:question_single, 3, question_group: question_group) }
       let(:question) do

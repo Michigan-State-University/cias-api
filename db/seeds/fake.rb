@@ -18,7 +18,7 @@ class Fake
     mattr_accessor :subclass_types
 
     def exploit
-      create_problems
+      create_interventions
       create_sessions
       create_session_invitations
       create_questions
@@ -37,26 +37,26 @@ class Fake
       subclasses.each { |file| file.gsub!(/\.rb/, '') }.map(&:classify)
     end
 
-    def create_problems
+    def create_interventions
       user_ids
       (4..14).to_a.sample.times do
-        Problem.create(
+        Intervention.create(
           name: Faker::University.name,
           user_id: user_ids.sample,
-          shared_to: Problem.shared_tos.keys.sample
+          shared_to: Intervention.shared_tos.keys.sample
         )
       end
     end
 
-    def problem_ids
-      @@problem_ids ||= Problem.ids
+    def intervention_ids
+      @@intervention_ids ||= Intervention.ids
     end
 
     def create_sessions
-      problem_ids
+      intervention_ids
       (40..60).to_a.sample.times do
         Session.create(
-          problem_id: problem_ids.sample,
+          intervention_id: intervention_ids.sample,
           name: Faker::Name.name,
           position: rand(1..100),
           body: { data: [
@@ -180,9 +180,9 @@ class Fake
     end
 
     def create_user_sessions
-      problems = Problem.order('RANDOM()').limit(4)
-      problems.each(&:broadcast)
-      Session.where(problem_id: problems.ids).each do |session|
+      interventions = Intervention.order('RANDOM()').limit(4)
+      interventions.each(&:broadcast)
+      Session.where(intervention_id: interventions.ids).each do |session|
         session.user_sessions.create(user_id: user_ids.sample)
       end
     end

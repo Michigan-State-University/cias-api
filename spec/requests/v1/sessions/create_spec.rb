@@ -2,15 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/problems/:problem_id/sessions', type: :request do
+RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:problem) { create(:problem) }
+  let(:intervention) { create(:intervention) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
       session: {
         name: 'research_assistant test1',
-        problem_id: problem.id,
+        intervention_id: intervention.id,
         body: {
           data: [
             {
@@ -26,7 +26,7 @@ RSpec.describe 'POST /v1/problems/:problem_id/sessions', type: :request do
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_problem_sessions_path(problem_id: problem.id) }
+      before { post v1_intervention_sessions_path(intervention_id: intervention.id) }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -36,7 +36,7 @@ RSpec.describe 'POST /v1/problems/:problem_id/sessions', type: :request do
     end
 
     context 'is valid' do
-      before { post v1_problem_sessions_path(problem_id: problem.id), params: params, headers: headers }
+      before { post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -49,7 +49,7 @@ RSpec.describe 'POST /v1/problems/:problem_id/sessions', type: :request do
   context 'when params' do
     context 'valid' do
       before do
-        post v1_problem_sessions_path(problem_id: problem.id), params: params, headers: headers
+        post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers
       end
 
       it { expect(response).to have_http_status(:success) }
@@ -59,7 +59,7 @@ RSpec.describe 'POST /v1/problems/:problem_id/sessions', type: :request do
       context 'params' do
         before do
           invalid_params = { session: {} }
-          post v1_problem_sessions_path(problem_id: problem.id), params: invalid_params, headers: headers
+          post v1_intervention_sessions_path(intervention_id: intervention.id), params: invalid_params, headers: headers
         end
 
         it { expect(response).to have_http_status(:bad_request) }

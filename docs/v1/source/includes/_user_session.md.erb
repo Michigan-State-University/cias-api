@@ -6,14 +6,14 @@
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/users`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/users`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-problem_id | Problem ID | yes
+intervention_id | Intervention ID | yes
 
 
 ### Query String
@@ -41,7 +41,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-GET <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users
+GET <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/users
 ```
 
 ```http
@@ -61,14 +61,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/users`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/users`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-problem_id | Problem ID | yes
+intervention_id | Intervention ID | yes
 
 
 ### Query String
@@ -104,7 +104,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-POST <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users
+POST <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/users
 ```
 
 ```http
@@ -134,14 +134,14 @@ uid: user@<%= ENV['DOMAIN_NAME'] %>
 
 ### Resource
 
-`<%= ENV['APP_HOSTNAME'] %>/v1/problems/:problem_id/users`
+`<%= ENV['APP_HOSTNAME'] %>/v1/interventions/:intervention_id/users`
 
 
 ### URL parameters
 
 Parameter | Description | Required
 --------- | ----------- | --------
-problem_id | Problem ID | yes
+intervention_id | Intervention ID | yes
 id | User ID | yes
 
 
@@ -170,7 +170,7 @@ Parameter | Description | Required
 > HTTP example request
 
 ```http
-DELETE <%= ENV['APP_HOSTNAME'] %>/v1/problems/1/users/1
+DELETE <%= ENV['APP_HOSTNAME'] %>/v1/interventions/1/users/1
 ```
 
 ```http
