@@ -14,7 +14,6 @@ class V1::Sessions::Show < BaseSerializer
       settings: session.settings,
       position: session.position,
       name: session.name,
-      slug: session.slug,
       schedule: session.schedule,
       schedule_at: session.schedule_at,
       formula: session.formula,
