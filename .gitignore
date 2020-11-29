@@ -16,3 +16,4 @@ db/structure.sql
 coverage/
 .ruby-gemset
 .generators
+.DS_Store
