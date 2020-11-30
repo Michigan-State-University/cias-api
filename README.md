@@ -20,9 +20,9 @@
 
 #### CORE LOGIC
 
-1. Problem is an object created to grouping interventions;
-1. Intervention is the core object. It acts as metadata in the process of harvesting data;
-1. Questions are data for intervention. Therefore intervention has got many questions through question groups;
+1. Intervention is an object created to grouping sessions;
+1. Session is the core object. It acts as metadata in the process of harvesting data;
+1. Questions are data for session. Therefore session has got many questions through question groups;
 1. The particular question contains static fields and one dynamic data field;
 1. For every question, we create many answers which carry the same type and logic as a question for which they are belonged to.
 
@@ -58,7 +58,7 @@
   * factory_bot_rails.
 * API documentation: Slate;
 * Code quaility:
-  * Static code analyzer and formatter: Rubocop.
+  * Static code analyzer and formatter (linter): Rubocop.
 
 
 ## DEVELOPMENT
