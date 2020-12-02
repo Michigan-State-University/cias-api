@@ -12,7 +12,9 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_free_response, question_group: question_group) }
 
-  before { post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token }
+  before do
+    post v1_question_answers_path(question.id), params: params, headers: user.create_new_auth_token
+  end
 
   context 'branching logic' do
     let(:user) { researcher }

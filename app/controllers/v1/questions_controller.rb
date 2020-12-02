@@ -55,7 +55,7 @@ class V1::QuestionsController < V1Controller
   end
 
   def questions_scope
-    question_group_load.questions.includes(%i[image_attachment image_blob]).order(:position)
+    question_group_load.questions.order(:position)
   end
 
   def question_load
@@ -63,7 +63,7 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
   end
 
   def position_params
