@@ -2,6 +2,49 @@ Changelog
 =========
 
 
+v0.2.0 (04.12.2020)
+------------
+- Fix version of application in helm chart, add changes to CHANGELOG. [Jerzy Sładkowski]
+- Fix application logic. [Jerzy Sładkowski]
+
+  * for each question we should have only one answer from one user
+  * add index and unique constraint for pair question_id and user_id in table answers
+- Fixed readme to be in line with renaming backend entities. [Jerzy
+  Sładkowski]
+- Add database schemas with refactoring proposals. [Jerzy Sładkowski]
+- Remove unused 'friendly slugs' [Jerzy Sładkowski]
+- Rename problem to intervention. [Jerzy Sładkowski]
+- Rename interventions to sessions. [Jerzy Sładkowski]
+- Remove addresses completely. [Jerzy Sładkowski]
+- Fix rubocop issues. [Michał Śnieć]
+- Add 'exact_date' scheduling option logic. [Jerzy Sładkowski]
+- Add config gem. [Jerzy Sładkowski]
+- Add workaround for letter_opener_web, to fix clear functionality.
+  [Jerzy Sładkowski]
+- Fix code styling. [Jerzy Sładkowski]
+
+  * update db/schema.rb to standard version for Rails6
+  * add db/schema.rb as an exception for rubocop
+  * fix most code styling problems according to rubocop
+  * switch off rubocop from overcommit
+- Disable not needed extensions. [Michał Śnieć]
+- Refactor migration to not use active record method. [Michał Śnieć]
+
+  Fix rubocop issue
+- Fix pull requst template. [Michał Śnieć]
+- Fix Heroku deployment. [Jerzy Sładkowski]
+- Fix questions move tests to work consistantly. [Michał Śnieć]
+- Fix intervention clone and set correct position. [Michał Śnieć]
+
+  Change method name
+
+  Add tests
+
+  Split tests to diffrent test cases
+- V0.1.2. [Michał Śnieć]
+- Update chart version up to 0.1.2. [Michał Śnieć]
+- Fix wrong queue prefix on production (#102) [Michał Śnieć, msniec]
+
 v0.0.0 (29.04.2020) - v0.1.1 (17.11.2020)
 ------------
 - Add versions discretization, based on tags [Jerzy Sładkowski]

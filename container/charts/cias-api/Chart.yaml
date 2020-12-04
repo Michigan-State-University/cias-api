@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "1.0"
 description: Sets up the CIAS API service
 name: cias-api
-version: 0.1.2
+version: 0.2.0
