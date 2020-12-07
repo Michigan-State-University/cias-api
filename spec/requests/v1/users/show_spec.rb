@@ -43,4 +43,14 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
       end
     end
   end
+
+  context 'invalid id' do
+    before do
+      get v1_user_path(id: 'invalid'), headers: headers
+    end
+
+    it 'returns not found' do
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

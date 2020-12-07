@@ -53,4 +53,14 @@ RSpec.describe 'GET /v1/question_groups/:question_group_id/questions/:id', type:
       end
     end
   end
+
+  context 'invalid question id' do
+    before do
+      get v1_question_group_question_path(question_group_id: question_group.id, id: 'invalid'), headers: headers
+    end
+
+    it 'returns not found http status' do
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

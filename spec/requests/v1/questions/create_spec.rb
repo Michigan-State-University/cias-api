@@ -106,6 +106,29 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     end
   end
 
+  context 'created' do
+    before do
+      post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
+    end
+
+    it 'has correct formula size' do
+      print json_response
+      expect(json_response['data']['attributes']['formula']['patterns'].size).to eq(2)
+    end
+
+    it 'has correct patterns data' do
+      expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => { 'id' => '', 'type' => 'Question' })
+    end
+
+    it 'has correct body data size' do
+      expect(json_response['data']['attributes']['body']['data'].size).to eq(2)
+    end
+
+    it 'has correct body data attributes' do
+      expect(json_response['data']['attributes']['body']['data'][0]).to include('payload' => 'create1', 'variable' => { 'value' => '1', 'name' => 'test1' })
+    end
+  end
+
   context 'when blocks' do
     context 'has not been passed' do
       before do

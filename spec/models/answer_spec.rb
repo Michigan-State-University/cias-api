@@ -114,10 +114,10 @@ RSpec.describe Answer, type: :model do
       it { expect(wrong_type.save).to eq false }
     end
 
-    describe 'fails when body is empty' do
+    describe 'does not fail when body is empty' do
       let(:with_empty) { build(:answer_multiple, :body_data_empty) }
 
-      xit { expect(with_empty.save).to eq false }
+      it { expect(with_empty.save).to eq true }
     end
   end
 
@@ -152,10 +152,10 @@ RSpec.describe Answer, type: :model do
       it { expect(wrong_type.save).to eq false }
     end
 
-    describe 'fails when body is empty' do
+    describe 'does not fail when body is empty' do
       let(:with_empty) { build(:answer_single, :body_data_empty) }
 
-      xit { expect(with_empty.save).to eq false }
+      it { expect(with_empty.save).to eq true }
     end
   end
 
@@ -174,10 +174,10 @@ RSpec.describe Answer, type: :model do
       it { expect(wrong_type.save).to eq false }
     end
 
-    describe 'fails when body is empty' do
+    describe 'does not fail when body is empty' do
       let(:with_empty) { build(:answer_free_response, :body_data_empty) }
 
-      xit { expect(with_empty.save).to eq false }
+      it { expect(with_empty.save).to eq true }
     end
   end
 

@@ -13,11 +13,33 @@ describe 'GET /v1/users/invitations', type: :request do
     let(:guest_user) { create(:user, :guest) }
     let(:headers)    { guest_user.create_new_auth_token }
 
-    it 'returns list of pending invitations' do
+    before do
       request
+    end
 
+    it 'returns correct http status' do
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns correct pending invitations size' do
       expect(json_response['invitations'].size).to eq 0
+    end
+  end
+
+  context 'when authenticated as researcher user' do
+    let(:researcher_user) { create(:user, :researcher) }
+    let(:headers)         { researcher_user.create_new_auth_token }
+
+    before do
+      request
+    end
+
+    it 'returns correct http status' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns correct pending invitations size' do
+      expect(json_response['invitations'].size).to eq 1
     end
   end
 
@@ -25,11 +47,19 @@ describe 'GET /v1/users/invitations', type: :request do
     let(:admin_user) { create(:user, :admin) }
     let(:headers)    { admin_user.create_new_auth_token }
 
-    it 'returns list of pending invitations' do
+    before do
       request
+    end
 
+    it 'returns correct http status' do
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns correct pending invitations size' do
       expect(json_response['invitations'].size).to eq 1
+    end
+
+    it 'returns correct email' do
       expect(json_response['invitations'][0]['email']).to eq 'test@example.com'
     end
   end
