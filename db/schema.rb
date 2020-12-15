@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -70,6 +71,28 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.index ["shared_to"], name: "index_interventions_on_shared_to"
     t.index ["status"], name: "index_interventions_on_status"
     t.index ["user_id"], name: "index_interventions_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.string "phone", null: false
+    t.text "body", null: false
+    t.string "status", default: "new", null: false
+    t.datetime "schedule_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "phones", force: :cascade do |t|
+    t.uuid "user_id"
+    t.string "iso", null: false
+    t.string "prefix", null: false
+    t.string "number", null: false
+    t.string "confirmation_code"
+    t.boolean "confirmed", default: false, null: false
+    t.datetime "confirmed_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
   create_table "invitations", force: :cascade do |t|
@@ -163,7 +186,6 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.string "first_name", default: "", null: false
     t.string "last_name", default: "", null: false
     t.string "email"
-    t.string "phone"
     t.string "time_zone"
     t.string "roles", default: [], array: true
     t.jsonb "tokens"
@@ -192,6 +214,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.inet "last_sign_in_ip"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "sms_notification", default: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

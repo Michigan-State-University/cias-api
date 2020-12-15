@@ -24,6 +24,29 @@ class V1::UsersController < V1Controller
     head :no_content
   end
 
+  def send_sms_token
+    phone = current_v1_user.phone
+    head :expectation_failed and return unless phone
+
+    phone.refresh_confirmation_code
+    number = phone.prefix + phone.number
+    sms = Message.create(
+      phone: number,
+      body: "Your CIAS verification code is: #{phone.confirmation_code}"
+    )
+    service = Communication::Sms.new(sms.id)
+    service.send_message
+    head service.errors.empty? ? :accepted : :expectation_failed
+  end
+
+  def verify_sms_token
+    phone = current_v1_user.phone
+    head :expectation_failed and return unless phone&.token_correct?(params[:sms_token])
+
+    phone.confirm!
+    head :ok
+  end
+
   private
 
   def users_scope
@@ -35,7 +58,16 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :email, :phone, :time_zone, :active, roles: [])
+    params.require(:user).permit(
+      :first_name,
+      :last_name,
+      :email,
+      :sms_notification,
+      :time_zone,
+      :active,
+      roles: [],
+      phone_attributes: %i[iso prefix number]
+    )
   end
 
   def query_string_digest

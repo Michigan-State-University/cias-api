@@ -15,6 +15,8 @@ Rails.application.routes.draw do
     }
 
     scope :users do
+      put 'send_sms_token', to: 'users#send_sms_token'
+      patch 'verify_sms_token', to: 'users#verify_sms_token'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]

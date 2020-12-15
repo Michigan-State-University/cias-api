@@ -14,3 +14,9 @@ log:
 
 sidekiq:
   retries: 10
+
+services:
+  twilio:
+    from: <%= ENV['TWILIO_FROM'] %>
+    sid: <%= ENV['TWILIO_ACCOUNT_SID'] %>
+    token: <%= ENV['TWILIO_AUTH_TOKEN'] %>

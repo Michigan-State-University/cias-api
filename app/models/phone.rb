@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+class Phone < ApplicationRecord
+  belongs_to :user
+  validates :iso, :prefix, :number, presence: true
+  before_update :remove_confirmation, if: :number_changed?
+
+  def token_correct?(code)
+    code == confirmation_code
+  end
+
+  def refresh_confirmation_code
+    update(confirmation_code: rand.to_s[2..5])
+  end
+
+  def confirmed?
+    confirmed
+  end
+
+  def confirm!
+    update(confirmed: true, confirmed_at: DateTime.now)
+  end
+
+  private
+
+  def remove_confirmation
+    self.confirmed = false
+    self.confirmed_at = nil
+    self.confirmation_code = nil
+  end
+end

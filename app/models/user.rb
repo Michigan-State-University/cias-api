@@ -25,9 +25,10 @@ class User < ApplicationRecord
                 multiple: true,
                 allow_blank: true
 
-  validates :phone, phone: true, allow_blank: true
   validates :time_zone, inclusion: { in: TIME_ZONES }
 
+  has_one :phone, dependent: :destroy
+  accepts_nested_attributes_for :phone, update_only: true
   has_one_attached :avatar
 
   has_many :interventions, dependent: :restrict_with_exception, inverse_of: :user

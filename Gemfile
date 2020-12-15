@@ -31,6 +31,7 @@ gem 'redis'
 gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sql_query'
+gem 'twilio-ruby', '~> 5.45.0'
 
 group :development, :test do
   gem 'bundler-audit'
