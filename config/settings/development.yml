@@ -1,3 +1,10 @@
+headers:
+  DEVELOPMENT_MODE: true
+  uid: <%= ENV['CIAS_UID'] || 'admin@cias-api.herokuapp.com' %>
+  access-token: developmentaccesstoken
+  client: development-client-str
+  token-type: Bearer
+
 log:
   level: debug
 

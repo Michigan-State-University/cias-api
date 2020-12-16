@@ -8,10 +8,18 @@ class V1Controller < ApplicationController
   include Resource
 
   def current_v1_user
+    bypass_auth_for_development_only
     @current_v1_user ||= super || create_guest_user
   end
 
   private
+
+  def bypass_auth_for_development_only
+    return unless Rails.env.development?
+
+    @current_v1_user = User.find_by(email: Settings.headers.uid)
+    Settings.headers.each { |header| response.set_header(header[0].to_s, header[1].to_s) }
+  end
 
   def guest_user
     @guest_user ||= User.new.tap do |u|
