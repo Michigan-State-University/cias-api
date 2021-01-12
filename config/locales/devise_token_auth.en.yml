@@ -43,11 +43,12 @@ en:
   devise:
     mailer:
       confirmation_instructions:
-        confirm_link_msg: "You can confirm your account email through the link below:"
+        confirm_link_msg: "Confirm your email address to get started on CIAS"
         confirm_account_link: "Confirm my account"
+        ignore_mail_msg: "If you didn't request this, please ignore this email."
       reset_password_instructions:
         request_reset_link_msg: "Someone has requested a link to change your password. You can do this through the link below."
-        password_change_link: "Change my password"
+        password_change_link: "Reset Password"
         ignore_mail_msg: "If you didn't request this, please ignore this email."
         no_changes_msg: "Your password won't change until you access the link above and create a new one."
       unlock_instructions:

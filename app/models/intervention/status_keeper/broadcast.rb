@@ -51,7 +51,7 @@ class Intervention::StatusKeeper::Broadcast
     intervention.user_sessions.each do |user_inter|
       SessionMailer.grant_access_to_a_user(
         user_inter.session,
-        user_inter.email
+        user_inter.user.email
       ).deliver_now
     end
   end
