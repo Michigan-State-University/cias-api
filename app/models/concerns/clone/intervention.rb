@@ -2,7 +2,7 @@
 
 class Clone::Intervention < Clone::Base
   def execute
-    outcome.to_initial
+    outcome.draft!
     outcome.save!
     create_sessions
     outcome

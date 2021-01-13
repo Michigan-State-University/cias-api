@@ -2,7 +2,6 @@
 
 class Session < ApplicationRecord
   extend DefaultValues
-  include AASM
   include BodyInterface
   include Clone
   include FormulaInterface

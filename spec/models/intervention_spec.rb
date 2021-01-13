@@ -15,75 +15,83 @@ RSpec.describe Intervention, type: :model do
   end
 
   context 'change states' do
-    context 'draft to published' do
+    context 'from draft' do
       let(:intervention) { create(:intervention) }
-      let(:sessions) { create_list(:session, 4, intervention_id: intervention.id) }
+      let!(:sessions) { create_list(:session, 4, intervention_id: intervention.id) }
 
-      it 'success event' do
-        sessions
-        intervention.broadcast
-        intervention.save
-        expect(intervention.published?).to be true
+      context 'to published' do
+        it 'success event' do
+          intervention.broadcast
+          expect(intervention.published?).to be true
+        end
+      end
+
+      context 'to closed' do
+        it 'no status change' do
+          intervention.close
+          expect(intervention.draft?).to be true
+        end
+      end
+
+      context 'to archived' do
+        it 'success event' do
+          intervention.archive
+          expect(intervention.archived?).to be true
+        end
       end
     end
 
-    context 'published to closed' do
+    context 'from published' do
       let(:intervention) { create(:intervention, :published) }
 
-      it 'success event' do
-        intervention.close
-        intervention.save
-        expect(intervention.closed?).to be true
+      context 'to closed' do
+        it 'success event' do
+          intervention.close
+          expect(intervention.closed?).to be true
+        end
+      end
+
+      context 'to archived' do
+        it 'no status change' do
+          intervention.archive
+          expect(intervention.published?).to be true
+        end
       end
     end
 
-    context 'closed to archived' do
+    context 'from closed' do
       let(:intervention) { create(:intervention, :closed) }
 
-      it 'success event' do
-        intervention.to_archive
-        intervention.save
-        expect(intervention.archived?).to be true
+      context 'to published' do
+        it 'no status change' do
+          intervention.broadcast
+          expect(intervention.closed?).to be true
+        end
+      end
+
+      context 'to archived' do
+        it 'success event' do
+          intervention.archive
+          expect(intervention.archived?).to be true
+        end
       end
     end
 
-    context 'draft to draft' do
-      let(:intervention) { create(:intervention) }
-
-      it 'success event' do
-        intervention.to_initial
-        intervention.save
-        expect(intervention.draft?).to be true
-      end
-    end
-
-    context 'published to draft' do
-      let(:intervention) { create(:intervention, :published) }
-
-      it 'success event' do
-        intervention.to_initial
-        intervention.save
-        expect(intervention.draft?).to be true
-      end
-    end
-
-    context 'closed to draft' do
-      let(:intervention) { create(:intervention, :closed) }
-
-      it 'success event' do
-        intervention.to_initial
-        intervention.save
-        expect(intervention.draft?).to be true
-      end
-    end
-
-    context 'archived to draft' do
+    context 'from archived' do
       let(:intervention) { create(:intervention, :archived) }
 
-      it 'success event' do
-        intervention.to_initial
-        intervention.save
-        expect(intervention.draft?).to be true
+      context 'to published' do
+        it 'no status change' do
+          intervention.broadcast
+          expect(intervention.archived?).to be true
+        end
+      end
+
+      context 'to closed' do
+        it 'no status change' do
+          intervention.close
+          expect(intervention.archived?).to be true
+        end
       end
     end
   end

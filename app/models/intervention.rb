@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Intervention < ApplicationRecord
-  include AASM
   include Clone
 
   belongs_to :user, inverse_of: :interventions
@@ -24,28 +23,21 @@ class Intervention < ApplicationRecord
   }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
+  enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
 
-  aasm.attribute_name :status
-  aasm do
-    state :draft, initial: true
-    state :published, :closed, :archived
+  def broadcast
+    return unless draft?
 
-    event :broadcast do
-      after { ::Intervention::StatusKeeper.new(id).broadcast }
-      transitions from: :draft, to: :published
-    end
+    published!
+    ::Intervention::StatusKeeper.new(id).broadcast
+  end
 
-    event :close do
-      transitions from: :published, to: :closed
-    end
+  def close
+    closed! if published?
+  end
 
-    event :to_archive do
-      transitions from: :closed, to: :archived
-    end
-
-    event :to_initial do
-      transitions from: %i[draft published closed archived], to: :draft
-    end
+  def archive
+    archived! if closed? || draft?
   end
 
   def export_answers_as(type:)

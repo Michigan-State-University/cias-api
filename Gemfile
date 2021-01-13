@@ -8,7 +8,6 @@ gem 'rails', '~> 6.0'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.0'
 
-gem 'aasm'
 gem 'activerecord_json_validator'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
