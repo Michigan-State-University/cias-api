@@ -2,6 +2,34 @@ Changelog
 =========
 
 
+v0.2.1 (14.01.2021)
+------------
+- Fix version of application in helm chart, add changes to CHANGELOG. [Jerzy Sładkowski]
+- Add contracts. [JakubZygmunt]
+- Add bypass auth headers for development. [Jerzy Sładkowski]
+- Add Twilio sms transport. [Jerzy Sładkowski]
+- Refactor access settings and session invites * add tests to access
+  settings * add participant access tests * rename contexts in question
+  group test cases. [Michał Śnieć]
+- Add some of the missing tests. [Michał Śnieć]
+- Fix state machine -> enum (Cias30-747)(#113) [Izabela Wiatrowska]
+  * replace status via enum
+  * set default value for intervention status
+  * remove gem aasm
+  * update specs
+  * actualize specs
+- Implement layout mail template (CIAS30-560/CIAS30-741)(#112) [hubert-
+  salamaga]
+  * Implement email templates prepared by frontend developers
+  * Remove unnecessary joins from Intervention::Csv#data_scope
+  * Fix problem with sending emails after publishing intervention
+  * Change link href in csv_answer email template
+  * Fix subjects for emails send via SessionMailer
+  * Add template for invitation
+- Fix rubocop issue. [Jerzy Sładkowski]
+- Fix TTS mock. [Michał Śnieć]
+- Create read question block on finish screen. [Michał Śnieć]
+
 v0.2.0 (04.12.2020)
 ------------
 - Fix version of application in helm chart, add changes to CHANGELOG. [Jerzy Sładkowski]
