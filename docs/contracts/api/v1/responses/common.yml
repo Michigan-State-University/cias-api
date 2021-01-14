@@ -1,0 +1,20 @@
+components:
+  responses:
+    badRequest:
+      description: 'Error: Bad Request'
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/error.yml#/components/schemas/error'
+    unauthorized:
+      description: 'Error: Unauthorized'
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/error.yml#/components/schemas/error'
+    notFound:
+      description: 'Error: Not Found'
+      content:
+        application/json:
+          schema:
+            $ref: '../schemas/error.yml#/components/schemas/error'

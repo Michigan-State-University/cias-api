@@ -1,0 +1,206 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: CIAS
+  license:
+    name: 'Proprietary, owner: Wayne State University'
+    url: 'https://wayne.edu/'
+servers:
+  - url: 'http://localhost:{port}/{version}/interventions'
+    variables:
+      port:
+        default: '3000'
+      version:
+        default: 'v1'
+paths:
+  /:
+    get:
+      summary: All intervenions
+      description: Returns all intervenions from the system that the user has access
+      parameters:
+        - $ref: '#/components/parameters/accessToken'
+        - $ref: '#/components/parameters/tokenType'
+        - $ref: '#/components/parameters/client'
+        - $ref: '#/components/parameters/uid'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                description: Interventions
+                items:
+                  $ref: '#/components/schemas/intervention'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+    post:
+      summary: Create intervention
+      description: Create a new intervention for logged in user
+      parameters:
+        - $ref: '#/components/parameters/accessToken'
+        - $ref: '#/components/parameters/tokenType'
+        - $ref: '#/components/parameters/client'
+        - $ref: '#/components/parameters/uid'
+      requestBody:
+        $ref: '#/components/requestBodies/postIntervention'
+      responses:
+        # Instead of full details we only need ID
+        '201':
+          $ref: '#/components/responses/interventionId'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+  /{id}:
+    get:
+      summary: Get intervention
+      description: Returns a details of the intervenion
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the intervention
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intervention'
+        '404':
+          $ref: '#/components/responses/notFound'
+    patch:
+      summary: Update intervention
+      description: Updates an intervention details
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the intervention
+      requestBody:
+        $ref: '#/components/requestBodies/updateIntervention'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/intervention'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/notFound'
+  /{id}/clone:
+    post:
+      summary: Clone intervention
+      description: Clone intervention for a logged in user or a specific one
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID of the intervention
+      requestBody:
+        $ref: '#/components/requestBodies/cloneIntervention'
+      responses:
+        # I do not see the need for response with intervention details now,
+        # we can leave id if in the future we would like to redirect to a cloned session
+        '201':
+          $ref: '#/components/responses/interventionId'
+        '400':
+          $ref: '#/components/responses/badRequest'
+        '401':
+          $ref: '#/components/responses/unauthorized'
+        '404':
+          $ref: '#/components/responses/notFound'
+components:
+  schemas:
+    intervention:
+      $ref: './schemas/intervention.yml#/components/schemas/intervention'
+  requestBodies:
+    postIntervention:
+      description: Intervention payload
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Intervention name
+                example: 'New e-intervention'
+    updateIntervention:
+      description: Each of the properties can be given optionally
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              intervention:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  status_event:
+                    type: string
+                    description: Intervention status event
+                    enum: [broadcast, close, to_archive]
+                  shared_to:
+                    type: string
+                    description: Intervention access level
+                    enum: [anyone, registered, invited]
+    cloneIntervention:
+      description: Clone intervention
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              intervention:
+                type: object
+                properties:
+                  user_ids:
+                    type: array
+                    description: List of users. An empty list will clone to the logged in user.
+                    items:
+                      type: string
+  responses:
+    badRequest:
+      $ref: './responses/common.yml#/components/responses/badRequest'
+    unauthorized:
+      $ref: './responses/common.yml#/components/responses/unauthorized'
+    notFound:
+      $ref: './responses/common.yml#/components/responses/notFound'
+    interventionId:
+      description: 'Intervention ID'
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  id:
+                    description: Intervention ID
+                    type: string
+  parameters:
+    accessToken:
+      $ref: './parameters.yml#/components/parameters/accessToken'
+    tokenType:
+      $ref: './parameters.yml#/components/parameters/tokenType'
+    client:
+      $ref: './parameters.yml#/components/parameters/client'
+    uid:
+      $ref: './parameters.yml#/components/parameters/uid'
