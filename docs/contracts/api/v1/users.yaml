@@ -1,0 +1,92 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: CIAS
+  license:
+    name: 'Proprietary, owner: Wayne State University'
+    url: 'https://wayne.edu/'
+servers:
+  - url: 'http://localhost:{port}/{version}/users'
+    variables:
+      port:
+        default: '3000'
+      version:
+        default: 'v1'
+paths:
+  /send_sms_token:
+    put:
+      description: Sends generated 4-digits SMS token to client
+      parameters:
+        - $ref: '#/components/parameters/accessToken'
+        - $ref: '#/components/parameters/tokenType'
+        - $ref: '#/components/parameters/client'
+        - $ref: '#/components/parameters/uid'
+      responses:
+        '202':
+          description: Sms was send successfully
+        '417':
+          description: Sms wasn't send due to error
+  /verify_sms_token:
+    patch:
+      description: Check SMS token and update phone number status if token is correct
+      parameters:
+        - $ref: '#/components/parameters/accessToken'
+        - $ref: '#/components/parameters/tokenType'
+        - $ref: '#/components/parameters/client'
+        - $ref: '#/components/parameters/uid'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              description: Sms token sent to User
+              type: object
+              properties:
+                sms_token:
+                  type: string
+                  minLength: 4
+                  maxLength: 4
+                  example: '3706'
+      responses:
+        '200':
+          description: Sms was verified successfully
+        '417':
+          description: Sms wasn't verified due to error
+components:
+  parameters:
+    accessToken:
+      name: access-token
+      in: header
+      description: Access token
+      required: true
+      schema:
+        type: string
+        minLength: 22
+        maxLength: 22
+        example: 'developmentaccesstoken'
+    tokenType:
+      name: token-type
+      in: header
+      description: Token type
+      required: true
+      schema:
+        type: string
+        example: Bearer
+    client:
+      name: client
+      in: header
+      description: client
+      required: true
+      schema:
+        type: string
+        minLength: 22
+        maxLength: 22
+        example: 'development-client-str'
+    uid:
+      name: uid
+      in: header
+      description: User id (email)
+      required: true
+      schema:
+        type: string
+        example: 'admin@cias.com'

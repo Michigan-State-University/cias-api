@@ -18,6 +18,13 @@
 require 'google/cloud/text_to_speech/v1/text_to_speech'
 require 'google/cloud/text_to_speech/v1/version'
 require 'faker'
+
+class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
+  def audio_content
+    SecureRandom.uuid
+  end
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -50,6 +57,13 @@ RSpec.configure do |config|
   # triggering implicit auto-inclusion in groups with matching metadata.
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
+  config.before do
+    tts_instance = instance_double(Google::Cloud::TextToSpeech::V1::TextToSpeech::Client)
+    speech_response_instance = Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake.new
+
+    allow(Google::Cloud::TextToSpeech).to receive(:text_to_speech).and_return(tts_instance)
+    allow(tts_instance).to receive(:synthesize_speech).and_return(speech_response_instance)
+  end
   # The settings below are suggested to provide a good initial experience
   # with RSpec, but feel free to customize to your heart's content.
   #   # This allows you to limit a spec run to individual examples or groups

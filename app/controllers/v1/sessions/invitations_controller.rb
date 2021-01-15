@@ -7,14 +7,15 @@
 # Check also Intervention::StatusKeeper::Broadcast.
 class V1::Sessions::InvitationsController < V1Controller
   def index
-    render_json session_invitations: session_invitations_scope
+    render_json invitations: session_invitations_scope
   end
 
   def create
-    authorize! :create, SessionInvitation
+    return head :not_acceptable unless session_load.published?
 
+    authorize! :create, Invitation
     session_load.invite_by_email(session_invitation_params[:emails])
-    render_json session_invitations: session_invitations_scope, action: :index, status: :created
+    render_json invitations: session_invitations_scope, action: :index, status: :created
   end
 
   def destroy
@@ -33,7 +34,7 @@ class V1::Sessions::InvitationsController < V1Controller
   end
 
   def session_invitations_scope
-    session_load.session_invitations
+    session_load.invitations
   end
 
   def session_invitation_load

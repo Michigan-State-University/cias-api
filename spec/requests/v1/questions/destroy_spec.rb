@@ -39,4 +39,12 @@ RSpec.describe 'DELETE /v1/question_groups/:question_group_id/questions/:id', ty
       it { expect(response).to have_http_status(:no_content) }
     end
   end
+
+  context 'when id is invalid' do
+    before do
+      delete v1_question_group_question_path(question_group_id: question_group.id, id: 'invalid'), headers: headers
+    end
+
+    it { expect(response).to have_http_status(:not_found) }
+  end
 end

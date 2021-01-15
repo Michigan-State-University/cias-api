@@ -15,6 +15,8 @@ Rails.application.routes.draw do
     }
 
     scope :users do
+      put 'send_sms_token', to: 'users#send_sms_token'
+      patch 'verify_sms_token', to: 'users#verify_sms_token'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]
@@ -30,19 +32,17 @@ Rails.application.routes.draw do
       post 'clone', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
+        resources :invitations, only: %i[index create destroy]
       end
       patch 'sessions/position', to: 'sessions#position'
       resources :sessions, only: %i[index show create update]
-      scope module: 'sessions' do
-        resources :users, only: %i[index create destroy]
-      end
     end
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     scope 'sessions/:session_id', as: 'session' do
       patch 'questions/move', to: 'questions#move', as: :move_question
       scope module: 'sessions' do
-        resources :invitations, only: %i[index create destroy] do
+        resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
       end

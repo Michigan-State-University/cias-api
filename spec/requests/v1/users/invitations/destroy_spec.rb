@@ -7,7 +7,7 @@ describe 'DELETE /v1/users/invitations', type: :request do
 
   let!(:user_with_pending_invitation) { create(:user, email: 'test@example.com', invitation_token: 'EXAMPLE_TOKEN', invitation_accepted_at: nil) }
 
-  context 'when autenticated as guest user' do
+  context 'when authenticated as guest user' do
     let(:guest_user) { create(:user, :guest) }
     let(:headers)    { guest_user.create_new_auth_token }
 
@@ -19,7 +19,7 @@ describe 'DELETE /v1/users/invitations', type: :request do
     end
   end
 
-  context 'when auhtenticated as admin user' do
+  context 'when authenticated as admin user' do
     let(:admin_user) { create(:user, :admin) }
     let(:headers)    { admin_user.create_new_auth_token }
 

@@ -4,7 +4,10 @@ class V1::QuestionGroupsController < V1Controller
   include Resource::Position
 
   def index
-    render_json question_groups: question_groups_scope
+    question_groups = question_groups_scope
+    raise ActiveRecord::RecordNotFound, 'Session not found' if question_groups.empty?
+
+    render_json question_groups: question_groups
   end
 
   def show

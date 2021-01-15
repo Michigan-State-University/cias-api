@@ -1,5 +1,18 @@
+headers:
+  DEVELOPMENT_MODE: true
+  uid: <%= ENV['CIAS_UID'] || 'admin@cias-api.herokuapp.com' %>
+  access-token: developmentaccesstoken
+  client: development-client-str
+  token-type: Bearer
+
 log:
   level: debug
 
 sidekiq:
   retries: 1
+
+services:
+  twilio:
+    from: +12314442242
+    sid: AC38387407c861aea9187167f15e224919
+    token: a436bd694307bdbbf9578071e0c0a6ed

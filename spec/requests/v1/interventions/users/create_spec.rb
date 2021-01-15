@@ -3,48 +3,66 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
-  let(:user_admin_1) { create(:user, :confirmed, :admin, first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
-  let(:user_admin_2) { create(:user, :confirmed, :participant, created_at: 4.days.ago) }
-  let(:intervention) { create(:intervention, user_id: user.id) }
-  let(:sessions) { create_list(:session, 2, intervention_id: intervention.id) }
-  let(:not_add_user_by_email) { 'a@a.com' }
-  let(:params) do
+  let!(:user) { create(:user, :confirmed, :admin) }
+  let!(:participant) { create(:user, :confirmed, :participant) }
+  let!(:intervention) { create(:intervention, user_id: user.id, status: intervention_status) }
+  let!(:intervention_status) { :published }
+  let!(:new_user_email) { 'a@a.com' }
+  let!(:params) do
     {
       user_session: {
-        emails: [user_admin_1.email, not_add_user_by_email]
+        emails: [participant.email, new_user_email]
       }
     }
   end
 
-  let(:request) { post v1_intervention_users_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
+  let(:request) { post v1_intervention_invitations_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
 
-  context 'create users' do
-    let(:params) do
-      {
-        user_session: {
-          emails: [user_admin_1.email, user_admin_2.email]
-        }
-      }
+  context 'create user access' do
+    %w[draft published].each do |status|
+      context "when intervention status is #{status}" do
+        let!(:intervention_status) { status.to_sym }
+
+        before do
+          request
+        end
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:created)
+        end
+
+        it 'returns correct response size' do
+          expect(json_response['user_sessions'].size).to eq 2
+        end
+
+        it 'returns correct email addresses' do
+          expect(json_response['user_sessions'].pluck('email')).to match_array([participant.email, new_user_email])
+        end
+
+        it 'does not create user account' do
+          expect(User.find_by(email: new_user_email)).to be nil
+        end
+
+        it 'set intervention invitation size correctly' do
+          expect(intervention.reload.invitations.size).to eq(2)
+        end
+      end
     end
+  end
 
-    it 'user to all sessions' do
-      sessions
-      request
+  context 'does not create intervention invitation when' do
+    %w[closed archived].each do |status|
+      context "when intervention is #{status}" do
+        let!(:intervention_status) { status.to_sym }
 
-      expect(response).to have_http_status(:created)
-      expect(json_response['user_sessions'].size).to eq 2
-      expect(json_response['user_sessions'].pluck('user_id').uniq).to match_array([user_admin_1.id, user_admin_2.id])
-      expect(User.find_by(email: not_add_user_by_email)).to be nil
-    end
+        before do
+          request
+        end
 
-    it 'many users to many sessions' do
-      sessions
-      request
-
-      expect(response).to have_http_status(:created)
-      expect(json_response['user_sessions'].size).to eq 2
-      expect(json_response['user_sessions'].pluck('user_id').uniq).to match_array([user_admin_1.id, user_admin_2.id])
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:not_acceptable)
+        end
+      end
     end
   end
 end

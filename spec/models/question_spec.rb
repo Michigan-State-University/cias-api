@@ -108,4 +108,24 @@ RSpec.describe Question, type: :model do
     it { should belong_to(:question_group) }
     it { should be_valid }
   end
+
+  describe 'callbacks' do
+    context 'after_create' do
+      context 'when question has type Question::Finish' do
+        let(:question_finish) { create(:question_finish) }
+
+        it 'creates default block' do
+          expect(question_finish['narrator']['blocks'].size).to eq(1)
+        end
+      end
+
+      context 'when question has different type' do
+        let(:question_single) { create(:question_single) }
+
+        it 'does not create default block' do
+          expect(question_single['narrator']['blocks'].size).to eq(0)
+        end
+      end
+    end
+  end
 end

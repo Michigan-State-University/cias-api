@@ -2,26 +2,24 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/interventions/:intervention_id/users', type: :request do
+RSpec.describe 'GET /v1/interventions/:intervention_id/invitations', type: :request do
   let!(:user) { create(:user, :confirmed, :admin) }
   let!(:users) { create_list(:user, 4, :confirmed) }
-  let!(:intervention) { create(:intervention, user_id: user.id) }
-  let!(:sessions) { create_list(:session, 2, intervention_id: intervention.id) }
-  let!(:user_sessions) do
-    users.each do |user|
-      sessions.each do |session|
-        session.user_sessions.create(user_id: user.id)
-      end
-    end
-  end
-  let(:request) { get v1_intervention_users_path(intervention_id: intervention.id), headers: user.create_new_auth_token }
+  let!(:intervention) { create(:intervention, user_id: user.id, invitations: users_with_access) }
+  let!(:users_with_access) { create_list(:intervention_invitation, 3) }
+  let(:request) { get v1_intervention_invitations_path(intervention_id: intervention.id), headers: user.create_new_auth_token }
 
-  context 'will retrive all users associated to sessions' do
-    it 'user previously exist in system' do
+  context 'will retrieve all users that were added to the access list' do
+    before do
       request
+    end
 
+    it 'returns correct http status' do
       expect(response).to have_http_status(:ok)
-      expect(json_response['user_sessions'].size).to eq 4
+    end
+
+    it 'returns correct invitations size' do
+      expect(json_response['user_sessions'].size).to eq 3
     end
   end
 end

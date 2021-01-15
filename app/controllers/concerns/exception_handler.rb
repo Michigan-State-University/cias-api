@@ -4,10 +4,6 @@ module ExceptionHandler
   extend ActiveSupport::Concern
 
   included do
-    rescue_from AASM::InvalidTransition do |exc|
-      render json: msg(exc), status: :bad_request
-    end
-
     rescue_from ActionController::ParameterMissing do |exc|
       render json: msg(exc), status: :bad_request
     end

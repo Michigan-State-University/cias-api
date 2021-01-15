@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class Intervention < ApplicationRecord
-  include AASM
   include Clone
 
   belongs_to :user, inverse_of: :interventions
   has_many :sessions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
-  has_many :session_invitations, dependent: :restrict_with_exception, through: :sessions
+  has_many :invitations, as: :invitable, dependent: :destroy
 
   has_many_attached :reports
 
@@ -18,34 +17,27 @@ class Intervention < ApplicationRecord
   validates :name, :shared_to, presence: true
   validates :status_event, inclusion: { in: %w[broadcast close to_archive] }, allow_nil: true
 
-  scope :available_for_participant, lambda { |participant_id|
-    left_joins(:user_sessions).published.not_shared_to_invited
-      .or(left_joins(:user_sessions).published.where(user_sessions: { user_id: participant_id }))
+  scope :available_for_participant, lambda { |participant_email|
+    left_joins(:invitations).published.not_shared_to_invited
+      .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
+  enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
 
-  aasm.attribute_name :status
-  aasm do
-    state :draft, initial: true
-    state :published, :closed, :archived
+  def broadcast
+    return unless draft?
 
-    event :broadcast do
-      after { ::Intervention::StatusKeeper.new(id).broadcast }
-      transitions from: :draft, to: :published
-    end
+    published!
+    ::Intervention::StatusKeeper.new(id).broadcast
+  end
 
-    event :close do
-      transitions from: :published, to: :closed
-    end
+  def close
+    closed! if published?
+  end
 
-    event :to_archive do
-      transitions from: :closed, to: :archived
-    end
-
-    event :to_initial do
-      transitions from: %i[draft published closed archived], to: :draft
-    end
+  def archive
+    archived! if closed? || draft?
   end
 
   def export_answers_as(type:)
@@ -59,15 +51,12 @@ class Intervention < ApplicationRecord
     save!
   end
 
-  def create_user_sessions(emails)
-    users_granted_access_ids = User.where(email: emails).ids
-    return if users_granted_access_ids.empty?
+  def give_user_access(emails)
+    return if emails.empty?
 
-    UserSession.transaction do
-      sessions.ids.each do |session_id|
-        users_granted_access_ids.each do |user_id|
-          UserSession.create!(user_id: user_id, session_id: session_id)
-        end
+    Invitation.transaction do
+      emails.each do |email|
+        invitations.create!(email: email)
       end
     end
   end

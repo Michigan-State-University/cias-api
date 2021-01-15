@@ -2,7 +2,6 @@
 
 class Session < ApplicationRecord
   extend DefaultValues
-  include AASM
   include BodyInterface
   include Clone
   include FormulaInterface
@@ -15,7 +14,7 @@ class Session < ApplicationRecord
   has_one :question_group_finish, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Finish'
   has_many :questions, dependent: :restrict_with_exception, through: :question_groups
   has_many :answers, dependent: :restrict_with_exception, through: :questions
-  has_many :session_invitations, dependent: :restrict_with_exception, inverse_of: :session
+  has_many :invitations, as: :invitable, dependent: :destroy
 
   has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :session
   has_many :users, dependent: :restrict_with_exception, through: :user_sessions
@@ -82,9 +81,9 @@ class Session < ApplicationRecord
       User.invite!(email: email)
     end
 
-    SessionInvitation.transaction do
+    Invitation.transaction do
       User.where(email: emails).find_each do |user|
-        SessionInvitation.create!(session_id: id, email: user.email)
+        invitations.create!(email: user.email)
       end
     end
 

@@ -1,0 +1,45 @@
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        email:
+          type: string
+          example: 'admin@cias-api.herokuapp.com'
+        first_name:
+          type: string
+        last_name:
+          type: string
+    intervention:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: 'New e-intervention'
+        status:
+          type: string
+          enum: [ draft, published, closed, archived ]
+        shared_to:
+          type: string
+          description: Intervention access level
+          enum: [ anyone, registered, invited ]
+        created_at:
+          type: string
+          format: date-time
+          example: '2020-12-22T12:00:00.000Z'
+        updated_at:
+          type: string
+          format: date-time
+          example: '2020-12-22T12:00:00.000Z'
+        published_at:
+          type: string
+          format: date-time
+          example: '2020-12-22T12:00:00.000Z'
+        user:
+          description: User who owns the intervention
+          $ref: '#/components/schemas/user'
+        sessions_size:
+          description: Number of sessions in the intervention
+          type: integer

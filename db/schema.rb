@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_03_224917) do
+ActiveRecord::Schema.define(version: 2020_12_21_122003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -62,7 +62,7 @@ ActiveRecord::Schema.define(version: 2020_12_03_224917) do
     t.string "name"
     t.uuid "user_id", null: false
     t.datetime "published_at"
-    t.string "status"
+    t.string "status", default: "draft"
     t.string "shared_to", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -71,6 +71,37 @@ ActiveRecord::Schema.define(version: 2020_12_03_224917) do
     t.index ["shared_to"], name: "index_interventions_on_shared_to"
     t.index ["status"], name: "index_interventions_on_status"
     t.index ["user_id"], name: "index_interventions_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.string "phone", null: false
+    t.text "body", null: false
+    t.string "status", default: "new", null: false
+    t.datetime "schedule_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "phones", force: :cascade do |t|
+    t.uuid "user_id"
+    t.string "iso", null: false
+    t.string "prefix", null: false
+    t.string "number", null: false
+    t.string "confirmation_code"
+    t.boolean "confirmed", default: false, null: false
+    t.datetime "confirmed_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_phones_on_user_id"
+  end
+
+  create_table "invitations", force: :cascade do |t|
+    t.string "email"
+    t.uuid "invitable_id"
+    t.string "invitable_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -104,14 +135,6 @@ ActiveRecord::Schema.define(version: 2020_12_03_224917) do
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
     t.index ["type", "title"], name: "index_questions_on_type_and_title", using: :gin
     t.index ["type"], name: "index_questions_on_type"
-  end
-
-  create_table "session_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "session_id", null: false
-    t.string "email"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["session_id", "email"], name: "index_session_invitations_on_session_id_and_email", unique: true
   end
 
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -163,7 +186,6 @@ ActiveRecord::Schema.define(version: 2020_12_03_224917) do
     t.string "first_name", default: "", null: false
     t.string "last_name", default: "", null: false
     t.string "email"
-    t.string "phone"
     t.string "time_zone"
     t.string "roles", default: [], array: true
     t.jsonb "tokens"
@@ -192,6 +214,7 @@ ActiveRecord::Schema.define(version: 2020_12_03_224917) do
     t.inet "last_sign_in_ip"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "sms_notification", default: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -210,7 +233,6 @@ ActiveRecord::Schema.define(version: 2020_12_03_224917) do
   add_foreign_key "interventions", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
-  add_foreign_key "session_invitations", "sessions"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "sessions"

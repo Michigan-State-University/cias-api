@@ -8,7 +8,6 @@ gem 'rails', '~> 6.0'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.0'
 
-gem 'aasm'
 gem 'activerecord_json_validator'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
@@ -32,6 +31,7 @@ gem 'redis'
 gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sql_query'
+gem 'twilio-ruby', '~> 5.45.0'
 
 group :development, :test do
   gem 'bundler-audit'

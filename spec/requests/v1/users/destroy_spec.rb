@@ -38,4 +38,12 @@ RSpec.describe 'DELETE /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:no_content) }
     end
   end
+
+  context 'not found' do
+    before do
+      delete v1_user_path(id: 'invalid'), headers: headers
+    end
+
+    it { expect(response).to have_http_status(:not_found) }
+  end
 end

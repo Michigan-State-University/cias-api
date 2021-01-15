@@ -2,12 +2,6 @@
 
 require 'rails_helper'
 
-class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
-  def audio_content
-    SecureRandom.uuid
-  end
-end
-
 RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
 
@@ -423,12 +417,6 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
   let(:narrator) { json_response['data']['attributes']['narrator'] }
 
   before do
-    tts_instance = instance_double(Google::Cloud::TextToSpeech::V1::TextToSpeech::Client)
-    speech_response_instance = Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake.new
-
-    allow(Google::Cloud::TextToSpeech).to receive(:text_to_speech).and_return(tts_instance)
-    allow(tts_instance).to receive(:synthesize_speech).and_return(speech_response_instance)
-
     patch v1_question_group_question_path(question_group_id: question_group_id, id: question_id), headers: headers, params: params, as: :json
   end
 

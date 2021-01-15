@@ -1,0 +1,38 @@
+components:
+  parameters:
+    accessToken:
+      name: access-token
+      in: header
+      description: Access token
+      required: true
+      schema:
+        type: string
+        minLength: 22
+        maxLength: 22
+        example: 'developmentaccesstoken'
+    tokenType:
+      name: token-type
+      in: header
+      description: Token type
+      required: true
+      schema:
+        type: string
+        example: 'Bearer'
+    client:
+      name: client
+      in: header
+      description: client
+      required: true
+      schema:
+        type: string
+        minLength: 22
+        maxLength: 22
+        example: 'development-client-str'
+    uid:
+      name: uid
+      in: header
+      description: User id (email)
+      required: true
+      schema:
+        type: string
+        example: 'admin@cias.com'
