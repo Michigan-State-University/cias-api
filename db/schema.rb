@@ -14,7 +14,6 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -73,6 +72,15 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.index ["user_id"], name: "index_interventions_on_user_id"
   end
 
+  create_table "invitations", force: :cascade do |t|
+    t.string "email"
+    t.uuid "invitable_id"
+    t.string "invitable_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
+  end
+
   create_table "messages", force: :cascade do |t|
     t.string "phone", null: false
     t.text "body", null: false
@@ -93,15 +101,6 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["user_id"], name: "index_phones_on_user_id"
-  end
-
-  create_table "invitations", force: :cascade do |t|
-    t.string "email"
-    t.uuid "invitable_id"
-    t.string "invitable_type"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

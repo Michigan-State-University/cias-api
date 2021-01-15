@@ -112,7 +112,6 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     end
 
     it 'has correct formula size' do
-      print json_response
       expect(json_response['data']['attributes']['formula']['patterns'].size).to eq(2)
     end
 
