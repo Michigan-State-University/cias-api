@@ -36,7 +36,7 @@ class Intervention < ApplicationRecord
     closed! if published?
   end
 
-  def archive
+  def to_archive
     archived! if closed? || draft?
   end
 

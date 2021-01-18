@@ -35,7 +35,7 @@ RSpec.describe Intervention, type: :model do
 
       context 'to archived' do
         it 'success event' do
-          intervention.archive
+          intervention.to_archive
           expect(intervention.archived?).to be true
         end
       end
@@ -53,7 +53,7 @@ RSpec.describe Intervention, type: :model do
 
       context 'to archived' do
         it 'no status change' do
-          intervention.archive
+          intervention.to_archive
           expect(intervention.published?).to be true
         end
       end
@@ -71,7 +71,7 @@ RSpec.describe Intervention, type: :model do
 
       context 'to archived' do
         it 'success event' do
-          intervention.archive
+          intervention.to_archive
           expect(intervention.archived?).to be true
         end
       end
