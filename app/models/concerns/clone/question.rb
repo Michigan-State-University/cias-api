@@ -3,8 +3,8 @@
 class Clone::Question < Clone::Base
   def execute
     attach_image
-    outcome.variable_clone_prefix
-    outcome.formula = Question.assign_default_values('formula')
+    clean_outcome_formulas if clean_formulas
+    outcome.position = position || outcome.question_group.questions.size
     outcome.save!
     outcome
   end
@@ -13,5 +13,10 @@ class Clone::Question < Clone::Base
 
   def attach_image
     outcome.image.attach(source.image.blob) if source.image.attachment
+  end
+
+  def clean_outcome_formulas
+    outcome.variable_clone_prefix
+    outcome.formula = Question.assign_default_values('formula')
   end
 end
