@@ -14,6 +14,8 @@ class V1::Interventions::Show < BaseSerializer
       created_at: @intervention.created_at,
       updated_at: @intervention.updated_at,
       published_at: @intervention.published_at,
+      csv_link: csv_link,
+      csv_generated_at: csv_generated_at,
       user: {
         email: @intervention.user.email,
         first_name: @intervention.user.first_name,
@@ -21,5 +23,19 @@ class V1::Interventions::Show < BaseSerializer
       },
       sessions_size: @intervention.sessions.size
     }
+  end
+
+  private
+
+  def csv_link
+    newest_csv_link if @intervention.reports.attached?
+  end
+
+  def csv_generated_at
+    @intervention.newest_report.created_at if @intervention.reports.attached?
+  end
+
+  def newest_csv_link
+    ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(@intervention.newest_report, only_path: true)
   end
 end

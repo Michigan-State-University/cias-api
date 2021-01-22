@@ -60,4 +60,8 @@ class Intervention < ApplicationRecord
       end
     end
   end
+
+  def newest_report
+    reports.attachments.order(created_at: :desc).first
+  end
 end

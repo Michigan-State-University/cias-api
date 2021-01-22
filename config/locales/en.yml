@@ -27,9 +27,9 @@ en:
       subject: "[CSV] Answers for: %{intervention_name}"
       body: You ordered the preparation of a CSV file with session data, therefore you receive this message. Your order is finished successfully. Please log in to the application, report file is ready to download.
       header: Your CSV file is ready to download
-      html_body: 'CSV file with data from <span style="color: #c866ea;">%{intervention_name}</span> intervention is ready to download in your dashboard'
-      button_text: Open CIAS dashboard
-      link: '%{web_url}/'
+      html_body: 'CSV file that you requested on %{requested_at} with data from <span style="color: #c866ea;">%{intervention_name}</span> intervention is ready to download in the e-intervention'
+      button_text: Open the e-intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
