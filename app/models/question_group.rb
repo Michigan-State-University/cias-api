@@ -9,7 +9,7 @@ class QuestionGroup < ApplicationRecord
   validates :title, :position, presence: true
   default_scope { order(:position) }
 
-  def default?
-    type == 'QuestionGroup::Default'
+  def finish?
+    type == 'QuestionGroup::Finish'
   end
 end

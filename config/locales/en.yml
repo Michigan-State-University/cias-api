@@ -5,8 +5,6 @@ en:
       subtitle: Finish Screen
       title: Finish Screen
   question_group:
-    default:
-      title: Default Group
     finish:
       title: Finish Group
     plain:

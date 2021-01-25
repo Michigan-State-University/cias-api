@@ -8,16 +8,15 @@ class Session < ApplicationRecord
 
   belongs_to :intervention, inverse_of: :sessions, touch: true
 
-  has_many :question_groups, dependent: :restrict_with_exception, inverse_of: :session
-  has_many :question_group_plains, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Plain'
-  has_one :question_group_default, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Default'
-  has_one :question_group_finish, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Finish'
-  has_many :questions, dependent: :restrict_with_exception, through: :question_groups
-  has_many :answers, dependent: :restrict_with_exception, through: :questions
+  has_many :question_groups, dependent: :destroy, inverse_of: :session
+  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
+  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
+  has_many :questions, dependent: :destroy, through: :question_groups
+  has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy
 
-  has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :session
-  has_many :users, dependent: :restrict_with_exception, through: :user_sessions
+  has_many :user_sessions, dependent: :destroy, inverse_of: :session
+  has_many :users, through: :user_sessions
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 0
@@ -103,7 +102,6 @@ class Session < ApplicationRecord
   private
 
   def create_core_childs
-    ::QuestionGroup::Default.create!(session_id: id) if question_group_default.nil?
     return unless question_group_finish.nil?
 
     qg_finish = ::QuestionGroup::Finish.new(session_id: id)

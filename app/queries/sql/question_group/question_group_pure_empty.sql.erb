@@ -3,7 +3,7 @@ DELETE FROM
 WHERE
   question_groups.type
 NOT IN
-  ('QuestionGroup::Default', 'QuestionGroup::Finish')
+  ('QuestionGroup::Finish')
 AND
   question_groups.id
 IN

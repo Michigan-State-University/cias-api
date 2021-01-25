@@ -35,7 +35,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create destroy]
       end
       patch 'sessions/position', to: 'sessions#position'
-      resources :sessions, only: %i[index show create update]
+      resources :sessions, only: %i[index show create update destroy]
     end
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session

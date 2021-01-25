@@ -33,7 +33,6 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
       let(:user) { create(:user, :confirmed, role) }
 
       context "when #{role} creates an answer" do
-
         it 'returns correct http status' do
           expect(response).to have_http_status(:created)
         end

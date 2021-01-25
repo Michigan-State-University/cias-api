@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class QuestionGroup::Finish < QuestionGroup
-  include PreventDestroy
-
   has_one :question_finish, inverse_of: :question_group, class_name: '::Question::Finish', foreign_key: :question_group_id, dependent: :destroy
 
   attribute :title, :string, default: I18n.t('question_group.finish.title')
