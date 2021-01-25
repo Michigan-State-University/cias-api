@@ -45,6 +45,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
+        resources :flows, only: %i[index]
       end
       resources :question_groups, only: %i[index show create update destroy] do
         member do

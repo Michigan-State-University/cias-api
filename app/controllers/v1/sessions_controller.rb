@@ -18,7 +18,6 @@ class V1::SessionsController < V1Controller
     session = sessions_scope.new(session_params)
     session.position = sessions_scope.last&.position.to_i + 1
     session.save!
-    session.add_user_sessions
     render json: serialized_response(session), status: :created
   end
 

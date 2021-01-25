@@ -2,15 +2,12 @@
 
 FactoryBot.define do
   factory :answer do
-    user
+    user_session
     body do
       { data: [
         {
-          payload: '',
-          variable: {
-            name: 'test',
-            value: '1'
-          }
+          var: 'test',
+          value: '1'
         }
       ] }
     end

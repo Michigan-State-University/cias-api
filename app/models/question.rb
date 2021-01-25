@@ -7,7 +7,7 @@ class Question < ApplicationRecord
   include FormulaInterface
   include BlockHelper
 
-  belongs_to :question_group, inverse_of: :questions, touch: true
+  belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :restrict_with_exception, inverse_of: :question
 
   attribute :narrator, :json, default: assign_default_values('narrator')
@@ -57,23 +57,6 @@ class Question < ApplicationRecord
       narrator['blocks'][index]['target_value'] = exploit_formula(answers_var_values, block['payload'], block['reflections'])
       break
     end
-  end
-
-  def next_session_or_question(answers_var_values)
-    return nil if id.eql?(position_equal_or_higher.last.id)
-
-    if formula['payload'].present?
-      obj_src = exploit_formula(answers_var_values)
-
-      if obj_src.is_a?(Hash)
-        next_obj = obj_src['target']['type'].safe_constantize.find(obj_src['target']['id'])
-        next_obj&.perform_narrator_reflection(answers_var_values)
-        return another_or_feedback(next_obj, answers_var_values)
-      end
-    end
-    next_obj = position_equal_or_higher[1]
-    next_obj&.perform_narrator_reflection(answers_var_values)
-    another_or_feedback(next_obj, answers_var_values)
   end
 
   def harvest_body_variables

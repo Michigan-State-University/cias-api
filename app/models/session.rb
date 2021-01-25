@@ -24,7 +24,7 @@ class Session < ApplicationRecord
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 
-  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date' }, _prefix: :schedule
+  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill' }, _prefix: :schedule
 
   delegate :published?, to: :intervention
 
@@ -41,6 +41,10 @@ class Session < ApplicationRecord
 
   def position_grather_than
     @position_grather_than ||= intervention.sessions.where('position > ?', position).order(:position)
+  end
+
+  def next_session
+    intervention.sessions.find_by(position: position + 1)
   end
 
   def propagate_settings
@@ -61,16 +65,6 @@ class Session < ApplicationRecord
     save!
   end
 
-  def add_user_sessions
-    return if intervention.user_sessions.empty?
-
-    UserSession.transaction do
-      intervention.user_sessions.pluck(:user_id).each do |user_id|
-        UserSession.create!(user_id: user_id, session_id: id)
-      end
-    end
-  end
-
   def perform_narrator_reflection(_placeholder)
     nil
   end
@@ -88,6 +82,22 @@ class Session < ApplicationRecord
     end
 
     SessionJob::Invitation.perform_later(id, emails)
+  end
+
+  def send_link_to_session(user)
+    SessionMailer.inform_to_an_email(self, user.email).deliver_later
+  end
+
+  def first_question
+    question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
+  end
+
+  def finish_screen
+    question_group_finish.questions.first
+  end
+
+  def queue_to_schedule(user)
+    send_link_to_session(user) if schedule == 'after_fill'
   end
 
   private
