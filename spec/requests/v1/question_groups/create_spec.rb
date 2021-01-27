@@ -6,7 +6,8 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
   let!(:user) { create(:user, :researcher) }
   let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:other_session) { create(:session, intervention: create(:intervention, user: user)) }
-  let!(:question_group) { create(:question_group_plain, session: other_session) }
+  let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
+  let!(:other_question_group) { create(:question_group_plain, session: other_session, position: 1) }
   let!(:question_ids) { create_list(:question_free_response, 3, title: 'Question Id Title', question_group: question_group) }
   let(:request) { post v1_session_question_groups_path(session_id: session.id), params: params, headers: user.create_new_auth_token }
   let!(:question_array_json) do
@@ -40,7 +41,6 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
     {
       question_group: {
         title: 'QuestionGroup Title',
-        position: 1,
         session_id: session.id,
         question_ids: question_ids.pluck(:id),
         questions: question_array_json
@@ -55,6 +55,7 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
 
         expect(response).to have_http_status(:created)
         expect(json_response['title']).to eq 'QuestionGroup Title'
+        expect(json_response['position']).to eq 2
         expect(json_response['questions'].size).to eq 5
         expect(json_response['questions'][0]['title']).to eq 'Question Id Title'
         expect(json_response['questions'][4]['title']).to eq 'Question Title 2'
@@ -66,7 +67,6 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
         {
           question_group: {
             title: 'QuestionGroup Title',
-            position: 1,
             session_id: session.id,
             question_ids: question_ids.pluck(:id)
           }
@@ -78,6 +78,7 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
 
         expect(response).to have_http_status(:created)
         expect(json_response['title']).to eq 'QuestionGroup Title'
+        expect(json_response['position']).to eq 2
         expect(json_response['questions'].size).to eq 3
         expect(json_response['questions'][0]['title']).to eq 'Question Id Title'
         expect(json_response['questions'][2]['title']).to eq 'Question Id Title'
@@ -89,7 +90,6 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
         {
           question_group: {
             title: 'QuestionGroup Title',
-            position: 1,
             session_id: session.id,
             questions: question_array_json
           }
@@ -101,6 +101,7 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
 
         expect(response).to have_http_status(:created)
         expect(json_response['title']).to eq 'QuestionGroup Title'
+        expect(json_response['position']).to eq 2
         expect(json_response['questions'].size).to eq 2
         expect(json_response['questions'][0]['title']).to eq 'Question Title 1'
         expect(json_response['questions'][1]['title']).to eq 'Question Title 2'
