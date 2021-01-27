@@ -22,26 +22,4 @@ RSpec.describe Session, type: :model do
       end
     end
   end
-
-  context 'calc schedule' do
-    context 'expect schedule_at when exact_date' do
-      subject { create(:session, :exact_date) }
-
-      it { should be_valid }
-    end
-
-    context 'expect schedule_at when days_after' do
-      let(:intervention) { create(:intervention, created_at: 6.days.ago) }
-      let(:session_1) { create(:session, intervention_id: intervention.id, position: 1,  created_at: 4.days.ago) }
-      let(:session_2) { create(:session, intervention_id: intervention.id, position: 2, schedule: 'days_after', schedule_payload: 7, created_at: 2.days.ago) }
-
-      it 'proper date' do
-        session_1
-        session_2
-        intervention.broadcast
-
-        expect(session_2.reload.schedule_at).to eq(Date.current + 7)
-      end
-    end
-  end
 end

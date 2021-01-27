@@ -5,15 +5,16 @@ class V1::FlowService
     @user = user
     @answer = Answer.find(answer_id)
     @question = @answer.question
+    @user_session = UserSession.find_by(user_id: user.id, session_id: @question.session.id)
   end
 
   attr_reader :user
-  attr_accessor :answer, :question
+  attr_accessor :answer, :question, :user_session
 
   def answer_branching_flow
-    perform_branching_to_question
-    # zaakonczenie sesjii czyli scheduling
-    # session_finished(answer) if question.type == 'Question::Finish'
+    response_question = perform_branching_to_question
+    user_session.finish if response_question.type == 'Question::Finish'
+    response_question
   end
 
   def retrieve_previous_and_current_answers
@@ -49,11 +50,9 @@ class V1::FlowService
   def branching_source_to_question(source)
     branching_type = source['target']['type']
     question_or_session = branching_type.safe_constantize.find(source['target']['id'])
-    # check if question_or_session is question
     return question_or_session if branching_type.include? 'Question'
 
-    # question_or_session is session
-    # sesja zakonczona i dalej patrzymy czy zworic pytanie czy wrzucic jakos do schedulingu
+    user_session.finish(send_email: false)
 
     return question_or_session.first_question if question_or_session.schedule == 'after_fill'
 

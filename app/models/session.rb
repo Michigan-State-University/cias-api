@@ -95,10 +95,6 @@ class Session < ApplicationRecord
     question_group_finish.questions.first
   end
 
-  def queue_to_schedule(user)
-    send_link_to_session(user) if schedule == 'after_fill'
-  end
-
   private
 
   def create_core_childs

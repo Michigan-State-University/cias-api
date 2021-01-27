@@ -176,10 +176,11 @@ ActiveRecord::Schema.define(version: 2021_01_26_105647) do
   create_table "user_sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "session_id", null: false
-    t.datetime "submitted_at"
-    t.date "schedule_at"
+    t.datetime "finished_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "last_answer_at"
+    t.string "timeout_job_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
