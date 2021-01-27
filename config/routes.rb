@@ -69,6 +69,8 @@ Rails.application.routes.draw do
         resource :images, only: %i[create destroy]
       end
     end
+
+    resources :teams, only: %i[index show create update destroy]
   end
 
   if Rails.env.development?
