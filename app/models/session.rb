@@ -8,23 +8,22 @@ class Session < ApplicationRecord
 
   belongs_to :intervention, inverse_of: :sessions, touch: true
 
-  has_many :question_groups, dependent: :restrict_with_exception, inverse_of: :session
-  has_many :question_group_plains, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Plain'
-  has_one :question_group_default, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Default'
-  has_one :question_group_finish, dependent: :restrict_with_exception, inverse_of: :session, class_name: 'QuestionGroup::Finish'
-  has_many :questions, dependent: :restrict_with_exception, through: :question_groups
-  has_many :answers, dependent: :restrict_with_exception, through: :questions
+  has_many :question_groups, dependent: :destroy, inverse_of: :session
+  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
+  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
+  has_many :questions, dependent: :destroy, through: :question_groups
+  has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy
 
-  has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :session
-  has_many :users, dependent: :restrict_with_exception, through: :user_sessions
+  has_many :user_sessions, dependent: :destroy, inverse_of: :session
+  has_many :users, through: :user_sessions
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 0
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 
-  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date' }, _prefix: :schedule
+  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill' }, _prefix: :schedule
 
   delegate :published?, to: :intervention
 
@@ -43,6 +42,10 @@ class Session < ApplicationRecord
     @position_grather_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end
 
+  def next_session
+    intervention.sessions.find_by(position: position + 1)
+  end
+
   def propagate_settings
     return unless settings_changed?
 
@@ -59,16 +62,6 @@ class Session < ApplicationRecord
 
     propagate_settings
     save!
-  end
-
-  def add_user_sessions
-    return if intervention.user_sessions.empty?
-
-    UserSession.transaction do
-      intervention.user_sessions.pluck(:user_id).each do |user_id|
-        UserSession.create!(user_id: user_id, session_id: id)
-      end
-    end
   end
 
   def perform_narrator_reflection(_placeholder)
@@ -90,10 +83,21 @@ class Session < ApplicationRecord
     SessionJob::Invitation.perform_later(id, emails)
   end
 
+  def send_link_to_session(user)
+    SessionMailer.inform_to_an_email(self, user.email).deliver_later
+  end
+
+  def first_question
+    question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
+  end
+
+  def finish_screen
+    question_group_finish.questions.first
+  end
+
   private
 
   def create_core_childs
-    ::QuestionGroup::Default.create!(session_id: id) if question_group_default.nil?
     return unless question_group_finish.nil?
 
     qg_finish = ::QuestionGroup::Finish.new(session_id: id)

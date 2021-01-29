@@ -36,7 +36,7 @@ class Intervention < ApplicationRecord
     closed! if published?
   end
 
-  def archive
+  def to_archive
     archived! if closed? || draft?
   end
 
@@ -59,5 +59,9 @@ class Intervention < ApplicationRecord
         invitations.create!(email: email)
       end
     end
+  end
+
+  def newest_report
+    reports.attachments.order(created_at: :desc).first
   end
 end

@@ -35,7 +35,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create destroy]
       end
       patch 'sessions/position', to: 'sessions#position'
-      resources :sessions, only: %i[index show create update]
+      resources :sessions, only: %i[index show create update destroy]
     end
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
@@ -45,6 +45,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
+        resources :flows, only: %i[index]
       end
       resources :question_groups, only: %i[index show create update destroy] do
         member do
@@ -68,6 +69,8 @@ Rails.application.routes.draw do
         resource :images, only: %i[create destroy]
       end
     end
+
+    resources :teams, only: %i[index show create update destroy]
   end
 
   if Rails.env.development?

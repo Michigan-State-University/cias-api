@@ -3,25 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe QuestionGroup, type: :model do
-  describe 'QuestionGroup::Default' do
-    subject(:question_group_default) { build(:question_group_default) }
-
-    it { should belong_to(:session) }
-    it { should be_valid }
-
-    it 'responds to message default? and should be true' do
-      expect(subject.default?).to be true
-    end
-  end
-
   describe 'QuestionGroup::Plain' do
     subject(:question_group_plain) { build(:question_group_plain) }
 
     it { should belong_to(:session) }
     it { should be_valid }
 
-    it 'responds to message default? and should be false' do
-      expect(subject.default?).to be false
+    it 'responds to message finish? and should be false' do
+      expect(subject.finish?).to be false
     end
   end
 
@@ -31,6 +20,10 @@ RSpec.describe QuestionGroup, type: :model do
 
       it { should belong_to(:session) }
       it { should be_valid }
+
+      it 'responds to message finish? and should be true' do
+        expect(subject.finish?).to be true
+      end
     end
   end
 end

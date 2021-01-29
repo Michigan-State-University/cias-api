@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
-  let(:request) { patch v1_session_question_group_path(session_id: session.id, id: question_group_default.id), params: params, headers: headers }
+  let(:request) { patch v1_session_question_group_path(session_id: session.id, id: question_group.id), params: params, headers: headers }
   let(:params) do
     {
       question_group: {
@@ -13,7 +13,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
   end
 
   let!(:session) { create(:session, intervention: create(:intervention, :published)) }
-  let!(:question_group_default) { create(:question_group_default, title: 'Old Title', session: session) }
+  let!(:question_group) { create(:question_group_plain, title: 'Old Title', session: session) }
 
   context 'when authenticated as guest user' do
     let(:guest_user) { create(:user, :guest) }

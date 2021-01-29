@@ -40,6 +40,9 @@ GEM
     activejob (6.0.3.4)
       activesupport (= 6.0.3.4)
       globalid (>= 0.3.6)
+    activejob-cancel (0.3.1)
+      activejob (>= 4.2.0)
+      activesupport (>= 4.2.0)
     activemodel (6.0.3.4)
       activesupport (= 6.0.3.4)
     activerecord (6.0.3.4)
@@ -479,6 +482,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activejob-cancel
   activerecord_json_validator
   aws-sdk-s3
   bootsnap (>= 1.4)

@@ -7,7 +7,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id/questions_change', 
   let(:params) do
     {
       question_group: {
-        questions: questions.pluck(:id)
+        question_ids: questions.pluck(:id)
       }
     }
   end

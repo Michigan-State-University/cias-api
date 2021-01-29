@@ -2,7 +2,8 @@
 
 module Clone
   include MetaOperations
-  def clone(params = {})
+
+  def clone(params: {}, clean_formulas: true, position: nil)
     if params[:user_ids].present?
       interventions = []
       user_ids = User.where(id: params[:user_ids]).limit_to_roles('researcher').pluck(:id)
@@ -10,14 +11,14 @@ module Clone
         interventions.push(
           "Clone::#{de_constantize_modulize_name.classify}".
             safe_constantize.
-            new(self, user_id: id).
+            new(self, { user_id: id, clean_formulas: clean_formulas, position: position }).
             execute
         )
       end
       interventions
     else
       "Clone::#{de_constantize_modulize_name.classify}".
-        safe_constantize.new(self).execute
+        safe_constantize.new(self, clean_formulas: clean_formulas, position: position).execute
     end
   end
 end

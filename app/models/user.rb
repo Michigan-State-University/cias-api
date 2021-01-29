@@ -34,7 +34,6 @@ class User < ApplicationRecord
   has_many :interventions, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :user
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
-  has_many :answers, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_log_requests, dependent: :destroy
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
