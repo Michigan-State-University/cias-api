@@ -22,8 +22,8 @@ class V1::UserSessionScheduleService
     nil
   end
 
-  def days_after_fill_schedule(_next_session)
-    nil
+  def days_after_fill_schedule(next_session)
+    DaysAfterFillScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id)
   end
 
   def exact_date_schedule(_next_session)
