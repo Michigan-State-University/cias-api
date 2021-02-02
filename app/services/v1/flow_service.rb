@@ -52,9 +52,11 @@ class V1::FlowService
     question_or_session = branching_type.safe_constantize.find(source['target']['id'])
     return question_or_session if branching_type.include? 'Question'
 
-    user_session.finish(send_email: false)
+    session_available_now = question_or_session.available_now
 
-    return question_or_session.first_question if question_or_session.schedule == 'after_fill'
+    user_session.finish(send_email: !session_available_now)
+
+    return question_or_session.first_question if session_available_now
 
     question.question_group.session.finish_screen
   end

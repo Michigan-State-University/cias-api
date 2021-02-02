@@ -106,11 +106,12 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
     end
 
     context 'response when branching is set to another session' do
-      let!(:other_session) { create(:session, intervention_id: intervention.id, position: 2, schedule: schedule) }
+      let!(:other_session) { create(:session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at) }
       let!(:other_question_group) { create(:question_group, session_id: other_session.id) }
       let!(:other_question) { create(:question_single, question_group_id: other_question_group.id) }
 
       let(:schedule) { :after_fill }
+      let(:schedule_at) { DateTime.now + 1.day }
 
       let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
       let!(:question) do
@@ -132,6 +133,13 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
       end
 
       context 'session that is branched to and has schedule after fill' do
+        it { expect(json_response['data']['id']).to eq other_question.id }
+      end
+
+      context 'session that is branched to and has schedule exact date with schedule in the past' do
+        let!(:schedule) { 'exact_date' }
+        let(:schedule_at) { DateTime.now - 1.day }
+
         it { expect(json_response['data']['id']).to eq other_question.id }
       end
 

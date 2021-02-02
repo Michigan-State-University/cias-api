@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class DaysAfterFillScheduleJob < ApplicationJob
+class SessionEmailScheduleJob < ApplicationJob
   queue_as :default
 
   def perform(session_id, user_id)

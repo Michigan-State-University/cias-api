@@ -95,6 +95,13 @@ class Session < ApplicationRecord
     question_group_finish.questions.first
   end
 
+  def available_now
+    return true if schedule == 'after_fill'
+    return true if schedule == 'exact_date' && schedule_at.noon.past?
+
+    false
+  end
+
   private
 
   def create_core_childs

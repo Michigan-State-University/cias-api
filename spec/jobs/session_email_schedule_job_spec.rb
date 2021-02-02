@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe DaysAfterFillScheduleJob, type: :job do
+RSpec.describe SessionEmailScheduleJob, type: :job do
   let!(:session) { create(:session) }
   let!(:user) { create(:user, :participant) }
   let(:session_id) { session.id }
