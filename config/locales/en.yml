@@ -11,6 +11,13 @@ en:
       title: Next Group
   activerecord:
     errors:
+      models:
+        user:
+          attributes:
+            roles:
+              team_id_is_required_for_team_admin: 'Team Admin must have a team'
+            team_id:
+              team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
       messages:
         undestroyable: Forbidden operation
   interventions:

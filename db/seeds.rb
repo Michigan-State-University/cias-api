@@ -18,6 +18,8 @@ class SummonUsers
 
     def summon_many
       User::APP_ROLES.each_with_index do |role, index|
+        next if role == 'team_admin'
+
         u = User.new(
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,

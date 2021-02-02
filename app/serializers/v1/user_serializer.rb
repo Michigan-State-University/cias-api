@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class V1::UserSerializer < V1Serializer
-  attributes :email, :full_name, :first_name, :last_name, :sms_notification, :time_zone, :active, :roles, :avatar_url, :phone
+  attributes :email, :full_name, :first_name, :last_name, :sms_notification, :time_zone, :active, :roles,
+             :avatar_url, :phone, :team_id
 
   attribute :avatar_url do |object|
     polymorphic_url(object.avatar) if object.avatar.attached?

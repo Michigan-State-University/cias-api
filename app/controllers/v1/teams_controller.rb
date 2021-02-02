@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::TeamsController < V1Controller
+  authorize_resource only: %i[index show create update destroy]
+
   def index
     render json: serialized_response(teams_scope)
   end
@@ -10,8 +12,8 @@ class V1::TeamsController < V1Controller
   end
 
   def create
-    team = Team.create(team_params)
-    render json: serialized_response(team), status: :created
+    new_team = V1::Teams::Create.call(team_params)
+    render json: serialized_response(new_team), status: :created
   end
 
   def update
@@ -24,17 +26,28 @@ class V1::TeamsController < V1Controller
     head :no_content
   end
 
+  def add_team_admin
+    authorize! :add_team_admin, Team
+
+    V1::Teams::AddTeamAdmin.call(
+      team,
+      params.require(:user_id)
+    )
+
+    render json: serialized_response(team)
+  end
+
   private
 
   def teams_scope
-    Team.all
+    Team.includes(:team_admin).accessible_by(current_ability)
   end
 
   def team
-    Team.find(params[:id])
+    @team ||= teams_scope.find(params[:id])
   end
 
   def team_params
-    params.require(:team).permit(:name)
+    params.require(:team).permit(:name, :user_id)
   end
 end

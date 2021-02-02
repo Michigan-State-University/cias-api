@@ -7,10 +7,14 @@ RSpec.describe 'GET /v1/teams', type: :request do
   let(:headers) { user.create_new_auth_token }
 
   context 'when there are teams' do
-    let!(:team_1) { create(:team) }
-    let!(:team_2) { create(:team) }
+    let!(:team_1) { create(:team, :with_team_admin) }
+    let!(:team_1_researcher) { create(:user, :researcher) }
+    let!(:team_2) { create(:team, :with_team_admin) }
+    let!(:team_2_researcher) { create(:user, :researcher) }
 
     before do
+      team_1.users << team_1_researcher
+      team_2.users << team_2_researcher
       get v1_teams_path, headers: headers
     end
 
@@ -22,11 +26,27 @@ RSpec.describe 'GET /v1/teams', type: :request do
       expect(json_response['data']).to include(
         'id' => team_1.id.to_s,
         'type' => 'team',
-        'attributes' => include('name' => team_1.name)
+        'attributes' => include('name' => team_1.name),
+        'relationships' => {
+          'team_admin' => {
+            'data' => include('id' => team_1.team_admin.id, 'type' => 'team_admin')
+          },
+          'users' => {
+            'data' => include('id' => team_1_researcher.id, 'type' => 'user')
+          }
+        }
       ).and include(
         'id' => team_2.id.to_s,
         'type' => 'team',
-        'attributes' => include('name' => team_2.name)
+        'attributes' => include('name' => team_2.name),
+        'relationships' => {
+          'team_admin' => {
+            'data' => include('id' => team_2.team_admin.id, 'type' => 'team_admin')
+          },
+          'users' => {
+            'data' => include('id' => team_2_researcher.id, 'type' => 'user')
+          }
+        }
       )
     end
   end

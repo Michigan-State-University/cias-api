@@ -70,7 +70,11 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :teams, only: %i[index show create update destroy]
+    resources :teams, only: %i[index show create update destroy] do
+      member do
+        post :add_team_admin
+      end
+    end
   end
 
   if Rails.env.development?

@@ -222,6 +222,7 @@ ActiveRecord::Schema.define(version: 2021_01_28_132553) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "sms_notification", default: false
+    t.uuid "team_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -229,6 +230,7 @@ ActiveRecord::Schema.define(version: 2021_01_28_132553) do
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
+    t.index ["team_id"], name: "index_users_on_team_id"
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
     t.index ["uid", "roles"], name: "index_users_on_uid_and_roles", using: :gin
     t.index ["uid"], name: "index_users_on_uid", unique: true
