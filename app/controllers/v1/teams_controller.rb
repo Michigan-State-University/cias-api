@@ -4,21 +4,23 @@ class V1::TeamsController < V1Controller
   authorize_resource only: %i[index show create update destroy]
 
   def index
-    render json: serialized_response(teams_scope)
+    paginated_teams_scope = paginate(teams_scope, params)
+
+    render json: team_serialized_response(paginated_teams_scope)
   end
 
   def show
-    render json: serialized_response(team)
+    render json: team_serialized_response(team)
   end
 
   def create
     new_team = V1::Teams::Create.call(team_params)
-    render json: serialized_response(new_team), status: :created
+    render json: team_serialized_response(new_team), status: :created
   end
 
   def update
     team.update(team_params)
-    render json: serialized_response(team)
+    render json: team_serialized_response(team)
   end
 
   def destroy
@@ -34,10 +36,17 @@ class V1::TeamsController < V1Controller
       params.require(:user_id)
     )
 
-    render json: serialized_response(team)
+    render json: team_serialized_response(team)
   end
 
   private
+
+  def team_serialized_response(teams)
+    V1::TeamSerializer.new(
+      teams,
+      { include: [:team_admin] }
+    )
+  end
 
   def teams_scope
     Team.includes(:team_admin).accessible_by(current_ability)

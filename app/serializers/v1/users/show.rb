@@ -16,6 +16,7 @@ class V1::Users::Show < BaseSerializer
       time_zone: @user.time_zone,
       active: @user.active,
       roles: @user.roles,
+      team_id: @user.team_id,
       avatar_url: url_for_image(@user, :avatar)
     }
   end

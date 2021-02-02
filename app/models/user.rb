@@ -59,6 +59,7 @@ class User < ApplicationRecord
               scope.limit_to_active
             end
     scope = scope.limit_to_roles(params[:roles])
+    scope = scope.from_team(params[:team_id]) if params.key?(:team_id)
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
     scope
   end

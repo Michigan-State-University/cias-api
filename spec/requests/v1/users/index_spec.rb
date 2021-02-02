@@ -103,6 +103,30 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
     end
 
+    context 'with team_id filter params' do
+      let!(:team1) { create(:team, :with_team_admin) }
+      let!(:team2) { create(:team, :with_team_admin) }
+      let(:params) { { team_id: team1.id } }
+
+      before do
+        create(:user, :researcher, team_id: team1.id)
+        create(:user, :researcher, team_id: team2.id)
+        request
+      end
+
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns correct user ids' do
+        expect(json_response['users'].pluck('id')).to match_array(team1.users.pluck(:id))
+      end
+
+      it 'returns correct users list size' do
+        expect(json_response['users'].size).to eq 2
+      end
+    end
+
     context 'with filters deactivated users' do
       let(:params) { { active: false } }
       let(:users) { [participant_1, participant_2, participant_3] }
@@ -228,6 +252,36 @@ RSpec.describe 'GET /v1/users', type: :request do
 
       it 'returns correct users list size' do
         expect(json_response['users'].size).to eq 1
+      end
+    end
+  end
+
+  context 'when current_user is team_admin' do
+    let!(:team1) { create(:team, :with_team_admin) }
+    let(:current_user) { team1.team_admin }
+
+    let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
+
+    context 'without params' do
+      let!(:team2) { create(:team, :with_team_admin) }
+      let(:params) { {} }
+
+      before do
+        create(:user, :researcher, team_id: team1.id)
+        create(:user, :researcher, team_id: team2.id)
+        request
+      end
+
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns users only from his team' do
+        expect(json_response['users'].pluck('id')).to match_array(team1.users.pluck(:id))
+      end
+
+      it 'returns correct users list size' do
+        expect(json_response['users'].size).to eq 2
       end
     end
   end

@@ -2,6 +2,5 @@
 
 class V1::TeamSerializer < V1Serializer
   attributes :name
-  has_many :users
-  has_one :team_admin
+  has_one :team_admin, serializer: V1::UserSerializer
 end
