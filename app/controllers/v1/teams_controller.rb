@@ -44,12 +44,12 @@ class V1::TeamsController < V1Controller
   def team_serialized_response(teams)
     V1::TeamSerializer.new(
       teams,
-      { include: [:team_admin] }
+      { meta: { teams_size: teams.try(:count) || 1 }, include: [:team_admin] }
     )
   end
 
   def teams_scope
-    Team.includes(:team_admin).accessible_by(current_ability)
+    Team.includes(team_admin: %i[phone avatar_attachment]).accessible_by(current_ability)
   end
 
   def team
