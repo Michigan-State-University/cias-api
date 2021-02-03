@@ -59,5 +59,20 @@ RSpec.describe V1::UserSessionScheduleService do
                                                                    .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
       end
     end
+
+    context 'when session has schedule days_after' do
+      let(:schedule) { 'days_after' }
+
+      it 'calls correct method' do
+        expect_any_instance_of(described_class).to receive(:days_after_schedule)
+        described_class.new(user_session).schedule
+      end
+
+      it 'schedules on correct time' do
+        expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                   .with(second_session.id, user.id)
+                                                                   .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+      end
+    end
   end
 end

@@ -9,7 +9,7 @@ class UserSession < ApplicationRecord
     return if finished_at
 
     cancel_timeout_job
-    update(finished_at: DateTime.now)
+    update(finished_at: DateTime.current)
 
     V1::UserSessionScheduleService.new(self).schedule if send_email
   end
@@ -17,7 +17,7 @@ class UserSession < ApplicationRecord
   def on_answer
     timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
     cancel_timeout_job
-    update(last_answer_at: DateTime.now, timeout_job_id: timeout_job.job_id)
+    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.job_id)
   end
 
   def cancel_timeout_job

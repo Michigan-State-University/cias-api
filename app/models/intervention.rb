@@ -29,7 +29,7 @@ class Intervention < ApplicationRecord
     return unless draft?
 
     published!
-    ::Intervention::StatusKeeper.new(id).broadcast
+    ::Intervention::PublishJob.perform_later(id)
   end
 
   def close

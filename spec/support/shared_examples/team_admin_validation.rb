@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.shared_examples 'without team admin validations' do
   subject { user.valid? }
 

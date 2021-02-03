@@ -18,8 +18,8 @@ class V1::UserSessionScheduleService
     next_session.send_link_to_session(user_session.user)
   end
 
-  def days_after_schedule(_next_session)
-    nil
+  def days_after_schedule(next_session)
+    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id)
   end
 
   def days_after_fill_schedule(next_session)

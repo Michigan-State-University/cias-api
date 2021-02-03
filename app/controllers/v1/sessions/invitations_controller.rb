@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-# Controller returns all address emails who have been invited to a particular session;
-# Invite does not mean grant access;
-# Invites is a feature to inform and create an account based on provided email if it didn't exist in the system;
-# Granted access is kept in UserSession;
-# Check also Intervention::StatusKeeper::Broadcast.
 class V1::Sessions::InvitationsController < V1Controller
   def index
     render_json invitations: session_invitations_scope

@@ -97,7 +97,7 @@ class Session < ApplicationRecord
 
   def available_now
     return true if schedule == 'after_fill'
-    return true if schedule == 'exact_date' && schedule_at.noon.past?
+    return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
 
     false
   end

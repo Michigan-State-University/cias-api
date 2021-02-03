@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Controller returns all users who have got grant access to all session associated with the intervention;
-# Check also Intervention::StatusKeeper::Broadcast.
+# Controller returns all users who have access to all session associated with the intervention
+# if intervention is shared to only selected registered participant;
 class V1::Interventions::InvitationsController < V1Controller
   def index
     render_json user_sessions: user_with_access_scope, action: :index

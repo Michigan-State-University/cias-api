@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class SessionJob::Broadcast < SessionJob
+class Intervention::PublishJob < ApplicationJob
   def perform(intervention_id)
-    Intervention::StatusKeeper::Broadcast.new(
+    V1::Intervention::Publish.new(
       Intervention.find(intervention_id)
     ).execute
   end

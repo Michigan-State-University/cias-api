@@ -143,6 +143,13 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
         it { expect(json_response['data']['id']).to eq other_question.id }
       end
 
+      context 'session that is branched to and has schedule days after with schedule in the past' do
+        let!(:schedule) { 'days_after' }
+        let(:schedule_at) { DateTime.now - 1.day }
+
+        it { expect(json_response['data']['id']).to eq other_question.id }
+      end
+
       %i[days_after_fill days_after exact_date].each do |schedule|
         context "session that is branched and has schedule #{schedule}" do
           let!(:schedule) { schedule }
