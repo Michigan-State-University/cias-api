@@ -16,7 +16,7 @@ class V1::Teams::Update
 
       V1::Teams::ChangeTeamAdmin.call(team, team_params[:user_id])
 
-      team
+      team.reload
     end
   end
 
