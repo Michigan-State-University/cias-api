@@ -5,5 +5,5 @@ class Team < ApplicationRecord
   has_one :team_admin, -> { team_admins },
           inverse_of: :team, dependent: :nullify, class_name: 'User'
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: true
 end

@@ -6,7 +6,10 @@ class V1::TeamsController < V1Controller
   def index
     paginated_teams_scope = paginate(teams_scope, params)
 
-    render json: team_serialized_response(paginated_teams_scope)
+    render json: V1::TeamSerializer.new(
+      paginated_teams_scope,
+      { meta: { teams_size: teams_scope.count }, include: [:team_admin] }
+    )
   end
 
   def show
@@ -19,32 +22,21 @@ class V1::TeamsController < V1Controller
   end
 
   def update
-    team.update(team_params)
-    render json: team_serialized_response(team)
+    updated_team = V1::Teams::Update.call(team, team_params)
+    render json: team_serialized_response(updated_team)
   end
 
   def destroy
-    team.destroy
+    V1::Teams::Destroy.call(team)
     head :no_content
-  end
-
-  def add_team_admin
-    authorize! :add_team_admin, Team
-
-    V1::Teams::AddTeamAdmin.call(
-      team,
-      params.require(:user_id)
-    )
-
-    render json: team_serialized_response(team)
   end
 
   private
 
-  def team_serialized_response(teams)
+  def team_serialized_response(team)
     V1::TeamSerializer.new(
-      teams,
-      { meta: { teams_size: teams.try(:count) || 1 }, include: [:team_admin] }
+      team,
+      { include: [:team_admin] }
     )
   end
 

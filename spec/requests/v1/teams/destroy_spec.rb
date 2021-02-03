@@ -18,6 +18,15 @@ RSpec.describe 'DELETE /v1/teams/:id', type: :request do
     it 'destroys a team' do
       expect { request }.to change(Team, :count).by(-1)
     end
+
+    context 'with team admin' do
+      let!(:team_admin) { create(:user, :team_admin, team_id: team_id) }
+
+      it 'changes team admin role to researcher after removing team' do
+        expect { request }.to change { team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
+          change(team_admin, :team_id).from(team_id).to(nil)
+      end
+    end
   end
 
   context 'when team with given id does not exist' do

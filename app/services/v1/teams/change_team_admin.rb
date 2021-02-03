@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::Teams::AddTeamAdmin
+class V1::Teams::ChangeTeamAdmin
   def self.call(team, team_admin_id)
     new(team, team_admin_id).call
   end
@@ -11,7 +11,7 @@ class V1::Teams::AddTeamAdmin
   end
 
   def call
-    return if already_team_admin?
+    return if admin_not_changed?
 
     ActiveRecord::Base.transaction do
       current_team_admin.update!(
@@ -37,7 +37,9 @@ class V1::Teams::AddTeamAdmin
     @current_team_admin ||= team.team_admin
   end
 
-  def already_team_admin?
-    new_team_admin.id == current_team_admin.id
+  def admin_not_changed?
+    return true if team_admin_id.blank?
+
+    current_team_admin.id.to_s == team_admin_id.to_s
   end
 end
