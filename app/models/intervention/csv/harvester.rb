@@ -21,11 +21,11 @@ class Intervention::Csv::Harvester
   private
 
   def find_or_add_row(answer, index)
-    locate = user_column.index(answer.user_id)
+    locate = user_column.index(answer.user_session.user_id)
     if locate.nil?
       rows.insert(-1, [])
-      user_column.insert(-1, answer.user_id)
-      users[answer.user_id] = { id: answer.user_id, email: answer.user.email }
+      user_column.insert(-1, answer.user_session.user_id)
+      users[answer.user_session.user_id] = { id: answer.user_session.user_id, email: answer.user_session.user.email }
       -1
     else
       rows[locate].insert(index, [])
@@ -39,7 +39,7 @@ class Intervention::Csv::Harvester
       question.answers&.each do |answer|
         row_index = find_or_add_row(answer, index)
         answer.body_data&.each do |data|
-          rows[row_index][index] = Array.new(header[index].size)
+          rows[row_index][index] = Array.new(header[index].size) if rows[row_index][index].blank?
           find_result = header[index].index(data['var'])
           rows[row_index][index][find_result.to_i] = data['value']
         end
