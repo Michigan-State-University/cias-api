@@ -41,6 +41,7 @@ Rails.application.routes.draw do
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     scope 'sessions/:session_id', as: 'session' do
       patch 'questions/move', to: 'questions#move', as: :move_question
+      delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
@@ -59,7 +60,7 @@ Rails.application.routes.draw do
     end
 
     resources :question_groups, only: [] do
-      resources :questions, only: %i[index show create update destroy]
+      resources :questions, only: %i[index show create update]
     end
 
     post 'questions/:id/clone', to: 'questions#clone', as: :clone_question
