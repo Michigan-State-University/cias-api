@@ -5,12 +5,13 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
-  let(:intervention) { create(:intervention, user_id: researcher.id) }
+  let(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
   let!(:session) { create(:session, intervention_id: intervention.id) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_single, question_group: question_group) }
   let(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id) }
   let(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+  let(:status) { 'draft' }
 
   before do
     get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
@@ -68,51 +69,105 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
       end
     end
 
-    context 'formula is not fully set and has division' do
-      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
-      let!(:question) do
-        question = questions.first
-        question.formula = { 'payload' => 'test/test2',
-                             'patterns' => [
-                               {
-                                 'match' => '=1',
-                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
-                               }
-                             ] }
-        question.save
-        question
+    context 'intervention is published' do
+      let(:status) { 'published' }
+
+      context 'formula is not fully set and has division' do
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test/test2',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                 }
+                               ] }
+          question.save
+          question
+        end
+
+        it 'returns next question' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'returns correct warning' do
+          expect(json_response['warning']).to eq nil
+        end
       end
 
-      it 'returns next question' do
-        expect(json_response['data']['id']).to eq questions[1].id
-      end
+      context 'formula is not correctly set' do
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test test2',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                 }
+                               ] }
+          question.save
+          question
+        end
 
-      it 'returns correct warning' do
-        expect(json_response['warning']).to eq 'ZeroDivisionError'
+        it 'returns next question id' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'returns correct warning' do
+          expect(json_response['warning']).to eq nil
+        end
       end
     end
 
-    context 'formula is not correctly set' do
-      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
-      let!(:question) do
-        question = questions.first
-        question.formula = { 'payload' => 'test test2',
-                             'patterns' => [
-                               {
-                                 'match' => '=1',
-                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
-                               }
-                             ] }
-        question.save
-        question
+    context 'intervention is draft' do
+      context 'formula is not fully set and has division' do
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test/test2',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                 }
+                               ] }
+          question.save
+          question
+        end
+
+        it 'returns next question' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'returns correct warning' do
+          expect(json_response['warning']).to eq 'ZeroDivisionError'
+        end
       end
 
-      it 'returns next question id' do
-        expect(json_response['data']['id']).to eq questions[1].id
-      end
+      context 'formula is not correctly set' do
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test test2',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                 }
+                               ] }
+          question.save
+          question
+        end
 
-      it 'returns correct warning' do
-        expect(json_response['warning']).to eq 'OtherFormulaError'
+        it 'returns next question id' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'returns correct warning' do
+          expect(json_response['warning']).to eq 'OtherFormulaError'
+        end
       end
     end
 

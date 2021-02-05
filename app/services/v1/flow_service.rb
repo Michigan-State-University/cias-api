@@ -12,9 +12,9 @@ class V1::FlowService
   attr_accessor :answer, :question, :user_session
 
   def answer_branching_flow
-    response_question = perform_branching_to_question
-    user_session.finish if response_question[:question].type == 'Question::Finish'
-    response_question
+    response_question_with_warning = perform_branching_to_question
+    user_session.finish if response_question_with_warning[:question].type == 'Question::Finish'
+    response_question_with_warning
   end
 
   def retrieve_previous_and_current_answers

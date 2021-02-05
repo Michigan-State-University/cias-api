@@ -2,12 +2,14 @@
 
 class V1::Sessions::FlowsController < V1Controller
   def index
-    question = V1::FlowService.new(current_v1_user, params[:answer_id]).answer_branching_flow
+    question_with_warning = V1::FlowService.new(current_v1_user, params[:answer_id]).answer_branching_flow
     response = serialized_hash(
-      question[:question],
-      question[:question]&.de_constantize_modulize_name || NilClass
+      question_with_warning[:question],
+      question_with_warning[:question]&.de_constantize_modulize_name || NilClass
     )
-    response = response.merge(warning: question[:warning]) if question[:warning].presence
+    if question_with_warning[:warning].presence && question_with_warning[:question].session.intervention.draft?
+      response = response.merge(warning: question_with_warning[:warning])
+    end
     render json: response
   end
 
