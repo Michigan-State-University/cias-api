@@ -181,6 +181,28 @@ RSpec.describe Answer, type: :model do
     end
   end
 
+  describe 'Answer::Date' do
+    describe 'expected behaviour' do
+      subject { create(:answer_date) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_date, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+
+    describe 'does not fail when body is empty' do
+      let(:with_empty) { build(:answer_date, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq true }
+    end
+  end
+
   describe 'Answer::ExternalLink' do
     describe 'expected behaviour' do
       subject { create(:answer_external_link) }

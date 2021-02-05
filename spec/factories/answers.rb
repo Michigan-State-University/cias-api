@@ -97,5 +97,15 @@ FactoryBot.define do
         association :question, factory: :question_multiple
       end
     end
+    factory :answer_date, class: Answer::Date do
+      type { Answer::Date }
+      association :question, factory: :question_date
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
+    end
   end
 end

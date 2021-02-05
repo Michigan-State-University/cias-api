@@ -240,5 +240,34 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, true]]
       end
     end
+
+    context 'when date' do
+      let!(:question_body) do
+        {
+          'data' => [
+            { 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'date' }
+        }
+      end
+      let!(:answer_body) do
+        {
+          'data' => [
+            {
+              'var' => 'date',
+              'value' => '2012-12-12'
+            }
+          ]
+        }
+      end
+      let!(:question) { create(:question_date, question_group: question_group, body: question_body) }
+      let!(:answer) { create(:answer_date, question: question, body: answer_body) }
+
+      it 'save variable and the clicking on the link to csv' do
+        subject.collect
+        expect(subject.header).to eq [:user_id, :email, 'date']
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12']]
+      end
+    end
   end
 end

@@ -102,6 +102,21 @@ RSpec.describe Question, type: :model do
     end
   end
 
+  describe 'Question::Date' do
+    describe 'expected behaviour' do
+      subject(:question_date) { build(:question_date) }
+
+      it { should belong_to(:question_group) }
+      it { should be_valid }
+    end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:question_date, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
+  end
+
   describe 'Question::ExternalLink' do
     subject(:question_external_link) { build(:question_external_link) }
 
