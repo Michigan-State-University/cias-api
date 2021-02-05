@@ -44,6 +44,78 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
       end
     end
 
+    context 'formula is not fully set' do
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+      let!(:question) do
+        question = questions.first
+        question.formula = { 'payload' => 'test + test2',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                               }
+                             ] }
+        question.save
+        question
+      end
+
+      it 'returns next question' do
+        expect(json_response['data']['id']).to eq questions[3].id
+      end
+
+      it 'does not have warning set' do
+        expect(json_response['warning']).to be nil
+      end
+    end
+
+    context 'formula is not fully set and has division' do
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+      let!(:question) do
+        question = questions.first
+        question.formula = { 'payload' => 'test/test2',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                               }
+                             ] }
+        question.save
+        question
+      end
+
+      it 'returns next question' do
+        expect(json_response['data']['id']).to eq questions[1].id
+      end
+
+      it 'returns correct warning' do
+        expect(json_response['warning']).to eq 'ZeroDivisionError'
+      end
+    end
+
+    context 'formula is not correctly set' do
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+      let!(:question) do
+        question = questions.first
+        question.formula = { 'payload' => 'test test2',
+                             'patterns' => [
+                               {
+                                 'match' => '=1',
+                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                               }
+                             ] }
+        question.save
+        question
+      end
+
+      it 'returns next question id' do
+        expect(json_response['data']['id']).to eq questions[1].id
+      end
+
+      it 'returns correct warning' do
+        expect(json_response['warning']).to eq 'OtherFormulaError'
+      end
+    end
+
     context 'match nothing, return next' do
       let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let!(:question) do

@@ -11,4 +11,9 @@ module Resource
     "V1::#{from_model}Serializer".safe_constantize.
       new(collection).serialized_json
   end
+
+  def serialized_hash(collection, from_model = controller_name.classify)
+    "V1::#{from_model}Serializer".safe_constantize.
+      new(collection).serializable_hash
+  end
 end

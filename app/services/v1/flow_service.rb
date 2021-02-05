@@ -13,7 +13,7 @@ class V1::FlowService
 
   def answer_branching_flow
     response_question = perform_branching_to_question
-    user_session.finish if response_question.type == 'Question::Finish'
+    user_session.finish if response_question[:question].type == 'Question::Finish'
     response_question
   end
 
@@ -35,16 +35,18 @@ class V1::FlowService
 
   def perform_branching_to_question
     answers_var_values = collect_var_values
+    warning = ''
     return nil if question.id.eql?(question.position_equal_or_higher.last.id)
 
     next_question = question.position_equal_or_higher[1]
     if question.formula['payload'].present?
       obj_src = question.exploit_formula(answers_var_values)
-
+      warning = obj_src if obj_src.is_a?(String)
       next_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
     end
     next_question.perform_narrator_reflection(answers_var_values)
-    question.another_or_feedback(next_question, answers_var_values)
+    question_another_or_feedback = question.another_or_feedback(next_question, answers_var_values)
+    { question: question_another_or_feedback, warning: warning }
   end
 
   def branching_source_to_question(source)
