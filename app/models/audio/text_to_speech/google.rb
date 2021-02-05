@@ -38,7 +38,7 @@ class Audio::TextToSpeech::Google
 
   def credentials
     @credentials ||= begin
-      Oj.load(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
+      Oj.load_file(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
     rescue Oj::ParseError
       ENV['GOOGLE_APPLICATION_CREDENTIALS']
     end
