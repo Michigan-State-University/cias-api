@@ -31,6 +31,14 @@ class V1::TeamsController < V1Controller
     head :no_content
   end
 
+  def remove_researcher
+    authorize! :remove_researcher, team
+
+    team.users.researchers.find(params.require(:user_id)).update!(team_id: nil)
+
+    render status: :ok
+  end
+
   private
 
   def team_serialized_response(team)
@@ -45,7 +53,7 @@ class V1::TeamsController < V1Controller
   end
 
   def team
-    @team ||= teams_scope.find(params[:id])
+    @team ||= teams_scope.find(params[:id] || params[:team_id])
   end
 
   def team_params

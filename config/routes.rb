@@ -72,6 +72,7 @@ Rails.application.routes.draw do
     end
 
     resources :teams, only: %i[index show create update destroy] do
+      delete :remove_researcher
       scope module: 'teams' do
         resources :invitations, only: :create
       end
