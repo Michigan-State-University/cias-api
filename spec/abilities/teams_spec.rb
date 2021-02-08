@@ -17,18 +17,18 @@ describe Team do
       let!(:other_team) { create(:team) }
       let(:user) { build_stubbed(:user, :confirmed, :team_admin, team_id: users_team.id) }
 
-      it 'can read, edit a team, invite_researcher that he is admin for' do
+      it 'can read, edit, invite_researcher, change_team_admin for team that he is admin for' do
         expect(subject).to have_abilities(
           {
-            read: true, update: true, destroy: false, invite_researcher: true
+            read: true, update: true, destroy: false, invite_researcher: true, change_team_admin: false
           },
           users_team
         )
       end
 
-      it 'can\'t read, update, destroy, invite_researcher other team' do
+      it 'can\'t read, update, destroy, invite_researcher, change_team_admin other team' do
         expect(subject).to not_have_abilities(
-          %i[read update destroy invite_researcher],
+          %i[read update destroy invite_researcher change_team_admin],
           other_team
         )
       end
@@ -41,7 +41,7 @@ describe Team do
 
       it do
         expect(subject).to not_have_abilities(
-          %i[read create update destroy invite_researcher],
+          %i[read create update destroy invite_researcher change_team_admin],
           described_class
         )
       end
@@ -52,7 +52,7 @@ describe Team do
 
       it do
         expect(subject).to not_have_abilities(
-          %i[read create update destroy invite_researcher],
+          %i[read create update destroy invite_researcher change_team_admin],
           described_class
         )
       end
@@ -63,7 +63,7 @@ describe Team do
 
       it do
         expect(subject).to not_have_abilities(
-          %i[read create update destroy invite_researcher],
+          %i[read create update destroy invite_researcher change_team_admin],
           described_class
         )
       end

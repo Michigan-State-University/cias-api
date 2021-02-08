@@ -99,4 +99,27 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
       end
     end
   end
+
+  context 'when team admin of current team' do
+    let(:team_admin) { create(:user, :confirmed, :team_admin, team_id: team.id) }
+    let(:user) { team_admin }
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+
+    context 'when name and team admin changed' do
+      let(:params) do
+        {
+          team: {
+            user_id: researcher.id,
+            name: 'Best team'
+          }
+        }
+      end
+
+      it 'team name is changed but team admin did not' do
+        expect { request }.to change { team.reload.name }.and \
+          avoid_changing { team_admin.reload.roles }.and \
+            avoid_changing { researcher.reload.roles }
+      end
+    end
+  end
 end

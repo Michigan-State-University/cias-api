@@ -22,7 +22,7 @@ class V1::TeamsController < V1Controller
   end
 
   def update
-    updated_team = V1::Teams::Update.call(team, team_params)
+    updated_team = V1::Teams::Update.call(team, team_params, current_ability)
     render json: team_serialized_response(updated_team)
   end
 

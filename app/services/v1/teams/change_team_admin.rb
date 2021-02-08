@@ -1,16 +1,18 @@
 # frozen_string_literal: true
 
 class V1::Teams::ChangeTeamAdmin
-  def self.call(team, team_admin_id)
-    new(team, team_admin_id).call
+  def self.call(team, team_admin_id, current_ability = nil)
+    new(team, team_admin_id, current_ability).call
   end
 
-  def initialize(team, team_admin_id)
-    @team          = team
-    @team_admin_id = team_admin_id
+  def initialize(team, team_admin_id, current_ability)
+    @team            = team
+    @team_admin_id   = team_admin_id
+    @current_ability = current_ability
   end
 
   def call
+    return unless able_to_change_team_admin?
     return if admin_not_changed?
 
     ActiveRecord::Base.transaction do
@@ -27,7 +29,19 @@ class V1::Teams::ChangeTeamAdmin
 
   private
 
-  attr_reader :team, :team_admin_id
+  attr_reader :team, :team_admin_id, :current_ability
+
+  def able_to_change_team_admin?
+    return if current_ability.blank?
+
+    current_ability.can?(:change_team_admin, team)
+  end
+
+  def admin_not_changed?
+    return true if team_admin_id.blank?
+
+    current_team_admin.id.to_s == team_admin_id.to_s
+  end
 
   def new_team_admin
     @new_team_admin ||= User.researchers.find(team_admin_id)
@@ -35,11 +49,5 @@ class V1::Teams::ChangeTeamAdmin
 
   def current_team_admin
     @current_team_admin ||= team.team_admin
-  end
-
-  def admin_not_changed?
-    return true if team_admin_id.blank?
-
-    current_team_admin.id.to_s == team_admin_id.to_s
   end
 end
