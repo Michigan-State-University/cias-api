@@ -18,6 +18,10 @@ en:
               team_id_is_required_for_team_admin: 'Team Admin must have a team'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
+        team_invitation:
+          attributes:
+            user_id:
+              already_exists: already exists
       messages:
         undestroyable: Forbidden operation
   interventions:
@@ -27,6 +31,17 @@ en:
   users:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
+  teams:
+    invitations:
+      accepted: "You've successfully joined team %{team_name}."
+      not_found: "Team Invitation not found"
+  team_mailer:
+    invite_user:
+      subject:      You've been invited to the Team
+      header:       '%{team_name} Invitation'
+      body:         "You've been invited to the %{team_name}."
+      instruction:  'Click the link below to accept the invitation and join the team.'
+      button_text:  Accept the Invitation
   csv_mailer:
     answers:
       subject: "[CSV] Answers for: %{intervention_name}"

@@ -71,7 +71,12 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :teams, only: %i[index show create update destroy]
+    resources :teams, only: %i[index show create update destroy] do
+      scope module: 'teams' do
+        resources :invitations, only: :create
+      end
+    end
+    get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
   end
 
   if Rails.env.development?

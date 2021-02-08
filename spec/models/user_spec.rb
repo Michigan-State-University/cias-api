@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 describe User, type: :model do
+  it { should have_many(:team_invitations).dependent(:destroy) }
+
   describe 'participant' do
     subject { create(:user, :confirmed, :participant) }
 
@@ -28,7 +30,7 @@ describe User, type: :model do
         end
       end
 
-      context 'team admin has not assigned team' do
+      context 'team admin has assigned team' do
         let(:team) { create(:team) }
         let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
 

@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe Team, type: :model do
   it { should have_many(:users) }
   it { should have_one(:team_admin) }
+  it { should have_many(:team_invitations).dependent(:destroy) }
 
   describe '#team_admin' do
     let(:team) { create(:team) }

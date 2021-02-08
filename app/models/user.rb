@@ -38,10 +38,12 @@ class User < ApplicationRecord
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :user_log_requests, dependent: :destroy
   belongs_to :team, optional: true
+  has_many :team_invitations, dependent: :destroy
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
 
+  scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
   scope :from_team, ->(team_id) { where(team_id: team_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
