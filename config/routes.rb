@@ -34,6 +34,7 @@ Rails.application.routes.draw do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
       end
+      post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
       resources :sessions, only: %i[index show create update destroy]
     end

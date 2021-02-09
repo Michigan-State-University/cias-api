@@ -15,6 +15,7 @@ class Clone::Session < Clone::Base
     source.question_groups.order(:position).each do |question_group|
       outcome.question_groups << Clone::QuestionGroup.new(question_group,
                                                           session_id: outcome.id,
+                                                          questions_count: 0,
                                                           clean_formulas: false,
                                                           position: question_group.position).execute
     end

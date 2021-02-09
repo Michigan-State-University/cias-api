@@ -187,7 +187,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             { 'payload' => {
               'end_value' => '',
               'start_value' => ''
-            }}
+            } }
           ],
           'variable' => { 'name' => 'test_1' }
         }

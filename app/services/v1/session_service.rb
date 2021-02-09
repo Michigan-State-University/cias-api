@@ -35,4 +35,13 @@ class V1::SessionService
   def destroy(session_id)
     session_load(session_id).destroy! if intervention.draft?
   end
+
+  def duplicate(session_id, new_intervention_id)
+    new_intervention = Intervention.accessible_by(user.ability).find(new_intervention_id)
+    old_session = session_load(session_id)
+    Clone::Session.new(old_session,
+                       intervention_id: new_intervention.id,
+                       clean_formulas: false,
+                       position: old_session.position).execute
+  end
 end

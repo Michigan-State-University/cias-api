@@ -11,7 +11,7 @@ class V1::SessionsController < V1Controller
   end
 
   def show
-    render json: serialized_response(session_service.session_load(params[:id]))
+    render json: serialized_response(session_service.session_load(session_id))
   end
 
   def create
@@ -20,23 +20,40 @@ class V1::SessionsController < V1Controller
   end
 
   def update
-    session = session_service.update(params[:id], session_params)
+    session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
   end
 
   def destroy
-    session_service.destroy(params[:id])
+    session_service.destroy(session_id)
     head :no_content
+  end
+
+  def duplicate
+    session = session_service.duplicate(session_id, new_intervention_id)
+    render json: serialized_response(session), status: :created
   end
 
   private
 
   def session_service
-    @session_service ||= V1::SessionService.new(current_v1_user, params[:intervention_id])
+    @session_service ||= V1::SessionService.new(current_v1_user, intervention_id)
   end
 
   def sessions_scope
     session_service.sessions
+  end
+
+  def session_id
+    params[:id]
+  end
+
+  def intervention_id
+    params[:intervention_id]
+  end
+
+  def new_intervention_id
+    params[:new_intervention_id]
   end
 
   def session_params
