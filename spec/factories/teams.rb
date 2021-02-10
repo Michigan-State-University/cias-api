@@ -6,7 +6,7 @@ FactoryBot.define do
 
     trait :with_team_admin do
       after(:create) do |team|
-        create(:user, :team_admin, team_id: team.id)
+        create(:user, :confirmed, :team_admin, team_id: team.id)
       end
     end
   end

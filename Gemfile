@@ -64,6 +64,7 @@ group :test do
   gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
+  gem 'test-prof'
 end
 
 group :production do

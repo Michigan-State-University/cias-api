@@ -102,3 +102,7 @@ end
 
 RSpec::Matchers.define_negated_matcher :avoid_changing, :change
 RSpec::Matchers.define_negated_matcher :not_include, :include
+
+# require let it be Rspec helper
+# https://test-prof.evilmartians.io/#/recipes/let_it_be
+require 'test_prof/recipes/rspec/let_it_be'

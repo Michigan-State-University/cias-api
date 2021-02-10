@@ -8,37 +8,30 @@ describe User do
 
     let(:ability) { Ability.new(user) }
 
-    before do
-      @team1 = create(:team)
-      team2 = create(:team)
+    let_it_be(:team1) { create(:team) }
+    let_it_be(:team2) { create(:team) }
 
-      @team_1_user = create(:user, :confirmed, :researcher, team_id: @team1.id)
-      @team_2_user = create(:user, :confirmed, :researcher, team_id: team2.id)
-      @researcher  = create(:user, :confirmed, :researcher)
-      @participant = create(:user, :confirmed, :participant)
-      @guest       = create(:user, :confirmed, :guest)
-      @admin       = create(:user, :confirmed, :admin)
-    end
-
-    after :all do
-      User.destroy_all
-      Team.destroy_all
-    end
+    let_it_be(:team_1_user) { create(:user, :confirmed, :researcher, team_id: team1.id) }
+    let_it_be(:team_2_user) { create(:user, :confirmed, :researcher, team_id: team2.id) }
+    let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
+    let_it_be(:participant) { create(:user, :confirmed, :participant) }
+    let_it_be(:guest) { create(:user, :confirmed, :guest) }
+    let_it_be(:admin) { create(:user, :confirmed, :admin) }
 
     context 'admin' do
       let!(:user) { create(:user, :confirmed, :admin) }
 
       it 'return all users' do
-        expect(subject).to include(@team_1_user, @team_2_user, @researcher, @participant, @guest, user)
+        expect(subject).to include(team_1_user, team_2_user, researcher, participant, guest, user)
       end
     end
 
     context 'team_admin' do
-      let!(:user) { create(:user, :confirmed, :team_admin, team_id: @team1.id) }
+      let!(:user) { create(:user, :confirmed, :team_admin, team_id: team1.id) }
 
       it 'return all users from team_admin\'s team' do
-        expect(subject).to include(@team_1_user, user).and \
-          not_include(@team_2_user, @researcher, @participant, @guest)
+        expect(subject).to include(team_1_user, user).and \
+          not_include(team_2_user, researcher, participant, guest)
       end
     end
 
@@ -47,7 +40,7 @@ describe User do
 
       it 'return all users from team_admin\'s team' do
         expect(subject).to include(user).and \
-          not_include(@team_1_user, @team_2_user, @researcher, @participant, @guest)
+          not_include(team_1_user, team_2_user, researcher, participant, guest)
       end
     end
 
@@ -56,7 +49,7 @@ describe User do
 
       it 'return all users from team_admin\'s team' do
         expect(subject).to include(user).and \
-          not_include(@team_1_user, @team_2_user, @researcher, @participant, @guest)
+          not_include(team_1_user, team_2_user, researcher, participant, guest)
       end
     end
   end
