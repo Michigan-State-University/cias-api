@@ -77,7 +77,7 @@ class V1::UsersController < V1Controller
   def authorize_update_abilities
     authorize! :update, user_load
     %i[active roles].each do |attr|
-      authorize! :update, attr unless user_params[attr].nil?
+      authorize! attr, user_load unless user_params[attr].nil?
     end
   end
 end

@@ -8,7 +8,6 @@ class V1Controller < ApplicationController
   include Resource
 
   def current_v1_user
-    bypass_auth_for_development_only
     @current_v1_user ||= super || create_guest_user
   end
 

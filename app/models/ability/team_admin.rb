@@ -10,7 +10,7 @@ class Ability::TeamAdmin < Ability::Base
 
   def team_admin
     can %i[read update invite_researcher remove_researcher], Team, id: user.team_id
-    can :read, User, team_id: user.team_id
+    can %i[read update active], User, team_id: user.team_id
 
     can :manage, Intervention, user_id: team_members_ids
     can :manage, UserSession, session: { intervention: { user_id: team_members_ids } }
