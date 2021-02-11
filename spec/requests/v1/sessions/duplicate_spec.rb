@@ -23,7 +23,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => include('@guest.true')
+          'Uid' => include('@guest.true')
         )
       end
     end
@@ -33,7 +33,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => user.email
+          'Uid' => user.email
         )
       end
 

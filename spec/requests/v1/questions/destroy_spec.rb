@@ -24,7 +24,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => include('@guest.true')
+          'Uid' => include('@guest.true')
         )
       end
     end
@@ -34,7 +34,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => user.email
+          'Uid' => user.email
         )
       end
     end

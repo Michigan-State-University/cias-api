@@ -17,7 +17,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => include('@guest.true')
+          'Uid' => include('@guest.true')
         )
       end
     end
@@ -27,7 +27,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => user.email
+          'Uid' => user.email
         )
       end
 
