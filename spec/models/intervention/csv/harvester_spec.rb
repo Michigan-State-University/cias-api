@@ -298,5 +298,34 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123']]
       end
     end
+
+    context 'when currency' do
+      let!(:question_body) do
+        {
+          'data' => [
+            { 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'currency' }
+        }
+      end
+      let!(:answer_body) do
+        {
+          'data' => [
+            {
+              'var' => 'currency',
+              'value' => '1000 USD'
+            }
+          ]
+        }
+      end
+      let!(:question) { create(:question_currency, question_group: question_group, body: question_body) }
+      let!(:answer) { create(:answer_currency, question: question, body: answer_body) }
+
+      it 'save variable and the value to csv' do
+        subject.collect
+        expect(subject.header).to eq [:user_id, :email, 'currency']
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD']]
+      end
+    end
   end
 end
