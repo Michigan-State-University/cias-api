@@ -52,4 +52,6 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   config.after_initialize { Bullet.enable = true }
+
+  Rails.application.routes.default_url_options[:protocol] = 'https'
 end
