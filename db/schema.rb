@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_21_122003) do
+ActiveRecord::Schema.define(version: 2021_02_03_141313) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -39,14 +39,13 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
   create_table "answers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "type"
     t.uuid "question_id", null: false
-    t.uuid "user_id"
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["question_id", "user_id"], name: "index_answers_on_question_id_and_user_id", unique: true
+    t.uuid "user_session_id"
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
-    t.index ["user_id"], name: "index_answers_on_user_id"
+    t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
   create_table "audios", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -110,6 +109,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "type"
+    t.integer "questions_count", default: 0
     t.index ["session_id", "title"], name: "index_question_groups_on_session_id_and_title", using: :gin
     t.index ["session_id"], name: "index_question_groups_on_session_id"
     t.index ["title"], name: "index_question_groups_on_title"
@@ -141,7 +141,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.jsonb "settings"
     t.integer "position", default: 0, null: false
     t.string "name", null: false
-    t.string "schedule"
+    t.string "schedule", default: "after_fill"
     t.integer "schedule_payload"
     t.date "schedule_at"
     t.jsonb "formula"
@@ -153,6 +153,25 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.index ["name"], name: "index_sessions_on_name"
     t.index ["schedule"], name: "index_sessions_on_schedule"
     t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
+  end
+
+  create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "team_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["accepted_at"], name: "index_team_invitations_on_accepted_at"
+    t.index ["invitation_token"], name: "index_team_invitations_on_invitation_token", unique: true
+    t.index ["user_id", "team_id"], name: "unique_not_accepted_team_invitation", unique: true, where: "(accepted_at IS NULL)"
+  end
+
+  create_table "teams", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_teams_on_name", unique: true
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -170,10 +189,11 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
   create_table "user_sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "session_id", null: false
-    t.datetime "submitted_at"
-    t.date "schedule_at"
+    t.datetime "finished_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "last_answer_at"
+    t.string "timeout_job_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
@@ -214,6 +234,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "sms_notification", default: false
+    t.uuid "team_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -221,6 +242,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
+    t.index ["team_id"], name: "index_users_on_team_id"
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
     t.index ["uid", "roles"], name: "index_users_on_uid_and_roles", using: :gin
     t.index ["uid"], name: "index_users_on_uid", unique: true
@@ -228,7 +250,7 @@ ActiveRecord::Schema.define(version: 2020_12_21_122003) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
-  add_foreign_key "answers", "users"
+  add_foreign_key "answers", "user_sessions"
   add_foreign_key "interventions", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"

@@ -30,6 +30,9 @@ Dir[Rails.root.join('spec/support/**/*.rb')].sort.each(&method(:require))
 # Temporary fix for missing cancancan classes in RSpec
 Dir[Rails.root.join('app/models/ability/*.rb')].sort.each(&method(:require))
 
+# include custom cancan matcher
+require 'support/custom_cancan_matcher'
+
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
 begin
@@ -96,3 +99,10 @@ end
 RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
 end
+
+RSpec::Matchers.define_negated_matcher :avoid_changing, :change
+RSpec::Matchers.define_negated_matcher :not_include, :include
+
+# require let it be Rspec helper
+# https://test-prof.evilmartians.io/#/recipes/let_it_be
+require 'test_prof/recipes/rspec/let_it_be'

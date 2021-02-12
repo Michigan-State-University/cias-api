@@ -4,39 +4,56 @@ class V1::SessionsController < V1Controller
   include Resource::Clone
   include Resource::Position
 
-  authorize_resource only: %i[create update]
+  authorize_resource only: %i[create update destroy]
 
   def index
     render json: serialized_response(sessions_scope)
   end
 
   def show
-    render json: serialized_response(session_load)
+    render json: serialized_response(session_service.session_load(session_id))
   end
 
   def create
-    session = sessions_scope.new(session_params)
-    session.position = sessions_scope.last&.position.to_i + 1
-    session.save!
-    session.add_user_sessions
+    session = session_service.create(session_params)
     render json: serialized_response(session), status: :created
   end
 
   def update
-    session = session_load
-    session.assign_attributes(session_params)
-    session.integral_update
+    session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
+  end
+
+  def destroy
+    session_service.destroy(session_id)
+    head :no_content
+  end
+
+  def duplicate
+    session = session_service.duplicate(session_id, new_intervention_id)
+    render json: serialized_response(session), status: :created
   end
 
   private
 
-  def sessions_scope
-    Intervention.includes(:sessions).accessible_by(current_ability).find(params[:intervention_id]).sessions.order(:position)
+  def session_service
+    @session_service ||= V1::SessionService.new(current_v1_user, intervention_id)
   end
 
-  def session_load
-    sessions_scope.find(params[:id])
+  def sessions_scope
+    session_service.sessions
+  end
+
+  def session_id
+    params[:id]
+  end
+
+  def intervention_id
+    params[:intervention_id]
+  end
+
+  def new_intervention_id
+    params[:new_intervention_id]
   end
 
   def session_params

@@ -5,14 +5,23 @@ en:
       subtitle: Finish Screen
       title: Finish Screen
   question_group:
-    default:
-      title: Default Group
     finish:
       title: Finish Group
     plain:
       title: Next Group
   activerecord:
     errors:
+      models:
+        user:
+          attributes:
+            roles:
+              team_id_is_required_for_team_admin: 'Team Admin must have a team'
+            team_id:
+              team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
+        team_invitation:
+          attributes:
+            user_id:
+              already_exists: already exists
       messages:
         undestroyable: Forbidden operation
   interventions:
@@ -22,14 +31,25 @@ en:
   users:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
+  teams:
+    invitations:
+      accepted: "You've successfully joined team %{team_name}."
+      not_found: "Team Invitation not found"
+  team_mailer:
+    invite_user:
+      subject:      You've been invited to the Team
+      header:       '%{team_name} Invitation'
+      body:         "You've been invited to the %{team_name}."
+      instruction:  'Click the link below to accept the invitation and join the team.'
+      button_text:  Accept the Invitation
   csv_mailer:
     answers:
       subject: "[CSV] Answers for: %{intervention_name}"
       body: You ordered the preparation of a CSV file with session data, therefore you receive this message. Your order is finished successfully. Please log in to the application, report file is ready to download.
       header: Your CSV file is ready to download
-      html_body: 'CSV file with data from <span style="color: #c866ea;">%{intervention_name}</span> intervention is ready to download in your dashboard'
-      button_text: Open CIAS dashboard
-      link: '%{web_url}/'
+      html_body: 'CSV file that you requested on %{requested_at} with data from <span style="color: #c866ea;">%{intervention_name}</span> intervention is ready to download in the e-intervention'
+      button_text: Open the e-intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!

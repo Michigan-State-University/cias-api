@@ -2,7 +2,9 @@
 
 class Clone::QuestionGroup < Clone::Base
   def execute
+    outcome.position = position || outcome.session.question_groups.size
     clone_questions
+    outcome.save!
     outcome
   end
 
@@ -10,8 +12,8 @@ class Clone::QuestionGroup < Clone::Base
 
   def clone_questions
     ActiveRecord::Base.transaction do
-      source.questions.find_each do |question|
-        outcome.questions << question.clone
+      source.questions.order(:position).find_each do |question|
+        outcome.questions << question.clone(clean_formulas: clean_formulas, position: question.position)
       end
     end
   end

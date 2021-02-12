@@ -34,17 +34,20 @@ Rails.application.routes.draw do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
       end
+      post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
-      resources :sessions, only: %i[index show create update]
+      resources :sessions, only: %i[index show create update destroy]
     end
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     scope 'sessions/:session_id', as: 'session' do
       patch 'questions/move', to: 'questions#move', as: :move_question
+      delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
+        resources :flows, only: %i[index]
       end
       resources :question_groups, only: %i[index show create update destroy] do
         member do
@@ -58,7 +61,7 @@ Rails.application.routes.draw do
     end
 
     resources :question_groups, only: [] do
-      resources :questions, only: %i[index show create update destroy]
+      resources :questions, only: %i[index show create update]
     end
 
     post 'questions/:id/clone', to: 'questions#clone', as: :clone_question
@@ -68,6 +71,14 @@ Rails.application.routes.draw do
         resource :images, only: %i[create destroy]
       end
     end
+
+    resources :teams, only: %i[index show create update destroy] do
+      delete :remove_researcher
+      scope module: 'teams' do
+        resources :invitations, only: :create
+      end
+    end
+    get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
   end
 
   if Rails.env.development?

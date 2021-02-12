@@ -167,7 +167,12 @@
                           <div style="font-family: DM Sans, Helvetica, Arial; font-size: 20px; font-weight: 700; line-height: 1; text-align: center; color: #2f3850;">
                             <%= t('devise.mailer.invitation_instructions.you_have_been_invited') %><br />
                             <br />
-                            <%= t('devise.mailer.invitation_instructions.click_the_link') %>
+                            <% user = User.find_by_invitation_token(@token, true) %>
+                            <% if user.team_id.present? %>
+                              <%= t('devise.mailer.team_invitation_instructions.click_the_link', team_name: user.team.name) %>
+                            <% else %>
+                              <%= t('devise.mailer.invitation_instructions.click_the_link') %>
+                            <% end %>
                           </div>
                         </td>
                       </tr>

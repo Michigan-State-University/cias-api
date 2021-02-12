@@ -6,8 +6,20 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
   let(:request) { post clone_v1_session_question_group_path(session_id: session.id, id: question_group.id), headers: headers }
 
   let!(:session) { create(:session, intervention: create(:intervention, :published)) }
+  let!(:other_session) { create(:session) }
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
-  let!(:questions)      { create_list(:question_free_response, 2, question_group: question_group, subtitle: 'Question Subtitle') }
+  let!(:question_1) do
+    create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
+                             formula: { 'payload' => 'var + 3', 'patterns' => [
+                               { 'match' => '=7', 'target' => { 'id' => question_2.id, type: 'Question::Single' } }
+                             ] })
+  end
+  let!(:question_2) do
+    create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
+                             formula: { 'payload' => 'var + 4', 'patterns' => [
+                               { 'match' => '=3', 'target' => { 'id' => other_session.id, type: 'Session' } }
+                             ] })
+  end
 
   context 'when authenticated as guest user' do
     let(:guest_user) { create(:user, :guest) }
@@ -15,7 +27,6 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
 
     it 'returns forbidden status' do
       request
-
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -25,14 +36,48 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
     let(:headers)    { admin_user.create_new_auth_token }
 
     context 'when question group does not have questions' do
-      it 'returns serialized cloned question_group' do
-        expect { request }
-          .to change(QuestionGroup, :count).by(1)
-          .and change(Question, :count).by(2)
-
+      it 'returns :ok https status code' do
+        request
         expect(response).to have_http_status(:ok)
-        expect(json_response['title']).to eq 'Question Group Title'
-        expect(json_response['questions'][0]['subtitle']).to eq 'Question Subtitle'
+      end
+
+      it 'creates proper count of records' do
+        expect { request }.to change(QuestionGroup, :count).by(1)
+                                           .and change(Question, :count).by(2)
+      end
+
+      it 'returns serialized cloned question_group' do
+        request
+        cloned_questions = QuestionGroup.find(json_response['id']).questions
+        expect(json_response).to include(
+          'title' => 'Question Group Title',
+          'questions' => [
+            include(
+              'id' => cloned_questions.first.id,
+              'subtitle' => 'Question Subtitle',
+              'position' => 1,
+              'body' => include(
+                'variable' => { 'name' => 'clone_' }
+              ),
+              'formula' => {
+                'payload' => '',
+                'patterns' => []
+              }
+            ),
+            include(
+              'id' => cloned_questions.second.id,
+              'subtitle' => 'Question Subtitle 2',
+              'position' => 2,
+              'body' => include(
+                'variable' => { 'name' => 'clone_' }
+              ),
+              'formula' => {
+                'payload' => '',
+                'patterns' => []
+              }
+            )
+          ]
+        )
       end
     end
   end

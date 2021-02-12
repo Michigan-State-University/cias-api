@@ -492,4 +492,73 @@ FactoryBot.define do
     sequence(:position) { |s| s }
     association :question_group
   end
+
+  factory :question_date, class: Question::Date do
+    title { 'date' }
+    type { Question::Date }
+    body do
+      {
+        data: [
+          {
+            payload: ''
+          }
+        ],
+        variable: {
+          name: ''
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
+
+  factory :question_phone, class: Question::Phone do
+    title { 'Phone' }
+    type { Question::Phone }
+    body do
+      {
+        data: [
+          {
+            payload: ''
+          }
+        ],
+        variable: {
+          name: ''
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
+
+  factory :question_currency, class: Question::Currency do
+    title { 'Currency' }
+    type { Question::Currency }
+    body do
+      {
+        data: [
+          {
+            payload: ''
+          }
+        ],
+        variable: {
+          name: ''
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
 end

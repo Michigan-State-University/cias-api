@@ -165,7 +165,7 @@
                       <tr>
                         <td align="center" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                           <div style="font-family: DM Sans, Helvetica, Arial; font-size: 20px; font-weight: 700; line-height: 1; text-align: center; color: #2f3850;">
-                            <%= render inline: t('csv_mailer.answers.html_body', intervention_name: @intervention.name) %>
+                            <%= render inline: t('csv_mailer.answers.html_body', intervention_name: @intervention.name, requested_at: @requested_at) %>
                           </div>
                         </td>
                       </tr>
@@ -192,7 +192,7 @@
                             <tr>
                               <td align="center" bgcolor="#107969" role="presentation" style="border: 1px solid #107969; border-radius: 100px; cursor: auto; mso-padding-alt: 10px 25px; background: #107969;" valign="middle">
                                 <a
-                                  href="<%= t 'csv_mailer.answers.link', web_url: ENV['WEB_URL']  %>"
+                                  href="<%= t 'csv_mailer.answers.link', web_url: ENV['WEB_URL'], intervention_id: @intervention.id  %>"
                                   style="
                                   display: inline-block;
                                     background: #107969;

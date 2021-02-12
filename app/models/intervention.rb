@@ -29,14 +29,14 @@ class Intervention < ApplicationRecord
     return unless draft?
 
     published!
-    ::Intervention::StatusKeeper.new(id).broadcast
+    ::Intervention::PublishJob.perform_later(id)
   end
 
   def close
     closed! if published?
   end
 
-  def archive
+  def to_archive
     archived! if closed? || draft?
   end
 
@@ -59,5 +59,9 @@ class Intervention < ApplicationRecord
         invitations.create!(email: email)
       end
     end
+  end
+
+  def newest_report
+    reports.attachments.order(created_at: :desc).first
   end
 end

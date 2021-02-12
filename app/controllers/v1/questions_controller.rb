@@ -8,28 +8,25 @@ class V1::QuestionsController < V1Controller
   end
 
   def show
-    render json: serialized_response(question_load)
+    render json: serialized_response(question_service.question_load(question_group_id, question_id))
   end
 
   def create
-    question = questions_scope.new(question_params)
-    question.position = questions_scope.last&.position.to_i + 1
-    question.save!
+    question = question_service.create(question_group_id, question_params)
+
     render json: serialized_response(question), status: :created
   end
 
   def update
-    question = question_load
-    question.assign_attributes(question_params.except(:type))
-    question.execute_narrator
-    question.save!
-    invalidate_cache(question_load)
+    question = question_service.update(question_group_id, question_id, question_params)
+    invalidate_cache(question_service.question_load(question_group_id, question_id))
+
     render json: serialized_response(question)
   end
 
   def destroy
-    question_load.destroy!
-    question_group_load.destroy! if questions_scope.empty? && !question_group_load.default?
+    question_service.destroy(session_id, question_ids)
+
     head :no_content
   end
 
@@ -40,26 +37,35 @@ class V1::QuestionsController < V1Controller
       'resource/question_bulk_update',
       values: position_params[:position]
     ).execute
-    invalidate_cache(question_groups_scope)
-    render_json question_groups: question_groups_scope, path: 'v1/question_groups', action: :index
+    question_groups = question_service.question_groups_scope(session_id)
+    invalidate_cache(question_groups)
+    render_json question_groups: question_groups, path: 'v1/question_groups', action: :index
   end
 
   private
 
-  def question_groups_scope
-    Session.includes(%i[question_groups questions]).accessible_by(current_ability).find(params[:session_id]).question_groups.order(:position)
-  end
-
-  def question_group_load
-    QuestionGroup.accessible_by(current_ability).find(params[:question_group_id])
+  def question_service
+    @question_service ||= V1::QuestionService.new(current_v1_user)
   end
 
   def questions_scope
-    question_group_load.questions.order(:position)
+    question_service.questions_scope(question_group_id)
   end
 
-  def question_load
-    questions_scope.find(params[:id])
+  def question_group_id
+    params[:question_group_id]
+  end
+
+  def question_id
+    params[:id]
+  end
+
+  def question_ids
+    params[:ids]
+  end
+
+  def session_id
+    params[:session_id]
   end
 
   def question_params

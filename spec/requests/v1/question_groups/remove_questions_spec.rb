@@ -7,7 +7,7 @@ describe 'DELETE /v1/sessions/:session_id/question_groups/:id/remove_questions',
   let(:params) do
     {
       question_group: {
-        questions: questions.pluck(:id)
+        question_ids: questions.pluck(:id)
       }
     }
   end

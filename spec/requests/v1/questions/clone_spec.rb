@@ -4,7 +4,29 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:question) { create(:question_single) }
+  let(:session) { create(:session) }
+  let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
+  let!(:question) do
+    create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
+                             formula: {
+                               'payload' => 'var + 3',
+                               'patterns' => [
+                                 { 'match' => '=7', 'target' => { 'id' => question_2.id, type: 'Question::Single' } }
+                               ]
+                             },
+                             body: {
+                               data: [
+                                 {
+                                   payload: '',
+                                   value: ''
+                                 }
+                               ],
+                               variable: {
+                                 name: 'variable'
+                               }
+                             })
+  end
+  let!(:question_2) { create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2) }
   let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do
@@ -13,7 +35,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => include('@guest.true')
+          'Uid' => include('@guest.true')
         )
       end
     end
@@ -23,62 +45,38 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'uid' => user.email
+          'Uid' => user.email
         )
       end
     end
   end
 
-  context 'when response' do
-    context 'is JSON' do
-      before do
-        post v1_clone_question_path(id: question.id), headers: headers
-      end
+  context 'when user clones a question' do
+    before { post v1_clone_question_path(id: question.id), headers: headers }
 
-      it { expect(response).to have_http_status(:created) }
-      it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
-    end
+    let(:question_cloned) { json_response['data']['attributes'] }
 
-    context 'is JSON and parse' do
-      before do
-        post v1_clone_question_path(id: question.id), headers: headers
-      end
+    it { expect(response).to have_http_status(:created) }
 
-      it 'success to Hash' do
-        expect(json_response.class).to be(Hash)
-      end
-    end
-
-    context 'cloned' do
-      before do
-        post v1_clone_question_path(id: question.id), headers: headers
-      end
-
-      let(:question_was) do
-        question.attributes.except('id', 'created_at', 'updated_at', 'image_url')
-      end
-      let(:question_cloned) do
-        json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'image_url')
-      end
-
-      let(:question_was_without_body) do
-        question.attributes.except('id', 'created_at', 'updated_at', 'image_url', 'body')
-      end
-      let(:question_cloned_without_body) do
-        json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'image_url', 'body')
-      end
-
-      it 'origin and outcome same' do
-        expect(question_was_without_body).to eq(question_cloned_without_body)
-      end
-
-      it 'cloned contain variable name with prefix' do
-        expect(question_cloned['body']['variable']['name']).to include('clone_')
-      end
-
-      it 'formula is empty' do
-        expect(question_cloned['formula']).to include({ 'payload' => '', 'patterns' => [] })
-      end
+    it 'returns proper cloend object' do
+      expect(question_cloned).to include(
+        'subtitle' => 'Question Subtitle',
+        'body' => {
+          'data' => [
+            {
+              'payload' => '',
+              'value' => ''
+            }
+          ],
+          'variable' => {
+            'name' => 'clone_variable'
+          }
+        },
+        'formula' => { 'payload' => '', 'patterns' => [] },
+        'position' => 3,
+        'question_group_id' => question_group.id,
+        'narrator' => question.narrator
+      )
     end
   end
 end

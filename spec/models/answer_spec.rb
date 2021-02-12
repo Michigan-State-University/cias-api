@@ -8,7 +8,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_slider) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -24,7 +24,7 @@ RSpec.describe Answer, type: :model do
       subject(:answer_bar_graph) { create(:answer_bar_graph) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -40,7 +40,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_feedback) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -56,7 +56,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_follow_up_contact) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -72,7 +72,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_grid) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -88,7 +88,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_information) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -104,7 +104,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_multiple) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -126,7 +126,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_number) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -142,7 +142,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_single) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -164,7 +164,7 @@ RSpec.describe Answer, type: :model do
       subject { create(:answer_free_response) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
@@ -181,17 +181,71 @@ RSpec.describe Answer, type: :model do
     end
   end
 
+  describe 'Answer::Date' do
+    describe 'expected behaviour' do
+      subject { create(:answer_date) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_date, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+
+    describe 'does not fail when body is empty' do
+      let(:with_empty) { build(:answer_date, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq true }
+    end
+  end
+
   describe 'Answer::ExternalLink' do
     describe 'expected behaviour' do
       subject { create(:answer_external_link) }
 
       it { should belong_to(:question) }
-      it { should belong_to(:user).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
 
     describe 'mismatch type question and answer' do
       let(:wrong_type) { build(:answer_external_link, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
+
+  describe 'Answer::Phone' do
+    describe 'expected behaviour' do
+      subject { create(:answer_phone) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_phone, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
+
+  describe 'Answer::Currency' do
+    describe 'expected behaviour' do
+      subject { create(:answer_currency) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_currency, :wrong_type) }
 
       it { expect(wrong_type.save).to eq false }
     end

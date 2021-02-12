@@ -18,7 +18,7 @@ class Phone < ApplicationRecord
   end
 
   def confirm!
-    update(confirmed: true, confirmed_at: DateTime.now)
+    update(confirmed: true, confirmed_at: DateTime.current)
   end
 
   private

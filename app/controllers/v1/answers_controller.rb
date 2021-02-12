@@ -12,22 +12,14 @@ class V1::AnswersController < V1Controller
   end
 
   def create
-    answer = Answer.where(question_id: params[:question_id], user_id: current_v1_user.id)
-               .order(:created_at)
-               .first_or_initialize(user_id: current_v1_user.id, question_id: params[:question_id])
-    answer.assign_attributes(answer_params)
-    answer.save!
-    session_or_question = answer.perform_response
-    render json: serialized_response(
-      session_or_question,
-      session_or_question&.de_constantize_modulize_name || NilClass
-    )
+    answer = V1::AnswerService.new(current_v1_user).create(params[:question_id], answer_params)
+    render json: serialized_response(answer), status: :created
   end
 
   private
 
   def answers_scope
-    Answer.includes(:question, :user).accessible_by(current_ability).where(question_id: params[:question_id])
+    Answer.includes(:question, :user_session).accessible_by(current_ability).where(question_id: params[:question_id])
   end
 
   def answer_load

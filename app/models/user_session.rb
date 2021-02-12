@@ -3,29 +3,33 @@
 class UserSession < ApplicationRecord
   belongs_to :user, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
+  has_many :answers, dependent: :destroy
 
-  before_save :alter_schedule
+  def finish(send_email: true)
+    return if finished_at
 
-  def alter_schedule
-    return if session == session_next
-    return if session_next&.schedule.nil?
-    return unless session_next&.schedule_days_after_fill?
-    return if submitted_at.nil?
+    cancel_timeout_job
+    update(finished_at: DateTime.current)
 
-    Session::Schedule.new(
-      self,
-      session_next,
-      user_session_next
-    ).days_after_fill
+    V1::UserSessionScheduleService.new(self).schedule if send_email
+  end
+
+  def on_answer
+    timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
+    cancel_timeout_job
+    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.job_id)
+  end
+
+  def cancel_timeout_job
+    return if timeout_job_id.nil?
+
+    UserSessionTimeoutJob.cancel(timeout_job_id)
+    update(timeout_job_id: nil)
   end
 
   private
 
   def session_next
     @session_next ||= session.position_grather_than.first
-  end
-
-  def user_session_next
-    @user_session_next ||= session_next.user_sessions.find_by(user_id: user_id)
   end
 end

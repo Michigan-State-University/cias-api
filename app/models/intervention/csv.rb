@@ -18,16 +18,16 @@ class Intervention::Csv
   private
 
   def data_scope(intervention)
-    Question.joins(:session, answers: :user).
-      where(sessions: { intervention_id: intervention.id }).
-      where.not(type: 'Question::Feedback').
-      group('sessions.position, sessions.updated_at, questions.position, questions.updated_at, questions.id').
-      order(
-        'sessions.position' => :asc,
-        'sessions.updated_at' => :asc,
-        'questions.position' => :asc,
-        'questions.updated_at' => :asc
-      )
+    Question.joins(question_group: :session)
+            .where(sessions: { intervention_id: intervention.id })
+            .where.not(type: %w[Question::Feedback Question::Finish Question::Information])
+            .group('sessions.position, sessions.updated_at, questions.position, questions.updated_at, questions.id')
+            .order(
+              'sessions.position' => :asc,
+              'sessions.updated_at' => :asc,
+              'questions.position' => :asc,
+              'questions.updated_at' => :asc
+            )
   end
 
   def collect_data

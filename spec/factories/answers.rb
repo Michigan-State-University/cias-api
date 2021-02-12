@@ -2,15 +2,12 @@
 
 FactoryBot.define do
   factory :answer do
-    user
+    user_session
     body do
       { data: [
         {
-          payload: '',
-          variable: {
-            name: 'test',
-            value: '1'
-          }
+          var: 'test',
+          value: '1'
         }
       ] }
     end
@@ -98,6 +95,36 @@ FactoryBot.define do
       association :question, factory: :question_external_link
       trait :wrong_type do
         association :question, factory: :question_multiple
+      end
+    end
+    factory :answer_currency do
+      type { Answer::Currency }
+      association :question, factory: :question_currency
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
+    end
+    factory :answer_phone do
+      type { Answer::Phone }
+      association :question, factory: :question_phone
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
+    end
+    factory :answer_date, class: Answer::Date do
+      type { Answer::Date }
+      association :question, factory: :question_date
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
       end
     end
   end

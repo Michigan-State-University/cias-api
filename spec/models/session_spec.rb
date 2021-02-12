@@ -11,36 +11,55 @@ RSpec.describe Session, type: :model do
     it { should have_many(:questions) }
     it { should be_valid }
 
-    describe '#create with question groups' do
-      let(:new_session) { build(:session) }
+    describe 'instance methods' do
+      describe '#create with question groups' do
+        let(:new_session) { build(:session) }
 
-      it 'creates new default question group' do
-        expect { new_session.save! }.to change(QuestionGroup, :count).by(2)
-        expect(new_session.reload.question_group_plains.model_name.name).to eq 'QuestionGroup::Plain'
-        expect(new_session.reload.question_group_finish.model_name.name).to eq 'QuestionGroup::Finish'
-        expect(new_session.reload.question_groups.size).to eq 2
+        it 'creates new default question group' do
+          expect { new_session.save! }.to change(QuestionGroup, :count).by(1)
+          expect(new_session.reload.question_group_plains.model_name.name).to eq 'QuestionGroup::Plain'
+          expect(new_session.reload.question_group_finish.model_name.name).to eq 'QuestionGroup::Finish'
+          expect(new_session.reload.question_groups.size).to eq 1
+        end
       end
-    end
-  end
 
-  context 'calc schedule' do
-    context 'expect schedule_at when exact_date' do
-      subject { create(:session, :exact_date) }
+      describe '#available_now' do
+        let(:session) { create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
+        let(:schedule) { 'after_fill' }
+        let(:schedule_at) { DateTime.now + 1.day }
+        let(:schedule_payload) { 2 }
 
-      it { should be_valid }
-    end
+        context 'session schedule is after fill' do
+          it 'returns true' do
+            expect(session.available_now).to be(true)
+          end
+        end
 
-    context 'expect schedule_at when days_after' do
-      let(:intervention) { create(:intervention, created_at: 6.days.ago) }
-      let(:session_1) { create(:session, intervention_id: intervention.id, position: 1,  created_at: 4.days.ago) }
-      let(:session_2) { create(:session, intervention_id: intervention.id, position: 2, schedule: 'days_after', schedule_payload: 7, created_at: 2.days.ago) }
+        context 'session schedule is days after fill' do
+          let(:schedule) { 'days_after_fill' }
 
-      it 'proper date' do
-        session_1
-        session_2
-        intervention.broadcast
+          it 'returns false' do
+            expect(session.available_now).to be(false)
+          end
+        end
 
-        expect(session_2.reload.schedule_at).to eq(Date.current + 7)
+        context 'session schedule' do
+          let(:schedule) { 'exact_date' }
+
+          context 'session is in the feature' do
+            it 'returns false ' do
+              expect(session.available_now).to be(false)
+            end
+          end
+
+          context 'session is in the past' do
+            let(:schedule_at) { DateTime.now - 1.day }
+
+            it 'returns true' do
+              expect(session.available_now).to be(true)
+            end
+          end
+        end
       end
     end
   end
