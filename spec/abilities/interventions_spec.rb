@@ -37,7 +37,7 @@ describe Intervention do
       end
 
       it 'can\'t manage any intervention' do
-        expect(subject).to have_abilities({ manage: false }, Intervention.new)
+        expect(subject).to have_abilities({ manage: false }, described_class.new)
       end
     end
   end

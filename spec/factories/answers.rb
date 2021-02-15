@@ -127,5 +127,15 @@ FactoryBot.define do
         body { { data: [] } }
       end
     end
+    factory :answer_name, class: Answer::Name do
+      type { Answer::Name }
+      association :question, factory: :question_name
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
+    end
   end
 end

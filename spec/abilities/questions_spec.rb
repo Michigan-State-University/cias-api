@@ -14,7 +14,7 @@ describe Question do
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
-      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      allow_any_instance_of(described_class).to receive(:execute_narrator).and_return(true)
 
       team1_session1 = create(:session, intervention: team1_intervention1)
       team1_session2 = create(:session, intervention: team1_intervention2)

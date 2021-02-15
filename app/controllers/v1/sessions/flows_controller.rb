@@ -7,9 +7,7 @@ class V1::Sessions::FlowsController < V1Controller
       question_with_warning[:question],
       question_with_warning[:question]&.de_constantize_modulize_name || NilClass
     )
-    if question_with_warning[:warning].presence && question_with_warning[:question].session.intervention.draft?
-      response = response.merge(warning: question_with_warning[:warning])
-    end
+    response = response.merge(warning: question_with_warning[:warning]) if question_with_warning[:warning].presence && question_with_warning[:question].session.intervention.draft?
     render json: response
   end
 

@@ -79,6 +79,7 @@ Rails.application.routes.draw do
       end
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
+    post :phonetic_preview, to: 'audio#create'
   end
 
   if Rails.env.development?

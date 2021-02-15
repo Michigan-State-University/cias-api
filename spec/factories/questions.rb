@@ -561,4 +561,27 @@ FactoryBot.define do
       body { { data: [] } }
     end
   end
+
+  factory :question_name, class: Question::Name do
+    title { 'Name screen' }
+    type { Question::Name }
+    body do
+      {
+        data: [
+          {
+            payload: ''
+          }
+        ],
+        variable: {
+          name: ''
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
 end

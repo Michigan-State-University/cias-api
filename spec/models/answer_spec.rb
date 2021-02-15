@@ -250,4 +250,20 @@ RSpec.describe Answer, type: :model do
       it { expect(wrong_type.save).to eq false }
     end
   end
+
+  describe 'Answer::Name' do
+    describe 'expected behaviour' do
+      subject { create(:answer_name) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_name, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
 end
