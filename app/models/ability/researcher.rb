@@ -18,6 +18,7 @@ class Ability::Researcher < Ability::Base
     can :manage, QuestionGroup, session: { intervention: { user_id: user.id } }
     can :manage, Question, question_group: { session: { intervention: { user_id: user.id } } }
     can :manage, Answer, question: { question_group: { session: { intervention: { user_id: user.id } } } }
+    can :manage, ReportTemplate, session: { intervention: { user_id: user.id } }
   end
 
   def roles_without_admin

@@ -21,6 +21,7 @@ class Ability::TeamAdmin < Ability::Base
     can :manage, QuestionGroup, session: { intervention: { user_id: team_members_ids } }
     can :manage, Question, question_group: { session: { intervention: { user_id: team_members_ids } } }
     can :manage, Answer, question: { question_group: { session: { intervention: { user_id: team_members_ids } } } }
+    can :manage, ReportTemplate, session: { intervention: { user_id: team_members_ids } }
   end
 
   def team_members_ids

@@ -14,6 +14,7 @@ class Session < ApplicationRecord
   has_many :questions, dependent: :destroy, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy
+  has_many :report_templates, dependent: :destroy
 
   has_many :user_sessions, dependent: :destroy, inverse_of: :session
   has_many :users, through: :user_sessions

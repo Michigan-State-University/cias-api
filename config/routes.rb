@@ -48,6 +48,9 @@ Rails.application.routes.draw do
           get 'resend', on: :member
         end
         resources :flows, only: %i[index]
+        resources :report_templates, only: %i[index show create update destroy] do
+          delete :remove_logo
+        end
       end
       resources :question_groups, only: %i[index show create update destroy] do
         member do

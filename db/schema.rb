@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_03_141313) do
+ActiveRecord::Schema.define(version: 2021_02_15_074252) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -136,6 +136,18 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
     t.index ["type"], name: "index_questions_on_type"
   end
 
+  create_table "report_templates", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "report_for", default: "third_party", null: false
+    t.uuid "session_id"
+    t.text "summary"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_for"], name: "index_report_templates_on_report_for"
+    t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
+    t.index ["session_id"], name: "index_report_templates_on_session_id"
+  end
+
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "intervention_id", null: false
     t.jsonb "settings"
@@ -148,6 +160,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "report_templates_count"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
