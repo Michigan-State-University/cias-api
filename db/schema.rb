@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_15_074252) do
+ActiveRecord::Schema.define(version: 2021_02_16_122044) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -134,6 +135,14 @@ ActiveRecord::Schema.define(version: 2021_02_15_074252) do
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
     t.index ["type", "title"], name: "index_questions_on_type_and_title", using: :gin
     t.index ["type"], name: "index_questions_on_type"
+  end
+
+  create_table "report_template_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "formula"
+    t.uuid "report_template_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_template_id"], name: "index_report_template_sections_on_report_template_id"
   end
 
   create_table "report_templates", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

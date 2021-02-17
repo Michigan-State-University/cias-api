@@ -40,11 +40,11 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_template', type: :request d
   end
 
   context 'when params are invalid' do
-    context 'when team params are missing' do
+    context 'when report template params are missing' do
       let(:params) { { report_template: {} } }
 
-      it 'does not create new team, returns :bad_request status' do
-        expect { request }.not_to change(Team, :count)
+      it 'does not create new report template, returns :bad_request status' do
+        expect { request }.not_to change(ReportTemplate, :count)
         expect(response).to have_http_status(:bad_request)
       end
     end
@@ -64,7 +64,7 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_template', type: :request d
     end
 
     it 'returns :forbidden status' do
-      expect { request }.not_to change(Team, :count)
+      expect { request }.not_to change(ReportTemplate, :count)
       expect(response).to have_http_status(:forbidden)
     end
   end

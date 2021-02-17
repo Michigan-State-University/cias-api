@@ -14,7 +14,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
         headers: headers
   end
 
-  context 'when there is report template' do
+  context 'when there is report template with given id' do
     it 'has correct http code :ok' do
       expect(response).to have_http_status(:ok)
     end
@@ -34,9 +34,10 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
     end
   end
 
-  context 'when there is no team with given id' do
+  context 'when there is no report template with given id' do
     before do
-      get v1_team_path(id: 'non-existing-id'), headers: headers
+      get v1_session_report_template_path(session_id: session.id, id: 'non-existing-id'),
+          headers: headers
     end
 
     it 'has correct http code :not_found' do

@@ -19,7 +19,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
       expect(response).to have_http_status(:ok)
     end
 
-    it 'returns list of teams with team admins details' do
+    it 'returns list of report templates for a session' do
       expect(json_response['data']).to include(
         'id' => report_template1.id.to_s,
         'type' => 'report_template',
@@ -44,7 +44,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
     end
   end
 
-  context 'when there are no teams' do
+  context 'when there are no report templates' do
     before do
       session.report_templates.destroy_all
       get v1_session_report_templates_path(session_id: session.id), headers: headers

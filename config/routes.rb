@@ -63,6 +63,10 @@ Rails.application.routes.draw do
       end
     end
 
+    scope 'report_templates/:report_template_id', module: :report_templates, as: :report_template do
+      resources :sections, only: %i[index show create update destroy]
+    end
+
     resources :question_groups, only: [] do
       resources :questions, only: %i[index show create update]
     end

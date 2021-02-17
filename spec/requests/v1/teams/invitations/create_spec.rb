@@ -50,7 +50,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
             email: researcher.email,
             team: team,
             invitation_token: token
-          )
+          ).and_return(double(deliver_later: nil))
 
           expect { request }.to change(TeamInvitation, :count).by(1).and \
             avoid_changing(User, :count).and \
@@ -143,7 +143,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
               email: researcher.email,
               team: team,
               invitation_token: token
-            )
+            ).and_return(double(deliver_later: nil))
 
             expect { request }.to change(TeamInvitation, :count).by(1).and \
               avoid_changing(User, :count).and \

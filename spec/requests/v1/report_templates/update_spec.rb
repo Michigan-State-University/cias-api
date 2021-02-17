@@ -59,11 +59,11 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
   end
 
   context 'when params are invalid' do
-    context 'when team params are missing' do
+    context 'when report template params are missing' do
       let(:params) { { report_template: {} } }
 
-      it 'does not create new team, returns :bad_request status' do
-        expect { request }.not_to change(Team, :count)
+      it 'does not update report template, returns :bad_request status' do
+        expect { request }.not_to change { report_template.reload.attributes }
         expect(response).to have_http_status(:bad_request)
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
     end
 
     it 'returns :forbidden status' do
-      expect { request }.not_to change(Team, :count)
+      expect { request }.not_to change { report_template.reload.attributes }
       expect(response).to have_http_status(:forbidden)
     end
   end

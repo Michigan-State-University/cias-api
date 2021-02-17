@@ -11,7 +11,6 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
   let(:session) { report_template.session }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
-  let(:logo) { fixture_file_upload('images/logo.png', 'image/png') }
 
   context 'when params are valid' do
     it 'returns :no_content status' do
@@ -23,7 +22,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
       expect { request }.to change(ActiveStorage::Attachment, :count).by(-1).and \
         change(ReportTemplate, :count).by(-1)
 
-      expect(ReportTemplate.where(id: report_template.id)).not_to exist
+      expect(ReportTemplate.exists?(report_template.id)).to be false
     end
   end
 
