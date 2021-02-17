@@ -27,6 +27,7 @@ Rails.application.routes.draw do
         resource :avatars, only: %i[create destroy]
       end
     end
+    resources :preview_session_users, only: :create
 
     resources :interventions, only: %i[index show create update] do
       post 'clone', on: :member

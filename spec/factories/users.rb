@@ -39,6 +39,13 @@ FactoryBot.define do
       team_id { create(:team).id }
     end
 
+    trait :preview_session do
+      roles { %w[preview_session] }
+      after(:build) do |user, evaluator|
+        user.preview_session_id = evaluator.preview_session_id
+      end
+    end
+
     trait :unconfirmed do
       after(:create) do |user, evaluator|
         user.update_attribute(:confirmation_sent_at, evaluator.allow_unconfirmed_period - 1.day)

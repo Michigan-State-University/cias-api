@@ -114,5 +114,14 @@ describe Session do
         )
       end
     end
+
+    context 'preview_session' do
+      let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: team1_session1.id) }
+
+      it 'can access only for preview session created for preview user' do
+        expect(subject).not_to include(team1_session2, team2_session1, team2_session2)
+        expect(subject).to include(team1_session1)
+      end
+    end
   end
 end

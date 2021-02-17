@@ -10,6 +10,8 @@ class Ability::Researcher < Ability::Base
 
   def researcher
     can :read, User, User.limit_to_roles(roles_without_admin), active: true
+    can :create, :preview_session_user
+
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }

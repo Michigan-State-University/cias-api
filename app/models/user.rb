@@ -16,7 +16,7 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest participant researcher team_admin admin].freeze
+  APP_ROLES = %w[guest participant researcher team_admin admin preview_session].freeze
 
   TIME_ZONES = ActiveSupport::TimeZone::MAPPING.values.uniq.sort.freeze
 

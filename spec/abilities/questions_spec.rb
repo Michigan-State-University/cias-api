@@ -125,5 +125,18 @@ describe Question do
         )
       end
     end
+
+    context 'preview_session' do
+      let!(:preview_session) { create(:session) }
+      let!(:prev_question_group) { create(:question_group, session: preview_session) }
+      let!(:prev_question) { create(:question_multiple, question_group: prev_question_group) }
+
+      let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
+
+      it 'can access only for questions of preview session created for preview user' do
+        expect(subject).not_to include(team1_question1, team1_question2, team2_question1, team2_question2)
+        expect(subject).to include(prev_question)
+      end
+    end
   end
 end
