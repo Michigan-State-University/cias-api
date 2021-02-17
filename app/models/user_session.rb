@@ -4,6 +4,9 @@ class UserSession < ApplicationRecord
   belongs_to :user, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
+  belongs_to :name_audio, class_name: 'Audio', optional: true
+
+  before_destroy :decrement_audio_usage
 
   def finish(send_email: true)
     return if finished_at
@@ -11,6 +14,7 @@ class UserSession < ApplicationRecord
     cancel_timeout_job
     update(finished_at: DateTime.current)
 
+    decrement_audio_usage
     V1::UserSessionScheduleService.new(self).schedule if send_email
   end
 
@@ -31,5 +35,9 @@ class UserSession < ApplicationRecord
 
   def session_next
     @session_next ||= session.position_grather_than.first
+  end
+
+  def decrement_audio_usage
+    name_audio&.decrement(:usage_counter)
   end
 end

@@ -14,7 +14,6 @@ ActiveRecord::Schema.define(version: 2021_02_16_122044) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -216,6 +215,8 @@ ActiveRecord::Schema.define(version: 2021_02_16_122044) do
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "last_answer_at"
     t.string "timeout_job_id"
+    t.uuid "name_audio_id"
+    t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
@@ -278,6 +279,7 @@ ActiveRecord::Schema.define(version: 2021_02_16_122044) do
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
+  add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "users"
 end

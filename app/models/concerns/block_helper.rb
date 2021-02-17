@@ -34,6 +34,32 @@ module BlockHelper
     block['type'].eql?(REFLECTION_FORMULA_BLOCK)
   end
 
+  def swap_name_into_reflectionformula_block(block, mp3url)
+    block['reflections'].each do |reflection|
+      next reflection unless reflection['text'].include?(':name:.')
+
+      index = reflection['text'].index(':name:.')
+      reflection['audio_urls'][index] = mp3url
+    end
+    block
+  end
+
+  def swap_name_into_reflection_block(block, mp3url)
+    block['reflections'].each do |reflection|
+      next reflection unless reflection['text'].include?(':name:.')
+
+      index = reflection['text'].index(':name:.')
+      reflection['audio_urls'][index] = mp3url
+    end
+    block
+  end
+
+  def swap_name_into_speech_block(block, mp3url)
+    index = block['text'].index(':name:.')
+    block['audio_urls'][index] = mp3url
+    block
+  end
+
   def default_finish_screen_block
     {
       'action' => 'NO_ACTION',

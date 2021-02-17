@@ -16,6 +16,7 @@ class V1::AnswerService
                    .first_or_initialize(question_id: question_id, user_session_id: user_session.id)
     answer.assign_attributes(answer_params)
     answer.save!
+    answer.on_answer
     answer
   end
 end

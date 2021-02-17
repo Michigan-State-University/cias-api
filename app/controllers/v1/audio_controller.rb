@@ -3,7 +3,7 @@
 class V1::AudioController < V1Controller
   def create
     text = audio_params[:text]
-    audio_url = V1::AudioService.new.create(text)
+    audio_url = V1::AudioService.new.create(text, preview: true).url
 
     render json: { url: audio_url }
   end

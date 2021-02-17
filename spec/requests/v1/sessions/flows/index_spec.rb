@@ -9,7 +9,8 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
   let!(:session) { create(:session, intervention_id: intervention.id) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_single, question_group: question_group) }
-  let(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id) }
+  let(:audio_id) { nil }
+  let(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
   let(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
   let(:status) { 'draft' }
 
@@ -351,6 +352,159 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
         expect(json_response['data']['attributes']['narrator']['blocks'].first).to include(
           'target_value' => include('text' => ['Good your value is 20.'], 'match' => '=1')
         )
+      end
+    end
+
+    context 'response with name mp3 override' do
+      let(:audio) { create(:audio) }
+      let(:audio_id) { audio.id }
+
+      context 'for speech block' do
+        let!(:question_with_speech_block) do
+          create(:question_single, question_group: question_group, position: 2,
+                                   narrator: {
+                                     blocks: [
+                                       {
+                                         action: 'NO_ACTION',
+                                         payload: 'test',
+                                         audio_urls: ['invalid_url'],
+                                         text: [':name:.'],
+                                         sha256: ['some_sha'],
+                                         animation: 'pointUp',
+                                         type: 'Speech',
+                                         endPosition: {
+                                           x: 0,
+                                           y: 600
+                                         }
+                                       }
+                                     ],
+                                     settings: {
+                                       voice: true,
+                                       animation: true
+                                     }
+                                   })
+        end
+        let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+
+        before do
+          allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
+          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+        end
+
+        it 'swaps url correctly' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['audio_urls'].first).to eq('phonetic_audio.mp3')
+        end
+      end
+
+      context 'for ReflectionFormula block' do
+        let!(:question_with_reflection_formula) do
+          create(:question_single, question_group: question_group, position: 2,
+                                   narrator: {
+                                     blocks: [
+                                       {
+                                         action: 'NO_ACTION',
+                                         payload: 'test',
+                                         reflections: [
+                                           {
+                                             match: '=1',
+                                             text: [
+                                               'Good your value is 20.',
+                                               ':name:.'
+                                             ],
+                                             audio_urls: %w[
+                                               some_url
+                                               some_url2
+                                             ],
+                                             sha256: %w[
+                                               some_sha
+                                               some_sha2
+                                             ]
+                                           },
+                                           {
+                                             match: '=2',
+                                             text: [
+                                               'Bad.'
+                                             ],
+                                             audio_urls: ['some_other_url'],
+                                             sha256: ['sone_other_sha']
+                                           }
+                                         ],
+                                         animation: 'pointUp',
+                                         type: 'ReflectionFormula',
+                                         endPosition: {
+                                           x: 0,
+                                           y: 600
+                                         }
+                                       }
+                                     ],
+                                     settings: {
+                                       voice: true,
+                                       animation: true
+                                     }
+                                   })
+        end
+
+        let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+
+        before do
+          allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
+          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+        end
+
+        it 'swaps url correctly' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].second).to eq('phonetic_audio.mp3')
+        end
+      end
+
+      context 'for reflection block' do
+        let!(:question_with_reflection_formula) do
+          create(:question_single, question_group: question_group, position: 2,
+                                   narrator: {
+                                     blocks: [
+                                       {
+                                         action: 'NO_ACTION',
+                                         payload: 'test',
+                                         reflections: [
+                                           {
+                                             payload: '1',
+                                             value: '1',
+                                             variable: 'test',
+                                             text: [
+                                               ':name:.'
+                                             ],
+                                             audio_urls: [
+                                               'some_url2'
+                                             ],
+                                             sha256: [
+                                               'some_sha2'
+                                             ]
+                                           }
+                                         ],
+                                         animation: 'pointUp',
+                                         type: 'Reflection',
+                                         endPosition: {
+                                           x: 0,
+                                           y: 600
+                                         }
+                                       }
+                                     ],
+                                     settings: {
+                                       voice: true,
+                                       animation: true
+                                     }
+                                   })
+        end
+
+        let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+
+        before do
+          allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
+          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+        end
+
+        it 'swaps url correctly' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].first).to eq('phonetic_audio.mp3')
+        end
       end
     end
   end

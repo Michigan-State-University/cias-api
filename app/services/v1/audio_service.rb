@@ -1,21 +1,18 @@
 # frozen_string_literal: true
 
 class V1::AudioService
-  def create(text)
+  def create(text, preview: false)
     digest = Digest::SHA256.hexdigest(text)
-    audio_url = was_audio_url(digest)
-    if audio_url.nil?
+    audio = Audio.find_by(sha256: digest)
+    if audio.nil?
       audio = Audio.create!(sha256: digest)
       Audio::TextToSpeech.new(
         audio,
         text: text
       ).execute
-      audio_url = audio.reload.url
+      audio.usage_counter = 0 if preview
+      audio.reload
     end
-    audio_url
-  end
-
-  def was_audio_url(digest)
-    Audio.find_by(sha256: digest)&.url
+    audio
   end
 end
