@@ -80,6 +80,10 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :user_sessions, only: %i[create] do
+      resources :next_question, only: %i[index], module: 'user_sessions'
+    end
+
     resources :teams, only: %i[index show create update destroy] do
       delete :remove_researcher
       scope module: 'teams' do
