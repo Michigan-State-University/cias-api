@@ -9,9 +9,8 @@ class Ability::Researcher < Ability::Base
   private
 
   def researcher
-    can :read, User, User.limit_to_roles(roles_without_admin), active: true
+    can %i[read update active], User, id: participants_with_answers(user)
     can :create, :preview_session_user
-
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }
@@ -23,9 +22,5 @@ class Ability::Researcher < Ability::Base
     can :manage, ReportTemplate, session: { intervention: { user_id: user.id } }
     can :manage, ReportTemplate::Section,
         report_template: { session: { intervention: { user_id: user.id } } }
-  end
-
-  def roles_without_admin
-    @roles_without_admin ||= User::APP_ROLES - ['admin']
   end
 end

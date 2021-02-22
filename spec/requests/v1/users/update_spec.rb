@@ -14,6 +14,10 @@ describe 'PATCH /v1/users/:id', type: :request do
     }
   end
   let(:user_id) { current_user.id }
+  let(:session) { nil }
+  let(:question_group) { nil }
+  let(:question) { nil }
+  let(:answer) { nil }
 
   before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
 
@@ -116,7 +120,7 @@ describe 'PATCH /v1/users/:id', type: :request do
   end
 
   context 'when current_user is researcher' do
-    let(:current_user) { create(:user, :confirmed, :researcher, first_name: 'Smith', last_name: 'Wazowski') }
+    let!(:current_user) { create(:user, :confirmed, :researcher, first_name: 'Smith', last_name: 'Wazowski') }
 
     context 'when current_user updates itself' do
       it { expect(response).to have_http_status(:ok) }
@@ -138,30 +142,207 @@ describe 'PATCH /v1/users/:id', type: :request do
       end
 
       context 'when current_user tries to update deactivated and roles attributes' do
-        let(:params) do
-          {
-            user: {
-              roles: %w[admin guest],
-              deactivated: true
+        context 'when deactivated user is admin or guest' do
+          let(:user_id) { other_user.id }
+          let(:params) do
+            {
+                user: {
+                    roles: %w[admin guest],
+                    active: true
+                }
             }
-          }
+          end
+
+          it { expect(response).to have_http_status(:not_found) }
+
+          it 'response contains proper error message' do
+            expect(json_response['message']).to include "Couldn't find User with"
+          end
         end
 
-        it { expect(response).to have_http_status(:forbidden) }
+        context 'when deactivated user is participant' do
+          context 'with answer' do
+            let!(:other_user) { create(:user, :participant, :confirmed, active: false) }
+            let!(:user_id) { other_user.id }
+            let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+            let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
+            let!(:question) { create(:question_slider, question_group: question_group) }
+            let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: other_user, session: session)) }
+            let!(:params) do
+              {
+                  user: {
+                      roles: %w[participant],
+                      active: true
+                  }
+              }
+            end
 
-        it 'response contains proper error message' do
-          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+            before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
+
+            it { expect(response).to have_http_status(:ok) }
+
+            it 'JSON response contains proper attributes' do
+              expect(json_response).to include(
+                                           'roles' => %w[participant],
+                                           'active' => true
+                                       )
+            end
+
+            it 'updates user attributes' do
+              expect(other_user.reload.attributes).to include(
+                                                          'active' => true
+                                                      )
+            end
+          end
+
+          context 'without answer' do
+            let(:other_user) { create(:user, :participant, :confirmed) }
+            let(:user_id) { other_user.id }
+            let(:params) do
+              {
+                  user: {
+                      roles: %w[participant],
+                      active: false
+                  }
+              }
+            end
+
+            it { expect(response).to have_http_status(:not_found) }
+
+          end
         end
+      end
+    end
+
+    context 'when current_user updates participant' do
+      let!(:other_user) { create(:user, :participant, :confirmed) }
+      let!(:user_id) { other_user.id }
+      let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+      let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
+      let!(:question) { create(:question_slider, question_group: question_group) }
+      let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: other_user, session: session)) }
+
+      before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response).to include(
+                                     'first_name' => other_user.first_name,
+                                     'last_name' => other_user.last_name,
+                                     'email' => other_user.email,
+                                     'avatar_url' => nil
+                                 )
       end
     end
 
     context 'when current_user updates other user' do
       let(:user_id) { other_user.id }
 
-      it { expect(response).to have_http_status(:forbidden) }
+      it { expect(response).to have_http_status(:not_found) }
 
       it 'response contains proper error message' do
-        expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        expect(json_response['message']).to include "Couldn't find User with"
+      end
+    end
+  end
+
+  context 'when current_user is team admin' do
+    let!(:team1) { create(:team, :with_team_admin) }
+    let!(:current_user) { team1.team_admin }
+    let(:team_participant) { create(:user, :participant, team_id: team1.id) }
+    let(:other_team_participant) { create(:user, :participant, team_id: team1.id) }
+    let(:researcher) { create(:user, :researcher, team_id: team1.id) }
+    let!(:session) { create(:session, intervention: create(:intervention, user: researcher)) }
+    let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
+    let!(:question) { create(:question_slider, question_group: question_group) }
+    let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant, session: session)) }
+    let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
+
+    context 'when current_user updates itself' do
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response).to include(
+                                     'first_name' => 'John',
+                                     'last_name' => 'Kowalski',
+                                     'email' => current_user.email,
+                                     'avatar_url' => nil
+                                 )
+      end
+
+      it 'updates user attributes' do
+        expect(current_user.reload.attributes).to include(
+                                                      'first_name' => 'John',
+                                                      'last_name' => 'Kowalski'
+                                                  )
+      end
+
+      context 'when current_user tries to update deactivated and roles attributes' do
+        context 'when deactivated user is admin or guest' do
+          let(:user_id) { other_user.id }
+          let(:params) do
+            {
+                user: {
+                    roles: %w[admin guest],
+                    active: true
+                }
+            }
+          end
+
+          it { expect(response).to have_http_status(:not_found) }
+
+          it 'response contains proper error message' do
+            expect(json_response['message']).to include "Couldn't find User with"
+          end
+        end
+
+        context 'when deactivated user is participant' do
+          context 'with answer' do
+            let(:other_user) { team_participant }
+            let!(:user_id) { team_participant.id }
+            let!(:params) do
+              {
+                  user: {
+                      roles: %w[participant],
+                      active: false
+                  }
+              }
+            end
+
+            before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
+
+            it { expect(response).to have_http_status(:ok) }
+
+            it 'JSON response contains proper attributes' do
+              expect(json_response).to include(
+                                           'roles' => %w[participant],
+                                           'active' => false
+                                       )
+            end
+
+            it 'updates user attributes' do
+              expect(team_participant.reload.attributes).to include(
+                                                                'active' => false
+                                                            )
+            end
+          end
+
+          context 'without answer' do
+            let(:other_user) { other_team_participant }
+            let(:user_id) { other_user.id }
+            let(:params) do
+              {
+                  user: {
+                      roles: %w[participant],
+                      active: false
+                  }
+              }
+            end
+
+            it { expect(response).to have_http_status(:ok) }
+          end
+        end
       end
     end
   end

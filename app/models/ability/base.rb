@@ -20,4 +20,12 @@ class Ability::Base
   def class_name
     self.class.name.demodulize.underscore
   end
+
+  def participants_with_answers(user)
+    User.participants.select { |participant| Answer.user_answers(participant.id, logged_user_sessions(user)).any? }.pluck(:id)
+  end
+
+  def logged_user_sessions(user)
+    Session.where(intervention_id: user.interventions.select(:id))
+  end
 end
