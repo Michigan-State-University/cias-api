@@ -48,7 +48,6 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
-        resources :flows, only: %i[index]
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
         end
@@ -74,14 +73,14 @@ Rails.application.routes.draw do
 
     post 'questions/:id/clone', to: 'questions#clone', as: :clone_question
     scope 'questions/:question_id', as: 'question' do
-      resources :answers, only: %i[index show create]
       scope module: 'questions' do
         resource :images, only: %i[create destroy]
       end
     end
 
     resources :user_sessions, only: %i[create] do
-      resources :next_question, only: %i[index], module: 'user_sessions'
+      resources :questions, only: %i[index], module: 'user_sessions'
+      resources :answers, only: %i[index show create], module: 'user_sessions'
     end
 
     resources :teams, only: %i[index show create update destroy] do

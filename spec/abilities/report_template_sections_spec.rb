@@ -53,7 +53,7 @@ describe ReportTemplate::Section do
         expect(subject).to have_abilities({ manage: true }, team1_report_section1)
         expect(subject).to have_abilities(
           { create: false },
-          ReportTemplate::Section.new(report_template_id: team2_report_section2.report_template.id)
+          described_class.new(report_template_id: team2_report_section2.report_template.id)
         )
       end
 
@@ -81,7 +81,7 @@ describe ReportTemplate::Section do
       it 'can\'t create report template section in other users session' do
         expect(subject).to have_abilities(
           { create: false },
-          ReportTemplate::Section.new(report_template_id: team2_report_section1.report_template.id)
+          described_class.new(report_template_id: team2_report_section1.report_template.id)
         )
       end
     end

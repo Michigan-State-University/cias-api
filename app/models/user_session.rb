@@ -31,6 +31,10 @@ class UserSession < ApplicationRecord
     update(timeout_job_id: nil)
   end
 
+  def last_answer
+    answers.order(:created_at).last
+  end
+
   private
 
   def session_next

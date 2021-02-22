@@ -48,7 +48,7 @@ describe ReportTemplate do
         expect(subject).to have_abilities({ manage: true }, team1_report_template1)
         expect(subject).to have_abilities(
           { create: false },
-          ReportTemplate.new(session_id: team2_intervention2.sessions.first.id)
+          described_class.new(session_id: team2_intervention2.sessions.first.id)
         )
       end
 
@@ -76,7 +76,7 @@ describe ReportTemplate do
       it 'can\'t create report template in other users session' do
         expect(subject).to have_abilities(
           { create: false },
-          ReportTemplate.new(session_id: team2_intervention2.sessions.first.id)
+          described_class.new(session_id: team2_intervention2.sessions.first.id)
         )
       end
     end

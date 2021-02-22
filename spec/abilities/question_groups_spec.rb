@@ -127,7 +127,6 @@ describe QuestionGroup do
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
 
-
       it 'can access only for questions groups of preview session created for preview user' do
         expect(subject).not_to include(team1_question_group1,
                                        team1_question_group2, team2_question_group1, team2_question_group2)

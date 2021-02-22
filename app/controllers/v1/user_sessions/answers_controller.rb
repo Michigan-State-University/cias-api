@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::AnswersController < V1Controller
+class V1::UserSessions::AnswersController < V1Controller
   authorize_resource only: :create
 
   def index
@@ -12,7 +12,7 @@ class V1::AnswersController < V1Controller
   end
 
   def create
-    answer = V1::AnswerService.new(current_v1_user).create(params[:question_id], answer_params)
+    answer = V1::AnswerService.new(current_v1_user).create(user_session_id, question_id, answer_params)
     render json: serialized_response(answer), status: :created
   end
 
@@ -26,7 +26,15 @@ class V1::AnswersController < V1Controller
     answers_scope.find(params[:id])
   end
 
+  def user_session_id
+    params[:user_session_id]
+  end
+
   def answer_params
     params.require(:answer).permit(:type, body: {})
+  end
+
+  def question_id
+    params.require(:question_id)
   end
 end

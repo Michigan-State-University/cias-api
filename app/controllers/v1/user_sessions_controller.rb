@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class V1::UserSessionsController < V1Controller
-
   def create
     user_session = user_session_service.create(user_session_params)
     render json: serialized_response(user_session), status: :ok
