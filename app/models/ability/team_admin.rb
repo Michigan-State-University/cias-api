@@ -25,6 +25,10 @@ class Ability::TeamAdmin < Ability::Base
     can :manage, ReportTemplate, session: { intervention: { user_id: team_members_ids } }
     can :manage, ReportTemplate::Section,
         report_template: { session: { intervention: { user_id: team_members_ids } } }
+    can :manage, ReportTemplate::Section::Variant,
+        report_template_section: {
+          report_template: { session: { intervention: { user_id: team_members_ids } } }
+        }
   end
 
   def team_members_ids

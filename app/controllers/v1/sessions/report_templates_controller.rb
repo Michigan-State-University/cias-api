@@ -12,7 +12,10 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def show
     authorize! :read, report_template
 
-    render json: serialized_response(report_template)
+    render json: V1::ReportTemplateSerializer.new(
+      report_template,
+      { include: %i[sections variants] }
+    )
   end
 
   def create
@@ -29,12 +32,15 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def update
     authorize! :update, report_template
 
-    updated_report_template = V1::ReportTemplates::Update.call(
+    V1::ReportTemplates::Update.call(
       report_template,
       report_template_params
     )
 
-    render json: serialized_response(updated_report_template)
+    render json: V1::ReportTemplateSerializer.new(
+      report_template.reload,
+      { include: %i[sections variants] }
+    )
   end
 
   def destroy

@@ -7,10 +7,17 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
   let(:headers) { user.create_new_auth_token }
   let!(:session) { create :session }
 
-  let!(:report_template1) { create(:report_template, :with_logo, session: session) }
+  let!(:report_template) { create(:report_template, :with_logo, session: session) }
+  let!(:section) { create(:report_template_section, report_template: report_template) }
+  let!(:variant1) do
+    create(:report_template_section_variant, report_template_section: section)
+  end
+  let!(:variant2) do
+    create(:report_template_section_variant, report_template_section: section)
+  end
 
   before do
-    get v1_session_report_template_path(session_id: session.id, id: report_template1.id),
+    get v1_session_report_template_path(session_id: session.id, id: report_template.id),
         headers: headers
   end
 
@@ -21,14 +28,81 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
 
     it 'returns report template' do
       expect(json_response['data']).to include(
-        'id' => report_template1.id.to_s,
+        'id' => report_template.id.to_s,
         'type' => 'report_template',
         'attributes' => include(
-          'name' => report_template1.name,
-          'report_for' => report_template1.report_for,
-          'summary' => report_template1.summary,
-          'logo_url' => include(report_template1.logo.name),
+          'name' => report_template.name,
+          'report_for' => report_template.report_for,
+          'summary' => report_template.summary,
+          'logo_url' => include(report_template.logo.name),
           'session_id' => session.id
+        ),
+        'relationships' => {
+          'sections' => {
+            'data' => [
+              include(
+                'id' => section.id,
+                'type' => 'section'
+              )
+            ]
+          },
+          'variants' => {
+            'data' => [
+              include(
+                'id' => variant1.id,
+                'type' => 'variant'
+              ),
+              include(
+                'id' => variant2.id,
+                'type' => 'variant'
+              )
+            ]
+          }
+        }
+      )
+
+      expect(json_response['included']).to include(
+        'id' => section.id.to_s,
+        'type' => 'section',
+        'attributes' => include(
+          'formula' => section.formula,
+          'report_template_id' => report_template.id
+        ),
+        'relationships' => {
+          'variants' => {
+            'data' => [
+              include(
+                'id' => variant1.id,
+                'type' => 'variant'
+              ),
+              include(
+                'id' => variant2.id,
+                'type' => 'variant'
+              )
+            ]
+          }
+        }
+      ).and include(
+        'id' => variant1.id.to_s,
+        'type' => 'variant',
+        'attributes' => include(
+          'title' => variant1.title,
+          'content' => variant1.content,
+          'preview' => variant1.preview,
+          'formula_match' => variant1.formula_match,
+          'image_url' => nil,
+          'report_template_section_id' => section.id
+        )
+      ).and include(
+        'id' => variant2.id.to_s,
+        'type' => 'variant',
+        'attributes' => include(
+          'title' => variant2.title,
+          'content' => variant2.content,
+          'preview' => variant2.preview,
+          'formula_match' => variant2.formula_match,
+          'image_url' => nil,
+          'report_template_section_id' => section.id
         )
       )
     end

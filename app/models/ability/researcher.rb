@@ -22,5 +22,9 @@ class Ability::Researcher < Ability::Base
     can :manage, ReportTemplate, session: { intervention: { user_id: user.id } }
     can :manage, ReportTemplate::Section,
         report_template: { session: { intervention: { user_id: user.id } } }
+    can :manage, ReportTemplate::Section::Variant,
+        report_template_section: {
+          report_template: { session: { intervention: { user_id: user.id } } }
+        }
   end
 end

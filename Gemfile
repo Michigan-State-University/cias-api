@@ -10,6 +10,7 @@ gem 'puma', '~> 5.0'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
+gem 'active_storage_validations'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
 gem 'config'

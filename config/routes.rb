@@ -68,6 +68,12 @@ Rails.application.routes.draw do
       resources :sections, only: %i[index show create update destroy]
     end
 
+    scope 'report_templates/sections/:section_id', module: 'report_templates/sections', as: :report_template_section do
+      resources :variants, only: %i[index show create update destroy] do
+        delete :remove_image
+      end
+    end
+
     resources :question_groups, only: [] do
       resources :questions, only: %i[index show create update]
     end

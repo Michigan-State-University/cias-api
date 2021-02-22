@@ -9,6 +9,12 @@ RSpec.describe 'GET /v1/report_templates/:report_template_id/sections', type: :r
   let!(:report_template) { create(:report_template, session: session) }
   let!(:report_template_section1) { create(:report_template_section, report_template: report_template) }
   let!(:report_template_section2) { create(:report_template_section, report_template: report_template) }
+  let!(:variant1) do
+    create(:report_template_section_variant, report_template_section: report_template_section1)
+  end
+  let!(:variant2) do
+    create(:report_template_section_variant, report_template_section: report_template_section1)
+  end
 
   before do
     get v1_report_template_sections_path(report_template_id: report_template.id),
@@ -27,14 +33,31 @@ RSpec.describe 'GET /v1/report_templates/:report_template_id/sections', type: :r
         'attributes' => include(
           'formula' => report_template_section1.formula,
           'report_template_id' => report_template.id
-        )
+        ),
+        'relationships' => {
+          'variants' => {
+            'data' => [
+              include(
+                'id' => variant1.id,
+                'type' => 'variant'
+              ),
+              include(
+                'id' => variant2.id,
+                'type' => 'variant'
+              )
+            ]
+          }
+        }
       ).and include(
         'id' => report_template_section2.id.to_s,
         'type' => 'section',
         'attributes' => include(
           'formula' => report_template_section2.formula,
           'report_template_id' => report_template.id
-        )
+        ),
+        'relationships' => {
+          'variants' => { 'data' => [] }
+        }
       )
     end
   end

@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_16_145418) do
+ActiveRecord::Schema.define(version: 2021_02_17_125859) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -134,6 +135,18 @@ ActiveRecord::Schema.define(version: 2021_02_16_145418) do
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
     t.index ["type", "title"], name: "index_questions_on_type_and_title", using: :gin
     t.index ["type"], name: "index_questions_on_type"
+  end
+
+  create_table "report_template_section_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "report_template_section_id", null: false
+    t.boolean "preview", default: false, null: false
+    t.string "formula_match"
+    t.string "title"
+    t.text "content"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
+    t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end
 
   create_table "report_template_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
