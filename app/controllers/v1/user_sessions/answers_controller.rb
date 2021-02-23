@@ -19,7 +19,7 @@ class V1::UserSessions::AnswersController < V1Controller
   private
 
   def answers_scope
-    Answer.includes(:question, :user_session).accessible_by(current_ability).where(question_id: params[:question_id])
+    Answer.includes(:question, :user_session).accessible_by(current_ability).where(user_session_id: params[:user_session_id])
   end
 
   def answer_load

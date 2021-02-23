@@ -2,25 +2,24 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: :request do
+RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
-  let(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
+  let!(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
   let!(:session) { create(:session, intervention_id: intervention.id) }
   let(:question_group) { create(:question_group, session: session) }
-  let(:question) { create(:question_single, question_group: question_group) }
+  let!(:question) { create(:question_single, question_group: question_group) }
   let(:audio_id) { nil }
-  let(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
-  let(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+  let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
+  let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
   let(:status) { 'draft' }
 
   before do
-    get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+    get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
   end
 
   context 'branching logic' do
     let(:user) { participant }
-    let(:params) { { answer_id: answer.id } }
 
     context 'returns finish screen if only question' do
       it { expect(json_response['data']['attributes']['type']).to eq 'Question::Finish' }
@@ -257,7 +256,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
       end
 
       before do
-        get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+        get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
       end
 
       context 'session that is branched to and has schedule after fill' do
@@ -388,7 +387,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
-          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+          get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
         end
 
         it 'swaps url correctly' do
@@ -448,7 +447,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
-          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+          get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
         end
 
         it 'swaps url correctly' do
@@ -499,7 +498,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
-          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+          get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
         end
 
         it 'swaps url correctly' do

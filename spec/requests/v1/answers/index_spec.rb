@@ -2,15 +2,16 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
+RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:answer) { create(:answer_free_response) }
-  let(:question) { answer.question }
+  let(:user_session) { create(:user_session) }
+  let(:question) { create(:question_free_response) }
+  let(:answer) { create(:answer_free_response, user_session: user_session, question: question) }
   let(:headers) { user.create_new_auth_token }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_question_answers_path(question.id) }
+      before { get v1_user_session_answers_path(user_session.id) }
 
       it { expect(response).to have_http_status(:ok) }
 
@@ -22,7 +23,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
     end
 
     context 'is valid' do
-      before { get v1_question_answers_path(question.id), headers: headers }
+      before { get v1_user_session_answers_path(user_session.id), headers: headers }
 
       it { expect(response).to have_http_status(:success) }
 
@@ -37,7 +38,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
   context 'when response' do
     context 'is JSON' do
       before do
-        get v1_question_answers_path(question.id), headers: headers
+        get v1_user_session_answers_path(user_session.id), headers: headers
       end
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
@@ -45,7 +46,7 @@ RSpec.describe 'GET /v1/questions/:question_id/answers', type: :request do
 
     context 'is JSON and parse' do
       before do
-        get v1_question_answers_path(question.id), headers: headers
+        get v1_user_session_answers_path(user_session.id), headers: headers
       end
 
       it 'success to Hash' do
