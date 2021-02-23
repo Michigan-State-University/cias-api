@@ -34,6 +34,7 @@ gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
+gem 'wicked_pdf'
 
 group :development, :test do
   gem 'bundler-audit'
@@ -57,6 +58,7 @@ group :development do
   gem 'letter_opener_web'
   gem 'license_finder'
   gem 'pgsync'
+  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
@@ -70,4 +72,5 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
+  gem 'wkhtmltopdf-heroku'
 end

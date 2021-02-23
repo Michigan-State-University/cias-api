@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <style>
+      * {
+        font-family: "DM Sans", Arial, Helvetica, sans-serif;
+      }
+
+      .logo {
+        max-width: 200px;
+        max-height: 200px;
+        padding: 40px 0px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="logo mb-big">
+      <% if report_template.logo.attached? %>
+        <img src="<%= Rails.application.routes.url_helpers.url_for(report_template.logo) %>" />
+      <% end %>
+    </div>
+  </body>
+</html>
+

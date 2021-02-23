@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <style>
+      * {
+        font-family: "DM Sans", Arial, Helvetica, sans-serif;
+      }
+
+      .alwaysbreak { page-break-before: always; }
+      .nobreak:before { clear:both; }
+      .nobreak { page-break-inside: avoid; }
+
+      .container {
+        padding: 0px;
+        width: 800px;
+      }
+
+      .header {
+        font-size: 32px;
+        font-weight: 700;
+        line-height: 42px;
+        letter-spacing: 0em;
+      }
+
+      .section-title {
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 17px;
+        letter-spacing: 0em;
+      }
+
+      .section-text {
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 23px;
+        letter-spacing: 0em;
+        vertical-align: top;
+        text-align: justify;
+        margin: 0;
+      }
+
+      .section-image {
+        max-width: 200px;
+        max-height: 200px;
+      }
+
+      .d-table {
+        display: table;
+        width: 100%;
+      }
+
+      .d-table-row {
+        display: table-row;
+      }
+
+      .d-table-cell {
+        display: table-cell;
+        vertical-align: top;
+      }
+
+      .mb-small {
+        margin-bottom: 10px;
+      }
+
+      .mb-medium {
+        margin-bottom: 24px;
+      }
+
+      .mb-big {
+        margin-bottom: 30px;
+      }
+
+      .ml-large {
+        margin-left: 60px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- REPORT HEADER -->
+      <div class="header mb-medium"><%= report_template.summary %></div>
+
+      <!-- SINGLE SECTION -->
+      <%- variants.each do |variant| %>
+        <div class="section d-table mb-big nobreak">
+          <!-- FIRST LINE -->
+          <div class="d-table-row">
+            <!-- TILE -->
+            <div class="d-table-cell">
+              <div class="section-title mb-small"><%= variant.title %></div>
+            </div>
+          </div>
+
+          <!-- SECOND LINE -->
+          <div class="d-table-row">
+            <!-- TEXT -->
+            <div class="d-table-cell">
+              <p class="section-text"><%= variant.content %></p>
+            </div>
+
+            <!-- IMAGE -->
+            <div class="d-table-cell">
+              <% if variant.image.attached? %>
+                <img class="section-image ml-large" src="<%= Rails.application.routes.url_helpers.url_for(variant.image) %>" />
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </body>
+</html>
