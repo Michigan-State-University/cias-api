@@ -7,20 +7,19 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let!(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
   let!(:session) { create(:session, intervention_id: intervention.id) }
-  let(:question_group) { create(:question_group, session: session) }
+  let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
   let(:audio_id) { nil }
   let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
   let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
   let(:status) { 'draft' }
+  let(:user) { participant }
 
   before do
     get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
   end
 
   context 'branching logic' do
-    let(:user) { participant }
-
     context 'returns finish screen if only question' do
       it { expect(json_response['data']['attributes']['type']).to eq 'Question::Finish' }
     end
@@ -505,6 +504,19 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].first).to eq('phonetic_audio.mp3')
         end
       end
+    end
+  end
+
+  context 'user session does not have have answers' do
+    let!(:other_session) { create(:user_session, session: session) }
+    let!(:other_user) { create(:user, :participant, :confirmed) }
+
+    before do
+      get v1_user_session_questions_url(other_session.id), headers: other_user.create_new_auth_token
+    end
+
+    it 'returns first question of session' do
+      expect(json_response['data']['id']).to eq(question.id)
     end
   end
 end

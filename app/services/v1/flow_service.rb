@@ -4,13 +4,15 @@ class V1::FlowService
   def initialize(user_session_id)
     @user_session = UserSession.find(user_session_id)
     @user = @user_session.user
-    @question = @user_session.last_answer.question
+    @question = @user_session.last_answer&.question
   end
 
   attr_reader :user
   attr_accessor :question, :user_session
 
   def next_question
+    return { question: user_session.session.first_question } if question.nil?
+
     response_question_with_warning = perform_branching_to_question
     response_question_with_warning = swap_name_mp3(response_question_with_warning)
     user_session.finish if response_question_with_warning[:question].type == 'Question::Finish'
