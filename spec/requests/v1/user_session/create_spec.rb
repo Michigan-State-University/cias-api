@@ -68,7 +68,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
       end
 
       it 'creates user session' do
-        expect { request }.to change(Team, :count).by(1)
+        expect { request }.to change(UserSession, :count).by(1)
       end
     end
 
@@ -82,7 +82,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
 
       it 'does not create user session' do
         request
-        expect { request }.to change(Team, :count).by(0)
+        expect { request }.to change(UserSession, :count).by(0)
       end
 
       it 'returns correct user_session_id' do
