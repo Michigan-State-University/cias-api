@@ -4,7 +4,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   load_and_authorize_resource :session
 
   def index
-    authorize! :read, report_templates_scope
+    authorize! :read, ReportTemplate
 
     render json: serialized_response(report_templates_scope)
   end

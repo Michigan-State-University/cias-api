@@ -5,7 +5,7 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
                                                         id_param: :section_id
 
   def index
-    authorize! :read, variants_scope
+    authorize! :read, ReportTemplate::Section::Variant
 
     render json: serialized_variant_response(variants_scope)
   end
