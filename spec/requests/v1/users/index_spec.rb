@@ -233,12 +233,12 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
     end
 
-    context 'when researcher does not have any session' do
+    context 'when researcher does not have any session but participant answered other user wuestion' do
       let!(:params) { {} }
-      let!(:session) {}
-      let!(:question_group) {}
-      let!(:question) {}
-      let!(:answer) {}
+      let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
+      let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
+      let!(:question) { create(:question_slider, question_group: question_group) }
+      let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: participant_1, session: session)) }
 
       before do
         request

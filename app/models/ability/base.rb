@@ -22,10 +22,12 @@ class Ability::Base
   end
 
   def participants_with_answers(user)
-    User.participants.select { |participant| Answer.user_answers(participant.id, logged_user_sessions(user)).any? }.pluck(:id)
+    result = logged_user_sessions(user)
+    return User.none if result.blank?
+    User.participants.select { |participant| Answer.user_answers(participant.id, result).any? }.pluck(:id)
   end
 
   def logged_user_sessions(user)
-    Session.where(intervention_id: user.interventions.select(:id))
+    Session.where(intervention_id: user.interventions.select(:id)).pluck(:id)
   end
 end
