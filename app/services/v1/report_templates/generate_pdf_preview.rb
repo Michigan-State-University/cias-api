@@ -33,8 +33,8 @@ class V1::ReportTemplates::GeneratePdfPreview
     WickedPdf.new.pdf_from_string(
       report_template_html,
       margin: {
-        top: 25,
-        bottom: 25,
+        top: 35,
+        bottom: 20,
         right: 15,
         left: 15
       },
