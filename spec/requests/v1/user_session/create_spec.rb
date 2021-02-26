@@ -3,8 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/user_sessions', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
-  let(:intervention) { create(:intervention) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:participant) { create(:user, :confirmed, :participant) }
+  let(:user) { admin }
+  let(:intervention_user) { admin }
+  let(:shared_to) {:anyone}
+  let(:status) {:draft}
+  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to) }
   let(:session) { create(:session, intervention: intervention) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -88,6 +94,53 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
       it 'returns correct user_session_id' do
         request
         expect(json_response['data']['id']).to eq(user_session.id)
+      end
+    end
+  end
+
+  context 'session access' do
+    before { post v1_user_sessions_path, params: params, headers: headers }
+
+    context 'user is admin' do
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns correct data' do
+        expect(json_response['data']['type']).to eq('user_session')
+      end
+    end
+
+    context 'user is researcher' do
+      let(:user) { researcher }
+
+      context 'access admin session' do
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'access his session' do
+        let(:intervention_user) {researcher}
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns correct data' do
+          expect(json_response['data']['type']).to eq('user_session')
+        end
+      end
+    end
+
+    context 'user is participant' do
+      let(:user) { participant }
+
+      context 'access admin session' do
+        context 'not published' do
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
       end
     end
   end

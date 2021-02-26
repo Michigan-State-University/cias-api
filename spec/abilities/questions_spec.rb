@@ -133,9 +133,9 @@ describe Question do
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
 
-      it 'can access only for questions of preview session created for preview user' do
+      it 'can\'t access only for questions of preview session created for preview user' do
         expect(subject).not_to include(team1_question1, team1_question2, team2_question1, team2_question2)
-        expect(subject).to include(prev_question)
+        expect(subject).not_to include(prev_question)
       end
     end
   end
