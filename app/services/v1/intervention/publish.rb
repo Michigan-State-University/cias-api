@@ -10,6 +10,7 @@ class V1::Intervention::Publish
     timestamp_published_at
     calculate_days_after_schedule
     delete_draft_answers
+    delete_preview_data
   end
 
   private
@@ -45,5 +46,14 @@ class V1::Intervention::Publish
     Answer.joins(question: { question_group: :session }).where(
       questions: { question_groups: { sessions: { intervention_id: intervention.id } } }
     ).destroy_all
+  end
+
+  def delete_preview_data
+    session_ids = intervention.sessions.select(:id)
+    preview_users = User.where(preview_session_id: session_ids)
+    preview_user_ids = preview_users.select(:id)
+    UserSession.where(user_id: preview_user_ids).delete_all
+    UserLogRequest.where(user_id: preview_user_ids).delete_all
+    preview_users.delete_all
   end
 end

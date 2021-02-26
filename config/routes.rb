@@ -27,6 +27,7 @@ Rails.application.routes.draw do
         resource :avatars, only: %i[create destroy]
       end
     end
+    resources :preview_session_users, only: :create
 
     resources :interventions, only: %i[index show create update] do
       post 'clone', on: :member
@@ -48,6 +49,9 @@ Rails.application.routes.draw do
           get 'resend', on: :member
         end
         resources :flows, only: %i[index]
+        resources :report_templates, only: %i[index show create update destroy] do
+          delete :remove_logo
+        end
       end
       resources :question_groups, only: %i[index show create update destroy] do
         member do
@@ -57,6 +61,21 @@ Rails.application.routes.draw do
           post :share
         end
         patch :position, on: :collection
+      end
+    end
+
+    scope module: :report_templates do
+      scope 'report_templates/:report_template_id', as: :report_template do
+        resources :sections, only: %i[index show create update destroy]
+        resource :generate_pdf_preview, only: :create
+      end
+
+      scope module: :sections do
+        scope 'report_templates/sections/:section_id', as: :report_template_section do
+          resources :variants, only: %i[index show create update destroy] do
+            delete :remove_image
+          end
+        end
       end
     end
 
@@ -79,6 +98,7 @@ Rails.application.routes.draw do
       end
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
+    post :phonetic_preview, to: 'audio#create'
   end
 
   if Rails.env.development?

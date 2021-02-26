@@ -18,6 +18,8 @@ class Answer < ApplicationRecord
     relation
   }
 
+  def on_answer; end
+
   private
 
   def type_integrity_validator

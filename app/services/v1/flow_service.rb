@@ -13,6 +13,7 @@ class V1::FlowService
 
   def answer_branching_flow
     response_question_with_warning = perform_branching_to_question
+    response_question_with_warning = swap_name_mp3(response_question_with_warning)
     user_session.finish if response_question_with_warning[:question].type == 'Question::Finish'
     response_question_with_warning
   end
@@ -61,5 +62,18 @@ class V1::FlowService
     return question_or_session.first_question if session_available_now
 
     question.question_group.session.finish_screen
+  end
+
+  def swap_name_mp3(question_with_warning)
+    question = question_with_warning[:question]
+    blocks = question.narrator['blocks']
+    blocks.map do |block|
+      next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
+      next block if user_session.name_audio.nil?
+
+      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, user_session.name_audio.url)
+      block
+    end
+    question_with_warning
   end
 end

@@ -67,6 +67,20 @@ describe Answer do
         expect(subject).to have_abilities({ manage: false }, team2_answer1)
       end
     end
+
+    context 'preview_session' do
+      let!(:preview_session) { create(:session) }
+      let!(:prev_question_group) { create(:question_group, session: preview_session) }
+      let!(:prev_question) { create(:question_multiple, question_group: prev_question_group) }
+      let!(:prev_answer) { create(:answer_multiple, question: prev_question) }
+
+      let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
+
+      it 'can create answers only for questions of preview session created for preview user' do
+        expect(subject).to have_abilities({ create: true }, prev_answer)
+        expect(subject).to have_abilities({ create: false }, team2_answer1)
+      end
+    end
   end
 
   describe '#accessible_by' do

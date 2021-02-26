@@ -46,17 +46,17 @@ describe Invitation do
       let(:user) { team1.team_admin }
 
       it 'can manage session\'s invitation of the user belonging to his team' do
-        expect(subject).to have_abilities({ create: true }, Invitation)
+        expect(subject).to have_abilities({ create: true }, described_class)
         expect(subject).to have_abilities({ read: true, update: true, destroy: true }, team1_session_invitation1)
       end
 
       it 'can manage his session\'s invitation' do
-        expect(subject).to have_abilities({ create: true }, Invitation)
+        expect(subject).to have_abilities({ create: true }, described_class)
         expect(subject).to have_abilities({ read: true, update: true, destroy: true }, team1_session_invitation2)
       end
 
       it 'can\'t manage session\'s invitation of users from another team' do
-        expect(subject).to have_abilities({ create: true }, Invitation)
+        expect(subject).to have_abilities({ create: true }, described_class)
         expect(subject).to have_abilities({ read: false, update: false, destroy: false }, team2_session_invitation1)
       end
     end

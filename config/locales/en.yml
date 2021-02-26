@@ -1,5 +1,8 @@
 en:
   hello: Hello %{full_name}
+  time:
+    formats:
+      file: '%m_%d_%Y_%H_%M_%S'
   question:
     finish:
       subtitle: Finish Screen
@@ -42,6 +45,11 @@ en:
       body:         "You've been invited to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
       button_text:  Accept the Invitation
+  report_template_mailer:
+    template_preview:
+      subject:      "PDF preview for %{report_template_name}"
+      header:       '%{report_template_name} PDF Preview'
+      body:         "Preview of the %{report_template_name} has been generated successfully and it's available as an attachment to this email."
   csv_mailer:
     answers:
       subject: "[CSV] Answers for: %{intervention_name}"
@@ -50,6 +58,10 @@ en:
       html_body: 'CSV file that you requested on %{requested_at} with data from <span style="color: #c866ea;">%{intervention_name}</span> intervention is ready to download in the e-intervention'
       button_text: Open the e-intervention
       link: '%{web_url}/interventions/%{intervention_id}'
+      preview:
+        subject: 'Preview [CSV] Answers for: %{intervention_name}'
+        header: Your preview CSV file is generated successfully
+        html_body: 'CSV that you requested on %{requested_at} with preview data from <span style="color: #c866ea;">%{intervention_name}</span> is available as attachment to this email'
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!

@@ -37,7 +37,7 @@ describe Intervention do
       end
 
       it 'can\'t manage any intervention' do
-        expect(subject).to have_abilities({ manage: false }, Intervention.new)
+        expect(subject).to have_abilities({ manage: false }, described_class.new)
       end
     end
   end
@@ -101,6 +101,19 @@ describe Intervention do
         expect(subject).not_to include(
           team1_intervention1, team1_intervention2, team2_intervention1, team2_intervention2
         )
+      end
+    end
+
+    context 'preview_session' do
+      let!(:published_intervention) { create(:intervention, :published) }
+      let!(:draft_intervention) { create(:intervention) }
+      let!(:preview_session) { create(:session, intervention: draft_intervention) }
+
+      let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
+
+      it 'can access only for draft intervention created for the preview session' do
+        expect(subject).to include(draft_intervention)
+        expect(subject).not_to include(published_intervention)
       end
     end
   end

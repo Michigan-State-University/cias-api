@@ -39,14 +39,6 @@ module ExceptionHandler
     rescue_from Dentaku::Error do |exc|
       render json: msg(exc), status: :unprocessable_entity
     end
-
-    rescue_from NameError do |exc|
-      render json: msg(exc), status: :bad_request
-    end
-
-    rescue_from NoMethodError do |exc|
-      render json: msg(exc), status: :unprocessable_entity
-    end
   end
 
   private

@@ -10,7 +10,8 @@ class Ability::TeamAdmin < Ability::Base
 
   def team_admin
     can %i[read update invite_researcher remove_researcher], Team, id: user.team_id
-    can %i[read update active], User, team_id: user.team_id
+    can %i[read update active], User, id: team_members_and_researchers_participants
+    can :create, :preview_session_user
 
     can :manage, Intervention, user_id: team_members_ids
     can :manage, UserSession, session: { intervention: { user_id: team_members_ids } }
@@ -21,9 +22,24 @@ class Ability::TeamAdmin < Ability::Base
     can :manage, QuestionGroup, session: { intervention: { user_id: team_members_ids } }
     can :manage, Question, question_group: { session: { intervention: { user_id: team_members_ids } } }
     can :manage, Answer, question: { question_group: { session: { intervention: { user_id: team_members_ids } } } }
+    can :manage, ReportTemplate, session: { intervention: { user_id: team_members_ids } }
+    can :manage, ReportTemplate::Section,
+        report_template: { session: { intervention: { user_id: team_members_ids } } }
+    can :manage, ReportTemplate::Section::Variant,
+        report_template_section: {
+          report_template: { session: { intervention: { user_id: team_members_ids } } }
+        }
   end
 
   def team_members_ids
     @team_members_ids ||= user.team.user_ids
+  end
+
+  def team_members_and_researchers_participants
+    members_ids = team_members_ids
+    User.where(id: members_ids).researchers.each do |researcher|
+      members_ids << participants_with_answers(researcher)
+    end
+    members_ids
   end
 end

@@ -32,6 +32,19 @@ RSpec.describe V1::Intervention::Publish do
       described_class.new(intervention).execute
       expect(intervention.sessions.first.question_groups.first.questions.first.answers.reload.size).to eq(0)
     end
+
+    context 'when we have preview data' do
+      let!(:preview_session_user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+      let!(:user_log_request) { create(:user_log_request, user: preview_session_user) }
+      let!(:user_session) { create(:user_session, user_id: preview_session_user.id, session_id: session.id) }
+
+      it 'clear preview users and preview user sessions' do
+        described_class.new(intervention).execute
+        expect(User.exists?(id: preview_session_user.id)).to eq false
+        expect(UserSession.exists?(id: user_session.id)).to eq false
+        expect(UserLogRequest.exists?(user_id: preview_session_user.id)).to eq false
+      end
+    end
   end
 
   context 'days after schedule calculation' do

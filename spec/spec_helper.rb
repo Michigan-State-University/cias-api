@@ -18,6 +18,7 @@
 require 'google/cloud/text_to_speech/v1/text_to_speech'
 require 'google/cloud/text_to_speech/v1/version'
 require 'faker'
+require 'active_storage_validations/matchers'
 
 class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   def audio_content
@@ -56,6 +57,8 @@ RSpec.configure do |config|
   # inherited by the metadata hash of host groups and examples, rather than
   # triggering implicit auto-inclusion in groups with matching metadata.
   config.shared_context_metadata_behavior = :apply_to_host_groups
+
+  config.include ActiveStorageValidations::Matchers
 
   config.before do
     tts_instance = instance_double(Google::Cloud::TextToSpeech::V1::TextToSpeech::Client)

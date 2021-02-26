@@ -16,7 +16,7 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest participant researcher team_admin admin].freeze
+  APP_ROLES = %w[guest participant researcher team_admin admin preview_session].freeze
 
   TIME_ZONES = ActiveSupport::TimeZone::MAPPING.values.uniq.sort.freeze
 
@@ -47,6 +47,7 @@ class User < ApplicationRecord
   scope :researchers, -> { limit_to_roles('researcher') }
   scope :from_team, ->(team_id) { where(team_id: team_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
+  scope :participants, -> { limit_to_roles('participant') }
   scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
   scope :name_contains, lambda { |substring|
@@ -55,12 +56,8 @@ class User < ApplicationRecord
 
   def self.detailed_search(params)
     scope = all
-    scope = if params.key?(:active)
-              scope.where(active: params[:active])
-            else
-              scope.limit_to_active
-            end
-    scope = scope.limit_to_roles(params[:roles])
+    scope = params[:user_roles].include?('researcher') ? scope.participants : scope.limit_to_roles(params[:roles])
+    scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
     scope = scope.from_team(params[:team_id]) if params.key?(:team_id)
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
     scope

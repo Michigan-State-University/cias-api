@@ -31,7 +31,7 @@ class SummonUsers
     end
 
     def roles
-      User::APP_ROLES - ['team_admin']
+      User::APP_ROLES - %w[team_admin preview_session]
     end
   end
 end

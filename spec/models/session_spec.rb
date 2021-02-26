@@ -9,6 +9,7 @@ RSpec.describe Session, type: :model do
     it { should belong_to(:intervention) }
     it { should have_many(:question_groups) }
     it { should have_many(:questions) }
+    it { should have_many(:report_templates).dependent(:destroy) }
     it { should be_valid }
 
     describe 'instance methods' do

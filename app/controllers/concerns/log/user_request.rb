@@ -31,5 +31,7 @@ module Log::UserRequest
     params[:user]&.delete(:password_confirmation)
     params[:image]&.delete(:file)
     params[:avatar]&.delete(:file)
+    params[:report_template]&.delete(:logo)
+    params[:variant]&.delete(:image)
   end
 end

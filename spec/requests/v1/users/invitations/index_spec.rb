@@ -39,7 +39,7 @@ describe 'GET /v1/users/invitations', type: :request do
     end
 
     it 'returns correct pending invitations size' do
-      expect(json_response['invitations'].size).to eq 1
+      expect(json_response['invitations'].size).to eq 0
     end
   end
 

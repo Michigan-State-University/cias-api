@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_03_141313) do
+ActiveRecord::Schema.define(version: 2021_02_17_125859) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -136,6 +137,38 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
     t.index ["type"], name: "index_questions_on_type"
   end
 
+  create_table "report_template_section_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "report_template_section_id", null: false
+    t.boolean "preview", default: false, null: false
+    t.string "formula_match"
+    t.string "title"
+    t.text "content"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
+    t.index ["report_template_section_id"], name: "index_variants_on_section_id"
+  end
+
+  create_table "report_template_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "formula"
+    t.uuid "report_template_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_template_id"], name: "index_report_template_sections_on_report_template_id"
+  end
+
+  create_table "report_templates", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "report_for", default: "third_party", null: false
+    t.uuid "session_id"
+    t.text "summary"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_for"], name: "index_report_templates_on_report_for"
+    t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
+    t.index ["session_id"], name: "index_report_templates_on_session_id"
+  end
+
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "intervention_id", null: false
     t.jsonb "settings"
@@ -148,6 +181,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "report_templates_count"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
@@ -194,6 +228,8 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "last_answer_at"
     t.string "timeout_job_id"
+    t.uuid "name_audio_id"
+    t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
@@ -235,11 +271,13 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "sms_notification", default: false
     t.uuid "team_id"
+    t.uuid "preview_session_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
+    t.index ["preview_session_id"], name: "index_users_on_preview_session_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
     t.index ["team_id"], name: "index_users_on_team_id"
@@ -256,6 +294,7 @@ ActiveRecord::Schema.define(version: 2021_02_03_141313) do
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
+  add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "users"
 end

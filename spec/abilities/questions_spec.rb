@@ -14,7 +14,7 @@ describe Question do
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
-      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      allow_any_instance_of(described_class).to receive(:execute_narrator).and_return(true)
 
       team1_session1 = create(:session, intervention: team1_intervention1)
       team1_session2 = create(:session, intervention: team1_intervention2)
@@ -123,6 +123,19 @@ describe Question do
         expect(subject).not_to include(
           team1_question1, team1_question2, team2_question1, team2_question2
         )
+      end
+    end
+
+    context 'preview_session' do
+      let!(:preview_session) { create(:session) }
+      let!(:prev_question_group) { create(:question_group, session: preview_session) }
+      let!(:prev_question) { create(:question_multiple, question_group: prev_question_group) }
+
+      let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
+
+      it 'can access only for questions of preview session created for preview user' do
+        expect(subject).not_to include(team1_question1, team1_question2, team2_question1, team2_question2)
+        expect(subject).to include(prev_question)
       end
     end
   end

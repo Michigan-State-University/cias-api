@@ -7,7 +7,7 @@ module Resource::Clone
       authorize! :update, model_constant
       cloned_resource = model_constant.
         find(params[:id]).
-        clone(clone_params)
+        clone(params: clone_params)
       render json: serialized_response(cloned_resource), status: :created
     end
   end
