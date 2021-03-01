@@ -75,7 +75,7 @@ describe Answer do
       let!(:prev_answer) { create(:answer_multiple, question: prev_question, user_session: user_session) }
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
-      let!(:user_session) { create(:user_session, user: user, session: preview_session)}
+      let!(:user_session) { create(:user_session, user: user, session: preview_session) }
 
       it 'can\'t create answers only for questions of preview session created for preview user' do
         expect(subject).to have_abilities({ create: true }, prev_answer)

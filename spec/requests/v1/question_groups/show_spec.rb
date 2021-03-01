@@ -12,6 +12,7 @@ describe 'GET /v1/sessions/:session_id/question_groups/:id', type: :request do
   context 'when authenticated as admin user' do
     let(:guest_user) { create(:user, :admin) }
     let(:headers)    { guest_user.create_new_auth_token }
+
     it 'returns serialized question_group' do
       request
 

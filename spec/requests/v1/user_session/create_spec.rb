@@ -6,12 +6,16 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:participant) { create(:user, :confirmed, :participant) }
+  let(:guest) { create(:user, :confirmed, :guest) }
+  let(:preview_session) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
   let(:user) { admin }
   let(:intervention_user) { admin }
-  let(:shared_to) {:anyone}
-  let(:status) {:draft}
-  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to) }
+  let(:shared_to) { :anyone }
+  let(:status) { :draft }
+  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations) }
   let(:session) { create(:session, intervention: intervention) }
+  let(:invitations) { [] }
+
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
@@ -121,7 +125,8 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
       end
 
       context 'access his session' do
-        let(:intervention_user) {researcher}
+        let(:intervention_user) { researcher }
+
         it 'returns correct http status' do
           expect(response).to have_http_status(:ok)
         end
@@ -134,12 +139,107 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
 
     context 'user is participant' do
       let(:user) { participant }
+      let(:status) { :published }
 
-      context 'access admin session' do
-        context 'not published' do
+      context 'access admin session shared to anyone with the link' do
+        %w[draft closed archived].each do |status|
+          context "intervention status is #{status}" do
+            let(:status) { status }
+
+            it 'returns correct http status' do
+              expect(response).to have_http_status(:forbidden)
+            end
+          end
+        end
+        context 'intervention status is published' do
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+
+      context 'shared to only registered participants' do
+        let(:shared_to) { :registered }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'shared to only invited registered participants' do
+        let(:shared_to) { :invited }
+
+        context 'participant was not invited' do
           it 'returns correct http status' do
             expect(response).to have_http_status(:forbidden)
           end
+        end
+
+        context 'participant was invited' do
+          let(:invitations) { [build(:intervention_invitation, email: participant.email)] }
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+
+    context 'user is guest' do
+      let(:user) { guest }
+      let(:status) { :published }
+
+      context 'shared to anyone' do
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'shared to only registered participants' do
+        let(:shared_to) { :registered }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'shared to only invited registered participants' do
+        let(:shared_to) { :invited }
+
+        context 'participant was not invited' do
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+
+        context 'participant was invited' do
+          let(:invitations) { [build(:intervention_invitation, email: guest.email)] }
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+      end
+    end
+
+    context 'user is preview session' do
+      let(:user) { preview_session }
+
+      %w[published closed archived].each do |status|
+        context "intervention status is #{status}" do
+          let(:status) { status }
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+      end
+
+      context 'intervention status is draft' do
+        let(:status) { :draft }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
         end
       end
     end
