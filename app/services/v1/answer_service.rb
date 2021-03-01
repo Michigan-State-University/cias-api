@@ -7,7 +7,7 @@ class V1::AnswerService
 
   attr_reader :user
 
-  def create(question_id, answer_params)
+  def create(user_session_id, question_id, answer_params)
     user_session = UserSession.find(user_session_id)
     answer = answer_params[:type].constantize.where(question_id: question_id, user_session_id: user_session.id)
                    .order(:created_at)
