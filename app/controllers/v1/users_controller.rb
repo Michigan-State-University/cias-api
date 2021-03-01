@@ -2,25 +2,28 @@
 
 class V1::UsersController < V1Controller
   def index
-    collection = users_scope.detailed_search(params).order(created_at: :desc)
+    authorize! :index, current_v1_user
+
+    collection = users_scope.detailed_search(params.merge('user_roles': current_v1_user.roles)).order(created_at: :desc)
     paginated_collection = paginate(collection, params)
     render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
   end
 
   def show
-    render_json user: user_load
+    render_json user: user_service.user_load(user_id)
   end
 
   def update
     authorize_update_abilities
 
-    user_load.update!(user_params)
-    invalidate_cache(user_load)
-    render_json user: user_load, action: :show
+    user = user_service.user_load(user_id)
+    user.update!(user_params)
+    invalidate_cache(user)
+    render_json user: user, action: :show
   end
 
   def destroy
-    user_load.deactivate!
+    user_service.user_load(user_id).deactivate!
     head :no_content
   end
 
@@ -49,25 +52,35 @@ class V1::UsersController < V1Controller
 
   private
 
-  def users_scope
-    User.accessible_by(current_ability)
+  def user_service
+    @user_service ||= V1::UserService.new(current_v1_user)
   end
 
-  def user_load
-    users_scope.find(params[:id])
+  def users_scope
+    user_service.users_scope
+  end
+
+  def user_id
+    params[:id]
   end
 
   def user_params
-    params.require(:user).permit(
-      :first_name,
-      :last_name,
-      :email,
-      :sms_notification,
-      :time_zone,
-      :active,
-      roles: [],
-      phone_attributes: %i[iso prefix number]
-    )
+    if (current_v1_user.roles & %w[team_admin researcher]).present? && current_v1_user.id != user_id
+      params.require(:user).permit(
+          :active
+      )
+    else
+      params.require(:user).permit(
+          :first_name,
+          :last_name,
+          :email,
+          :sms_notification,
+          :time_zone,
+          :active,
+          roles: [],
+          phone_attributes: %i[iso prefix number]
+      )
+    end
   end
 
   def query_string_digest
@@ -75,9 +88,10 @@ class V1::UsersController < V1Controller
   end
 
   def authorize_update_abilities
-    authorize! :update, user_load
+    user = user_service.user_load(user_id)
+    authorize! :update, user
     %i[active roles].each do |attr|
-      authorize! attr, user_load unless user_params[attr].nil?
+      authorize! attr, user unless user_params[attr].nil?
     end
   end
 end

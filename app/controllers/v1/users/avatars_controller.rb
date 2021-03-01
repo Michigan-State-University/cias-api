@@ -2,7 +2,7 @@
 
 class V1::Users::AvatarsController < V1Controller
   def create
-    authorize! :update, user_load
+    authorize_user
 
     user_load.update!(avatar: avatar_params[:file])
     invalidate_cache(user_load)
@@ -10,7 +10,7 @@ class V1::Users::AvatarsController < V1Controller
   end
 
   def destroy
-    authorize! :update, user_load
+    authorize_user
 
     user_load.avatar.purge
     invalidate_cache(user_load)
@@ -18,6 +18,12 @@ class V1::Users::AvatarsController < V1Controller
   end
 
   private
+
+  def authorize_user
+    raise CanCan::AccessDenied.new if current_v1_user.role?('researcher') && current_v1_user.id != params[:user_id]
+
+    authorize! :update, user_load
+  end
 
   def user_load
     User.accessible_by(current_ability).find(params[:user_id])

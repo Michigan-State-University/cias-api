@@ -266,4 +266,36 @@ RSpec.describe Answer, type: :model do
       it { expect(wrong_type.save).to eq false }
     end
   end
+
+  describe 'Answer::ParticipantReport' do
+    describe 'expected behaviour' do
+      subject { create(:answer_participant_report) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_participant_report, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
+
+  describe 'Answer::ThirdParty' do
+    describe 'expected behaviour' do
+      subject { create(:answer_third_party) }
+
+      it { should belong_to(:question) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_third_party, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
 end

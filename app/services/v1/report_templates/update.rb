@@ -14,8 +14,6 @@ class V1::ReportTemplates::Update
     report_template.update!(
       params
     )
-
-    report_template.reload
   end
 
   private

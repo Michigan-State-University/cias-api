@@ -1,5 +1,8 @@
 en:
   hello: Hello %{full_name}
+  time:
+    formats:
+      file: '%m_%d_%Y_%H_%M_%S'
   question:
     finish:
       subtitle: Finish Screen
@@ -42,6 +45,11 @@ en:
       body:         "You've been invited to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
       button_text:  Accept the Invitation
+  report_template_mailer:
+    template_preview:
+      subject:      "PDF preview for %{report_template_name}"
+      header:       '%{report_template_name} PDF Preview'
+      body:         "Preview of the %{report_template_name} has been generated successfully and it's available as an attachment to this email."
   csv_mailer:
     answers:
       subject: "[CSV] Answers for: %{intervention_name}"

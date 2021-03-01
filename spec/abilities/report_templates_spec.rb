@@ -45,7 +45,7 @@ describe ReportTemplate do
       let(:user) { team1.team_admin }
 
       it 'can manage report_template of the user belonging to his team' do
-        expect(subject).to have_abilities({ manage: true }, team1_report_template1)
+        expect(subject).to have_abilities({ manage: true, generate_pdf_preview: true }, team1_report_template1)
         expect(subject).to have_abilities(
           { create: false },
           described_class.new(session_id: team2_intervention2.sessions.first.id)
@@ -53,7 +53,7 @@ describe ReportTemplate do
       end
 
       it 'can manage his report_template' do
-        expect(subject).to have_abilities({ manage: true }, team1_report_template2)
+        expect(subject).to have_abilities({ manage: true, generate_pdf_preview: true }, team1_report_template2)
       end
 
       it 'can\'t manage report_template of users from another team' do
@@ -65,12 +65,12 @@ describe ReportTemplate do
       let(:user) { team1_researcher }
 
       it 'can manage report_template of the session that belongs to him' do
-        expect(subject).to have_abilities({ manage: true }, team1_report_template2)
+        expect(subject).to have_abilities({ manage: true, generate_pdf_preview: true }, team1_report_template2)
       end
 
       it 'can\'t manage report_template of other users' do
-        expect(subject).to have_abilities({ manage: false }, team1_report_template1)
-        expect(subject).to have_abilities({ manage: false }, team2_report_template1)
+        expect(subject).to have_abilities({ manage: false, generate_pdf_preview: false }, team1_report_template1)
+        expect(subject).to have_abilities({ manage: false, generate_pdf_preview: false }, team2_report_template1)
       end
 
       it 'can\'t create report template in other users session' do

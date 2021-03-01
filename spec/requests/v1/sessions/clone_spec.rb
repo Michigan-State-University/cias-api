@@ -33,6 +33,29 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                              ] })
   end
 
+  let!(:question_5) do
+    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 5', position: 2,
+                             narrator: {
+                               blocks: [
+                                 {
+                                   action: 'NO_ACTION',
+                                   question_id: question_3.id,
+                                   reflections: [],
+                                   animation: 'pointUp',
+                                   type: 'Reflection',
+                                   endPosition: {
+                                     x: 0,
+                                     y: 600
+                                   }
+                                 }
+                               ],
+                               settings: {
+                                 voice: true,
+                                 animation: true
+                               }
+                             })
+  end
+
   context 'when auth' do
     context 'is invalid' do
       before { post v1_clone_session_path(id: session.id) }
@@ -157,6 +180,25 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
             'patterns' => [
               { 'match' => '=11', 'target' => { 'id' => cloned_questions_collection.first.id, 'type' => 'Question::Single' } }
             ]
+          }
+        ),
+        include(
+          'subtitle' => 'Question Subtitle 5',
+          'position' => 2,
+          'body' => include(
+            'variable' => { 'name' => '' }
+          ),
+          'narrator' => {
+            'blocks' => [
+              {
+                'type' => 'Reflection', 'question_id' => cloned_questions_collection.third.id, 'action' => 'NO_ACTION', 'reflections' => [],
+                'animation' => 'pointUp', 'endPosition' => { 'x' => 0, 'y' => 600 }
+              }
+            ],
+            'settings' => {
+              'voice' => true,
+              'animation' => true
+            }
           }
         ),
         include(

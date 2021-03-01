@@ -10,6 +10,14 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
   let!(:report_template1) { create(:report_template, :with_logo, session: session) }
   let!(:report_template2) { create(:report_template, :with_logo, session: session) }
 
+  let!(:section) { create(:report_template_section, report_template: report_template1) }
+  let!(:variant1) do
+    create(:report_template_section_variant, report_template_section: section)
+  end
+  let!(:variant2) do
+    create(:report_template_section_variant, report_template_section: section)
+  end
+
   before do
     get v1_session_report_templates_path(session_id: session.id), headers: headers
   end
@@ -29,7 +37,29 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
           'summary' => report_template1.summary,
           'logo_url' => include(report_template1.logo.name),
           'session_id' => session.id
-        )
+        ),
+        'relationships' => {
+          'sections' => {
+            'data' => [
+              include(
+                'id' => section.id,
+                'type' => 'section'
+              )
+            ]
+          },
+          'variants' => {
+            'data' => [
+              include(
+                'id' => variant1.id,
+                'type' => 'variant'
+              ),
+              include(
+                'id' => variant2.id,
+                'type' => 'variant'
+              )
+            ]
+          }
+        }
       ).and include(
         'id' => report_template2.id.to_s,
         'type' => 'report_template',
@@ -39,7 +69,11 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
           'summary' => report_template2.summary,
           'logo_url' => include(report_template2.logo.name),
           'session_id' => session.id
-        )
+        ),
+        'relationships' => {
+          'sections' => { 'data' => [] },
+          'variants' => { 'data' => [] }
+        }
       )
     end
   end

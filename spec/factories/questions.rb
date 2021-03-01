@@ -584,4 +584,48 @@ FactoryBot.define do
       body { { data: [] } }
     end
   end
+
+  factory :question_participant_report, class: Question::ParticipantReport do
+    title { 'ParticipantReport' }
+    type { Question::ParticipantReport }
+    body do
+      {
+        data: [
+          {
+            payload: ''
+          }
+        ],
+        variable: {
+          name: ''
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
+
+  factory :question_third_party, class: Question::ThirdParty do
+    title { 'Third party' }
+    type { Question::ThirdParty }
+    body do
+      {
+        data: [
+          {
+            payload: '',
+            value: ''
+          }
+        ]
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
 end

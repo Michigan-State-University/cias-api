@@ -169,6 +169,21 @@ RSpec.describe Question, type: :model do
     end
   end
 
+  describe 'Question::ParticipantReport' do
+    describe 'expected behaviour' do
+      subject(:question_participant_report) { build(:question_participant_report) }
+
+      it { should belong_to(:question_group) }
+      it { should be_valid }
+    end
+
+    describe 'fails when body is empty' do
+      let(:with_empty) { build(:question_participant_report, :body_data_empty) }
+
+      it { expect(with_empty.save).to eq false }
+    end
+  end
+
   describe 'callbacks' do
     context 'after_create' do
       context 'when question has type Question::Finish' do

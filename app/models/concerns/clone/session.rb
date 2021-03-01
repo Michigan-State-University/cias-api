@@ -6,6 +6,7 @@ class Clone::Session < Clone::Base
     create_question_groups
     outcome.save!
     reassign_branching
+    reassign_reflections
     outcome
   end
 
@@ -51,5 +52,21 @@ class Clone::Session < Clone::Base
            .joins(:question_group)
            .where(question_groups: { position: target.question_group.position })
            .find_by!(position: target.position).id
+  end
+
+  def reassign_reflections
+    outcome_questions.each do |question|
+      question.narrator['blocks'].each do |block|
+        next block unless block['type'] == 'Reflection'
+
+        reflection_question_id = block['question_id']
+
+        next block if reflection_question_id.nil?
+
+        matched_reflection_question_id = matching_question_id(reflection_question_id)
+        block['question_id'] = matched_reflection_question_id
+      end
+      question.save!
+    end
   end
 end

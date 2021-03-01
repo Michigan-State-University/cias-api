@@ -137,5 +137,25 @@ FactoryBot.define do
         body { { data: [] } }
       end
     end
+    factory :answer_participant_report, class: Answer::ParticipantReport do
+      type { Answer::ParticipantReport }
+      association :question, factory: :question_participant_report
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
+    end
+    factory :answer_third_party, class: Answer::ThirdParty do
+      type { Answer::ThirdParty }
+      association :question, factory: :question_third_party
+      trait :wrong_type do
+        association :question, factory: :question_multiple
+      end
+      trait :body_data_empty do
+        body { { data: [] } }
+      end
+    end
   end
 end

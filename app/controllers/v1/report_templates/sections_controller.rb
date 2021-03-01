@@ -4,7 +4,7 @@ class V1::ReportTemplates::SectionsController < V1Controller
   load_and_authorize_resource :report_template
 
   def index
-    authorize! :read, sections_scope
+    authorize! :read, ReportTemplate::Section
 
     render json: serialized_section_response(sections_scope)
   end
@@ -31,7 +31,10 @@ class V1::ReportTemplates::SectionsController < V1Controller
 
     section.update!(formula: section_params[:formula])
 
-    render json: serialized_section_response(section.reload)
+    render json: V1::ReportTemplate::SectionSerializer.new(
+      section.reload,
+      { include: %i[variants] }
+    )
   end
 
   def destroy
