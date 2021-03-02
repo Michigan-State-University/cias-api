@@ -46,7 +46,8 @@ class V1::FlowService
       warning = obj_src if obj_src.is_a?(String)
       next_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
     end
-    next_question.perform_narrator_reflection(answers_var_values)
+
+    next_question = perform_narrator_reflections(next_question, answers_var_values)
     question_another_or_feedback = question.another_or_feedback(next_question, answers_var_values)
     { question: question_another_or_feedback, warning: warning }
   end
@@ -76,5 +77,24 @@ class V1::FlowService
       block
     end
     question_with_warning
+  end
+
+  def perform_narrator_reflections(next_question, answers_var_values)
+    next_question.narrator['blocks']&.each_with_index do |block, index|
+      next unless %w[Reflection ReflectionFormula].include?(block['type'])
+
+      next_question.narrator['blocks'][index]['target_value'] = prepare_block_target_value(next_question, answers_var_values, block)
+    end
+    next_question
+  end
+
+  def prepare_block_target_value(next_question, answers_var_values, block)
+    return next_question.exploit_formula(answers_var_values, block['payload'], block['reflections']) if block['type'].eql?('ReflectionFormula')
+
+    matched_reflections = []
+    block['reflections'].each do |reflection|
+      matched_reflections.push(reflection) if answers_var_values.key?(reflection['variable']) && answers_var_values[reflection['variable']].eql?(reflection['value'])
+    end
+    matched_reflections
   end
 end
