@@ -5,18 +5,19 @@ class V1::FlowService
     @user_session = UserSession.find(user_session_id)
     @user = @user_session.user
     @question = @user_session.last_answer&.question
+    @warning = ''
   end
 
   attr_reader :user
-  attr_accessor :question, :user_session
+  attr_accessor :question, :user_session, :warning
 
   def next_question
     return { question: user_session.session.first_question } if question.nil?
 
-    response_question_with_warning = perform_branching_to_question
-    response_question_with_warning = swap_name_mp3(response_question_with_warning)
-    user_session.finish if response_question_with_warning[:question].type == 'Question::Finish'
-    response_question_with_warning
+    response_question = perform_branching_to_question
+    response_question = swap_name_mp3(response_question)
+    user_session.finish if response_question.type == 'Question::Finish'
+    { question: response_question, warning: self.warning }
   end
 
   def retrieve_previous_and_current_answers
@@ -37,19 +38,18 @@ class V1::FlowService
 
   def perform_branching_to_question
     answers_var_values = collect_var_values
-    warning = ''
     return nil if question.id.eql?(question.position_equal_or_higher.last.id)
 
     next_question = question.position_equal_or_higher[1]
     if question.formula['payload'].present?
       obj_src = question.exploit_formula(answers_var_values)
-      warning = obj_src if obj_src.is_a?(String)
+      self.warning = obj_src if obj_src.is_a?(String)
       next_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
     end
 
     next_question = perform_narrator_reflections(next_question, answers_var_values)
-    question_another_or_feedback = question.another_or_feedback(next_question, answers_var_values)
-    { question: question_another_or_feedback, warning: warning }
+    question.another_or_feedback(next_question, answers_var_values)
+
   end
 
   def branching_source_to_question(source)
@@ -66,8 +66,7 @@ class V1::FlowService
     question.question_group.session.finish_screen
   end
 
-  def swap_name_mp3(question_with_warning)
-    question = question_with_warning[:question]
+  def swap_name_mp3(question)
     blocks = question.narrator['blocks']
     blocks.map do |block|
       next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
@@ -76,7 +75,7 @@ class V1::FlowService
       block = question.send("swap_name_into_#{block['type'].downcase}_block", block, user_session.name_audio.url)
       block
     end
-    question_with_warning
+    question
   end
 
   def perform_narrator_reflections(next_question, answers_var_values)
@@ -93,6 +92,11 @@ class V1::FlowService
 
     matched_reflections = []
     block['reflections'].each do |reflection|
+      if reflection['variable'].eql?('') || reflection['value'].eql?('')
+          self.warning = 'ReflectionMissMatch'
+        return []
+      end
+
       matched_reflections.push(reflection) if answers_var_values.key?(reflection['variable']) && answers_var_values[reflection['variable']].eql?(reflection['value'])
     end
     matched_reflections
