@@ -18,6 +18,7 @@ module FormulaInterface
       matched_pattern = parser_runtime.evaluate!("#{calculated_formula} #{pattern['match']}")
       return pattern if matched_pattern
     end
+    nil
   rescue Dentaku::ZeroDivisionError
     ZERO_DIVISION_ERROR
   rescue StandardError
