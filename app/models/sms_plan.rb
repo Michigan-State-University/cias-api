@@ -2,6 +2,7 @@
 
 class SmsPlan < ApplicationRecord
   belongs_to :session, counter_cache: true
+  has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
 
   validates :name, :schedule, :frequency, presence: true
 

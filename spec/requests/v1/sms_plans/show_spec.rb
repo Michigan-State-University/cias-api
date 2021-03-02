@@ -9,6 +9,7 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
 
   context 'when there is a sms plan with given id' do
     let!(:sms_plan) { create(:sms_plan) }
+    let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
     let!(:sms_plan_id) { sms_plan.id }
 
     before do
@@ -19,11 +20,19 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'returns sms plan' do
+    it 'returns sms plan with variant data' do
       expect(json_response['data']).to include(
         'id' => sms_plan_id.to_s,
         'type' => 'sms_plan',
         'attributes' => include('name' => sms_plan.name)
+      )
+      expect(json_response['included']).to include(
+        'id' => variant.id,
+        'type' => 'variant',
+        'attributes' => include(
+          'formula_match' => variant.formula_match,
+          'content' => variant.content
+        )
       )
     end
   end

@@ -30,6 +30,7 @@ class Ability::TeamAdmin < Ability::Base
           report_template: { session: { intervention: { user_id: team_members_ids } } }
         }
     can :manage, SmsPlan, session_id: team_session_ids
+    can :manage, SmsPlan::Variant, sms_plan: { session_id: team_session_ids }
   end
 
   def team_members_ids

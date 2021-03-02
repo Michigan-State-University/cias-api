@@ -8,7 +8,7 @@ class V1::SmsPlansController < V1Controller
   end
 
   def show
-    render json: serialized_response(sms_plan)
+    render json: V1::SmsPlanSerializer.new(sms_plan, { include: [:variants] })
   end
 
   def create

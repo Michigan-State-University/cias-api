@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_24_090600) do
+ActiveRecord::Schema.define(version: 2021_02_25_111040) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -201,6 +201,15 @@ ActiveRecord::Schema.define(version: 2021_02_24_090600) do
     t.index ["name"], name: "index_sessions_on_name"
     t.index ["schedule"], name: "index_sessions_on_schedule"
     t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
+  end
+
+  create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "sms_plan_id"
+    t.string "formula_match"
+    t.text "content"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
   end
 
   create_table "sms_plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

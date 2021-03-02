@@ -65,6 +65,12 @@ Rails.application.routes.draw do
       end
     end
 
+    scope module: 'sms_plans' do
+      scope 'sms_plans/:sms_plan_id', as: :sms_plan do
+        resources :variants
+      end
+    end
+
     scope module: :report_templates do
       scope 'report_templates/:report_template_id', as: :report_template do
         resources :sections, only: %i[index show create update destroy]
