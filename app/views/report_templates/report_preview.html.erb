@@ -92,6 +92,8 @@
 
       <!-- SINGLE SECTION -->
       <%- variants.each do |variant| %>
+        <% next if variant.content.blank? && variant.title.blank? %>
+
         <div class="section d-table mb-big nobreak">
           <!-- FIRST LINE -->
           <div class="d-table-row">

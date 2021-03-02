@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe ReportTemplate, type: :model do
   it { should belong_to(:session) }
+  it { should have_many(:generated_reports) }
 
   describe '#name' do
     context 'name is unique for a session' do

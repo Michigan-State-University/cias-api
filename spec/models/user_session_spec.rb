@@ -9,6 +9,7 @@ RSpec.describe UserSession, type: :model do
     it { should belong_to(:user) }
     it { should belong_to(:session) }
     it { should have_many(:answers) }
+    it { should have_many(:generated_reports) }
     it { should be_valid }
   end
 

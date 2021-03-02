@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_17_125859) do
+ActiveRecord::Schema.define(version: 2021_02_24_080048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -55,6 +55,20 @@ ActiveRecord::Schema.define(version: 2021_02_17_125859) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+  end
+
+  create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.uuid "report_template_id"
+    t.uuid "user_session_id"
+    t.string "report_for", default: "third_party", null: false
+    t.boolean "shown_for_participant", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["report_for"], name: "index_generated_reports_on_report_for"
+    t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"
+    t.index ["shown_for_participant"], name: "index_generated_reports_on_shown_for_participant"
+    t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
   end
 
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

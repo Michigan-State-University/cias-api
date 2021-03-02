@@ -5,6 +5,7 @@ class UserSession < ApplicationRecord
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
   belongs_to :name_audio, class_name: 'Audio', optional: true
+  has_many :generated_reports, dependent: :destroy
 
   before_destroy :decrement_audio_usage
 
@@ -13,6 +14,8 @@ class UserSession < ApplicationRecord
 
     cancel_timeout_job
     update(finished_at: DateTime.current)
+
+    GenerateUserSessionReportsJob.perform_later(id)
 
     decrement_audio_usage
     V1::UserSessionScheduleService.new(self).schedule if send_email
@@ -29,6 +32,14 @@ class UserSession < ApplicationRecord
 
     UserSessionTimeoutJob.cancel(timeout_job_id)
     update(timeout_job_id: nil)
+  end
+
+  def all_var_values
+    answers.each_with_object({}) do |answer, var_values|
+      answer.body_data.each do |obj|
+        var_values[obj['var']] = obj['value']
+      end
+    end
   end
 
   private
