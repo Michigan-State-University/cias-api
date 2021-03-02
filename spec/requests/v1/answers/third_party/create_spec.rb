@@ -6,7 +6,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user_id: researcher.id) }
   let(:session) { create(:session, intervention_id: intervention.id) }
-  let(:user_session) {create(:user_session, session: session, user: researcher)}
+  let(:user_session) { create(:user_session, session: session, user: researcher) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_third_party, question_group: question_group) }
   let(:params) do
@@ -21,7 +21,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answers', type: :request do
           ]
         }
       },
-      question_id: question.id,
+      question_id: question.id
     }
   end
 

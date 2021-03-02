@@ -35,6 +35,14 @@ class UserSession < ApplicationRecord
     answers.order(:created_at).last
   end
 
+  def all_var_values
+    answers.each_with_object({}) do |answer, var_values|
+      answer.body_data.each do |obj|
+        var_values[obj['var']] = obj['value']
+      end
+    end
+  end
+
   private
 
   def session_next
