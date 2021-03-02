@@ -29,6 +29,7 @@ class Ability::TeamAdmin < Ability::Base
         report_template_section: {
           report_template: { session: { intervention: { user_id: team_members_ids } } }
         }
+    can :manage, SmsPlan, session_id: team_session_ids
   end
 
   def team_members_ids
@@ -41,5 +42,9 @@ class Ability::TeamAdmin < Ability::Base
       members_ids << participants_with_answers(researcher)
     end
     members_ids
+  end
+
+  def team_session_ids
+    Session.joins(:intervention).where(interventions: { user_id: team_members_ids }).select(:id)
   end
 end

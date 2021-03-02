@@ -26,5 +26,6 @@ class Ability::Researcher < Ability::Base
         report_template_section: {
           report_template: { session: { intervention: { user_id: user.id } } }
         }
+    can :manage, SmsPlan, session_id: logged_user_sessions(user)
   end
 end

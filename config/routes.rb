@@ -48,6 +48,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
+        resources :sms_plans, only: :index
         resources :flows, only: %i[index]
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
@@ -99,6 +100,7 @@ Rails.application.routes.draw do
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
     post :phonetic_preview, to: 'audio#create'
+    resources :sms_plans
   end
 
   if Rails.env.development?

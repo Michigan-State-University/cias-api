@@ -1,0 +1,19 @@
+# frozen_string_literal: true
+
+class SmsPlan < ApplicationRecord
+  belongs_to :session, counter_cache: true
+
+  validates :name, :schedule, :frequency, presence: true
+
+  enum schedule: {
+    days_after_session_end: 'days_after_session_end',
+    after_session_end: 'after_session_end'
+  }, _suffix: true
+
+  enum frequency: {
+    once: 'once',
+    once_a_day: 'once_a_day',
+    once_a_week: 'once_a_week',
+    once_a_month: 'once_a_month'
+  }, _suffix: true
+end

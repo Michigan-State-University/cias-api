@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_24_080048) do
+ActiveRecord::Schema.define(version: 2021_02_24_090600) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -196,11 +195,27 @@ ActiveRecord::Schema.define(version: 2021_02_24_080048) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "report_templates_count"
+    t.integer "sms_plans_count", default: 0, null: false
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
     t.index ["schedule"], name: "index_sessions_on_schedule"
     t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
+  end
+
+  create_table "sms_plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "session_id"
+    t.string "name", null: false
+    t.string "schedule", null: false
+    t.integer "schedule_payload"
+    t.string "frequency", default: "once", null: false
+    t.datetime "end_at"
+    t.string "formula"
+    t.text "no_formula_text"
+    t.boolean "is_used_formula", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
