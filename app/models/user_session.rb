@@ -5,6 +5,7 @@ class UserSession < ApplicationRecord
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
   belongs_to :name_audio, class_name: 'Audio', optional: true
+  has_many :generated_reports, dependent: :destroy
 
   before_destroy :decrement_audio_usage
 
@@ -13,6 +14,8 @@ class UserSession < ApplicationRecord
 
     cancel_timeout_job
     update(finished_at: DateTime.current)
+
+    GenerateUserSessionReportsJob.perform_later(id)
 
     decrement_audio_usage
     V1::UserSessionScheduleService.new(self).schedule if send_email

@@ -11,6 +11,8 @@ class Session < ApplicationRecord
   has_many :question_groups, dependent: :destroy, inverse_of: :session
   has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
   has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
+  has_many :sms_plans, dependent: :destroy
+
   has_many :questions, dependent: :destroy, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy

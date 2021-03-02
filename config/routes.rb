@@ -48,6 +48,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
+        resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
         end
@@ -60,6 +61,12 @@ Rails.application.routes.draw do
           post :share
         end
         patch :position, on: :collection
+      end
+    end
+
+    scope module: 'sms_plans' do
+      scope 'sms_plans/:sms_plan_id', as: :sms_plan do
+        resources :variants
       end
     end
 
@@ -102,6 +109,7 @@ Rails.application.routes.draw do
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
     post :phonetic_preview, to: 'audio#create'
+    resources :sms_plans
   end
 
   if Rails.env.development?
