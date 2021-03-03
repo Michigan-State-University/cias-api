@@ -47,7 +47,7 @@ RSpec.describe V1::GeneratedReports::Create do
           change(ActiveStorage::Blob, :count).by(1)
 
       expect(generated_report).to have_attributes(
-        name: include(report_template.name),
+        name: include('Report'),
         user_session_id: user_session.id,
         report_template_id: report_template.id,
         report_for: report_template.report_for,

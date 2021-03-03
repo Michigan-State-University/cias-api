@@ -31,7 +31,7 @@ class V1::GeneratedReports::Create
 
     GeneratedReport.transaction do
       generated_report = GeneratedReport.create!(
-        name: report_name(report_template),
+        name: report_name,
         user_session_id: user_session.id,
         report_template_id: report_template.id,
         report_for: report_template.report_for,
@@ -40,7 +40,7 @@ class V1::GeneratedReports::Create
 
       MetaOperations::FilesKeeper.new(
         stream: render_pdf_report(variants_to_generate),
-        add_to: generated_report, filename: report_name(report_template),
+        add_to: generated_report, filename: report_name,
         macro: :pdf_report, ext: :pdf, type: 'application/pdf'
       ).execute
     end
@@ -91,7 +91,7 @@ class V1::GeneratedReports::Create
     variants_to_generate.each { |variant| variant.content.gsub!('.:name:.', name_variable) }
   end
 
-  def report_name(report_template)
-    @report_name ||= "#{report_template.name} #{I18n.l(Time.current, format: :file)}"
+  def report_name
+    @report_name ||= "Report #{I18n.l(Time.current, format: :file)}"
   end
 end

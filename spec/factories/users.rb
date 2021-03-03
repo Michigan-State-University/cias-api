@@ -34,6 +34,10 @@ FactoryBot.define do
       roles { %w[researcher] }
     end
 
+    trait :third_party do
+      roles { %w[third_party] }
+    end
+
     trait :team_admin do
       roles { %w[team_admin] }
       team_id { create(:team).id }

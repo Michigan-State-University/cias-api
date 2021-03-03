@@ -28,5 +28,7 @@ class Ability::Researcher < Ability::Base
         }
     can :manage, SmsPlan, session_id: logged_user_sessions(user)
     can :manage, SmsPlan::Variant, sms_plan: { session_id: logged_user_sessions(user) }
+    can :read, GeneratedReport,
+        user_session: { session: { intervention: { user_id: user.id } } }
   end
 end

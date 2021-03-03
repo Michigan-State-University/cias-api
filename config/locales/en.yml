@@ -2,7 +2,7 @@ en:
   hello: Hello %{full_name}
   time:
     formats:
-      file: '%m_%d_%Y_%H_%M_%S'
+      file: '%m_%d_%Y'
   question:
     finish:
       subtitle: Finish Screen

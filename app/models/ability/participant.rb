@@ -14,5 +14,7 @@ class Ability::Participant < Ability::Base
     can :read, QuestionGroup, session: { intervention_id: Intervention.available_for_participant(user.email) }
     can :read, Question, question_group: { session: { intervention_id: Intervention.available_for_participant(user.email) } }
     can :manage, Answer, question: { question_group: { session: { intervention_id: Intervention.available_for_participant(user.email) } } }
+    can :read, GeneratedReport, user_session: { user_id: user.id }, report_for: 'participant',
+                                shown_for_participant: true
   end
 end
