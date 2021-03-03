@@ -60,32 +60,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
       context 'intervention is allowed for anyone or registered users' do
         let(:shared_to) { %w[anyone registered].sample }
 
-        it 'contains proper sessions collection' do
-          expect(json_response['sessions_size']).to eq sessions.size
-        end
-
-        context 'when intervention does not contain any report' do
-          it 'contains proper attributes' do
-            expect(json_response).to include(
-              'name' => 'Some intervention',
-              'shared_to' => shared_to,
-              'csv_link' => nil,
-              'csv_generated_at' => nil
-            )
-          end
-        end
-
-        context 'when intervention contains some report' do
-          let!(:reports) { [csv_attachment] }
-
-          it 'contains proper attributes' do
-            expect(json_response).to include(
-              'name' => 'Some intervention',
-              'shared_to' => shared_to,
-              'csv_link' => include('test_empty.csv'),
-              'csv_generated_at' => be_present
-            )
-          end
+        it 'returns :not_found http status code' do
+          expect(response).to have_http_status(:not_found)
         end
       end
 
@@ -107,32 +83,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
           before { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
 
-          it 'contains proper sessions collection' do
-            expect(json_response['sessions_size']).to eq sessions.size
-          end
-
-          context 'when intervention does not contain any report' do
-            it 'contains proper attributes' do
-              expect(json_response).to include(
-                'name' => 'Some intervention',
-                'shared_to' => shared_to,
-                'csv_link' => nil,
-                'csv_generated_at' => nil
-              )
-            end
-          end
-
-          context 'when intervention contains some report' do
-            let!(:reports) { [csv_attachment] }
-
-            it 'contains proper attributes' do
-              expect(json_response).to include(
-                'name' => 'Some intervention',
-                'shared_to' => shared_to,
-                'csv_link' => include('test_empty.csv'),
-                'csv_generated_at' => be_present
-              )
-            end
+          it 'returns :not_found http status code' do
+            expect(response).to have_http_status(:not_found)
           end
         end
       end
@@ -200,32 +152,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
       context 'intervention is allowed for guests' do
         let(:shared_to) { 'anyone' }
 
-        it 'contains proper sessions collection' do
-          expect(json_response['sessions_size']).to eq sessions.size
-        end
-
-        context 'when intervention does not contain any report' do
-          it 'contains proper attributes' do
-            expect(json_response).to include(
-              'name' => 'Some intervention',
-              'shared_to' => shared_to,
-              'csv_link' => nil,
-              'csv_generated_at' => nil
-            )
-          end
-        end
-
-        context 'when intervention contains some report' do
-          let!(:reports) { [csv_attachment] }
-
-          it 'contains proper attributes' do
-            expect(json_response).to include(
-              'name' => 'Some intervention',
-              'shared_to' => shared_to,
-              'csv_link' => include('test_empty.csv'),
-              'csv_generated_at' => be_present
-            )
-          end
+        it 'returns :not_found http status code' do
+          expect(response).to have_http_status(:not_found)
         end
       end
     end

@@ -50,15 +50,6 @@ class Question < ApplicationRecord
     next_obj
   end
 
-  def perform_narrator_reflection(answers_var_values)
-    narrator['blocks']&.each_with_index do |block, index|
-      next unless block['type'].eql?('ReflectionFormula')
-
-      narrator['blocks'][index]['target_value'] = exploit_formula(answers_var_values, block['payload'], block['reflections'])
-      break
-    end
-  end
-
   def harvest_body_variables
     [nil]
   end

@@ -2,26 +2,24 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: :request do
+RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
-  let(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
+  let!(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
   let!(:session) { create(:session, intervention_id: intervention.id) }
-  let(:question_group) { create(:question_group, session: session) }
-  let(:question) { create(:question_single, question_group: question_group) }
+  let!(:question_group) { create(:question_group, session: session) }
+  let!(:question) { create(:question_single, question_group: question_group) }
   let(:audio_id) { nil }
-  let(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
-  let(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+  let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
+  let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
   let(:status) { 'draft' }
+  let(:user) { participant }
 
   before do
-    get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+    get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
   end
 
   context 'branching logic' do
-    let(:user) { participant }
-    let(:params) { { answer_id: answer.id } }
-
     context 'returns finish screen if only question' do
       it { expect(json_response['data']['attributes']['type']).to eq 'Question::Finish' }
     end
@@ -257,7 +255,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
       end
 
       before do
-        get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+        get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
       end
 
       context 'session that is branched to and has schedule after fill' do
@@ -388,7 +386,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
-          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+          get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
         end
 
         it 'swaps url correctly' do
@@ -448,7 +446,7 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
-          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+          get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
         end
 
         it 'swaps url correctly' do
@@ -499,11 +497,278 @@ RSpec.describe 'POST /v1/session/:session_id/flows?answer_id=:answer_id', type: 
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
-          get v1_session_flows_path(session.id), params: params, headers: user.create_new_auth_token
+          get v1_user_session_questions_path(user_session.id), headers: user.create_new_auth_token
         end
 
         it 'swaps url correctly' do
           expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].first).to eq('phonetic_audio.mp3')
+        end
+      end
+    end
+  end
+
+  context 'user session does not have have answers' do
+    let!(:other_session) { create(:user_session, session: session, user: other_user) }
+    let!(:other_user) { create(:user, :participant, :confirmed) }
+
+    before do
+      get v1_user_session_questions_url(other_session.id), headers: other_user.create_new_auth_token
+    end
+
+    it 'returns first question of session' do
+      expect(json_response['data']['id']).to eq(question.id)
+    end
+  end
+
+  context 'start preview from given question' do
+    before do
+      get v1_user_session_questions_url(user_session.id), params: params, headers: user.create_new_auth_token
+    end
+
+    let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+    let(:params) { { preview_question_id: questions[2].id } }
+
+    context 'intervention is draft' do
+      it 'returns correct question id' do
+        expect(json_response['data']['id']).to eq questions[2].id
+      end
+    end
+
+    context 'intervention is published' do
+      let(:status) { 'published' }
+
+      it 'returns correct question id' do
+        expect(json_response['data']['id']).to eq questions[0].id
+      end
+    end
+  end
+
+  context 'speech reflections' do
+    let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+    let(:question) { questions.first }
+
+    context 'reflection block' do
+      context 'correctly setup' do
+        let!(:question_second) do
+          question = questions.second
+          question.narrator = {
+            blocks: [{
+              "type": 'Reflection',
+              "action": 'NO_ACTION',
+              "animation": 'rest',
+              "endPosition": {
+                "x": 600,
+                "y": 600
+              },
+              "question_id": questions.first.id,
+              "reflections": [
+                {
+                  "text": [
+                    'test'
+                  ],
+                  "value": '1',
+                  "sha256": [],
+                  "payload": '1',
+                  "variable": 'test',
+                  "audio_urls": []
+                },
+                {
+                  "text": [
+                    'test2'
+                  ],
+                  "value": '2',
+                  "sha256": [],
+                  "payload": '2',
+                  "variable": 'test',
+                  "audio_urls": []
+                }
+              ]
+            }],
+            settings: {
+              "voice": true,
+              "animation": true
+            }
+          }
+          question.save!
+        end
+
+        before do
+          get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+        end
+
+        it 'returns correct target value size' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value'].size).to eq(1)
+        end
+
+        it 'has correct reflection text' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value'].first['text'].first).to eq('test')
+        end
+      end
+
+      context 'incorrectly setup' do
+        let!(:question_second) do
+          question = questions.second
+          question.narrator = {
+            blocks: [{
+              "type": 'Reflection',
+              "action": 'NO_ACTION',
+              "animation": 'rest',
+              "endPosition": {
+                "x": 600,
+                "y": 600
+              },
+              "question_id": questions.first.id,
+              "reflections": [
+                {
+                  "text": [
+                    'test'
+                  ],
+                  "value": '',
+                  "sha256": [],
+                  "payload": '',
+                  "variable": '',
+                  "audio_urls": []
+                },
+                {
+                  "text": [
+                    'test2'
+                  ],
+                  "value": '',
+                  "sha256": [],
+                  "payload": '',
+                  "variable": '',
+                  "audio_urls": []
+                }
+              ]
+            }],
+            settings: {
+              "voice": true,
+              "animation": true
+            }
+          }
+          question.save!
+        end
+
+        context 'when intervention is draft' do
+          before do
+            get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+          end
+
+          it 'returns correct target value size' do
+            expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value'].size).to eq(0)
+          end
+
+          it 'has correct warning' do
+            expect(json_response['warning']).to eq('ReflectionMissMatch')
+          end
+        end
+
+        context 'when intervention is published' do
+          let(:status) { 'published' }
+
+          before do
+            get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+          end
+
+          it 'returns correct target value size' do
+            expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value'].size).to eq(0)
+          end
+
+          it 'has correct warning' do
+            expect(json_response['warning']).to eq(nil)
+          end
+        end
+      end
+    end
+
+    context 'reflection formula block' do
+      context 'no formula matched' do
+        let!(:question_second) do
+          question = questions.second
+          question.narrator = {
+            blocks: [{
+              "type": 'ReflectionFormula',
+              "action": 'NO_ACTION',
+              "payload": 'test',
+              "animation": 'rest',
+              "endPosition": {
+                "x": 600,
+                "y": 600
+              },
+              "reflections": [
+                {
+                  "text": [
+                    'Wrong case'
+                  ],
+                  "match": '>2',
+                  "sha256": [],
+                  "audio_urls": []
+                }
+              ]
+            }],
+            settings: {
+              "voice": true,
+              "animation": true
+            }
+          }
+          question.save!
+        end
+
+        before do
+          get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+        end
+
+        it 'returns nil target value' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value']).to eq(nil)
+        end
+      end
+
+      context 'formula matched' do
+        let!(:question_second) do
+          question = questions.second
+          question.narrator = {
+            blocks: [{
+              "type": 'ReflectionFormula',
+              "action": 'NO_ACTION',
+              "payload": 'test',
+              "animation": 'rest',
+              "endPosition": {
+                "x": 600,
+                "y": 600
+              },
+              "reflections": [
+                {
+                  "text": [
+                    'Matched case'
+                  ],
+                  "match": '<2',
+                  "sha256": [],
+                  "audio_urls": []
+                },
+                {
+                  "text": [
+                    'Not Matched case'
+                  ],
+                  "match": '>2',
+                  "sha256": [],
+                  "audio_urls": []
+                }
+              ]
+            }],
+            settings: {
+              "voice": true,
+              "animation": true
+            }
+          }
+          question.save!
+        end
+
+        before do
+          get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+        end
+
+        it 'returns correct target value text' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value']['text'].first).to eq('Matched case')
         end
       end
     end

@@ -67,18 +67,18 @@ class V1::UsersController < V1Controller
   def user_params
     if (current_v1_user.roles & %w[team_admin researcher]).present? && current_v1_user.id != user_id
       params.require(:user).permit(
-          :active
+        :active
       )
     else
       params.require(:user).permit(
-          :first_name,
-          :last_name,
-          :email,
-          :sms_notification,
-          :time_zone,
-          :active,
-          roles: [],
-          phone_attributes: %i[iso prefix number]
+        :first_name,
+        :last_name,
+        :email,
+        :sms_notification,
+        :time_zone,
+        :active,
+        roles: [],
+        phone_attributes: %i[iso prefix number]
       )
     end
   end

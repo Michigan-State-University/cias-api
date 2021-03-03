@@ -10,7 +10,6 @@ RSpec.describe 'GET /v1/sessions/:session_id/sms_plans', type: :request do
   let!(:sms_plan_1) { create(:sms_plan, session: session) }
   let!(:sms_plan_2) { create(:sms_plan, session: session) }
 
-
   it 'returns sms plans for session' do
     request
 

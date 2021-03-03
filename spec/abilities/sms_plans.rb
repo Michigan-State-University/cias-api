@@ -81,7 +81,6 @@ describe SmsPlan do
       let!(:user) { team.team_admin }
       let(:team_intervention) { create(:intervention, user: user) }
 
-
       let(:session_1) { create(:session, intervention: team_intervention) }
 
       it 'can access for sms plan connected with session of intervention from his team' do

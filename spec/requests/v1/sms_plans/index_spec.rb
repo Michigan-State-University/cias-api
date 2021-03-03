@@ -11,7 +11,6 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
     let!(:sms_plan_1) { create(:sms_plan) }
     let!(:sms_plan_2) { create(:sms_plan) }
 
-
     before do
       request
     end

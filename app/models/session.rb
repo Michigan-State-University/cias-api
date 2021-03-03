@@ -29,6 +29,7 @@ class Session < ApplicationRecord
   enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill' }, _prefix: :schedule
 
   delegate :published?, to: :intervention
+  delegate :draft?, to: :intervention
 
   validates :name, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
