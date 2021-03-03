@@ -2,7 +2,7 @@
 
 class V1::UserSessionsController < V1Controller
   def create
-    user_session = UserSession.find_or_initialize_by(session_id: user_session_params['session_id'], user_id: current_v1_user.id)
+    user_session = UserSession.find_or_initialize_by(session_id: user_session_params[:session_id], user_id: current_v1_user.id)
     authorize! :create, user_session
     user_session.save!
     render json: serialized_response(user_session), status: :ok

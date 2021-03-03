@@ -10,7 +10,6 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
   let!(:intervention) { create(:intervention) }
   let(:session) { create(:session, intervention: intervention) }
 
-
   context 'when params are valid' do
     let(:params) do
       {

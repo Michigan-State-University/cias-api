@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class V1::SmsPlans::VariantsController < V1Controller
-
   def create
     authorize! :create, SmsPlan::Variant
     return render status: :method_not_allowed if sms_plan.session.intervention.published?

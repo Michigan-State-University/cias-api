@@ -3,8 +3,8 @@
 class V1::FlowService
   REFLECTION_MISS_MATCH = 'ReflectionMissMatch'
 
-  def initialize(user_session_id)
-    @user_session = UserSession.find(user_session_id)
+  def initialize(user_session)
+    @user_session = user_session
     @user = @user_session.user
     @warning = ''
   end
@@ -16,7 +16,6 @@ class V1::FlowService
     answers_var_values = user_session.all_var_values
 
     question = question_to_display(answers_var_values, preview_question_id)
-
     question = perform_narrator_reflections(question, answers_var_values)
     question = prepare_questions_with_answer_values(question, answers_var_values)
     question.another_or_feedback(question, answers_var_values)
@@ -27,7 +26,7 @@ class V1::FlowService
   end
 
   def question_to_display(answers_var_values, preview_question_id)
-    return user_session.session.questions.find(preview_question_id) if !preview_question_id.nil? && !user_session.session.published?
+    return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
 
     last_answered_question = user_session.last_answer&.question
     return user_session.session.first_question if last_answered_question.nil?

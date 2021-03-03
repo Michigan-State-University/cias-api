@@ -2,7 +2,8 @@
 
 class V1::UserSessions::QuestionsController < V1Controller
   def index
-    next_question = V1::FlowService.new(user_session_id).user_session_question(preview_question_id)
+    authorize! :read, user_session
+    next_question = V1::FlowService.new(user_session).user_session_question(preview_question_id)
     response = serialized_hash(
       next_question[:question],
       next_question[:question]&.de_constantize_modulize_name || NilClass
@@ -13,8 +14,8 @@ class V1::UserSessions::QuestionsController < V1Controller
 
   private
 
-  def user_session_id
-    params[:user_session_id]
+  def user_session
+    UserSession.find(params[:user_session_id])
   end
 
   def preview_question_id
