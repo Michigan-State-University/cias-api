@@ -61,7 +61,7 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :create, QuestionGroup
     shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
 
-    render_json question_group: shared_question_group , action: :show, status: :ok
+    render_json question_group: shared_question_group, action: :show, status: :ok
   end
 
   private
