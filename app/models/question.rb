@@ -62,6 +62,10 @@ class Question < ApplicationRecord
     Narrator.new(self).execute
   end
 
+  def clear_narrator_blocks
+    narrator['blocks'] = []
+  end
+
   private
 
   def initialize_narrator

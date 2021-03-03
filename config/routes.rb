@@ -110,7 +110,9 @@ Rails.application.routes.draw do
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
     post :phonetic_preview, to: 'audio#create'
     resources :sms_plans
-  end
+
+    resources :generated_reports, only: :index
+  end # v1 namespace ends here
 
   if Rails.env.development?
     scope 'rails' do

@@ -31,7 +31,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/position', type: :reque
     }
   end
 
-  context 'when authenticated as admin user' do
+  context 'when authenticated as researcher user' do
     context 'when question group does not have questions' do
       it 'returns serialized cloned question_group' do
         request
