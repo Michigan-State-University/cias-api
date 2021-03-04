@@ -8,7 +8,7 @@ class V1::UserSessionScheduleService
   attr_reader :user_session
 
   def schedule
-    next_session = user_session.session.next_session
+    next_session = branch_to_session
     return if next_session.nil?
 
     send("#{next_session.schedule}_schedule", next_session)
@@ -28,5 +28,15 @@ class V1::UserSessionScheduleService
 
   def exact_date_schedule(next_session)
     SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id)
+  end
+
+  def branch_to_session
+    next_session = user_session.session.next_session
+    session = user_session.session
+    if session.settings['formula']
+      formula_result = session.exploit_formula(user_session.all_var_values)
+      next_session = Session.find(formula_result['target']['id']) if formula_result.is_a?(Hash) && !formula_result['target']['id'].nil?
+    end
+    next_session
   end
 end
