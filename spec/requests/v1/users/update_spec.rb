@@ -146,10 +146,10 @@ describe 'PATCH /v1/users/:id', type: :request do
           let(:user_id) { other_user.id }
           let(:params) do
             {
-                user: {
-                    roles: %w[admin guest],
-                    active: true
-                }
+              user: {
+                roles: %w[admin guest],
+                active: true
+              }
             }
           end
 
@@ -170,10 +170,10 @@ describe 'PATCH /v1/users/:id', type: :request do
             let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: other_user, session: session)) }
             let!(:params) do
               {
-                  user: {
-                      roles: %w[participant],
-                      active: true
-                  }
+                user: {
+                  roles: %w[participant],
+                  active: true
+                }
               }
             end
 
@@ -183,15 +183,15 @@ describe 'PATCH /v1/users/:id', type: :request do
 
             it 'JSON response contains proper attributes' do
               expect(json_response).to include(
-                                           'roles' => %w[participant],
-                                           'active' => true
-                                       )
+                'roles' => %w[participant],
+                'active' => true
+              )
             end
 
             it 'updates user attributes' do
               expect(other_user.reload.attributes).to include(
-                                                          'active' => true
-                                                      )
+                'active' => true
+              )
             end
           end
 
@@ -200,15 +200,14 @@ describe 'PATCH /v1/users/:id', type: :request do
             let(:user_id) { other_user.id }
             let(:params) do
               {
-                  user: {
-                      roles: %w[participant],
-                      active: false
-                  }
+                user: {
+                  roles: %w[participant],
+                  active: false
+                }
               }
             end
 
             it { expect(response).to have_http_status(:not_found) }
-
           end
         end
       end
@@ -228,11 +227,11 @@ describe 'PATCH /v1/users/:id', type: :request do
 
       it 'JSON response contains proper attributes' do
         expect(json_response).to include(
-                                     'first_name' => other_user.first_name,
-                                     'last_name' => other_user.last_name,
-                                     'email' => other_user.email,
-                                     'avatar_url' => nil
-                                 )
+          'first_name' => other_user.first_name,
+          'last_name' => other_user.last_name,
+          'email' => other_user.email,
+          'avatar_url' => nil
+        )
       end
     end
 
@@ -264,18 +263,18 @@ describe 'PATCH /v1/users/:id', type: :request do
 
       it 'JSON response contains proper attributes' do
         expect(json_response).to include(
-                                     'first_name' => 'John',
-                                     'last_name' => 'Kowalski',
-                                     'email' => current_user.email,
-                                     'avatar_url' => nil
-                                 )
+          'first_name' => 'John',
+          'last_name' => 'Kowalski',
+          'email' => current_user.email,
+          'avatar_url' => nil
+        )
       end
 
       it 'updates user attributes' do
         expect(current_user.reload.attributes).to include(
-                                                      'first_name' => 'John',
-                                                      'last_name' => 'Kowalski'
-                                                  )
+          'first_name' => 'John',
+          'last_name' => 'Kowalski'
+        )
       end
 
       context 'when current_user tries to update deactivated and roles attributes' do
@@ -283,10 +282,10 @@ describe 'PATCH /v1/users/:id', type: :request do
           let(:user_id) { other_user.id }
           let(:params) do
             {
-                user: {
-                    roles: %w[admin guest],
-                    active: true
-                }
+              user: {
+                roles: %w[admin guest],
+                active: true
+              }
             }
           end
 
@@ -303,10 +302,10 @@ describe 'PATCH /v1/users/:id', type: :request do
             let!(:user_id) { team_participant.id }
             let!(:params) do
               {
-                  user: {
-                      roles: %w[participant],
-                      active: false
-                  }
+                user: {
+                  roles: %w[participant],
+                  active: false
+                }
               }
             end
 
@@ -316,15 +315,15 @@ describe 'PATCH /v1/users/:id', type: :request do
 
             it 'JSON response contains proper attributes' do
               expect(json_response).to include(
-                                           'roles' => %w[participant],
-                                           'active' => false
-                                       )
+                'roles' => %w[participant],
+                'active' => false
+              )
             end
 
             it 'updates user attributes' do
               expect(team_participant.reload.attributes).to include(
-                                                                'active' => false
-                                                            )
+                'active' => false
+              )
             end
           end
 
@@ -333,10 +332,10 @@ describe 'PATCH /v1/users/:id', type: :request do
             let(:user_id) { other_user.id }
             let(:params) do
               {
-                  user: {
-                      roles: %w[participant],
-                      active: false
-                  }
+                user: {
+                  roles: %w[participant],
+                  active: false
+                }
               }
             end
 

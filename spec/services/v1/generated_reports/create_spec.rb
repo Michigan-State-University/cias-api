@@ -59,6 +59,30 @@ RSpec.describe V1::GeneratedReports::Create do
       )
     end
 
+    context 'third party report' do
+      before do
+        report_template.update(report_for: 'third_party')
+      end
+
+      it 'shares report to third party' do
+        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+        expect(V1::GeneratedReports::ShareToThirdParty).to receive(:call)
+        subject
+      end
+    end
+
+    context 'participant report' do
+      before do
+        report_template.update(report_for: 'participant')
+      end
+
+      it 'does not share report to third party' do
+        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+        expect(V1::GeneratedReports::ShareToThirdParty).not_to receive(:call)
+        subject
+      end
+    end
+
     context 'when some of variables values are missing' do
       let(:dentaku_calculator) { Dentaku::Calculator.new.store(var1: 5, var2: 5) }
 

@@ -1,4 +1,4 @@
-  # frozen_string_literal: true
+# frozen_string_literal: true
 
 class V1::InterventionsController < V1Controller
   include Resource::Clone

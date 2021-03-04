@@ -8,10 +8,12 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
   let!(:session) { create(:session, intervention: intervention) }
   let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
   let!(:other_question_group) { create(:question_group_plain, session: session, position: 2) }
-  let!(:question_ids) { create_list(:question_single, 3, :narrator_block_one, title: 'Question Id Title', question_group: question_group,
-                                    formula: { 'payload' => 'var + 4', 'patterns' => [
-                                        { 'match' => '=3', 'target' => { 'id' => other_session.id, type: 'Session' } }
-                                    ] }) }
+  let!(:question_ids) do
+    create_list(:question_single, 3, :narrator_block_one, title: 'Question Id Title', question_group: question_group,
+                                                          formula: { 'payload' => 'var + 4', 'patterns' => [
+                                                            { 'match' => '=3', 'target' => { 'id' => other_session.id, type: 'Session' } }
+                                                          ] })
+  end
   let!(:other_question_ids) { create_list(:question_free_response, 2, title: 'Other question Id Title', question_group: other_question_group) }
 
   let!(:other_intervention) { create(:intervention, user: user) }
@@ -23,10 +25,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
   let(:params) do
     {
-        question_group: {
-            question_ids: question_ids.pluck(:id),
-            question_group_ids: [other_question_group.id],
-        }
+      question_group: {
+        question_ids: question_ids.pluck(:id),
+        question_group_ids: [other_question_group.id]
+      }
     }
   end
 
@@ -97,6 +99,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       context 'when user clones questions from current question_group' do
         let(:request) { post share_v1_session_question_group_path(session_id: session.id, id: question_group.id), params: params, headers: user.create_new_auth_token }
         let!(:first_question_position) { question_ids.first.position }
+
         before { request }
 
         it 'returns ok status' do
@@ -175,7 +178,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       end
 
       context 'when question group does not have questions' do
-        let!(:other_question_ids) { }
+        let!(:other_question_ids) {}
 
         before { request }
 
@@ -192,11 +195,11 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       context 'when ids are duplicated' do
         let(:params) do
           {
-              question_group: {
-                  question_ids: question_ids.pluck(:id),
-                  question_group_ids: [question_group.id],
-                  shared_qg_id: shared_question_group.id
-              }
+            question_group: {
+              question_ids: question_ids.pluck(:id),
+              question_group_ids: [question_group.id],
+              shared_qg_id: shared_question_group.id
+            }
           }
         end
 
@@ -220,7 +223,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
       end
 
-      context '#forbidden' do
+      describe '#forbidden' do
         context 'when intervention belongs to other researcher' do
           let!(:other_user) { create(:user, :researcher) }
           let!(:other_intervention) { create(:intervention, user: other_user) }
@@ -253,14 +256,14 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
       end
 
-      context '#not_found' do
+      describe '#not_found' do
         context 'when one id of questions is invalid' do
           let(:params) do
             {
-                question_group: {
-                    question_ids: question_ids.pluck(:id) << 'invalid',
-                    question_group_ids: [other_question_group.id],
-                }
+              question_group: {
+                question_ids: question_ids.pluck(:id) << 'invalid',
+                question_group_ids: [other_question_group.id]
+              }
             }
           end
 
@@ -276,10 +279,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         context 'when one id of question groups is invalid' do
           let(:params) do
             {
-                question_group: {
-                    question_ids: question_ids.pluck(:id),
-                    question_group_ids: ['invalid'],
-                }
+              question_group: {
+                question_ids: question_ids.pluck(:id),
+                question_group_ids: ['invalid']
+              }
             }
           end
 

@@ -43,12 +43,21 @@ class V1::GeneratedReports::Create
         add_to: generated_report, filename: report_name,
         macro: :pdf_report, ext: :pdf, type: 'application/pdf'
       ).execute
+
+      share_report_to_third_party(generated_report) if generated_report.third_party?
     end
   end
 
   private
 
   attr_reader :report_template, :user_session, :dentaku_calculator
+
+  def share_report_to_third_party(generated_report)
+    V1::GeneratedReports::ShareToThirdParty.call(
+      generated_report,
+      user_session
+    )
+  end
 
   def render_pdf_report(variants_to_generate)
     V1::RenderPdfReport.call(

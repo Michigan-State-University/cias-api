@@ -68,7 +68,7 @@ group :test do
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'test-prof'
-  gem "timecop"
+  gem 'timecop'
 end
 
 group :production do

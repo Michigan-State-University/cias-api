@@ -112,7 +112,7 @@ Rails.application.routes.draw do
     resources :sms_plans
 
     resources :generated_reports, only: :index
-  end # v1 namespace ends here
+  end
 
   if Rails.env.development?
     scope 'rails' do

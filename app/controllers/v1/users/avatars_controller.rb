@@ -6,7 +6,7 @@ class V1::Users::AvatarsController < V1Controller
 
     user_load.update!(avatar: avatar_params[:file])
     invalidate_cache(user_load)
-    render json: serialized_response(user_load, 'User'), status: 201
+    render json: serialized_response(user_load, 'User'), status: :created
   end
 
   def destroy
@@ -20,7 +20,7 @@ class V1::Users::AvatarsController < V1Controller
   private
 
   def authorize_user
-    raise CanCan::AccessDenied.new if current_v1_user.role?('researcher') && current_v1_user.id != params[:user_id]
+    raise CanCan::AccessDenied if current_v1_user.role?('researcher') && current_v1_user.id != params[:user_id]
 
     authorize! :update, user_load
   end

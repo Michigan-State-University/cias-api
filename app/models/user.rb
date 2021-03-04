@@ -46,6 +46,7 @@ class User < ApplicationRecord
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
+  scope :third_parties, -> { limit_to_roles('third_party') }
   scope :from_team, ->(team_id) { where(team_id: team_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
   scope :participants, -> { limit_to_roles('participant') }
@@ -86,6 +87,14 @@ class User < ApplicationRecord
 
   def send_devise_notification(notification, *args)
     devise_mailer.send(notification, self, *args).deliver_later
+  end
+
+  def deactivated?
+    !active?
+  end
+
+  def not_a_third_party?
+    roles.exclude?('third_party')
   end
 
   private

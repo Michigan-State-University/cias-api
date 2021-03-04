@@ -17,7 +17,7 @@ class V1::QuestionGroup::ShareService
   end
 
   def share(shared_question_group_id, question_group_ids, question_ids)
-    raise CanCan::AccessDenied.new if question_group_intervention_published?
+    raise CanCan::AccessDenied if question_group_intervention_published?
 
     shared_question_group = question_group_load(shared_question_group_id)
 
@@ -32,6 +32,7 @@ class V1::QuestionGroup::ShareService
       question_group_ids.each do |question_group_id|
         questions = all_user_questions.where(question_group_id: question_group_id)
         next if questions.empty?
+
         share_question_group_questions(shared_questions, questions, question_ids)
       end
     end
@@ -48,6 +49,7 @@ class V1::QuestionGroup::ShareService
   def share_question_group_questions(shared_questions, questions, question_ids)
     questions.each do |question|
       next if question_ids.include?(question.id)
+
       share_question(shared_questions, question)
     end
   end

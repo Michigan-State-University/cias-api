@@ -62,7 +62,7 @@ describe ReportTemplate::Section::Variant do
         expect(subject).to have_abilities({ manage: true }, team1_report_variant1)
         expect(subject).to have_abilities(
           { create: false },
-          ReportTemplate::Section::Variant.new(
+          described_class.new(
             report_template_section_id: team2_report_variant2.report_template_section_id
           )
         )
@@ -92,7 +92,7 @@ describe ReportTemplate::Section::Variant do
       it 'can\'t create report template section in other users session' do
         expect(subject).to have_abilities(
           { create: false },
-          ReportTemplate::Section::Variant.new(
+          described_class.new(
             report_template_section_id: team2_report_variant1.report_template_section_id
           )
         )
