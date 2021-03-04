@@ -35,7 +35,7 @@ class V1::UserSessionScheduleService
     session = user_session.session
     if session.settings['formula']
       formula_result = session.exploit_formula(user_session.all_var_values)
-      next_session = Session.find(formula_result['target']['id']) if formula_result.is_a?(Hash)
+      next_session = Session.find(formula_result['target']['id']) if formula_result.is_a?(Hash) && !formula_result['target']['id'].nil?
     end
     next_session
   end
