@@ -31,15 +31,9 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', typ
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params }
+      before { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params }
 
-      it 'response contains generated uid token' do
-        request
-
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

@@ -60,11 +60,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     context 'is invalid' do
       before { post v1_clone_session_path(id: session.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

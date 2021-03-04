@@ -10,11 +10,7 @@ RSpec.describe 'PATCH /v1/users/verify_sms_token', type: :request do
     context 'is invalid' do
       before { patch v1_verify_sms_token_path }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

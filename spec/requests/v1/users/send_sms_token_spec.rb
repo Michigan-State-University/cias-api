@@ -11,11 +11,7 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
     context 'is invalid' do
       before { put v1_send_sms_token_path }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

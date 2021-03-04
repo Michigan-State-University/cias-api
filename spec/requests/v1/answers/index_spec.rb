@@ -13,13 +13,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
     context 'is invalid' do
       before { get v1_user_session_answers_path(user_session.id) }
 
-      it { expect(response).to have_http_status(:ok) }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

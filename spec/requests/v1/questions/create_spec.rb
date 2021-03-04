@@ -66,11 +66,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     context 'is invalid' do
       before { post v1_question_group_questions_path(question_group.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

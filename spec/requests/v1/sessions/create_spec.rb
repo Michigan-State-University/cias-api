@@ -28,11 +28,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
     context 'is invalid' do
       before { post v1_intervention_sessions_path(intervention_id: intervention.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

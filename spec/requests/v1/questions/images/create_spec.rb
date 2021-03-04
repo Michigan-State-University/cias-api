@@ -21,11 +21,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
     context 'is invalid' do
       before { post v1_question_images_path(question.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do
