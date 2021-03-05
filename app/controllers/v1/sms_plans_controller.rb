@@ -1,17 +1,20 @@
 # frozen_string_literal: true
 
 class V1::SmsPlansController < V1Controller
-  authorize_resource
-
   def index
+    authorize! :read, SmsPlan
+
     render json: serialized_response(sms_plans_scope)
   end
 
   def show
+    authorize! :read, sms_plan
+
     render json: V1::SmsPlanSerializer.new(sms_plan, { include: [:variants] })
   end
 
   def create
+    authorize! :create, SmsPlan
     authorize! :create, sms_plan_session
 
     return render status: :method_not_allowed if sms_plan_session.intervention.published?
@@ -21,6 +24,7 @@ class V1::SmsPlansController < V1Controller
   end
 
   def update
+    authorize! :update, sms_plan
     authorize! :update, sms_plan_session if sms_plan_params[:session_id].present?
 
     return render status: :method_not_allowed if intervention_published?
@@ -30,6 +34,8 @@ class V1::SmsPlansController < V1Controller
   end
 
   def destroy
+    authorize! :destroy, sms_plan
+
     return render status: :method_not_allowed if intervention_published?
 
     sms_plan.destroy

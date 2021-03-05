@@ -24,22 +24,44 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
       }
     end
 
-    it 'returns :created status' do
-      request
-      expect(response).to have_http_status(:created)
+    context 'researcher' do
+      let(:user) { create(:user, :confirmed, :researcher) }
+      let!(:intervention) { create(:intervention, user: user) }
+
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
     end
 
-    it 'creates new sms plan with proper data' do
-      expect { request }.to change(SmsPlan, :count).by(1)
+    context 'team admin' do
+      let(:user) { create(:user, :confirmed, :team_admin) }
+      let!(:intervention) { create(:intervention, user: user) }
 
-      expect(SmsPlan.last).to have_attributes(
-        name: 'sms plan 1',
-        session: session,
-        schedule: SmsPlan.schedules[:after_session_end],
-        frequency: SmsPlan.frequencies[:once_a_day],
-        is_used_formula: false,
-        no_formula_text: 'test text'
-      )
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+    end
+
+    context 'admin' do
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates new sms plan with proper data' do
+        expect { request }.to change(SmsPlan, :count).by(1)
+
+        expect(SmsPlan.last).to have_attributes(
+          name: 'sms plan 1',
+          session: session,
+          schedule: SmsPlan.schedules[:after_session_end],
+          frequency: SmsPlan.frequencies[:once_a_day],
+          is_used_formula: false,
+          no_formula_text: 'test text'
+        )
+      end
     end
   end
 

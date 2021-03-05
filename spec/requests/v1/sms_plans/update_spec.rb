@@ -66,10 +66,9 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
       }
     end
 
-    it 'returns :forbidden status and not authorized message' do
+    it 'returns :not_found status' do
       request
-      expect(response).to have_http_status(:forbidden)
-      expect(json_response['message']).to eq('You are not authorized to access this page.')
+      expect(response).to have_http_status(:not_found)
     end
   end
 end
