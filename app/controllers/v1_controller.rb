@@ -13,6 +13,20 @@ class V1Controller < ApplicationController
     @current_v1_user ||= super
   end
 
+  def create_guest_user
+    V1::Users::CreateGuest.call
+  end
+
+  def create_preview_session_user(session_id)
+    User.new.tap do |u|
+      u.preview_session_id = session_id
+      u.roles = %w[preview_session]
+      u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@preview.session"
+      u.skip_confirmation!
+      u.save(validate: false)
+    end
+  end
+
   private
 
   def authenticate_user!
