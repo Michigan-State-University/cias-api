@@ -18,6 +18,7 @@ class UserSession < ApplicationRecord
     GenerateUserSessionReportsJob.perform_later(id)
 
     decrement_audio_usage
+    V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
   end
 
