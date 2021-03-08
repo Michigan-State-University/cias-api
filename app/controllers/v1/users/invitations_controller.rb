@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Users::InvitationsController < V1Controller
-  skip_before_action :authenticate_user!, only: [:edit, :update]
+  skip_before_action :authenticate_user!, only: %i[edit update]
 
   def index
     users = users_scope.invitation_not_accepted.limit_to_roles(['researcher'])

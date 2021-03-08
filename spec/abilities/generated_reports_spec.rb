@@ -82,10 +82,10 @@ describe GeneratedReport do
         create(:generated_report, :third_party, user_session: user_session)
       end
       let!(:not_shown_participant_report) do
-        create(:generated_report, :participant, :not_shown_for_participant, user_session: user_session)
+        create(:generated_report, :participant, user_session: user_session)
       end
       let!(:shown_participant_report) do
-        create(:generated_report, :participant, :shown_for_participant, user_session: user_session)
+        create(:generated_report, :participant, participant_id: user.id, user_session: user_session)
       end
 
       it 'can read only his report if the report kind is \'participant\' and report is shown to participant' do
@@ -170,10 +170,10 @@ describe GeneratedReport do
         create(:generated_report, :third_party, user_session: user_session)
       end
       let!(:not_shown_participant_report) do
-        create(:generated_report, :participant, :not_shown_for_participant, user_session: user_session)
+        create(:generated_report, :participant, user_session: user_session)
       end
       let!(:shown_participant_report) do
-        create(:generated_report, :participant, :shown_for_participant, user_session: user_session)
+        create(:generated_report, :participant, participant_id: user.id, user_session: user_session)
       end
 
       it 'can access only reports generated for his user session and report kind is \'participant\' and report is shown to participant' do

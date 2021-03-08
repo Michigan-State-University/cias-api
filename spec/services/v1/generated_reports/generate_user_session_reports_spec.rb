@@ -5,8 +5,8 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
 
   let!(:current_v1_user) { create(:user, :confirmed, :guest) }
   let!(:session) { create(:session) }
-  let!(:report_template1) { create(:report_template, session: session) }
-  let!(:report_template2) { create(:report_template, session: session) }
+  let!(:third_party_report_template) { create(:report_template, :third_party, session: session) }
+  let!(:participant_report_template) { create(:report_template, :participant, session: session) }
   let!(:user_session) { create(:user_session, user: current_v1_user, session: session) }
   let(:dentaku_calculator) { Dentaku::Calculator.new }
 
@@ -18,9 +18,11 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
     it 'runs GeneratedReports::Create service for each report template' do
       expect(dentaku_calculator).not_to receive(:store)
       expect(V1::GeneratedReports::Create).to receive(:call).
-        with(report_template1, user_session, dentaku_calculator)
+        with(third_party_report_template, user_session, dentaku_calculator)
       expect(V1::GeneratedReports::Create).to receive(:call).
-        with(report_template2, user_session, dentaku_calculator)
+        with(participant_report_template, user_session, dentaku_calculator)
+      expect(V1::GeneratedReports::ShareToThirdParty).to receive(:call).with(user_session)
+      expect(V1::GeneratedReports::ShareToParticipant).to receive(:call).with(user_session)
       subject
     end
 

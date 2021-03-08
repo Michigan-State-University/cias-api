@@ -12,7 +12,6 @@ class Ability::Participant < Ability::Base
     can :create, UserSession, session: { intervention: Intervention.available_for_participant(user.email) }
     can :read, UserSession, user_id: user.id
     can :create, Answer, user_session: { user_id: user.id }
-    can :read, GeneratedReport, user_session: { user_id: user.id }, report_for: 'participant',
-                                shown_for_participant: true
+    can :read, GeneratedReport, participant_id: user.id, report_for: 'participant'
   end
 end

@@ -34,8 +34,7 @@ class V1::GeneratedReports::Create
         name: report_name,
         user_session_id: user_session.id,
         report_template_id: report_template.id,
-        report_for: report_template.report_for,
-        shown_for_participant: display_to_participant?
+        report_for: report_template.report_for
       )
 
       MetaOperations::FilesKeeper.new(
@@ -43,21 +42,12 @@ class V1::GeneratedReports::Create
         add_to: generated_report, filename: report_name,
         macro: :pdf_report, ext: :pdf, type: 'application/pdf'
       ).execute
-
-      share_report_to_third_party(generated_report) if generated_report.third_party?
     end
   end
 
   private
 
   attr_reader :report_template, :user_session, :dentaku_calculator
-
-  def share_report_to_third_party(generated_report)
-    V1::GeneratedReports::ShareToThirdParty.call(
-      generated_report,
-      user_session
-    )
-  end
 
   def render_pdf_report(variants_to_generate)
     V1::RenderPdfReport.call(
@@ -74,17 +64,6 @@ class V1::GeneratedReports::Create
     dentaku_calculator.store(
       **missing_variables.index_with { |_var| 0 }
     )
-  end
-
-  def display_to_participant?
-    participant_report_answer = Answer.find_by(
-      type: 'Answer::ParticipantReport',
-      user_session_id: user_session.id
-    )
-
-    return false if participant_report_answer.blank?
-
-    participant_report_answer.body_data.first&.dig('value', 'receive_report') ? true : false
   end
 
   def name_variable

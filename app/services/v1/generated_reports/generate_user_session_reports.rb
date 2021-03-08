@@ -21,6 +21,16 @@ class V1::GeneratedReports::GenerateUserSessionReports
         dentaku_calculator
       )
     end
+
+    user_session.reload
+
+    V1::GeneratedReports::ShareToParticipant.call(
+      user_session
+    )
+
+    V1::GeneratedReports::ShareToThirdParty.call(
+      user_session
+    )
   end
 
   private

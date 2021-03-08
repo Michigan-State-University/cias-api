@@ -4,7 +4,6 @@ FactoryBot.define do
   factory :generated_report do
     name       { Faker::Name.name }
     report_for { 'third_party' }
-    shown_for_participant { false }
     association(:report_template)
     association(:user_session)
 
@@ -16,12 +15,12 @@ FactoryBot.define do
       report_for { 'participant' }
     end
 
-    trait(:shown_for_participant) do
-      shown_for_participant { true }
+    trait(:shared_with_participant) do
+      participant_id { create(:user, :confirmed, :participant) }
     end
 
-    trait(:not_shown_for_participant) do
-      shown_for_participant { false }
+    trait(:shared_with_third_party) do
+      participant_id { create(:user, :confirmed, :participant) }
     end
 
     trait(:shared_to_third_party) do
