@@ -18,7 +18,7 @@ class User < ApplicationRecord
   # Order of roles is important because final authorization is the sum of all roles
   APP_ROLES = %w[guest participant third_party researcher team_admin admin preview_session].freeze
 
-  TIME_ZONES = ActiveSupport::TimeZone::MAPPING.values.uniq.sort.freeze
+  TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
   enumerate_for :roles,
                 APP_ROLES,
