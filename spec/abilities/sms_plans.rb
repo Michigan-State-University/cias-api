@@ -13,9 +13,25 @@ describe SmsPlan do
     end
 
     context 'team admin' do
-      let(:user) { build_stubbed(:user, :confirmed, :team_admin) }
+      let!(:user) { create(:user, :confirmed, :team_admin) }
+      let!(:intervention_1) { create(:intervention, user: user) }
+      let!(:session_1) { create(:session, intervention: intervention_1) }
+      let!(:sms_plan_1) { create(:sms_plan, session: session_1) }
+
+      let!(:user_2) { create(:user, :researcher, team_id: user.team_id) }
+      let!(:intervention_2) { create(:intervention, user: user_2) }
+      let!(:session_2) { create(:session, intervention: intervention_2) }
+      let!(:sms_plan_2) { create(:sms_plan, session: session_2) }
 
       it { should have_abilities(:manage, described_class) }
+
+      it 'can manage sms plans for sessions created by his' do
+        expect(subject).to have_abilities({ manage: true }, sms_plan_1)
+      end
+
+      it 'can manage sms plans for sessions created by users from his teams' do
+        expect(subject).to have_abilities({ manage: true }, sms_plan_2)
+      end
     end
 
     context 'researcher' do

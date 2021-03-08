@@ -48,6 +48,6 @@ class Ability::TeamAdmin < Ability::Base
   end
 
   def team_session_ids
-    Session.joins(:intervention).where(interventions: { user_id: team_members_ids }).select(:id)
+    Session.joins(:intervention).where(interventions: { user_id: team_members_ids }).pluck(:id)
   end
 end

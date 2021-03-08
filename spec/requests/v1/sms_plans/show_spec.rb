@@ -16,6 +16,17 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
       request
     end
 
+    context 'team admin' do
+      let(:user) { create(:user, :confirmed, :team_admin) }
+      let!(:intervention) { create(:intervention, user: user) }
+      let!(:session) { create(:session, intervention: intervention) }
+      let!(:sms_plan) { create(:sms_plan, session: session) }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
     it 'has correct http code :ok' do
       expect(response).to have_http_status(:ok)
     end
