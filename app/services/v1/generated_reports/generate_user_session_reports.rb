@@ -14,7 +14,7 @@ class V1::GeneratedReports::GenerateUserSessionReports
 
     dentaku_calculator.store(**all_var_values) if all_var_values.present?
 
-    dentaku_calculator.memory.transform_values!(&:to_i)
+    dentaku_calculator.memory.transform_values! { |val| val.to_s.to_i }
 
     report_templates.each do |report_template|
       V1::GeneratedReports::Create.call(
