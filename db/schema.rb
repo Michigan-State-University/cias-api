@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_04_143728) do
 
+ActiveRecord::Schema.define(version: 2021_03_04_143728) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -219,7 +218,7 @@ ActiveRecord::Schema.define(version: 2021_03_04_143728) do
     t.uuid "session_id"
     t.string "name", null: false
     t.string "schedule", null: false
-    t.integer "schedule_payload"
+    t.integer "schedule_payload", default: 0
     t.string "frequency", default: "once", null: false
     t.datetime "end_at"
     t.string "formula"
