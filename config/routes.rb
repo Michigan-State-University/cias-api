@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     scope :users do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
+      get 'researchers', to: 'users#researchers'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]
@@ -90,6 +91,7 @@ Rails.application.routes.draw do
     end
 
     post 'questions/:id/clone', to: 'questions#clone', as: :clone_question
+    post 'questions/share', to: 'questions#share', as: :share_questions
     scope 'questions/:question_id', as: 'question' do
       scope module: 'questions' do
         resource :images, only: %i[create destroy]

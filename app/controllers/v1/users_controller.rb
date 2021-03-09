@@ -15,6 +15,15 @@ class V1::UsersController < V1Controller
     render_json user: user_service.user_load(user_id)
   end
 
+  def researchers
+    authorize! :list_researchers, User
+
+    collection = User.researchers
+    collection = collection.from_team(current_v1_user.team_id) if current_v1_user.team_id
+    paginated_collection = paginate(collection, params)
+    render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
+  end
+
   def update
     authorize_update_abilities
 
