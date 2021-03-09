@@ -4,7 +4,14 @@ class V1::GeneratedReportsController < V1Controller
   def index
     authorize! :read, GeneratedReport
 
-    render json: serialized_response(generated_reports_scope)
+    collection = generated_reports_scope.order(created_at: order)
+    paginated_collection = paginate(collection, params)
+    response = serialized_hash(
+      paginated_collection,
+    )
+    response = response.merge(reports_size: collection.size)
+    
+    render json: response
   end
 
   private
@@ -15,5 +22,11 @@ class V1::GeneratedReportsController < V1Controller
 
   def filter_params
     params.permit(:report_for)
+  end
+
+  def order
+    order = params[:order].present? ? params[:order] : "ASC"
+    order = "ASC" if not order.casecmp?("DESC")
+    order
   end
 end
