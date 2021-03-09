@@ -64,6 +64,19 @@ describe User, type: :model do
     end
   end
 
+  describe '#time_zone' do
+    %w[America/New_York Europe/Warsaw Europe/Vienna America/Chicago America/Denver
+       America/Detroit].each do |time_zone|
+      context "time zone is #{time_zone}" do
+        let(:user) { build_stubbed(:user, :confirmed, :researcher, time_zone: time_zone) }
+
+        it 'user is valid with time zone' do
+          expect(user).to be_valid
+        end
+      end
+    end
+  end
+
   context 'user has role researcher' do
     let(:user) { build_stubbed(:user, :researcher) }
 

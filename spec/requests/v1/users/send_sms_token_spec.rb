@@ -23,13 +23,13 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
 
   context 'when auth' do
     context 'is invalid' do
-      context  'when session_id is present' do
+      context 'when session_id is present' do
         let(:params) do
           {
-              phone_number: phone_number,
-              prefix: prefix,
-              iso: iso,
-              session_id: session.id
+            phone_number: phone_number,
+            prefix: prefix,
+            iso: iso,
+            session_id: session.id
           }
         end
 
@@ -37,8 +37,8 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
 
         it 'response contains generated uid token' do
           expect(response.headers.to_h).to include(
-                                               'Uid' => include('@preview.session')
-                                           )
+            'Uid' => include('@preview.session')
+          )
         end
       end
 
@@ -47,8 +47,8 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
 
         it 'response contains generated uid token' do
           expect(response.headers.to_h).to include(
-                                               'Uid' => include('@guest.true')
-                                           )
+            'Uid' => include('@guest.true')
+          )
         end
       end
     end

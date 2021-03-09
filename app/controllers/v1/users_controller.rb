@@ -118,7 +118,7 @@ class V1::UsersController < V1Controller
   end
 
   def user_without_phone?
-    create_guest_or_preview_session_user(session_id) unless current_v1_user.present?
+    create_guest_or_preview_session_user(session_id) if current_v1_user.blank?
 
     current_v1_user.phone.blank?
   end

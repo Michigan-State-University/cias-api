@@ -74,9 +74,9 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def now_in_timezone
     @now_in_timezone ||= begin
-                           timezone = Phonelib.parse(phone_number).timezone
-                           Time.use_zone(timezone) { Time.current }
-                         end
+      timezone = Phonelib.parse(phone_number).timezone
+      Time.use_zone(timezone) { Time.current }
+    end
   end
 
   def phone_number
