@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class V1::GeneratedReportsController < V1Controller
-  include Pagy::Backend
-  after_action { pagy_headers_merge(@pagy) if @pagy }
-
   def index
     authorize! :read, GeneratedReport
 

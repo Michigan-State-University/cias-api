@@ -97,8 +97,6 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     context 'order parameter is desc' do
       let(:params) { { order: 'desc' } }
-      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
-      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
       
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
