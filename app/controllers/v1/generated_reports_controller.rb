@@ -4,8 +4,8 @@ class V1::GeneratedReportsController < V1Controller
   def index
     authorize! :read, GeneratedReport
 
-    collection = generated_reports_scope
-    paginated_collection = paginate(collection.order(created_at: order), params)
+    collection = generated_reports_scope.order(created_at: order)
+    paginated_collection = paginate(collection, params)
     response = serialized_hash(
       paginated_collection,
     )
