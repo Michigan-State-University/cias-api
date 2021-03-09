@@ -78,6 +78,70 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
         end
       end
     end
+
+    context 'order parameter is asc' do
+      let(:params) { { order: 'asc' } }
+      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
+      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
+      
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns list in good order' do
+        expected_order = [third_party_report['id'], participant_report['id']]
+        returned_order = [json_response['data'][0]['id'], json_response['data'][1]['id']]
+        expect(returned_order).to eq(expected_order)
+      end
+    end
+
+    context 'order parameter is desc' do
+      let(:params) { { order: 'desc' } }
+      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
+      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
+      
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns list in good order' do
+        expected_order = [participant_report['id'], third_party_report['id']]
+        returned_order = [json_response['data'][0]['id'], json_response['data'][1]['id']]
+        expect(returned_order).to eq(expected_order)
+      end
+    end
+
+    context 'with pagination' do
+      let(:params) { { per_page: 1 , order: 'desc'} }
+      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
+      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns good first page' do
+        expect(json_response['data'].size).to eq(1)
+        expect(json_response['reports_size']).to eq(2)
+        expect(json_response['data'].map { |data| data['id'] }).to include(participant_report.id.to_s)
+      end
+    end
+
+    context 'with pagination and page' do
+      let(:params) { { per_page: 1 , order: 'desc', page: 2} }
+      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
+      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns good second page' do
+        expect(json_response['data'].size).to eq(1)
+        expect(json_response['reports_size']).to eq(2)
+        expect(json_response['data'].map { |data| data['id'] }).to include(third_party_report.id.to_s)
+      end
+    end
   end
 
   context 'when there are no generated reports' do

@@ -7,10 +7,14 @@ class V1::GeneratedReportsController < V1Controller
   def index
     authorize! :read, GeneratedReport
 
-    set_limit
-    set_order
-    @pagy, @records = pagy(generated_reports_scope.order(created_at: @order), items: @limit)
-    render json: serialized_response(@records)
+    collection = generated_reports_scope
+    paginated_collection = paginate(collection.order(created_at: order), params)
+    response = serialized_hash(
+      paginated_collection,
+    )
+    response = response.merge(reports_size: collection.size)
+    
+    render json: response
   end
 
   private
@@ -23,12 +27,9 @@ class V1::GeneratedReportsController < V1Controller
     params.permit(:report_for)
   end
 
-  def set_limit
-    @limit = params[:limit].present? ? params[:limit].to_i : 7
-  end
-
-  def set_order
-    @order = params[:order].present? ? params[:order] : "ASC"
-    @order = "ASC" if not ["ASC", "DESC"].include?(@order.upcase)
+  def order
+    order = params[:order].present? ? params[:order] : "ASC"
+    order = "ASC" if not order.casecmp?("DESC")
+    order
   end
 end
