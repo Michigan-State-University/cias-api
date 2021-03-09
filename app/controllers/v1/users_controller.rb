@@ -123,7 +123,7 @@ class V1::UsersController < V1Controller
   end
 
   def new_phone
-    Phone.create_or_find_by!(number: phone_number, prefix: prefix, iso: iso, user: current_v1_user)
+    Phone.create!(number: phone_number, prefix: prefix, iso: iso, user: current_v1_user)
   end
 
   def user_without_phone?

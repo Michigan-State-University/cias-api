@@ -116,14 +116,36 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
 
     context 'user is logged in but phone number is not uniq' do
       let!(:other_user) { create(:user, :confirmed, :participant) }
-      let!(:other_phone) { create(:phone, number: phone_number, prefix: prefix, iso: iso, user: other_user) }
+      let!(:other_phone) { create(:phone, :confirmed, number: phone_number, prefix: prefix, iso: iso, user: other_user) }
+      let(:message) { create(:message, :with_code) }
+      let(:service) { Communication::Sms.new(message.id) }
 
       before do
+        allow(service).to receive(:send_message).and_return(:double)
+        allow(Communication::Sms).to receive(:new).and_return(service)
         put v1_send_sms_token_path, headers: headers, params: params
       end
 
       it 'response has status accepted' do
-        expect(response.status).to eq 417
+        expect(response.status).to eq 202
+      end
+
+      it 'creates phone object for user' do
+        expect(user.phone.attributes).to include(
+          'number' => phone_number,
+          'prefix' => prefix,
+          'iso' => iso,
+          'user_id' => user.id
+        )
+      end
+
+      it 'confirmations code of both users are diffrent' do
+        expect(user.phone.confirmation_code).not_to eq other_phone.confirmation_code
+      end
+
+      it 'statuses of both phones are diffrent' do
+        expect(user.phone.confirmed).to be false
+        expect(user.phone.confirmed).not_to be other_user.phone.confirmed
       end
     end
   end
