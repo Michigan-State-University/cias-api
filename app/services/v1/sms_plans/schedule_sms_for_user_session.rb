@@ -14,6 +14,8 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     return unless phone.present? && phone.confirmed?
 
     session.sms_plans.each do |plan|
+      next unless can_run_plan?(plan)
+
       send("#{plan.schedule}_schedule", plan)
     end
   end
@@ -27,22 +29,28 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def after_session_end_schedule(plan)
-    return if plan.is_used_formula || plan.no_formula_text.blank?
-
     set_frequency(Time.current, plan)
   end
 
   def days_after_session_end_schedule(plan)
-    return if plan.is_used_formula || plan.no_formula_text.blank? || plan.schedule_payload.zero?
+    return after_session_end_schedule(plan) if plan.schedule_payload.zero?
 
     start_time = now_in_timezone.next_day(plan.schedule_payload).change({ hour: 13 }).utc
-
     set_frequency(start_time, plan)
+  end
+
+  def can_run_plan?(plan)
+    return false if plan.is_used_formula.blank? && plan.no_formula_text.blank?
+    return false if plan.is_used_formula && (plan.formula.blank? || plan.variants.empty?)
+
+    true
   end
 
   def set_frequency(start_time, plan)
     frequency = plan.frequency
-    content = plan.no_formula_text
+    content = sms_content(plan)
+    return if content.blank?
+
     finish_date = plan.end_at
 
     if frequency == SmsPlan.frequencies[:once]
@@ -54,6 +62,14 @@ class V1::SmsPlans::ScheduleSmsForUserSession
         date = date.next_day(number_days[frequency])
       end
     end
+  end
+
+  def sms_content(plan)
+    plan.is_used_formula ? matched_variant(plan)&.content : plan.no_formula_text
+  end
+
+  def matched_variant(plan)
+    V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, user_session.all_var_values)
   end
 
   def number_days
@@ -73,10 +89,11 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def now_in_timezone
-    @now_in_timezone ||= begin
-      timezone = Phonelib.parse(phone_number).timezone
-      Time.use_zone(timezone) { Time.current }
-    end
+    @now_in_timezone ||=
+      begin
+        timezone = Phonelib.parse(phone_number).timezone
+        Time.use_zone(timezone) { Time.current }
+      end
   end
 
   def phone_number
