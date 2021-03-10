@@ -8,7 +8,9 @@ class GeneratedReportFinder
   def initialize(filter_params, current_user)
     @filter_params = filter_params || {}
     @current_user = current_user
-    @scope = GeneratedReport.accessible_by(current_user.ability)
+    @scope = GeneratedReport
+    @scope = @scope.joins(:user_session).where(user_sessions: {session_id: filter_params[:session_id]}) if not filter_params[:session_id].blank?
+    @scope = @scope.accessible_by(current_user.ability)
   end
 
   def search

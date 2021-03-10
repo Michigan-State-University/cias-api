@@ -15,9 +15,14 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
   end
 
   context 'when there are generated reports' do
-    let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant) }
+    let(:session_1) { create(:session) }
+    let(:session_2) { create(:session) }
+    let(:user_session_1) { create(:user_session, user: user, session: session_1) }
+    let(:user_session_2) { create(:user_session, user: user, session: session_2) }
+    let(:params) { {report_for: ['participant', 'third_party'], session_id:  session_1.id} }
+    let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant, user_session: user_session_1) }
     let(:params) { {} }
-    let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party) }
+    let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session_2) }
 
     before do
       get v1_generated_reports_path, params: params, headers: headers
@@ -30,6 +35,32 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     it 'returns list of report templates for a session' do
       expect(json_response['data']).to be_empty
     end
+
+    context 'report filtred by id_session for participant report' do
+      let(:params) { {report_for: ['participant', 'third_party'], session_id:  session_1.id} }
+      
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'return participant report' do
+        expect(json_response['reports_size']).to eq(1)
+        expect(json_response['data'].map { |data| data['id'] }).to include(participant_report.id.to_s)
+      end
+    end
+
+    context 'report filtred by id_session for third part report' do
+      let(:params) { {report_for: ['participant', 'third_party'], session_id:  session_2.id} }
+        
+        it 'has correct http code :ok' do
+          expect(response).to have_http_status(:ok)
+        end
+  
+        it 'return third party report' do
+          expect(json_response['reports_size']).to eq(1)
+          expect(json_response['data'].map { |data| data['id'] }).to include(third_party_report.id.to_s)
+        end
+      end
 
     context 'report_for filter is used' do
       context 'reports for participant' do
