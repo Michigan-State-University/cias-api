@@ -20,7 +20,7 @@ class GeneratedReportFinder
   attr_reader :filter_params, :current_user, :scope
 
   def filter_report_for(reports)
-    return reports if filter_params[:report_for].blank?
+    return GeneratedReport.none if filter_params[:report_for].blank?
 
     reports.where(report_for: filter_params[:report_for])
   end

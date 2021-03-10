@@ -112,6 +112,7 @@ Rails.application.routes.draw do
     resources :sms_plans
 
     resources :generated_reports, only: :index
+    get 'generated_reports/:session_id', to: 'generated_reports#index'
   end
 
   if Rails.env.development?
