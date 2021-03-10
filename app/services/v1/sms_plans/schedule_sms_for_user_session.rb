@@ -61,6 +61,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
       #   send_sms(date.change({ hour: 13 }).utc, content)
       #   # date = date.next_day(number_days[frequency])
       # end
+      finish_date = date + 1.hour
 
       while date <= finish_date
         send_sms(date.utc, content)
