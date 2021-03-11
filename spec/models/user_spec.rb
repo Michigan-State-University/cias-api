@@ -31,31 +31,7 @@ describe User, type: :model do
       end
 
       context 'team admin has assigned team' do
-        let(:team) { create(:team) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
-
-        it 'is valid' do
-          expect(user).to be_valid
-        end
-      end
-    end
-  end
-
-  describe 'team_admin_already_exists?' do
-    context 'user has role team admin' do
-      context 'when team already has other team admin' do
-        let!(:team) { create(:team, :with_team_admin) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
-
-        it 'is not valid' do
-          expect(user).not_to be_valid
-          expect(user.errors.messages[:team_id]).to include(/There should be only one Team Admin in a team. The chosen team already has Team Admin/)
-        end
-      end
-
-      context 'when team does not have team admin yet' do
-        let(:team) { create(:team) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
+        let(:user) { build(:user, :team_admin) }
 
         it 'is valid' do
           expect(user).to be_valid

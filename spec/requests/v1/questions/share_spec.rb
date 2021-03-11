@@ -4,9 +4,10 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/questions/share', type: :request do
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
-  let(:current_user) { create(:user, :confirmed, :researcher, team_id: team_admin.team_id) }
-  let(:researcher_1) { create(:user, :confirmed, :researcher, team_id: team_admin.team_id) }
-  let(:researcher_2) { create(:user, :confirmed, :researcher, team_id: team_admin.team_id) }
+  let(:team) { team_admin.admins_teams.first }
+  let(:current_user) { create(:user, :confirmed, :researcher, team_id: team.id) }
+  let(:researcher_1) { create(:user, :confirmed, :researcher, team_id: team.id) }
+  let(:researcher_2) { create(:user, :confirmed, :researcher, team_id: team.id) }
 
   let(:intervention) { create(:intervention, user: current_user) }
   let(:session) { create(:session, intervention: intervention) }

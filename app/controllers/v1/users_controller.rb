@@ -18,8 +18,7 @@ class V1::UsersController < V1Controller
   def researchers
     authorize! :list_researchers, User
 
-    collection = User.researchers
-    collection = collection.from_team(current_v1_user.team_id) if current_v1_user.team_id
+    collection = UserFinder.available_researchers(current_v1_user)
     paginated_collection = paginate(collection, params)
     render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
   end
@@ -68,7 +67,7 @@ class V1::UsersController < V1Controller
   end
 
   def users_scope
-    user_service.users_scope
+    user_service.users_scope.includes(:team, :phone, :avatar_attachment)
   end
 
   def user_id

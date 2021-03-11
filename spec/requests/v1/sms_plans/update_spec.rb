@@ -29,7 +29,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
     it 'updates sms plan attributes' do
       expect { request }.to change { sms_plan.reload.name }.from(sms_plan.name).to('new name').and \
         avoid_changing { SmsPlan.count }.and \
-        change { sms_plan.reload.end_at }.from(sms_plan.end_at).to(expected_end_at)
+          change { sms_plan.reload.end_at }.from(sms_plan.end_at).to(expected_end_at)
     end
   end
 

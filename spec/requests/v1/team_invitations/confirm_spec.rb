@@ -8,7 +8,7 @@ RSpec.describe 'GET /v1/team_invitations/confirm', type: :request do
                                                                               headers: headers
   end
   let!(:researcher) { create(:user, :confirmed, :researcher) }
-  let!(:team) { create(:team, :with_team_admin) }
+  let!(:team) { create(:team) }
   let(:params) { { invitation_token: invitation_token } }
   let(:success_message) do
     { success: Base64.encode64(I18n.t('teams.invitations.accepted', team_name: team.name)) }.to_query

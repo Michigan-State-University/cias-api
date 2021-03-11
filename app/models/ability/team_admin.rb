@@ -9,7 +9,7 @@ class Ability::TeamAdmin < Ability::Base
   private
 
   def team_admin
-    can %i[read update invite_researcher remove_researcher], Team, id: user.team_id
+    can %i[read update invite_researcher remove_researcher], Team, team_admin_id: user.id
     can %i[read update active], User, id: team_members_and_researchers_participants
     can :create, :preview_session_user
     can :list_researchers, User, team_id: user.team_id
@@ -30,14 +30,19 @@ class Ability::TeamAdmin < Ability::Base
         report_template_section: {
           report_template: { session: { intervention: { user_id: team_members_ids } } }
         }
-    can :manage, SmsPlan, session_id: team_session_ids
-    can :manage, SmsPlan::Variant, sms_plan: { session_id: team_session_ids }
+    can :manage, SmsPlan, session: { intervention: { user_id: team_members_ids } }
+    can :manage, SmsPlan::Variant, sms_plan: {
+      session: { intervention: { user_id: team_members_ids } }
+    }
     can :read, GeneratedReport,
         user_session: { session: { intervention: { user_id: team_members_ids } } }
   end
 
   def team_members_ids
-    @team_members_ids ||= user.team.user_ids
+    @team_members_ids ||= User.select(:id)
+      .where(team_id: Team.select(:id).where(team_admin_id: user.id))
+      .or(User.select(:id).where(id: user.id))
+      .pluck(:id)
   end
 
   def team_members_and_researchers_participants
@@ -46,9 +51,5 @@ class Ability::TeamAdmin < Ability::Base
       members_ids << participants_with_answers(researcher)
     end
     members_ids
-  end
-
-  def team_session_ids
-    Session.joins(:intervention).where(interventions: { user_id: team_members_ids }).pluck(:id)
   end
 end

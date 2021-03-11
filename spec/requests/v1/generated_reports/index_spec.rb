@@ -83,7 +83,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
       let(:params) { { order: 'asc' } }
       let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
       let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
-      
+
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
       end
@@ -97,7 +97,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     context 'order parameter is desc' do
       let(:params) { { order: 'desc' } }
-      
+
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
       end
@@ -110,7 +110,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'with pagination' do
-      let(:params) { { per_page: 1 , order: 'desc'} }
+      let(:params) { { per_page: 1, order: 'desc' } }
       let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
       let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
 
@@ -126,7 +126,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'with pagination and page' do
-      let(:params) { { per_page: 1 , order: 'desc', page: 2} }
+      let(:params) { { per_page: 1, order: 'desc', page: 2 } }
       let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago) }
       let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago) }
 

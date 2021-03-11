@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class V1::SmsPlans::CalculateMatchedVariant
-
   def self.call(formula, variants, all_var_values)
     new(formula, variants, all_var_values).call
   end

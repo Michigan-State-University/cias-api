@@ -7,10 +7,10 @@ class V1::GeneratedReportsController < V1Controller
     collection = generated_reports_scope.order(created_at: order)
     paginated_collection = paginate(collection, params)
     response = serialized_hash(
-      paginated_collection,
+      paginated_collection
     )
     response = response.merge(reports_size: collection.size)
-    
+
     render json: response
   end
 
@@ -25,8 +25,8 @@ class V1::GeneratedReportsController < V1Controller
   end
 
   def order
-    order = params[:order].present? ? params[:order] : "ASC"
-    order = "ASC" if not order.casecmp?("DESC")
+    order = params[:order].presence || 'ASC'
+    order = 'ASC' unless order.casecmp?('DESC')
     order
   end
 end

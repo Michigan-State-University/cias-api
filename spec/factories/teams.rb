@@ -2,12 +2,11 @@
 
 FactoryBot.define do
   factory :team do
-    name { Faker::Team.name }
+    sequence(:name) { |n| "#{Faker::Team.name} #{n}" }
+    team_admin { build(:user, :confirmed, :team_admin) }
 
-    trait :with_team_admin do
-      after(:create) do |team|
-        create(:user, :confirmed, :team_admin, team_id: team.id)
-      end
+    after(:build) do |team|
+      team.team_admin.admins_teams = [team] unless team.team_admin.persisted?
     end
   end
 end

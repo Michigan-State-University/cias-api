@@ -5,7 +5,7 @@ class Question::Name < Question
 
   def self.assign_default_values(attr)
     super(attr).merge(
-        { 'required' => true }
+      { 'required' => true }
     )
   end
 end
