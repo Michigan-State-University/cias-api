@@ -17,20 +17,16 @@ class V1::GeneratedReportsController < V1Controller
   private
 
   def generated_reports_scope
-    GeneratedReportFinder.search(filter_params, current_v1_user, session_param)
+    GeneratedReportFinder.search(filter_params, current_v1_user)
   end
 
   def filter_params
-    params.permit( report_for: [])
+    params.permit( :session_id, report_for: [] )
   end
 
   def order
     order = params[:order].present? ? params[:order] : "ASC"
     order = "ASC" if not order.casecmp?("DESC")
     order
-  end
-
-  def session_param
-    params.permit(:session_id)
   end
 end

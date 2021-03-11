@@ -11,7 +11,11 @@ class V1::SessionsController < V1Controller
   end
 
   def show
-    render json: serialized_response(session_service.session_load(session_id))
+    response = serialized_hash(
+      session_service.session_load(session_id),
+    )
+    response = response.merge(reports_size: reports_size)
+    render json: response
   end
 
   def create
@@ -58,5 +62,9 @@ class V1::SessionsController < V1Controller
 
   def session_params
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :intervention_id, narrator: {}, settings: {}, formula: {}, body: {})
+  end
+
+  def reports_size
+    GeneratedReport.joins(:user_session).where(user_sessions: {session_id: session_id}).size
   end
 end

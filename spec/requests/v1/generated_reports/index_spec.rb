@@ -69,7 +69,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'report filtred by id_session for participant report' do
-      let(:params) { {report_for: ['participant', 'third_party'], session_id:  session_1.id} }
+      let(:params) { {report_for: ['participant'], session_id:  session_1.id} }
       
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -82,6 +82,8 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'report filtred by id_session for third part report' do
+      let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant, user_session: user_session_1) }
+      let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session_2) }
       let(:params) { {report_for: ['participant', 'third_party'], session_id:  session_2.id} }
         
         it 'has correct http code :ok' do

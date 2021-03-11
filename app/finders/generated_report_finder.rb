@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 class GeneratedReportFinder
-  def self.search(filter_params, current_user, session_param)
-    new(filter_params, current_user, session_param).search
+  def self.search(filter_params, current_user)
+    new(filter_params, current_user).search
   end
 
-  def initialize(filter_params, current_user, session_param)
-    @filter_params = filter_params || {}
-    @session_param = session_param || {}
+  def initialize(filter_params, current_user)
+    @filter_params = filter_params
     @current_user = current_user
     @scope = GeneratedReport.accessible_by(current_user.ability)
-    @scope = @scope.joins(:user_session).where(user_sessions: {session_id: session_param[:session_id]}) if not session_param.blank?
+    @scope = filter_for_session
   end
 
   def search
@@ -25,5 +24,10 @@ class GeneratedReportFinder
     return GeneratedReport.none if filter_params[:report_for].blank?
 
     reports.where(report_for: filter_params[:report_for])
+  end
+
+  def filter_for_session
+    return scope if filter_params[:session_id].blank?
+    scope.joins(:user_session).where(user_sessions: {session_id: filter_params[:session_id]})
   end
 end
