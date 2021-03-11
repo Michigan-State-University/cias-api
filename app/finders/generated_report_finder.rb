@@ -9,10 +9,10 @@ class GeneratedReportFinder
     @filter_params = filter_params
     @current_user = current_user
     @scope = GeneratedReport.accessible_by(current_user.ability)
-    @scope = filter_for_session
   end
 
   def search
+    scope = filter_for_session
     scope.then { |reports| filter_report_for(reports) }
   end
 
