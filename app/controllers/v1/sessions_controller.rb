@@ -11,15 +11,7 @@ class V1::SessionsController < V1Controller
   end
 
   def show
-    response = serialized_hash(
-      session_service.session_load(session_id)
-    )
-    response = response.merge(reports_size: reports_size)
-    render json: response
-
-    # response = session_service.session_load(session_id)
-    # response.assign_attributes(reports_size)
-    # render json: serialized_response(response)
+    render json: serialized_response(session_service.session_load(session_id))
   end
 
   def create
