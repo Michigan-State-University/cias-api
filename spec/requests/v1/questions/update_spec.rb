@@ -23,8 +23,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               }
             }
           ],
-          "variable": {
-            "name": 'var test 1'
+          variable: {
+            name: 'var test 1'
           }
         }
       }

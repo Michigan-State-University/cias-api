@@ -6,7 +6,7 @@ class V1::UsersController < V1Controller
   def index
     authorize! :index, current_v1_user
 
-    collection = users_scope.detailed_search(params.merge('user_roles': current_v1_user.roles)).order(created_at: :desc)
+    collection = users_scope.detailed_search(params.merge(user_roles: current_v1_user.roles)).order(created_at: :desc)
     paginated_collection = paginate(collection, params)
     render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
   end

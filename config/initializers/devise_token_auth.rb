@@ -44,9 +44,9 @@ DeviseTokenAuth.setup do |config|
   # Makes it possible to change the headers names
   config.headers_names = {
     'access-token': 'Access-Token',
-    'client': 'Client',
-    'expiry': 'Expiry',
-    'uid': 'Uid',
+    client: 'Client',
+    expiry: 'Expiry',
+    uid: 'Uid',
     'token-type': 'Token-Type'
   }
 

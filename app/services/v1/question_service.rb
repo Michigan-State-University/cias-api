@@ -36,4 +36,38 @@ class V1::QuestionService < V1::Question::BaseService
       end
     end
   end
+
+  def clone_multiple(session_id, question_ids)
+    questions = questions_scope_by_session(session_id).where(id: question_ids)
+    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids)
+
+    question_group_id = questions.first&.question_group_id
+    question_group = if all_questions_from_one_question_group?(questions, question_group_id)
+                       question_group_load(question_group_id)
+                     else
+                       question_groups = question_groups_scope(session_id)
+                       position = question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
+                       question_groups.create!(title: 'Copied Questions', position: position)
+                     end
+
+    clone_questions(questions, question_group)
+  end
+
+  private
+
+  def clone_questions(questions, question_group)
+    question_group_questions = question_group.questions
+    questions.each do |question|
+      cloned = question.clone
+      cloned.position = question_group_questions.last&.position.to_i + 1
+      cloned.question_group_id = question_group.id
+      question_group_questions << cloned
+    end
+
+    question_group_questions.last(questions.size)
+  end
+
+  def all_questions_from_one_question_group?(questions, question_group_id)
+    questions.all? { |question| question.question_group_id.eql?(question_group_id) }
+  end
 end

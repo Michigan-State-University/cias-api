@@ -553,40 +553,40 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           question = questions.second
           question.narrator = {
             blocks: [{
-              "type": 'Reflection',
-              "action": 'NO_ACTION',
-              "animation": 'rest',
-              "endPosition": {
-                "x": 600,
-                "y": 600
+              type: 'Reflection',
+              action: 'NO_ACTION',
+              animation: 'rest',
+              endPosition: {
+                x: 600,
+                y: 600
               },
-              "question_id": questions.first.id,
-              "reflections": [
+              question_id: questions.first.id,
+              reflections: [
                 {
-                  "text": [
+                  text: [
                     'test'
                   ],
-                  "value": '1',
-                  "sha256": [],
-                  "payload": '1',
-                  "variable": 'test',
-                  "audio_urls": []
+                  value: '1',
+                  sha256: [],
+                  payload: '1',
+                  variable: 'test',
+                  audio_urls: []
                 },
                 {
-                  "text": [
+                  text: [
                     'test2'
                   ],
-                  "value": '2',
-                  "sha256": [],
-                  "payload": '2',
-                  "variable": 'test',
-                  "audio_urls": []
+                  value: '2',
+                  sha256: [],
+                  payload: '2',
+                  variable: 'test',
+                  audio_urls: []
                 }
               ]
             }],
             settings: {
-              "voice": true,
-              "animation": true
+              voice: true,
+              animation: true
             }
           }
           question.save!
@@ -610,40 +610,40 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           question = questions.second
           question.narrator = {
             blocks: [{
-              "type": 'Reflection',
-              "action": 'NO_ACTION',
-              "animation": 'rest',
-              "endPosition": {
-                "x": 600,
-                "y": 600
+              type: 'Reflection',
+              action: 'NO_ACTION',
+              animation: 'rest',
+              endPosition: {
+                x: 600,
+                y: 600
               },
-              "question_id": questions.first.id,
-              "reflections": [
+              question_id: questions.first.id,
+              reflections: [
                 {
-                  "text": [
+                  text: [
                     'test'
                   ],
-                  "value": '',
-                  "sha256": [],
-                  "payload": '',
-                  "variable": '',
-                  "audio_urls": []
+                  value: '',
+                  sha256: [],
+                  payload: '',
+                  variable: '',
+                  audio_urls: []
                 },
                 {
-                  "text": [
+                  text: [
                     'test2'
                   ],
-                  "value": '',
-                  "sha256": [],
-                  "payload": '',
-                  "variable": '',
-                  "audio_urls": []
+                  value: '',
+                  sha256: [],
+                  payload: '',
+                  variable: '',
+                  audio_urls: []
                 }
               ]
             }],
             settings: {
-              "voice": true,
-              "animation": true
+              voice: true,
+              animation: true
             }
           }
           question.save!
@@ -687,28 +687,28 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           question = questions.second
           question.narrator = {
             blocks: [{
-              "type": 'ReflectionFormula',
-              "action": 'NO_ACTION',
-              "payload": 'test',
-              "animation": 'rest',
-              "endPosition": {
-                "x": 600,
-                "y": 600
+              type: 'ReflectionFormula',
+              action: 'NO_ACTION',
+              payload: 'test',
+              animation: 'rest',
+              endPosition: {
+                x: 600,
+                y: 600
               },
-              "reflections": [
+              reflections: [
                 {
-                  "text": [
+                  text: [
                     'Wrong case'
                   ],
-                  "match": '>2',
-                  "sha256": [],
-                  "audio_urls": []
+                  match: '>2',
+                  sha256: [],
+                  audio_urls: []
                 }
               ]
             }],
             settings: {
-              "voice": true,
-              "animation": true
+              voice: true,
+              animation: true
             }
           }
           question.save!
@@ -728,36 +728,36 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           question = questions.second
           question.narrator = {
             blocks: [{
-              "type": 'ReflectionFormula',
-              "action": 'NO_ACTION',
-              "payload": 'test',
-              "animation": 'rest',
-              "endPosition": {
-                "x": 600,
-                "y": 600
+              type: 'ReflectionFormula',
+              action: 'NO_ACTION',
+              payload: 'test',
+              animation: 'rest',
+              endPosition: {
+                x: 600,
+                y: 600
               },
-              "reflections": [
+              reflections: [
                 {
-                  "text": [
+                  text: [
                     'Matched case'
                   ],
-                  "match": '<2',
-                  "sha256": [],
-                  "audio_urls": []
+                  match: '<2',
+                  sha256: [],
+                  audio_urls: []
                 },
                 {
-                  "text": [
+                  text: [
                     'Not Matched case'
                   ],
-                  "match": '>2',
-                  "sha256": [],
-                  "audio_urls": []
+                  match: '>2',
+                  sha256: [],
+                  audio_urls: []
                 }
               ]
             }],
             settings: {
-              "voice": true,
-              "animation": true
+              voice: true,
+              animation: true
             }
           }
           question.save!

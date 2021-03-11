@@ -53,7 +53,7 @@ class Session < ApplicationRecord
   def propagate_settings
     return unless settings_changed?
 
-    narrator = Hash[settings['narrator'].to_a - settings_was['narrator'].to_a]
+    narrator = (settings['narrator'].to_a - settings_was['narrator'].to_a).to_h
     questions.each do |question|
       question.narrator['settings'].merge!(narrator)
       question.execute_narrator
