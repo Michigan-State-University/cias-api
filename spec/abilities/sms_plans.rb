@@ -13,9 +13,32 @@ describe SmsPlan do
     end
 
     context 'team admin' do
-      let(:user) { build_stubbed(:user, :confirmed, :team_admin) }
+      let!(:user) { create(:user, :confirmed, :team_admin) }
+      let!(:intervention_1) { create(:intervention, user: user) }
+      let!(:session_1) { create(:session, intervention: intervention_1) }
+      let!(:sms_plan_1) { create(:sms_plan, session: session_1) }
+
+      let!(:user_2) { create(:user, :researcher, team_id: user.team_id) }
+      let!(:intervention_2) { create(:intervention, user: user_2) }
+      let!(:session_2) { create(:session, intervention: intervention_2) }
+      let!(:sms_plan_2) { create(:sms_plan, session: session_2) }
+
+      let!(:another_team) { create(:team, team_admin: user) }
+      let!(:user_3) { create(:user, :researcher, team: another_team) }
+      let!(:intervention_3) { create(:intervention, user: user_3) }
+      let!(:session_3) { create(:session, intervention: intervention_3) }
+      let!(:sms_plan_3) { create(:sms_plan, session: session_3) }
 
       it { should have_abilities(:manage, described_class) }
+
+      it 'can manage sms plans for sessions created by him' do
+        expect(subject).to have_abilities({ manage: true }, sms_plan_1)
+      end
+
+      it 'can manage sms plans for sessions created by users from his teams' do
+        expect(subject).to have_abilities({ manage: true }, sms_plan_2)
+        expect(subject).to have_abilities({ manage: true }, sms_plan_3)
+      end
     end
 
     context 'researcher' do
@@ -77,7 +100,7 @@ describe SmsPlan do
     end
 
     context 'team admin' do
-      let(:team) { create(:team, :with_team_admin) }
+      let(:team) { create(:team) }
       let!(:user) { team.team_admin }
       let(:team_intervention) { create(:intervention, user: user) }
 

@@ -50,8 +50,7 @@ RSpec.describe V1::GeneratedReports::Create do
         name: include('Report'),
         user_session_id: user_session.id,
         report_template_id: report_template.id,
-        report_for: report_template.report_for,
-        shown_for_participant: false
+        report_for: report_template.report_for
       )
 
       expect(generated_report.pdf_report.attachment.blob).to have_attributes(
@@ -66,7 +65,6 @@ RSpec.describe V1::GeneratedReports::Create do
 
       it 'shares report to third party' do
         expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        expect(V1::GeneratedReports::ShareToThirdParty).to receive(:call)
         subject
       end
     end
@@ -78,7 +76,6 @@ RSpec.describe V1::GeneratedReports::Create do
 
       it 'does not share report to third party' do
         expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        expect(V1::GeneratedReports::ShareToThirdParty).not_to receive(:call)
         subject
       end
     end
@@ -92,38 +89,6 @@ RSpec.describe V1::GeneratedReports::Create do
         expect { subject }.to change(GeneratedReport, :count).by(1)
 
         expect(dentaku_calculator.memory).to include('var3' => 0, 'var4' => 0)
-      end
-    end
-
-    context 'when display participant voted for not receiving report' do
-      let(:dentaku_calculator) { Dentaku::Calculator.new }
-      let!(:answer_receive_report_false) do
-        create(:answer_participant_report, user_session: user_session,
-                                           body: { data: [{ value: { receive_report: false } }] })
-      end
-
-      it 'creates generated report with show_for_participant set to false' do
-        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        subject
-        expect(generated_report).to have_attributes(
-          shown_for_participant: false
-        )
-      end
-    end
-
-    context 'when display participant voted for receiving report' do
-      let(:dentaku_calculator) { Dentaku::Calculator.new }
-      let!(:answer_receive_report_true) do
-        create(:answer_participant_report, user_session: user_session,
-                                           body: { data: [{ value: { receive_report: true } }] })
-      end
-
-      it 'creates generated report with show_for_participant set to true' do
-        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        subject
-        expect(generated_report).to have_attributes(
-          shown_for_participant: true
-        )
       end
     end
 

@@ -12,12 +12,15 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
   let(:params) do
     {
       sms_plan: {
-        name: 'new name'
+        name: 'new name',
+        end_at: '11/03/2021'
       }
     }
   end
 
   context 'valid params' do
+    let(:expected_end_at) { Date.strptime('11/03/2021', '%d/%m/%Y') }
+
     it 'returns :ok status' do
       request
       expect(response).to have_http_status(:ok)
@@ -25,7 +28,8 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
 
     it 'updates sms plan attributes' do
       expect { request }.to change { sms_plan.reload.name }.from(sms_plan.name).to('new name').and \
-        avoid_changing { SmsPlan.count }
+        avoid_changing { SmsPlan.count }.and \
+          change { sms_plan.reload.end_at }.from(sms_plan.end_at).to(expected_end_at)
     end
   end
 

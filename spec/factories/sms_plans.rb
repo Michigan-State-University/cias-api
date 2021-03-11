@@ -5,6 +5,6 @@ FactoryBot.define do
     association(:session)
     sequence(:name) { |s| "sms_plan#{s}" }
     schedule { SmsPlan.schedules[:after_session_end] }
-    frequency { SmsPlan.frequencies[:once_a_day] }
+    frequency { SmsPlan.frequencies[:once] }
   end
 end

@@ -27,5 +27,6 @@ class V1::GeneratedReportsController < V1Controller
   def order
     order = params[:order].presence || 'ASC'
     order = 'ASC' unless order.casecmp?('DESC')
+    order
   end
 end

@@ -1,33 +1,36 @@
 # frozen_string_literal: true
 
 class V1::GeneratedReports::ShareToThirdParty
-  def self.call(report, user_session)
-    new(report, user_session).call
+  def self.call(user_session)
+    new(user_session).call
   end
 
-  def initialize(report, user_session)
-    @report = report
-    @user_session = user_session
+  def initialize(user_session)
+    @user_session        = user_session
+    @third_party_reports = user_session.generated_reports.third_party
   end
 
   def call
-    return unless report.third_party?
+    return if third_party_reports.blank?
     return if third_party_email.blank?
     return if user_is_not_third_party?
-    return if user_deactivated?
 
-    if user.blank?
-      third_party = User.invite!(email: third_party_email, roles: ['third_party'])
-      report.update!(third_party_id: third_party.id)
-    else
-      report.update!(third_party_id: user.id)
-      GeneratedReportMailer.new_report_available(user.email).deliver_now
-    end
+    third_party_user = find_or_create_third_party
+
+    third_party_reports.update_all(third_party_id: third_party_user.id)
+
+    return if third_party_user&.deactivated?
+
+    GeneratedReportMailer.new_report_available(user.email).deliver_now
   end
 
   private
 
-  attr_reader :user_session, :report
+  attr_reader :user_session, :third_party_reports
+
+  def find_or_create_third_party
+    user || User.invite!(email: third_party_email, roles: ['third_party'])
+  end
 
   def user
     @user ||= User.find_by(email: third_party_email)
@@ -35,10 +38,6 @@ class V1::GeneratedReports::ShareToThirdParty
 
   def user_is_not_third_party?
     user&.not_a_third_party?
-  end
-
-  def user_deactivated?
-    user&.deactivated?
   end
 
   def third_party_email

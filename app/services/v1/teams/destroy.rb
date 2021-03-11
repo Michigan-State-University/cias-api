@@ -11,7 +11,7 @@ class V1::Teams::Destroy
 
   def call
     ActiveRecord::Base.transaction do
-      team_admin&.update!(roles: ['researcher'])
+      team_admin&.update!(roles: ['researcher']) if last_team?
 
       team.destroy!
     end
@@ -23,5 +23,9 @@ class V1::Teams::Destroy
 
   def team_admin
     team.team_admin
+  end
+
+  def last_team?
+    team_admin.admins_teams.size == 1
   end
 end

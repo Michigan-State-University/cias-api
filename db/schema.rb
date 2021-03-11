@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_02_130406) do
+ActiveRecord::Schema.define(version: 2021_03_09_101750) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -62,13 +62,13 @@ ActiveRecord::Schema.define(version: 2021_03_02_130406) do
     t.uuid "report_template_id"
     t.uuid "user_session_id"
     t.string "report_for", default: "third_party", null: false
-    t.boolean "shown_for_participant", default: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "third_party_id"
+    t.uuid "participant_id"
+    t.index ["participant_id"], name: "index_generated_reports_on_participant_id"
     t.index ["report_for"], name: "index_generated_reports_on_report_for"
     t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"
-    t.index ["shown_for_participant"], name: "index_generated_reports_on_shown_for_participant"
     t.index ["third_party_id"], name: "index_generated_reports_on_third_party_id"
     t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
   end
@@ -219,7 +219,7 @@ ActiveRecord::Schema.define(version: 2021_03_02_130406) do
     t.uuid "session_id"
     t.string "name", null: false
     t.string "schedule", null: false
-    t.integer "schedule_payload"
+    t.integer "schedule_payload", default: 0
     t.string "frequency", default: "once", null: false
     t.datetime "end_at"
     t.string "formula"
@@ -246,7 +246,9 @@ ActiveRecord::Schema.define(version: 2021_03_02_130406) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.uuid "team_admin_id"
     t.index ["name"], name: "index_teams_on_name", unique: true
+    t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

@@ -1,34 +1,12 @@
 # frozen_string_literal: true
 
-class V1::QuestionService
-  def initialize(user)
-    @user = user
-  end
-
-  attr_reader :user
-
+class V1::QuestionService < V1::Question::BaseService
   def question_groups_scope(session_id)
     Session.includes(%i[question_groups questions]).accessible_by(user.ability).find(session_id).question_groups.order(:position)
   end
 
   def questions_scope_by_session(session_id)
     Session.includes(%i[question_groups questions]).accessible_by(user.ability).find(session_id).questions.order(:position)
-  end
-
-  def question_group_load(question_group_id)
-    QuestionGroup.accessible_by(user.ability).find(question_group_id)
-  end
-
-  def questions_scope(question_group_id)
-    question_group_load(question_group_id).questions.order(:position)
-  end
-
-  def question_load(question_group_id, id)
-    questions_scope(question_group_id).find(id)
-  end
-
-  def chosen_questions(question_group_id, ids)
-    questions_scope(question_group_id).where(id: ids)
   end
 
   def create(question_group_id, question_params)

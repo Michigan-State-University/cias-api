@@ -54,6 +54,7 @@ class V1::Intervention::Publish
     preview_user_ids = preview_users.select(:id)
     UserSession.where(user_id: preview_user_ids).delete_all
     UserLogRequest.where(user_id: preview_user_ids).delete_all
+    Phone.where(user_id: preview_user_ids).delete_all
     preview_users.delete_all
   end
 end

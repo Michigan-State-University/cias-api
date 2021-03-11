@@ -100,8 +100,8 @@ RSpec.describe 'GET /v1/users', type: :request do
     end
 
     context 'with team_id filter params' do
-      let!(:team1) { create(:team, :with_team_admin) }
-      let!(:team2) { create(:team, :with_team_admin) }
+      let!(:team1) { create(:team) }
+      let!(:team2) { create(:team) }
       let(:params) { { team_id: team1.id } }
 
       before do
@@ -289,7 +289,7 @@ RSpec.describe 'GET /v1/users', type: :request do
   end
 
   context 'when current_user is team_admin' do
-    let!(:team1) { create(:team, :with_team_admin) }
+    let!(:team1) { create(:team) }
     let(:current_user) { team1.team_admin }
     let(:team_participant) { create(:user, :participant, team_id: team1.id) }
     let(:other_team_participant) { create(:user, :participant, team_id: team1.id) }
@@ -298,9 +298,10 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:question) { create(:question_slider, question_group: question_group) }
     let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant, session: session)) }
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
+    let(:expected_users_ids) { [*team1.users.pluck(:id), current_user.id] }
 
     context 'without params' do
-      let!(:team2) { create(:team, :with_team_admin) }
+      let!(:team2) { create(:team) }
       let(:params) { {} }
 
       before do
@@ -314,11 +315,11 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
 
       it 'returns users only from his team' do
-        expect(json_response['users'].pluck('id')).to match_array(team1.users.pluck(:id))
+        expect(json_response['users'].pluck('id')).to match_array(expected_users_ids)
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq team1.users.size
+        expect(json_response['users'].size).to eq expected_users_ids.size
       end
     end
   end

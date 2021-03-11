@@ -4,22 +4,12 @@ require 'rails_helper'
 
 RSpec.describe Team, type: :model do
   it { should have_many(:users) }
-  it { should have_one(:team_admin) }
+  it { should belong_to(:team_admin) }
   it { should have_many(:team_invitations).dependent(:destroy) }
-
-  describe '#team_admin' do
-    let(:team) { create(:team) }
-    let!(:researcher) { create(:user, :researcher, team_id: team.id) }
-    let!(:team_admin) { create(:user, :team_admin, team_id: team.id) }
-
-    it 'returns team admin from team' do
-      expect(team.team_admin).to eq team_admin
-    end
-  end
 
   describe '#name' do
     context 'name is unique' do
-      let(:team) { build_stubbed(:team) }
+      let(:team) { build(:team) }
 
       it 'team is valid' do
         expect(team).to be_valid

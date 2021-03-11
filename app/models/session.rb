@@ -22,7 +22,7 @@ class Session < ApplicationRecord
   has_many :users, through: :user_sessions
 
   attribute :settings, :json, default: assign_default_values('settings')
-  attribute :position, :integer, default: 0
+  attribute :position, :integer, default: 1
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 

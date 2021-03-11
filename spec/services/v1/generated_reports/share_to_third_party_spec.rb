@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::GeneratedReports::ShareToThirdParty do
-  subject { described_class.call(generated_report, user_session) }
+  subject { described_class.call(user_session) }
 
-  let!(:generated_report) { create(:generated_report, :third_party) }
   let!(:user_session) { create(:user_session) }
+  let!(:generated_report) { create(:generated_report, :third_party, user_session: user_session) }
   let!(:answer_third_party) do
     create(:answer_third_party, user_session: user_session,
                                 body: { data: [{ value: 'johnny@example.com' }] })
@@ -85,8 +85,8 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
   context 'when user is a third party but with deactived account' do
     let!(:user) { create(:user, :confirmed, :third_party, email: 'johnny@example.com', active: false) }
 
-    it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { generated_report.reload.third_party_id }.and \
+    it 'share report with third party but avoid sending email about new report' do
+      expect { subject }.to change { generated_report.reload.third_party_id }.from(nil).to(user.id).and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }
     end

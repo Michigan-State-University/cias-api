@@ -247,7 +247,7 @@ describe 'PATCH /v1/users/:id', type: :request do
   end
 
   context 'when current_user is team admin' do
-    let!(:team1) { create(:team, :with_team_admin) }
+    let!(:team1) { create(:team) }
     let!(:current_user) { team1.team_admin }
     let(:team_participant) { create(:user, :participant, team_id: team1.id) }
     let(:other_team_participant) { create(:user, :participant, team_id: team1.id) }
