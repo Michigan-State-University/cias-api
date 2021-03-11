@@ -32,8 +32,40 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'returns list of report templates for a session' do
+    it 'returns empty list of report templates for a session' do
       expect(json_response['data']).to be_empty
+    end
+
+    context 'reports per session' do
+      let(:params) { {report_for: ['participant', 'third_party'], session_id:  session_1.id} }
+      let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session_1) }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns list of report templates for a session' do
+        expect(json_response['reports_size']).to eq(2)
+        expect(json_response['data']).to include(
+          'id' => participant_report.id.to_s,
+          'type' => 'generated_report',
+          'attributes' => include(
+            'name' => participant_report.name,
+            'report_for' => 'participant',
+            'pdf_report_url' => include('example_report.pdf'),
+            'created_at' => Time.current.iso8601
+          )
+        ).and include(
+          'id' => third_party_report.id.to_s,
+          'type' => 'generated_report',
+          'attributes' => include(
+            'name' => third_party_report.name,
+            'report_for' => 'third_party',
+            'pdf_report_url' => include('example_report.pdf'),
+            'created_at' => Time.current.iso8601
+          )
+        )
+      end 
     end
 
     context 'report filtred by id_session for participant report' do
