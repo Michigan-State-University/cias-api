@@ -28,6 +28,7 @@ class GeneratedReportFinder
 
   def filter_for_session
     return scope if filter_params[:session_id].blank?
-    scope.joins(:user_session).where(user_sessions: {session_id: filter_params[:session_id]})
+
+    scope.joins(:user_session).where(user_sessions: { session_id: filter_params[:session_id] })
   end
 end
