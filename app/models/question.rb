@@ -31,6 +31,7 @@ class Question < ApplicationRecord
 
   delegate :session, to: :question_group
   after_create :initialize_narrator
+  before_destroy :decrement_usage_counters
   default_scope { order(:position) }
 
   def subclass_name
@@ -71,6 +72,10 @@ class Question < ApplicationRecord
   def initialize_narrator
     narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish'
     execute_narrator
+  end
+
+  def decrement_usage_counters
+    Narrator.new(self).execute(destroy: true)
   end
 
   def json_schema_path

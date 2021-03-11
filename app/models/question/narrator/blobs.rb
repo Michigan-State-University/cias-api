@@ -20,6 +20,7 @@ class Question::Narrator::Blobs
   def remove(digest)
     digest_index = ids.index(digest)
     ids.delete_at(digest_index) if digest_index
+    digest_index.nil?
   end
 
   def purification
@@ -37,7 +38,7 @@ class Question::Narrator::Blobs
     narrator['blocks'].each do |b|
       if speech?(b) || read_question?(b)
         body(b)
-      elsif reflection?(b)
+      elsif reflection?(b) || reflection_formula?(b)
         reflection_block(b)
       end
     end
