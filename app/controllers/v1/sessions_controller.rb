@@ -44,6 +44,10 @@ class V1::SessionsController < V1Controller
     session_service.sessions
   end
 
+  def session_id
+    params[:id]
+  end
+
   def intervention_id
     params[:intervention_id]
   end
