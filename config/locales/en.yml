@@ -2,7 +2,7 @@ en:
   hello: Hello %{full_name}
   time:
     formats:
-      file: '%m_%d_%Y_%H_%M_%S'
+      file: '%m_%d_%Y'
   question:
     finish:
       subtitle: Finish Screen
@@ -45,6 +45,12 @@ en:
       body:         "You've been invited to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
       button_text:  Accept the Invitation
+  generated_report_mailer:
+    new_report_available:
+      subject:      "New report in the system is ready for you"
+      header:       "New report in the system is ready for you"
+      body:         "You have a new report available for download in your dashboard. Click the link below to visit your dashboard."
+      button_text:  Visit Dashboard
   report_template_mailer:
     template_preview:
       subject:      "PDF preview for %{report_template_name}"

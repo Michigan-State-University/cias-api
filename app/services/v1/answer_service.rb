@@ -7,15 +7,14 @@ class V1::AnswerService
 
   attr_reader :user
 
-  def create(question_id, answer_params)
-    question = Question.find(question_id)
-    user_session = UserSession.find_or_create_by!(session_id: question.session.id, user_id: user.id)
-    user_session.on_answer
-    answer = Answer.where(question_id: question_id, user_session_id: user_session.id)
+  def create(user_session_id, question_id, answer_params)
+    user_session = UserSession.find(user_session_id)
+    answer = answer_params[:type].constantize.where(question_id: question_id, user_session_id: user_session.id)
                    .order(:created_at)
-                   .first_or_initialize(question_id: question_id, user_session_id: user_session.id)
+                   .first_or_initialize(question_id: question_id, user_session_id: user_session_id)
     answer.assign_attributes(answer_params)
     answer.save!
+    user_session.on_answer
     answer.on_answer
     answer
   end

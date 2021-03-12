@@ -31,8 +31,7 @@ describe User, type: :model do
       end
 
       context 'team admin has assigned team' do
-        let(:team) { create(:team) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
+        let(:user) { build(:user, :team_admin) }
 
         it 'is valid' do
           expect(user).to be_valid
@@ -41,23 +40,13 @@ describe User, type: :model do
     end
   end
 
-  describe 'team_admin_already_exists?' do
-    context 'user has role team admin' do
-      context 'when team already has other team admin' do
-        let!(:team) { create(:team, :with_team_admin) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
+  describe '#time_zone' do
+    %w[America/New_York Europe/Warsaw Europe/Vienna America/Chicago America/Denver
+       America/Detroit].each do |time_zone|
+      context "time zone is #{time_zone}" do
+        let(:user) { build_stubbed(:user, :confirmed, :researcher, time_zone: time_zone) }
 
-        it 'is not valid' do
-          expect(user).not_to be_valid
-          expect(user.errors.messages[:team_id]).to include(/There should be only one Team Admin in a team. The chosen team already has Team Admin/)
-        end
-      end
-
-      context 'when team does not have team admin yet' do
-        let(:team) { create(:team) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
-
-        it 'is valid' do
+        it 'user is valid with time zone' do
           expect(user).to be_valid
         end
       end

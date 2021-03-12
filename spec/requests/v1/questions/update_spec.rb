@@ -23,8 +23,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               }
             }
           ],
-          "variable": {
-            "name": 'var test 1'
+          variable: {
+            name: 'var test 1'
           }
         }
       }
@@ -35,11 +35,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     context 'is invalid' do
       before { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do

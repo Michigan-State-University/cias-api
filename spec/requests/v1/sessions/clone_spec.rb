@@ -60,11 +60,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     context 'is invalid' do
       before { post v1_clone_session_path(id: session.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do
@@ -105,11 +101,11 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let(:cloned_question_groups) { Session.find(cloned_session_id).question_groups.order(:position) }
 
     let(:session_was) do
-      session.attributes.except('id', 'created_at', 'updated_at', 'position')
+      session.attributes.except('id', 'created_at', 'updated_at', 'position', 'sms_plans_count')
     end
 
     let(:session_cloned) do
-      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'position')
+      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'position', 'sms_plans_count')
     end
 
     it 'has correct http code' do

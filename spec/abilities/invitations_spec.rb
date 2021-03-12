@@ -3,8 +3,8 @@
 require 'cancan/matchers'
 
 describe Invitation do
-  let_it_be(:team1) { create(:team, :with_team_admin) }
-  let_it_be(:team2) { create(:team, :with_team_admin) }
+  let_it_be(:team1) { create(:team) }
+  let_it_be(:team2) { create(:team) }
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
   let_it_be(:team1_intervention1) { create(:intervention, user_id: team1_researcher.id) }

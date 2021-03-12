@@ -57,15 +57,21 @@ class V1::QuestionGroupsController < V1Controller
     render_json question_group: cloned_question_group, action: :show, status: :ok
   end
 
-  # TODO: Implement business logic
   def share
     authorize! :create, QuestionGroup
+    shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
+
+    render_json question_group: shared_question_group, action: :show, status: :ok
   end
 
   private
 
   def question_group_service
-    @question_group_service ||= V1::QuestionGroupService.new(current_v1_user, params[:session_id])
+    @question_group_service ||= V1::QuestionGroupService.new(current_v1_user, session_id)
+  end
+
+  def question_group_share_service
+    @question_group_share_service ||= V1::QuestionGroup::ShareService.new(current_v1_user, session_id)
   end
 
   def question_groups_scope
@@ -86,6 +92,14 @@ class V1::QuestionGroupsController < V1Controller
 
   def question_group_id
     params[:id]
+  end
+
+  def question_group_ids
+    params[:question_group][:question_group_ids]
+  end
+
+  def session_id
+    params[:session_id]
   end
 
   def question_groups_positions_params

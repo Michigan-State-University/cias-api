@@ -35,6 +35,7 @@ RSpec.describe V1::Intervention::Publish do
 
     context 'when we have preview data' do
       let!(:preview_session_user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+      let!(:preview_user_phone) { create(:phone, :confirmed, user: preview_session_user) }
       let!(:user_log_request) { create(:user_log_request, user: preview_session_user) }
       let!(:user_session) { create(:user_session, user_id: preview_session_user.id, session_id: session.id) }
 
@@ -43,6 +44,7 @@ RSpec.describe V1::Intervention::Publish do
         expect(User.exists?(id: preview_session_user.id)).to eq false
         expect(UserSession.exists?(id: user_session.id)).to eq false
         expect(UserLogRequest.exists?(user_id: preview_session_user.id)).to eq false
+        expect(Phone.exists?(id: preview_user_phone.id)).to eq false
       end
     end
   end

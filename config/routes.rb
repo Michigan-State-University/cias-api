@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     scope :users do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
+      get 'researchers', to: 'users#researchers'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]
@@ -42,13 +43,14 @@ Rails.application.routes.draw do
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     scope 'sessions/:session_id', as: 'session' do
+      post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
         resources :invitations, only: %i[index create] do
           get 'resend', on: :member
         end
-        resources :flows, only: %i[index]
+        resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
         end
@@ -61,6 +63,12 @@ Rails.application.routes.draw do
           post :share
         end
         patch :position, on: :collection
+      end
+    end
+
+    scope module: 'sms_plans' do
+      scope 'sms_plans/:sms_plan_id', as: :sms_plan do
+        resources :variants
       end
     end
 
@@ -84,11 +92,16 @@ Rails.application.routes.draw do
     end
 
     post 'questions/:id/clone', to: 'questions#clone', as: :clone_question
+    post 'questions/share', to: 'questions#share', as: :share_questions
     scope 'questions/:question_id', as: 'question' do
-      resources :answers, only: %i[index show create]
       scope module: 'questions' do
         resource :images, only: %i[create destroy]
       end
+    end
+
+    resources :user_sessions, only: %i[create] do
+      resources :questions, only: %i[index], module: 'user_sessions'
+      resources :answers, only: %i[index show create], module: 'user_sessions'
     end
 
     resources :teams, only: %i[index show create update destroy] do
@@ -99,6 +112,9 @@ Rails.application.routes.draw do
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
     post :phonetic_preview, to: 'audio#create'
+    resources :sms_plans
+
+    resources :generated_reports, only: :index
   end
 
   if Rails.env.development?

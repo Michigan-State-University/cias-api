@@ -29,7 +29,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       let(:interventions_scope) { admin_interventions + interventions_for_guests }
 
       it 'returns proper error message' do
-        expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.map(&:id)
+        expect(json_response['interventions'].pluck('id')).to match_array []
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       let(:interventions_scope) { interventions_for_guests }
 
       it 'returns proper interventions' do
-        expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.map(&:id)
+        expect(json_response['interventions'].pluck('id')).to match_array []
       end
     end
   end

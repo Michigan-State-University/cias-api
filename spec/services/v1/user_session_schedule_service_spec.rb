@@ -3,13 +3,16 @@
 RSpec.describe V1::UserSessionScheduleService do
   let!(:intervention) { create(:intervention) }
   let!(:user) { create(:user, :participant) }
-  let!(:first_session) { create(:session, intervention: intervention, position: 1) }
+  let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formula: formula) }
   let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at) }
+  let!(:third_session) { create(:session, intervention: intervention, position: 3) }
   let!(:user_session) { create(:user_session, user: user, session: first_session) }
   let(:schedule) { 'after_fill' }
   let(:schedule_payload) { 2 }
   let(:schedule_at) { (DateTime.now + 4.days).to_s }
   let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+  let(:settings) { { formula: false } }
+  let(:formula) { { patterns: [], payload: '' } }
 
   before do
     allow(message_delivery).to receive(:deliver_later)
@@ -17,61 +20,172 @@ RSpec.describe V1::UserSessionScheduleService do
   end
 
   context 'user session schedule service' do
-    context 'when session has schedule after fill' do
-      after { described_class.new(user_session).schedule }
+    context 'session scheduling' do
+      context 'when session has schedule after fill' do
+        after { described_class.new(user_session).schedule }
 
-      it 'calls correct method' do
-        expect_any_instance_of(described_class).to receive(:after_fill_schedule)
+        it 'calls correct method' do
+          expect_any_instance_of(described_class).to receive(:after_fill_schedule)
+        end
+
+        it 'sends an email' do
+          expect(SessionMailer).to receive(:inform_to_an_email).with(second_session, user.email).and_return(message_delivery)
+        end
       end
 
-      it 'sends an email' do
-        expect(SessionMailer).to receive(:inform_to_an_email).with(second_session, user.email).and_return(message_delivery)
+      context 'when session has schedule days after fill' do
+        let(:schedule) { 'days_after_fill' }
+        let(:expected_timestamp) { Time.current + schedule_payload.days }
+
+        it 'calls correct method' do
+          expect_any_instance_of(described_class).to receive(:days_after_fill_schedule)
+          described_class.new(user_session).schedule
+        end
+
+        it 'schedules on correct time' do
+          expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                 .with(second_session.id, user.id)
+                                                 .at(a_value_within(1.second).of(expected_timestamp))
+        end
+      end
+
+      context 'when session has schedule exact date' do
+        let(:schedule) { 'exact_date' }
+
+        it 'calls correct method' do
+          expect_any_instance_of(described_class).to receive(:exact_date_schedule)
+          described_class.new(user_session).schedule
+        end
+
+        it 'schedules on correct time' do
+          expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                     .with(second_session.id, user.id)
+                                                                     .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+        end
+      end
+
+      context 'when session has schedule days_after' do
+        let(:schedule) { 'days_after' }
+
+        it 'calls correct method' do
+          expect_any_instance_of(described_class).to receive(:days_after_schedule)
+          described_class.new(user_session).schedule
+        end
+
+        it 'schedules on correct time' do
+          expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                     .with(second_session.id, user.id)
+                                                                     .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+        end
       end
     end
 
-    context 'when session has schedule days after fill' do
-      let(:schedule) { 'days_after_fill' }
-      let(:expected_timestamp) { Time.current + schedule_payload.days }
+    context 'session branching' do
+      let(:instance) { described_class.new(user_session) }
 
-      it 'calls correct method' do
-        expect_any_instance_of(described_class).to receive(:days_after_fill_schedule)
-        described_class.new(user_session).schedule
+      context 'formula settings is off' do
+        context 'formula is empty' do
+          it 'returns next session id' do
+            expect(instance.branch_to_session.id).to eq(second_session.id)
+          end
+        end
+
+        context 'formula is set up' do
+          let(:question_group) { create(:question_group, session: first_session) }
+          let(:question) { create(:question_single, question_group: question_group) }
+          let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+          let(:formula) do
+            {
+              payload: 'test',
+              patterns: [{
+                match: '=2',
+                target: {
+                  id: second_session.id,
+                  type: 'Session'
+                }
+              },
+                         {
+                           match: '=1',
+                           target: {
+                             id: third_session.id,
+                             type: 'Session'
+                           }
+                         }]
+            }
+          end
+
+          it 'returns next session id' do
+            expect(instance.branch_to_session.id).to eq(second_session.id)
+          end
+        end
       end
 
-      it 'schedules on correct time' do
-        expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                               .with(second_session.id, user.id)
-                                               .at(a_value_within(1.second).of(expected_timestamp))
-      end
-    end
+      context 'formula settings is on' do
+        let(:settings) { { formula: true } }
 
-    context 'when session has schedule exact date' do
-      let(:schedule) { 'exact_date' }
+        context 'branching is empty' do
+          it 'returns next session id' do
+            expect(instance.branch_to_session.id).to eq(second_session.id)
+          end
+        end
 
-      it 'calls correct method' do
-        expect_any_instance_of(described_class).to receive(:exact_date_schedule)
-        described_class.new(user_session).schedule
-      end
+        context 'branching is set up' do
+          let(:question_group) { create(:question_group, session: first_session) }
+          let(:question) { create(:question_single, question_group: question_group) }
+          let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
 
-      it 'schedules on correct time' do
-        expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                   .with(second_session.id, user.id)
-                                                                   .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
-      end
-    end
+          context 'branches with match' do
+            let(:formula) do
+              {
+                payload: 'test',
+                patterns: [{
+                  match: '=2',
+                  target: {
+                    id: second_session.id,
+                    type: 'Session'
+                  }
+                },
+                           {
+                             match: '=1',
+                             target: {
+                               id: third_session.id,
+                               type: 'Session'
+                             }
+                           }]
+              }
+            end
 
-    context 'when session has schedule days_after' do
-      let(:schedule) { 'days_after' }
+            it 'returns branched session id' do
+              expect(instance.branch_to_session.id).to eq third_session.id
+            end
+          end
 
-      it 'calls correct method' do
-        expect_any_instance_of(described_class).to receive(:days_after_schedule)
-        described_class.new(user_session).schedule
-      end
+          context 'branches with no match' do
+            let(:formula) do
+              {
+                payload: 'test',
+                patterns: [{
+                  match: '=2',
+                  target: {
+                    id: second_session.id,
+                    type: 'Session'
+                  }
+                },
+                           {
+                             match: '=3',
+                             target: {
+                               id: third_session.id,
+                               type: 'Session'
+                             }
+                           }]
+              }
+            end
 
-      it 'schedules on correct time' do
-        expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                   .with(second_session.id, user.id)
-                                                                   .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+            it 'returns branched session id' do
+              expect(instance.branch_to_session.id).to eq second_session.id
+            end
+          end
+        end
       end
     end
   end

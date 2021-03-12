@@ -36,8 +36,8 @@ FactoryBot.define do
             }
           }
         ],
-        "variable": {
-          "name": 'var_1'
+        variable: {
+          name: 'var_1'
         }
       }
     end

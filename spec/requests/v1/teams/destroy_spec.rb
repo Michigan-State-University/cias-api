@@ -19,12 +19,20 @@ RSpec.describe 'DELETE /v1/teams/:id', type: :request do
       expect { request }.to change(Team, :count).by(-1)
     end
 
-    context 'with team admin' do
-      let!(:team_admin) { create(:user, :team_admin, team_id: team_id) }
+    context 'with team admin, with only one team' do
+      let!(:team_admin) { team.team_admin }
 
       it 'changes team admin role to researcher after removing team' do
-        expect { request }.to change { team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
-          change(team_admin, :team_id).from(team_id).to(nil)
+        expect { request }.to change { team_admin.reload.roles }.from(['team_admin']).to(['researcher'])
+      end
+    end
+
+    context 'with team admin, with other teams' do
+      let!(:team_admin) { team.team_admin }
+      let!(:other_team) { create(:team, team_admin: team_admin) }
+
+      it 'does not change team admin role' do
+        expect { request }.to avoid_changing { team_admin.reload.roles }
       end
     end
   end

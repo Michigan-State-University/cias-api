@@ -16,9 +16,9 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest participant researcher team_admin admin preview_session].freeze
+  APP_ROLES = %w[guest participant third_party researcher team_admin admin preview_session].freeze
 
-  TIME_ZONES = ActiveSupport::TimeZone::MAPPING.values.uniq.sort.freeze
+  TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
   enumerate_for :roles,
                 APP_ROLES,
@@ -26,8 +26,7 @@ class User < ApplicationRecord
                 allow_blank: true
 
   validates :time_zone, inclusion: { in: TIME_ZONES }
-  validate :team_is_present?, if: :team_admin?
-  validate :team_admin_already_exists?, if: :team_admin?
+  validate :team_is_present?, if: :team_admin?, on: :update
 
   has_one :phone, dependent: :destroy
   accepts_nested_attributes_for :phone, update_only: true
@@ -38,13 +37,18 @@ class User < ApplicationRecord
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :user_log_requests, dependent: :destroy
   belongs_to :team, optional: true
+  has_many :admins_teams, class_name: 'Team', dependent: :nullify,
+                          foreign_key: :team_admin_id, inverse_of: :team_admin
   has_many :team_invitations, dependent: :destroy
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
 
+  delegate :name, to: :team, prefix: true, allow_nil: true
+
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
+  scope :third_parties, -> { limit_to_roles('third_party') }
   scope :from_team, ->(team_id) { where(team_id: team_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
   scope :participants, -> { limit_to_roles('participant') }
@@ -87,6 +91,14 @@ class User < ApplicationRecord
     devise_mailer.send(notification, self, *args).deliver_later
   end
 
+  def deactivated?
+    !active?
+  end
+
+  def not_a_third_party?
+    roles.exclude?('third_party')
+  end
+
   private
 
   def team_admin?
@@ -94,16 +106,8 @@ class User < ApplicationRecord
   end
 
   def team_is_present?
-    return if team_id.present?
+    return if Team.exists?(team_admin_id: id)
 
     errors.add(:roles, :team_id_is_required_for_team_admin)
-  end
-
-  def team_admin_already_exists?
-    return unless User.limit_to_roles(['team_admin']).
-                       from_team(team_id).
-                       where.not(id: id).exists?
-
-    errors.add(:team_id, :team_admin_already_exists_for_the_team)
   end
 end

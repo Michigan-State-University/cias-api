@@ -26,11 +26,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
     context 'is invalid' do
       before { post clone_v1_intervention_path(id: intervention.id) }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
-        )
-      end
+      it { expect(response).to have_http_status(:unauthorized) }
     end
 
     context 'is valid' do
@@ -107,10 +103,6 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
 
   context 'when researcher sends copy to other reseracher' do
     let(:other_user) { create(:user, :confirmed, :researcher) }
-    let(:params) { { intervention: { user_ids: [other_user.id] } } }
-
-    before { post clone_v1_intervention_path(id: intervention.id), params: params, headers: headers }
-
     let(:cloned_intervention_object) { Intervention.find(json_response['data'].first['id']) }
     let(:cloned_sessions) { cloned_intervention_object.sessions.order(:position) }
     let(:cloned_questions) { cloned_sessions.first.questions.order(:position) }
@@ -120,6 +112,9 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
     let(:intervention_cloned) do
       json_response['data'].first['attributes'].except('id', 'created_at', 'updated_at', 'sessions')
     end
+    let(:params) { { intervention: { user_ids: [other_user.id] } } }
+
+    before { post clone_v1_intervention_path(id: intervention.id), params: params, headers: headers }
 
     it { expect(response).to have_http_status(:created) }
 

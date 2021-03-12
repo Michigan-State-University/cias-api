@@ -1,0 +1,115 @@
+# frozen_string_literal: true
+
+require 'cancan/matchers'
+
+describe SmsPlan do
+  describe 'abilities' do
+    subject(:ability) { Ability.new(user) }
+
+    context 'admin' do
+      let(:user) { build_stubbed(:user, :confirmed, :admin) }
+
+      it { should have_abilities(:manage, described_class) }
+    end
+
+    context 'team admin' do
+      let!(:user) { create(:user, :confirmed, :team_admin) }
+      let!(:intervention_1) { create(:intervention, user: user) }
+      let!(:session_1) { create(:session, intervention: intervention_1) }
+      let!(:sms_plan_1) { create(:sms_plan, session: session_1) }
+
+      let!(:user_2) { create(:user, :researcher, team_id: user.team_id) }
+      let!(:intervention_2) { create(:intervention, user: user_2) }
+      let!(:session_2) { create(:session, intervention: intervention_2) }
+      let!(:sms_plan_2) { create(:sms_plan, session: session_2) }
+
+      let!(:another_team) { create(:team, team_admin: user) }
+      let!(:user_3) { create(:user, :researcher, team: another_team) }
+      let!(:intervention_3) { create(:intervention, user: user_3) }
+      let!(:session_3) { create(:session, intervention: intervention_3) }
+      let!(:sms_plan_3) { create(:sms_plan, session: session_3) }
+
+      it { should have_abilities(:manage, described_class) }
+
+      it 'can manage sms plans for sessions created by him' do
+        expect(subject).to have_abilities({ manage: true }, sms_plan_1)
+      end
+
+      it 'can manage sms plans for sessions created by users from his teams' do
+        expect(subject).to have_abilities({ manage: true }, sms_plan_2)
+        expect(subject).to have_abilities({ manage: true }, sms_plan_3)
+      end
+    end
+
+    context 'researcher' do
+      let(:user) { build_stubbed(:user, :confirmed, :researcher) }
+
+      it { should have_abilities(:manage, described_class) }
+    end
+
+    context 'participant' do
+      let(:user) { build_stubbed(:user, :confirmed, :participant) }
+
+      it do
+        expect(subject).to not_have_abilities(
+          %i[read create update destroy],
+          described_class
+        )
+      end
+    end
+
+    context 'guest' do
+      let(:user) { build_stubbed(:user, :confirmed, :guest) }
+
+      it do
+        expect(subject).to not_have_abilities(
+          %i[read create update destroy],
+          described_class
+        )
+      end
+    end
+  end
+
+  describe '#accessible_by' do
+    subject { described_class.accessible_by(ability) }
+
+    let(:ability) { Ability.new(user) }
+
+    let(:session_1) { create(:session) }
+    let(:session_2) { create(:session) }
+    let!(:sms_plan_1) { create(:sms_plan, session: session_1) }
+    let!(:sms_plan_2) { create(:sms_plan, session: session_2) }
+
+    context 'admin' do
+      let!(:user) { create(:user, :confirmed, :admin) }
+
+      it 'can access all sms plans' do
+        expect(subject).to include(sms_plan_1, sms_plan_2)
+      end
+    end
+
+    context 'researcher' do
+      let!(:user) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention, user: user) }
+      let(:session_1) { create(:session, intervention: intervention) }
+
+      it 'can access for sms plan connected with session of intervention created by researcher' do
+        expect(subject).to include(sms_plan_1)
+        expect(subject).not_to include(sms_plan_2)
+      end
+    end
+
+    context 'team admin' do
+      let(:team) { create(:team) }
+      let!(:user) { team.team_admin }
+      let(:team_intervention) { create(:intervention, user: user) }
+
+      let(:session_1) { create(:session, intervention: team_intervention) }
+
+      it 'can access for sms plan connected with session of intervention from his team' do
+        expect(subject).to include(sms_plan_1)
+        expect(subject).not_to include(sms_plan_2)
+      end
+    end
+  end
+end

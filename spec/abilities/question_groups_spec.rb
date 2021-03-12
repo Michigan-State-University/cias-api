@@ -3,14 +3,17 @@
 require 'cancan/matchers'
 
 describe QuestionGroup do
-  let_it_be(:team1) { create(:team, :with_team_admin) }
-  let_it_be(:team2) { create(:team, :with_team_admin) }
+  let_it_be(:team1) { create(:team) }
+  let_it_be(:team2) { create(:team) }
+  let_it_be(:team3) { create(:team, team_admin: team1.team_admin) }
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
+  let_it_be(:team3_researcher) { create(:user, :confirmed, :researcher, team_id: team3.id) }
   let_it_be(:team1_intervention1) { create(:intervention, user_id: team1_researcher.id) }
   let_it_be(:team1_intervention2) { create(:intervention, user_id: team1.team_admin.id) }
   let_it_be(:team2_intervention1) { create(:intervention, user_id: team2_researcher.id) }
   let_it_be(:team2_intervention2) { create(:intervention, user_id: team2.team_admin.id) }
+  let_it_be(:team3_intervention1) { create(:intervention, user_id: team3.team_admin.id) }
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
@@ -20,11 +23,13 @@ describe QuestionGroup do
       team1_session2 = create(:session, intervention: team1_intervention2)
       team2_session1 = create(:session, intervention: team2_intervention1)
       team2_session2 = create(:session, intervention: team2_intervention2)
+      team3_session1 = create(:session, intervention: team3_intervention1)
 
       @team1_question_group1 = create(:question_group, session: team1_session1)
       @team1_question_group2 = create(:question_group, session: team1_session2)
       @team2_question_group1 = create(:question_group, session: team2_session1)
       @team2_question_group2 = create(:question_group, session: team2_session2)
+      @team3_question_group1 = create(:question_group, session: team3_session1)
     end
   end
 
@@ -32,6 +37,7 @@ describe QuestionGroup do
   let(:team1_question_group2) { @team1_question_group2 }
   let(:team2_question_group1) { @team2_question_group1 }
   let(:team2_question_group2) { @team2_question_group2 }
+  let(:team3_question_group1) { @team3_question_group1 }
 
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }
@@ -47,6 +53,7 @@ describe QuestionGroup do
 
       it 'can manage question_group of the user belonging to his team' do
         expect(subject).to have_abilities({ manage: true }, team1_question_group1)
+        expect(subject).to have_abilities({ manage: true }, team3_question_group1)
       end
 
       it 'can manage his question_group' do
@@ -78,7 +85,7 @@ describe QuestionGroup do
       let!(:user) { team1.team_admin }
 
       it 'can access only question_groups from his team' do
-        expect(subject).to include(team1_question_group1, team1_question_group2).and \
+        expect(subject).to include(team1_question_group1, team1_question_group2, team3_question_group1).and \
           not_include(team2_question_group1, team2_question_group2)
       end
     end
@@ -127,10 +134,10 @@ describe QuestionGroup do
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
 
-      it 'can access only for questions groups of preview session created for preview user' do
+      it 'can\'t access only for questions groups of preview session created for preview user' do
         expect(subject).not_to include(team1_question_group1,
                                        team1_question_group2, team2_question_group1, team2_question_group2)
-        expect(subject).to include(prev_question_group)
+        expect(subject).not_to include(prev_question_group)
       end
     end
   end

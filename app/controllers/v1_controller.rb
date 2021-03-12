@@ -7,32 +7,34 @@ class V1Controller < ApplicationController
   include Pagination
   include Resource
 
+  before_action :authenticate_user!
+
   def current_v1_user
-    @current_v1_user ||= super || create_guest_user
+    @current_v1_user ||= super
+  end
+
+  def create_guest_user
+    V1::Users::CreateGuest.call
+  end
+
+  def create_preview_session_user(session_id)
+    User.new.tap do |u|
+      u.preview_session_id = session_id
+      u.roles = %w[preview_session]
+      u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@preview.session"
+      u.skip_confirmation!
+      u.save(validate: false)
+    end
   end
 
   private
 
-  def bypass_auth_for_development_only
-    return unless Rails.env.development?
-
-    @current_v1_user = User.find_by(email: Settings.headers.uid)
-    Settings.headers.each { |header| response.set_header(header[0].to_s, header[1].to_s) }
+  def authenticate_user!
+    head :unauthorized unless signed_in?
   end
 
-  def guest_user
-    @guest_user ||= User.new.tap do |u|
-      u.roles = %w[guest]
-      u.skip_confirmation!
-    end
-  end
-
-  def create_guest_user
-    user = guest_user
-    user.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@guest.true"
-    user.save(validate: false)
-    response.headers.merge!(user.create_new_auth_token)
-    user
+  def signed_in?
+    current_v1_user.present?
   end
 
   def current_ability

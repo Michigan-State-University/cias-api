@@ -4,19 +4,20 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/teams', type: :request do
   let(:request) { post v1_teams_path, params: params, headers: headers }
-  let!(:researcher) { create(:user, :confirmed, :researcher) }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
 
-  context 'when params are valid' do
+  context 'when params are valid, new team admin is researcher' do
+    let(:new_team_admin) { create(:user, :confirmed, :researcher) }
     let(:params) do
       {
         team: {
           name: 'Best Team',
-          user_id: researcher.id
+          user_id: new_team_admin.id
         }
       }
     end
+    let(:new_team) { Team.order(:created_at).last }
 
     it 'returns :created status' do
       request
@@ -26,12 +27,44 @@ RSpec.describe 'POST /v1/teams', type: :request do
     it 'creates new team with proper name, sets researcher as team admin' do
       expect { request }.to change(Team, :count).by(1)
 
-      expect(Team.last).to have_attributes(
-        name: 'Best Team'
+      expect(new_team).to have_attributes(
+        name: 'Best Team',
+        team_admin_id: new_team_admin.id
       )
-      expect(researcher.reload).to have_attributes(
-        team_id: json_response.dig('data', 'id'),
-        roles: ['team_admin']
+      expect(new_team_admin.reload).to have_attributes(
+        roles: ['team_admin'],
+        team_id: nil
+      )
+    end
+  end
+
+  context 'when params are valid, new team admin is team_admin' do
+    let!(:new_team_admin) { create(:user, :confirmed, :team_admin) }
+    let(:params) do
+      {
+        team: {
+          name: 'Best Team',
+          user_id: new_team_admin.id
+        }
+      }
+    end
+    let(:new_team) { Team.order(:created_at).last }
+
+    it 'returns :created status' do
+      request
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'creates new team with proper name, sets team admin as team\'s admin' do
+      expect { request }.to change(Team, :count).by(1)
+
+      expect(new_team).to have_attributes(
+        name: 'Best Team',
+        team_admin_id: new_team_admin.id
+      )
+      expect(new_team_admin.reload).to have_attributes(
+        roles: ['team_admin'],
+        team_id: nil
       )
     end
   end
@@ -51,7 +84,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
 
       it 'does not create new team, returns :unprocessable_entity status' do
         expect { request }.not_to change(Team, :count)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:not_found)
       end
     end
 

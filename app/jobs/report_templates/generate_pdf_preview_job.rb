@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReportTemplates::GeneratePdfPreviewJob < ApplicationJob
-  queue_as :default
+  queue_as :reports
 
   def perform(report_template_id, current_v1_user_id)
     V1::ReportTemplates::GeneratePdfPreview.call(

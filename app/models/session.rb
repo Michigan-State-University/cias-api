@@ -11,6 +11,8 @@ class Session < ApplicationRecord
   has_many :question_groups, dependent: :destroy, inverse_of: :session
   has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
   has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
+  has_many :sms_plans, dependent: :destroy
+
   has_many :questions, dependent: :destroy, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy
@@ -20,13 +22,14 @@ class Session < ApplicationRecord
   has_many :users, through: :user_sessions
 
   attribute :settings, :json, default: assign_default_values('settings')
-  attribute :position, :integer, default: 0
+  attribute :position, :integer, default: 1
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 
   enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill' }, _prefix: :schedule
 
   delegate :published?, to: :intervention
+  delegate :draft?, to: :intervention
 
   validates :name, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
@@ -50,7 +53,7 @@ class Session < ApplicationRecord
   def propagate_settings
     return unless settings_changed?
 
-    narrator = Hash[settings['narrator'].to_a - settings_was['narrator'].to_a]
+    narrator = (settings['narrator'].to_a - settings_was['narrator'].to_a).to_h
     questions.each do |question|
       question.narrator['settings'].merge!(narrator)
       question.execute_narrator

@@ -9,7 +9,8 @@ class Ability::Researcher < Ability::Base
   private
 
   def researcher
-    can %i[read update active], User, id: participants_with_answers(user)
+    can %i[update active], User, id: participants_with_answers(user)
+    can %i[read list_researchers], User, id: participants_and_researchers(user)
     can :create, :preview_session_user
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
@@ -26,5 +27,13 @@ class Ability::Researcher < Ability::Base
         report_template_section: {
           report_template: { session: { intervention: { user_id: user.id } } }
         }
+    can :manage, SmsPlan, session_id: logged_user_sessions(user)
+    can :manage, SmsPlan::Variant, sms_plan: { session_id: logged_user_sessions(user) }
+    can :read, GeneratedReport,
+        user_session: { session: { intervention: { user_id: user.id } } }
+  end
+
+  def participants_and_researchers(user)
+    participants_with_answers(user) + researchers_from_team(user.team_id)
   end
 end

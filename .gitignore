@@ -17,3 +17,4 @@ coverage/
 .ruby-gemset
 .generators
 .DS_Store
+credentials_google.json

@@ -6,7 +6,7 @@ RSpec.describe 'DELETE /v1/teams/:team_id/remove_researcher', type: :request do
   let(:request) { delete v1_team_remove_researcher_path(team_id: team.id), params: params, headers: headers }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
-  let!(:team) { create :team, :with_team_admin }
+  let!(:team) { create :team }
 
   context 'when params are valid' do
     let(:params) do

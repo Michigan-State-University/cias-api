@@ -1,0 +1,32 @@
+# frozen_string_literal: true
+
+class V1::GeneratedReportsController < V1Controller
+  def index
+    authorize! :read, GeneratedReport
+
+    collection = generated_reports_scope.order(created_at: order)
+    paginated_collection = paginate(collection, params)
+    response = serialized_hash(
+      paginated_collection
+    )
+    response = response.merge(reports_size: collection.size)
+
+    render json: response
+  end
+
+  private
+
+  def generated_reports_scope
+    GeneratedReportFinder.search(filter_params, current_v1_user)
+  end
+
+  def filter_params
+    params.permit(:session_id, report_for: [])
+  end
+
+  def order
+    order = params[:order].presence || 'ASC'
+    order = 'ASC' unless order.casecmp?('DESC')
+    order
+  end
+end

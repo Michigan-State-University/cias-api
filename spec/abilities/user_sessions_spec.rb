@@ -3,8 +3,8 @@
 require 'cancan/matchers'
 
 describe UserSession do
-  let_it_be(:team1) { create(:team, :with_team_admin) }
-  let_it_be(:team2) { create(:team, :with_team_admin) }
+  let_it_be(:team1) { create(:team) }
+  let_it_be(:team2) { create(:team) }
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
   let_it_be(:team1_intervention1) { create(:intervention, user_id: team1_researcher.id) }
@@ -45,15 +45,15 @@ describe UserSession do
     context 'team admin' do
       let(:user) { team1.team_admin }
 
-      it 'can manage user_session of the user belonging to his team' do
+      it 'can manage user_sessions of the user belonging to his team' do
         expect(subject).to have_abilities({ manage: true }, team1_user_session1)
       end
 
-      it 'can manage his user_session' do
+      it 'can manage his user_sessions' do
         expect(subject).to have_abilities({ manage: true }, team1_user_session2)
       end
 
-      it 'can\'t manage user_session of users from another team' do
+      it 'can\'t manage user_sessions of users from another team' do
         expect(subject).to have_abilities({ manage: false }, team2_user_session1)
       end
     end
@@ -95,7 +95,7 @@ describe UserSession do
     context 'team1 - researcher' do
       let!(:user) { team1_researcher }
 
-      it 'can access only his user_session' do
+      it 'can access only his user_sessions' do
         expect(subject).to include(team1_user_session1).and \
           not_include(team1_user_session2, team2_user_session1, team2_user_session2)
       end
@@ -104,7 +104,7 @@ describe UserSession do
     context 'participant' do
       let!(:user) { create(:user, :confirmed, :participant) }
 
-      it 'can\'t access any of the teams user_session' do
+      it 'can\'t access any of the teams user_sessions' do
         expect(subject).not_to include(
           team1_user_session1, team1_user_session2, team2_user_session1, team2_user_session2
         )
@@ -114,7 +114,7 @@ describe UserSession do
     context 'guest' do
       let!(:user) { create(:user, :confirmed, :guest) }
 
-      it 'can\'t access any of the teams user_session' do
+      it 'can\'t access any of the teams user_sessions' do
         expect(subject).not_to include(
           team1_user_session1, team1_user_session2, team2_user_session1, team2_user_session2
         )

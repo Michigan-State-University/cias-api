@@ -2,15 +2,15 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# This file is the source Rails uses to define your schema when running `rails
-# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_17_125859) do
+ActiveRecord::Schema.define(version: 2021_03_09_101750) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -55,6 +55,22 @@ ActiveRecord::Schema.define(version: 2021_02_17_125859) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+  end
+
+  create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.uuid "report_template_id"
+    t.uuid "user_session_id"
+    t.string "report_for", default: "third_party", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.uuid "third_party_id"
+    t.uuid "participant_id"
+    t.index ["participant_id"], name: "index_generated_reports_on_participant_id"
+    t.index ["report_for"], name: "index_generated_reports_on_report_for"
+    t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"
+    t.index ["third_party_id"], name: "index_generated_reports_on_third_party_id"
+    t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
   end
 
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -182,11 +198,36 @@ ActiveRecord::Schema.define(version: 2021_02_17_125859) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "report_templates_count"
+    t.integer "sms_plans_count", default: 0, null: false
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
     t.index ["schedule"], name: "index_sessions_on_schedule"
     t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
+  end
+
+  create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "sms_plan_id"
+    t.string "formula_match"
+    t.text "content"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
+  end
+
+  create_table "sms_plans", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "session_id"
+    t.string "name", null: false
+    t.string "schedule", null: false
+    t.integer "schedule_payload", default: 0
+    t.string "frequency", default: "once", null: false
+    t.datetime "end_at"
+    t.string "formula"
+    t.text "no_formula_text"
+    t.boolean "is_used_formula", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -205,7 +246,9 @@ ActiveRecord::Schema.define(version: 2021_02_17_125859) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.uuid "team_admin_id"
     t.index ["name"], name: "index_teams_on_name", unique: true
+    t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

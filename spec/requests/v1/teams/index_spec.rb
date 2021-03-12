@@ -7,9 +7,9 @@ RSpec.describe 'GET /v1/teams', type: :request do
   let(:headers) { user.create_new_auth_token }
 
   context 'when there are teams' do
-    let!(:team_1) { create(:team, :with_team_admin) }
+    let!(:team_1) { create(:team) }
     let!(:team_1_researcher) { create(:user, :researcher) }
-    let!(:team_2) { create(:team, :with_team_admin) }
+    let!(:team_2) { create(:team) }
     let!(:team_2_researcher) { create(:user, :researcher) }
     let(:team_1_admin) { team_1.team_admin }
     let(:team_2_admin) { team_2.team_admin }
@@ -28,7 +28,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
       expect(json_response['data']).to include(
         'id' => team_1.id.to_s,
         'type' => 'team',
-        'attributes' => include('name' => team_1.name),
+        'attributes' => include('name' => team_1.name, 'team_admin_id' => team_1_admin.id),
         'relationships' => {
           'team_admin' => {
             'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
@@ -37,7 +37,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
       ).and include(
         'id' => team_2.id.to_s,
         'type' => 'team',
-        'attributes' => include('name' => team_2.name),
+        'attributes' => include('name' => team_2.name, 'team_admin_id' => team_2_admin.id),
         'relationships' => {
           'team_admin' => {
             'data' => include('id' => team_2_admin.id, 'type' => 'team_admin')
@@ -52,7 +52,8 @@ RSpec.describe 'GET /v1/teams', type: :request do
           'email' => team_2_admin.email,
           'full_name' => team_2_admin.full_name,
           'roles' => ['team_admin'],
-          'team_id' => team_2.id
+          'team_id' => nil,
+          'admins_team_ids' => [team_2.id]
         )
       ).and include(
         'id' => team_1_admin.id,
@@ -61,8 +62,13 @@ RSpec.describe 'GET /v1/teams', type: :request do
           'email' => team_1_admin.email,
           'full_name' => team_1_admin.full_name,
           'roles' => ['team_admin'],
-          'team_id' => team_1.id
+          'team_id' => nil,
+          'admins_team_ids' => [team_1.id]
         )
+      )
+
+      expect(json_response['meta']).to include(
+        'teams_size' => 2
       )
     end
   end

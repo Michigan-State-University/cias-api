@@ -237,22 +237,22 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
     context 'and intervention status is published' do
       context 'with anyone with link access setting' do
         it 'returns correct http status' do
-          expect(response).to have_http_status(:ok)
+          expect(response).to have_http_status(:not_found)
         end
 
         it 'has correct size of question groups' do
-          expect(json_response['question_groups'].size).to eq(4)
+          expect(json_response['question_groups']).to be(nil)
         end
 
         context 'with only registered participant access setting' do
           let(:shared_to) { :registered }
 
           it 'returns correct http status' do
-            expect(response).to have_http_status(:ok)
+            expect(response).to have_http_status(:not_found)
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['question_groups']).to eq(nil)
           end
         end
 
@@ -273,11 +273,11 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
             let(:users_with_accesses) { [build(:intervention_invitation, email: participant.email)] }
 
             it 'returns correct http status' do
-              expect(response).to have_http_status(:ok)
+              expect(response).to have_http_status(:not_found)
             end
 
             it 'has correct size of question groups' do
-              expect(json_response['question_groups'].size).to eq(4)
+              expect(json_response['question_groups']).to be(nil)
             end
           end
         end
@@ -303,11 +303,11 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
     context 'and intervention status is published' do
       context 'with anyone with link access setting' do
         it 'returns correct http status' do
-          expect(response).to have_http_status(:ok)
+          expect(response).to have_http_status(:not_found)
         end
 
         it 'has correct size of question groups' do
-          expect(json_response['question_groups'].size).to eq(4)
+          expect(json_response['question_groups']).to be(nil)
         end
       end
 

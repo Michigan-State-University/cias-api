@@ -3,8 +3,8 @@
 require 'cancan/matchers'
 
 describe Answer do
-  let_it_be(:team1) { create(:team, :with_team_admin) }
-  let_it_be(:team2) { create(:team, :with_team_admin) }
+  let_it_be(:team1) { create(:team) }
+  let_it_be(:team2) { create(:team) }
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
   let_it_be(:team1_intervention1) { create(:intervention, user_id: team1_researcher.id) }
@@ -72,11 +72,12 @@ describe Answer do
       let!(:preview_session) { create(:session) }
       let!(:prev_question_group) { create(:question_group, session: preview_session) }
       let!(:prev_question) { create(:question_multiple, question_group: prev_question_group) }
-      let!(:prev_answer) { create(:answer_multiple, question: prev_question) }
+      let!(:prev_answer) { create(:answer_multiple, question: prev_question, user_session: user_session) }
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
+      let!(:user_session) { create(:user_session, user: user, session: preview_session) }
 
-      it 'can create answers only for questions of preview session created for preview user' do
+      it 'can\'t create answers only for questions of preview session created for preview user' do
         expect(subject).to have_abilities({ create: true }, prev_answer)
         expect(subject).to have_abilities({ create: false }, team2_answer1)
       end

@@ -7,6 +7,14 @@ FactoryBot.define do
     summary    { 'Your session summary' }
     association(:session)
 
+    trait :third_party do
+      report_for { 'third_party' }
+    end
+
+    trait :participant do
+      report_for { 'participant' }
+    end
+
     trait :with_logo do
       after(:create) do |report_template|
         report_template.update(
