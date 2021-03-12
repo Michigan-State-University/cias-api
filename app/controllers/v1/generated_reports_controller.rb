@@ -21,7 +21,7 @@ class V1::GeneratedReportsController < V1Controller
   end
 
   def filter_params
-    params.permit(:report_for)
+    params.permit(:session_id, report_for: [])
   end
 
   def order
