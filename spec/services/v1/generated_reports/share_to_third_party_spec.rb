@@ -10,6 +10,15 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
                                 body: { data: [{ value: 'johnny@example.com' }] })
   end
 
+  before do
+    ActiveJob::Base.queue_adapter = :test
+    Timecop.freeze
+  end
+
+  after do
+    Timecop.return
+  end
+
   context 'when user with the email not exist in the system' do
     let(:new_user) { User.third_parties.first }
 
@@ -17,6 +26,10 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
       expect { subject }.to change(User, :count).by(1)
 
       expect(generated_report.reload.third_party_id).to eq(new_user.id)
+
+      expect(ActionMailer::MailDeliveryJob).to have_been_enqueued
+      expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
+            .with(new_user.email)
 
       expect(new_user).to have_attributes(
         roles: ['third_party'],

@@ -20,7 +20,12 @@ class V1::GeneratedReports::ShareToParticipant
       participant_id: participant.id
     )
 
-    GeneratedReportMailer.new_report_available(participant.email).deliver
+    if participant.confirmed?
+      GeneratedReportMailer.new_report_available(participant.email).deliver_now
+    else
+      SendNewReportNotificationJob.set(wait: 30.seconds)
+        .perform_later(participant.email)
+    end
   end
 
   private
