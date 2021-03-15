@@ -28,7 +28,7 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.includes(:sessions).accessible_by(current_ability)
+    Intervention.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
   end
 
   def intervention_load
