@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  before_save :invalidate_token_after_changes
+
   devise :confirmable,
          :database_authenticatable,
          :invitable,
@@ -109,5 +111,12 @@ class User < ApplicationRecord
     return if Team.exists?(team_admin_id: id)
 
     errors.add(:roles, :team_id_is_required_for_team_admin)
+  end
+
+  def invalidate_token_after_changes
+    return unless persisted?
+    return if !roles_changed? && (!active_changed? || active)
+
+    self.tokens = {}
   end
 end
