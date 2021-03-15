@@ -35,13 +35,14 @@ RSpec.describe V1::QuestionService do
 
     context 'questions are from different question groups' do
       let(:question_ids) { [questions.first.id, questions_2.first.id] }
-      let(:result) { subject.clone_multiple(session.id, question_ids) }
+      let(:copied_questions) { Question.where(id: question_ids) }
+      let(:result) { subject.clone_multiple(session.id, question_ids).sort_by(&:position) }
 
       it 'returns list of cloned questions' do
-        expect(result[0].attributes).to include({ 'title' => questions.first.title,
+        expect(result[0].attributes).to include({ 'title' => copied_questions[0].title,
                                                   'position' => 1,
                                                   'question_group_id' => session.question_groups.reload.last(2).first.id })
-        expect(result[1].attributes).to include({ 'title' => questions_2.first.title,
+        expect(result[1].attributes).to include({ 'title' => copied_questions[1].title,
                                                   'position' => 2,
                                                   'question_group_id' => session.question_groups.reload.last(2).first.id })
       end
