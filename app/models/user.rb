@@ -101,6 +101,10 @@ class User < ApplicationRecord
     roles.exclude?('third_party')
   end
 
+  def with_invalid_email?
+    roles.include?('guest') || roles.include?('preview_session')
+  end
+
   private
 
   def team_admin?
