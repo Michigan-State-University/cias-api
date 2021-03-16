@@ -14,6 +14,7 @@ class Question < ApplicationRecord
   attribute :position, :integer, default: 0
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
+  attribute :duplicated, :boolean, default: false
 
   has_one_attached :image
   has_many_attached :speeches
@@ -31,6 +32,7 @@ class Question < ApplicationRecord
 
   delegate :session, to: :question_group
   after_create :initialize_narrator
+  before_destroy :decrement_usage_counters
   default_scope { order(:position) }
 
   def subclass_name
@@ -50,10 +52,6 @@ class Question < ApplicationRecord
     next_obj
   end
 
-  def harvest_body_variables
-    [nil]
-  end
-
   def variable_clone_prefix
     nil
   end
@@ -66,11 +64,19 @@ class Question < ApplicationRecord
     narrator['blocks'] = []
   end
 
+  def csv_header_names
+    [body_variable['name']]
+  end
+
   private
 
   def initialize_narrator
     narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish'
     execute_narrator
+  end
+
+  def decrement_usage_counters
+    Narrator.new(self).execute(destroy: true)
   end
 
   def json_schema_path

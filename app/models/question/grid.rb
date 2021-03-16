@@ -9,7 +9,7 @@ class Question::Grid < Question
     )
   end
 
-  def harvest_body_variables
+  def csv_header_names
     body_data.first['payload']['rows'].map { |row| row['variable']['name'] }
   end
 

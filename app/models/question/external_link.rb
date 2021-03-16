@@ -6,8 +6,4 @@ class Question::ExternalLink < Question
   def variable_clone_prefix
     body['variable']['name'] = "clone_#{body['variable']['name']}"
   end
-
-  def harvest_body_variables
-    [body_variable['name']]
-  end
 end

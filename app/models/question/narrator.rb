@@ -9,8 +9,15 @@ class Question::Narrator
     @question = question
   end
 
-  def execute
-    self.outdated_files = Blobs.new(question.narrator_was).execute
+  def execute(destroy: false)
+    return if question.changed? && question.narrator == question.narrator_was
+
+    self.outdated_files = Blobs.new(question.narrator_was, cloned = question.duplicated).execute
+
+    if destroy
+      outdated_files.purification
+      return
+    end
 
     return unless Launch.new(question, outdated_files).execute
 

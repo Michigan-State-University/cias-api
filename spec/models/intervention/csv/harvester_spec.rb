@@ -3,10 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe Intervention::Csv::Harvester, type: :model do
-  let(:subject) { described_class.new([question]) }
+  let(:subject) { described_class.new(questions) }
+  let!(:questions) { Question.where(id: question.id).joins(:question_group) }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention) }
   let!(:session) { create(:session, intervention: intervention) }
+  let!(:user_session) { create(:user_session, user: user, session: session) }
   let!(:question_group) { create(:question_group_plain, session: session) }
 
   describe '#collect_data' do
@@ -31,7 +33,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_single, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
@@ -70,7 +72,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_multiple, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_multiple, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_multiple, question: question, body: answer_body, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
@@ -99,7 +101,9 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_free_response, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_free_response, question: question, body: answer_body) }
+      let!(:answer) do
+        create(:answer_free_response, question: question, body: answer_body, user_session: user_session)
+      end
 
       it 'save every variables and scores to csv' do
         subject.collect
@@ -128,7 +132,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_number, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_number, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_number, question: question, body: answer_body, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
@@ -171,7 +175,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_grid, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_grid, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_grid, question: question, body: answer_body, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
@@ -203,7 +207,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_slider, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_slider, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_slider, question: question, body: answer_body, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
@@ -232,7 +236,9 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_external_link, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_external_link, question: question, body: answer_body) }
+      let!(:answer) do
+        create(:answer_external_link, question: question, body: answer_body, user_session: user_session)
+      end
 
       it 'save variable and the clicking on the link to csv' do
         subject.collect
@@ -261,7 +267,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_date, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_date, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_date, question: question, body: answer_body, user_session: user_session) }
 
       it 'save variable and the clicking on the link to csv' do
         subject.collect
@@ -284,13 +290,13 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           'data' => [
             {
               'var' => 'phone',
-              'value' => '+48123123123'
+              'value' => { 'iso' => 'PL', 'number' => '123123123', 'prefix' => '+48', 'confirmed' => true }
             }
           ]
         }
       end
       let!(:question) { create(:question_phone, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_phone, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_phone, question: question, body: answer_body, user_session: user_session) }
 
       it 'save variable and the value to csv' do
         subject.collect
@@ -319,12 +325,78 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_currency, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_currency, question: question, body: answer_body) }
+      let!(:answer) { create(:answer_currency, question: question, body: answer_body, user_session: user_session) }
 
       it 'save variable and the value to csv' do
         subject.collect
         expect(subject.header).to eq [:user_id, :email, 'currency']
         expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD']]
+      end
+    end
+
+    context 'when exist questions without answers' do
+      let!(:question_1_body) do
+        {
+          'data' => [
+            { 'value' => '1', 'payload' => '' },
+            { 'value' => '2', 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'var_1' }
+        }
+      end
+      let!(:answer_1_body) do
+        {
+          'data' => [
+            {
+              'var' => 'var_1',
+              'value' => '1'
+            }
+          ]
+        }
+      end
+      let!(:question_2_body) do
+        {
+          'data' => [
+            {
+              'payload' => '',
+              'variable' => { 'name' => 'var_2', value: '1' }
+            },
+            {
+              'payload' => '',
+              'variable' => { 'name' => 'var_3', value: '2' }
+            }
+          ]
+        }
+      end
+      let!(:question_1) do
+        create(:question_single, question_group: question_group, body: question_1_body, position: 1)
+      end
+      let!(:question_2) do
+        create(:question_multiple, question_group: question_group, body: question_2_body, position: 2)
+      end
+      let!(:question_3) { create(:question_name, position: 3) }
+      let!(:questions) do
+        Question.joins(:question_group).where(id: [question_1.id, question_2.id, question_3.id]).order(:position)
+      end
+      let!(:answer_1) do
+        create(:answer_single, question: question_1, body: answer_1_body, user_session: user_session)
+      end
+      let!(:answer_2) do
+        create(:answer_name, user_session: user_session, question: question_3, body: { data: [
+                 { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
+               ] })
+      end
+
+      it 'save nil values for each variable unanswered questions' do
+        subject.collect
+        expect(subject.header).to eq [:user_id, :email, 'var_1', 'var_2', 'var_3', 'phoneticName']
+        expect(subject.rows).to eq [
+          [
+            answer_1.user_session.user_id.to_s,
+            answer_1.user_session.user.email.to_s,
+            '1', nil, nil, { 'name' => 'John', 'phoneticName' => 'John' }
+          ]
+        ]
       end
     end
   end

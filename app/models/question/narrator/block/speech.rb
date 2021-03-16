@@ -12,7 +12,7 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
 
   def prepare_sha256_for(block)
     block['sha256'] = block['text'].map do |text|
-      Digest::SHA256.hexdigest(text)
+      Digest::SHA256.hexdigest(text.strip.downcase)
     end
   end
 
@@ -21,7 +21,6 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
       was_audio_url_result = was_audio_url(digest)
       new_audio_url = was_audio_url_result || create_audio_url(digest, index_block, block)
 
-      outdated_files.remove(digest)
       new_audio_url
     end
   end
@@ -30,7 +29,8 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
     audio = Audio.find_by(sha256: digest)
     return nil unless audio
 
-    audio.increment!(:usage_counter)
+    not_removed = outdated_files.remove(digest)
+    audio.increment!(:usage_counter) if not_removed
     audio.url
   end
 

@@ -4,10 +4,11 @@ class Question::Narrator::Blobs
   include BlockHelper
 
   attr_accessor :ids
-  attr_reader :narrator
+  attr_reader :narrator, :cloned
 
-  def initialize(narrator)
+  def initialize(narrator, cloned = false)
     @narrator = narrator
+    @cloned = cloned
     @ids = []
   end
 
@@ -18,11 +19,16 @@ class Question::Narrator::Blobs
   end
 
   def remove(digest)
+    return true if cloned
+
     digest_index = ids.index(digest)
     ids.delete_at(digest_index) if digest_index
+    digest_index.nil?
   end
 
   def purification
+    return if cloned
+
     counts = ids.tally
     Audio.where(sha256: ids).find_each { |audio| audio.decrement!(:usage_counter, counts[audio.sha256]) }
   end
@@ -37,7 +43,7 @@ class Question::Narrator::Blobs
     narrator['blocks'].each do |b|
       if speech?(b) || read_question?(b)
         body(b)
-      elsif reflection?(b)
+      elsif reflection?(b) || reflection_formula?(b)
         reflection_block(b)
       end
     end

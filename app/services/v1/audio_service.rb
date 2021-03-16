@@ -11,8 +11,10 @@ class V1::AudioService
         text: text
       ).execute
       audio.usage_counter = 0 if preview
-      audio.reload
+    else
+      audio.increment!(:usage_counter) unless preview
     end
-    audio
+    audio.save
+    audio.reload
   end
 end

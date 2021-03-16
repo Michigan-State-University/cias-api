@@ -13,48 +13,53 @@ class Intervention::Csv::Harvester
   end
 
   def collect
-    processing
-    post_processing
+    set_headers
+    set_rows
     self
   end
 
   private
 
-  def find_or_add_row(answer, index)
-    locate = user_column.index(answer.user_session.user_id)
-    if locate.nil?
-      rows.insert(-1, [])
-      user_column.insert(-1, answer.user_session.user_id)
-      users[answer.user_session.user_id] = { id: answer.user_session.user_id, email: answer.user_session.user.email }
-      -1
-    else
-      rows[locate].insert(index, [])
-      locate
+  def set_headers
+    questions.each_with_index do |question, index|
+      header.insert(index, question.csv_header_names)
     end
+    header.flatten!
+    header.unshift(:email)
+    header.unshift(:user_id)
   end
 
-  def processing
-    questions.each_with_index do |question, index|
-      header.insert(index, question.harvest_body_variables)
-      question.answers&.each do |answer|
-        row_index = find_or_add_row(answer, index)
+  def set_rows
+    user_sessions.each_with_index do |user_session, row_index|
+      initialize_row
+      set_user_data(row_index, user_session)
+
+      user_session.answers.each do |answer|
         answer.body_data&.each do |data|
-          rows[row_index][index] = Array.new(header[index].size) if rows[row_index][index].blank?
-          find_result = header[index].index(data['var'])
-          rows[row_index][index][find_result.to_i] = data['value']
+          var_index = header.index(answer.csv_header_name(data))
+          next if var_index.blank?
+
+          var_value = answer.csv_row_value(data)
+          rows[row_index][var_index] = var_value
         end
       end
     end
   end
 
-  def post_processing
-    rows.each(&:flatten!)
-    user_column.each_with_index do |user_id, index|
-      rows[index].unshift(users[user_id][:email])
-      rows[index].unshift(users[user_id][:id])
-    end
-    header.unshift(:email)
-    header.unshift(:user_id)
-    header.flatten!
+  def user_sessions
+    UserSession.where(session_id: session_ids)
+  end
+
+  def session_ids
+    questions.select('question_groups.session_id')
+  end
+
+  def initialize_row
+    rows << Array.new(header.size)
+  end
+
+  def set_user_data(index, user_session)
+    rows[index][0] = user_session.user_id
+    rows[index][1] = user_session.user.email
   end
 end

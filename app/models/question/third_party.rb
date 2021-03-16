@@ -8,4 +8,8 @@ class Question::ThirdParty < Question
       { 'required' => false }
     )
   end
+
+  def csv_header_names
+    []
+  end
 end

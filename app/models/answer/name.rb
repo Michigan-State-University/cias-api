@@ -6,4 +6,8 @@ class Answer::Name < Answer
     user_session.name_audio = V1::AudioService.new.create(text)
     user_session.save!
   end
+
+  def csv_header_name(_data)
+    'phoneticName'
+  end
 end

@@ -335,6 +335,8 @@ GEM
     puma (5.0.4)
       nio4r (~> 2.0)
     rack (2.2.3)
+    rack-attack (6.5.0)
+      rack (>= 1.0, < 3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-test (1.1.0)
@@ -428,6 +430,7 @@ GEM
     ruby_parser (3.15.0)
       sexp_processor (~> 4.9)
     rubyzip (2.3.0)
+    secure_headers (6.3.2)
     sentry-raven (3.1.1)
       faraday (>= 1.0)
     sexp_processor (4.15.1)
@@ -527,6 +530,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   puma (~> 5.0)
+  rack-attack
   rack-cors
   rails (~> 6.0)
   redis
@@ -537,6 +541,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   rubocop-thread_safety
+  secure_headers
   sentry-raven
   shoulda-matchers
   sidekiq
