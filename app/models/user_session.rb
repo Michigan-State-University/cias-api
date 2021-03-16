@@ -54,6 +54,9 @@ class UserSession < ApplicationRecord
   end
 
   def decrement_audio_usage
-    name_audio&.decrement(:usage_counter)
+    return if name_audio.nil?
+
+    name_audio.decrement(:usage_counter)
+    name_audio.save!
   end
 end

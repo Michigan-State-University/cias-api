@@ -64,7 +64,7 @@ module BlockHelper
     {
       'action' => 'NO_ACTION',
       'animation' => 'rest',
-      'text' => ['Finish screen'],
+      'text' => ['Finish Screen'],
       'audio_urls' => [],
       'sha256' => [],
       'type' => READ_QUESTION_BLOCK,
