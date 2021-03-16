@@ -61,7 +61,6 @@ class Question < ApplicationRecord
   end
 
   def execute_narrator
-    # require 'pry'; binding.pry
     Narrator.new(self).execute
   end
 

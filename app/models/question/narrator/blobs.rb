@@ -18,7 +18,7 @@ class Question::Narrator::Blobs
     self
   end
 
-  def remove(digest, text)
+  def remove(digest)
     return true if cloned
 
     digest_index = ids.index(digest)
@@ -28,6 +28,7 @@ class Question::Narrator::Blobs
 
   def purification
     return if cloned
+
     counts = ids.tally
     Audio.where(sha256: ids).find_each { |audio| audio.decrement!(:usage_counter, counts[audio.sha256]) }
   end
