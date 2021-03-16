@@ -12,7 +12,7 @@ class Question::Narrator
   def execute(destroy: false)
     return if question.changed? && question.narrator == question.narrator_was
 
-    self.outdated_files = Blobs.new(question.narrator_was).execute
+    self.outdated_files = Blobs.new(question.narrator_was, cloned = question.duped).execute
 
     if destroy
       outdated_files.purification
