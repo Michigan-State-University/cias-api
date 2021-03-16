@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::UserSessionScheduleService do
-  let!(:intervention) { create(:intervention) }
+  let!(:intervention) { create(:intervention, :published) }
   let!(:user) { create(:user, :participant) }
   let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formula: formula) }
   let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at) }
