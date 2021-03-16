@@ -7,7 +7,7 @@ class Answer::Name < Answer
     user_session.save!
   end
 
-  def csv_header_name(data)
+  def csv_header_name(_data)
     'phoneticName'
   end
 end
