@@ -21,7 +21,10 @@ class Intervention::Csv
     Question.joins(question_group: :session)
             .where(sessions: { intervention_id: intervention.id })
             .where.not(type: %w[Question::Feedback Question::Finish Question::Information Question::ThirdParty])
-            .group('sessions.position, sessions.updated_at, questions.position, questions.updated_at, questions.id')
+            .group(
+              'sessions.position, sessions.updated_at, questions.position, questions.updated_at, questions.id',
+              'question_groups.session_id'
+            )
             .order(
               'sessions.position' => :asc,
               'sessions.updated_at' => :asc,

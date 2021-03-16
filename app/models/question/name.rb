@@ -8,4 +8,8 @@ class Question::Name < Question
       { 'required' => true }
     )
   end
+
+  def csv_header_names
+    ['phoneticName']
+  end
 end

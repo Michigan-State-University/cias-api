@@ -196,7 +196,7 @@ class Fake
           type: "Answer::#{question.subclass_name}"
         )
         answer.save
-        var_name = answer.question.harvest_body_variables&.sample
+        var_name = answer.question.csv_header_names&.sample
         answer.body = answer_body_data(var_name)
         answer.save
       end

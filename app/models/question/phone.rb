@@ -8,8 +8,4 @@ class Question::Phone < Question
       { 'required' => true }
     )
   end
-
-  def harvest_body_variables
-    [body_variable['name']]
-  end
 end

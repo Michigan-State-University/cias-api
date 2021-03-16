@@ -7,4 +7,8 @@ class Question::Finish < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
   attr_readonly :position
+
+  def csv_header_names
+    []
+  end
 end

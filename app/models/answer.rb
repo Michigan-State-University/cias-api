@@ -20,6 +20,14 @@ class Answer < ApplicationRecord
 
   def on_answer; end
 
+  def csv_header_name(data)
+    data['var']
+  end
+
+  def csv_row_value(data)
+    data['value']
+  end
+
   private
 
   def type_integrity_validator

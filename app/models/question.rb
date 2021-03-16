@@ -52,10 +52,6 @@ class Question < ApplicationRecord
     next_obj
   end
 
-  def harvest_body_variables
-    [nil]
-  end
-
   def variable_clone_prefix
     nil
   end
@@ -66,6 +62,10 @@ class Question < ApplicationRecord
 
   def clear_narrator_blocks
     narrator['blocks'] = []
+  end
+
+  def csv_header_names
+    [body_variable['name']]
   end
 
   private

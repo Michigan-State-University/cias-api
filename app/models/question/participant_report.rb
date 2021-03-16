@@ -8,4 +8,8 @@ class Question::ParticipantReport < Question
       { 'required' => true }
     )
   end
+
+  def csv_header_names
+    []
+  end
 end
