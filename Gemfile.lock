@@ -430,6 +430,7 @@ GEM
     ruby_parser (3.15.0)
       sexp_processor (~> 4.9)
     rubyzip (2.3.0)
+    secure_headers (6.3.2)
     sentry-raven (3.1.1)
       faraday (>= 1.0)
     sexp_processor (4.15.1)
@@ -540,6 +541,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   rubocop-thread_safety
+  secure_headers
   sentry-raven
   shoulda-matchers
   sidekiq

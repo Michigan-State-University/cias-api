@@ -36,6 +36,7 @@ gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
 gem 'rack-attack'
+gem 'secure_headers'
 
 group :development, :test do
   gem 'bundler-audit'
