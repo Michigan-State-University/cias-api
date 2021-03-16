@@ -335,6 +335,8 @@ GEM
     puma (5.0.4)
       nio4r (~> 2.0)
     rack (2.2.3)
+    rack-attack (6.5.0)
+      rack (>= 1.0, < 3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-test (1.1.0)
@@ -527,7 +529,9 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   puma (~> 5.0)
+  rack-attack
   rack-cors
+  rack-test
   rails (~> 6.0)
   redis
   rspec-rails
