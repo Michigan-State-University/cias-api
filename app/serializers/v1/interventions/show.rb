@@ -15,6 +15,7 @@ class V1::Interventions::Show < BaseSerializer
       updated_at: @intervention.updated_at,
       published_at: @intervention.published_at,
       csv_link: csv_link,
+      logo_url: url_for_image(@intervention, :logo),
       csv_generated_at: csv_generated_at,
       user: {
         email: @intervention.user.email,

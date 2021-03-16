@@ -9,6 +9,10 @@ class Intervention < ApplicationRecord
   has_many :invitations, as: :invitable, dependent: :destroy
 
   has_many_attached :reports
+  has_one_attached :logo
+
+  has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
+  has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
 
   attr_accessor :status_event
 

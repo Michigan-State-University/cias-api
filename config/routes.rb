@@ -41,6 +41,12 @@ Rails.application.routes.draw do
       resources :sessions, only: %i[index show create update destroy]
     end
 
+    scope 'interventions/:interventions_id', as: 'intervention' do
+      scope module: 'interventions' do
+        resource :logo, only: %i[create destroy]
+      end
+    end
+
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     scope 'sessions/:session_id', as: 'session' do
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
