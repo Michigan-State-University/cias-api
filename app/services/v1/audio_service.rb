@@ -16,6 +16,5 @@ class V1::AudioService
     end
     audio.save
     audio.reload
-    audio
   end
 end

@@ -9,7 +9,7 @@ class Clone::Base
     @clean_formulas = options.delete(:clean_formulas)
     @position = options.delete(:position)
     @outcome.assign_attributes(options)
-    @outcome.duped = true if outcome.is_a?(Question)
+    @outcome.duplicated = true if outcome.is_a?(Question)
     @outcome.save!
   end
 

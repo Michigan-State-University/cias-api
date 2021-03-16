@@ -14,7 +14,7 @@ class Question < ApplicationRecord
   attribute :position, :integer, default: 0
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
-  attribute :duped, :boolean, default: false
+  attribute :duplicated, :boolean, default: false
 
   has_one_attached :image
   has_many_attached :speeches
