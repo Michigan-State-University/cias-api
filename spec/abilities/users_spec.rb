@@ -27,10 +27,12 @@ describe User do
     end
 
     context 'team_admin' do
-      let!(:user) { create(:user, :confirmed, :team_admin, team_id: team1.id) }
+      let(:user) { team1.team_admin }
+      let!(:team3) { create(:team, team_admin: user) }
+      let!(:team3_member) { create(:user, :confirmed, team_id: team3.id) }
 
-      it 'return all users from team_admin\'s team' do
-        expect(subject).to include(team_1_user, user).and \
+      it 'return all users from team_admin\'s teams' do
+        expect(subject).to include(team_1_user, team3_member, user).and \
           not_include(team_2_user, researcher, participant, guest)
       end
     end

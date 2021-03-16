@@ -10,6 +10,7 @@ AllCops:
   Exclude:
     - 'bin/*'
     - 'db/schema.rb'
+    - 'config.ru'
 
 Bundler/OrderedGems:
   Enabled: false

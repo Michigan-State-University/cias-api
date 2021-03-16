@@ -49,6 +49,13 @@ class V1::QuestionsController < V1Controller
     head :created
   end
 
+  def clone_multiple
+    authorize! :create, Question
+    cloned_questions = question_service.clone_multiple(session_id, question_ids)
+
+    render json: serialized_response(cloned_questions), status: :created
+  end
+
   private
 
   def question_service

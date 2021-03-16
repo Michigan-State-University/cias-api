@@ -16,13 +16,21 @@ class V1::Teams::ChangeTeamAdmin
     return if admin_not_changed?
 
     ActiveRecord::Base.transaction do
-      current_team_admin.update!(
-        roles: ['researcher']
-      )
+      if admin_for_one_team?
+        current_team_admin.update!(
+          roles: ['researcher'],
+          team_id: team.id
+        )
+      else
+        current_team_admin.update!(
+          team_id: nil
+        )
+      end
+
+      team.update!(team_admin_id: team_admin_id)
 
       new_team_admin.update!(
-        roles: ['team_admin'],
-        team_id: team.id
+        roles: ['team_admin']
       )
     end
   end
@@ -44,10 +52,15 @@ class V1::Teams::ChangeTeamAdmin
   end
 
   def new_team_admin
-    @new_team_admin ||= User.researchers.find(team_admin_id)
+    @new_team_admin ||= User.limit_to_roles(%w[researcher team_admin])
+      .find(team_admin_id)
   end
 
   def current_team_admin
     @current_team_admin ||= team.team_admin
+  end
+
+  def admin_for_one_team?
+    current_team_admin.admins_teams.count == 1
   end
 end

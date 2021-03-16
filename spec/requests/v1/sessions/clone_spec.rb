@@ -101,11 +101,11 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let(:cloned_question_groups) { Session.find(cloned_session_id).question_groups.order(:position) }
 
     let(:session_was) do
-      session.attributes.except('id', 'created_at', 'updated_at', 'position', 'sms_plans_count')
+      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count')
     end
 
     let(:session_cloned) do
-      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'position', 'sms_plans_count')
+      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count')
     end
 
     it 'has correct http code' do

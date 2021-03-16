@@ -11,24 +11,28 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
   end
 
   before do
-    ActiveJob::Base.queue_adapter = :inline
+    ActiveJob::Base.queue_adapter = :test
+    Timecop.freeze
+  end
+
+  after do
+    Timecop.return
   end
 
   context 'when there is participant report' do
     context 'and guest user wants to receive the report' do
       context 'provided email not exist in the system' do
-        let(:new_participant_id) { User.participants.select(:id).order(created_at: :desc).first&.id }
+        let(:new_participant) { User.participants.select(:id, :email).order(created_at: :desc).first }
 
         it 'creates new user with participant role and given email, shares report to that user
         and sends an invitation email and an email about new report' do
           expect { subject }.to change(User, :count).by(1)
 
-          expect(ActionMailer::Base.deliveries.map(&:subject)).to include(
-            'Welcome to CIAS!',
-            'New report in the system is ready for you'
-          )
+          expect(ActionMailer::MailDeliveryJob).to have_been_enqueued
+          expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
+            .with(new_participant.email)
 
-          expect(participant_report.reload.participant_id).to eq(new_participant_id)
+          expect(participant_report.reload.participant_id).to eq(new_participant.id)
         end
       end
 

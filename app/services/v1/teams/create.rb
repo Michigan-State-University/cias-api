@@ -11,10 +11,12 @@ class V1::Teams::Create
 
   def call
     ActiveRecord::Base.transaction do
-      team = Team.create!(name: team_params[:name])
+      team = Team.create!(
+        name: team_params[:name],
+        team_admin_id: new_team_admin.id
+      )
 
-      researcher.update!(
-        team_id: team.id,
+      new_team_admin.update!(
         roles: ['team_admin']
       )
 
@@ -26,7 +28,8 @@ class V1::Teams::Create
 
   attr_reader :team_params
 
-  def researcher
-    @researcher ||= User.researchers.find(team_params[:user_id])
+  def new_team_admin
+    @new_team_admin ||= User.limit_to_roles(%w[researcher team_admin])
+      .find(team_params[:user_id])
   end
 end

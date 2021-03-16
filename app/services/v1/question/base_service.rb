@@ -22,4 +22,10 @@ class V1::Question::BaseService
   def chosen_questions(question_group_id, ids)
     questions_scope(question_group_id).where(id: ids)
   end
+
+  protected
+
+  def proper_questions?(questions, question_ids)
+    question_ids && questions.size == question_ids.size
+  end
 end

@@ -28,21 +28,56 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
       end
 
       context 'when team admin has changed' do
-        let!(:team_admin) { create(:user, :team_admin, team_id: team.id) }
-        let(:researcher) { create(:user, :researcher) }
         let(:params) do
           {
             team: {
-              user_id: researcher.id
+              user_id: new_team_admin.id
             }
           }
         end
 
-        it 'sets researcher as new team_admin and sets team_admin as researcher' do
-          expect { request }.to change { researcher.reload.roles }.from(['researcher']).to(['team_admin']).and \
-            change(researcher, :team_id).from(nil).to(team.id).and \
-              change { team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
-                avoid_changing { team_admin.team_id }
+        context 'and new team admin is a researcher' do
+          let(:previous_team_admin) { team.team_admin }
+          let(:new_team_admin) { create(:user, :researcher) }
+
+          it 'sets researcher as new team_admin and sets team_admin as researcher' do
+            expect { request }.to change { new_team_admin.reload.roles }.from(['researcher']).to(['team_admin']).and \
+              change { team.reload.team_admin_id }.from(previous_team_admin.id).to(new_team_admin.id).and \
+                change { previous_team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
+                  change { previous_team_admin.reload.team_id }.from(nil).to(team.id)
+          end
+        end
+
+        context 'and new team admin is an other team admin' do
+          let(:previous_team_admin) { team.team_admin }
+          let!(:new_team_admin) { create(:user, :team_admin) }
+
+          it 'sets team admin as new team_admin and sets an old team_admin as researcher' do
+            expect { request }.to avoid_changing { new_team_admin.reload.team_id }.and \
+              change { team.reload.team_admin_id }.from(previous_team_admin.id).to(new_team_admin.id).and \
+                change { previous_team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
+                  change { previous_team_admin.reload.team_id }.from(nil).to(team.id)
+
+            expect(new_team_admin.reload.roles).to eq(['team_admin'])
+          end
+        end
+
+        context 'new team admin is another team admin, old team admin is admin for another teams' do
+          let(:previous_team_admin) { team.team_admin }
+          let!(:second_team) { create(:team, team_admin: previous_team_admin) }
+          let!(:new_team_admin) { create(:user, :team_admin) }
+
+          it 'sets team admin as new admin of the team, old one is still team admin for another teams' do
+            expect { request }.to avoid_changing { new_team_admin.reload.team_id }.and \
+              change { team.reload.team_admin_id }.from(previous_team_admin.id).to(new_team_admin.id).and \
+                avoid_changing { previous_team_admin.reload.roles }
+
+            expect(new_team_admin.reload.roles).to eq(['team_admin'])
+            expect(previous_team_admin).to have_attributes(
+              team_id: nil,
+              roles: ['team_admin']
+            )
+          end
         end
       end
 
@@ -74,7 +109,7 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
       end
 
       context 'when team admin didn\'t change' do
-        let!(:team_admin) { create(:user, :team_admin, team_id: team.id) }
+        let!(:team_admin) { team.team_admin }
         let(:params) { { team: { user_id: team_admin.id } } }
 
         it 'does not update team' do
@@ -101,7 +136,7 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
   end
 
   context 'when team admin of current team' do
-    let(:team_admin) { create(:user, :confirmed, :team_admin, team_id: team.id) }
+    let(:team_admin) { team.team_admin }
     let(:user) { team_admin }
     let(:researcher) { create(:user, :confirmed, :researcher) }
 

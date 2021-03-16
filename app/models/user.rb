@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  before_save :invalidate_token_after_changes
+
   devise :confirmable,
          :database_authenticatable,
          :invitable,
@@ -26,8 +28,7 @@ class User < ApplicationRecord
                 allow_blank: true
 
   validates :time_zone, inclusion: { in: TIME_ZONES }
-  validate :team_is_present?, if: :team_admin?
-  validate :team_admin_already_exists?, if: :team_admin?
+  validate :team_is_present?, if: :team_admin?, on: :update
 
   has_one :phone, dependent: :destroy
   accepts_nested_attributes_for :phone, update_only: true
@@ -38,11 +39,14 @@ class User < ApplicationRecord
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :user_log_requests, dependent: :destroy
   belongs_to :team, optional: true
+  has_many :admins_teams, class_name: 'Team', dependent: :nullify,
+                          foreign_key: :team_admin_id, inverse_of: :team_admin
   has_many :team_invitations, dependent: :destroy
-  has_many :shared_reports, class_name: 'GeneratedReport', foreign_key: :third_party_id
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
+
+  delegate :name, to: :team, prefix: true, allow_nil: true
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
@@ -104,16 +108,15 @@ class User < ApplicationRecord
   end
 
   def team_is_present?
-    return if team_id.present?
+    return if Team.exists?(team_admin_id: id)
 
     errors.add(:roles, :team_id_is_required_for_team_admin)
   end
 
-  def team_admin_already_exists?
-    return unless User.limit_to_roles(['team_admin']).
-                       from_team(team_id).
-                       where.not(id: id).exists?
+  def invalidate_token_after_changes
+    return unless persisted?
+    return if !roles_changed? && (!active_changed? || active)
 
-    errors.add(:team_id, :team_admin_already_exists_for_the_team)
+    self.tokens = {}
   end
 end

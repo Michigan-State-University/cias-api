@@ -98,17 +98,17 @@ RSpec.describe V1::UserSessionScheduleService do
             {
               payload: 'test',
               patterns: [{
-                "match": '=2',
-                "target": {
-                  "id": second_session.id,
-                  "type": 'Session'
+                match: '=2',
+                target: {
+                  id: second_session.id,
+                  type: 'Session'
                 }
               },
                          {
-                           "match": '=1',
-                           "target": {
-                             "id": third_session.id,
-                             "type": 'Session'
+                           match: '=1',
+                           target: {
+                             id: third_session.id,
+                             type: 'Session'
                            }
                          }]
             }
@@ -139,17 +139,17 @@ RSpec.describe V1::UserSessionScheduleService do
               {
                 payload: 'test',
                 patterns: [{
-                  "match": '=2',
-                  "target": {
-                    "id": second_session.id,
-                    "type": 'Session'
+                  match: '=2',
+                  target: {
+                    id: second_session.id,
+                    type: 'Session'
                   }
                 },
                            {
-                             "match": '=1',
-                             "target": {
-                               "id": third_session.id,
-                               "type": 'Session'
+                             match: '=1',
+                             target: {
+                               id: third_session.id,
+                               type: 'Session'
                              }
                            }]
               }
@@ -165,17 +165,17 @@ RSpec.describe V1::UserSessionScheduleService do
               {
                 payload: 'test',
                 patterns: [{
-                  "match": '=2',
-                  "target": {
-                    "id": second_session.id,
-                    "type": 'Session'
+                  match: '=2',
+                  target: {
+                    id: second_session.id,
+                    type: 'Session'
                   }
                 },
                            {
-                             "match": '=3',
-                             "target": {
-                               "id": third_session.id,
-                               "type": 'Session'
+                             match: '=3',
+                             target: {
+                               id: third_session.id,
+                               type: 'Session'
                              }
                            }]
               }

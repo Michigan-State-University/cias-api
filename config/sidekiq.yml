@@ -3,6 +3,7 @@
 :queues:
   - [default,1]
   - [reports,1]
+  - [sms_plans, 1]
   - [mailers,2]
   - [log,3]
   - [active_storage_purge,4]

@@ -31,31 +31,7 @@ describe User, type: :model do
       end
 
       context 'team admin has assigned team' do
-        let(:team) { create(:team) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
-
-        it 'is valid' do
-          expect(user).to be_valid
-        end
-      end
-    end
-  end
-
-  describe 'team_admin_already_exists?' do
-    context 'user has role team admin' do
-      context 'when team already has other team admin' do
-        let!(:team) { create(:team, :with_team_admin) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
-
-        it 'is not valid' do
-          expect(user).not_to be_valid
-          expect(user.errors.messages[:team_id]).to include(/There should be only one Team Admin in a team. The chosen team already has Team Admin/)
-        end
-      end
-
-      context 'when team does not have team admin yet' do
-        let(:team) { create(:team) }
-        let(:user) { build_stubbed(:user, :team_admin, team_id: team.id) }
+        let(:user) { build(:user, :team_admin) }
 
         it 'is valid' do
           expect(user).to be_valid
@@ -73,6 +49,58 @@ describe User, type: :model do
         it 'user is valid with time zone' do
           expect(user).to be_valid
         end
+      end
+    end
+  end
+
+  describe 'invalidate_token_after_changes' do
+    let(:user_tokens) do
+      {
+        'yfEoLJFWF0KC-XOg5BieDw' =>
+           {
+             'token' => '$2a$10$EmyNiFLYAN1LihYzsmGKq.SVk/8WfQVWzbFl42aYhweC0YH.bsp8K',
+             'expiry' => 1_617_002_885,
+             'last_token' => '$2a$10$tCHDzitG9YDitEJQlntvHuSWbEHzWeuEE.pYRh7bJ2bnpsnpBAwX6',
+             'updated_at' => 'Mon, 15 Mar 2021 07:28:05 +0000'
+           }
+      }
+    end
+    let!(:user) { create(:user, :confirmed, :team_admin, tokens: user_tokens) }
+
+    context 'roles changed' do
+      it 'removes current user tokens' do
+        expect { user.update(roles: ['researcher']) }.to change { user.reload.tokens }
+          .from(user_tokens).to({})
+      end
+    end
+
+    context 'roles have not changed' do
+      it 'does not remove user tokens' do
+        expect { user.update(roles: ['team_admin']) }.not_to change { user.reload.tokens }
+      end
+    end
+
+    context 'active changed to inactive' do
+      it 'removes current user tokens' do
+        expect { user.update(active: false) }.to change { user.reload.tokens }
+          .from(user_tokens).to({})
+      end
+    end
+
+    context 'active changed to active' do
+      before do
+        user.update(active: false)
+        user.update(tokens: user_tokens)
+      end
+
+      it 'does not remove user tokens' do
+        expect { user.update(active: true) }.not_to change { user.reload.tokens }
+      end
+    end
+
+    context 'active have not changed' do
+      it 'does not remove user tokens' do
+        expect { user.update(active: true) }.not_to change { user.reload.tokens }
       end
     end
   end

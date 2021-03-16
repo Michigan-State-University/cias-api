@@ -46,11 +46,11 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           'data' => [
             {
               'payload' => '',
-              'variable' => { 'name' => 'test_1', 'value': '1' }
+              'variable' => { 'name' => 'test_1', value: '1' }
             },
             {
               'payload' => '',
-              'variable' => { 'name' => 'test_2', 'value': '2' }
+              'variable' => { 'name' => 'test_2', value: '2' }
             }
           ]
         }

@@ -273,15 +273,15 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
                   audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
                 }
               ],
-              "animation": 'rest',
-              "position": {
-                "posFrom": {
-                  "x": 0,
-                  "y": 0
+              animation: 'rest',
+              position: {
+                posFrom: {
+                  x: 0,
+                  y: 0
                 },
-                "posTo": {
-                  "x": 0,
-                  "y": 0
+                posTo: {
+                  x: 0,
+                  y: 0
                 }
               }
             },

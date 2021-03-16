@@ -68,14 +68,12 @@ class V1::Question::ShareService < V1::Question::BaseService
     researcher_ids && researchers.size == researcher_ids.size
   end
 
-  def proper_questions?(questions, question_ids)
-    question_ids && questions.size == question_ids.size
-  end
-
   def prepare_researchers(user)
     all_researchers = User.researchers
-    @researchers = if user.role?('researcher') && user.team_id.present? || user.role?('team_admin')
+    @researchers = if user.role?('researcher') && user.team_id.present?
                      all_researchers.where(team_id: user.team_id)
+                   elsif user.role?('team_admin')
+                     all_researchers.where(team_id: user.admins_team_ids)
                    elsif user.role?('admin')
                      all_researchers
                    else

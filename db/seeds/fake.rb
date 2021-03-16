@@ -214,8 +214,8 @@ class Fake
               }
             }
           ],
-          "variable": {
-            "name": 'var_1'
+          variable: {
+            name: 'var_1'
           }
         }
       in 'Grid'

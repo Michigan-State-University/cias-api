@@ -43,6 +43,7 @@ Rails.application.routes.draw do
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     scope 'sessions/:session_id', as: 'session' do
+      post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do

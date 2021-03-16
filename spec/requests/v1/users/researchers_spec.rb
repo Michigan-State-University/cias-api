@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/users/researchers', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:team) { create(:team, :with_team_admin) }
+  let(:team) { create(:team) }
   let(:team_admin) { team.team_admin }
   let!(:researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
   let!(:other_researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
@@ -98,7 +98,7 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
 
   context 'when current_user is team_admin' do
     let!(:user) { team_admin }
-    let(:team2) { create(:team, :with_team_admin) }
+    let(:team2) { create(:team) }
 
     before do
       create(:user, :researcher, team_id: team2.id)

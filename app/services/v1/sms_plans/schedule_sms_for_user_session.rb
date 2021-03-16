@@ -57,15 +57,9 @@ class V1::SmsPlans::ScheduleSmsForUserSession
       send_sms(start_time, content)
     else
       date = start_time
-      # while date.to_date <= finish_date.to_date
-      #   send_sms(date.change({ hour: 13 }).utc, content)
-      #   # date = date.next_day(number_days[frequency])
-      # end
-      finish_date = date + 1.hour
-
-      while date <= finish_date
-        send_sms(date.utc, content)
-        date += number_minutes[frequency].minutes
+      while date.to_date <= finish_date.to_date
+        send_sms(date.change({ hour: 13 }).utc, content)
+        date = date.next_day(number_days[frequency])
       end
     end
   end
@@ -78,18 +72,10 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, user_session.all_var_values)
   end
 
-  # def number_days
-  #   {
-  #     'once_a_day' => 1,
-  #     'once_a_week' => 7,
-  #     'once_a_month' => 30
-  #   }
-  # end
-
-  def number_minutes
+  def number_days
     {
-      'once_a_day' => 5,
-      'once_a_week' => 15,
+      'once_a_day' => 1,
+      'once_a_week' => 7,
       'once_a_month' => 30
     }
   end

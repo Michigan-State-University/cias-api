@@ -3,14 +3,17 @@
 require 'cancan/matchers'
 
 describe Intervention do
-  let_it_be(:team1) { create(:team, :with_team_admin) }
-  let_it_be(:team2) { create(:team, :with_team_admin) }
+  let_it_be(:team1) { create(:team) }
+  let_it_be(:team2) { create(:team) }
+  let_it_be(:team3) { create(:team, team_admin: team1.team_admin) }
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
+  let_it_be(:team3_researcher) { create(:user, :confirmed, :researcher, team_id: team3.id) }
   let_it_be(:team1_intervention1) { create(:intervention, user_id: team1.team_admin.id) }
   let_it_be(:team1_intervention2) { create(:intervention, user_id: team1_researcher.id) }
   let_it_be(:team2_intervention1) { create(:intervention, user_id: team2.team_admin.id) }
   let_it_be(:team2_intervention2) { create(:intervention, user_id: team2_researcher.id) }
+  let_it_be(:team3_intervention1) { create(:intervention, user_id: team3_researcher.id) }
 
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }
@@ -26,6 +29,7 @@ describe Intervention do
 
       it 'can manage intervention of the user belonging to his team' do
         expect(subject).to have_abilities({ manage: true }, team1_intervention1)
+        expect(subject).to have_abilities({ manage: true }, team3_intervention1)
       end
 
       it 'can manage his intervention' do

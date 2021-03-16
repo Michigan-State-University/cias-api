@@ -21,7 +21,12 @@ class V1::GeneratedReports::ShareToThirdParty
 
     return if third_party_user&.deactivated?
 
-    GeneratedReportMailer.new_report_available(user.email).deliver_now
+    if third_party_user.confirmed?
+      GeneratedReportMailer.new_report_available(third_party_user.email).deliver_now
+    else
+      SendNewReportNotificationJob.set(wait: 30.seconds)
+        .perform_later(third_party_user.email)
+    end
   end
 
   private

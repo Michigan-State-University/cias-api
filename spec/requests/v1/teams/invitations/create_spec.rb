@@ -8,7 +8,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
   end
   let!(:researcher) { create(:user, :confirmed, :researcher) }
   let(:headers) { user.create_new_auth_token }
-  let!(:team) { create(:team, :with_team_admin) }
+  let!(:team) { create(:team) }
 
   context 'user is admin' do
     let!(:user) { create(:user, :confirmed, :admin) }
@@ -25,7 +25,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
 
         it 'create new researcher assigned to the team' do
           expect { request }.to change(User, :count).by(1).and \
-            change { team.reload.users.count }.from(1).to(2)
+            change { team.reload.users.count }.by(1)
 
           expect(new_researcher).to have_attributes(
             email: params[:email],
@@ -183,7 +183,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
     end
 
     context 'when user is team admin of the other team' do
-      let(:other_team) { create(:team, :with_team_admin) }
+      let(:other_team) { create(:team) }
       let(:user) { other_team.team_admin }
 
       it_behaves_like 'user who is not able to invite researcher to the team'

@@ -40,7 +40,13 @@ FactoryBot.define do
 
     trait :team_admin do
       roles { %w[team_admin] }
-      team_id { create(:team).id }
+      after(:build) do |team_admin|
+        if team_admin.admins_teams.blank?
+          new_team = build(:team, team_admin: team_admin)
+          new_team.team_admin = team_admin
+          team_admin.admins_teams = [new_team]
+        end
+      end
     end
 
     trait :preview_session do
