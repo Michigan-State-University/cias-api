@@ -531,7 +531,6 @@ DEPENDENCIES
   puma (~> 5.0)
   rack-attack
   rack-cors
-  rack-test
   rails (~> 6.0)
   redis
   rspec-rails
