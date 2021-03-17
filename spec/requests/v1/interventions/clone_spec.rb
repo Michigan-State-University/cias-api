@@ -6,7 +6,15 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention) }
   let!(:session) { create(:session, intervention: intervention, position: 1) }
-  let!(:other_session) { create(:session, intervention: intervention, position: 2) }
+  let!(:other_session) do
+    create(:session, intervention: intervention, position: 2,
+                     formula: { 'payload' => 'var + 2',
+                                'patterns' =>
+                                              [{ 'match' => '=1',
+                                                 'target' =>
+                                                    { 'id' => third_session.id, 'type' => 'Session' } }] })
+  end
+  let!(:third_session) { create(:session, intervention: intervention, position: 3) }
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question_1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
@@ -46,6 +54,8 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
     let(:cloned_intervention_object) { Intervention.find(json_response['data']['id']) }
     let(:cloned_sessions) { cloned_intervention_object.sessions.order(:position) }
     let(:cloned_questions) { cloned_sessions.first.questions.order(:position) }
+    let(:second_cloned_session) { cloned_sessions.second }
+    let(:third_cloned_session) { cloned_sessions.third }
 
     let(:intervention_was) do
       intervention.attributes.except('id', 'created_at', 'updated_at')
@@ -97,6 +107,18 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'position' => 999_999,
           'type' => 'Question::Finish'
         )
+      )
+    end
+
+    it 'correctly clones sessions with proper connections between other sessions' do
+      expect(second_cloned_session.attributes).to include(
+        'position' => 2,
+        'formula' => {
+          'payload' => 'var + 2',
+          'patterns' => [
+            { 'match' => '=1', 'target' => { 'id' => third_cloned_session.id, 'type' => 'Session' } }
+          ]
+        }
       )
     end
   end
