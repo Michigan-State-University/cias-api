@@ -30,7 +30,7 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   def intervention_params
-    params.require(:image).permit(:file)
+    params.require(:logo).permit(:file)
   end
 
   def intervention_published?
