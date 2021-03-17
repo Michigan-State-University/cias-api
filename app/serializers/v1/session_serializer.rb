@@ -7,4 +7,8 @@ class V1::SessionSerializer < V1Serializer
   attribute :generated_report_count do |object|
     GeneratedReport.joins(:user_session).where(user_sessions: { session_id: object.id }).size
   end
+
+  attribute :logo_url do |object|
+    url_for(Intervention.find(object.intervention_id).logo) if Intervention.find(object.intervention_id).logo.attached?
+  end
 end

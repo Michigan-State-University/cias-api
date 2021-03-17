@@ -41,7 +41,7 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
     end
   end
 
-  context 'when current_user is participant' do
+  context 'when current_user is third_party' do
     context 'when current_user try to add a logo' do
       before { post v1_intervention_logo_path(intervention_id), params: params, headers: other_user_2.create_new_auth_token }
 
@@ -52,6 +52,6 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
   context 'when intervention is published' do
     before { delete v1_intervention_logo_path(published_intervention_id), headers: current_user.create_new_auth_token }
 
-    it { expect(response).to have_http_status(:forbidden) }
+    it { expect(response).to have_http_status(:method_not_allowed) }
   end
 end

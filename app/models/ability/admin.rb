@@ -10,5 +10,6 @@ class Ability::Admin < Ability::Base
 
   def admin
     can :manage, :all
+    can :add_logo, Intervention
   end
 end

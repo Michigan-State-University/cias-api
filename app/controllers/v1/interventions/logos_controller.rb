@@ -3,7 +3,7 @@
 class V1::Interventions::LogosController < V1Controller
   def create
     authorize_user
-    chech_intervention_status
+    return render status: :method_not_allowed if intervention_published?
 
     intervention_load.update!(logo: intervention_params[:file])
     invalidate_cache(intervention_load)
@@ -12,19 +12,17 @@ class V1::Interventions::LogosController < V1Controller
 
   def destroy
     authorize_user
-    chech_intervention_status
+    return render status: :method_not_allowed if intervention_published?
 
     intervention_load.logo.purge_later
     invalidate_cache(intervention_load)
-    render json: serialized_response(intervention_load, 'Intervention')
+    head :no_content
   end
 
   private
 
   def authorize_user
-    raise CanCan::AccessDenied unless current_v1_user.role?('admin')
-
-    authorize! :update, intervention_load
+    authorize! :add_logo, Intervention
   end
 
   def intervention_load
@@ -32,10 +30,10 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   def intervention_params
-    params.require(:logo).permit(:file)
+    params.require(:image).permit(:file)
   end
 
-  def chech_intervention_status
-    raise CanCan::AccessDenied if intervention_load.status.eql? 'published'
+  def intervention_published?
+    intervention_load.published?
   end
 end

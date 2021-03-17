@@ -14,13 +14,7 @@ RSpec.describe 'DELETE /v1/interventions/:interventions_id/logo', type: :request
     before { delete v1_intervention_logo_path(intervention_id), headers: current_user.create_new_auth_token }
 
     context 'wden current_user deletes a logo' do
-      it { expect(response).to have_http_status(:ok) }
-
-      it 'JSON response contains proper attributes' do
-        expect(json_response['data']['attributes']).to include(
-          'logo_url' => nil
-        )
-      end
+      it { expect(response).to have_http_status(:no_content) }
 
       it 'removes attached logo' do
         expect(intervention.reload.logo.attachment).to eq nil
@@ -37,6 +31,6 @@ RSpec.describe 'DELETE /v1/interventions/:interventions_id/logo', type: :request
   context 'when intervention is published' do
     before { delete v1_intervention_logo_path(published_intervention_id), headers: current_user.create_new_auth_token }
 
-    it { expect(response).to have_http_status(:forbidden) }
+    it { expect(response).to have_http_status(:method_not_allowed) }
   end
 end
