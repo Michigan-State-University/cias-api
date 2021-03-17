@@ -26,7 +26,7 @@ class V1::AudioService
 
   def create_audio(digest)
     clear_text = text.tr(',!.', '').strip.downcase
-    audio = Audio.create!(sha256: digest, language: language_code, voice_type: voice_type, text: clear_text)
+    audio = Audio.create!(sha256: digest, language: language_code, voice_type: voice_type)
     audio.usage_counter = 0 if preview_audio
     Audio::TextToSpeech.new(
       audio,
