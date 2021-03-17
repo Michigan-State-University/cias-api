@@ -20,11 +20,7 @@ class V1::Sessions::Show < BaseSerializer
       body: session.body,
       created_at: session.created_at,
       updated_at: session.updated_at,
-      logo_url: url_for_image(Intervention.find(session.intervention_id))
+      logo_url: url_for_image(Intervention.find(session.intervention_id), :logo)
     }
-  end
-
-  def current_intervention
-    Intervention.find(session.intervention_id)
   end
 end
