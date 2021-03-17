@@ -11,4 +11,8 @@ class V1::UserSerializer < V1Serializer
   attribute :phone do |object|
     object.phone.as_json(only: %i[iso prefix number confirmed])
   end
+
+  attribute :team_name do |object|
+    object.team&.name
+  end
 end
