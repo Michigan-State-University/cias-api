@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:session) { create(:session) }
+  let!(:sms_plan) { create(:sms_plan, session: session) }
+  let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
   let!(:other_session) { create(:session) }
   let!(:question_group_1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
   let!(:question_group_2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
@@ -55,6 +57,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                }
                              })
   end
+
+  let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
 
   context 'when auth' do
     context 'is invalid' do
@@ -201,6 +205,19 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'position' => 999_999,
           'type' => 'Question::Finish'
         )
+      )
+    end
+
+    it 'correctly clone sms plans' do
+      expect(outcome_sms_plans.size).to eq 1
+      outcome_sms_plan = outcome_sms_plans.last
+
+      expect(outcome_sms_plan.variants.size).to eq 1
+      expect(outcome_sms_plan.slice(*SmsPlan::ATTR_NAMES_TO_COPY)).to eq sms_plan.slice(
+        *SmsPlan::ATTR_NAMES_TO_COPY
+      )
+      expect(outcome_sms_plan.variants.last.slice(*SmsPlan::Variant::ATTR_NAMES_TO_COPY)).to eq variant.slice(
+        *SmsPlan::Variant::ATTR_NAMES_TO_COPY
       )
     end
   end

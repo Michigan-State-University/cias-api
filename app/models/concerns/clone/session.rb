@@ -5,6 +5,7 @@ class Clone::Session < Clone::Base
     outcome.position = position || outcome.intervention.sessions.size
     create_question_groups
     outcome.save!
+    create_sms_plans
     reassign_branching
     reassign_reflections
     outcome
@@ -67,6 +68,18 @@ class Clone::Session < Clone::Base
         block['question_id'] = matched_reflection_question_id
       end
       question.save!
+    end
+  end
+
+  def create_sms_plans
+    outcome.sms_plans_count = 0
+    source.sms_plans.each do |plan|
+      new_sms_plan = SmsPlan.new(plan.slice(*SmsPlan::ATTR_NAMES_TO_COPY))
+      outcome.sms_plans << new_sms_plan
+
+      plan.variants.each do |variant|
+        new_sms_plan.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
+      end
     end
   end
 end
