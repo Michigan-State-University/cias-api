@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class V1::UsersController < V1Controller
-  skip_before_action :authenticate_user!, only: :send_sms_token
-
   def index
     authorize! :index, current_v1_user
 
@@ -38,7 +36,9 @@ class V1::UsersController < V1Controller
   end
 
   def send_sms_token
-    phone = user_without_phone? ? new_phone : current_v1_user.phone
+    authorize! :update, current_v1_user
+
+    phone = phone_service.get_phone
     head :expectation_failed and return unless phone
 
     phone.refresh_confirmation_code
@@ -66,6 +66,10 @@ class V1::UsersController < V1Controller
     @user_service ||= V1::UserService.new(current_v1_user)
   end
 
+  def phone_service
+    @phone_service ||= V1::Users::PhoneService.new(current_v1_user, phone_params)
+  end
+
   def users_scope
     user_service.users_scope.includes(:team, :phone, :avatar_attachment)
   end
@@ -74,20 +78,8 @@ class V1::UsersController < V1Controller
     params[:id]
   end
 
-  def phone_number
-    params[:phone_number]
-  end
-
-  def iso
-    params[:iso]
-  end
-
-  def prefix
-    params[:prefix]
-  end
-
-  def session_id
-    params[:session_id]
+  def phone_params
+    params.permit(:phone_number, :iso, :prefix)
   end
 
   def user_params
@@ -119,20 +111,5 @@ class V1::UsersController < V1Controller
     %i[active roles].each do |attr|
       authorize! attr, user unless user_params[attr].nil?
     end
-  end
-
-  def new_phone
-    Phone.create!(number: phone_number, prefix: prefix, iso: iso, user: current_v1_user)
-  end
-
-  def user_without_phone?
-    create_guest_or_preview_session_user(session_id) if current_v1_user.blank?
-
-    current_v1_user.phone.blank?
-  end
-
-  def create_guest_or_preview_session_user(session_id)
-    @current_v1_user = session_id.present? ? create_preview_session_user(session_id) : create_guest_user
-    response.headers.merge!(@current_v1_user.create_new_auth_token)
   end
 end
