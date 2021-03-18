@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddLanguageAndVoiceToAudioTable < ActiveRecord::Migration[6.0]
   def up
     change_table :audios, bulk: true do |t|

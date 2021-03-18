@@ -20,7 +20,7 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
     {
       phone_number: phone_number,
       prefix: prefix,
-      iso: iso,
+      iso: iso
     }
   end
   let(:request) { put v1_send_sms_token_path, headers: headers, params: params }
