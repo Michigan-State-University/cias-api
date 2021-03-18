@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 2021_03_17_103013) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "language"
     t.string "voice_type"
-    t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+    t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
