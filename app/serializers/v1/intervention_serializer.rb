@@ -11,6 +11,10 @@ class V1::InterventionSerializer < V1Serializer
     object.newest_report.created_at if object.reports.attached?
   end
 
+  attributes :logo_url do |object|
+    url_for(object.logo) if object.logo.attached?
+  end
+
   def self.newest_csv_link(object)
     ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end
