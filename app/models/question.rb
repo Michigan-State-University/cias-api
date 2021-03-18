@@ -71,7 +71,7 @@ class Question < ApplicationRecord
   private
 
   def initialize_narrator
-    narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish'
+    narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish' && narrator['blocks'].empty?
     execute_narrator
   end
 

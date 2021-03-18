@@ -6,6 +6,10 @@ class SmsPlan < ApplicationRecord
 
   validates :name, :schedule, :frequency, presence: true
 
+  ATTR_NAMES_TO_COPY = %w[
+    name schedule schedule_payload frequency end_at formula no_formula_text is_used_formula
+  ].freeze
+
   enum schedule: {
     days_after_session_end: 'days_after_session_end',
     after_session_end: 'after_session_end'

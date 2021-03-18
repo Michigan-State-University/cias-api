@@ -7,8 +7,11 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
   let(:headers) { user.create_new_auth_token }
   let(:message) { create(:message, :with_code, phone: user.phone) }
 
-  let(:intervention) { create(:intervention) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:intervention) { create(:intervention, user: researcher) }
   let(:session) { create(:session, intervention: intervention) }
+  let(:question_group) { create(:question_group, session: session) }
+  let(:question) { create(:question_phone, question_group: question_group) }
 
   let(:phone_number) { '123456789' }
   let(:prefix) { '48' }
@@ -17,100 +20,104 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
     {
       phone_number: phone_number,
       prefix: prefix,
-      iso: iso
+      iso: iso,
     }
+  end
+  let(:request) { put v1_send_sms_token_path, headers: headers, params: params }
+  let(:request_with_stubbed_service) do
+    allow(service).to receive(:send_message).and_return(:double)
+    allow(Communication::Sms).to receive(:new).and_return(service)
+    request
   end
 
   context 'when auth' do
     context 'is invalid' do
-      context 'when session_id is present' do
-        let(:params) do
-          {
-            phone_number: phone_number,
-            prefix: prefix,
-            iso: iso,
-            session_id: session.id
-          }
-        end
+      let(:request) { put v1_send_sms_token_path, params: params }
 
-        before { put v1_send_sms_token_path, params: params }
-
-        it 'response contains generated uid token' do
-          expect(response.headers.to_h).to include(
-            'Uid' => include('@preview.session')
-          )
-        end
-      end
-
-      context 'when session_id is not present' do
-        before { put v1_send_sms_token_path, params: params }
-
-        it 'response contains generated uid token' do
-          expect(response.headers.to_h).to include(
-            'Uid' => include('@guest.true')
-          )
-        end
-      end
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { put v1_send_sms_token_path, headers: headers, params: params }
+      it_behaves_like 'authorized user'
+    end
+  end
 
-      it 'response contains proper uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+  shared_examples 'creates phone for user' do
+    it 'response has status accepted' do
+      expect(response.status).to eq 202
+    end
+
+    it 'creates phone object for user' do
+      expect(user.reload.phone.attributes).to include(
+        'number' => phone_number,
+        'prefix' => prefix,
+        'iso' => iso,
+        'user_id' => user.id
+      )
     end
   end
 
   context 'when phone non exist and' do
-    context 'user is not logged in' do
-      let(:message) { create(:message, :with_code) }
-      let(:service) { Communication::Sms.new(message.id) }
-      let(:user) { User.find_by(uid: response.headers.to_h['Uid']) }
-
-      before do
-        allow(service).to receive(:send_message).and_return(:double)
-        allow(Communication::Sms).to receive(:new).and_return(service)
-        put v1_send_sms_token_path, params: params
-      end
-
-      it 'response has status accepted' do
-        expect(response.status).to eq 202
-      end
-
-      it 'creates phone object for user' do
-        expect(user.phone.attributes).to include(
-          'number' => phone_number,
-          'prefix' => prefix,
-          'iso' => iso,
-          'user_id' => user.id
-        )
-      end
-    end
-
     context 'user is logged in' do
       let(:message) { create(:message, :with_code) }
       let(:service) { Communication::Sms.new(message.id) }
 
-      before do
-        allow(service).to receive(:send_message).and_return(:double)
-        allow(Communication::Sms).to receive(:new).and_return(service)
-        put v1_send_sms_token_path, headers: headers, params: params
+      context 'user is preview session user' do
+        let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
       end
 
-      it 'response has status accepted' do
-        expect(response.status).to eq 202
+      context 'user is guest user' do
+        let!(:user) { create(:user, :confirmed, :guest) }
+
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
       end
 
-      it 'creates phone object for user' do
-        expect(user.phone.attributes).to include(
-          'number' => phone_number,
-          'prefix' => prefix,
-          'iso' => iso,
-          'user_id' => user.id
-        )
+      context 'user is super admin' do
+        let!(:user) { create(:user, :confirmed, :admin) }
+
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
+      end
+
+      context 'user is team admin' do
+        let!(:user) { create(:user, :confirmed, :team_admin) }
+
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
+      end
+
+      context 'user is researcher' do
+        let!(:user) { create(:user, :confirmed, :researcher) }
+
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
+      end
+
+      context 'user is participant' do
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
       end
     end
 
@@ -121,23 +128,10 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
       let(:service) { Communication::Sms.new(message.id) }
 
       before do
-        allow(service).to receive(:send_message).and_return(:double)
-        allow(Communication::Sms).to receive(:new).and_return(service)
-        put v1_send_sms_token_path, headers: headers, params: params
+        request_with_stubbed_service
       end
 
-      it 'response has status accepted' do
-        expect(response.status).to eq 202
-      end
-
-      it 'creates phone object for user' do
-        expect(user.phone.attributes).to include(
-          'number' => phone_number,
-          'prefix' => prefix,
-          'iso' => iso,
-          'user_id' => user.id
-        )
-      end
+      it_behaves_like 'creates phone for user'
 
       it 'confirmations code of both users are diffrent' do
         expect(user.phone.confirmation_code).not_to eq other_phone.confirmation_code
@@ -154,21 +148,33 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
     let!(:phone) { create(:phone, user_id: user.id) }
     let(:service) { Communication::Sms.new(message.id) }
 
-    context 'sms service respond with no error' do
+    context 'user doesn\'t change phone number' do
+      let!(:phone_number) { phone.number }
+      let(:prefix) { phone.prefix }
+      let(:iso) { phone.iso }
+
       before do
-        allow(service).to receive(:send_message).and_return(:double)
-        allow(Communication::Sms).to receive(:new).and_return(service)
-        put v1_send_sms_token_path, headers: headers
+        request_with_stubbed_service
       end
 
-      it 'response has status accepted' do
-        expect(response.status).to eq 202
+      it_behaves_like 'creates phone for user'
+    end
+
+    context 'user changes phone number' do
+      let!(:phone_number) { '123123123' }
+      let(:prefix) { '+48' }
+      let(:iso) { 'PL' }
+
+      before do
+        request_with_stubbed_service
       end
+
+      it_behaves_like 'creates phone for user'
     end
 
     context 'sms service respond with error' do
       before do
-        put v1_send_sms_token_path, headers: headers
+        put v1_send_sms_token_path, headers: headers, params: params
       end
 
       it 'response has status expectation_failed' do

@@ -111,7 +111,7 @@ class Session < ApplicationRecord
   private
 
   def create_core_childs
-    return unless question_group_finish.nil?
+    return if question_group_finish
 
     qg_finish = ::QuestionGroup::Finish.new(session_id: id)
     qg_finish.save!

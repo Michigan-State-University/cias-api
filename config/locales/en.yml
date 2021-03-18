@@ -5,7 +5,7 @@ en:
       file: '%m_%d_%Y'
   question:
     finish:
-      subtitle: Finish Screen
+      subtitle: <h1>Finish Screen</h1>
       title: Finish Screen
   question_group:
     finish:
