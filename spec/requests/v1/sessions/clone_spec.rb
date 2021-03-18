@@ -98,11 +98,12 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     before { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
     let(:cloned_session_id) { json_response['data']['id'] }
+    let(:cloned_session) { Session.find(json_response['data']['id']) }
     let(:cloned_questions_collection) do
       Question.unscoped.includes(:question_group).where(question_groups: { session_id: cloned_session_id })
               .order('question_groups.position' => 'asc', 'questions.position' => 'asc')
     end
-    let(:cloned_question_groups) { Session.find(cloned_session_id).question_groups.order(:position) }
+    let(:cloned_question_groups) { cloned_session.question_groups.order(:position) }
 
     let(:session_was) do
       session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count')
@@ -126,6 +127,18 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
 
     it 'has correct number of sessions' do
       expect(session.intervention.sessions.size).to eq(2)
+    end
+
+    it 'has correct number of question_groups' do
+      expect(cloned_session.question_groups.size).to eq(3)
+    end
+
+    it 'has one finish question_group' do
+      expect(cloned_session.question_groups.where(type: 'QuestionGroup::Finish').size).to eq(1)
+    end
+
+    it 'has one finish question' do
+      expect(cloned_questions_collection.where(type: 'Question::Finish').size).to eq(1)
     end
 
     it 'correctly clone questions' do
@@ -205,6 +218,17 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'position' => 999_999,
           'type' => 'Question::Finish'
         )
+      )
+    end
+
+    it 'finish question has only one speech' do
+      expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'].size).to eq(1)
+      expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'][0]).to include(
+        'text' => ['Finish Screen'],
+        'type' => 'ReadQuestion',
+        'action' => 'NO_ACTION',
+        'animation' => 'rest',
+        'endPosition' => { 'x' => 600, 'y' => 600 }
       )
     end
 

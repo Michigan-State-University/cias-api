@@ -14,6 +14,8 @@ class Clone::Session < Clone::Base
   private
 
   def create_question_groups
+    destroy_default_finish_question_group
+
     source.question_groups.order(:position).each do |question_group|
       outcome.question_groups << Clone::QuestionGroup.new(question_group,
                                                           session_id: outcome.id,
@@ -69,6 +71,10 @@ class Clone::Session < Clone::Base
       end
       question.save!
     end
+  end
+
+  def destroy_default_finish_question_group
+    outcome.question_groups.first.destroy
   end
 
   def create_sms_plans
