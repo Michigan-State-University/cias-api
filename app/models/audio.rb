@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Audio < ApplicationRecord
-  has_one_attached :mp3
+  has_one_attached :mp3, dependent: :purge_later
 
   validates :usage_counter, numericality: { greater_than_or_equal_to: 0 }
 
