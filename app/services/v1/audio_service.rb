@@ -3,10 +3,10 @@
 class V1::AudioService
   attr_reader :text, :language_code, :voice_type, :preview_audio
 
-  def initialize(text, preview: false)
-    @text = text.tr(',!.', '').strip.downcase
-    @language_code = ENV.fetch('TEXT_TO_SPEECH_LANGUAGE', 'en-US')
-    @voice_type = ENV.fetch('TEXT_TO_SPEECH_VOICE', 'en-US-Standard-C')
+  def initialize(text, preview: false, language_code: nil, voice_type: nil)
+    @text = unify_text(text)
+    @language_code = language_code || ENV.fetch('TEXT_TO_SPEECH_LANGUAGE', 'en-US')
+    @voice_type = voice_type || ENV.fetch('TEXT_TO_SPEECH_VOICE', 'en-US-Standard-C')
     @preview_audio = preview
   end
 
@@ -33,5 +33,9 @@ class V1::AudioService
       voice_type: voice_type
     ).execute
     audio
+  end
+
+  def unify_text(text)
+    text.tr(',!.', '').strip.downcase
   end
 end
