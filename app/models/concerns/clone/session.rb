@@ -44,7 +44,7 @@ class Clone::Session < Clone::Base
 
   def matching_outcome_target_id(pattern)
     target_id = pattern['target']['id']
-    return target_id if pattern['target']['type'] == 'Session'
+    return target_id if pattern['target']['type'] == 'Session' || target_id.empty?
 
     matching_question_id(target_id)
   end

@@ -14,7 +14,14 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
                                                  'target' =>
                                                     { 'id' => third_session.id, 'type' => 'Session' } }] })
   end
-  let!(:third_session) { create(:session, intervention: intervention, position: 3) }
+  let!(:third_session) do
+    create(:session, intervention: intervention, position: 3,
+                     formula: { 'payload' => '',
+                                'patterns' =>
+                          [{ 'match' => '',
+                             'target' =>
+                                 { 'id' => '', 'type' => 'Session' } }] })
+  end
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question_1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
@@ -117,6 +124,15 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'payload' => 'var + 2',
           'patterns' => [
             { 'match' => '=1', 'target' => { 'id' => third_cloned_session.id, 'type' => 'Session' } }
+          ]
+        }
+      )
+      expect(third_cloned_session.attributes).to include(
+        'position' => 3,
+        'formula' => {
+          'payload' => '',
+          'patterns' => [
+            { 'match' => '', 'target' => { 'id' => '', 'type' => 'Session' } }
           ]
         }
       )

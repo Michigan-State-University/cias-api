@@ -57,6 +57,12 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                }
                              })
   end
+  let!(:question_6) do
+    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 6', position: 3,
+                             formula: { 'payload' => '', 'patterns' => [
+                               { 'match' => '', 'target' => { 'id' => '', type: 'Question::Single' } }
+                             ] })
+  end
 
   let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
 
@@ -110,7 +116,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
 
     let(:session_cloned) do
-      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count')
+      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url')
     end
 
     it 'has correct http code' do
@@ -212,6 +218,19 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
               'voice' => true,
               'animation' => true
             }
+          }
+        ),
+        include(
+          'subtitle' => 'Question Subtitle 6',
+          'position' => 3,
+          'body' => include(
+            'variable' => { 'name' => '' }
+          ),
+          'formula' => {
+            'payload' => '',
+            'patterns' => [
+              { 'match' => '', 'target' => { 'id' => '', 'type' => 'Question::Single' } }
+            ]
           }
         ),
         include(
