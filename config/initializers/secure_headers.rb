@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable all
-if Rails.env.development?
+if Rails.env.development? || ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
   SecureHeaders::Configuration.default do |config|
     config.hsts = 'max-age=31536000; includeSubDomains'
     config.x_frame_options = 'SAMEORIGIN'
