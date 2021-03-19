@@ -3,10 +3,12 @@
 class Audio::TextToSpeech::Google
   include Audio::TextToSpeech::Interface
 
-  attr_reader :text
+  attr_reader :text, :voice_type, :language
 
-  def initialize(text)
+  def initialize(text, language, voice_type)
     @text = text
+    @language = language || ENV.fetch('TEXT_TO_SPEECH_LANGUAGE', 'en-US')
+    @voice_type = voice_type || ENV.fetch('TEXT_TO_SPEECH_VOICE', 'en-US-Standard-C')
   end
 
   def synthesize
@@ -21,8 +23,8 @@ class Audio::TextToSpeech::Google
 
   def voice
     @voice ||= {
-      language_code: ENV.fetch('TEXT_TO_SPEECH_LANGUAGE', 'en-US'),
-      name: ENV.fetch('TEXT_TO_SPEECH_VOICE', 'en-US-Standard-C')
+      language_code: language,
+      name: voice_type
     }
   end
 

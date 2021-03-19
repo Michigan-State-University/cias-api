@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_09_101750) do
+ActiveRecord::Schema.define(version: 2021_03_17_103013) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -53,7 +53,9 @@ ActiveRecord::Schema.define(version: 2021_03_09_101750) do
     t.integer "usage_counter", default: 1
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+    t.string "language"
+    t.string "voice_type"
+    t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
