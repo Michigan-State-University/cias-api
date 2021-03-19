@@ -8,7 +8,6 @@ if Rails.env.development?
     config.x_content_type_options = 'nosniff'
     config.x_xss_protection = '1; mode=block'
     config.x_download_options = 'noopen'
-    config.x_permitted_cross_domain_policies = 'none'
     config.referrer_policy = %w[origin-when-cross-origin strict-origin-when-cross-origin]
     config.csp = {
       # directive values: these values will directly translate into source directives
