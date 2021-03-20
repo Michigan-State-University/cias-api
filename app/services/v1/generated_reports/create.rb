@@ -70,7 +70,7 @@ class V1::GeneratedReports::Create
     @name_variable ||= Answer.select(:body).find_by(
       type: 'Answer::Name',
       user_session_id: user_session.id
-    )&.body_data&.first&.dig('value', 'name')
+    )&.body_data&.first&.dig('value').presence&.dig('name')
   end
 
   def insert_name_into_variants(variants_to_generate)
