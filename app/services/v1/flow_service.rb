@@ -7,10 +7,11 @@ class V1::FlowService
     @user_session = user_session
     @user = @user_session.user
     @warning = ''
+    @next_session_id = ''
   end
 
   attr_reader :user
-  attr_accessor :user_session, :warning
+  attr_accessor :user_session, :warning, :next_session_id
 
   def user_session_question(preview_question_id)
     answers_var_values = user_session.all_var_values
@@ -22,7 +23,7 @@ class V1::FlowService
 
     user_session.finish if question.type == 'Question::Finish'
 
-    { question: question, warning: warning }
+    { question: question, warning: warning, next_session_id: next_session_id }
   end
 
   def question_to_display(answers_var_values, preview_question_id)
@@ -56,7 +57,7 @@ class V1::FlowService
 
     user_session.finish(send_email: !session_available_now)
 
-    return question_or_session.first_question if session_available_now
+    self.next_session_id = question_or_session.id
 
     user_session.session.finish_screen
   end

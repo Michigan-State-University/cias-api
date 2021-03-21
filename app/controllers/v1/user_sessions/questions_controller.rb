@@ -9,6 +9,7 @@ class V1::UserSessions::QuestionsController < V1Controller
       next_question[:question]&.de_constantize_modulize_name || NilClass
     )
     response = response.merge(warning: next_question[:warning]) if next_question[:warning].presence && next_question[:question].session.intervention.draft?
+    response = response.merge(next_session_id: next_question[:next_session_id]) if next_question[:next_session_id].present?
     render json: response
   end
 
