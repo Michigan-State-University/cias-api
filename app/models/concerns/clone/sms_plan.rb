@@ -2,6 +2,7 @@
 
 class Clone::SmsPlan < Clone::Base
   def execute
+    outcome.name = "Copy of #{source.name}"
     outcome.save!
     create_sms_variants
     outcome
