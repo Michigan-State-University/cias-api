@@ -27,7 +27,9 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
           it 'send sms immediately after session end of America/New_York timezone' do
             subject
 
-            expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(phone.prefix + phone.number, 'test')
+            expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(
+              phone.prefix + phone.number, 'test', user.id
+            )
           end
         end
       end
@@ -263,6 +265,15 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         expect(SmsPlans::SendSmsJob).not_to have_been_enqueued
       end
     end
+
+    context 'when user does not have enabled sms notifications' do
+      let(:user) { create(:user, :confirmed, sms_notification: false) }
+
+      it 'dont send sms' do
+        subject
+        expect(SmsPlans::SendSmsJob).not_to have_been_enqueued
+      end
+    end
   end
 
   context 'with formula' do
@@ -298,7 +309,9 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
     context 'when two variants match to formula' do
       it 'send sms with content of first variant' do
         subject
-        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(phone.prefix + phone.number, 'variant 1 content')
+        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
+          phone.prefix + phone.number, 'variant 1 content', user.id
+        )
       end
     end
   end

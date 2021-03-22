@@ -274,6 +274,7 @@ Rails/ShortI18n:
 
 Rails/SkipsModelValidations:
   Exclude:
+    - 'lib/tasks/one_time_use/enable_sms_notification_for_users.rake'
     - 'app/models/question/narrator/**/*'
     - 'spec/**/*'
 
