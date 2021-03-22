@@ -143,6 +143,20 @@ describe 'PATCH /v1/users/:id', type: :request do
         )
       end
 
+      context 'with feedback_completed params' do
+        let(:params) do
+          {
+            user: {
+              feedback_completed: true
+            }
+          }
+        end
+
+        it 'updates feedback_completed to true' do
+          expect(current_user.reload.feedback_completed).to eq(true)
+        end
+      end
+
       context 'when current_user tries to update deactivated and roles attributes' do
         context 'when deactivated user is admin or guest' do
           let(:user_id) { other_user.id }

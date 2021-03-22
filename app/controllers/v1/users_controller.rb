@@ -96,6 +96,7 @@ class V1::UsersController < V1Controller
         :email_notification,
         :time_zone,
         :active,
+        :feedback_completed,
         roles: [],
         phone_attributes: %i[iso prefix number]
       )
