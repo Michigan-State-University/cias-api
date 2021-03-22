@@ -14,7 +14,6 @@ ActiveRecord::Schema.define(version: 2021_03_22_132139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -201,6 +200,7 @@ ActiveRecord::Schema.define(version: 2021_03_22_132139) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "report_templates_count"
     t.integer "sms_plans_count", default: 0, null: false
+    t.integer "last_report_template_number", default: 0
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"

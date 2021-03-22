@@ -32,6 +32,7 @@ class Session < ApplicationRecord
   delegate :draft?, to: :intervention
 
   validates :name, presence: true
+  validates :last_report_template_number, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
@@ -106,6 +107,12 @@ class Session < ApplicationRecord
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
 
     false
+  end
+
+  def increment_and_get_last_report_template_number
+    self.last_report_template_number += 1
+    save!
+    self.last_report_template_number
   end
 
   private
