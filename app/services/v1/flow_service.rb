@@ -57,7 +57,10 @@ class V1::FlowService
 
     user_session.finish(send_email: !session_available_now)
 
-    self.next_session_id = question_or_session.id if session_available_now
+    if session_available_now
+      self.next_session_id = question_or_session.id 
+      return question_or_session.first_question
+    end
 
     user_session.session.finish_screen
   end
