@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class SmsPlan < ApplicationRecord
+  include Clone
+
   belongs_to :session, counter_cache: true
   has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
 
