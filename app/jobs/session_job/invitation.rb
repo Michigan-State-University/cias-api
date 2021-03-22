@@ -2,11 +2,14 @@
 
 class SessionJob::Invitation < SessionJob
   def perform(session_id, emails)
+    users = User.where(email: emails)
     session = Session.find(session_id)
-    emails.each do |email|
+    users.each do |user|
+      next unless user.email_notification
+
       SessionMailer.inform_to_an_email(
         session,
-        email
+        user.email
       ).deliver_now
     end
   end

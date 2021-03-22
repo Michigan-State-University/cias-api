@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_17_134418) do
+ActiveRecord::Schema.define(version: 2021_03_18_104612) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -317,6 +317,7 @@ ActiveRecord::Schema.define(version: 2021_03_17_134418) do
     t.boolean "sms_notification", default: true, null: false
     t.uuid "team_id"
     t.uuid "preview_session_id"
+    t.boolean "email_notification", default: true, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

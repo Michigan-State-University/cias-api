@@ -93,6 +93,7 @@ class V1::UsersController < V1Controller
         :last_name,
         :email,
         :sms_notification,
+        :email_notification,
         :time_zone,
         :active,
         roles: [],

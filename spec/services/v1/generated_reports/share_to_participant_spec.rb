@@ -142,4 +142,22 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
           avoid_changing { third_party_report.reload.participant_id }
     end
   end
+
+  context 'when user has disabled email notifications' do
+    let!(:participant) { create(:user, :confirmed, :participant, email: 'johnny@example.com') }
+
+    it "Don't send email" do
+      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
+    end
+  end
+
+  context 'when user has enabled email notifications' do
+    let!(:participant) do
+      create(:user, :confirmed, :participant, email: 'johnny@example.com', email_notification: false)
+    end
+
+    it 'send email' do
+      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+    end
+  end
 end

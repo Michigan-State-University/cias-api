@@ -36,28 +36,36 @@ RSpec.describe V1::ReportTemplates::GeneratePdfPreview do
   end
 
   context 'there are variants to preview' do
-    it 'runs mailer with created PDF preview' do
-      expect(action_controller_double).to receive(:render_to_string).with(
-        template: 'report_templates/report_preview.html.erb',
-        locals: {
+    context 'email notification enabled' do
+      it 'runs mailer with created PDF preview' do
+        expect(action_controller_double).to receive(:render_to_string).with(
+          template: 'report_templates/report_preview.html.erb',
+          locals: {
+            report_template: report_template,
+            variants: match_array(variants_to_preview)
+          }
+        )
+        expect(action_controller_double).to receive(:render_to_string).with(
+          template: 'report_templates/report_header.html.erb',
+          locals: {
+            report_template: report_template
+          }
+        )
+        expect(wicked_pdf_instance).to receive(:pdf_from_string).and_return('PDF')
+        expect(ReportTemplateMailer).to receive(:template_preview).with(
+          email: current_v1_user.email,
           report_template: report_template,
-          variants: match_array(variants_to_preview)
-        }
-      )
-      expect(action_controller_double).to receive(:render_to_string).with(
-        template: 'report_templates/report_header.html.erb',
-        locals: {
-          report_template: report_template
-        }
-      )
-      expect(wicked_pdf_instance).to receive(:pdf_from_string).and_return('PDF')
-      expect(ReportTemplateMailer).to receive(:template_preview).with(
-        email: current_v1_user.email,
-        report_template: report_template,
-        report_template_preview_pdf: 'PDF'
-      ).and_return(template_preview_mailer)
+          report_template_preview_pdf: 'PDF'
+        ).and_return(template_preview_mailer)
 
-      subject
+        subject
+      end
+    end
+
+    context 'email notification disabled' do
+      it "don't run mailer" do
+        expect(ReportTemplateMailer).not_to receive(:template_preview)
+      end
     end
   end
 end

@@ -88,7 +88,7 @@ class Session < ApplicationRecord
   end
 
   def send_link_to_session(user)
-    return if !intervention.published? || user.with_invalid_email?
+    return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
     SessionMailer.inform_to_an_email(self, user.email).deliver_later
   end

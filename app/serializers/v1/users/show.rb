@@ -19,6 +19,7 @@ class V1::Users::Show < BaseSerializer
       team_id: @user.team_id,
       team_name: @user.team_name,
       avatar_url: url_for_image(@user, :avatar),
+      email_notification: @user.email_notification,
       sms_notification: @user.sms_notification
     }
   end
