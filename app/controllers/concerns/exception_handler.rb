@@ -40,6 +40,7 @@ module ExceptionHandler
     end
 
     rescue_from CanCan::AccessDenied do |exc|
+      Airbrake.notify(exc)
       render json: msg(exc), status: :forbidden
     end
 

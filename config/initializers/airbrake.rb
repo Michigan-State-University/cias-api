@@ -17,7 +17,7 @@ Airbrake.configure do |c|
   c.host              = ENV['AIRBRAKE_HOST']
   c.project_id        = ENV['AIRBRAKE_PROJECT_ID']
   c.project_key       = ENV['AIRBRAKE_PROJECT_KEY']
-  c.performance_stats = ENV['AIRBRAKE_PERFORMANCE_STATS'] || false
+  c.performance_stats = false
 
   # Configures the root directory of your project. Expects a String or a
   # Pathname, which represents the path to your project. Providing this option
@@ -43,7 +43,7 @@ Airbrake.configure do |c|
   # unwanted environments such as :test.
   # NOTE: This option *does not* work if you don't set the 'environment' option.
   # https://github.com/airbrake/airbrake-ruby#ignore_environments
-  c.ignore_environments = %w[development test]
+  c.ignore_environments = %w[test development]
 
   # A list of parameters that should be filtered out of what is sent to
   # Airbrake. By default, all "password" attributes will have their contents
@@ -72,3 +72,7 @@ end
 # integration with the Logger class from stdlib.
 # https://github.com/airbrake/airbrake#logger
 # Rails.logger = Airbrake::AirbrakeLogger.new(Rails.logger)
+
+Airbrake.add_filter do |notice|
+  notice.ignore! if %w[SIGHUP SIGTERM].include?(notice[:type])
+end
