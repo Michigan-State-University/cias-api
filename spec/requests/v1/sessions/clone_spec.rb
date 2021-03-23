@@ -4,7 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
-  let(:session) { create(:session) }
+  let(:session) do
+    create(:session,
+           formula: { 'payload' => 'var + 5', 'patterns' => [
+             { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
+           ] },
+           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
+  end
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
   let!(:other_session) { create(:session) }
@@ -112,11 +118,11 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let(:cloned_question_groups) { cloned_session.question_groups.order(:position) }
 
     let(:session_was) do
-      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'last_report_template_number')
+      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'last_report_template_number', 'formula', 'settings')
     end
 
     let(:session_cloned) do
-      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url')
+      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url', 'formula', 'settings')
     end
 
     it 'has correct http code' do
@@ -129,6 +135,14 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
 
     it 'has correct position' do
       expect(json_response['data']['attributes']['position']).to eq(2)
+    end
+
+    it 'has cleared formula' do
+      expect(json_response['data']['attributes']['formula']).to include(
+        'payload' => '',
+        'patterns' => []
+      )
+      expect(json_response['data']['attributes']['settings']['formula']).to eq(false)
     end
 
     it 'has correct number of sessions' do

@@ -115,6 +115,11 @@ class Session < ApplicationRecord
     self.last_report_template_number
   end
 
+  def clear_formula
+    self.formula = self.class.assign_default_values('formula')
+    settings['formula'] = false
+  end
+
   private
 
   def create_core_childs

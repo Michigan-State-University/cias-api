@@ -6,7 +6,14 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   let(:user) { create(:user, :confirmed, :researcher) }
   let!(:intervention) { create(:intervention, user: user) }
   let!(:intervention_2) { create(:intervention, user: user) }
-  let!(:session) { create(:session, intervention: intervention) }
+  let(:other_session) { create(:session, intervention: intervention) }
+  let!(:session) do
+    create(:session, intervention: intervention,
+                     formula: { 'payload' => 'var + 5', 'patterns' => [
+                       { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
+                     ] },
+                     settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
+  end
   let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
   let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
   let!(:params) do
@@ -36,7 +43,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
       it 'session is duplicated' do
         expect(json_response['data']['attributes']).to include(
           'intervention_id' => intervention_2.id,
-          'position' => session.position,
+          'position' => intervention_2.sessions.size,
           'name' => session.name,
           'schedule' => session.schedule,
           'schedule_payload' => session.schedule_payload
@@ -108,11 +115,19 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
       it 'session is duplicated' do
         expect(json_response['data']['attributes']).to include(
           'intervention_id' => intervention_2.id,
-          'position' => session.position,
+          'position' => intervention_2.sessions.size,
           'name' => session.name,
           'schedule' => session.schedule,
           'schedule_payload' => session.schedule_payload
         )
+      end
+
+      it 'has cleared formula' do
+        expect(json_response['data']['attributes']['formula']).to include(
+          'payload' => '',
+          'patterns' => []
+        )
+        expect(json_response['data']['attributes']['settings']['formula']).to eq(false)
       end
 
       it 'question_group is duplicated' do
