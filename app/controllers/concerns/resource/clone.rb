@@ -24,7 +24,8 @@ module Resource::Clone
       {
         intervention: [{ user_ids: [] }],
         session: [],
-        question: []
+        question: [],
+        sms_plan: []
       }
     end
   end
