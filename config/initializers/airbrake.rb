@@ -17,7 +17,7 @@ Airbrake.configure do |c|
   c.host              = ENV['AIRBRAKE_HOST']
   c.project_id        = ENV['AIRBRAKE_PROJECT_ID']
   c.project_key       = ENV['AIRBRAKE_PROJECT_KEY']
-  c.performance_stats = false
+  c.performance_stats = ENV['AIRBRAKE_PERFORMANCE_STATS'] == 'true'
 
   # Configures the root directory of your project. Expects a String or a
   # Pathname, which represents the path to your project. Providing this option
@@ -74,5 +74,5 @@ end
 # Rails.logger = Airbrake::AirbrakeLogger.new(Rails.logger)
 
 Airbrake.add_filter do |notice|
-  notice.ignore! if %w[SIGHUP SIGTERM].include?(notice[:type])
+  notice.ignore! if %w[SIGHUP SIGTERM].include?(notice.stash[:exception].class.name)
 end
