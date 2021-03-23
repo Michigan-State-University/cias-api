@@ -15,10 +15,10 @@ describe 'GET /v1/sessions/:session_id/question_groups/:id', type: :request do
 
     it 'returns serialized question_group' do
       request
-
+      p json_response
       expect(response).to have_http_status(:ok)
-      expect(json_response['title']).to eq 'QuestionGroup Title'
-      expect(json_response['questions'][0]['title']).to eq 'Question Title'
+      expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+      expect(json_response['included'][0]['attributes']['title']).to eq 'Question Title'
     end
   end
 
