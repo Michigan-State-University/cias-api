@@ -7,23 +7,19 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
   let(:session) { create(:session) }
   let(:headers) { user.create_new_auth_token }
   let!(:sms_plan) { create(:sms_plan, name: 'Plan name', session: session) }
-  let!(:variants) { create_list(:sms_plan_variant, 3, sms_plan: sms_plan) }
+  let!(:variants) { create_list(:sms_plan_variant, 3, sms_plan: sms_plan, formula_match: 'test', content: 'content') }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post clone_v1_sms_plan_path(id: sms_plan.id) }
+      let(:request) { post clone_v1_sms_plan_path(id: sms_plan.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post clone_v1_sms_plan_path(id: sms_plan.id), headers: headers }
+      let(:request) { post clone_v1_sms_plan_path(id: sms_plan.id), headers: headers }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
@@ -38,8 +34,18 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
       expect(cloned_sms_plan['name']).to eq 'Copy of Plan name'
     end
 
-    it 'has correct number of variants' do
-      expect(SmsPlan.find(json_response['data']['id']).variants.size).to eq variants.size
+    context 'copied variants' do
+      it 'have correct size' do
+        expect(SmsPlan.find(json_response['data']['id']).variants.size).to eq variants.size
+      end
+
+      it 'have correct content' do
+        expect(SmsPlan.find(json_response['data']['id']).variants.first.content).to eq 'content'
+      end
+
+      it 'have correct formula_match' do
+        expect(SmsPlan.find(json_response['data']['id']).variants.first.formula_match).to eq 'test'
+      end
     end
   end
 end
