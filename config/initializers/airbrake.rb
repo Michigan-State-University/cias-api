@@ -75,4 +75,8 @@ end
 
 Airbrake.add_filter do |notice|
   notice.ignore! if %w[SIGHUP SIGTERM].include?(notice.stash[:exception].class.name)
+
+  next unless (request = notice.stash[:rack_request])
+
+  notice[:environment][:uid] = request.env['HTTP_UID']
 end
