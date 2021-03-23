@@ -15,6 +15,14 @@ RSpec.describe V1::Intervention::Publish do
   let(:schedule_payload) { 7 }
   let(:days_after_payload) { 5 }
 
+  before do
+    Timecop.freeze
+  end
+
+  after do
+    Timecop.return
+  end
+
   context 'intervention status change publish' do
     it 'calls correct methods on execute' do
       expect_any_instance_of(described_class).to receive(:timestamp_published_at)
