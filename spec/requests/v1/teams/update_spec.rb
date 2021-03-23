@@ -46,6 +46,19 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
                 change { previous_team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
                   change { previous_team_admin.reload.team_id }.from(nil).to(team.id)
           end
+
+          context 'when there are waiting team invitations for researcher' do
+            let!(:team_invitation1) { create(:team_invitation, user: new_team_admin) }
+            let!(:team_invitation2) { create(:team_invitation, user: new_team_admin) }
+            let!(:accepted_team_invitation) { create(:team_invitation, :accepted, user: new_team_admin) }
+
+            it 'not accepted yet invitations are removed' do
+              expect { request }.to change(TeamInvitation, :count).by(-2)
+              expect(team_invitation1).to be_removed
+              expect(team_invitation2).to be_removed
+              expect(accepted_team_invitation).to exist
+            end
+          end
         end
 
         context 'and new team admin is an other team admin' do

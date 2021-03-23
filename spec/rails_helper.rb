@@ -104,6 +104,16 @@ end
 
 RSpec::Matchers.define_negated_matcher :avoid_changing, :change
 RSpec::Matchers.define_negated_matcher :not_include, :include
+RSpec::Matchers.define :be_removed do
+  match do |record|
+    !record.class.exists?(record.id)
+  end
+end
+RSpec::Matchers.define :exist do
+  match do |record|
+    record.class.exists?(record.id)
+  end
+end
 
 # require let it be Rspec helper
 # https://test-prof.evilmartians.io/#/recipes/let_it_be

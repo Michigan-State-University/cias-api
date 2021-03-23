@@ -20,6 +20,8 @@ class V1::Teams::Create
         roles: ['team_admin']
       )
 
+      V1::Teams::RemoveUsersActiveInvitations.call(new_team_admin)
+
       team
     end
   end

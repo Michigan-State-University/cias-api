@@ -32,6 +32,8 @@ class V1::Teams::ChangeTeamAdmin
       new_team_admin.update!(
         roles: ['team_admin']
       )
+
+      V1::Teams::RemoveUsersActiveInvitations.call(new_team_admin)
     end
   end
 

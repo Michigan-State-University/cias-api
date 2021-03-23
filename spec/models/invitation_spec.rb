@@ -9,7 +9,6 @@ RSpec.describe Invitation, type: :model do
   let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
 
   describe '#resend' do
-
     before do
       allow(message_delivery).to receive(:deliver_later)
       ActiveJob::Base.queue_adapter = :test
