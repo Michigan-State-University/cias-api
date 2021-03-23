@@ -2,6 +2,7 @@
 
 class V1::FlowService
   REFLECTION_MISS_MATCH = 'ReflectionMissMatch'
+  NO_BRANCHING_TARGET = 'NoBranchingTarget'
 
   def initialize(user_session)
     @user_session = user_session
@@ -41,7 +42,9 @@ class V1::FlowService
     if last_question.formula['payload'].present?
       obj_src = last_question.exploit_formula(answers_var_values)
       self.warning = obj_src if obj_src.is_a?(String)
-      next_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
+      branching_question = nil
+      branching_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
+      next_question = branching_question unless branching_question.nil?
     end
 
     next_question
@@ -49,7 +52,11 @@ class V1::FlowService
 
   def branching_source_to_question(source)
     branching_type = source['target']['type']
-    question_or_session = branching_type.safe_constantize.find(source['target']['id'])
+    question_or_session = branching_type.safe_constantize.find_by(id: source['target']['id'])
+    if question_or_session.nil?
+      self.warning = NO_BRANCHING_TARGET
+      return nil
+    end
     return question_or_session if branching_type.include? 'Question'
 
     session_available_now = question_or_session.available_now
