@@ -31,8 +31,10 @@ class Question < ApplicationRecord
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
 
   delegate :session, to: :question_group
+
   after_create :initialize_narrator
   before_destroy :decrement_usage_counters
+  
   default_scope { order(:position) }
 
   def subclass_name
