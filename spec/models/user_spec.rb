@@ -53,6 +53,58 @@ describe User, type: :model do
     end
   end
 
+  describe 'invalidate_token_after_changes' do
+    let(:user_tokens) do
+      {
+        'yfEoLJFWF0KC-XOg5BieDw' =>
+           {
+             'token' => '$2a$10$EmyNiFLYAN1LihYzsmGKq.SVk/8WfQVWzbFl42aYhweC0YH.bsp8K',
+             'expiry' => 1_617_002_885,
+             'last_token' => '$2a$10$tCHDzitG9YDitEJQlntvHuSWbEHzWeuEE.pYRh7bJ2bnpsnpBAwX6',
+             'updated_at' => 'Mon, 15 Mar 2021 07:28:05 +0000'
+           }
+      }
+    end
+    let!(:user) { create(:user, :confirmed, :team_admin, tokens: user_tokens) }
+
+    context 'roles changed' do
+      it 'removes current user tokens' do
+        expect { user.update(roles: ['researcher']) }.to change { user.reload.tokens }
+          .from(user_tokens).to({})
+      end
+    end
+
+    context 'roles have not changed' do
+      it 'does not remove user tokens' do
+        expect { user.update(roles: ['team_admin']) }.not_to change { user.reload.tokens }
+      end
+    end
+
+    context 'active changed to inactive' do
+      it 'removes current user tokens' do
+        expect { user.update(active: false) }.to change { user.reload.tokens }
+          .from(user_tokens).to({})
+      end
+    end
+
+    context 'active changed to active' do
+      before do
+        user.update(active: false)
+        user.update(tokens: user_tokens)
+      end
+
+      it 'does not remove user tokens' do
+        expect { user.update(active: true) }.not_to change { user.reload.tokens }
+      end
+    end
+
+    context 'active have not changed' do
+      it 'does not remove user tokens' do
+        expect { user.update(active: true) }.not_to change { user.reload.tokens }
+      end
+    end
+  end
+
   context 'user has role researcher' do
     let(:user) { build_stubbed(:user, :researcher) }
 

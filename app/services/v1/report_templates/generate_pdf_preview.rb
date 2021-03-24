@@ -11,6 +11,8 @@ class V1::ReportTemplates::GeneratePdfPreview
   end
 
   def call
+    return unless current_v1_user.email_notification
+
     ReportTemplateMailer.template_preview(
       email: current_v1_user.email,
       report_template: report_template,

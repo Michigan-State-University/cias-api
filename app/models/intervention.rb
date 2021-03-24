@@ -9,6 +9,7 @@ class Intervention < ApplicationRecord
   has_many :invitations, as: :invitable, dependent: :destroy
 
   has_many_attached :reports
+  has_one_attached :logo, dependent: :purge_later
 
   attr_accessor :status_event
 

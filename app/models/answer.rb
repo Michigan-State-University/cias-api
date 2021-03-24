@@ -6,6 +6,7 @@ class Answer < ApplicationRecord
   belongs_to :question, inverse_of: :answers
   belongs_to :user_session, optional: true
 
+  attribute :decrypted_body, :json, default: { data: [] }
   attribute :body, :json, default: { data: [] }
 
   delegate :subclass_name, :settings, :position, :title, :subtitle, :formula, to: :question, allow_nil: true
@@ -18,7 +19,21 @@ class Answer < ApplicationRecord
     relation
   }
 
+  encrypts :body, type: :json, migrating: true
+
   def on_answer; end
+
+  def csv_header_name(data)
+    data['var']
+  end
+
+  def csv_row_value(data)
+    data['value']
+  end
+
+  def decrypted_body
+    Answer.decrypt_body_ciphertext(self.body_ciphertext)
+  end
 
   private
 

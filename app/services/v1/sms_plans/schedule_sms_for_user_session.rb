@@ -12,6 +12,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   def call
     return unless session.intervention.published?
     return unless phone.present? && phone.confirmed?
+    return unless user.sms_notification
 
     session.sms_plans.each do |plan|
       next unless can_run_plan?(plan)
@@ -81,11 +82,15 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def send_sms(start_time, content)
-    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone_number, content)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone_number, content, user.id)
   end
 
   def phone
-    @phone ||= user_session.user.phone
+    @phone ||= user.phone
+  end
+
+  def user
+    @user ||= user_session.user
   end
 
   def now_in_timezone

@@ -23,10 +23,7 @@ class V1::ReportTemplates::Create
   attr_reader :report_template_params, :session
 
   def report_name
+    report_number = session.increment_and_get_last_report_template_number
     report_template_params.delete(:name).presence || "New Report #{report_number}"
-  end
-
-  def report_number
-    session.report_templates_count.to_i + 1
   end
 end

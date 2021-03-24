@@ -2,10 +2,12 @@
 
 class Audio::TextToSpeech < SimpleDelegator
   attr_accessor :mp3_file
-  attr_reader :text
+  attr_reader :text, :language, :voice_type
 
-  def initialize(audio, text:)
+  def initialize(audio, text:, language:, voice_type:)
     @text = text
+    @language = language
+    @voice_type = voice_type
     super(audio)
   end
 
@@ -30,6 +32,6 @@ class Audio::TextToSpeech < SimpleDelegator
   end
 
   def fetch_speech_from_text
-    provider.new(text).synthesize
+    provider.new(text, language, voice_type).synthesize
   end
 end

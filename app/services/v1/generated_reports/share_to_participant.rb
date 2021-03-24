@@ -19,6 +19,7 @@ class V1::GeneratedReports::ShareToParticipant
     participant_reports.update_all(
       participant_id: participant.id
     )
+    return unless participant.email_notification
 
     if participant.confirmed?
       GeneratedReportMailer.new_report_available(participant.email).deliver_now

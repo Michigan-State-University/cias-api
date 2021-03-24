@@ -4,17 +4,15 @@ class Communication::Sms
   attr_accessor :errors
   attr_reader :sms, :client
 
-  TWILIO = Settings.services.twilio
-
-  def initialize(message_id, client = Twilio::REST::Client.new(TWILIO.sid, TWILIO.token))
+  def initialize(message_id)
     @sms = Message.find message_id
-    @client = client
+    @client = Twilio::REST::Client.new(ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_AUTH_TOKEN'])
     @errors = []
   end
 
   def send_message
     client.messages.create(
-      from: TWILIO.from,
+      from: ENV['TWILIO_FROM'],
       to: sms.phone,
       body: sms.body
     )

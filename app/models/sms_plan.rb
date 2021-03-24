@@ -1,10 +1,16 @@
 # frozen_string_literal: true
 
 class SmsPlan < ApplicationRecord
+  include Clone
+
   belongs_to :session, counter_cache: true
   has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
 
   validates :name, :schedule, :frequency, presence: true
+
+  ATTR_NAMES_TO_COPY = %w[
+    name schedule schedule_payload frequency end_at formula no_formula_text is_used_formula
+  ].freeze
 
   enum schedule: {
     days_after_session_end: 'days_after_session_end',

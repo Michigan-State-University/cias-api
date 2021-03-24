@@ -35,28 +35,30 @@ module BlockHelper
   end
 
   def swap_name_into_reflectionformula_block(block, mp3url)
-    block['reflections'].each do |reflection|
-      next reflection unless reflection['text'].include?(':name:.')
-
-      index = reflection['text'].index(':name:.')
-      reflection['audio_urls'][index] = mp3url
-    end
-    block
+    swap_name_into_reflection_block(block, mp3url)
   end
 
   def swap_name_into_reflection_block(block, mp3url)
     block['reflections'].each do |reflection|
       next reflection unless reflection['text'].include?(':name:.')
 
-      index = reflection['text'].index(':name:.')
-      reflection['audio_urls'][index] = mp3url
+      swap_name_into_block(reflection, mp3url)
     end
     block
   end
 
   def swap_name_into_speech_block(block, mp3url)
-    index = block['text'].index(':name:.')
-    block['audio_urls'][index] = mp3url
+    return block unless block['text'].include?(':name:.')
+
+    swap_name_into_block(block, mp3url)
+  end
+
+  def swap_name_into_block(block, mp3url)
+    block['text'].each_with_index do |text, index|
+      next text unless text == ':name:.'
+
+      block['audio_urls'][index] = mp3url
+    end
     block
   end
 
@@ -64,7 +66,7 @@ module BlockHelper
     {
       'action' => 'NO_ACTION',
       'animation' => 'rest',
-      'text' => ['Finish screen'],
+      'text' => ['Finish Screen'],
       'audio_urls' => [],
       'sha256' => [],
       'type' => READ_QUESTION_BLOCK,

@@ -104,4 +104,12 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
           avoid_changing { User.count }
     end
   end
+
+  context "when third party user doesn't have enabled email notifications" do
+    let!(:user) { create(:user, :confirmed, :third_party, email: 'johnny@example.com', email_notification: false) }
+
+    it "don't send email" do
+      expect { subject }.to avoid_changing { ActionMailer::Base.deliveries.size }
+    end
+  end
 end

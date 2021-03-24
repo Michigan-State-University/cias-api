@@ -12,4 +12,8 @@ class Question::Feedback < Question
     )
     body_data[0]['payload']['target_value'] = result
   end
+
+  def csv_header_names
+    []
+  end
 end

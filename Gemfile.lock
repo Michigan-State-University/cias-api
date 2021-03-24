@@ -66,6 +66,10 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
+    airbrake (11.0.1)
+      airbrake-ruby (~> 5.1)
+    airbrake-ruby (5.2.0)
+      rbtree3 (~> 0.5)
     argon2 (2.0.2)
       ffi (~> 1.9)
       ffi-compiler (>= 0.1)
@@ -280,6 +284,7 @@ GEM
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
+    lockbox (0.6.2)
     loofah (2.7.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -335,6 +340,8 @@ GEM
     puma (5.0.4)
       nio4r (~> 2.0)
     rack (2.2.3)
+    rack-attack (6.5.0)
+      rack (>= 1.0, < 3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-test (1.1.0)
@@ -370,6 +377,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbtree3 (0.6.0)
     redis (4.2.2)
     regexp_parser (1.8.2)
     responders (3.0.1)
@@ -428,8 +436,7 @@ GEM
     ruby_parser (3.15.0)
       sexp_processor (~> 4.9)
     rubyzip (2.3.0)
-    sentry-raven (3.1.1)
-      faraday (>= 1.0)
+    secure_headers (6.3.2)
     sexp_processor (4.15.1)
     shellany (0.0.1)
     shoulda-matchers (4.4.1)
@@ -493,6 +500,7 @@ DEPENDENCIES
   active_storage_validations
   activejob-cancel
   activerecord_json_validator
+  airbrake
   aws-sdk-s3
   bootsnap (>= 1.4)
   brakeman
@@ -517,6 +525,7 @@ DEPENDENCIES
   hiredis
   letter_opener_web
   license_finder
+  lockbox
   oj
   overcommit
   pagy
@@ -527,6 +536,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   puma (~> 5.0)
+  rack-attack
   rack-cors
   rails (~> 6.0)
   redis
@@ -537,7 +547,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   rubocop-thread_safety
-  sentry-raven
+  secure_headers
   shoulda-matchers
   sidekiq
   simplecov

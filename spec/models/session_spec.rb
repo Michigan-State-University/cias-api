@@ -64,6 +64,68 @@ RSpec.describe Session, type: :model do
           end
         end
       end
+
+      describe '#send_link_to_session' do
+        before do
+          allow(message_delivery).to receive(:deliver_later)
+          ActiveJob::Base.queue_adapter = :test
+        end
+
+        after { session.send_link_to_session(user) }
+
+        let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+        let(:intervention) { create(:intervention, status: status) }
+        let(:session) { create(:session, intervention: intervention) }
+        let(:status) { :draft }
+
+        context 'intervention is draft' do
+          %i[admin researcher participant guest preview_session].each do |role|
+            context "user is #{role}" do
+              let(:user) { create(:user, :confirmed, role) }
+
+              it 'dose not schedule send email' do
+                expect(SessionMailer).not_to receive(:inform_to_an_email)
+              end
+            end
+          end
+
+          context 'intervention is published' do
+            let(:status) { :published }
+
+            %i[guest preview_session].each do |role|
+              context "user is #{role}" do
+                let(:user) { create(:user, :confirmed, role) }
+
+                it 'dose not schedule send email' do
+                  expect(SessionMailer).not_to receive(:inform_to_an_email)
+                end
+              end
+            end
+
+            %i[admin researcher participant].each do |role|
+              context "user is #{role}" do
+                let(:user) { create(:user, :confirmed, role) }
+
+                context 'email notification enabled' do
+                  it 'schedules send email' do
+                    expect(SessionMailer).to receive(:inform_to_an_email).with(session, user.email).and_return(
+                      message_delivery
+                    )
+                  end
+                end
+
+                context 'email notification disabled' do
+                  let!(:disable_email_notification) { user.email_notification = false }
+
+                  it "Don't schedule send email" do
+                    expect(SessionMailer).not_to receive(:inform_to_an_email)
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end

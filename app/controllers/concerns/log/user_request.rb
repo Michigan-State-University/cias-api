@@ -33,5 +33,6 @@ module Log::UserRequest
     params[:avatar]&.delete(:file)
     params[:report_template]&.delete(:logo)
     params[:variant]&.delete(:image)
+    params[:logo]&.delete(:file)
   end
 end

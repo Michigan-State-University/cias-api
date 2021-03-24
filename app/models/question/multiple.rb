@@ -9,7 +9,7 @@ class Question::Multiple < Question
     )
   end
 
-  def harvest_body_variables
+  def csv_header_names
     body_data.map { |payload| payload['variable']['name'] }
   end
 

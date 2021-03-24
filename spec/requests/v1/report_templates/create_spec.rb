@@ -48,6 +48,38 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_template', type: :request d
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when name for report template is missing' do
+      let(:params) do
+        {
+          report_template: {
+            report_for: 'participant',
+            summary: 'Your session summary'
+          }
+        }
+      end
+
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates new report template with correct attributes' do
+        expect { request }.to change(ReportTemplate, :count).by(1)
+
+        expect(ReportTemplate.last).to have_attributes(
+          name: 'New Report 1',
+          report_for: 'participant',
+          summary: 'Your session summary',
+          session_id: session.id
+        )
+      end
+
+      it 'changes number of last report template' do
+        request
+        expect(session.reload.last_report_template_number).to eq(1)
+      end
+    end
   end
 
   context 'when user is not super admin' do
