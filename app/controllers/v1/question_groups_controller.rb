@@ -61,7 +61,11 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :create, QuestionGroup
     shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
 
-    render_json question_group: shared_question_group, action: :show, status: :ok
+    if shared_question_group.nil?
+      render json: { warning: 'This type of question can appear only once per group' }, status: :conflict
+    else
+      render_json question_group: shared_question_group, action: :show, status: :ok
+    end
   end
 
   private

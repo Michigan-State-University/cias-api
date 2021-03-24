@@ -26,7 +26,11 @@ class V1::QuestionGroup::ShareService
 
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
-        share_question(shared_questions, question)
+        if can_copy_this_question(shared_questions, question)
+          share_question(shared_questions, question)
+        else
+          return nil
+        end
       end
 
       question_group_ids.each do |question_group_id|
@@ -59,5 +63,16 @@ class V1::QuestionGroup::ShareService
     cloned.clear_narrator_blocks
     cloned.position = shared_questions.last&.position.to_i + 1
     shared_questions << cloned
+  end
+
+  def can_copy_this_question(shared_questions, question)
+    if question.type.eql? 'Question::Name' || 'Question::ParticipantReport' || 'Question::ThirdParty'
+      shared_questions.each do |shared_question|
+        shared_question
+        return false if shared_question.type.eql? question.type
+      end
+    end
+
+    true
   end
 end
