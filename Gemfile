@@ -37,6 +37,9 @@ gem 'wicked_pdf'
 gem 'rack-attack'
 gem 'secure_headers'
 gem 'airbrake'
+# for encrypt data
+gem 'lockbox'
+
 
 group :development, :test do
   gem 'bundler-audit'

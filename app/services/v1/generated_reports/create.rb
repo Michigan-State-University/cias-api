@@ -67,8 +67,7 @@ class V1::GeneratedReports::Create
   end
 
   def name_variable
-    @name_variable ||= Answer.select(:body).find_by(
-      type: 'Answer::Name',
+    @name_variable ||= Answer::Name.find_by(
       user_session_id: user_session.id
     )&.body_data&.first&.dig('value').presence&.dig('name')
   end
