@@ -74,7 +74,7 @@ end
 # Rails.logger = Airbrake::AirbrakeLogger.new(Rails.logger)
 
 Airbrake.add_filter do |notice|
-  notice.ignore! if %w[SIGHUP SIGTERM].include?(notice.stash[:exception].class.name)
+  notice.ignore! if %w[SignalException].include?(notice.stash[:exception].class.name)
 
   next unless (request = notice.stash[:rack_request])
 
