@@ -11,7 +11,7 @@ class Ability::PreviewSession < Ability::Base
   def preview_session
     can :read, Intervention, id: intervention_id, status: 'draft'
     can :read, Session, id: user.preview_session_id, intervention: { status: 'draft' }
-    can :manage, UserSession, session: { id: user.preview_session_id, intervention: { status: 'draft' } }
+    can :manage, UserSession, session: { intervention_id: intervention_id, intervention: { status: 'draft' } }
     can :create, Answer, user_session: { user_id: user.id }
   end
 
