@@ -23,30 +23,23 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
       }
     }
   end
+  let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_intervention_sessions_path(intervention_id: intervention.id) }
+      let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when params' do
     context 'valid' do
-      before do
-        post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers
-      end
+      before { request }
 
       it { expect(response).to have_http_status(:success) }
     end

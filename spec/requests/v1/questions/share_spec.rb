@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/questions/share', type: :request do
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
   let(:team) { team_admin.admins_teams.first }
-  let(:current_user) { create(:user, :confirmed, :researcher, team_id: team.id) }
+  let(:user) { create(:user, :confirmed, :researcher, team_id: team.id) }
   let(:researcher_1) { create(:user, :confirmed, :researcher, team_id: team.id) }
   let(:researcher_2) { create(:user, :confirmed, :researcher, team_id: team.id) }
 
-  let(:intervention) { create(:intervention, user: current_user) }
+  let(:intervention) { create(:intervention, user: user) }
   let(:session) { create(:session, intervention: intervention) }
   let(:question_group) { create(:question_group, session: session) }
   let(:other_question_group) { create(:question_group, session: session) }
@@ -22,26 +22,18 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
       researcher_ids: [researcher_1.id, researcher_2.id]
     }
   end
-  let(:headers) { current_user.create_new_auth_token }
+  let(:headers) { user.create_new_auth_token }
   let(:request) { post v1_share_questions_path, params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_share_questions_path, params: params }
+      let(:request) { post v1_share_questions_path, params: params }
 
-      it 'returns :unathorized status' do
-        expect(response).to have_http_status(:unauthorized)
-      end
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { request }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => current_user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
 
     context 'when user shares questions to other researchers' do
@@ -64,8 +56,8 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
         let(:researcher_2_first_question_group) { researcher_2_last_session.question_groups.first }
 
         it 'researchers have new intervention with proper name' do
-          expect(researcher_1_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{current_user.full_name}")
-          expect(researcher_2_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{current_user.full_name}")
+          expect(researcher_1_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{user.full_name}")
+          expect(researcher_2_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{user.full_name}")
         end
 
         it 'researchers have new session with proper name' do
@@ -85,7 +77,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
       end
 
       context 'when user is super admin' do
-        let(:current_user) { create(:user, :confirmed, :admin) }
+        let(:user) { create(:user, :confirmed, :admin) }
 
         before { request }
 
@@ -101,7 +93,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
       end
 
       context 'when user is team admin' do
-        let(:current_user) { team_admin }
+        let(:user) { team_admin }
 
         context 'all researchers are from team' do
           before { request }
@@ -138,7 +130,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
 
       context 'when user is researcher' do
         context 'when researcher doesn\'t belong to any team' do
-          let(:current_user) { create(:user, :confirmed, :researcher) }
+          let(:user) { create(:user, :confirmed, :researcher) }
 
           before { request }
 

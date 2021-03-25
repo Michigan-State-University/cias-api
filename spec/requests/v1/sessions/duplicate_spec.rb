@@ -26,19 +26,15 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params }
+      let!(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
       before { request }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
 
       it 'session is duplicated' do
         expect(json_response['data']['attributes']).to include(
