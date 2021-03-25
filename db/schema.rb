@@ -2,19 +2,18 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# This file is the source Rails uses to define your schema when running `bin/rails
-# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# This file is the source Rails uses to define your schema when running `rails
+# db:schema:load`. When creating a new database, `rails db:schema:load` tends to
 # be faster and is potentially less error prone than running all of your
 # migrations from scratch. Old migrations may fail to apply correctly if those
 # migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_09_101750) do
+ActiveRecord::Schema.define(version: 2021_03_22_135145) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -44,6 +43,7 @@ ActiveRecord::Schema.define(version: 2021_03_09_101750) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "user_session_id"
+    t.text "body_ciphertext"
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
@@ -54,7 +54,9 @@ ActiveRecord::Schema.define(version: 2021_03_09_101750) do
     t.integer "usage_counter", default: 1
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+    t.string "language"
+    t.string "voice_type"
+    t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -199,6 +201,7 @@ ActiveRecord::Schema.define(version: 2021_03_09_101750) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "report_templates_count"
     t.integer "sms_plans_count", default: 0, null: false
+    t.integer "last_report_template_number", default: 0
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
@@ -312,9 +315,11 @@ ActiveRecord::Schema.define(version: 2021_03_09_101750) do
     t.inet "last_sign_in_ip"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "sms_notification", default: false
+    t.boolean "sms_notification", default: true, null: false
     t.uuid "team_id"
     t.uuid "preview_session_id"
+    t.boolean "email_notification", default: true, null: false
+    t.boolean "feedback_completed", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

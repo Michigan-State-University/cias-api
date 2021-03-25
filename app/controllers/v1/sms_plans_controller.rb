@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::SmsPlansController < V1Controller
+  include Resource::Clone
+
   def index
     authorize! :read, SmsPlan
 

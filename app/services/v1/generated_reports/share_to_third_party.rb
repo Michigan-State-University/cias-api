@@ -20,6 +20,7 @@ class V1::GeneratedReports::ShareToThirdParty
     third_party_reports.update_all(third_party_id: third_party_user.id)
 
     return if third_party_user&.deactivated?
+    return unless third_party_user.email_notification
 
     if third_party_user.confirmed?
       GeneratedReportMailer.new_report_available(third_party_user.email).deliver_now

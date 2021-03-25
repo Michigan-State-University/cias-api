@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'sidekiq/web' if Rails.env.development?
+require 'sidekiq/web' if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
 
 Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
@@ -118,7 +118,9 @@ Rails.application.routes.draw do
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
     post :phonetic_preview, to: 'audio#create'
-    resources :sms_plans
+    resources :sms_plans do
+      post 'clone', on: :member
+    end
 
     resources :generated_reports, only: :index
   end
@@ -126,6 +128,15 @@ Rails.application.routes.draw do
   if Rails.env.development?
     scope 'rails' do
       mount LetterOpenerWeb::Engine, at: '/browse_emails'
+    end
+  end
+
+  if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+    scope 'rails' do
+      Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
+          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
+      end
       mount Sidekiq::Web => '/workers'
     end
   end

@@ -106,8 +106,20 @@ RSpec.describe Session, type: :model do
               context "user is #{role}" do
                 let(:user) { create(:user, :confirmed, role) }
 
-                it 'schedules send email' do
-                  expect(SessionMailer).to receive(:inform_to_an_email).with(session, user.email).and_return(message_delivery)
+                context 'email notification enabled' do
+                  it 'schedules send email' do
+                    expect(SessionMailer).to receive(:inform_to_an_email).with(session, user.email).and_return(
+                      message_delivery
+                    )
+                  end
+                end
+
+                context 'email notification disabled' do
+                  let!(:disable_email_notification) { user.email_notification = false }
+
+                  it "Don't schedule send email" do
+                    expect(SessionMailer).not_to receive(:inform_to_an_email)
+                  end
                 end
               end
             end

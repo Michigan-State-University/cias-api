@@ -2,8 +2,8 @@
 
 class Answer::Name < Answer
   def on_answer
-    text = body_data.first.dig('value', 'phonetic_name')
-    user_session.name_audio = V1::AudioService.new.create(text)
+    text = body_data&.first&.dig('value').presence&.dig('phonetic_name') || ''
+    user_session.name_audio = V1::AudioService.new(text).execute
     user_session.save!
   end
 

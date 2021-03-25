@@ -27,18 +27,25 @@ class Clone::Intervention < Clone::Base
   end
 
   def reassign_branching_between_sessions(outcome_session)
+    outcome_session.formula['patterns'] = update_object_pattern(outcome_session)
+    outcome_session.save!
+
     outcome_session.questions.find_each do |question|
-      question.formula['patterns'] = question.formula['patterns'].map do |pattern|
-        pattern['target']['id'] = matching_outcome_target_id(pattern)
-        pattern
-      end
+      question.formula['patterns'] = update_object_pattern(question)
       question.save!
+    end
+  end
+
+  def update_object_pattern(object)
+    object.formula['patterns'].map do |pattern|
+      pattern['target']['id'] = matching_outcome_target_id(pattern)
+      pattern
     end
   end
 
   def matching_outcome_target_id(pattern)
     target_id = pattern['target']['id']
-    return target_id if pattern['target']['type'] != 'Session'
+    return target_id if pattern['target']['type'] != 'Session' || target_id.empty?
 
     matching_session_id(target_id)
   end

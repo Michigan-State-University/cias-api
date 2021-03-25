@@ -4,7 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
-  let(:session) { create(:session) }
+  let(:session) do
+    create(:session,
+           formula: { 'payload' => 'var + 5', 'patterns' => [
+             { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
+           ] },
+           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
+  end
+  let!(:sms_plan) { create(:sms_plan, session: session) }
+  let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
   let!(:other_session) { create(:session) }
   let!(:question_group_1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
   let!(:question_group_2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
@@ -55,6 +63,14 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                }
                              })
   end
+  let!(:question_6) do
+    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 6', position: 3,
+                             formula: { 'payload' => '', 'patterns' => [
+                               { 'match' => '', 'target' => { 'id' => '', type: 'Question::Single' } }
+                             ] })
+  end
+
+  let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
 
   context 'when auth' do
     context 'is invalid' do
@@ -94,18 +110,19 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     before { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
     let(:cloned_session_id) { json_response['data']['id'] }
+    let(:cloned_session) { Session.find(json_response['data']['id']) }
     let(:cloned_questions_collection) do
       Question.unscoped.includes(:question_group).where(question_groups: { session_id: cloned_session_id })
               .order('question_groups.position' => 'asc', 'questions.position' => 'asc')
     end
-    let(:cloned_question_groups) { Session.find(cloned_session_id).question_groups.order(:position) }
+    let(:cloned_question_groups) { cloned_session.question_groups.order(:position) }
 
     let(:session_was) do
-      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count')
+      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'last_report_template_number', 'formula', 'settings')
     end
 
     let(:session_cloned) do
-      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url')
+      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url', 'formula', 'settings')
     end
 
     it 'has correct http code' do
@@ -120,8 +137,28 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       expect(json_response['data']['attributes']['position']).to eq(2)
     end
 
+    it 'has cleared formula' do
+      expect(json_response['data']['attributes']['formula']).to include(
+        'payload' => '',
+        'patterns' => []
+      )
+      expect(json_response['data']['attributes']['settings']['formula']).to eq(false)
+    end
+
     it 'has correct number of sessions' do
       expect(session.intervention.sessions.size).to eq(2)
+    end
+
+    it 'has correct number of question_groups' do
+      expect(cloned_session.question_groups.size).to eq(3)
+    end
+
+    it 'has one finish question_group' do
+      expect(cloned_session.question_groups.where(type: 'QuestionGroup::Finish').size).to eq(1)
+    end
+
+    it 'has one finish question' do
+      expect(cloned_questions_collection.where(type: 'Question::Finish').size).to eq(1)
     end
 
     it 'correctly clone questions' do
@@ -198,9 +235,46 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           }
         ),
         include(
+          'subtitle' => 'Question Subtitle 6',
+          'position' => 3,
+          'body' => include(
+            'variable' => { 'name' => '' }
+          ),
+          'formula' => {
+            'payload' => '',
+            'patterns' => [
+              { 'match' => '', 'target' => { 'id' => '', 'type' => 'Question::Single' } }
+            ]
+          }
+        ),
+        include(
           'position' => 999_999,
           'type' => 'Question::Finish'
         )
+      )
+    end
+
+    it 'finish question has only one speech' do
+      expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'].size).to eq(1)
+      expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'][0]).to include(
+        'text' => ['Finish Screen'],
+        'type' => 'ReadQuestion',
+        'action' => 'NO_ACTION',
+        'animation' => 'rest',
+        'endPosition' => { 'x' => 600, 'y' => 600 }
+      )
+    end
+
+    it 'correctly clone sms plans' do
+      expect(outcome_sms_plans.size).to eq 1
+      outcome_sms_plan = outcome_sms_plans.last
+
+      expect(outcome_sms_plan.variants.size).to eq 1
+      expect(outcome_sms_plan.slice(*SmsPlan::ATTR_NAMES_TO_COPY)).to eq sms_plan.slice(
+        *SmsPlan::ATTR_NAMES_TO_COPY
+      )
+      expect(outcome_sms_plan.variants.last.slice(*SmsPlan::Variant::ATTR_NAMES_TO_COPY)).to eq variant.slice(
+        *SmsPlan::Variant::ATTR_NAMES_TO_COPY
       )
     end
   end

@@ -4,9 +4,8 @@ require 'rails_helper'
 
 RSpec.describe Communication::Sms do
   let(:message) { create :message, :with_code }
-  let(:twilio) { Settings.services.twilio }
-  let(:client) { Twilio::REST::Client.new(twilio.sid, twilio.token) }
-  let(:subject) { described_class.new(message.id, client) }
+  let(:subject) { described_class.new(message.id) }
+  let(:client) { subject.client }
   let(:call) { subject.send_message }
 
   it 'raise an error for non exist message' do

@@ -9,7 +9,8 @@ describe 'PATCH /v1/users/:id', type: :request do
     {
       user: {
         first_name: 'John',
-        last_name: 'Kowalski'
+        last_name: 'Kowalski',
+        sms_notification: false
       }
     }
   end
@@ -37,7 +38,8 @@ describe 'PATCH /v1/users/:id', type: :request do
       it 'updates user attributes' do
         expect(current_user.reload.attributes).to include(
           'first_name' => 'John',
-          'last_name' => 'Kowalski'
+          'last_name' => 'Kowalski',
+          'sms_notification' => false
         )
       end
 
@@ -139,6 +141,20 @@ describe 'PATCH /v1/users/:id', type: :request do
           'first_name' => 'John',
           'last_name' => 'Kowalski'
         )
+      end
+
+      context 'with feedback_completed params' do
+        let(:params) do
+          {
+            user: {
+              feedback_completed: true
+            }
+          }
+        end
+
+        it 'updates feedback_completed to true' do
+          expect(current_user.reload.feedback_completed).to eq(true)
+        end
       end
 
       context 'when current_user tries to update deactivated and roles attributes' do

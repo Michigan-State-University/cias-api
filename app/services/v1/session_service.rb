@@ -41,7 +41,7 @@ class V1::SessionService
     old_session = session_load(session_id)
     Clone::Session.new(old_session,
                        intervention_id: new_intervention.id,
-                       clean_formulas: false,
-                       position: old_session.position).execute
+                       clean_formulas: true,
+                       position: new_intervention.sessions.last&.position.to_i + 1).execute
   end
 end

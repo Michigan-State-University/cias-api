@@ -9,10 +9,20 @@ module BodyInterface
   end
 
   def body_data
-    body['data']
+    return unless data_container
+
+    data_container['data']
   end
 
   def body_variable
-    body['variable']
+    return unless data_container
+
+    data_container['variable']
+  end
+
+  private
+
+  def data_container
+    self.class.superclass.name == 'Answer' ? decrypted_body : body
   end
 end

@@ -5,7 +5,7 @@ en:
       file: '%m_%d_%Y'
   question:
     finish:
-      subtitle: Finish Screen
+      subtitle: <h1>Finish Screen</h1>
       title: Finish Screen
   question_group:
     finish:
@@ -74,7 +74,7 @@ en:
       body: You got access to session %{session_name}. Please click in the link to fill the session.
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
     inform_to_an_email:
-      subject: You have been invited to complete an session.
+      subject: You have been invited to complete a session.
       body: You have been invited to complete %{session_name}. Please click in the link to get more information.
       header: Complete a new session
       html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the link below to start the session'

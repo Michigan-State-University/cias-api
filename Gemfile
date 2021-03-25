@@ -30,13 +30,16 @@ gem 'postgresql_cursor'
 gem 'pry-rails'
 gem 'rack-cors'
 gem 'redis'
-gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
 gem 'rack-attack'
 gem 'secure_headers'
+gem 'airbrake'
+# for encrypt data
+gem 'lockbox'
+
 
 group :development, :test do
   gem 'bundler-audit'

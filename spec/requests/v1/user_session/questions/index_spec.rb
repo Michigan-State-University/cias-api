@@ -118,6 +118,30 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           expect(json_response['warning']).to eq nil
         end
       end
+
+      context 'formula has invalid target' do
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => { 'id' => 'INVALID ID', 'type' => 'Question' }
+                                 }
+                               ] }
+          question.save
+          question
+        end
+
+        it 'returns next question' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'returns correct warning' do
+          expect(json_response['warning']).to eq nil
+        end
+      end
     end
 
     context 'intervention is draft' do
@@ -166,6 +190,30 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
         it 'returns correct warning' do
           expect(json_response['warning']).to eq 'OtherFormulaError'
+        end
+      end
+
+      context 'formula has invalid target' do
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => { 'id' => 'INVALID ID', 'type' => 'Question' }
+                                 }
+                               ] }
+          question.save
+          question
+        end
+
+        it 'returns next question' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'returns correct warning' do
+          expect(json_response['warning']).to eq 'NoBranchingTarget'
         end
       end
     end
