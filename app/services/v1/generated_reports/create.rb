@@ -79,6 +79,6 @@ class V1::GeneratedReports::Create
   end
 
   def report_name
-    @report_name ||= "Report #{I18n.l(Time.current, format: :file)}"
+    @report_name ||= "Report #{I18n.l(Time.current, format: :report_file)}"
   end
 end
