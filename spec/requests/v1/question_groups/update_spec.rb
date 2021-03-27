@@ -33,7 +33,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
     context 'when new title is provided in params' do
       it 'returns serialized question_group' do
         request
-      
+
         expect(response).to have_http_status(:ok)
         expect(json_response['data']['attributes']['title']).to eq 'New Title'
       end
@@ -51,7 +51,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
 
       it 'returns serialized question_group' do
         request
-        
+
         expect(response).to have_http_status(:ok)
         expect(json_response['data']['attributes']['session_id']).to eq new_session.id
       end

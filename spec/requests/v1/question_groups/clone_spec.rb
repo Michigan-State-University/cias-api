@@ -55,8 +55,8 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
         expect(json_response).to include(
           'included' => [
             include(
-                'id' => cloned_questions.first.id,
-                'attributes' => include(
+              'id' => cloned_questions.first.id,
+              'attributes' => include(
                 'subtitle' => 'Question Subtitle',
                 'position' => 1,
                 'body' => include(
