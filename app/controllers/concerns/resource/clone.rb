@@ -8,6 +8,7 @@ module Resource::Clone
       cloned_resource = model_constant.
         find(params[:id]).
         clone(params: clone_params)
+      cloned_resource['body']['variable']['name'] = '' if cloned_resource['body']['variable']['name'].presence
       render json: serialized_response(cloned_resource), status: :created
     end
   end
