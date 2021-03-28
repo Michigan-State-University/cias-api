@@ -7,10 +7,12 @@ class V1::QuestionGroup::ShareService
     @intervention = Intervention.accessible_by(user.ability).find(session.intervention_id)
     @all_user_questions = Question.accessible_by(user.ability)
     @question_groups = QuestionGroup.includes(:session, :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
+    @warning = ''
+    @shared_question_group = nil
   end
 
   attr_reader :user, :intervention, :session, :all_user_questions
-  attr_accessor :question_groups
+  attr_accessor :question_groups, :warning, :shared_question_group
 
   def question_group_load(qg_id)
     question_groups.find(qg_id)
@@ -26,10 +28,10 @@ class V1::QuestionGroup::ShareService
 
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
-        if can_copy_this_question(shared_questions, question)
+        if can_share(shared_questions, question)
           share_question(shared_questions, question)
         else
-          return nil
+          self.warning = 'This type of question can appear only once per session'
         end
       end
 
@@ -41,7 +43,8 @@ class V1::QuestionGroup::ShareService
       end
     end
 
-    shared_question_group.reload
+    self.shared_question_group = shared_question_group.reload
+    { shared_question_group: shared_question_group, warning: warning }
   end
 
   private
@@ -65,14 +68,12 @@ class V1::QuestionGroup::ShareService
     shared_questions << cloned
   end
 
-  def can_copy_this_question(shared_questions, question)
-    if question.type.eql? 'Question::Name' || 'Question::ParticipantReport' || 'Question::ThirdParty'
-      shared_questions.each do |shared_question|
-        shared_question
-        return false if shared_question.type.eql? question.type
-      end
+  def can_share(shared_questions, question)
+    if [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty].member? question.class
+      session_id = QuestionGroup.find(shared_questions.first.question_group_id).session_id
+      Question.joins(:question_group).where(question_groups: { session_id: session_id }).where(type: question.type).empty?
+    else
+      true
     end
-
-    true
   end
 end

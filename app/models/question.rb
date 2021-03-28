@@ -29,12 +29,13 @@ class Question < ApplicationRecord
   validates :video_url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
+  validates :type, uniqueness: { scope: :question_group_id, conditions: -> { where(type: %w[Question::Name Question::ParticipantReport Question::ThirdParty]) }, message: 'You cannot have more than one of this type of screen per group'}
 
   delegate :session, to: :question_group
 
   after_create :initialize_narrator
   before_destroy :decrement_usage_counters
-  
+
   default_scope { order(:position) }
 
   def subclass_name
