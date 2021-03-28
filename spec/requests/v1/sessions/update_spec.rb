@@ -19,22 +19,17 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       }
     }
   end
+  let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
+      let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
@@ -42,7 +37,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
     context 'valid' do
       before do
         session.reload
-        patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
+        request
       end
 
       it { expect(response).to have_http_status(:success) }

@@ -30,22 +30,17 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       }
     }
   end
+  let(:request) { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id) }
+      let(:request) { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
@@ -59,9 +54,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     end
 
     context 'contains' do
-      before do
-        patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params, headers: headers
-      end
+      before { request }
 
       it 'to hash success' do
         expect(json_response.class).to be(Hash)

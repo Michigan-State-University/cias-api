@@ -28,38 +28,29 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', typ
       }
     }
   end
+  let(:request) { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
 
   context 'when auth' do
     context 'is invalid' do
-      before { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params }
+      let(:request) { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is JSON' do
-      before do
-        patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token
-      end
+      before { request }
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'contains' do
-      before do
-        patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token
-      end
+      before { request }
 
       it 'to hash success' do
         expect(json_response.class).to be(Hash)

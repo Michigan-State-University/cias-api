@@ -11,22 +11,17 @@ RSpec.describe 'GET /v1/users', type: :request do
   let(:participant_3) { create(:user, :confirmed, :participant, first_name: 'Mark', last_name: 'Smith', email: 'mark.smith@test.com', created_at: 1.day.ago) }
   let(:users_deactivated) { create_list(:user, 2, active: false, roles: %w[participant]) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { get v1_users_path, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_users_path }
+      let(:request) { get v1_users_path }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { get v1_users_path, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
@@ -61,9 +56,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { { page: 1, per_page: 2 } }
       let!(:users) { [participant_3, participant_2] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -82,9 +75,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { { name: 'John', roles: %w[admin participant] } }
       let!(:users) { [participant_1, user] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -127,9 +118,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let(:params) { { active: false } }
       let(:users) { [participant_1, participant_2, participant_3] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -144,9 +133,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { { active: false } }
       let!(:users) { users_deactivated }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -170,9 +157,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { {} }
       let!(:users) { [participant_1] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -191,9 +176,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { { page: 1, per_page: 2 } }
       let!(:users) { [participant_1] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -212,9 +195,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { { name: 'John', roles: %w[admin participant] } }
       let!(:users) { [participant_1] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
@@ -236,9 +217,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:question) { create(:question_slider, question_group: question_group) }
       let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: participant_1, session: session)) }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns empty list of users' do
         expect(json_response['users'].size).to eq 0
@@ -252,9 +231,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:question) { create(:question_slider, question_group: question_group) }
       let!(:answer) {}
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns empty list of users' do
         expect(json_response['users'].size).to eq 0
@@ -270,9 +247,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let(:params) { {} }
       let(:users) { [participant] }
 
-      before do
-        request
-      end
+      before { request }
 
       it 'returns correct http status' do
         expect(response).to have_http_status(:ok)

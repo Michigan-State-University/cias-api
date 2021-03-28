@@ -10,22 +10,19 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
   let!(:questions) { create_list(:question_single, 4, question_group: question_group) }
   let!(:answers) { create_list(:answer_single, 3, question: questions.first) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
+      let(:request) { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers }
+      before { request }
 
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
 
       it 'session is deleted' do
         expect(Session.find_by(id: session.id)).to eq(nil)
@@ -67,9 +64,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
 
   context 'when all params are valid and response' do
     context 'is success' do
-      before do
-        delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers
-      end
+      before { request }
 
       it { expect(response).to have_http_status(:no_content) }
 
@@ -93,7 +88,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
     context 'is failure' do
       before do
         intervention.broadcast
-        delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers
+        request
       end
 
       it { expect(response).to have_http_status(:no_content) }

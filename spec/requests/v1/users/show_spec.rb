@@ -6,30 +6,23 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:alter_user) { create(:user, :confirmed, :participant) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { get v1_user_path(id: alter_user.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_user_path(id: alter_user.id) }
+      let(:request) { get v1_user_path(id: alter_user.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { get v1_user_path(id: alter_user.id), headers: headers }
-
-      it 'response contains proper uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is JSON' do
-      before do
-        get v1_user_path(id: alter_user.id), headers: headers
-      end
+      before { request }
 
       it 'return User' do
         expect(response).to have_http_status(:ok)

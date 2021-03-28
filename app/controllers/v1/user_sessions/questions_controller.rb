@@ -8,7 +8,8 @@ class V1::UserSessions::QuestionsController < V1Controller
       next_question[:question],
       next_question[:question]&.de_constantize_modulize_name || NilClass
     )
-    response = response.merge(warning: next_question[:warning]) if next_question[:warning].presence && next_question[:question].session.intervention.draft?
+    response = add_information(response, :warning, next_question) if next_question[:question].session.intervention.draft?
+    response = add_information(response, :next_user_session_id, next_question)
     render json: response
   end
 
@@ -20,5 +21,10 @@ class V1::UserSessions::QuestionsController < V1Controller
 
   def preview_question_id
     params[:preview_question_id]
+  end
+
+  def add_information(response, key, next_question)
+    response = response.merge(key => next_question[key]) if next_question[key].presence
+    response
   end
 end

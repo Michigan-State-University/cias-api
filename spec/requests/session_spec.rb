@@ -34,11 +34,9 @@ RSpec.describe 'Session', type: :request do
     end
 
     context 'when login params is invalid' do
-      before { post '/v1/auth/sign_in' }
+      let(:request) { post '/v1/auth/sign_in' }
 
-      it 'returns http unauthorized' do
-        expect(response).to have_http_status(:unauthorized)
-      end
+      it_behaves_like 'unauthorized user'
     end
   end
 

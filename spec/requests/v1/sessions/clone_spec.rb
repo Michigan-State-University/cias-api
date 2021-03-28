@@ -71,22 +71,17 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
 
   let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
+  let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_clone_session_path(id: session.id) }
+      let(:request) { post v1_clone_session_path(id: session.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
@@ -107,7 +102,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
 
   context 'when user clones a session' do
-    before { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
+    before { request }
 
     let(:cloned_session_id) { json_response['data']['id'] }
     let(:cloned_session) { Session.find(json_response['data']['id']) }

@@ -16,19 +16,13 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_researchers_path }
+      let(:request) { get v1_researchers_path }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { request }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 

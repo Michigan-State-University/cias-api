@@ -5,27 +5,22 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/users/verify_sms_token', type: :request do
   let(:user) { create(:user, :confirmed, :participant) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { patch v1_verify_sms_token_path, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { patch v1_verify_sms_token_path }
+      let(:request) { patch v1_verify_sms_token_path }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { patch v1_verify_sms_token_path, headers: headers }
-
-      it 'response contains proper uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when phone non exist' do
-    before { patch v1_verify_sms_token_path, headers: headers }
+    before { request }
 
     it 'response has status expectation_failed' do
       expect(response.status).to eq 417

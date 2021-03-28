@@ -17,37 +17,29 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
     }
   end
 
+  let(:request) { post v1_question_images_path(question.id), params: params, headers: headers }
+
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_question_images_path(question.id) }
+      let(:request) { post v1_question_images_path(question.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_question_images_path(question.id), params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is appropriate Content-Type' do
-      before do
-        post v1_question_images_path(question.id), params: params, headers: headers
-      end
+      before { request }
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'is success' do
-      before do
-        post v1_question_images_path(question.id), params: params, headers: headers
-      end
+      before { request }
 
       it { expect(response).to have_http_status(:created) }
     end
