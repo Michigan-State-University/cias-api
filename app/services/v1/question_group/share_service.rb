@@ -28,7 +28,7 @@ class V1::QuestionGroup::ShareService
 
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
-        if can_share(shared_questions, question)
+        if can_share(question)
           share_question(shared_questions, question)
         else
           self.warning = 'This type of question can appear only once per session'
@@ -68,10 +68,9 @@ class V1::QuestionGroup::ShareService
     shared_questions << cloned
   end
 
-  def can_share(shared_questions, question)
+  def can_share(question)
     if [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty].member? question.class
-      session_id = QuestionGroup.find(shared_questions.first.question_group_id).session_id
-      Question.joins(:question_group).where(question_groups: { session_id: session_id }).where(type: question.type).empty?
+      raise ActionController::BadRequest.new, 'This type of question can appear only once per session' if Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
     else
       true
     end
