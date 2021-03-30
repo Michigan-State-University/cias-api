@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_24_074521) do
+ActiveRecord::Schema.define(version: 2021_03_30_184301) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -201,6 +201,8 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.integer "report_templates_count"
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
+    t.string "language_code", default: "en-US", null: false
+    t.string "voice_name", default: "en-US-Standard-C", null: false
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
