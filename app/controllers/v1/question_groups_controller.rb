@@ -59,9 +59,12 @@ class V1::QuestionGroupsController < V1Controller
 
   def share
     authorize! :create, QuestionGroup
-    shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
-
-    render json: question_group_response(shared_question_group), action: :show, status: :ok
+    response = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
+    if response[:warning].presence
+      render json: { warning: response[:warning] }, status: :conflict
+    else
+      render json: question_group_response(response[:shared_question_group]), action: :show, status: :ok
+    end
   end
 
   private

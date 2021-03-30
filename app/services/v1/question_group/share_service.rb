@@ -7,10 +7,11 @@ class V1::QuestionGroup::ShareService
     @intervention = Intervention.accessible_by(user.ability).find(session.intervention_id)
     @all_user_questions = Question.accessible_by(user.ability)
     @question_groups = QuestionGroup.includes(:session, :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
+    @warning = ''
   end
 
   attr_reader :user, :intervention, :session, :all_user_questions
-  attr_accessor :question_groups
+  attr_accessor :question_groups, :warning
 
   def question_group_load(qg_id)
     question_groups.find(qg_id)
@@ -27,6 +28,8 @@ class V1::QuestionGroup::ShareService
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
         validate_uniqueness(question)
+        return { shared_question_group: [], warning: warning } if warning.presence
+
         share_question(shared_questions, question)
       end
 
@@ -38,7 +41,7 @@ class V1::QuestionGroup::ShareService
       end
     end
 
-    shared_question_group.reload
+    { shared_question_group: shared_question_group.reload, warning: warning }
   end
 
   private
@@ -65,6 +68,10 @@ class V1::QuestionGroup::ShareService
   def validate_uniqueness(question)
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty].member? question.class
 
-    raise ActionController::BadRequest.new, 'This type of question can appear only once per session' if Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
+    self.warning = 'This type of question can appear only once per session' if question_type_exist_in_session(question)
+  end
+
+  def question_type_exist_in_session(question)
+    Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
   end
 end

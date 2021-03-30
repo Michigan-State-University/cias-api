@@ -310,9 +310,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       let!(:other_question_name) { create(:question_name, title: 'Name Question 2', question_group: other_question_group_with_name) }
       let!(:other_question_group_without_name_in_session_with_name) { create(:question_group_plain, session: other_session_with_name, position: 1) }
 
-      let(:request_1) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params, headers: user.create_new_auth_token }
-      let(:request_2) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params, headers: user.create_new_auth_token }
-      let(:request_3) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request_1) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request_2) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request_3) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params, headers: user.create_new_auth_token }
 
       let(:params) do
         {
@@ -323,17 +323,20 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       end
 
       it 'when Question::Name exist in session return BadRequest' do
-        expect { request_1 }.to raise_error(ActionController::BadRequest)
+        request_1
+        expect(response).to have_http_status(:conflict)
         expect(question_group_with_name.questions_count).to be(1)
       end
 
       it 'when Question::Name exit in other session and in a group' do
-        expect { request_2 }.to raise_error(ActionController::BadRequest)
+        request_2
+        expect(response).to have_http_status(:conflict)
         expect(question_group_with_name.questions_count).to be(1)
       end
 
       it 'when Question::Name exit in other session but not in a group' do
-        expect { request_3 }.to raise_error(ActionController::BadRequest)
+        request_3
+        expect(response).to have_http_status(:conflict)
         expect(question_group_with_name.questions_count).to be(1)
       end
     end

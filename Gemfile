@@ -40,7 +40,6 @@ gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
 
-
 group :development, :test do
   gem 'bundler-audit'
   gem 'brakeman', require: false
