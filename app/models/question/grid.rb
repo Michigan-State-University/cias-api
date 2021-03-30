@@ -15,7 +15,7 @@ class Question::Grid < Question
 
   def variable_clone_prefix
     body_data[0]['payload']['rows']&.each do |row|
-      row['variable']['name'] = "clone_#{row['variable']['name']}"
+      row['variable']['name'] = "clone_#{row['variable']['name']}" if row['variable']['name'].presence
     end
   end
 end

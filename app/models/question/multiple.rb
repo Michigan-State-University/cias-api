@@ -15,7 +15,7 @@ class Question::Multiple < Question
 
   def variable_clone_prefix
     body_data&.each do |payload|
-      payload['variable']['name'] = "clone_#{payload['variable']['name']}"
+      payload['variable']['name'] = "clone_#{payload['variable']['name']}" if payload['variable']['name'].presence
     end
   end
 end

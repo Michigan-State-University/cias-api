@@ -40,13 +40,13 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         it 'returned questions have no branching,variables and cleared speech blocks' do
           expect(json_response['included'][2]['attributes']['narrator']['blocks']).not_to eq question_ids.third.narrator['blocks']
           expect(json_response['included'][2]['attributes']['formula']).not_to eq question_ids.third.formula
-          expect(json_response['included'][2]['attributes']['body']).not_to eq question_ids.third.body
+          expect(json_response['included'][2]['attributes']['body']).to eq question_ids.third.body
         end
 
         it 'shared_question_group questions have no branching,variables and cleared speech blocks' do
           expect(third_question.narrator['blocks']).not_to eq question_ids.third.narrator['blocks']
           expect(third_question.formula).not_to eq question_ids.third.formula
-          expect(third_question.body).not_to eq question_ids.third.body
+          expect(third_question.body).to eq question_ids.third.body
         end
       end
 

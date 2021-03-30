@@ -60,7 +60,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
                 'subtitle' => 'Question Subtitle',
                 'position' => 1,
                 'body' => include(
-                  'variable' => { 'name' => 'clone_' }
+                  'variable' => { 'name' => '' }
                 ),
                 'formula' => {
                   'payload' => '',
@@ -74,7 +74,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
                 'subtitle' => 'Question Subtitle 2',
                 'position' => 2,
                 'body' => include(
-                  'variable' => { 'name' => 'clone_' }
+                  'variable' => { 'name' => '' }
                 ),
                 'formula' => {
                   'payload' => '',

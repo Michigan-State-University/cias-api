@@ -10,6 +10,6 @@ class Question::FollowUpContact < Question
   end
 
   def variable_clone_prefix
-    body['variable']['name'] = "clone_#{body['variable']['name']}"
+    body['variable']['name'] = "clone_#{body['variable']['name']}" if body['variable']['name'].present?
   end
 end
