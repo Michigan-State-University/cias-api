@@ -16,4 +16,8 @@ class ReportTemplate < ApplicationRecord
     third_party: 'third_party',
     participant: 'participant'
   }
+
+  ATTR_NAMES_TO_COPY = %w[
+    name report_for summary
+  ].freeze
 end

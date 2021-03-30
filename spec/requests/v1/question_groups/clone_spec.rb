@@ -48,33 +48,39 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
 
       it 'returns serialized cloned question_group' do
         request
-        cloned_questions = QuestionGroup.find(json_response['id']).questions
+
+        cloned_questions = QuestionGroup.find(json_response['data']['id']).questions
+
+        expect(json_response['data']['attributes']).to include('title' => 'Question Group Title')
         expect(json_response).to include(
-          'title' => 'Question Group Title',
-          'questions' => [
+          'included' => [
             include(
               'id' => cloned_questions.first.id,
-              'subtitle' => 'Question Subtitle',
-              'position' => 1,
-              'body' => include(
-                'variable' => { 'name' => 'clone_' }
-              ),
-              'formula' => {
-                'payload' => '',
-                'patterns' => []
-              }
+              'attributes' => include(
+                'subtitle' => 'Question Subtitle',
+                'position' => 1,
+                'body' => include(
+                  'variable' => { 'name' => 'clone_' }
+                ),
+                'formula' => {
+                  'payload' => '',
+                  'patterns' => []
+                }
+              )
             ),
             include(
               'id' => cloned_questions.second.id,
-              'subtitle' => 'Question Subtitle 2',
-              'position' => 2,
-              'body' => include(
-                'variable' => { 'name' => 'clone_' }
-              ),
-              'formula' => {
-                'payload' => '',
-                'patterns' => []
-              }
+              'attributes' => include(
+                'subtitle' => 'Question Subtitle 2',
+                'position' => 2,
+                'body' => include(
+                  'variable' => { 'name' => 'clone_' }
+                ),
+                'formula' => {
+                  'payload' => '',
+                  'patterns' => []
+                }
+              )
             )
           ]
         )

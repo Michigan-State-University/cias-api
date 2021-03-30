@@ -35,7 +35,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['title']).to eq 'New Title'
+        expect(json_response['data']['attributes']['title']).to eq 'New Title'
       end
     end
 
@@ -53,7 +53,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['session_id']).to eq new_session.id
+        expect(json_response['data']['attributes']['session_id']).to eq new_session.id
       end
     end
   end

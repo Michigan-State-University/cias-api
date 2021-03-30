@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:session) do
-    create(:session,
+    create(:session, :with_report_templates,
            formula: { 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
            ] },
@@ -71,6 +71,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
 
   let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
+  let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
   let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
   context 'when auth' do
@@ -270,6 +271,26 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       )
       expect(outcome_sms_plan.variants.last.slice(*SmsPlan::Variant::ATTR_NAMES_TO_COPY)).to eq variant.slice(
         *SmsPlan::Variant::ATTR_NAMES_TO_COPY
+      )
+    end
+
+    it 'correctly clones report templates' do
+      expect(outcome_report_templates.size).to eq 2
+
+      outcome_report_template = outcome_report_templates.order(:created_at).last
+      report_template = session.report_templates.order(:created_at).last
+
+      expect(outcome_report_template.variants.size).to eq 1
+      expect(outcome_report_template.sections.size).to eq 1
+
+      expect(outcome_report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY)).to eq report_template.slice(
+        *ReportTemplate::ATTR_NAMES_TO_COPY
+      )
+      expect(outcome_report_template.sections.last.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY)).to eq report_template.sections.last.slice(
+        *ReportTemplate::Section::ATTR_NAMES_TO_COPY
+      )
+      expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)).to eq report_template.variants.last.slice(
+        *ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY
       )
     end
   end

@@ -8,7 +8,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def show
-    render_json intervention: intervention_load
+    render json: serialized_response(intervention_load)
   end
 
   def create

@@ -14,6 +14,10 @@ FactoryBot.define do
       answers { create_list(:answer, 5) }
     end
 
+    trait :with_report_templates do
+      report_templates { create_list(:report_template, 2, :with_logo, :with_sections) }
+    end
+
     trait :days_after do
       schedule { 'days_after' }
       schedule_payload { 7 }
