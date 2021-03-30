@@ -22,5 +22,11 @@ FactoryBot.define do
         )
       end
     end
+
+    trait :with_sections do
+      after(:create) do |report_template|
+        report_template.sections << create(:report_template_section, :with_variant)
+      end
+    end
   end
 end

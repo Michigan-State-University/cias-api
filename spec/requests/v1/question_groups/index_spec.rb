@@ -32,7 +32,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['data'].size).to eq(4)
           end
         end
 
@@ -56,7 +56,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['data'].size).to eq(4)
           end
         end
 
@@ -80,7 +80,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['data'].size).to eq(4)
           end
         end
 
@@ -105,7 +105,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
         end
 
         it 'has correct size of question groups' do
-          expect(json_response['question_groups'].size).to eq(4)
+          expect(json_response['data'].size).to eq(4)
         end
       end
 
@@ -144,7 +144,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['data'].size).to eq(4)
           end
         end
       end
@@ -172,7 +172,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['data'].size).to eq(4)
           end
         end
       end
@@ -200,7 +200,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
           end
 
           it 'has correct size of question groups' do
-            expect(json_response['question_groups'].size).to eq(4)
+            expect(json_response['data'].size).to eq(4)
           end
         end
       end

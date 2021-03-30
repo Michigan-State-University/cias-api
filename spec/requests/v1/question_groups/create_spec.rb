@@ -54,11 +54,11 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
         request
 
         expect(response).to have_http_status(:created)
-        expect(json_response['title']).to eq 'QuestionGroup Title'
-        expect(json_response['position']).to eq 2
-        expect(json_response['questions'].size).to eq 5
-        expect(json_response['questions'][0]['title']).to eq 'Question Id Title'
-        expect(json_response['questions'][4]['title']).to eq 'Question Title 2'
+        expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+        expect(json_response['data']['attributes']['position']).to eq 2
+        expect(json_response['data']['relationships']['questions']['data'].size).to eq 5
+        expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
+        expect(json_response['included'][4]['attributes']['title']).to eq 'Question Title 2'
       end
     end
 
@@ -77,11 +77,11 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
         request
 
         expect(response).to have_http_status(:created)
-        expect(json_response['title']).to eq 'QuestionGroup Title'
-        expect(json_response['position']).to eq 2
-        expect(json_response['questions'].size).to eq 3
-        expect(json_response['questions'][0]['title']).to eq 'Question Id Title'
-        expect(json_response['questions'][2]['title']).to eq 'Question Id Title'
+        expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+        expect(json_response['data']['attributes']['position']).to eq 2
+        expect(json_response['data']['relationships']['questions']['data'].size).to eq 3
+        expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
+        expect(json_response['included'][2]['attributes']['title']).to eq 'Question Id Title'
       end
     end
 
@@ -100,11 +100,11 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
         request
 
         expect(response).to have_http_status(:created)
-        expect(json_response['title']).to eq 'QuestionGroup Title'
-        expect(json_response['position']).to eq 2
-        expect(json_response['questions'].size).to eq 2
-        expect(json_response['questions'][0]['title']).to eq 'Question Title 1'
-        expect(json_response['questions'][1]['title']).to eq 'Question Title 2'
+        expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+        expect(json_response['data']['attributes']['position']).to eq 2
+        expect(json_response['data']['relationships']['questions']['data'].size).to eq 2
+        expect(json_response['included'][0]['attributes']['title']).to eq 'Question Title 1'
+        expect(json_response['included'][1]['attributes']['title']).to eq 'Question Title 2'
       end
     end
   end

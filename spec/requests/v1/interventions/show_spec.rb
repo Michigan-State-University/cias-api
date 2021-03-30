@@ -21,17 +21,19 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:reports) { [] }
   let(:csv_attachment) { fixture_file_upload(Rails.root.join('spec/factories/csv/test_empty.csv'), 'text/csv') }
 
+  let(:attrs) { json_response['data']['attributes'] }
+
   context 'when user' do
     before { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
 
     context 'has role admin' do
       it 'contains proper sessions collection' do
-        expect(json_response['sessions_size']).to eq sessions.size
+        expect(attrs['sessions'].size).to eq sessions.size
       end
 
       context 'when intervention does not contain any report' do
         it 'contains proper attributes' do
-          expect(json_response).to include(
+          expect(attrs).to include(
             'name' => 'Some intervention',
             'shared_to' => shared_to,
             'csv_link' => nil,
@@ -44,7 +46,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
         let!(:reports) { [csv_attachment] }
 
         it 'contains proper attributes' do
-          expect(json_response).to include(
+          expect(attrs).to include(
             'name' => 'Some intervention',
             'shared_to' => shared_to,
             'csv_link' => include('test_empty.csv'),
@@ -107,12 +109,12 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
         let(:intervention_user) { researcher }
 
         it 'contains proper sessions collection' do
-          expect(json_response['sessions_size']).to eq 2
+          expect(attrs['sessions'].size).to eq 2
         end
 
         context 'when intervention does not contain any report' do
           it 'contains proper attributes' do
-            expect(json_response).to include(
+            expect(attrs).to include(
               'name' => 'Some intervention',
               'shared_to' => shared_to,
               'csv_link' => nil,
@@ -125,7 +127,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           let!(:reports) { [csv_attachment] }
 
           it 'contains proper attributes' do
-            expect(json_response).to include(
+            expect(attrs).to include(
               'name' => 'Some intervention',
               'shared_to' => shared_to,
               'csv_link' => include('test_empty.csv'),

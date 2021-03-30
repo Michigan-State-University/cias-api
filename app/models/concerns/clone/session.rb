@@ -4,11 +4,14 @@ class Clone::Session < Clone::Base
   def execute
     outcome.position = position || outcome.intervention.sessions.size
     outcome.clear_formula if clean_formulas
-    create_question_groups
-    outcome.save!
-    create_sms_plans
-    reassign_branching
-    reassign_reflections
+    ActiveRecord::Base.transaction do
+      create_question_groups
+      outcome.save!
+      create_sms_plans
+      create_report_templates
+      reassign_branching
+      reassign_reflections
+    end
     outcome
   end
 
@@ -86,6 +89,29 @@ class Clone::Session < Clone::Base
 
       plan.variants.each do |variant|
         new_sms_plan.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
+      end
+    end
+  end
+
+  def create_report_templates
+    outcome.report_templates_count = 0
+    source.report_templates.each do |report_template|
+      new_report_template = ReportTemplate.new(report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY))
+      outcome.report_templates << new_report_template
+
+      new_report_template.logo.attach(report_template.logo.blob) if report_template.logo.attachment
+      new_report_template.pdf_preview.attach(report_template.pdf_preview.blob) if report_template.pdf_preview.attachment
+
+      report_template.sections.each do |section|
+        new_section = ReportTemplate::Section.new(section.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY))
+        new_report_template.sections << new_section
+
+        section.variants.each do |variant|
+          new_variant = ReportTemplate::Section::Variant.new(variant.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
+          new_section.variants << new_variant
+
+          new_variant.image.attach(variant.image.blob) if variant.image.attachment
+        end
       end
     end
   end

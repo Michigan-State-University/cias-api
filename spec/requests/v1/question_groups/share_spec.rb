@@ -38,9 +38,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         let(:third_question) { shared_question_group.reload.questions.third }
 
         it 'returned questions have no branching,variables and cleared speech blocks' do
-          expect(json_response['questions'][2]['narrator']['blocks']).not_to eq question_ids.third.narrator['blocks']
-          expect(json_response['questions'][2]['formula']).not_to eq question_ids.third.formula
-          expect(json_response['questions'][2]['body']).not_to eq question_ids.third.body
+          expect(json_response['included'][2]['attributes']['narrator']['blocks']).not_to eq question_ids.third.narrator['blocks']
+          expect(json_response['included'][2]['attributes']['formula']).not_to eq question_ids.third.formula
+          expect(json_response['included'][2]['attributes']['body']).not_to eq question_ids.third.body
         end
 
         it 'shared_question_group questions have no branching,variables and cleared speech blocks' do
@@ -58,9 +58,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
 
         it 'returns serialized question_group with new questions' do
-          expect(json_response['questions'][0]['title']).to eq 'Shared question Id Title'
-          expect(json_response['questions'][2]['title']).to eq 'Question Id Title'
-          expect(json_response['questions'][6]['title']).to eq 'Other question Id Title'
+          expect(json_response['included'][0]['attributes']['title']).to eq 'Shared question Id Title'
+          expect(json_response['included'][2]['attributes']['title']).to eq 'Question Id Title'
+          expect(json_response['included'][6]['attributes']['title']).to eq 'Other question Id Title'
         end
 
         it 'shared_question_group questions have proper title' do
@@ -70,7 +70,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
 
         it 'returns proper number of questions' do
-          expect(json_response['questions'].size).to eq 7
+          expect(json_response['included'].size).to eq 7
         end
 
         it 'shared_question_group has proper number of questions' do
@@ -82,9 +82,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
 
         it 'returns questions with proper positions' do
-          expect(json_response['questions'][0]['position']).to eq first_question_position
-          expect(json_response['questions'][2]['position']).to eq first_question_position + 2
-          expect(json_response['questions'][6]['position']).to eq first_question_position + 6
+          expect(json_response['included'][0]['attributes']['position']).to eq first_question_position
+          expect(json_response['included'][2]['attributes']['position']).to eq first_question_position + 2
+          expect(json_response['included'][6]['attributes']['position']).to eq first_question_position + 6
         end
 
         it 'shared questions have proper positions' do
@@ -107,9 +107,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
 
         it 'returns serialized question_group with new questions' do
-          expect(json_response['questions'][0]['title']).to eq 'Question Id Title'
-          expect(json_response['questions'][2]['title']).to eq 'Question Id Title'
-          expect(json_response['questions'][6]['title']).to eq 'Other question Id Title'
+          expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
+          expect(json_response['included'][2]['attributes']['title']).to eq 'Question Id Title'
+          expect(json_response['included'][6]['attributes']['title']).to eq 'Other question Id Title'
         end
 
         it 'shared_question_group questions have proper title' do
@@ -119,7 +119,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
 
         it 'returns proper number of questions' do
-          expect(json_response['questions'].size).to eq 8
+          expect(json_response['included'].size).to eq 8
         end
 
         it 'shared_question_group has proper number of questions' do
@@ -131,9 +131,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
 
         it 'returns questions with proper positions' do
-          expect(json_response['questions'][0]['position']).to eq first_question_position
-          expect(json_response['questions'][2]['position']).to eq first_question_position + 2
-          expect(json_response['questions'][6]['position']).to eq first_question_position + 6
+          expect(json_response['included'][0]['attributes']['position']).to eq first_question_position
+          expect(json_response['included'][2]['attributes']['position']).to eq first_question_position + 2
+          expect(json_response['included'][6]['attributes']['position']).to eq first_question_position + 6
         end
 
         it 'shared questions have proper positions' do
@@ -145,8 +145,8 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
       shared_examples 'titles are the same' do
         it 'returns serialized question_group with new questions' do
-          expect(json_response['questions'][0]['title']).to eq 'Shared question Id Title'
-          expect(json_response['questions'][4]['title']).to eq 'Question Id Title'
+          expect(json_response['included'][0]['attributes']['title']).to eq 'Shared question Id Title'
+          expect(json_response['included'][4]['attributes']['title']).to eq 'Question Id Title'
         end
 
         it 'shared_question_group questions have proper title' do
@@ -157,8 +157,8 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
       shared_examples 'positions are proper' do
         it 'shared questions have proper position' do
-          expect(json_response['questions'][0]['position']).to eq first_question_position
-          expect(json_response['questions'][4]['position']).to eq first_question_position + 4
+          expect(json_response['included'][0]['attributes']['position']).to eq first_question_position
+          expect(json_response['included'][4]['attributes']['position']).to eq first_question_position + 4
         end
 
         it 'shared questions have proper positions' do
@@ -169,7 +169,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
       shared_examples 'question number is proper' do
         it 'returns proper number of questions' do
-          expect(json_response['questions'].size).to eq 5
+          expect(json_response['included'].size).to eq 5
         end
 
         it 'shared_question_group has proper number of questions' do
