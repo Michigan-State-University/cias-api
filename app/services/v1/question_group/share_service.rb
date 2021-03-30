@@ -7,12 +7,10 @@ class V1::QuestionGroup::ShareService
     @intervention = Intervention.accessible_by(user.ability).find(session.intervention_id)
     @all_user_questions = Question.accessible_by(user.ability)
     @question_groups = QuestionGroup.includes(:session, :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
-    @warning = ''
-    @shared_question_group = nil
   end
 
   attr_reader :user, :intervention, :session, :all_user_questions
-  attr_accessor :question_groups, :warning, :shared_question_group
+  attr_accessor :question_groups
 
   def question_group_load(qg_id)
     question_groups.find(qg_id)
@@ -28,11 +26,8 @@ class V1::QuestionGroup::ShareService
 
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
-        if can_share(question)
-          share_question(shared_questions, question)
-        else
-          self.warning = 'This type of question can appear only once per session'
-        end
+        validate_uniqueness(question)
+        share_question(shared_questions, question)
       end
 
       question_group_ids.each do |question_group_id|
@@ -43,8 +38,7 @@ class V1::QuestionGroup::ShareService
       end
     end
 
-    self.shared_question_group = shared_question_group.reload
-    { shared_question_group: shared_question_group, warning: warning }
+    shared_question_group.reload
   end
 
   private
@@ -68,11 +62,9 @@ class V1::QuestionGroup::ShareService
     shared_questions << cloned
   end
 
-  def can_share(question)
-    if [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty].member? question.class
-      raise ActionController::BadRequest.new, 'This type of question can appear only once per session' if Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
-    else
-      true
-    end
+  def validate_uniqueness(question)
+    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Number].member? question.class
+
+    raise ActionController::BadRequest.new, 'This type of question can appear only once per session' if Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
   end
 end
