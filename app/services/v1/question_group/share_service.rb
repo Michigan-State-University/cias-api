@@ -63,7 +63,7 @@ class V1::QuestionGroup::ShareService
   end
 
   def validate_uniqueness(question)
-    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Number].member? question.class
+    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty].member? question.class
 
     raise ActionController::BadRequest.new, 'This type of question can appear only once per session' if Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
   end
