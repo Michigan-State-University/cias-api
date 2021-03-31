@@ -304,6 +304,8 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       let!(:session_with_name) { create(:session, intervention: third_intervention) }
       let!(:question_group_with_name) { create(:question_group_plain, session: session_with_name, position: 1) }
       let!(:name_question) { create(:question_name, title: 'Name Question 1', question_group: question_group_with_name) }
+      let!(:simple_question_1) { create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name) }
+      let!(:simple_question_2) { create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name) }
 
       let!(:other_session_with_name) { create(:session, intervention: third_intervention) }
       let!(:other_question_group_with_name) { create(:question_group_plain, session: other_session_with_name, position: 1) }
@@ -313,6 +315,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       let!(:request_1) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params, headers: user.create_new_auth_token }
       let!(:request_2) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params, headers: user.create_new_auth_token }
       let!(:request_3) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request_4) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      let!(:request_5) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      let!(:request_6) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
 
       let(:params) do
         {
@@ -322,22 +327,50 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         }
       end
 
+      let(:params_with_questions) do
+        {
+          question_group: {
+            question_ids: [simple_question_1.id, simple_question_2.id, name_question.id]
+          }
+        }
+      end
+
       it 'when Question::Name exist in session return BadRequest' do
         request_1
         expect(response).to have_http_status(:conflict)
-        expect(question_group_with_name.questions_count).to be(1)
+        expect(question_group_with_name.reload.questions.size).to be(3)
       end
 
       it 'when Question::Name exit in other session and in a group' do
         request_2
         expect(response).to have_http_status(:conflict)
-        expect(question_group_with_name.questions_count).to be(1)
+        expect(other_question_group_with_name.reload.questions.size).to be(1)
       end
 
       it 'when Question::Name exit in other session but not in a group' do
         request_3
         expect(response).to have_http_status(:conflict)
-        expect(question_group_with_name.questions_count).to be(1)
+        expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
+      end
+
+      context 'testing rollback when in group is invalid question' do
+        it 'when in group of shared questions is Question::Name and exit in group' do
+          request_4
+          expect(response).to have_http_status(:conflict)
+          expect(question_group_with_name.reload.questions.size).to be(3)
+        end
+
+        it 'when in group of shared questions is Question::Name and Question::Name exit in other session and in a group' do
+          request_5
+          expect(response).to have_http_status(:conflict)
+          expect(other_question_group_with_name.reload.questions.size).to be(1)
+        end
+
+        it 'when in group of shared questions is Question::Name and Question::Name exit in other session but not in a group' do
+          request_6
+          expect(response).to have_http_status(:conflict)
+          expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
+        end
       end
     end
   end

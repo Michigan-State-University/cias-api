@@ -28,7 +28,7 @@ class V1::QuestionGroup::ShareService
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
         validate_uniqueness(question)
-        return { shared_question_group: [], warning: warning } if warning.presence
+        raise ActiveRecord::Rollback if warning.presence
 
         share_question(shared_questions, question)
       end
