@@ -66,7 +66,7 @@ class V1::QuestionGroup::ShareService
   end
 
   def validate_uniqueness(question)
-    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty].member? question.class
+    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
 
     self.warning = 'This type of question can appear only once per session' if question_type_exist_in_session(question)
   end
