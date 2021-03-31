@@ -34,7 +34,7 @@ class Question < ApplicationRecord
 
   after_create :initialize_narrator
   before_destroy :decrement_usage_counters
-  
+
   default_scope { order(:position) }
 
   def subclass_name
@@ -54,8 +54,20 @@ class Question < ApplicationRecord
     next_obj
   end
 
-  def variable_clone_prefix
+  def variable_clone_prefix(_taken_variables)
     nil
+  end
+
+  def variable_with_clone_index(taken_variables, variable_base)
+    index = 1
+    new_variable = ''
+    loop do
+      new_variable = "clone#{index}_#{variable_base}"
+      break unless taken_variables.include?(new_variable)
+
+      index += 1
+    end
+    new_variable
   end
 
   def execute_narrator

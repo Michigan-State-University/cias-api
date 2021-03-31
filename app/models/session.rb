@@ -120,6 +120,18 @@ class Session < ApplicationRecord
     settings['formula'] = false
   end
 
+  def session_variables
+    used_variables = []
+    question_groups.each do |question_group|
+      question_group.questions.each do |question|
+        question.csv_header_names.each do |variable|
+          used_variables.append(variable)
+        end
+      end
+    end
+    used_variables
+  end
+
   private
 
   def create_core_childs
