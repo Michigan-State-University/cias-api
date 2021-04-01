@@ -34,7 +34,7 @@ class Question < ApplicationRecord
 
   after_create :initialize_narrator
   before_destroy :decrement_usage_counters
-  
+
   default_scope { order(:position) }
 
   def subclass_name
