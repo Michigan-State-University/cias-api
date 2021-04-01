@@ -68,7 +68,7 @@ class V1::QuestionGroup::ShareService
   def validate_uniqueness(question)
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
 
-    self.warning = 'ViolationUniqueness' if question_type_exist_in_session(question)
+    self.warning = I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type
   end
 
   def question_type_exist_in_session(question)
