@@ -399,5 +399,64 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         ]
       end
     end
+
+    context 'when we have the two sessions of the same intervention' do
+      let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
+      let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
+      let!(:question_2) { create(:question_single, question_group: question_group_2, body: question_body_2) }
+      let!(:answer_2) do
+        create(:answer_single, question: question_2, body: answer_body_2, user_session: user_session_2)
+      end
+      let!(:questions) do
+        Question.joins(:question_group).where(id: [question.id, question_2.id]).order(:position)
+      end
+      let!(:session_2) { create(:session, intervention: intervention) }
+      let!(:user_session_2) { create(:user_session, user: user, session: session_2) }
+      let!(:question_group_2) { create(:question_group_plain, session: session_2) }
+      let(:question_body) do
+        {
+          'data' => [
+            { 'value' => '1', 'payload' => '' },
+            { 'value' => '2', 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'test' }
+        }
+      end
+      let(:answer_body) do
+        {
+          'data' => [
+            {
+              'var' => 'test',
+              'value' => '1'
+            }
+          ]
+        }
+      end
+      let(:question_body_2) do
+        {
+          'data' => [
+            { 'value' => '3', 'payload' => '' },
+            { 'value' => '4', 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'test_2' }
+        }
+      end
+      let(:answer_body_2) do
+        {
+          'data' => [
+            {
+              'var' => 'test_2',
+              'value' => '3'
+            }
+          ]
+        }
+      end
+
+      it 'save the values into the one row' do
+        subject.collect
+        expect(subject.rows.size).to eq 1
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', '3']]
+      end
+    end
   end
 end
