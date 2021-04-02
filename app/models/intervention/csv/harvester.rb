@@ -30,24 +30,27 @@ class Intervention::Csv::Harvester
   end
 
   def set_rows
-    user_sessions.each_with_index do |user_session, row_index|
+    users.each_with_index do |user, row_index|
       initialize_row
-      set_user_data(row_index, user_session)
 
-      user_session.answers.each do |answer|
-        answer.body_data&.each do |data|
-          var_index = header.index(answer.csv_header_name(data))
-          next if var_index.blank?
+      user.user_sessions.where(session_id: session_ids).each_with_index do |user_session, index|
+        set_user_data(row_index, user_session) if index.zero?
+        user_session.answers.each do |answer|
+          answer.body_data&.each do |data|
+            var_index = header.index(answer.csv_header_name(data))
+            next if var_index.blank?
 
-          var_value = answer.csv_row_value(data)
-          rows[row_index][var_index] = var_value
+            var_value = answer.csv_row_value(data)
+            rows[row_index][var_index] = var_value
+          end
         end
       end
     end
   end
 
-  def user_sessions
-    UserSession.where(session_id: session_ids)
+  def users
+    user_ids = UserSession.where(session_id: session_ids).pluck(:user_id)
+    User.where(id: user_ids).includes(:user_sessions)
   end
 
   def session_ids

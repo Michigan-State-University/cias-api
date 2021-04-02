@@ -26,6 +26,8 @@ en:
           attributes:
             user_id:
               already_exists: already exists
+        question_group:
+          question: '%{question_type} can appear only once per session'
       messages:
         undestroyable: Forbidden operation
   interventions:
