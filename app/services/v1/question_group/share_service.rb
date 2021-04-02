@@ -17,6 +17,7 @@ class V1::QuestionGroup::ShareService
   end
 
   def share(shared_question_group_id, question_group_ids, question_ids)
+    #shared_question_group_id grupa do ktorej sharruje, question_group_ids sharowana grupa, question_ids sharowane pytania
     raise CanCan::AccessDenied if question_group_intervention_published?
 
     shared_question_group = question_group_load(shared_question_group_id)
@@ -26,14 +27,14 @@ class V1::QuestionGroup::ShareService
 
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
-        share_question(shared_questions, question)
+        share_question(shared_questions, question, shared_question_group_id)
       end
 
       question_group_ids.each do |question_group_id|
         questions = all_user_questions.where(question_group_id: question_group_id)
         next if questions.empty?
 
-        share_question_group_questions(shared_questions, questions, question_ids)
+        share_question_group_questions(shared_questions, questions, question_ids, question_group_id)
       end
     end
 
@@ -46,16 +47,16 @@ class V1::QuestionGroup::ShareService
     intervention.published?
   end
 
-  def share_question_group_questions(shared_questions, questions, question_ids)
+  def share_question_group_questions(shared_questions, questions, question_ids, question_group_id)
     questions.each do |question|
       next if question_ids.include?(question.id)
 
-      share_question(shared_questions, question)
+      share_question(shared_questions, question, question_group_id)
     end
   end
 
-  def share_question(shared_questions, question)
-    cloned = question.clone
+  def share_question(shared_questions, question, question_group_id)
+    cloned = Clone::Question.new(question, { question_group_id: question_group_id, clean_formulas: true }).execute
     cloned.clear_narrator_blocks
     cloned.position = shared_questions.last&.position.to_i + 1
     shared_questions << cloned
