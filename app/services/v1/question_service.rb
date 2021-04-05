@@ -56,18 +56,29 @@ class V1::QuestionService < V1::Question::BaseService
   private
 
   def clone_questions(questions, question_group)
+    warning = ''
     question_group_questions = question_group.questions
-    questions.each do |question|
-      cloned = question.clone
-      cloned.position = question_group_questions.last&.position.to_i + 1
-      cloned.question_group_id = question_group.id
-      question_group_questions << cloned
-    end
 
-    question_group_questions.last(questions.size)
+    Question.transaction do
+      questions.each do |question|
+        if validate_uniqueness(question)
+          warning = I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type
+          raise ActiveRecord::Rollback
+        end
+        cloned = question.clone
+        cloned.position = question_group_questions.last&.position.to_i + 1
+        question_group_questions << cloned
+      end
+    end
+    question_group.destroy! if question_group.title.eql?('Copied Questions') && warning.present?
+    { question_group: question_group_questions.last(questions.size), warning: warning }
   end
 
   def all_questions_from_one_question_group?(questions, question_group_id)
     questions.all? { |question| question.question_group_id.eql?(question_group_id) }
+  end
+
+  def validate_uniqueness(question)
+    [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
   end
 end

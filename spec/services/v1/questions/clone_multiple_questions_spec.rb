@@ -17,38 +17,38 @@ RSpec.describe V1::QuestionService do
       let(:result) { subject.clone_multiple(session.id, question_ids) }
 
       it 'returns list of cloned questions' do
-        expect(result[0].attributes).to include({ 'title' => questions.last.title,
-                                                  'position' => questions.last.position + 1,
-                                                  'question_group_id' => questions.last.question_group_id })
-        expect(result[1].attributes).to include({ 'title' => questions.last.title,
-                                                  'position' => questions.last.position + 2,
-                                                  'question_group_id' => questions.last.question_group_id })
-        expect(result[2].attributes).to include({ 'title' => questions.last.title,
-                                                  'position' => questions.last.position + 3,
-                                                  'question_group_id' => questions.last.question_group_id })
+        expect(result[:question_group][0].attributes).to include({ 'title' => questions.last.title,
+                                                                   'position' => questions.last.position + 1,
+                                                                   'question_group_id' => questions.last.question_group_id })
+        expect(result[:question_group][1].attributes).to include({ 'title' => questions.last.title,
+                                                                   'position' => questions.last.position + 2,
+                                                                   'question_group_id' => questions.last.question_group_id })
+        expect(result[:question_group][2].attributes).to include({ 'title' => questions.last.title,
+                                                                   'position' => questions.last.position + 3,
+                                                                   'question_group_id' => questions.last.question_group_id })
       end
 
       it 'returns proper number of questions' do
-        expect(result.size).to eq(question_ids.size)
+        expect(result[:question_group].size).to eq(question_ids.size)
       end
     end
 
     context 'questions are from different question groups' do
       let(:question_ids) { [questions.first.id, questions_2.first.id] }
       let(:copied_questions) { Question.where(id: question_ids) }
-      let(:result) { subject.clone_multiple(session.id, question_ids).sort_by(&:position) }
+      let(:result) { subject.clone_multiple(session.id, question_ids) }
 
       it 'returns list of cloned questions' do
-        expect(result[0].attributes).to include({ 'title' => copied_questions[0].title,
-                                                  'position' => 1,
-                                                  'question_group_id' => session.question_groups.reload.last(2).first.id })
-        expect(result[1].attributes).to include({ 'title' => copied_questions[1].title,
-                                                  'position' => 2,
-                                                  'question_group_id' => session.question_groups.reload.last(2).first.id })
+        expect(result[:question_group][0].attributes).to include({ 'title' => copied_questions[0].title,
+                                                                   'position' => 1,
+                                                                   'question_group_id' => session.question_groups.reload.last(2).first.id })
+        expect(result[:question_group][1].attributes).to include({ 'title' => copied_questions[1].title,
+                                                                   'position' => 2,
+                                                                   'question_group_id' => session.question_groups.reload.last(2).first.id })
       end
 
       it 'returns proper number of questions' do
-        expect(result.size).to eq(question_ids.size)
+        expect(result[:question_group].size).to eq(question_ids.size)
       end
     end
 
@@ -83,6 +83,33 @@ RSpec.describe V1::QuestionService do
 
           it 'raises proper error' do
             expect(result).to eq('ActiveRecord::RecordNotFound')
+          end
+        end
+      end
+
+      context 'question type can appear only once per session' do
+        let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
+        let!(:session_id) { session.id }
+        let!(:question_group_1) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
+        let!(:question_group_2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
+
+        let!(:question) { create(:question_name, title: 'Name::Question', question_group: question_group_1) }
+        let!(:question_2) { create(:question_name, title: 'Name::Question', question_group: question_group_2) }
+        let(:question_ids) { [question.id] }
+
+        it 'return warning when copied question is Question::Name' do
+          expect(result[:warning]).to eq('Question::Name can appear only once per session')
+          expect(question_group_1.reload.questions.size).to be(1)
+        end
+
+        context 'one of question is Question::Name' do
+          let!(:question_3) { create(:question_single, title: 'Single::Question', question_group: question_group_2) }
+          let(:question_ids) { [question.id, question_3.id] }
+
+          it 'return warning and not add Copied Questions' do
+            size_of_question_before = session.question_groups.reload.size
+            expect(result[:warning]).to eq('Question::Name can appear only once per session')
+            expect(session.question_groups.reload.size).to eql(size_of_question_before)
           end
         end
       end
