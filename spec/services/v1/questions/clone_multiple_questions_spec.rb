@@ -107,9 +107,9 @@ RSpec.describe V1::QuestionService do
           let(:question_ids) { [question.id, question_3.id] }
 
           it 'return warning and not add Copied Questions' do
-            size_of_question_before = session.question_groups.reload.size
+            size_of_questions_before = session.question_groups.reload.size
             expect(result[:warning]).to eq('Question::Name can appear only once per session')
-            expect(session.question_groups.reload.size).to eql(size_of_question_before)
+            expect(session.question_groups.reload.size).to eql(size_of_questions_before)
           end
         end
       end
