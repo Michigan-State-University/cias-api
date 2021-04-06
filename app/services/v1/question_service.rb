@@ -41,16 +41,18 @@ class V1::QuestionService < V1::Question::BaseService
     questions = questions_scope_by_session(session_id).where(id: question_ids)
     raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids)
 
-    question_group_id = questions.first&.question_group_id
-    question_group = if all_questions_from_one_question_group?(questions, question_group_id)
-                       question_group_load(question_group_id)
-                     else
-                       question_groups = question_groups_scope(session_id)
-                       position = question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
-                       question_groups.create!(title: 'Copied Questions', position: position)
-                     end
+    QuestionGroup.transaction do
+      question_group_id = questions.first&.question_group_id
+      question_group = if all_questions_from_one_question_group?(questions, question_group_id)
+                         question_group_load(question_group_id)
+                       else
+                         question_groups = question_groups_scope(session_id)
+                         position = question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
+                         question_groups.create!(title: 'Copied Questions', position: position)
+                       end
 
-    clone_questions(questions, question_group)
+      clone_questions(questions, question_group)
+    end
   end
 
   private
@@ -67,7 +69,6 @@ class V1::QuestionService < V1::Question::BaseService
         question_group_questions << cloned
       end
     end
-    question_group.destroy! if question_group.questions.size.eql?(0)
     question_group_questions.last(questions.size)
   end
 

@@ -112,8 +112,13 @@ RSpec.describe V1::QuestionService do
           let!(:question_3) { create(:question_single, title: 'Single::Question', question_group: question_group_2) }
           let(:question_ids) { [question.id, question_3.id] }
 
-          it 'return appropriate message and not add Copied Questions' do
+          it 'return appropriate message' do
             expect(result).to eq('Question::Name can appear only once per session')
+          end
+
+          it 'not create an empty group' do
+            size_of_question_before = session.question_groups.reload.size
+            expect(session.question_groups.reload.size).to eql(size_of_question_before)
           end
         end
       end
