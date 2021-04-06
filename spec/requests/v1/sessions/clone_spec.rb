@@ -4,8 +4,10 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
+  let(:intervention) { create(:intervention, user: user) }
   let(:session) do
     create(:session, :with_report_templates,
+           intervention: intervention,
            formula: { 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
            ] },
@@ -98,7 +100,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
 
     it 'has correct failure message' do
-      expect(json_response['message']).to eq("Couldn't find Session with 'id'=#{invalid_session_id}")
+      expect(json_response['message']).to include("Couldn't find Session with 'id'=#{invalid_session_id}")
     end
   end
 
@@ -121,12 +123,15 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url', 'formula', 'settings', 'language_code', 'voice_name')
     end
 
+    let(:session_cloned_position) { intervention.sessions.order(:position).last.position + 1 }
+
     it 'has correct http code' do
       expect(response).to have_http_status(:created)
     end
 
-    it 'origin and outcome same' do
-      expect(session_was).to eq(session_cloned)
+    it 'origin and outcome same except variable' do
+      expect(session_was.except('variable')).to eq(session_cloned.except('variable'))
+      expect(session_cloned['variable']).to eq "cloned_#{session.variable}_#{session_cloned_position}"
     end
 
     it 'has correct position' do

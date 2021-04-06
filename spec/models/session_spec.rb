@@ -4,7 +4,10 @@ require 'rails_helper'
 
 RSpec.describe Session, type: :model do
   describe 'Session' do
-    subject { create(:session) }
+    subject { build(:session, variable: variable, intervention: intervention) }
+
+    let(:variable) { 'session_1' }
+    let(:intervention) { create(:intervention) }
 
     it { should belong_to(:intervention) }
     it { should have_many(:question_groups) }
@@ -123,6 +126,32 @@ RSpec.describe Session, type: :model do
                 end
               end
             end
+          end
+        end
+      end
+    end
+
+    context 'validations' do
+      context 'unique_variable' do
+        context 'when variable exists in other session of the same intervention' do
+          let!(:session_2) { create(:session, variable: variable, intervention: intervention) }
+
+          it 'invalidate' do
+            expect(subject.validate).to eq false
+          end
+        end
+
+        context 'when variable exists in other session, but in other intervention' do
+          let!(:session_2) { create(:session, variable: variable) }
+
+          it 'validate' do
+            expect(subject.validate).to eq true
+          end
+        end
+
+        context "when variable doesn't exist in other sessions" do
+          it 'validate' do
+            expect(subject.validate).to eq true
           end
         end
       end

@@ -55,6 +55,7 @@ class V1::Question::ShareService < V1::Question::BaseService
       )
       new_session = Session.create!(
         name: 'Copied Session',
+        variable: 'copied_session',
         intervention: new_intervention
       )
       QuestionGroup.create!(

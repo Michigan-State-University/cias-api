@@ -8,6 +8,8 @@ class Clone::Base
     @outcome = @source.dup
     @clean_formulas = options.delete(:clean_formulas)
     @position = options.delete(:position)
+    @outcome.variable = options[:params][:variable] if options[:params].present? && options[:params][:variable].present?
+    options.delete(:params)
     @outcome.assign_attributes(options)
     @outcome.duplicated = true if outcome.is_a?(Question)
     @outcome.save!

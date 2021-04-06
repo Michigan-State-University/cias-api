@@ -26,6 +26,10 @@ en:
           attributes:
             user_id:
               already_exists: already exists
+        session:
+          attributes:
+            variable:
+              already_exists: already exists
       messages:
         undestroyable: Forbidden operation
   interventions:

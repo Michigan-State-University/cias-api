@@ -39,9 +39,18 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
 
   context 'when params' do
     context 'valid' do
-      before { request }
+      before do
+        allow_any_instance_of(Kernel).to receive(:rand).and_return(1234)
+        request
+      end
 
       it { expect(response).to have_http_status(:success) }
+
+      context 'when variable is missing' do
+        it 'adding default value for variable' do
+          expect(Session.last.variable).to eq 's1234'
+        end
+      end
     end
 
     context 'invalid' do
