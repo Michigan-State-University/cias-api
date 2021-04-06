@@ -36,7 +36,7 @@ class V1::QuestionGroup::ShareService
         questions = all_user_questions.where(question_group_id: question_group_id)
         next if questions.empty?
 
-        question_group = question_group_load(question_group_id)
+        question_group = QuestionGroup.includes(:questions).find(question_group_id)
 
         share_question_group_questions(shared_questions, questions, question_ids, question_group)
       end
@@ -64,6 +64,7 @@ class V1::QuestionGroup::ShareService
     validate_uniqueness(cloned, question_group)
     cloned.clear_narrator_blocks
     cloned.position = shared_questions.last&.position.to_i + 1
+    shared_questions << cloned
   end
 
   def validate_uniqueness(question, question_group)
