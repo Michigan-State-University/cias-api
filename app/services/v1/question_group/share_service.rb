@@ -7,11 +7,10 @@ class V1::QuestionGroup::ShareService
     @intervention = Intervention.accessible_by(user.ability).find(session.intervention_id)
     @all_user_questions = Question.accessible_by(user.ability)
     @question_groups = QuestionGroup.includes(:session, :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
-    @warning = ''
   end
 
   attr_reader :user, :intervention, :session, :all_user_questions
-  attr_accessor :question_groups, :warning
+  attr_accessor :question_groups
 
   def question_group_load(qg_id)
     question_groups.find(qg_id)
@@ -28,7 +27,6 @@ class V1::QuestionGroup::ShareService
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
         validate_uniqueness(question)
-        raise ActiveRecord::Rollback if warning.presence
 
         share_question(shared_questions, question)
       end
@@ -41,7 +39,7 @@ class V1::QuestionGroup::ShareService
       end
     end
 
-    { shared_question_group: shared_question_group.reload, warning: warning }
+    shared_question_group.reload
   end
 
   private
@@ -68,7 +66,7 @@ class V1::QuestionGroup::ShareService
   def validate_uniqueness(question)
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
 
-    self.warning = I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type
+    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_exist_in_session(question)
   end
 
   def question_type_exist_in_session(question)

@@ -51,12 +51,9 @@ class V1::QuestionsController < V1Controller
 
   def clone_multiple
     authorize! :create, Question
-    response = question_service.clone_multiple(session_id, question_ids)
-    if response[:warning].presence
-      render json: { message: response[:warning] }, status: :conflict
-    else
-      render json: serialized_response(response[:question_group]), status: :created
-    end
+    cloned_questions = question_service.clone_multiple(session_id, question_ids)
+
+    render json: serialized_response(cloned_questions), status: :created
   end
 
   private
