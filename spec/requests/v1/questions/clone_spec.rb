@@ -100,7 +100,6 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
       it { expect(response).to have_http_status(:created) }
 
       it 'returns proper cloned object' do
-        p question_cloned
         expect(question_cloned).to include(
           'subtitle' => 'Question Subtitle',
           'body' => {

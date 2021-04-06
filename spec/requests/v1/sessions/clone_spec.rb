@@ -163,7 +163,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 3',
@@ -176,7 +176,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 2',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 4',
@@ -189,7 +189,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 3',
           'position' => 3,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 2',
@@ -202,7 +202,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 4',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 7',
@@ -215,7 +215,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 5',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'narrator' => {
             'blocks' => [
@@ -234,7 +234,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 6',
           'position' => 3,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => '',

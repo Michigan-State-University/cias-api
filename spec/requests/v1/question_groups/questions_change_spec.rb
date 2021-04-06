@@ -32,7 +32,6 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id/questions_change', 
     let(:headers)    { admin_user.create_new_auth_token }
 
     it 'returns serialized question_group' do
-      # p json_response
       expect { request }.to change { question_group.questions.count }.by(2)
 
       expect(response).to have_http_status(:ok)

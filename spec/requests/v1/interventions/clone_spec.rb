@@ -83,7 +83,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 3',
@@ -96,7 +96,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 2',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 4',
@@ -165,7 +165,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 3',
@@ -178,7 +178,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 2',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 4',

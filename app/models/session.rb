@@ -121,15 +121,15 @@ class Session < ApplicationRecord
   end
 
   def session_variables
-    used_variables = []
-    question_groups.each do |question_group|
-      question_group.questions.each do |question|
-        question.csv_header_names.each do |variable|
-          used_variables.append(variable)
+    [].tap do |array|
+      question_groups.each do |question_group|
+        question_group.questions.each do |question|
+          question.csv_header_names.each do |variable|
+            array << variable
+          end
         end
       end
     end
-    used_variables
   end
 
   private

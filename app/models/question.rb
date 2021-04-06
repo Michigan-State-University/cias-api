@@ -54,9 +54,7 @@ class Question < ApplicationRecord
     next_obj
   end
 
-  def variable_clone_prefix(_taken_variables)
-    nil
-  end
+  def variable_clone_prefix(_taken_variables) end
 
   def variable_with_clone_index(taken_variables, variable_base)
     index = 1
