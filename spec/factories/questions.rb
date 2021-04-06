@@ -37,7 +37,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: 'var_1'
+          name: 'question_slider_var'
         }
       }
     end
@@ -124,7 +124,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'follow_up_contact_var'
         }
       }
     end
@@ -144,7 +144,7 @@ FactoryBot.define do
                 {
                   payload: '',
                   variable: {
-                    name: ''
+                    name: 'row1'
                   }
                 }
               ],
@@ -192,28 +192,28 @@ FactoryBot.define do
           {
             payload: '',
             variable: {
-              name: '',
+              name: 'answer_1',
               value: ''
             }
           },
           {
             payload: '',
             variable: {
-              name: '',
+              name: 'answer_2',
               value: ''
             }
           },
           {
             payload: '',
             variable: {
-              name: '',
+              name: 'answer_3',
               value: ''
             }
           },
           {
             payload: '',
             variable: {
-              name: '',
+              name: 'answer_4',
               value: ''
             }
           }
@@ -239,7 +239,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'number_var'
         }
       }
     end
@@ -264,7 +264,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'single_var'
         }
       }
     end
@@ -462,7 +462,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'free_response_var'
         }
       }
     end
@@ -485,7 +485,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'external_link_var'
         }
       }
     end
@@ -504,7 +504,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'date_var'
         }
       }
     end
@@ -550,7 +550,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: 'currency_var'
         }
       }
     end

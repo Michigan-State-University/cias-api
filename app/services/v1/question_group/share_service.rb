@@ -27,17 +27,18 @@ class V1::QuestionGroup::ShareService
 
       question_ids.each do |question_id|
         question = all_user_questions.find(question_id)
-        validate_uniqueness(question)
-        raise ActiveRecord::Rollback if warning.presence
+        share_question(shared_questions, question, shared_question_group)
 
-        share_question(shared_questions, question)
+        raise ActiveRecord::Rollback if warning.presence
       end
 
       question_group_ids.each do |question_group_id|
         questions = all_user_questions.where(question_group_id: question_group_id)
         next if questions.empty?
 
-        share_question_group_questions(shared_questions, questions, question_ids)
+        question_group = QuestionGroup.includes(:questions).find(question_group_id)
+
+        share_question_group_questions(shared_questions, questions, question_ids, question_group)
       end
     end
 
@@ -50,28 +51,25 @@ class V1::QuestionGroup::ShareService
     intervention.published?
   end
 
-  def share_question_group_questions(shared_questions, questions, question_ids)
+  def share_question_group_questions(shared_questions, questions, question_ids, question_group)
     questions.each do |question|
       next if question_ids.include?(question.id)
 
-      share_question(shared_questions, question)
+      share_question(shared_questions, question, question_group)
     end
   end
 
-  def share_question(shared_questions, question)
-    cloned = question.clone
+  def share_question(shared_questions, question, question_group)
+    cloned = Clone::Question.new(question, { question_group_id: question_group.id, clean_formulas: true }).execute
+    validate_uniqueness(cloned, question_group)
     cloned.clear_narrator_blocks
     cloned.position = shared_questions.last&.position.to_i + 1
     shared_questions << cloned
   end
 
-  def validate_uniqueness(question)
+  def validate_uniqueness(question, question_group)
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
 
-    self.warning = I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type
-  end
-
-  def question_type_exist_in_session(question)
-    Question.joins(:question_group).where(question_groups: { session_id: session.id }).where(type: question.type).any?
+    self.warning = I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type if question_group.session.questions.where(type: question.type).any?
   end
 end
