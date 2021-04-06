@@ -87,7 +87,7 @@ RSpec.describe V1::QuestionService do
         end
       end
 
-      context 'question type can appear only once per session' do
+      context 'specific question type can appear only once per session' do
         let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
         let!(:session_id) { session.id }
         let!(:question_group_1) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
@@ -102,7 +102,7 @@ RSpec.describe V1::QuestionService do
           expect(question_group_1.reload.questions.size).to be(1)
         end
 
-        context 'one of question is Question::Name' do
+        context 'one of questions is Question::Name' do
           let!(:question_3) { create(:question_single, title: 'Single::Question', question_group: question_group_2) }
           let(:question_ids) { [question.id, question_3.id] }
 
