@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/users', type: :request do
   let(:user) { create(:user, :confirmed, :admin, first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
-  let(:researcher) { create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'john.Wazowski@test.com', created_at: 4.days.ago) }
+  let(:researcher) { create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'mike.Wazowski@test.com', created_at: 4.days.ago) }
   let(:participant) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Lenon', email: 'john.lenon@test.com', created_at: 4.days.ago) }
   let(:participant_1) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com', created_at: 3.days.ago) }
   let(:participant_2) { create(:user, :confirmed, :participant, first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@test.com', created_at: 2.days.ago) }
@@ -210,7 +210,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
     end
 
-    context 'when researcher does not have any session but participant answered other user wuestion' do
+    context 'when researcher does not have any session but participant answered other user question' do
       let!(:params) { {} }
       let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
       let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
@@ -235,6 +235,28 @@ RSpec.describe 'GET /v1/users', type: :request do
 
       it 'returns empty list of users' do
         expect(json_response['users'].size).to eq 0
+      end
+    end
+
+    context 'when researcher wants to see other researchers from team' do
+      let!(:team) { create(:team) }
+      let!(:researcher_1) { create(:user, :confirmed, :researcher, first_name: 'Oliver', last_name: 'Wood', email: 'oliver.Wood@test.com', created_at: 4.days.ago, team_id: team.id) }
+      let!(:add_current_user_to_team) { researcher.team_id = team.id }
+      let!(:params) { { roles: %w[researcher], team_id: team.id } }
+      let!(:users) { [researcher_1, current_user] }
+
+      before { request }
+
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns correct user ids' do
+        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
+      end
+
+      it 'returns correct users list size' do
+        expect(json_response['users'].size).to eq users.size
       end
     end
   end

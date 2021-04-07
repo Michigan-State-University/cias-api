@@ -54,8 +54,18 @@ class Question < ApplicationRecord
     next_obj
   end
 
-  def variable_clone_prefix
-    nil
+  def variable_clone_prefix(_taken_variables) end
+
+  def variable_with_clone_index(taken_variables, variable_base)
+    index = 1
+    new_variable = ''
+    loop do
+      new_variable = "clone#{index}_#{variable_base}"
+      break unless taken_variables.include?(new_variable)
+
+      index += 1
+    end
+    new_variable
   end
 
   def execute_narrator

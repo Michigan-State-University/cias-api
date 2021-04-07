@@ -62,9 +62,9 @@ class User < ApplicationRecord
 
   def self.detailed_search(params)
     scope = all
-    scope = params[:user_roles].include?('researcher') ? scope.participants : scope.limit_to_roles(params[:roles])
+    scope = params[:user_roles].include?('researcher') ? users_for_researcher(params, scope) : scope.limit_to_roles(params[:roles])
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope = scope.from_team(params[:team_id]) if params.key?(:team_id)
+    scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && !params[:user_roles].include?('researcher')
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
     scope
   end
@@ -106,6 +106,14 @@ class User < ApplicationRecord
   end
 
   private
+
+  def self.users_for_researcher(params, scope)
+    if params[:roles]&.include?('researcher')
+      scope.researchers.from_team(params[:team_id])
+    else
+      scope.participants
+    end
+  end
 
   def team_admin?
     roles.include?('team_admin')
