@@ -67,7 +67,7 @@ class V1::QuestionGroup::ShareService
   def validate_uniqueness(question, question_group)
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
 
-    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_exist_in_session(question)
+    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_exist_in_session(question, question_group)
   end
 
   def question_type_exist_in_session(question, question_group)
