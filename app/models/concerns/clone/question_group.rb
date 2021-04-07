@@ -12,7 +12,7 @@ class Clone::QuestionGroup < Clone::Base
 
   def clone_questions
     ActiveRecord::Base.transaction do
-      source.questions.order(:position).find_each do |question|
+      source.questions.order(:position).each do |question|
         outcome.questions << Clone::Question.new(question,
                                                  question_group_id: outcome.id,
                                                  clean_formulas: clean_formulas,
