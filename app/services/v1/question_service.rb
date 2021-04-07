@@ -41,7 +41,7 @@ class V1::QuestionService < V1::Question::BaseService
     questions = questions_scope_by_session(session_id).where(id: question_ids)
     raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids)
 
-    QuestionGroup.transaction do
+    ActiveRecord::Base.transaction do
       question_group_id = questions.first&.question_group_id
       question_group = if all_questions_from_one_question_group?(questions, question_group_id)
                          question_group_load(question_group_id)
@@ -60,15 +60,14 @@ class V1::QuestionService < V1::Question::BaseService
   def clone_questions(questions, question_group)
     question_group_questions = question_group.questions
 
-    Question.transaction do
-      questions.each do |question|
-        raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_must_be_unique(question)
+    questions.each do |question|
+      raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_must_be_unique(question)
 
-        cloned = question.clone
-        cloned.position = question_group_questions.last&.position.to_i + 1
-        question_group_questions << cloned
-      end
+      cloned = question.clone
+      cloned.position = question_group_questions.last&.position.to_i + 1
+      question_group_questions << cloned
     end
+
     question_group_questions.last(questions.size)
   end
 

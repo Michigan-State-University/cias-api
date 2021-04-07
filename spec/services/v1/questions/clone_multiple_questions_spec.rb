@@ -117,7 +117,7 @@ RSpec.describe V1::QuestionService do
           end
 
           it 'not create an empty group' do
-            size_of_question_before = session.question_groups.reload.size
+            size_of_question_before = session.question_groups.size
             expect(session.question_groups.reload.size).to eql(size_of_question_before)
           end
         end
