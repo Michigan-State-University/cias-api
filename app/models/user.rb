@@ -64,7 +64,7 @@ class User < ApplicationRecord
     scope = all
     scope = params[:user_roles].include?('researcher') ? users_for_researcher(params, scope) : scope.limit_to_roles(params[:roles])
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && !params[:user_roles].include?('researcher')
+    scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && params[:user_roles].exclude?('researcher')
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
     scope
   end
