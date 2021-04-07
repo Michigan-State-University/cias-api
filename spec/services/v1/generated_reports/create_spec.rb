@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::GeneratedReports::Create do
-  subject { described_class.call(report_template, user_session, dentaku_calculator) }
+  subject { described_class.call(report_template, user_session, dentaku_service) }
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
@@ -31,8 +31,13 @@ RSpec.describe V1::GeneratedReports::Create do
   let(:section1_variant2) { @section1_variant2 }
   let(:section2_variant1) { @section2_variant1 }
   let(:section2_variant2) { @section2_variant2 }
+  let(:all_var_values) { { var1: 5, var2: 5, var3: 10, var4: 5 } }
+  let(:dentaku_service) { Calculations::DentakuService.new(all_var_values) }
+  let(:dentaku_calculator) { Dentaku::Calculator.new }
 
   before do
+    allow(Dentaku::Calculator).to receive(:new).and_return(dentaku_calculator)
+    dentaku_service.store_and_transform_values
     Timecop.freeze
   end
 
@@ -41,7 +46,6 @@ RSpec.describe V1::GeneratedReports::Create do
   end
 
   context 'when there are sections with variants' do
-    let(:dentaku_calculator) { Dentaku::Calculator.new.store(var1: 5, var2: 5, var3: 10, var4: 5) }
     let(:generated_report) { GeneratedReport.last }
     let!(:answer_receive_report_true) do
       create(:answer_name, user_session: user_session,
@@ -102,7 +106,7 @@ RSpec.describe V1::GeneratedReports::Create do
     end
 
     context 'when some of variables values are missing' do
-      let(:dentaku_calculator) { Dentaku::Calculator.new.store(var1: 5, var2: 5) }
+      let(:all_var_values) { { var1: 5, var2: 5 } }
 
       it 'creates generated report with proper attributes and attachments' do
         expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
@@ -114,7 +118,6 @@ RSpec.describe V1::GeneratedReports::Create do
     end
 
     context 'when name variable is used' do
-      let(:dentaku_calculator) { Dentaku::Calculator.new.store(var1: 5, var2: 5, var3: 10, var4: 5) }
       let!(:answer_receive_report_true) do
         create(:answer_name, user_session: user_session,
                              body: { data: [
@@ -142,7 +145,7 @@ RSpec.describe V1::GeneratedReports::Create do
   end
 
   context 'when there are no variants that meet formula' do
-    let(:dentaku_calculator) { Dentaku::Calculator.new.store(var1: 50, var2: 50, var3: 100, var4: 5) }
+    let(:all_var_values) { { var1: 50, var2: 50, var3: 100, var4: 5 } }
 
     it 'does not create new generated report' do
       expect { subject }.to avoid_changing(GeneratedReport, :count).and \
@@ -152,7 +155,6 @@ RSpec.describe V1::GeneratedReports::Create do
   end
 
   context 'when there are no sections in the report' do
-    let(:dentaku_calculator) { Dentaku::Calculator.new }
     let!(:report_template) { create(:report_template) }
 
     it 'does not create new generated report' do

@@ -3,7 +3,7 @@
 class V1::SessionsController < V1Controller
   include Resource::Position
 
-  authorize_resource only: %i[create update destroy, clone]
+  authorize_resource only: %i[create update destroy clone]
 
   def index
     render json: serialized_response(sessions_scope)

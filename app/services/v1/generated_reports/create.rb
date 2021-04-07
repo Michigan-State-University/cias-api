@@ -5,22 +5,16 @@ class V1::GeneratedReports::Create
     new(report_template, user_session, dentaku_calculator).call
   end
 
-  def initialize(report_template, user_session, dentaku_calculator)
+  def initialize(report_template, user_session, dentaku_service)
     @report_template = report_template
     @user_session = user_session
-    @dentaku_calculator = dentaku_calculator
+    @dentaku_service = dentaku_service
   end
 
   def call
     variants_to_generate =
       report_template.sections.map do |section|
-        add_missing_variables(section)
-
-        result = dentaku_calculator.evaluate!(section.formula)
-
-        section.variants.order(:created_at).detect do |variant|
-          dentaku_calculator.evaluate("#{result}#{variant.formula_match}")
-        end
+        dentaku_service.evaluate(section.formula, section.variants)
       end
 
     variants_to_generate.compact!
@@ -47,22 +41,12 @@ class V1::GeneratedReports::Create
 
   private
 
-  attr_reader :report_template, :user_session, :dentaku_calculator
+  attr_reader :report_template, :user_session, :dentaku_service
 
   def render_pdf_report(variants_to_generate)
     V1::RenderPdfReport.call(
       report_template: report_template,
       variants_to_generate: variants_to_generate
-    )
-  end
-
-  def add_missing_variables(section)
-    missing_variables = dentaku_calculator.dependencies(section.formula)
-
-    return if missing_variables.blank?
-
-    dentaku_calculator.store(
-      **missing_variables.index_with { |_var| 0 }
     )
   end
 
