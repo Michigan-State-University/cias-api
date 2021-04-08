@@ -32,7 +32,7 @@ RSpec.describe Session, type: :model do
       describe '#available_now' do
         let(:session) { create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
         let(:schedule) { 'after_fill' }
-        let(:schedule_at) { DateTime.now + 1.day }
+        let(:schedule_at) { DateTime.now.tomorrow }
         let(:schedule_payload) { 2 }
 
         context 'session schedule is after fill' do
@@ -46,6 +46,20 @@ RSpec.describe Session, type: :model do
 
           it 'returns false' do
             expect(session.available_now).to be(false)
+          end
+        end
+
+        context 'session schedule is days after date' do
+          let(:participant) { create(:user, :confirmed, :participant) }
+          let!(:user_session) { create(:user_session, user: participant, session_id: session.id) }
+          let!(:update_session) { session.days_after_date_variable_name = 'var1' }
+          let!(:answer) { create(:answer_date, user_session: user_session, body: { data: [{ var: 'var1', value: DateTime.now.tomorrow }] }) }
+          let!(:calculated_date) { user_session.all_var_values[session.days_after_date_variable_name].to_datetime + session.schedule_payload&.days }
+
+          let(:schedule) { 'days_after_date' }
+
+          it 'returns false' do
+            expect(session.available_now(calculated_date)).to be(false)
           end
         end
 

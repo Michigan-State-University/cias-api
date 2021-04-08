@@ -11,7 +11,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
            formula: { 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
            ] },
-           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
+           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
+           days_after_date_variable_name: 'var1')
   end
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
@@ -117,13 +118,14 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
 
     let(:session_was) do
       session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count',
-                                'last_report_template_number', 'formula', 'settings', 'language_code', 'voice_name')
+                                'last_report_template_number', 'formula', 'settings', 'days_after_date_variable_name',
+                                'language_code', 'voice_name')
     end
 
     let(:session_cloned) do
       json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position',
-                                                 'sms_plans_count', 'logo_url', 'formula', 'settings', 'language_code',
-                                                 'voice_name')
+                                                 'sms_plans_count', 'logo_url', 'formula', 'settings', 'days_after_date_variable_name',
+                                                 'language_code', 'voice_name')
     end
 
     let(:session_cloned_position) { intervention.sessions.order(:position).last.position + 1 }
@@ -147,6 +149,10 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
         'patterns' => []
       )
       expect(json_response['data']['attributes']['settings']['formula']).to eq(false)
+    end
+
+    it 'has cleared days_after_date_variable_name value' do
+      expect(json_response['data']['attributes']['days_after_date_variable_name']).to eq(nil)
     end
 
     it 'has correct number of sessions' do

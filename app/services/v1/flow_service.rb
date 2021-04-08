@@ -60,7 +60,7 @@ class V1::FlowService
     end
     return question_or_session if branching_type.include? 'Question'
 
-    session_available_now = question_or_session.available_now
+    session_available_now = question_or_session.available_now(prepare_participant_date_with_schedule_payload(question_or_session))
 
     user_session.finish(send_email: !session_available_now)
 
@@ -113,5 +113,12 @@ class V1::FlowService
 
   def prepare_questions_with_answer_values(question, answers_var_values)
     question.another_or_feedback(question, answers_var_values)
+  end
+
+  def prepare_participant_date_with_schedule_payload(next_session)
+    return unless next_session.schedule == 'days_after_date'
+
+    participant_date = user_session.all_var_values[next_session.days_after_date_variable_name]
+    (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
   end
 end

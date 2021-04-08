@@ -26,7 +26,7 @@ class Session < ApplicationRecord
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 
-  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill' }, _prefix: :schedule
+  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill', days_after_date: 'days_after_date' }, _prefix: :schedule
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
@@ -104,9 +104,10 @@ class Session < ApplicationRecord
     question_group_finish.questions.first
   end
 
-  def available_now
+  def available_now(participant_date = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
+    return true if schedule == 'days_after_date' && participant_date&.noon&.past?
 
     false
   end
