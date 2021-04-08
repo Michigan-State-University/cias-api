@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_31_105427) do
+ActiveRecord::Schema.define(version: 2021_04_08_091254) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -72,6 +72,22 @@ ActiveRecord::Schema.define(version: 2021_03_31_105427) do
     t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"
     t.index ["third_party_id"], name: "index_generated_reports_on_third_party_id"
     t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
+  end
+
+  create_table "google_tts_languages", force: :cascade do |t|
+    t.string "language_name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "google_tts_voices", force: :cascade do |t|
+    t.integer "google_tts_language_id"
+    t.string "voice_label"
+    t.string "voice_type"
+    t.string "language_code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["google_tts_language_id"], name: "index_google_tts_voices_on_google_tts_language_id"
   end
 
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

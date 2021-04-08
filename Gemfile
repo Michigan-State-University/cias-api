@@ -39,6 +39,7 @@ gem 'secure_headers'
 gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
+gem 'countries'
 
 group :development, :test do
   gem 'bundler-audit'
