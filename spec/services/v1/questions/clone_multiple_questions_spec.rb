@@ -36,7 +36,7 @@ RSpec.describe V1::QuestionService do
     context 'questions are from different question groups' do
       let(:question_ids) { [questions.first.id, questions_2.first.id] }
       let(:copied_questions) { Question.where(id: question_ids) }
-      let(:result) { subject.clone_multiple(session.id, question_ids).sort_by(&:position) }
+      let(:result) { subject.clone_multiple(session.id, question_ids) }
 
       it 'returns list of cloned questions' do
         expect(result[0].attributes).to include({ 'title' => copied_questions[0].title,
@@ -83,6 +83,42 @@ RSpec.describe V1::QuestionService do
 
           it 'raises proper error' do
             expect(result).to eq('ActiveRecord::RecordNotFound')
+          end
+        end
+      end
+
+      context 'specific question type can appear only once per session' do
+        let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
+        let!(:session_id) { session.id }
+        let!(:question_group_1) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
+        let!(:question_group_2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
+
+        let!(:question) { create(:question_name, title: 'Name::Question', question_group: question_group_1) }
+        let!(:question_2) { create(:question_name, title: 'Name::Question', question_group: question_group_2) }
+        let(:question_ids) { [question.id] }
+
+        let(:result) do
+          subject.clone_multiple(session_id, question_ids)
+        rescue StandardError => e
+          e.message
+        end
+
+        it 'return warning when copied question is Question::Name' do
+          expect(result).to eq('Question::Name can appear only once per session')
+          expect(question_group_1.reload.questions.size).to be(1)
+        end
+
+        context 'one of questions is Question::Name' do
+          let!(:question_3) { create(:question_single, title: 'Single::Question', question_group: question_group_2) }
+          let(:question_ids) { [question.id, question_3.id] }
+
+          it 'return appropriate message' do
+            expect(result).to eq('Question::Name can appear only once per session')
+          end
+
+          it 'not create an empty group' do
+            size_of_question_before = session.question_groups.size
+            expect(session.question_groups.reload.size).to eql(size_of_question_before)
           end
         end
       end

@@ -28,51 +28,97 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   end
   let!(:question_2) { create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { post v1_clone_question_path(id: question.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_clone_question_path(id: question.id) }
+      let(:request) { post v1_clone_question_path(id: question.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_clone_question_path(id: question.id), headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when user clones a question' do
-    before { post v1_clone_question_path(id: question.id), headers: headers }
+    context 'there is no cloned variable' do
+      before { request }
 
-    let(:question_cloned) { json_response['data']['attributes'] }
+      let(:question_cloned) { json_response['data']['attributes'] }
 
-    it { expect(response).to have_http_status(:created) }
+      it { expect(response).to have_http_status(:created) }
 
-    it 'returns proper cloend object' do
-      expect(question_cloned).to include(
-        'subtitle' => 'Question Subtitle',
-        'body' => {
-          'data' => [
-            {
-              'payload' => '',
-              'value' => ''
+      it 'returns proper cloned object' do
+        expect(question_cloned).to include(
+          'subtitle' => 'Question Subtitle',
+          'body' => {
+            'data' => [
+              {
+                'payload' => '',
+                'value' => ''
+              }
+            ],
+            'variable' => {
+              'name' => 'clone_variable'
             }
-          ],
-          'variable' => {
-            'name' => 'clone_variable'
-          }
-        },
-        'formula' => { 'payload' => '', 'patterns' => [] },
-        'position' => 3,
-        'question_group_id' => question_group.id,
-        'narrator' => question.narrator
-      )
+          },
+          'formula' => { 'payload' => '', 'patterns' => [] },
+          'position' => 3,
+          'question_group_id' => question_group.id,
+          'narrator' => question.narrator
+        )
+      end
+    end
+
+    context 'when there is question with same variables' do
+      let!(:third_question) do
+        create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 3,
+                                 formula: {
+                                   'payload' => 'var + 3',
+                                   'patterns' => [
+                                     { 'match' => '=7', 'target' => { 'id' => question_2.id, type: 'Question::Single' } }
+                                   ]
+                                 },
+                                 body: {
+                                   data: [
+                                     {
+                                       payload: '',
+                                       value: ''
+                                     }
+                                   ],
+                                   variable: {
+                                     name: 'clone_variable'
+                                   }
+                                 })
+      end
+      let(:question_cloned) { json_response['data']['attributes'] }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:created) }
+
+      it 'returns proper cloned object' do
+        expect(question_cloned).to include(
+          'subtitle' => 'Question Subtitle',
+          'body' => {
+            'data' => [
+              {
+                'payload' => '',
+                'value' => ''
+              }
+            ],
+            'variable' => {
+              'name' => 'clone1_variable'
+            }
+          },
+          'formula' => { 'payload' => '', 'patterns' => [] },
+          'position' => 4,
+          'question_group_id' => question_group.id,
+          'narrator' => question.narrator
+        )
+      end
     end
   end
 end

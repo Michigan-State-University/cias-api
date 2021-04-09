@@ -32,7 +32,9 @@ class Answer < ApplicationRecord
   end
 
   def decrypted_body
-    Answer.decrypt_body_ciphertext(self.body_ciphertext)
+    return { 'data' => [] } unless body_ciphertext
+
+    Answer.decrypt_body_ciphertext(body_ciphertext)
   end
 
   private

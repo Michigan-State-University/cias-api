@@ -9,14 +9,10 @@ module BodyInterface
   end
 
   def body_data
-    return unless data_container
-
     data_container['data']
   end
 
   def body_variable
-    return unless data_container
-
     data_container['variable']
   end
 

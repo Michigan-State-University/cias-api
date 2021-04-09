@@ -23,32 +23,28 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
   let(:intervention_id) { intervention.id }
 
+  let(:request) { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+
   context 'when auth' do
     context 'is invalid' do
-      before { patch v1_intervention_path(intervention_id) }
+      let(:request) { patch v1_intervention_path(intervention_id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'is response header Content-Type eq JSON' do
-    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+    before { request }
 
     it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
   end
 
   context 'when user has role admin' do
-    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+    before { request }
 
     context 'when params are VALID' do
       it { expect(response).to have_http_status(:ok) }
@@ -98,7 +94,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   context 'when user has role researcher' do
     let(:user) { researcher }
 
-    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+    before { request }
 
     context 'intervention does not belong to him' do
       it { expect(response).to have_http_status(:not_found) }
@@ -156,7 +152,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   context 'when user has role participant' do
     let(:user) { participant }
 
-    before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+    before { request }
 
     it { expect(response).to have_http_status(:forbidden) }
   end

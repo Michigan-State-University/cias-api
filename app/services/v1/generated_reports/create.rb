@@ -73,12 +73,10 @@ class V1::GeneratedReports::Create
   end
 
   def insert_name_into_variants(variants_to_generate)
-    return if name_variable.blank?
-
-    variants_to_generate.each { |variant| variant.content.gsub!('.:name:.', name_variable) }
+    variants_to_generate.each { |variant| variant.content.gsub!('.:name:.', name_variable.presence || 'Participant') }
   end
 
   def report_name
-    @report_name ||= "Report #{I18n.l(Time.current, format: :file)}"
+    @report_name ||= "Report #{I18n.l(Time.current, format: :report_file)}"
   end
 end

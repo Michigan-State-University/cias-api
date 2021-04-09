@@ -3,9 +3,10 @@ en:
   time:
     formats:
       file: '%m_%d_%Y'
+      report_file: '%m_%d_%Y_%H_%M'
   question:
     finish:
-      subtitle: <h1>Finish Screen</h1>
+      subtitle: <h2>Finish Screen</h2>
       title: Finish Screen
   question_group:
     finish:
@@ -25,6 +26,8 @@ en:
           attributes:
             user_id:
               already_exists: already exists
+        question_group:
+          question: '%{question_type} can appear only once per session'
       messages:
         undestroyable: Forbidden operation
   interventions:

@@ -6,38 +6,29 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions', type: :request
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { get v1_intervention_sessions_path(intervention.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_intervention_sessions_path(intervention.id) }
+      let(:request) { get v1_intervention_sessions_path(intervention.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { get v1_intervention_sessions_path(intervention.id), headers: headers }
-
-      it 'response contains proper uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is JSON' do
-      before do
-        get v1_intervention_sessions_path(intervention.id), headers: headers
-      end
+      before { request }
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'is JSON and parse' do
-      before do
-        get v1_intervention_sessions_path(intervention.id), headers: headers
-      end
+      before { request }
 
       it 'success to Hash' do
         expect(json_response.class).to be(Hash)

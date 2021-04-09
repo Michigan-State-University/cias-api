@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:session) do
-    create(:session,
+    create(:session, :with_report_templates,
            formula: { 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
            ] },
@@ -71,22 +71,18 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
 
   let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
+  let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
+  let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_clone_session_path(id: session.id) }
+      let(:request) { post v1_clone_session_path(id: session.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
@@ -107,7 +103,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
 
   context 'when user clones a session' do
-    before { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
+    before { request }
 
     let(:cloned_session_id) { json_response['data']['id'] }
     let(:cloned_session) { Session.find(json_response['data']['id']) }
@@ -167,7 +163,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 3',
@@ -180,7 +176,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 2',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 4',
@@ -193,7 +189,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 3',
           'position' => 3,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 2',
@@ -206,7 +202,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 4',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 7',
@@ -219,7 +215,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 5',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'narrator' => {
             'blocks' => [
@@ -238,7 +234,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 6',
           'position' => 3,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => '',
@@ -275,6 +271,26 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       )
       expect(outcome_sms_plan.variants.last.slice(*SmsPlan::Variant::ATTR_NAMES_TO_COPY)).to eq variant.slice(
         *SmsPlan::Variant::ATTR_NAMES_TO_COPY
+      )
+    end
+
+    it 'correctly clones report templates' do
+      expect(outcome_report_templates.size).to eq 2
+
+      outcome_report_template = outcome_report_templates.order(:created_at).last
+      report_template = session.report_templates.order(:created_at).last
+
+      expect(outcome_report_template.variants.size).to eq 1
+      expect(outcome_report_template.sections.size).to eq 1
+
+      expect(outcome_report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY)).to eq report_template.slice(
+        *ReportTemplate::ATTR_NAMES_TO_COPY
+      )
+      expect(outcome_report_template.sections.last.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY)).to eq report_template.sections.last.slice(
+        *ReportTemplate::Section::ATTR_NAMES_TO_COPY
+      )
+      expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)).to eq report_template.variants.last.slice(
+        *ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY
       )
     end
   end

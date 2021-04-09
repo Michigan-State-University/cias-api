@@ -7,38 +7,29 @@ RSpec.describe 'GET /v1/question_groups/:question_group_id/questions/:id', type:
   let(:question) { create(:question_slider, question_group: question_group) }
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { get v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_question_group_question_path(question_group_id: question_group.id, id: question.id) }
+      let(:request) { get v1_question_group_question_path(question_group_id: question_group.id, id: question.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { get v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is JSON' do
-      before do
-        get v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers
-      end
+      before { request }
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'contains' do
-      before do
-        get v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers
-      end
+      before { request }
 
       it 'to hash success' do
         expect(json_response.class).to be(Hash)

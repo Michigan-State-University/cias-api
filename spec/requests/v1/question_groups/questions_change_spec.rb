@@ -35,7 +35,7 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id/questions_change', 
       expect { request }.to change { question_group.questions.count }.by(2)
 
       expect(response).to have_http_status(:ok)
-      expect(json_response['questions'].size).to eq 2
+      expect(json_response['included'].size).to eq 2
     end
   end
 end

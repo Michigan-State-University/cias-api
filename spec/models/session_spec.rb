@@ -126,6 +126,16 @@ RSpec.describe Session, type: :model do
           end
         end
       end
+
+      describe '#session_variables' do
+        let!(:session) { create(:session) }
+        let!(:question_group) { create(:question_group, session: session) }
+        let!(:question) { create(:question_single, :branching_to_session, question_group: question_group) }
+
+        it 'returns correct session variables' do
+          expect(session.session_variables).to eq ['a1']
+        end
+      end
     end
   end
 end

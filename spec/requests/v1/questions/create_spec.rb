@@ -61,30 +61,23 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       }
     }
   end
+  let(:request) { post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_question_group_questions_path(question_group.id) }
+      let(:request) { post v1_question_group_questions_path(question_group.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is JSON' do
-      before do
-        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
-      end
+      before { request }
 
       it {
         expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
@@ -92,9 +85,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     end
 
     context 'is JSON and parse' do
-      before do
-        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
-      end
+      before { request }
 
       it 'success to Hash' do
         expect(json_response.class).to be(Hash)
@@ -103,9 +94,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   end
 
   context 'created' do
-    before do
-      post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
-    end
+    before { request }
 
     it 'has correct formula size' do
       expect(json_response['data']['attributes']['formula']['patterns'].size).to eq(2)
@@ -126,9 +115,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
 
   context 'when blocks' do
     context 'has not been passed' do
-      before do
-        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
-      end
+      before { request }
 
       it 'do not create narrator blocks' do
         expect(json_response['data']['attributes']['narrator']['blocks'].size).to be(0)
@@ -153,9 +140,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         ]
       end
 
-      before do
-        post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
-      end
+      before { request }
 
       it('has correct blocks size') do
         expect(json_response['data']['attributes']['narrator']['blocks'].size).to be(1)

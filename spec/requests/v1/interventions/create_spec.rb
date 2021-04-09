@@ -17,33 +17,28 @@ RSpec.describe 'POST /v1/interventions', type: :request do
       }
     }
   end
+  let(:request) { post v1_interventions_path, params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_interventions_path }
+      let(:request) { post v1_interventions_path }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post v1_interventions_path, params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'is response header Content-Type eq JSON' do
-    before { post v1_interventions_path, params: params, headers: headers }
+    before { request }
 
     it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
   end
 
   context 'when user has role admin' do
-    before { post v1_interventions_path, params: params, headers: headers }
+    before { request }
 
     context 'when params are VALID' do
       it { expect(response).to have_http_status(:created) }
@@ -90,7 +85,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   context 'when user has role researcher' do
     let(:user) { researcher }
 
-    before { post v1_interventions_path, params: params, headers: headers }
+    before { request }
 
     context 'when params are VALID' do
       it { expect(response).to have_http_status(:created) }
@@ -137,7 +132,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   context 'when user has role participant' do
     let(:user) { participant }
 
-    before { post v1_interventions_path, params: params, headers: headers }
+    before { request }
 
     it { expect(response).to have_http_status(:forbidden) }
 
@@ -149,7 +144,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   context 'when user has role guest' do
     let(:user) { guest }
 
-    before { post v1_interventions_path, params: params, headers: headers }
+    before { request }
 
     it { expect(response).to have_http_status(:forbidden) }
 

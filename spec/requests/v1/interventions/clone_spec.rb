@@ -36,27 +36,22 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
                              ] })
   end
   let(:headers) { user.create_new_auth_token }
+  let(:request) { post clone_v1_intervention_path(id: intervention.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post clone_v1_intervention_path(id: intervention.id) }
+      let(:request) { post clone_v1_intervention_path(id: intervention.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { post clone_v1_intervention_path(id: intervention.id), headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when user clones an intervention' do
-    before { post clone_v1_intervention_path(id: intervention.id), headers: headers }
+    before { request }
 
     let(:cloned_intervention_object) { Intervention.find(json_response['data']['id']) }
     let(:cloned_sessions) { cloned_intervention_object.sessions.order(:position) }
@@ -88,7 +83,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 3',
@@ -101,7 +96,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 2',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 4',
@@ -170,7 +165,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle',
           'position' => 1,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 3',
@@ -183,7 +178,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'subtitle' => 'Question Subtitle 2',
           'position' => 2,
           'body' => include(
-            'variable' => { 'name' => '' }
+            'variable' => { 'name' => 'single_var' }
           ),
           'formula' => {
             'payload' => 'var + 4',

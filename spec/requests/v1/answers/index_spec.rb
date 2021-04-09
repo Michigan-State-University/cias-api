@@ -8,40 +8,29 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
   let(:question) { create(:question_free_response) }
   let(:answer) { create(:answer_free_response, user_session: user_session, question: question) }
   let(:headers) { user.create_new_auth_token }
+  let(:request) { get v1_user_session_answers_path(user_session.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { get v1_user_session_answers_path(user_session.id) }
+      let(:request) { get v1_user_session_answers_path(user_session.id) }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { get v1_user_session_answers_path(user_session.id), headers: headers }
-
-      it { expect(response).to have_http_status(:success) }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is JSON' do
-      before do
-        get v1_user_session_answers_path(user_session.id), headers: headers
-      end
+      before { request }
 
       it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }
     end
 
     context 'is JSON and parse' do
-      before do
-        get v1_user_session_answers_path(user_session.id), headers: headers
-      end
+      before { request }
 
       it 'success to Hash' do
         expect(json_response.class).to be(Hash)

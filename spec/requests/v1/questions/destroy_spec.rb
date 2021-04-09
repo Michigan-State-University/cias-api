@@ -17,30 +17,23 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
       ids: questions.pluck(:id) + other_questions.pluck(:id).without(other_questions.last.id)
     }
   end
+  let(:request) { delete v1_session_delete_questions_path(session_id: session.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { delete v1_session_delete_questions_path(session_id: session.id), params: params }
+      let(:request) { delete v1_session_delete_questions_path(session_id: session.id), params: params }
 
-      it { expect(response).to have_http_status(:unauthorized) }
+      it_behaves_like 'unauthorized user'
     end
 
     context 'is valid' do
-      before { delete v1_session_delete_questions_path(session_id: session.id), params: params, headers: headers }
-
-      it 'response contains generated uid token' do
-        expect(response.headers.to_h).to include(
-          'Uid' => user.email
-        )
-      end
+      it_behaves_like 'authorized user'
     end
   end
 
   context 'when response' do
     context 'is success' do
-      before do
-        delete v1_session_delete_questions_path(session_id: session.id), params: params, headers: headers
-      end
+      before { request }
 
       it 'returns proper http status' do
         expect(response).to have_http_status(:no_content)
@@ -75,9 +68,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
       }
     end
 
-    before do
-      delete v1_session_delete_questions_path(session_id: session.id), params: params, headers: headers
-    end
+    before { request }
 
     it { expect(response).to have_http_status(:not_found) }
     it { expect(questions.size).to be(3) }

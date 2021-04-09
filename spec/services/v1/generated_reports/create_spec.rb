@@ -32,22 +32,43 @@ RSpec.describe V1::GeneratedReports::Create do
   let(:section2_variant1) { @section2_variant1 }
   let(:section2_variant2) { @section2_variant2 }
 
+  before do
+    Timecop.freeze
+  end
+
+  after do
+    Timecop.return
+  end
+
   context 'when there are sections with variants' do
     let(:dentaku_calculator) { Dentaku::Calculator.new.store(var1: 5, var2: 5, var3: 10, var4: 5) }
     let(:generated_report) { GeneratedReport.last }
+    let!(:answer_receive_report_true) do
+      create(:answer_name, user_session: user_session,
+                           body: { data: [
+                             { 'var' => '.:name:.', 'value' => { 'name' => '', 'phoneticName' => 'John' } }
+                           ] })
+    end
+
+    before do
+      section1_variant1.update(content: "Hello .:name:., #{section1_variant1.content}")
+      section2_variant1.update(content: "Hello .:name:.. #{section2_variant1.content}")
+    end
 
     it 'creates generated report with proper attributes and attachments' do
       expect(V1::RenderPdfReport).to receive(:call).with(
         report_template: report_template,
-        variants_to_generate: [section1_variant1, section2_variant1]
+        variants_to_generate: [
+          variant_with_content('Hello Participant,'),
+          variant_with_content('Hello Participant.')
+        ]
       ).and_return('PDF TEMPLATE')
 
       expect { subject }.to change(GeneratedReport, :count).by(1).and \
         change(ActiveStorage::Attachment, :count).by(1).and \
           change(ActiveStorage::Blob, :count).by(1)
-
       expect(generated_report).to have_attributes(
-        name: include('Report'),
+        name: include("Report #{Time.current.strftime('%m_%d_%Y_%H_%M')}"),
         user_session_id: user_session.id,
         report_template_id: report_template.id,
         report_for: report_template.report_for
