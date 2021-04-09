@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/google_tts_languages/:google_tts_language_id/google_tts_voices', type: :request do
+RSpec.describe 'GET  /v1/languages/:language_id/voices', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
@@ -14,11 +14,11 @@ RSpec.describe 'GET /v1/google_tts_languages/:google_tts_language_id/google_tts_
   let(:first_voice) { language.google_tts_voices.first }
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_google_tts_language_google_tts_voices_path(language.id), headers: headers }
+  let(:request) { get v1_language_voices_path(language.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { get v1_google_tts_language_google_tts_voices_path(language.id) }
+      let(:request) { get v1_language_voices_path(language.id) }
 
       it_behaves_like 'unauthorized user'
     end
@@ -37,10 +37,11 @@ RSpec.describe 'GET /v1/google_tts_languages/:google_tts_language_id/google_tts_
       end
 
       it 'returns proper collection data' do
+        p json_response
         expect(json_response['data'][0]).to include(
           {
             'id' => first_voice.id.to_s,
-            'type' => 'google_tts_voice',
+            'type' => 'voice',
             'attributes' => {
               'google_tts_language_id' => language.id,
               'voice_label' => first_voice.voice_label,

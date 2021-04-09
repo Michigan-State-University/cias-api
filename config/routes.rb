@@ -124,8 +124,10 @@ Rails.application.routes.draw do
 
     resources :generated_reports, only: :index
 
-    resources :google_tts_languages, only: :index do
-      resources :google_tts_voices, only: :index
+    scope module: :google_tts do
+      resources :languages, only: :index do
+        resources :voices, only: :index
+      end
     end
   end
 

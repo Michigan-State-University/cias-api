@@ -14,29 +14,31 @@ namespace :google_tts_languages do
       hash[voice.language_codes[0]] = hash[voice.language_codes[0]] ? hash[voice.language_codes[0]] << voice : [voice]
     end
     languages_hash = prepare_languages_hash
-    hash.each do |language, voices|
-      language_name = prepare_language_name(language, languages_hash)
-      tts_language = GoogleTtsLanguage.create(language_name: language_name)
+    ActiveRecord::Base::transaction do
+      hash.each do |language, voices|
+        language_name = prepare_language_name(language, languages_hash)
+        tts_language = GoogleTtsLanguage.create!(language_name: language_name)
 
-      usage_hash = {
-        'standard-male' => 1,
-        'standard-female' => 1,
-        'wavenet-male' => 1,
-        'wavenet-female' => 1
-      }
-      voices.each do |voice_type|
-        voice_standard = voice_type.name.split('-')[2].downcase
-        voice_gender = voice_type.ssml_gender.to_s.downcase
-        voice_hash = "#{voice_standard}-#{voice_gender}"
-        voice_name = "#{voice_hash}-#{usage_hash[voice_hash]}"
-        usage_hash[voice_hash] += 1
+        usage_hash = {
+          'standard-male' => 1,
+          'standard-female' => 1,
+          'wavenet-male' => 1,
+          'wavenet-female' => 1
+        }
+        voices.each do |voice_type|
+          voice_standard = voice_type.name.split('-')[2].downcase
+          voice_gender = voice_type.ssml_gender.to_s.downcase
+          voice_hash = "#{voice_standard}-#{voice_gender}"
+          voice_name = "#{voice_hash}-#{usage_hash[voice_hash]}"
+          usage_hash[voice_hash] += 1
 
-        GoogleTtsVoice.create(
-          voice_label: voice_name.capitalize,
-          voice_type: voice_type.name,
-          language_code: language,
-          google_tts_language: tts_language
-        )
+          GoogleTtsVoice.create!(
+            voice_label: voice_name.capitalize,
+            voice_type: voice_type.name,
+            language_code: language,
+            google_tts_language: tts_language
+          )
+        end
       end
     end
   end

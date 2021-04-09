@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::GoogleTtsVoicesController < V1Controller
+class V1::GoogleTts::VoicesController < V1Controller
   def index
     authorize! :index, GoogleTtsVoice
 
@@ -14,10 +14,10 @@ class V1::GoogleTtsVoicesController < V1Controller
   end
 
   def google_tts_voices_scope
-    google_tts_languages_voices_service.google_tts_voices(google_tts_language_id)
+    google_tts_languages_voices_service.google_tts_voices(language_id)
   end
 
-  def google_tts_language_id
-    params[:google_tts_language_id]
+  def language_id
+    params[:language_id]
   end
 end

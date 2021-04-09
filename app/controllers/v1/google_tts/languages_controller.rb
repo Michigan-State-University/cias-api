@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::GoogleTtsLanguagesController < V1Controller
+class V1::GoogleTts::LanguagesController < V1Controller
   def index
     authorize! :index, GoogleTtsLanguage
 
