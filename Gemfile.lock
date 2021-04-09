@@ -112,6 +112,10 @@ GEM
       deep_merge (~> 1.2, >= 1.2.1)
       dry-validation (~> 1.0, >= 1.0.0)
     connection_pool (2.2.3)
+    countries (3.1.0)
+      i18n_data (~> 0.11.0)
+      sixarm_ruby_unaccent (~> 1.1)
+      unicode_utils (~> 1.4)
     crass (1.0.6)
     deep_merge (1.2.1)
     dentaku (3.3.4)
@@ -261,6 +265,7 @@ GEM
     hiredis (0.6.3)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
+    i18n_data (0.11.0)
     iniparse (1.5.0)
     jmespath (1.4.0)
     json-schema (2.8.1)
@@ -295,9 +300,7 @@ GEM
       mimemagic (~> 0.3.2)
     memoist (0.16.2)
     method_source (1.0.0)
-    mimemagic (0.3.10)
-      nokogiri (~> 1)
-      rake
+    mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.14.2)
@@ -456,6 +459,7 @@ GEM
       docile (~> 1.1)
       simplecov-html (~> 0.11)
     simplecov-html (0.12.3)
+    sixarm_ruby_unaccent (1.2.0)
     slop (4.8.2)
     sprockets (3.7.2)
       concurrent-ruby (~> 1.0)
@@ -481,6 +485,7 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
+    unicode_utils (1.4.0)
     uniform_notifier (1.13.0)
     warden (1.2.9)
       rack (>= 2.0.9)
@@ -512,6 +517,7 @@ DEPENDENCIES
   cancancan
   config
   connection_pool
+  countries
   dentaku
   devise-argon2
   devise_invitable
