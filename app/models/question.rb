@@ -72,8 +72,8 @@ class Question < ApplicationRecord
     Narrator.new(self).execute
   end
 
-  def clear_narrator_blocks
-    narrator['blocks'] = []
+  def remove_blocks_with_types(block_types_to_remove)
+    narrator['blocks'] = narrator['blocks'].filter { |block| !block_types_to_remove.include?(block['type']) }
   end
 
   def csv_header_names
