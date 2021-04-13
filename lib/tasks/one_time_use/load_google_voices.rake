@@ -14,7 +14,7 @@ namespace :google_tts_languages do
       hash[voice.language_codes[0]] = hash[voice.language_codes[0]] ? hash[voice.language_codes[0]] << voice : [voice]
     end
     languages_hash = prepare_languages_hash
-    ActiveRecord::Base::transaction do
+    ActiveRecord::Base.transaction do
       hash.each do |language, voices|
         language_name = prepare_language_name(language, languages_hash)
         tts_language = GoogleTtsLanguage.create!(language_name: language_name)
