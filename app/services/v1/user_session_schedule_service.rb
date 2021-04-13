@@ -3,7 +3,9 @@
 class V1::UserSessionScheduleService
   def initialize(user_session)
     @user_session = user_session
-    @all_var_values = user_session.all_var_values
+    @all_var_values = V1::UserInterventionService.new(
+      user_session.user.id, user_session.session.intervention_id, user_session.id
+    ).var_values
   end
 
   attr_reader :user_session, :all_var_values

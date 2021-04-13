@@ -23,7 +23,6 @@ class Calculations::DentakuService
 
   def evaluate(formula, formula_cases, is_formula_interface = false)
     add_missing_variables(formula)
-
     result = dentaku_calculator.evaluate!(formula)
 
     is_formula_interface ? json_formula(result, formula_cases) : variant_formula(result, formula_cases)

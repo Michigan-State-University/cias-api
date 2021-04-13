@@ -15,33 +15,32 @@ class V1::FlowService
   attr_accessor :user_session, :warning, :next_user_session_id
 
   def user_session_question(preview_question_id)
-    answers_var_values = user_session.all_var_values
-
-    question = question_to_display(answers_var_values, preview_question_id)
-    question = perform_narrator_reflections(question, answers_var_values)
-    question = prepare_questions_with_answer_values(question, answers_var_values)
-    question.another_or_feedback(question, answers_var_values)
+    question = question_to_display(preview_question_id)
+    question = perform_narrator_reflections(question)
+    question = prepare_questions_with_answer_values(question)
+    question.another_or_feedback(question, all_var_values)
 
     user_session.finish if question.type == 'Question::Finish'
 
     { question: question, warning: warning, next_user_session_id: next_user_session_id }
   end
 
-  def question_to_display(answers_var_values, preview_question_id)
+  def question_to_display(preview_question_id)
     return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
 
     last_answered_question = user_session.last_answer&.question
     return user_session.session.first_question if last_answered_question.nil?
 
-    perform_branching_to_next_question(last_answered_question, answers_var_values)
+    perform_branching_to_next_question(last_answered_question)
   end
 
-  def perform_branching_to_next_question(last_question, answers_var_values)
+  def perform_branching_to_next_question(last_question)
     return nil if last_question.id.eql?(last_question.position_equal_or_higher.last.id)
 
     next_question = last_question.position_equal_or_higher[1]
     if last_question.formula['payload'].present?
-      obj_src = last_question.exploit_formula(answers_var_values)
+
+      obj_src = last_question.exploit_formula(all_var_values)
       self.warning = obj_src if obj_src.is_a?(String)
       branching_question = nil
       branching_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
@@ -86,18 +85,18 @@ class V1::FlowService
     question
   end
 
-  def perform_narrator_reflections(question, answers_var_values)
+  def perform_narrator_reflections(question)
     question = swap_name_mp3(question)
     question.narrator['blocks']&.each_with_index do |block, index|
       next unless %w[Reflection ReflectionFormula].include?(block['type'])
 
-      question.narrator['blocks'][index]['target_value'] = prepare_block_target_value(question, answers_var_values, block)
+      question.narrator['blocks'][index]['target_value'] = prepare_block_target_value(question, block)
     end
     question
   end
 
-  def prepare_block_target_value(question, answers_var_values, block)
-    return question.exploit_formula(answers_var_values, block['payload'], block['reflections']) if block['type'].eql?('ReflectionFormula')
+  def prepare_block_target_value(question, block)
+    return question.exploit_formula(all_var_values, block['payload'], block['reflections']) if block['type'].eql?('ReflectionFormula')
 
     matched_reflections = []
     block['reflections'].each do |reflection|
@@ -106,19 +105,27 @@ class V1::FlowService
         return []
       end
 
-      matched_reflections.push(reflection) if answers_var_values.key?(reflection['variable']) && answers_var_values[reflection['variable']].eql?(reflection['value'])
+      matched_reflections.push(reflection) if all_var_values.key?(reflection['variable']) && all_var_values[reflection['variable']].eql?(reflection['value'])
     end
     matched_reflections
   end
 
-  def prepare_questions_with_answer_values(question, answers_var_values)
-    question.another_or_feedback(question, answers_var_values)
+  def prepare_questions_with_answer_values(question)
+    question.another_or_feedback(question, all_var_values)
   end
 
   def prepare_participant_date_with_schedule_payload(next_session)
     return unless next_session.schedule == 'days_after_date'
 
-    participant_date = user_session.all_var_values[next_session.days_after_date_variable_name]
+    participant_date = all_var_values[next_session.days_after_date_variable_name]
     (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
+  end
+
+  private
+
+  def all_var_values
+    @all_var_values ||= V1::UserInterventionService.new(
+      user.id, user_session.session.intervention_id, user_session.id
+    ).var_values
   end
 end

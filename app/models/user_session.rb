@@ -39,10 +39,11 @@ class UserSession < ApplicationRecord
     answers.order(:created_at).last
   end
 
-  def all_var_values
+  def all_var_values(include_session_var: true)
     answers.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|
-        var_values[obj['var']] = obj['value']
+        key = include_session_var ? "#{session.variable}.#{obj['var']}" : obj['var']
+        var_values[key] = obj['value']
       end
     end
   end

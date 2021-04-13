@@ -54,7 +54,10 @@ RSpec.describe Session, type: :model do
           let!(:user_session) { create(:user_session, user: participant, session_id: session.id) }
           let!(:update_session) { session.days_after_date_variable_name = 'var1' }
           let!(:answer) { create(:answer_date, user_session: user_session, body: { data: [{ var: 'var1', value: DateTime.now.tomorrow }] }) }
-          let!(:calculated_date) { user_session.all_var_values[session.days_after_date_variable_name].to_datetime + session.schedule_payload&.days }
+          let!(:all_var_values) { user_session.all_var_values(include_session_var: false) }
+          let!(:calculated_date) do
+            all_var_values[session.days_after_date_variable_name].to_datetime + session.schedule_payload&.days
+          end
 
           let(:schedule) { 'days_after_date' }
 
