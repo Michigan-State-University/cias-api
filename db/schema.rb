@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_08_091254) do
+ActiveRecord::Schema.define(version: 2021_04_12_174158) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -119,6 +119,12 @@ ActiveRecord::Schema.define(version: 2021_04_08_091254) do
     t.text "body", null: false
     t.string "status", default: "new", null: false
     t.datetime "schedule_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "organizations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
