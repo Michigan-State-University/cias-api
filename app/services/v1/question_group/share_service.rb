@@ -59,7 +59,7 @@ class V1::QuestionGroup::ShareService
   def share_question(shared_questions, question, question_group)
     validate_uniqueness(question, question_group)
     cloned = Clone::Question.new(question, { question_group_id: question_group.id, clean_formulas: true }).execute
-    cloned.clear_narrator_blocks
+    cloned.remove_blocks_with_types(%w[ReflectionFormula Reflection])
     cloned.position = shared_questions.last&.position.to_i + 1
     shared_questions << cloned
   end
