@@ -4,10 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/organizations/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:team_admin) { create(:user, :confirmed, :team_admin) }
-  let(:researcher) { create(:user, :confirmed, :researcher) }
-  let(:participant) { create(:user, :confirmed, :participant) }
-  let(:guest) { create(:user, :confirmed, :guest) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, name: 'Michigan Public Health') }
@@ -63,28 +59,13 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
       end
     end
 
-    context 'when user is team admin' do
-      let(:headers) { team_admin.create_new_auth_token }
+    %i[team_admin researcher participant guest].each do |role|
+      context "user is #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+        let(:headers) { user.create_new_auth_token }
 
-      it_behaves_like 'unpermitted user'
-    end
-
-    context 'when user is researcher' do
-      let(:headers) { researcher.create_new_auth_token }
-
-      it_behaves_like 'unpermitted user'
-    end
-
-    context 'when user is participant' do
-      let(:headers) { participant.create_new_auth_token }
-
-      it_behaves_like 'unpermitted user'
-    end
-
-    context 'when user is guest' do
-      let(:headers) { guest.create_new_auth_token }
-
-      it_behaves_like 'unpermitted user'
+        it_behaves_like 'unpermitted user'
+      end
     end
 
     context 'when user is preview user' do
