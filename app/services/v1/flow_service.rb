@@ -78,9 +78,10 @@ class V1::FlowService
     blocks = question.narrator['blocks']
     blocks.map do |block|
       next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
-      next block if user_session.name_audio.nil?
+      name_audio_url = ''
+      name_audio_url = user_session.name_audio.url unless user_session.name_audio.nil?
 
-      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, user_session.name_audio.url)
+      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, name_audio_url)
       block
     end
     question
