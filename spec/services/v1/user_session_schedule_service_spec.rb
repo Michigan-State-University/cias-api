@@ -87,7 +87,7 @@ RSpec.describe V1::UserSessionScheduleService do
           let!(:update_second_session) { second_session.update(days_after_date_variable_name: 'days_after_date_variable') }
           let!(:answer) do
             create(:answer_date, user_session: user_session,
-                                 body: { data: [{ var: 'days_after_date_variable', 'value': tomorrow.to_s }] })
+                                 body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })
           end
 
           it 'calls correct method' do

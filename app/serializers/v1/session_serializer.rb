@@ -12,4 +12,8 @@ class V1::SessionSerializer < V1Serializer
   attribute :logo_url do |object|
     url_for(Intervention.find(object.intervention_id).logo) if Intervention.find(object.intervention_id).logo.attached?
   end
+
+  attribute :google_tts_voice do |object|
+    GoogleTtsVoice.find(object.google_tts_voice_id)
+  end
 end

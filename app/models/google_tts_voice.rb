@@ -4,4 +4,5 @@ class GoogleTtsVoice < ApplicationRecord
   belongs_to :google_tts_language
 
   default_scope { order(:voice_label) }
+  has_many :sessions, dependent: :nullify
 end

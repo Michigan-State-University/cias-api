@@ -71,7 +71,7 @@ class V1::SessionsController < V1Controller
 
   def session_params
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable,
-                                    :intervention_id, :days_after_date_variable_name, narrator: {}, settings: {},
-                                                                                      formula: {}, body: {})
+                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, narrator: {}, settings: {},
+                                                                                                            formula: {}, body: {})
   end
 end
