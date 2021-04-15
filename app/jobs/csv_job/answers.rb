@@ -5,7 +5,6 @@ class CsvJob::Answers < CsvJob
 
   def perform(user_id, intervention_id, requested_at)
     user = User.find(user_id)
-    return unless user.email_notification
 
     intervention = Intervention.find(intervention_id)
     preview_csv_content = intervention.export_answers_as(type: module_name)
@@ -13,6 +12,9 @@ class CsvJob::Answers < CsvJob
       stream: preview_csv_content, add_to: intervention,
       macro: :reports, ext: :csv, type: 'text/csv', user: user
     ).execute
+
+    return unless user.email_notification
+
     if intervention.draft?
       CsvMailer::Answers.csv_answers_preview(user, intervention, preview_csv_content, requested_at).deliver_now
     else
