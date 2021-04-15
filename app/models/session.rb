@@ -26,17 +26,19 @@ class Session < ApplicationRecord
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 
-  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill' }, _prefix: :schedule
+  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill', days_after_date: 'days_after_date' }, _prefix: :schedule
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
 
-  validates :name, presence: true
+  validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
+  validate :unique_variable, on: %i[create update]
 
+  before_validation :set_default_variable
   after_commit :create_core_childs, on: :create
 
   def position_less_than
@@ -102,9 +104,10 @@ class Session < ApplicationRecord
     question_group_finish.questions.first
   end
 
-  def available_now
+  def available_now(participant_date = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
+    return true if schedule == 'days_after_date' && participant_date&.noon&.past?
 
     false
   end
@@ -144,5 +147,21 @@ class Session < ApplicationRecord
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/session'
+  end
+
+  def unique_variable
+    return unless ::Session.where.not(id: id).where(intervention: intervention).exists?(variable: variable)
+
+    errors.add(:variable, :already_exists)
+  end
+
+  def set_default_variable
+    return if variable.present?
+
+    default_variable = loop do
+      default_variable = "s#{rand(1..9999)}"
+      break default_variable unless ::Session.exists?(variable: default_variable, intervention: intervention)
+    end
+    self.variable = default_variable
   end
 end

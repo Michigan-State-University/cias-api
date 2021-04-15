@@ -22,7 +22,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     }
   end
   let!(:headers) { user.create_new_auth_token }
-  let!(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
+  let(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
@@ -42,7 +42,8 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
           'position' => intervention_2.sessions.size,
           'name' => session.name,
           'schedule' => session.schedule,
-          'schedule_payload' => session.schedule_payload
+          'schedule_payload' => session.schedule_payload,
+          'variable' => "duplicated_#{session.variable}_#{intervention_2.sessions.last&.position.to_i}"
         )
       end
 

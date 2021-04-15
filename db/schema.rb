@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_24_074521) do
+ActiveRecord::Schema.define(version: 2021_04_12_174158) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -75,6 +75,22 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
   end
 
+  create_table "google_tts_languages", force: :cascade do |t|
+    t.string "language_name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "google_tts_voices", force: :cascade do |t|
+    t.integer "google_tts_language_id"
+    t.string "voice_label"
+    t.string "voice_type"
+    t.string "language_code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["google_tts_language_id"], name: "index_google_tts_voices_on_google_tts_language_id"
+  end
+
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "user_id", null: false
@@ -104,6 +120,12 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.text "body", null: false
     t.string "status", default: "new", null: false
     t.datetime "schedule_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "organizations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -202,6 +224,10 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.integer "report_templates_count"
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
+    t.string "language_code", default: "en-US", null: false
+    t.string "voice_name", default: "en-US-Standard-C", null: false
+    t.string "variable"
+    t.string "days_after_date_variable_name"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"

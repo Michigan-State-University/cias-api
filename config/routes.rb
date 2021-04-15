@@ -123,6 +123,14 @@ Rails.application.routes.draw do
     end
 
     resources :generated_reports, only: :index
+
+    scope module: :google_tts do
+      resources :languages, only: :index do
+        resources :voices, only: :index
+      end
+    end
+
+    resources :organizations, controller: :organizations
   end
 
   if Rails.env.development?

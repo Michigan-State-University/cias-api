@@ -4,12 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
+  let(:intervention) { create(:intervention, user: user) }
   let(:session) do
     create(:session, :with_report_templates,
+           intervention: intervention,
            formula: { 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
            ] },
-           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
+           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
+           days_after_date_variable_name: 'var1')
   end
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
@@ -98,7 +101,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
 
     it 'has correct failure message' do
-      expect(json_response['message']).to eq("Couldn't find Session with 'id'=#{invalid_session_id}")
+      expect(json_response['message']).to include("Couldn't find Session with 'id'=#{invalid_session_id}")
     end
   end
 
@@ -114,19 +117,26 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let(:cloned_question_groups) { cloned_session.question_groups.order(:position) }
 
     let(:session_was) do
-      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'last_report_template_number', 'formula', 'settings')
+      session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count',
+                                'last_report_template_number', 'formula', 'settings', 'days_after_date_variable_name',
+                                'language_code', 'voice_name')
     end
 
     let(:session_cloned) do
-      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count', 'logo_url', 'formula', 'settings')
+      json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position',
+                                                 'sms_plans_count', 'logo_url', 'formula', 'settings', 'days_after_date_variable_name',
+                                                 'language_code', 'voice_name')
     end
+
+    let(:session_cloned_position) { intervention.sessions.order(:position).last.position + 1 }
 
     it 'has correct http code' do
       expect(response).to have_http_status(:created)
     end
 
-    it 'origin and outcome same' do
-      expect(session_was).to eq(session_cloned)
+    it 'origin and outcome same except variable' do
+      expect(session_was.except('variable')).to eq(session_cloned.except('variable'))
+      expect(session_cloned['variable']).to eq "cloned_#{session.variable}_#{session_cloned_position}"
     end
 
     it 'has correct position' do
@@ -139,6 +149,10 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
         'patterns' => []
       )
       expect(json_response['data']['attributes']['settings']['formula']).to eq(false)
+    end
+
+    it 'has cleared days_after_date_variable_name value' do
+      expect(json_response['data']['attributes']['days_after_date_variable_name']).to eq(nil)
     end
 
     it 'has correct number of sessions' do

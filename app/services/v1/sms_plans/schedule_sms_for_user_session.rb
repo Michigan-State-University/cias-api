@@ -70,7 +70,8 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def matched_variant(plan)
-    V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, user_session.all_var_values)
+    all_var_values = V1::UserInterventionService.new(user.id, session.intervention_id, user_session.id).var_values
+    V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, all_var_values)
   end
 
   def number_days

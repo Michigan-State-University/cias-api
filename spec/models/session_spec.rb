@@ -4,7 +4,10 @@ require 'rails_helper'
 
 RSpec.describe Session, type: :model do
   describe 'Session' do
-    subject { create(:session) }
+    subject { build(:session, variable: variable, intervention: intervention) }
+
+    let(:variable) { 'session_1' }
+    let(:intervention) { create(:intervention) }
 
     it { should belong_to(:intervention) }
     it { should have_many(:question_groups) }
@@ -29,7 +32,7 @@ RSpec.describe Session, type: :model do
       describe '#available_now' do
         let(:session) { create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
         let(:schedule) { 'after_fill' }
-        let(:schedule_at) { DateTime.now + 1.day }
+        let(:schedule_at) { DateTime.now.tomorrow }
         let(:schedule_payload) { 2 }
 
         context 'session schedule is after fill' do
@@ -43,6 +46,23 @@ RSpec.describe Session, type: :model do
 
           it 'returns false' do
             expect(session.available_now).to be(false)
+          end
+        end
+
+        context 'session schedule is days after date' do
+          let(:participant) { create(:user, :confirmed, :participant) }
+          let!(:user_session) { create(:user_session, user: participant, session_id: session.id) }
+          let!(:update_session) { session.days_after_date_variable_name = 'var1' }
+          let!(:answer) { create(:answer_date, user_session: user_session, body: { data: [{ var: 'var1', value: DateTime.now.tomorrow }] }) }
+          let!(:all_var_values) { user_session.all_var_values(include_session_var: false) }
+          let!(:calculated_date) do
+            all_var_values[session.days_after_date_variable_name].to_datetime + session.schedule_payload&.days
+          end
+
+          let(:schedule) { 'days_after_date' }
+
+          it 'returns false' do
+            expect(session.available_now(calculated_date)).to be(false)
           end
         end
 
@@ -134,6 +154,32 @@ RSpec.describe Session, type: :model do
 
         it 'returns correct session variables' do
           expect(session.session_variables).to eq ['a1']
+        end
+      end
+    end
+
+    context 'validations' do
+      context 'unique_variable' do
+        context 'when variable exists in other session of the same intervention' do
+          let!(:session_2) { create(:session, variable: variable, intervention: intervention) }
+
+          it 'invalidate' do
+            expect(subject.validate).to eq false
+          end
+        end
+
+        context 'when variable exists in other session, but in other intervention' do
+          let!(:session_2) { create(:session, variable: variable) }
+
+          it 'validate' do
+            expect(subject.validate).to eq true
+          end
+        end
+
+        context "when variable doesn't exist in other sessions" do
+          it 'validate' do
+            expect(subject.validate).to eq true
+          end
         end
       end
     end

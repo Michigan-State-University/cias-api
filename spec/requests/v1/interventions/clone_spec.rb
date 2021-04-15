@@ -129,7 +129,8 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           'patterns' => [
             { 'match' => '', 'target' => { 'id' => '', 'type' => 'Session' } }
           ]
-        }
+        },
+        'variable' => third_session.variable.to_s
       )
     end
   end

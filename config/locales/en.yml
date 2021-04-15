@@ -28,6 +28,10 @@ en:
               already_exists: already exists
         question_group:
           question: '%{question_type} can appear only once per session'
+        session:
+          attributes:
+            variable:
+              already_exists: already exists
       messages:
         undestroyable: Forbidden operation
   interventions:

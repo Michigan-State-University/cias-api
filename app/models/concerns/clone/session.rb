@@ -4,6 +4,7 @@ class Clone::Session < Clone::Base
   def execute
     outcome.position = position || outcome.intervention.sessions.size
     outcome.clear_formula if clean_formulas
+    outcome.days_after_date_variable_name = nil
     ActiveRecord::Base.transaction do
       create_question_groups
       outcome.save!

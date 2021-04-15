@@ -11,6 +11,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
     {
       session: {
         name: 'test1 params',
+        days_after_date_variable_name: 'var1',
         body: {
           payload: 1,
           target: '',
@@ -41,6 +42,16 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       end
 
       it { expect(response).to have_http_status(:success) }
+
+      it 'updated values are proper' do
+        expect(json_response['data']['attributes']).to include('name' => 'test1 params',
+                                                               'days_after_date_variable_name' => 'var1',
+                                                               'body' => {
+                                                                 'payload' => '1',
+                                                                 'target' => '',
+                                                                 'variable' => '1'
+                                                               })
+      end
     end
 
     context 'invalid' do

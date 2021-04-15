@@ -18,7 +18,7 @@ module Clone
       interventions
     else
       "Clone::#{de_constantize_modulize_name.classify}".
-        safe_constantize.new(self, clean_formulas: clean_formulas, position: position).execute
+        safe_constantize.new(self, clean_formulas: clean_formulas, position: position, params: params).execute
     end
   end
 end

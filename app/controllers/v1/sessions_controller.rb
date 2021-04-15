@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 class V1::SessionsController < V1Controller
-  include Resource::Clone
   include Resource::Position
 
-  authorize_resource only: %i[create update destroy]
+  authorize_resource only: %i[create update destroy clone]
 
   def index
     render json: serialized_response(sessions_scope)
@@ -34,6 +33,16 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(session), status: :created
   end
 
+  def clone
+    authorize! :update, Session
+
+    intervention = session_obj.intervention
+    position = intervention.sessions.order(:position).last.position + 1
+    params = { variable: "cloned_#{session_obj.variable}_#{position}" }
+    cloned_resource = Session.find(session_id).clone(params: params)
+    render json: serialized_response(cloned_resource), status: :created
+  end
+
   private
 
   def session_service
@@ -48,6 +57,10 @@ class V1::SessionsController < V1Controller
     params[:id]
   end
 
+  def session_obj
+    @session_obj ||= Session.accessible_by(current_ability).find(session_id)
+  end
+
   def intervention_id
     params[:intervention_id]
   end
@@ -57,6 +70,8 @@ class V1::SessionsController < V1Controller
   end
 
   def session_params
-    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :intervention_id, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable,
+                                    :intervention_id, :days_after_date_variable_name, narrator: {}, settings: {},
+                                                                                      formula: {}, body: {})
   end
 end

@@ -3,6 +3,7 @@
 FactoryBot.define do
   factory :session do
     sequence(:name) { |s| "session_#{s}" }
+    sequence(:variable) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
     association :intervention
 
@@ -30,6 +31,11 @@ FactoryBot.define do
     trait :exact_date do
       schedule { 'exact_date' }
       schedule_at { Date.current + 7 }
+    end
+
+    trait :days_after_date do
+      schedule { 'days_after_date' }
+      schedule_payload { 7 }
     end
   end
 end

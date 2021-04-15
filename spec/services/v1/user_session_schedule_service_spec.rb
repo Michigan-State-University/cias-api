@@ -78,6 +78,43 @@ RSpec.describe V1::UserSessionScheduleService do
                                                                      .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
         end
       end
+
+      context 'when session has schedule days_after_date' do
+        let(:schedule) { 'days_after_date' }
+        let(:tomorrow) { DateTime.now.tomorrow }
+
+        context 'when days_after_date_variable is given' do
+          let!(:update_second_session) { second_session.update(days_after_date_variable_name: 'days_after_date_variable') }
+          let!(:answer) do
+            create(:answer_date, user_session: user_session,
+                                 body: { data: [{ var: 'days_after_date_variable', 'value': tomorrow.to_s }] })
+          end
+
+          it 'calls correct method' do
+            expect_any_instance_of(described_class).to receive(:days_after_date_schedule)
+            described_class.new(user_session).schedule
+          end
+
+          it 'schedules on correct time' do
+            expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                         .with(second_session.id, user.id)
+                                                                         .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
+          end
+        end
+
+        context 'when days_after_date_variable is not given' do
+          let!(:answer) { create(:answer_date, user_session: user_session) }
+
+          it 'calls correct method' do
+            expect_any_instance_of(described_class).to receive(:days_after_date_schedule)
+            described_class.new(user_session).schedule
+          end
+
+          it 'does not schedule' do
+            expect(described_class.new(user_session).schedule).to eq(nil)
+          end
+        end
+      end
     end
 
     context 'session branching' do
