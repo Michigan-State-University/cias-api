@@ -19,6 +19,7 @@ require 'google/cloud/text_to_speech/v1/text_to_speech'
 require 'google/cloud/text_to_speech/v1/version'
 require 'faker'
 require 'active_storage_validations/matchers'
+require 'rake'
 
 class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   def audio_content
@@ -66,6 +67,15 @@ RSpec.configure do |config|
 
     allow(Google::Cloud::TextToSpeech).to receive(:text_to_speech).and_return(tts_instance)
     allow(tts_instance).to receive(:synthesize_speech).and_return(speech_response_instance)
+  end
+
+  config.before :suite do
+    DatabaseCleaner.strategy = :truncation, { except: %w[google_tts_voice google_tts_language] }
+    DatabaseCleaner.clean_with :truncation
+
+    language = GoogleTtsLanguage.create(language_name: 'English (United States)')
+    GoogleTtsVoice.create(id: 43, voice_label: 'Standard-female-1', voice_type: 'en-US-Standard-C', language_code: 'en-US', google_tts_language: language)
+    GoogleTtsVoice.create(id: 44, voice_label: 'Standard-female-2', voice_type: 'en-US-Standard-B', language_code: 'en-US', google_tts_language: language)
   end
   # The settings below are suggested to provide a good initial experience
   # with RSpec, but feel free to customize to your heart's content.

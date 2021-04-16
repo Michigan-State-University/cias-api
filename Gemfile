@@ -74,6 +74,7 @@ group :test do
   gem 'simplecov', require: false
   gem 'test-prof'
   gem 'timecop'
+  gem 'database_cleaner-active_record'
 end
 
 group :production do

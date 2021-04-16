@@ -39,21 +39,17 @@ module MetaOperations
     end
 
     def filename
-      @filename ||= begin
-        if options[:filename]
-          "#{options[:filename]}.#{options[:ext]}"
-        else
-          "#{timestamp}_#{add_to.name.parameterize.underscore[..12]}.#{options[:ext]}"
-        end
-      end
+      @filename ||= if options[:filename]
+                      "#{options[:filename]}.#{options[:ext]}"
+                    else
+                      "#{timestamp}_#{add_to.name.parameterize.underscore[..12]}.#{options[:ext]}"
+                    end
     end
 
     def tmp_file # rubocop:disable Lint/DuplicateMethods
-      @tmp_file ||= begin
-        File.open(Rails.root.join('tmp', filename), 'wb') do |file|
-          file.write(stream)
-          file.path
-        end
+      @tmp_file ||= File.open(Rails.root.join('tmp', filename), 'wb') do |file|
+        file.write(stream)
+        file.path
       end
     end
 

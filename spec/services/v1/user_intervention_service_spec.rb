@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::UserInterventionService do
-  subject{ described_class.new(user.id, intervention.id, user_session2.id) }
+  subject { described_class.new(user.id, intervention.id, user_session2.id) }
 
   describe '#var_values' do
     let(:user) { create(:user) }

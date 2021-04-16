@@ -34,7 +34,7 @@ RSpec.describe 'GET /v1/languages', type: :request do
       before { request }
 
       it 'returns proper collection size' do
-        expect(json_response['data'].size).to eq(3)
+        expect(json_response['data'].size).to eq(4)
       end
 
       it 'returns proper collection data' do

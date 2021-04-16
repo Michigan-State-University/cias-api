@@ -12,7 +12,7 @@ class V1::AudioService
 
   def execute
     digest = prepare_audio_digest
-    audio = Audio.find_by(sha256: digest, language: language_code, voice_type: voice_type)
+    audio = Audio.find_by(sha256: digest)
     audio&.increment!(:usage_counter) unless preview_audio
     audio = create_audio(digest) if audio.nil?
     audio.save
@@ -20,7 +20,7 @@ class V1::AudioService
   end
 
   def prepare_audio_digest
-    Digest::SHA256.hexdigest(text)
+    Digest::SHA256.hexdigest("#{text}_#{language_code}_#{voice_type}")
   end
 
   def create_audio(digest)

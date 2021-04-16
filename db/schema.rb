@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_12_174158) do
+ActiveRecord::Schema.define(version: 2021_04_15_143621) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -224,10 +224,10 @@ ActiveRecord::Schema.define(version: 2021_04_12_174158) do
     t.integer "report_templates_count"
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
-    t.string "language_code", default: "en-US", null: false
-    t.string "voice_name", default: "en-US-Standard-C", null: false
     t.string "variable"
     t.string "days_after_date_variable_name"
+    t.bigint "google_tts_voice_id", default: 43
+    t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
@@ -366,6 +366,7 @@ ActiveRecord::Schema.define(version: 2021_04_12_174158) do
   add_foreign_key "interventions", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
+  add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"

@@ -117,6 +117,10 @@ GEM
       sixarm_ruby_unaccent (~> 1.1)
       unicode_utils (~> 1.4)
     crass (1.0.6)
+    database_cleaner-active_record (2.0.0)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     deep_merge (1.2.1)
     dentaku (3.4.1)
     devise (4.7.3)
@@ -518,6 +522,7 @@ DEPENDENCIES
   config
   connection_pool
   countries
+  database_cleaner-active_record
   dentaku
   devise-argon2
   devise_invitable

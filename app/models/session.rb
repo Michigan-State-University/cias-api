@@ -7,6 +7,7 @@ class Session < ApplicationRecord
   include FormulaInterface
 
   belongs_to :intervention, inverse_of: :sessions, touch: true
+  belongs_to :google_tts_voice
 
   has_many :question_groups, dependent: :destroy, inverse_of: :session
   has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
@@ -40,6 +41,10 @@ class Session < ApplicationRecord
 
   before_validation :set_default_variable
   after_commit :create_core_childs, on: :create
+
+  after_update do
+    SessionJob::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
+  end
 
   def position_less_than
     @position_less_than ||= intervention.sessions.where(position: ...position).order(:position)
