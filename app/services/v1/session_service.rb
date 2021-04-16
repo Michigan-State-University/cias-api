@@ -20,6 +20,7 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
+    session.google_tts_voice_id = google_tts_voice_id if google_tts_voice_id.present?
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
@@ -46,5 +47,12 @@ class V1::SessionService
                        clean_formulas: true,
                        variable: new_variable,
                        position: new_position).execute
+  end
+
+  private
+
+  def google_tts_voice_id
+    ala = intervention.sessions
+    ala = intervention.sessions.order(:position)&.first&.google_tts_voice_id
   end
 end

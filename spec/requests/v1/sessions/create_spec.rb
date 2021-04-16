@@ -6,6 +6,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention) }
   let(:headers) { user.create_new_auth_token }
+  let(:language) { create(:google_tts_language) }
+  let(:first_voice) { create(:google_tts_voice, google_tts_language: language) }
+  let!(:session) { create(:session, intervention_id: intervention.id, google_tts_voice_id: first_voice.id) }
   let(:params) do
     {
       session: {
@@ -49,6 +52,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
       context 'when variable is missing' do
         it 'adding default value for variable' do
           expect(Session.last.variable).to eq 's1234'
+          expect(Session.last.google_tts_voice).to eq(first_voice)
         end
       end
     end
