@@ -72,7 +72,7 @@ module BlockHelper
       'type' => READ_QUESTION_BLOCK,
       'endPosition' => {
         'x' => 600,
-        'y' => 600
+        'y' => 550
       }
     }
   end
