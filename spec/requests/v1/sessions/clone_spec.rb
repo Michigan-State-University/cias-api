@@ -257,7 +257,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
         'type' => 'ReadQuestion',
         'action' => 'NO_ACTION',
         'animation' => 'rest',
-        'endPosition' => { 'x' => 600, 'y' => 600 }
+        'endPosition' => { 'x' => 600, 'y' => 550 }
       )
     end
 
