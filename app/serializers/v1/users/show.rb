@@ -21,7 +21,8 @@ class V1::Users::Show < BaseSerializer
       avatar_url: url_for_image(@user, :avatar),
       feedback_completed: @user.feedback_completed,
       email_notification: @user.email_notification,
-      sms_notification: @user.sms_notification
+      sms_notification: @user.sms_notification,
+      description: @user.description
     }
   end
 end

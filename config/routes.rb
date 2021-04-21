@@ -122,6 +122,14 @@ Rails.application.routes.draw do
       post 'clone', on: :member
     end
 
+    resources :organizations, controller: :organizations do
+      scope module: 'organizations' do
+        post 'invitations/invite_organization_admin', to: 'invitations#invite_organization_admin'
+        post 'invitations/invite_intervention_admin', to: 'invitations#invite_intervention_admin'
+      end
+    end
+    get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
+
     resources :generated_reports, only: :index
 
     scope module: :google_tts do

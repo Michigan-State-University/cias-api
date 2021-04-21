@@ -20,6 +20,7 @@ en:
           attributes:
             roles:
               team_id_is_required_for_team_admin: 'Team Admin must have a team'
+              organization_id_is_required_for_organization_admin: 'Organization Admin must have an organization'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
         team_invitation:
@@ -28,6 +29,10 @@ en:
               already_exists: already exists
         question_group:
           question: '%{question_type} can appear only once per session'
+        organization_invitation:
+          attributes:
+            user_id:
+              already_exists: already exists
         session:
           attributes:
             variable:
@@ -51,6 +56,17 @@ en:
       header:       '%{team_name} Invitation'
       body:         "You've been invited to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
+      button_text:  Accept the Invitation
+  organizations:
+    invitations:
+      accepted: "You've successfully joined organization %{organization_name}."
+      not_found: "Organization Invitation not found"
+  organization_mailer:
+    invite_user:
+      subject:      You've been invited to the Organization
+      header:       '%{organization_name} Invitation'
+      body:         "You've been invited to the %{organization_name}."
+      instruction:  'Click the link below to accept the invitation and join the organization.'
       button_text:  Accept the Invitation
   generated_report_mailer:
     new_report_available:

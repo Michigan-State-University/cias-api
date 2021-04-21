@@ -7,8 +7,15 @@ RSpec.describe 'GET /v1/organizations', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization_1) { create(:organization) }
-  let!(:organization_2) { create(:organization, name: 'Michigan Public Health') }
+  let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:organization_3) { create(:organization, name: 'Oregano Public Health') }
+
+  let(:roles) do
+    {
+      'organization_admin' => organization_2.organization_admins.first,
+      'e_intervention_admin' => organization_2.e_intervention_admins.first
+    }
+  end
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_organizations_path, headers: headers }
@@ -62,6 +69,32 @@ RSpec.describe 'GET /v1/organizations', type: :request do
 
     context 'when user is admin' do
       it_behaves_like 'permitted user'
+    end
+
+    context 'when user is' do
+      %w[organization_admin e_intervention_admin].each do |role|
+        context role.to_s do
+          let(:user) { roles[role] }
+
+          before { request }
+
+          it 'returns proper collection size' do
+            expect(json_response['data'].size).to eq(1)
+          end
+
+          it 'returns proper collection data' do
+            expect(json_response['data']).to include(
+              {
+                'id' => organization_2.id.to_s,
+                'type' => 'organization',
+                'attributes' => {
+                  'name' => organization_2.name
+                }
+              }
+            )
+          end
+        end
+      end
     end
   end
 

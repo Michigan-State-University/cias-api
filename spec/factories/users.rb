@@ -49,6 +49,24 @@ FactoryBot.define do
       end
     end
 
+    trait :organization_admin do
+      roles { %w[organization_admin] }
+    end
+
+    trait :with_organization do
+      after(:create, :build) do |organization_admin|
+        if organization_admin.role?('organization_admin')
+          new_organization = create(:organization)
+          new_organization.organization_admins << organization_admin
+          organization_admin.organization = new_organization
+        end
+      end
+    end
+
+    trait :e_intervention_admin do
+      roles { %w[e_intervention_admin] }
+    end
+
     trait :preview_session do
       roles { %w[preview_session] }
       after(:build) do |user, evaluator|

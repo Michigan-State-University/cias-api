@@ -77,6 +77,7 @@ class V1::FlowService
     blocks = question.narrator['blocks']
     blocks.map do |block|
       next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
+
       name_audio_url = ''
       name_audio_url = user_session.name_audio.url unless user_session.name_audio.nil?
 

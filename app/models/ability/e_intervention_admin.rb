@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-class Ability::Researcher < Ability::Base
+class Ability::EInterventionAdmin < Ability::Base
   def definition
     super
-    researcher if role?(class_name)
+    e_intervention_admin if role?(class_name)
   end
 
   private
 
-  def researcher
+  def e_intervention_admin
     can %i[update active], User, id: participants_with_answers(user)
     can %i[read list_researchers], User, id: participants_and_researchers(user)
     can :create, :preview_session_user
@@ -33,5 +33,8 @@ class Ability::Researcher < Ability::Base
         user_session: { session: { intervention: { user_id: user.id } } }
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
+    can :manage, Organization, e_intervention_admins: { id: user.id }
+    can :invite_organization_admin, Organization, e_intervention_admins: { id: user.id }
+    can :confirm_organization_membership, OrganizationInvitation, user_id: user.id
   end
 end

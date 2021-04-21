@@ -4,13 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/organizations', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
+  let(:new_organization_admin) { create(:user, :confirmed, :e_intervention_admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      intervention: {
-        name: 'New Organization'
+      organization: {
+        name: 'New Organization',
+        organization_admin_id: new_organization_admin.id
       }
     }
   end
@@ -67,6 +69,12 @@ RSpec.describe 'POST /v1/organizations', type: :request do
         end
       end
     end
+
+    context 'when user is e_intervention admin' do
+      let(:user) { create(:user, :confirmed, :e_intervention_admin) }
+
+      it_behaves_like 'permitted user'
+    end
   end
 
   context 'when user is not permitted' do
@@ -78,7 +86,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       end
     end
 
-    %i[team_admin researcher participant guest].each do |role|
+    %i[organization_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

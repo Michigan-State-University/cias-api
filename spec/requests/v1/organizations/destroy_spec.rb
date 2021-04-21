@@ -6,7 +6,7 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, name: 'Michigan Public Health') }
+  let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_organization_path(organization.id), headers: headers }
@@ -49,6 +49,12 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
         end
       end
     end
+
+    context 'when user is e-intervention admin' do
+      let(:user) { organization.e_intervention_admins.first }
+
+      it_behaves_like 'permitted user'
+    end
   end
 
   context 'when user is not permitted' do
@@ -60,7 +66,7 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
       end
     end
 
-    %i[team_admin researcher participant guest].each do |role|
+    %i[organization_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

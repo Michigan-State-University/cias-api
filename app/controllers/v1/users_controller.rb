@@ -27,6 +27,7 @@ class V1::UsersController < V1Controller
     user = user_service.user_load(user_id)
     user.update!(user_params)
     invalidate_cache(user)
+
     render_json user: user, action: :show
   end
 
@@ -97,6 +98,7 @@ class V1::UsersController < V1Controller
         :time_zone,
         :active,
         :feedback_completed,
+        :description,
         roles: [],
         phone_attributes: %i[iso prefix number]
       )

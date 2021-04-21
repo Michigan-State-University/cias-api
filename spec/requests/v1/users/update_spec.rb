@@ -10,7 +10,8 @@ describe 'PATCH /v1/users/:id', type: :request do
       user: {
         first_name: 'John',
         last_name: 'Kowalski',
-        sms_notification: false
+        sms_notification: false,
+        description: 'Some details about user'
       }
     }
   end
@@ -31,7 +32,8 @@ describe 'PATCH /v1/users/:id', type: :request do
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => current_user.email,
-          'avatar_url' => nil
+          'avatar_url' => nil,
+          'description' => 'Some details about user'
         )
       end
 
@@ -39,7 +41,8 @@ describe 'PATCH /v1/users/:id', type: :request do
         expect(current_user.reload.attributes).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
-          'sms_notification' => false
+          'sms_notification' => false,
+          'description' => 'Some details about user'
         )
       end
 

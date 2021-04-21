@@ -40,6 +40,28 @@ describe User, type: :model do
     end
   end
 
+  describe 'organization_is_present?' do
+    context 'user has role organization admin' do
+      context 'organization admin has not assigned organization' do
+        let(:user) { build_stubbed(:user, :organization_admin) }
+
+        it 'is not valid' do
+          expect(user).to be_valid
+          expect(user.organization).to be(nil)
+        end
+      end
+
+      context 'organization admin has assigned organization' do
+        let(:user) { build(:user, :organization_admin, :with_organization) }
+
+        it 'is valid' do
+          expect(user).to be_valid
+          expect(user.organization).not_to be(nil)
+        end
+      end
+    end
+  end
+
   describe '#time_zone' do
     %w[America/New_York Europe/Warsaw Europe/Vienna America/Chicago America/Denver
        America/Detroit].each do |time_zone|

@@ -6,13 +6,18 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, name: 'Michigan Public Health') }
+  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:new_organization_admin) { create(:user, :confirmed, :organization_admin) }
+  let!(:organization_admin_to_remove) { organization.organization_admins.first }
+  let(:admins_ids) { organization.reload.organization_admins.pluck(:id) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      intervention: {
-        name: 'Oregano Public Health'
+      organization: {
+        name: 'Oregano Public Health',
+        organization_admins_to_remove: [organization_admin_to_remove.id],
+        organization_admins_to_add: [new_organization_admin.id]
       }
     }
   end
@@ -51,7 +56,9 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
     end
 
     context 'when user is admin' do
-      it_behaves_like 'permitted user'
+      context 'when params are proper' do
+        it_behaves_like 'permitted user'
+      end
 
       context 'when params are invalid' do
         let(:params) do
@@ -68,6 +75,12 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
           end
         end
       end
+    end
+
+    context 'when user is e_intervention admin' do
+      let(:user) { organization.e_intervention_admins.first }
+
+      it_behaves_like 'permitted user'
     end
   end
 

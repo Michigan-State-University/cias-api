@@ -14,7 +14,6 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -91,6 +90,22 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.index ["google_tts_language_id"], name: "index_google_tts_voices_on_google_tts_language_id"
   end
 
+  create_table "health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.uuid "health_system_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
+  end
+
+  create_table "health_systems", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.uuid "organization_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_health_systems_on_organization_id"
+  end
+
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "user_id", null: false
@@ -124,8 +139,20 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "organization_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["invitation_token"], name: "index_organization_invitations_on_invitation_token"
+    t.index ["organization_id"], name: "index_organization_invitations_on_organization_id"
+    t.index ["user_id"], name: "index_organization_invitations_on_user_id"
+  end
+
   create_table "organizations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "name"
+    t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -207,6 +234,13 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"
+  end
+
+  create_table "reporting_dashboards", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "organization_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_reporting_dashboards_on_organization_id"
   end
 
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -346,11 +380,14 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.uuid "preview_session_id"
     t.boolean "email_notification", default: true, null: false
     t.boolean "feedback_completed", default: false, null: false
+    t.string "description", default: ""
+    t.uuid "organization_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
+    t.index ["organization_id"], name: "index_users_on_organization_id"
     t.index ["preview_session_id"], name: "index_users_on_preview_session_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
