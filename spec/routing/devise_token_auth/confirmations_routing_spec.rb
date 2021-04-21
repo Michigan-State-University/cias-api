@@ -5,15 +5,15 @@ require 'rails_helper'
 RSpec.describe DeviseTokenAuth::ConfirmationsController, type: :routing do
   describe 'routing' do
     it 'routes to #new' do
-      expect(get: '/v1/auth/confirmation/new').to route_to('v1/auth_controller/confirmations#new')
+      expect(get: '/v1/auth/confirmation/new').to route_to('v1/auth/confirmations#new')
     end
 
     it 'routes to #show' do
-      expect(get: '/v1/auth/confirmation').to route_to('v1/auth_controller/confirmations#show')
+      expect(get: '/v1/auth/confirmation').to route_to('v1/auth/confirmations#show')
     end
 
     it 'routes to #create' do
-      expect(post: '/v1/auth/confirmation').to route_to('v1/auth_controller/confirmations#create')
+      expect(post: '/v1/auth/confirmation').to route_to('v1/auth/confirmations#create')
     end
   end
 end

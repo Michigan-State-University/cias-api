@@ -6,6 +6,7 @@ class ActiveStorage::BlobsController < ActiveStorage::BaseController
   include DeviseTokenAuth::Concerns::SetUserByToken
   include ActiveStorage::SetBlob
   include ExceptionHandler
+  include Log
 
   def show
     return head :no_content unless user_authenticated?

@@ -2,6 +2,7 @@
 
 class V1::Auth::PasswordsController < DeviseTokenAuth::PasswordsController
   include Resource
+  include Log
   prepend Auth::Default
 
   protected

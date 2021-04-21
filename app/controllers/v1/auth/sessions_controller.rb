@@ -3,6 +3,7 @@
 class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
   include Resource
   prepend Auth::Default
+  include Log
 
   private
 

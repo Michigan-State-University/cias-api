@@ -7,10 +7,10 @@ Rails.application.routes.draw do
 
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
-      confirmations: 'v1/auth_controller/confirmations',
+      confirmations: 'v1/auth/confirmations',
       invitations: 'v1/users/invitations',
       passwords: 'v1/auth/passwords',
-      registrations: 'v1/auth_controller/registrations',
+      registrations: 'v1/auth/registrations',
       sessions: 'v1/auth/sessions'
     }
 

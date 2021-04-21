@@ -3,7 +3,6 @@
 class V1Controller < ApplicationController
   include DeviseTokenAuth::Concerns::SetUserByToken
   include ExceptionHandler
-  include Log
   include Pagination
   include Resource
 

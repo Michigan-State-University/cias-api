@@ -2,6 +2,7 @@
 
 class ApplicationController < ActionController::API
   before_action :user_params, if: :devise_controller?
+  include Log
 
   protected
 
