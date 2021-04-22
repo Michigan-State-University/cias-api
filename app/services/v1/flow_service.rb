@@ -51,8 +51,9 @@ class V1::FlowService
   end
 
   def branching_source_to_question(source)
-    branching_type = source['target']['type']
-    question_or_session = branching_type.safe_constantize.find_by(id: source['target']['id'])
+    source = randomizer(source['target'])
+    branching_type = source['type']
+    question_or_session = branching_type.safe_constantize.find_by(id: source['id'])
     if question_or_session.nil?
       self.warning = NO_BRANCHING_TARGET
       return nil
@@ -73,10 +74,23 @@ class V1::FlowService
     user_session.session.finish_screen
   end
 
+  def randomizer(sources)
+    return sources.first if sources.first['probability'].nil?
+
+    probability = rand(100)
+    current_question_probability = 0
+
+    sources.each do |s|
+      current_question_probability += s['probability'].to_i
+      return s if probability < current_question_probability
+    end
+  end
+
   def swap_name_mp3(question)
     blocks = question.narrator['blocks']
     blocks.map do |block|
       next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
+
       name_audio_url = ''
       name_audio_url = user_session.name_audio.url unless user_session.name_audio.nil?
 

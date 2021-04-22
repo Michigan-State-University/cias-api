@@ -15,15 +15,22 @@
               "type": "string"
             },
             "target": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string"
-                },
-                "id": {
-                  "type": "string"
+              "type": "array",
+              "items": [
+                {
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "probability": {
+                      "type": "string"
+                    }
+                  }
                 }
-              },
+              ],
               "required": [
                 "type",
                 "id"

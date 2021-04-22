@@ -11,7 +11,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
   let!(:question_ids) do
     create_list(:question_single, 3, :narrator_block_one, title: 'Question Id Title', question_group: question_group,
                                                           formula: { 'payload' => 'var + 4', 'patterns' => [
-                                                            { 'match' => '=3', 'target' => { 'id' => other_session.id, type: 'Session' } }
+                                                            { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
                                                           ] })
   end
   let!(:other_question_ids) { create_list(:question_free_response, 2, title: 'Other question Id Title', question_group: other_question_group) }

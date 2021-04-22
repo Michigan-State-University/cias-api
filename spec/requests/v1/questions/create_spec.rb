@@ -19,17 +19,19 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
           patterns: [
             {
               match: '= 5',
-              target: {
+              target: [{
                 type: 'Session',
+                probability: '100',
                 id: ''
-              }
+              }]
             },
             {
               match: '> 5',
-              target: {
+              target: [{
                 type: 'Question',
+                probability: '100',
                 id: ''
-              }
+              }]
             }
           ]
         },
@@ -97,11 +99,12 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     before { request }
 
     it 'has correct formula size' do
+      p json_response
       expect(json_response['data']['attributes']['formula']['patterns'].size).to eq(2)
     end
 
     it 'has correct patterns data' do
-      expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => { 'id' => '', 'type' => 'Question' })
+      expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => [{ 'id' => '', 'probability' => '100', 'type' => 'Question' }])
     end
 
     it 'has correct body data size' do
