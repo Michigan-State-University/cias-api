@@ -11,7 +11,6 @@ class V1::Users::Verifications::Create
   end
 
   def call
-    return unless user
     return if user.verification_code.present? && !code_expired? && verification_code_from_cookies.present?
 
     user.update!(verification_code: verification_code, verification_code_created_at: Time.current)

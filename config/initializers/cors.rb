@@ -8,10 +8,12 @@
 # Read more: https://github.com/cyu/rack-cors
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
+  binding.pry
   allow do
-    origins '*'
+    origins ENV['WEB_URL']
     resource '*',
              headers: :any,
+             credentials: true,
              expose: %w[Access-Token Expiry Token-Type Uid Client],
              methods: %i[delete get options patch post put]
   end

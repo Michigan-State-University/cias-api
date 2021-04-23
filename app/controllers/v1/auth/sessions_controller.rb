@@ -8,6 +8,8 @@ class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
   include Log
 
   def verify_login_code
+    return unless @resource && @resource.valid_password?(resource_params[:password])
+
     head :forbidden if V1::Users::Verifications::Create.call(@resource, request.cookies['verification_code'])
   end
 

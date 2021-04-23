@@ -11,6 +11,7 @@ FactoryBot.define do
     time_zone { 'Europe/Warsaw' }
     sequence(:verification_code) { |s| "verification_code_#{s}" }
     verification_code_created_at { Time.current }
+    confirmed_verification { true }
 
     transient do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }

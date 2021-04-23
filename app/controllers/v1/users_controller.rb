@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::UsersController < V1Controller
+  skip_before_action :authenticate_user!, only: %i[confirm_logging_code]
+
   def index
     authorize! :index, current_v1_user
 
@@ -59,6 +61,16 @@ class V1::UsersController < V1Controller
 
     phone.confirm!
     head :ok
+  end
+
+  def confirm_logging_code
+    code = params[:verification_code]
+    code = V1::Users::Verifications::Confirm.call(code)
+    if code.present?
+      render json: { verification_code: code }, status: :ok
+    else
+      head :request_timeout
+    end
   end
 
   private

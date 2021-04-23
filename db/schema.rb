@@ -13,7 +13,6 @@
 ActiveRecord::Schema.define(version: 2021_04_15_143621) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -382,6 +381,7 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.boolean "feedback_completed", default: false, null: false
     t.string "verification_code"
     t.datetime "verification_code_created_at"
+    t.boolean "confirmed_verification", default: false, null: false
     t.string "description", default: ""
     t.uuid "organization_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
