@@ -1,9 +1,15 @@
 # frozen_string_literal: true
 
 class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
+  after_action :verify_login_code, only: :create
+
   include Resource
   prepend Auth::Default
   include Log
+
+  def verify_login_code
+    head :forbidden if V1::Users::Verifications::Create.call(@resource, request.cookies['verification_code'])
+  end
 
   private
 
