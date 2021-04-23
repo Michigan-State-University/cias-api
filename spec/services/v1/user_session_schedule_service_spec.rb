@@ -138,6 +138,7 @@ RSpec.describe V1::UserSessionScheduleService do
                 match: '=2',
                 target: [{
                   id: second_session.id,
+                  probability: '100',
                   type: 'Session'
                 }]
               },
@@ -208,6 +209,7 @@ RSpec.describe V1::UserSessionScheduleService do
                   match: '=2',
                   target: [{
                     id: second_session.id,
+                    probability: '100',
                     type: 'Session'
                   }]
                 },
@@ -215,6 +217,7 @@ RSpec.describe V1::UserSessionScheduleService do
                              match: '=3',
                              target: [{
                                id: third_session.id,
+                               probability: '100',
                                type: 'Session'
                              }]
                            }]
