@@ -206,17 +206,17 @@ RSpec.describe V1::UserSessionScheduleService do
                 payload: 'test',
                 patterns: [{
                   match: '=2',
-                  target: {
+                  target: [{
                     id: second_session.id,
                     type: 'Session'
-                  }
+                  }]
                 },
                            {
                              match: '=3',
-                             target: {
+                             target: [{
                                id: third_session.id,
                                type: 'Session'
-                             }
+                             }]
                            }]
               }
             end

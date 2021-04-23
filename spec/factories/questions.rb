@@ -331,7 +331,7 @@ FactoryBot.define do
               target: [{
                 id: '',
                 type: 'Session'
-              } ]}
+              }] }
           ]
         }
       end

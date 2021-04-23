@@ -182,7 +182,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'formula' => {
             'payload' => 'var + 3',
             'patterns' => [
-              { 'match' => '=7', 'target' => [{ 'id' => cloned_questions_collection.second.id, 'probability' => '100', 'type' => 'Question::Single' }] }
+              { 'match' => '=7', 'target' => [{ 'id' => cloned_questions_collection.second.id, 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
           }
         ),
@@ -195,7 +195,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'formula' => {
             'payload' => 'var + 4',
             'patterns' => [
-              { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'probability' => '100', 'type' => 'Session' }] }
+              { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'type' => 'Session', 'probability' => '100' }] }
             ]
           }
         ),
@@ -208,7 +208,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'formula' => {
             'payload' => 'var + 2',
             'patterns' => [
-              { 'match' => '=4', 'target' => [{ 'id' => cloned_questions_collection.fourth.id, 'probability' => '100', 'type' => 'Question::Single' }] }
+              { 'match' => '=4', 'target' => [{ 'id' => cloned_questions_collection.fourth.id, 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
           }
         ),
@@ -221,7 +221,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'formula' => {
             'payload' => 'var + 7',
             'patterns' => [
-              { 'match' => '=11', 'target' => [{ 'id' => cloned_questions_collection.first.id, 'probability' => '100', 'type' => 'Question::Single' }] }
+              { 'match' => '=11', 'target' => [{ 'id' => cloned_questions_collection.first.id, 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
           }
         ),
@@ -253,7 +253,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           'formula' => {
             'payload' => '',
             'patterns' => [
-              { 'match' => '', 'target' => { 'id' => '', 'type' => 'Question::Single' } }
+              { 'match' => '', 'target' => [{ 'id' => '', 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
           }
         ),

@@ -37,7 +37,6 @@ RSpec.describe 'GET  /v1/languages/:language_id/voices', type: :request do
       end
 
       it 'returns proper collection data' do
-        p json_response
         expect(json_response['data'][0]).to include(
           {
             'id' => first_voice.id.to_s,

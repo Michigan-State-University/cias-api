@@ -32,7 +32,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => [{ 'id' => questions[2].id, 'probability' => '100', 'type' => 'Question' }]
+                                 'target' => [
+                                   { 'id' => questions[2].id, 'probability' => '50', 'type' => 'Question' },
+                                   { 'id' => questions[3].id, 'probability' => '50', 'type' => 'Question' }
+                                 ]
                                }
                              ] }
         question.save
@@ -40,7 +43,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       end
 
       it 'returns branched question id' do
-        expect(json_response['data']['id']).to eq questions[2].id
+        expect([questions[2].id, questions[3].id]).to include(json_response['data']['id'])
       end
     end
 

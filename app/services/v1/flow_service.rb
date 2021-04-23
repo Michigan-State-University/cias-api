@@ -51,7 +51,7 @@ class V1::FlowService
   end
 
   def branching_source_to_question(source)
-    source = randomizer(source['target'])
+    source = V1::RandomizationService.new(source['target']).execute
     branching_type = source['type']
     question_or_session = branching_type.safe_constantize.find_by(id: source['id'])
     if question_or_session.nil?
@@ -72,18 +72,6 @@ class V1::FlowService
     end
 
     user_session.session.finish_screen
-  end
-
-  def randomizer(sources)
-    return sources.first if sources.first['probability'].nil?
-
-    probability = rand(100)
-    current_question_probability = 0
-
-    sources.each do |s|
-      current_question_probability += s['probability'].to_i
-      return s if probability < current_question_probability
-    end
   end
 
   def swap_name_mp3(question)

@@ -99,7 +99,6 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     before { request }
 
     it 'has correct formula size' do
-      p json_response
       expect(json_response['data']['attributes']['formula']['patterns'].size).to eq(2)
     end
 
