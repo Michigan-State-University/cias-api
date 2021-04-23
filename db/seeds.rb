@@ -23,7 +23,10 @@ class SummonUsers
           last_name: Faker::GreekPhilosophers.name,
           email: "#{role}@#{ENV['DOMAIN_NAME']}",
           password: passwords_harvester[index],
-          roles: [role]
+          roles: [role],
+          confirmed_verification: true,
+          verification_code: SecureRandom.base64(6),
+          verification_code_created_at: Time.current
         )
         u.confirm
         u.save
