@@ -13,9 +13,9 @@ class V1::RandomizationService
     probability = rand(100)
     current_question_probability = 0
 
-    target_array.each do |s|
-      current_question_probability += s['probability'].to_i
-      return s if probability < current_question_probability
+    target_array.each do |target|
+      current_question_probability += target['probability'].to_i
+      return target if probability < current_question_probability
     end
   end
 end
