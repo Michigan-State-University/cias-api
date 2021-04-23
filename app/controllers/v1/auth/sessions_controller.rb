@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
-  after_action :verify_login_code, only: :create
+  # after_action :verify_login_code, only: :create
 
   include Resource
   prepend Auth::Default
