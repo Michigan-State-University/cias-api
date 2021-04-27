@@ -42,7 +42,7 @@ class Session < ApplicationRecord
   before_validation :set_default_variable
   after_commit :create_core_childs, on: :create
 
-  after_update do
+  after_update_commit do
     SessionJob::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
   end
 
