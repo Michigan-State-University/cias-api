@@ -15,7 +15,11 @@ class V1::Organizations::Create
         name: organization_params[:name]
       )
 
-      add_new_organization_admin(organization) if new_organization_admin
+      V1::Organizations::ChangeOrganizationAdmins.call(
+        organization,
+        organization_params[:organization_admins_to_add],
+        nil
+      )
 
       organization
     end
@@ -24,16 +28,4 @@ class V1::Organizations::Create
   private
 
   attr_reader :organization_params
-
-  def add_new_organization_admin(organization)
-    organization.organization_admins << new_organization_admin
-    new_organization_admin.organization = organization
-
-    OrganizationInvitation.not_accepted.where(user_id: new_organization_admin.id).destroy_all
-  end
-
-  def new_organization_admin
-    @new_organization_admin ||= User.limit_to_roles(%w[organization_admin])
-                            .find_by(id: organization_params[:organization_admin_id])
-  end
 end

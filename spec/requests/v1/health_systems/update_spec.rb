@@ -2,25 +2,31 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/organizations', type: :request do
+RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:new_organization_admin) { create(:user, :confirmed, :e_intervention_admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
+
+  let!(:organization) { create(:organization, :with_e_intervention_admin) }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization) }
+  let!(:new_health_system_admin) { create(:user, :confirmed, :health_system_admin) }
+  let!(:health_system_admin_to_remove) { health_system.health_system_admins.first }
+  let(:admins_ids) { health_system.reload.health_system_admins.pluck(:id) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      organization: {
-        name: 'New Organization',
-        organization_admins_to_add: [new_organization_admin.id.to_s]
+      health_system: {
+        name: 'Health System 50',
+        organization_admins_to_remove: [health_system_admin_to_remove.id],
+        organization_admins_to_add: [new_health_system_admin.id]
       }
     }
   end
-  let(:request) { post v1_organizations_path, params: params, headers: headers }
+  let(:request) { patch v1_health_system_path(health_system.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { post v1_organizations_path }
+      let(:request) { patch v1_health_system_path(health_system.id) }
 
       it_behaves_like 'unauthorized user'
     end
@@ -35,15 +41,15 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       before { request }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:ok)
       end
 
       it 'returns proper data' do
         expect(json_response['data']).to include(
           {
-            'type' => 'organization',
+            'type' => 'health_system',
             'attributes' => {
-              'name' => 'New Organization'
+              'name' => 'Health System 50'
             }
           }
         )
@@ -51,12 +57,14 @@ RSpec.describe 'POST /v1/organizations', type: :request do
     end
 
     context 'when user is admin' do
-      it_behaves_like 'permitted user'
+      context 'when params are proper' do
+        it_behaves_like 'permitted user'
+      end
 
       context 'when params are invalid' do
         let(:params) do
           {
-            organization: {
+            health_system: {
               name: ''
             }
           }
@@ -71,7 +79,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
     end
 
     context 'when user is e_intervention admin' do
-      let(:user) { create(:user, :confirmed, :e_intervention_admin) }
+      let(:user) { organization.e_intervention_admins.first }
 
       it_behaves_like 'permitted user'
     end
@@ -86,7 +94,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       end
     end
 
-    %i[organization_admin team_admin researcher participant guest].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

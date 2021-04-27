@@ -30,7 +30,7 @@ class V1::Organizations::ChangeOrganizationAdmins
 
       organization_admin_to_add = organization_admin(organization_admin_id)
       organization_admin_to_add.activate!
-      organization_admin_to_add.organization = organization
+      organization_admin_to_add.organizable = organization
       organization_admin_to_add.save!
 
       OrganizationInvitation.not_accepted.where(user_id: organization_admin_id).destroy_all
@@ -45,7 +45,7 @@ class V1::Organizations::ChangeOrganizationAdmins
 
       organization_admin_to_remove = organization_admin(organization_admin_id)
       organization_admin_to_remove.deactivate!
-      organization_admin_to_remove.organization = nil
+      organization_admin_to_remove.organizable = nil
       organization_admin_to_remove.save!
     end
   end

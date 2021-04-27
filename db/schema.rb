@@ -392,11 +392,11 @@ ActiveRecord::Schema.define(version: 2021_04_22_091757) do
     t.uuid "preview_session_id"
     t.boolean "email_notification", default: true, null: false
     t.boolean "feedback_completed", default: false, null: false
+    t.string "description", default: ""
     t.string "verification_code"
     t.datetime "verification_code_created_at"
-    t.boolean "confirmed_verification", default: false, null: false
-    t.string "description", default: ""
     t.uuid "organizable_id"
+    t.boolean "confirmed_verification", default: false, null: false
     t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true

@@ -2,25 +2,28 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/organizations', type: :request do
+RSpec.describe 'POST /v1/health_systems', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:new_organization_admin) { create(:user, :confirmed, :e_intervention_admin) }
+  let(:new_health_system_admin) { create(:user, :confirmed, :health_system_admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
+
+  let!(:organization) { create(:organization, :with_e_intervention_admin) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      organization: {
-        name: 'New Organization',
-        organization_admins_to_add: [new_organization_admin.id.to_s]
+      health_system: {
+        name: 'New Health System',
+        organization_id: organization.id,
+        health_system_admins_to_add: [new_health_system_admin.id.to_s]
       }
     }
   end
-  let(:request) { post v1_organizations_path, params: params, headers: headers }
+  let(:request) { post v1_health_systems_path, params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { post v1_organizations_path }
+      let(:request) { post v1_health_systems_path }
 
       it_behaves_like 'unauthorized user'
     end
@@ -41,9 +44,9 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       it 'returns proper data' do
         expect(json_response['data']).to include(
           {
-            'type' => 'organization',
+            'type' => 'health_system',
             'attributes' => {
-              'name' => 'New Organization'
+              'name' => 'New Health System'
             }
           }
         )
@@ -56,7 +59,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       context 'when params are invalid' do
         let(:params) do
           {
-            organization: {
+            health_system: {
               name: ''
             }
           }
@@ -86,7 +89,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       end
     end
 
-    %i[organization_admin team_admin researcher participant guest].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
