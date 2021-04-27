@@ -11,7 +11,7 @@ RSpec.describe Organization, type: :model do
 
   describe '#name' do
     context 'name is unique' do
-      let(:organization) { build(:organization) }
+      let(:organization) { build(:organization, :with_organization_admin) }
 
       it 'organization is valid' do
         expect(organization).to be_valid

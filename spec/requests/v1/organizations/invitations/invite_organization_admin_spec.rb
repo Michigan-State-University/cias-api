@@ -41,6 +41,7 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
               expect(new_organization_admin).to have_attributes(
                 email: params[:email],
                 confirmed_at: nil,
+                organizable_id: organization.id,
                 roles: ['organization_admin']
               )
 
@@ -58,10 +59,11 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
             end
 
             it 'creates invitation for the existing organization admin' do
-              expect(OrganizationMailer).to receive(:invite_user).with(
+              expect(OrganizableMailer).to receive(:invite_user).with(
                 email: organization_admin.email,
-                organization: organization,
-                invitation_token: token
+                organizable: organization,
+                invitation_token: token,
+                organizable_type: 'Organization'
               ).and_return(double(deliver_later: nil))
 
               expect { request }.to change(OrganizationInvitation, :count).by(1).and \
@@ -83,7 +85,7 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
             end
 
             it 'does not invite organiztaion admin once again' do
-              expect(OrganizationMailer).not_to receive(:invite_user)
+              expect(OrganizableMailer).not_to receive(:invite_user)
 
               expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
                 avoid_changing(User, :count).and \
@@ -96,7 +98,7 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
             let(:params) { { email: not_confirmed_organization_admin.email } }
 
             it 'not invite organization admin with not confirmed account' do
-              expect(OrganizationMailer).not_to receive(:invite_user)
+              expect(OrganizableMailer).not_to receive(:invite_user)
 
               expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
                 avoid_changing(User, :count).and \
@@ -112,7 +114,7 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
             end
 
             it 'organization admin shouldn\'t be invited' do
-              expect(OrganizationMailer).not_to receive(:invite_user)
+              expect(OrganizableMailer).not_to receive(:invite_user)
 
               expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
                 avoid_changing(User, :count).and \
@@ -129,7 +131,7 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
               end
 
               it 'organization_admin shouldn\'t be invited again' do
-                expect(OrganizationMailer).not_to receive(:invite_user)
+                expect(OrganizableMailer).not_to receive(:invite_user)
 
                 expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
                   avoid_changing(User, :count).and \
@@ -151,10 +153,11 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
               end
 
               it 'creates invitation for the existing organization_admin' do
-                expect(OrganizationMailer).to receive(:invite_user).with(
+                expect(OrganizableMailer).to receive(:invite_user).with(
                   email: organization_admin.email,
-                  organization: organization,
-                  invitation_token: token
+                  organizable: organization,
+                  invitation_token: token,
+                  organizable_type: 'Organization'
                 ).and_return(double(deliver_later: nil))
 
                 expect { request }.to change(OrganizationInvitation, :count).by(1).and \

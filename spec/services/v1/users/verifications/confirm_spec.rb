@@ -6,7 +6,6 @@ RSpec.describe V1::Users::Verifications::Confirm do
   let(:current_time) { Time.zone.local(2020, 2, 2, 12, 12) }
   let(:verification_code) { '1234' }
 
-
   before do
     Timecop.freeze(current_time)
   end

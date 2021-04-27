@@ -29,11 +29,11 @@ class V1::Organizations::InvitationsController < V1Controller
     V1::Organizations::Invitations::Confirm.call(organization_invitation)
 
     redirect_to_web_app(
-      success: I18n.t('organizations.invitations.accepted', organization_name: organization_invitation.organization.name)
+      success: I18n.t('organizables.invitations.accepted', organizable_type: 'Organization', organizable_name: organization_invitation.organization.name)
     )
   rescue ActiveRecord::RecordNotFound
     redirect_to_web_app(
-      error: I18n.t('organizations.invitations.not_found')
+      error: I18n.t('organizables.invitations.not_found', organizable_type: 'Organization')
     )
   end
 

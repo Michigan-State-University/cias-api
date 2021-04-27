@@ -33,6 +33,10 @@ en:
           attributes:
             user_id:
               already_exists: already exists
+        health_system_invitation:
+          attributes:
+            user_id:
+              already_exists: already exists
         session:
           attributes:
             variable:
@@ -57,16 +61,16 @@ en:
       body:         "You've been invited to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
       button_text:  Accept the Invitation
-  organizations:
+  organizables:
     invitations:
-      accepted: "You've successfully joined organization %{organization_name}."
-      not_found: "Organization Invitation not found"
-  organization_mailer:
+      accepted: "You've successfully joined %{organizable_type} %{organizable_name}."
+      not_found: "%{organizable_type} Invitation not found"
+  organizable_mailer:
     invite_user:
-      subject:      You've been invited to the Organization
+      subject:      You've been invited to the %{organization_type}
       header:       '%{organization_name} Invitation'
       body:         "You've been invited to the %{organization_name}."
-      instruction:  'Click the link below to accept the invitation and join the organization.'
+      instruction:  'Click the link below to accept the invitation and join the %{organization_type}.'
       button_text:  Accept the Invitation
   generated_report_mailer:
     new_report_available:

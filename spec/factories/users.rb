@@ -60,8 +60,22 @@ FactoryBot.define do
       after(:create, :build) do |organization_admin|
         if organization_admin.role?('organization_admin')
           new_organization = create(:organization)
+          organization_admin.organizable = new_organization
           new_organization.organization_admins << organization_admin
-          organization_admin.organization = new_organization
+        end
+      end
+    end
+
+    trait :health_system_admin do
+      roles { %w[health_system_admin] }
+    end
+
+    trait :with_health_system do
+      after(:create, :build) do |health_system_admin|
+        if health_system_admin.role?('health_system_admin')
+          new_health_system = create(:health_system)
+          health_system_admin.organizable = new_health_system
+          new_health_system.health_system_admins << health_system_admin
         end
       end
     end

@@ -94,7 +94,7 @@ describe Organization do
       let!(:user) { create(:user, :confirmed, :organization_admin, :with_organization) }
 
       it 'return all organization_admin\'s organizations' do
-        expect(subject).to include(user.organization).and not_include(other_organization)
+        expect(subject).to include(user.organizable).and not_include(other_organization)
       end
     end
   end

@@ -7,18 +7,18 @@ FactoryBot.define do
     trait :with_organization_admin do
       after(:create, :build) do |organization|
         organization_admin = create(:user, :confirmed, :organization_admin)
+        organization_admin.organizable = organization
         organization.organization_admins << organization_admin
-        organization_admin.organization = organization
       end
     end
 
     trait :with_e_intervention_admin do
       after(:create, :build) do |organization|
-        organization.e_intervention_admins << create(:user, :confirmed, :e_intervention_admin, organization_id: organization.id)
+        organization.e_intervention_admins << create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id)
       end
     end
 
-    trait :with_health_systems do
+    trait :with_health_system do
       after(:create) do |organization|
         organization.health_systems << create(:health_system, :with_clinics)
       end

@@ -131,6 +131,13 @@ Rails.application.routes.draw do
     end
     get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
 
+    resources :health_systems, controller: :health_systems do
+      scope module: 'health_systems' do
+        post 'invitations/invite_health_system_admin', to: 'invitations#invite_health_system_admin'
+      end
+    end
+    get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm', as: :health_system_invitations_confirm
+
     resources :generated_reports, only: :index
 
     scope module: :google_tts do

@@ -13,13 +13,13 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
 
   let(:params) { { invitation_token: invitation_token } }
   let(:success_message) do
-    { success: Base64.encode64(I18n.t('organizations.invitations.accepted', organization_name: organization.name)) }.to_query
+    { success: Base64.encode64(I18n.t('organizables.invitations.accepted', organizable_type: 'Organization', organizable_name: organization.name)) }.to_query
   end
   let(:success_path) do
     "#{ENV['WEB_URL']}?#{success_message}"
   end
   let(:error_message) do
-    { error: Base64.encode64(I18n.t('organizations.invitations.not_found')) }.to_query
+    { error: Base64.encode64(I18n.t('organizables.invitations.not_found', organizable_type: 'Organization')) }.to_query
   end
   let(:error_path) do
     "#{ENV['WEB_URL']}?#{error_message}"
@@ -32,7 +32,7 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
       let(:invitation_token) { organization_invitation.invitation_token }
 
       it 'confirms organization invitation and assign user to the organization' do
-        expect { request }.to change { intervention_admin.reload.organization_id }.from(nil).to(organization.id).and \
+        expect { request }.to change { intervention_admin.reload.organizable_id }.from(nil).to(organization.id).and \
           change { organization_invitation.reload.accepted_at }.and \
             change(organization_invitation, :invitation_token).to(nil)
       end
@@ -49,7 +49,7 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
       let(:invitation_token) { organization_invitation.invitation_token }
 
       it 'confirms organization invitation and assign user to the organization' do
-        expect { request }.to change { organization_admin.reload.organization }.from(nil).to(organization).and \
+        expect { request }.to change { organization_admin.reload.organizable }.from(nil).to(organization).and \
           change { organization_invitation.reload.accepted_at }.and \
             change(organization_invitation, :invitation_token).to(nil)
       end

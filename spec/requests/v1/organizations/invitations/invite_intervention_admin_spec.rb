@@ -23,13 +23,13 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
           expect(response).to have_http_status(:created)
         end
 
-        it 'creates new e-intervention admin assigned to the team' do
+        it 'creates new e-intervention admin assigned to the organization' do
           expect { request }.to change(User, :count).by(1).and \
             change { organization.reload.e_intervention_admins.count }.by(1)
 
           expect(new_intervention_admin).to have_attributes(
             email: params[:email],
-            organization_id: organization.id,
+            organizable_id: organization.id,
             confirmed_at: nil,
             roles: ['e_intervention_admin']
           )
@@ -46,10 +46,11 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         end
 
         it 'creates invitation for the existing e-intervention admin' do
-          expect(OrganizationMailer).to receive(:invite_user).with(
+          expect(OrganizableMailer).to receive(:invite_user).with(
             email: intervention_admin.email,
-            organization: organization,
-            invitation_token: token
+            organizable: organization,
+            invitation_token: token,
+            organizable_type: 'Organization'
           ).and_return(double(deliver_later: nil))
 
           expect { request }.to change(OrganizationInvitation, :count).by(1).and \
@@ -67,11 +68,12 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         let(:params) { { email: intervention_admin.email } }
 
         before do
-          intervention_admin.update(organization_id: organization.id)
+          intervention_admin.update(organizable_id: organization.id)
+          organization.e_intervention_admins << intervention_admin
         end
 
         it 'does not invite intervention_admin once again' do
-          expect(OrganizationMailer).not_to receive(:invite_user)
+          expect(OrganizableMailer).not_to receive(:invite_user)
 
           expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
             avoid_changing(User, :count).and \
@@ -84,7 +86,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         let(:params) { { email: not_confirmed_intervention_admin.email } }
 
         it 'not invite intervention_admin with not confirmed account' do
-          expect(OrganizationMailer).not_to receive(:invite_user)
+          expect(OrganizableMailer).not_to receive(:invite_user)
 
           expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
             avoid_changing(User, :count).and \
@@ -100,7 +102,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         end
 
         it 'organization admin shouldn\'t be invited again' do
-          expect(OrganizationMailer).not_to receive(:invite_user)
+          expect(OrganizableMailer).not_to receive(:invite_user)
 
           expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
             avoid_changing(User, :count).and \
@@ -117,7 +119,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
           end
 
           it 'intervention_admin shouldn\'t be invited again' do
-            expect(OrganizationMailer).not_to receive(:invite_user)
+            expect(OrganizableMailer).not_to receive(:invite_user)
 
             expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
               avoid_changing(User, :count).and \
@@ -139,10 +141,11 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
           end
 
           it 'creates invitation for the existing intervention_admin' do
-            expect(OrganizationMailer).to receive(:invite_user).with(
+            expect(OrganizableMailer).to receive(:invite_user).with(
               email: intervention_admin.email,
-              organization: organization,
-              invitation_token: token
+              organizable: organization,
+              invitation_token: token,
+              organizable_type: 'Organization'
             ).and_return(double(deliver_later: nil))
 
             expect { request }.to change(OrganizationInvitation, :count).by(1).and \

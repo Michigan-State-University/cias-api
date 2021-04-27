@@ -13,7 +13,12 @@ class V1::Organizations::Invitations::Confirm
 
   def call
     ActiveRecord::Base.transaction do
-      user.update!(organization: organization)
+      user.update!(organizable: organization)
+      if user.role?('organization_admin')
+        organization.organization_admins << user
+      else
+        organization.e_intervention_admins << user
+      end
 
       organization_invitation.update!(
         accepted_at: Time.current,

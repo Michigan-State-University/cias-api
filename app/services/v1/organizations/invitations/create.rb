@@ -19,10 +19,11 @@ class V1::Organizations::Invitations::Create
       organization: organization
     )
 
-    OrganizationMailer.invite_user(
+    OrganizableMailer.invite_user(
       invitation_token: invitation.invitation_token,
       email: user.email,
-      organization: organization
+      organizable: organization,
+      organizable_type: 'Organization'
     ).deliver_later
   end
 

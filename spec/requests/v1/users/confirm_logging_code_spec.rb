@@ -29,7 +29,6 @@ RSpec.describe 'PATCH /v1/users/confirm_logging_code', type: :request do
   context 'when user with the code does not exist' do
     let!(:user) { create(:user, verification_code: '111', verification_code_created_at: Time.current - 2.hours) }
 
-
     it 'return 404 status' do
       expect(response).to have_http_status(:not_found)
     end

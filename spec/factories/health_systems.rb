@@ -3,7 +3,15 @@
 FactoryBot.define do
   factory :health_system do
     sequence(:name) { |n| "#{Faker::Alphanumeric.alpha(number: 6)} #{n}" }
-    organization { build(:organization) }
+    association(:organization)
+
+    trait :with_health_system_admin do
+      after(:create, :build) do |health_system|
+        health_system_admin = create(:user, :confirmed, :health_system_admin)
+        health_system_admin.organizable = health_system
+        health_system.health_system_admins << health_system_admin
+      end
+    end
 
     trait :with_clinics do
       after(:create) do |health_system|

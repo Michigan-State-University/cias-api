@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_15_143621) do
+ActiveRecord::Schema.define(version: 2021_04_22_091757) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "uuid-ossp"
@@ -95,6 +96,18 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
+  end
+
+  create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_system_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_system_id"], name: "index_health_system_invitations_on_health_system_id"
+    t.index ["invitation_token"], name: "index_health_system_invitations_on_invitation_token"
+    t.index ["user_id"], name: "index_health_system_invitations_on_user_id"
   end
 
   create_table "health_systems", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -383,13 +396,15 @@ ActiveRecord::Schema.define(version: 2021_04_15_143621) do
     t.datetime "verification_code_created_at"
     t.boolean "confirmed_verification", default: false, null: false
     t.string "description", default: ""
-    t.uuid "organization_id"
+    t.uuid "organizable_id"
+    t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
-    t.index ["organization_id"], name: "index_users_on_organization_id"
+    t.index ["organizable_id", "organizable_type"], name: "index_users_on_organizable_id_and_organizable_type"
+    t.index ["organizable_id"], name: "index_users_on_organizable_id"
     t.index ["preview_session_id"], name: "index_users_on_preview_session_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin

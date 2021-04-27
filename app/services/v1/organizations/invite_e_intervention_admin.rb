@@ -15,7 +15,8 @@ class V1::Organizations::InviteEInterventionAdmin
     return if user_is_not_e_intervention_admin_or_researcher?
 
     if user.blank?
-      User.invite!(email: email, roles: ['e_intervention_admin'], organization_id: organization.id)
+      new_user = User.invite!(email: email, roles: ['e_intervention_admin'], organizable_id: organization.id)
+      organization.e_intervention_admins << new_user
     else
       set_researcher_as_e_intervention_admin
       V1::Organizations::Invitations::Create.call(organization, user)

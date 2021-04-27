@@ -18,7 +18,7 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest preview_session participant third_party organization_admin researcher e_intervention_admin team_admin admin].freeze
+  APP_ROLES = %w[guest preview_session participant third_party health_system_admin organization_admin researcher e_intervention_admin team_admin admin].freeze
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
@@ -39,11 +39,12 @@ class User < ApplicationRecord
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :user_log_requests, dependent: :destroy
   belongs_to :team, optional: true
-  belongs_to :organization, optional: true
+  belongs_to :organizable, polymorphic: true, optional: true
   has_many :admins_teams, class_name: 'Team', dependent: :nullify,
                           foreign_key: :team_admin_id, inverse_of: :team_admin
   has_many :team_invitations, dependent: :destroy
   has_many :organization_invitations, dependent: :destroy
+  has_many :health_system_invitations, dependent: :destroy
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')

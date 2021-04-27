@@ -47,7 +47,7 @@ describe User, type: :model do
 
         it 'is not valid' do
           expect(user).to be_valid
-          expect(user.organization).to be(nil)
+          expect(user.organizable).to be(nil)
         end
       end
 
@@ -56,7 +56,7 @@ describe User, type: :model do
 
         it 'is valid' do
           expect(user).to be_valid
-          expect(user.organization).not_to be(nil)
+          expect(user.organizable).not_to be(nil)
         end
       end
     end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Organization < ApplicationRecord
-  has_many :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }, class_name: 'User'
-  has_many :organization_admins, -> { limit_to_roles('organization_admin') }, class_name: 'User'
+  has_many :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }, class_name: 'User', as: :organizable
+  has_many :organization_admins, -> { limit_to_roles('organization_admin') }, class_name: 'User', as: :organizable
   has_many :health_systems, dependent: :destroy
   has_many :health_clinics, through: :health_systems
   has_many :organization_invitations, dependent: :destroy

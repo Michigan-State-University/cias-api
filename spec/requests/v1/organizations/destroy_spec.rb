@@ -7,6 +7,7 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:intervention_admin_id) { organization.e_intervention_admins.first.id }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_organization_path(organization.id), headers: headers }
@@ -33,6 +34,10 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
 
       it 'organization is deleted' do
         expect(Organization.find_by(id: organization.id)).to eq(nil)
+      end
+
+      it 'intervention admins doesn\'t belongs to organization' do
+        expect(User.find(intervention_admin_id).organizable_id).to eq(nil)
       end
     end
 
