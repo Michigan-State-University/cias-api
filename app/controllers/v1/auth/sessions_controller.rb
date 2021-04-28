@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
-  # after_action :verify_login_code, only: :create
+  after_action :verify_login_code, only: :create
 
   include Resource
   prepend Auth::Default
@@ -10,7 +10,7 @@ class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
   def verify_login_code
     return unless @resource && @resource.valid_password?(resource_params[:password])
 
-    head :forbidden if V1::Users::Verifications::Create.call(@resource, request.cookies['verification_code'])
+    head :forbidden if V1::Users::Verifications::Create.call(@resource, request.headers['Verification-Code'])
   end
 
   private
