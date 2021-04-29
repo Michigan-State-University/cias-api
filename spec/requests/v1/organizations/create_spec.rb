@@ -75,6 +75,12 @@ RSpec.describe 'POST /v1/organizations', type: :request do
 
       it_behaves_like 'permitted user'
     end
+
+    context 'when the user has multiple roles and one of it is e_intervention admin' do
+      let(:user) { create(:user, :confirmed, roles: %w[participant e_intervention_admin guest]) }
+
+      it_behaves_like 'permitted user'
+    end
   end
 
   context 'when user is not permitted' do

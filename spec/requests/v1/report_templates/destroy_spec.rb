@@ -9,20 +9,33 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
   end
   let!(:report_template) { create(:report_template, :with_logo) }
   let(:session) { report_template.session }
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:headers) { user.create_new_auth_token }
 
-  context 'when params are valid' do
-    it 'returns :no_content status' do
-      request
-      expect(response).to have_http_status(:no_content)
-    end
+  context 'admin has one or multiple roles' do
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+      context 'when params are valid' do
+        it 'returns :no_content status' do
+          request
+          expect(response).to have_http_status(:no_content)
+        end
 
-    it 'removes report template and it\'s attachments' do
-      expect { request }.to change(ActiveStorage::Attachment, :count).by(-1).and \
-        change(ReportTemplate, :count).by(-1)
+        it 'removes report template and it\'s attachments' do
+          expect { request }.to change(ActiveStorage::Attachment, :count).by(-1).and \
+            change(ReportTemplate, :count).by(-1)
 
-      expect(ReportTemplate.exists?(report_template.id)).to be false
+          expect(ReportTemplate.exists?(report_template.id)).to be false
+        end
+      end
     end
   end
 

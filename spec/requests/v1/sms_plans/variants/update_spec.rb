@@ -12,7 +12,15 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
     patch v1_sms_plan_variant_path(sms_plan_id: sms_plan.id, id: variant_id), params: params, headers: headers
   end
 
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
@@ -22,28 +30,50 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
     }
   end
 
-  context 'valid params' do
-    it 'returns :ok status' do
-      request
-      expect(response).to have_http_status(:ok)
-    end
+  context 'one or multiple roles' do
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+      context 'valid params' do
+        it 'returns :ok status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
 
-    it 'updates variant attributes' do
-      expect { request }.to change { variant.reload.formula_match }.from(variant.formula_match).to('> 3').and \
-        avoid_changing { SmsPlan::Variant.count }
-    end
-  end
+        it 'updates variant attributes' do
+          expect { request }.to change { variant.reload.formula_match }.from(variant.formula_match).to('> 3').and \
+            avoid_changing { SmsPlan::Variant.count }
+        end
+      end
 
-  context 'invalid params' do
-    let(:params) { { variant: {} } }
+      context 'invalid params' do
+        let(:params) { { variant: {} } }
 
-    it 'returns :bad_request status' do
-      request
-      expect(response).to have_http_status(:bad_request)
-    end
+        it 'returns :bad_request status' do
+          request
+          expect(response).to have_http_status(:bad_request)
+        end
 
-    it 'does not update variant attributes' do
-      expect { request }.not_to change(variant, :formula_match)
+        it 'does not update variant attributes' do
+          expect { request }.not_to change(variant, :formula_match)
+        end
+      end
+
+      context 'when intervention was published' do
+        let(:intervention) { create(:intervention, :published) }
+        let(:session) { create(:session, intervention: intervention) }
+        let(:params) do
+          {
+            variant: {
+              formula_match: '> 3'
+            }
+          }
+        end
+
+        it 'returns 405 status' do
+          expect { request }.not_to change(variant, :formula_match)
+          expect(response).to have_http_status(:method_not_allowed)
+        end
+      end
     end
   end
 
@@ -55,23 +85,6 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
     it 'returns :forbidden status and not authorized message' do
       request
       expect(response).to have_http_status(:not_found)
-    end
-  end
-
-  context 'when intervention was published' do
-    let(:intervention) { create(:intervention, :published) }
-    let(:session) { create(:session, intervention: intervention) }
-    let(:params) do
-      {
-        variant: {
-          formula_match: '> 3'
-        }
-      }
-    end
-
-    it 'returns 405 status' do
-      expect { request }.not_to change(variant, :formula_match)
-      expect(response).to have_http_status(:method_not_allowed)
     end
   end
 end

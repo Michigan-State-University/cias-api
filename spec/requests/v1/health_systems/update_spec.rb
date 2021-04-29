@@ -83,6 +83,12 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
 
       it_behaves_like 'permitted user'
     end
+
+    context 'when user has multiple roles' do
+      let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+
+      it_behaves_like 'permitted user'
+    end
   end
 
   context 'when user is not permitted' do

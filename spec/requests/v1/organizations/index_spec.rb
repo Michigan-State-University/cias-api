@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/organizations', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization_1) { create(:organization) }
@@ -68,7 +76,13 @@ RSpec.describe 'GET /v1/organizations', type: :request do
     end
 
     context 'when user is admin' do
-      it_behaves_like 'permitted user'
+      context 'one or multiple roles' do
+        %w[admin admin_with_multiple_roles].each do |role|
+          let(:user) { users[role] }
+
+          it_behaves_like 'permitted user'
+        end
+      end
     end
 
     context 'when user is' do

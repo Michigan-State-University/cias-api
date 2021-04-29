@@ -4,7 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
   let(:request) { patch v1_sms_plan_path(sms_plan.id), params: params, headers: headers }
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
   let(:session) { create(:session, intervention: intervention) }
@@ -18,41 +26,46 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
     }
   end
 
-  context 'valid params' do
-    let(:expected_end_at) { Date.strptime('11/03/2021', '%d/%m/%Y') }
+  context 'when user has admin role' do
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+      context 'valid params' do
+        let(:expected_end_at) { Date.strptime('11/03/2021', '%d/%m/%Y') }
 
-    it 'returns :ok status' do
-      request
-      expect(response).to have_http_status(:ok)
-    end
+        it 'returns :ok status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
 
-    it 'updates sms plan attributes' do
-      expect { request }.to change { sms_plan.reload.name }.from(sms_plan.name).to('new name').and \
-        avoid_changing { SmsPlan.count }.and \
-          change { sms_plan.reload.end_at }.from(sms_plan.end_at).to(expected_end_at)
-    end
-  end
+        it 'updates sms plan attributes' do
+          expect { request }.to change { sms_plan.reload.name }.from(sms_plan.name).to('new name').and \
+            avoid_changing { SmsPlan.count }.and \
+              change { sms_plan.reload.end_at }.from(sms_plan.end_at).to(expected_end_at)
+        end
+      end
 
-  context 'invalid params' do
-    let(:params) { { sms_plan: {} } }
+      context 'invalid params' do
+        let(:params) { { sms_plan: {} } }
 
-    it 'returns :bad_request status' do
-      request
-      expect(response).to have_http_status(:bad_request)
-    end
+        it 'returns :bad_request status' do
+          request
+          expect(response).to have_http_status(:bad_request)
+        end
 
-    it 'does not update team attributes' do
-      expect { request }.not_to change(sms_plan, :name)
-    end
-  end
+        it 'does not update team attributes' do
+          expect { request }.not_to change(sms_plan, :name)
+        end
+      end
 
-  context 'when intervention was published' do
-    let(:intervention) { create(:intervention, :published) }
-    let(:session) { create(:session, intervention: intervention) }
+      context 'when intervention was published' do
+        let(:intervention) { create(:intervention, :published) }
+        let(:session) { create(:session, intervention: intervention) }
 
-    it 'returns 405 status' do
-      expect { request }.not_to change(sms_plan, :name)
-      expect(response).to have_http_status(:method_not_allowed)
+        it 'returns 405 status' do
+          expect { request }.not_to change(sms_plan, :name)
+          expect(response).to have_http_status(:method_not_allowed)
+        end
+      end
     end
   end
 

@@ -7,12 +7,18 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:guest) { create(:user, :guest) }
+  let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
+  let(:users) do
+    {
+      'researcher' => researcher,
+      'user_with_multiple_roles' => user_with_multiple_roles
+    }
+  end
 
   let(:shared_to) { 'registered' }
   let(:intervention_user) { admin }
   let(:sessions) { create_list(:session, 2) }
-  let(:users) { [] }
   let!(:intervention) do
     create(:intervention, :published, name: 'Some intervention',
                                       user: intervention_user, sessions: sessions, shared_to: shared_to,
@@ -26,32 +32,36 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   context 'when user' do
     before { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
 
-    context 'has role admin' do
-      it 'contains proper sessions collection' do
-        expect(attrs['sessions'].size).to eq sessions.size
-      end
+    %w[researcher user_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
 
-      context 'when intervention does not contain any report' do
-        it 'contains proper attributes' do
-          expect(attrs).to include(
-            'name' => 'Some intervention',
-            'shared_to' => shared_to,
-            'csv_link' => nil,
-            'csv_generated_at' => nil
-          )
+      context 'has role admin' do
+        it 'contains proper sessions collection' do
+          expect(attrs['sessions'].size).to eq sessions.size
         end
-      end
 
-      context 'when intervention contains some report' do
-        let!(:reports) { [csv_attachment] }
+        context 'when intervention does not contain any report' do
+          it 'contains proper attributes' do
+            expect(attrs).to include(
+              'name' => 'Some intervention',
+              'shared_to' => shared_to,
+              'csv_link' => nil,
+              'csv_generated_at' => nil
+            )
+          end
+        end
 
-        it 'contains proper attributes' do
-          expect(attrs).to include(
-            'name' => 'Some intervention',
-            'shared_to' => shared_to,
-            'csv_link' => include('test_empty.csv'),
-            'csv_generated_at' => be_present
-          )
+        context 'when intervention contains some report' do
+          let!(:reports) { [csv_attachment] }
+
+          it 'contains proper attributes' do
+            expect(attrs).to include(
+              'name' => 'Some intervention',
+              'shared_to' => shared_to,
+              'csv_link' => include('test_empty.csv'),
+              'csv_generated_at' => be_present
+            )
+          end
         end
       end
     end

@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
-  let(:user) { create(:user, :confirmed, :researcher) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
+  let(:user) { researcher }
+  let(:users) do
+    {
+      'researcher' => researcher,
+      'user_with_multiple_roles' => user_with_multiple_roles
+    }
+  end
   let(:intervention) { create(:intervention) }
   let!(:session) { create(:session, intervention: intervention, position: 1) }
   let!(:other_session) do
@@ -51,87 +59,91 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   end
 
   context 'when user clones an intervention' do
-    before { request }
+    %w[researcher user_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+      let(:headers) { user.create_new_auth_token }
+      before { request }
 
-    let(:cloned_intervention_object) { Intervention.find(json_response['data']['id']) }
-    let(:cloned_sessions) { cloned_intervention_object.sessions.order(:position) }
-    let(:cloned_questions) { cloned_sessions.first.questions.order(:position) }
-    let(:second_cloned_session) { cloned_sessions.second }
-    let(:third_cloned_session) { cloned_sessions.third }
+      let(:cloned_intervention_object) { Intervention.find(json_response['data']['id']) }
+      let(:cloned_sessions) { cloned_intervention_object.sessions.order(:position) }
+      let(:cloned_questions) { cloned_sessions.first.questions.order(:position) }
+      let(:second_cloned_session) { cloned_sessions.second }
+      let(:third_cloned_session) { cloned_sessions.third }
 
-    let(:intervention_was) do
-      intervention.attributes.except('id', 'created_at', 'updated_at')
-    end
+      let(:intervention_was) do
+        intervention.attributes.except('id', 'created_at', 'updated_at')
+      end
 
-    let(:intervention_cloned) do
-      json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'sessions')
-    end
+      let(:intervention_cloned) do
+        json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'sessions')
+      end
 
-    it { expect(response).to have_http_status(:created) }
+      it { expect(response).to have_http_status(:created) }
 
-    it 'origin and outcome same' do
-      expect(intervention_was.delete(['status'])).to eq(intervention_cloned.delete(['status']))
-    end
+      it 'origin and outcome same' do
+        expect(intervention_was.delete(['status'])).to eq(intervention_cloned.delete(['status']))
+      end
 
-    it 'status to draft' do
-      expect(intervention_cloned['status']).to eq('draft')
-    end
+      it 'status to draft' do
+        expect(intervention_cloned['status']).to eq('draft')
+      end
 
-    it 'correctly clone questions to cloned session' do
-      expect(cloned_questions.map(&:attributes)).to include(
-        include(
-          'subtitle' => 'Question Subtitle',
-          'position' => 1,
-          'body' => include(
-            'variable' => { 'name' => 'single_var' }
+      it 'correctly clone questions to cloned session' do
+        expect(cloned_questions.map(&:attributes)).to include(
+          include(
+            'subtitle' => 'Question Subtitle',
+            'position' => 1,
+            'body' => include(
+              'variable' => { 'name' => 'single_var' }
+            ),
+            'formula' => {
+              'payload' => 'var + 3',
+              'patterns' => [
+                { 'match' => '=7', 'target' => { 'id' => cloned_questions.second.id, 'type' => 'Question::Single' } }
+              ]
+            }
           ),
-          'formula' => {
-            'payload' => 'var + 3',
-            'patterns' => [
-              { 'match' => '=7', 'target' => { 'id' => cloned_questions.second.id, 'type' => 'Question::Single' } }
-            ]
-          }
-        ),
-        include(
-          'subtitle' => 'Question Subtitle 2',
-          'position' => 2,
-          'body' => include(
-            'variable' => { 'name' => 'single_var' }
+          include(
+            'subtitle' => 'Question Subtitle 2',
+            'position' => 2,
+            'body' => include(
+              'variable' => { 'name' => 'single_var' }
+            ),
+            'formula' => {
+              'payload' => 'var + 4',
+              'patterns' => [
+                { 'match' => '=3', 'target' => { 'id' => cloned_sessions.second.id, 'type' => 'Session' } }
+              ]
+            }
           ),
-          'formula' => {
-            'payload' => 'var + 4',
-            'patterns' => [
-              { 'match' => '=3', 'target' => { 'id' => cloned_sessions.second.id, 'type' => 'Session' } }
-            ]
-          }
-        ),
-        include(
-          'position' => 999_999,
-          'type' => 'Question::Finish'
+          include(
+            'position' => 999_999,
+            'type' => 'Question::Finish'
+          )
         )
-      )
-    end
+      end
 
-    it 'correctly clones sessions with proper connections between other sessions' do
-      expect(second_cloned_session.attributes).to include(
-        'position' => 2,
-        'formula' => {
-          'payload' => 'var + 2',
-          'patterns' => [
-            { 'match' => '=1', 'target' => { 'id' => third_cloned_session.id, 'type' => 'Session' } }
-          ]
-        }
-      )
-      expect(third_cloned_session.attributes).to include(
-        'position' => 3,
-        'formula' => {
-          'payload' => '',
-          'patterns' => [
-            { 'match' => '', 'target' => { 'id' => '', 'type' => 'Session' } }
-          ]
-        },
-        'variable' => third_session.variable.to_s
-      )
+      it 'correctly clones sessions with proper connections between other sessions' do
+        expect(second_cloned_session.attributes).to include(
+          'position' => 2,
+          'formula' => {
+            'payload' => 'var + 2',
+            'patterns' => [
+              { 'match' => '=1', 'target' => { 'id' => third_cloned_session.id, 'type' => 'Session' } }
+            ]
+          }
+        )
+        expect(third_cloned_session.attributes).to include(
+          'position' => 3,
+          'formula' => {
+            'payload' => '',
+            'patterns' => [
+              { 'match' => '', 'target' => { 'id' => '', 'type' => 'Session' } }
+            ]
+          },
+          'variable' => third_session.variable.to_s
+        )
+      end
     end
   end
 

@@ -73,6 +73,12 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
       end
     end
 
+    context 'when user has multiple roles' do
+      let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+
+      it_behaves_like 'permitted user'
+    end
+
     context 'when user is e_intervention admin' do
       let(:user) { create(:user, :confirmed, :e_intervention_admin) }
 
