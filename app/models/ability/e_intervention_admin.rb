@@ -38,5 +38,6 @@ class Ability::EInterventionAdmin < Ability::Base
     can :confirm_organization_membership, OrganizationInvitation, user_id: user.id
     can :manage, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
     can :invite_health_system_admin, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
+    can :manage, HealthClinic
   end
 end

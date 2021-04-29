@@ -146,7 +146,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :organizations, controller: :organizations
+    resources :health_clinics, controller: :health_clinics
   end
 
   if Rails.env.development?

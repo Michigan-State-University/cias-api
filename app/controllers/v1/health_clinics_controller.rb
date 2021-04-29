@@ -1,4 +1,4 @@
-class V1::HealthClinicController <V1Controller
+class V1::HealthClinicsController < V1Controller
   def index
     authorize! :read, HealthClinic
 
@@ -6,7 +6,7 @@ class V1::HealthClinicController <V1Controller
   end
 
   def show
-    authroize! :read, HealthClinic
+    authorize! :read, HealthClinic
 
     render json: serialized_response(clinic_load)
   end
@@ -35,7 +35,7 @@ class V1::HealthClinicController <V1Controller
   private
 
   def clinic_scope
-    HealthClinic.accesible_by(current_ability)
+    HealthClinic.accessible_by(current_ability)
   end
 
   def clinic_load
@@ -43,6 +43,6 @@ class V1::HealthClinicController <V1Controller
   end
 
   def clinic_params
-    params.require(:clinic).permit(:name)
+    params.require(:health_clinic).permit(:name, :health_system_id)
   end
 end
