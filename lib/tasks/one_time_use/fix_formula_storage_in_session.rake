@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-namespace :questions do
+namespace :session do
   desc 'Fix storage target in formula for questions'
   task target_fix: :environment do
-    Question.all.each do |question|
-      next unless question['formula']['patterns'].any?
+    Session.all.each do |session|
+      next unless session['formula']['patterns'].any?
 
-      question['formula']['patterns'].each do |pattern|
+      session['formula']['patterns'].each do |pattern|
         pattern['target']['probability'] = 100.to_s
         target = pattern['target']
         pattern['target'] = [target]
       end
 
-      question.save!
+      session.save!
     end
   end
 end
