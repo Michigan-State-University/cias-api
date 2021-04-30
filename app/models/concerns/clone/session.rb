@@ -40,16 +40,20 @@ class Clone::Session < Clone::Base
   def reassign_branching
     outcome_questions.find_each do |question|
       question.formula['patterns'] = question.formula['patterns'].map do |pattern|
-        pattern['target']['id'] = matching_outcome_target_id(pattern)
+        index = 0
+        pattern['target'].each do |current_target|
+          current_target['id'] = matching_outcome_target_id(pattern, index)
+          index += 1
+        end
         pattern
       end
       question.save!
     end
   end
 
-  def matching_outcome_target_id(pattern)
-    target_id = pattern['target']['id']
-    return target_id if pattern['target']['type'] == 'Session' || target_id.empty?
+  def matching_outcome_target_id(pattern, index)
+    target_id = pattern['target'][index]['id']
+    return target_id if pattern['target'][index]['type'] == 'Session' || target_id.empty?
 
     matching_question_id(target_id)
   end

@@ -32,7 +32,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => questions[2].id, 'type' => 'Question' }
+                                 'target' => [
+                                   { 'id' => questions[2].id, 'probability' => '50', 'type' => 'Question' },
+                                   { 'id' => questions[3].id, 'probability' => '50', 'type' => 'Question' }
+                                 ]
                                }
                              ] }
         question.save
@@ -40,7 +43,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       end
 
       it 'returns branched question id' do
-        expect(json_response['data']['id']).to eq questions[2].id
+        expect([questions[2].id, questions[3].id]).to include(json_response['data']['id'])
       end
     end
 
@@ -52,7 +55,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                 'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                }
                              ] }
         question.save
@@ -79,7 +82,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -103,7 +106,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -127,7 +130,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => { 'id' => 'INVALID ID', 'type' => 'Question' }
+                                   'target' => [{ 'id' => 'INVALID ID', 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -153,7 +156,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -177,7 +180,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -201,7 +204,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => { 'id' => 'INVALID ID', 'type' => 'Question' }
+                                   'target' => [{ 'id' => 'INVALID ID', 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -226,7 +229,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=2',
-                                 'target' => { 'id' => questions[3].id, 'type' => 'Question' }
+                                 'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                }
                              ] }
         question
@@ -268,7 +271,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => question_feedback.id, 'type' => 'Question' }
+                                 'target' => [{ 'id' => question_feedback.id, 'probability' => '100', 'type' => 'Question' }]
                                }
                              ] }
         question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
@@ -294,7 +297,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => other_session.id, 'type' => 'Session' }
+                                 'target' => [{ 'id' => other_session.id, 'probability' => '100', 'type' => 'Session' }]
                                }
                              ] }
         question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
@@ -384,7 +387,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => { 'id' => question_with_reflection_formula.id, 'type' => 'Question' }
+                                 'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100', 'type' => 'Question' }]
                                }
                              ] }
         question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
