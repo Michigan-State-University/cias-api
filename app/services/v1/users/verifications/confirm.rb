@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class V1::Users::Verifications::Confirm
-  def self.call(verification_code)
-    new(verification_code).call
+  def self.call(verification_code, email)
+    new(verification_code, email).call
   end
 
-  def initialize(verification_code)
+  def initialize(verification_code, email)
     @verification_code = verification_code
+    @email = email
   end
 
   def call
@@ -18,10 +19,10 @@ class V1::Users::Verifications::Confirm
 
   private
 
-  attr_reader :verification_code
+  attr_reader :verification_code, :email
 
   def user
-    @user ||= User.find_by!(verification_code: verification_code)
+    @user ||= User.find_by!(verification_code: verification_code, email: email)
   end
 
   def code_expired?
