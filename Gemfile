@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.0'
+gem 'rails', '~> 6.0.3.6'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.0'
 
@@ -39,6 +39,10 @@ gem 'secure_headers'
 gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
+# for search on encrypted data
+gem 'blind_index'
+# for stop logging sensitive data
+gem 'logstop'
 gem 'countries'
 
 group :development, :test do

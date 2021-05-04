@@ -22,7 +22,7 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
   context 'when there is participant report' do
     context 'and guest user wants to receive the report' do
       context 'provided email not exist in the system' do
-        let(:new_participant) { User.participants.select(:id, :email).order(created_at: :desc).first }
+        let(:new_participant) { User.participants.order(created_at: :desc).first }
 
         it 'creates new user with participant role and given email, shares report to that user
         and sends an invitation email and an email about new report' do
