@@ -46,6 +46,7 @@ RSpec.describe 'POST /v1/health_clinics', type: :request do
           {
             'type' => 'health_clinic',
             'attributes' => {
+              'health_system_id' => health_system.id,
               'name' => 'New Health Clinic'
             }
           }
