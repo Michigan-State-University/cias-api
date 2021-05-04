@@ -3,6 +3,6 @@
 FactoryBot.define do
   factory :health_clinic do
     sequence(:name) { |n| "#{Faker::Alphanumeric.alpha(number: 6)} #{n}" }
-    health_system { build(:health_system) }
+    association(:health_system)
   end
 end

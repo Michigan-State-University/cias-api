@@ -47,10 +47,14 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
       it 'returns proper data' do
         expect(json_response['data']).to include(
           {
+            'id' => health_system.id,
             'type' => 'health_system',
             'attributes' => {
-              'name' => 'Health System 50'
-            }
+              'name' => 'Health System 50',
+              'health_clinics' => { 'data' => [] },
+              'organization_id' => organization.id
+            },
+            'relationships' => { 'health_system_admins' => { 'data' => [{ 'id' => health_system_admin_to_remove.id, 'type' => 'health_system_admin' }] } }
           }
         )
       end

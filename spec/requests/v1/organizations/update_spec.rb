@@ -10,6 +10,8 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
   let!(:new_organization_admin) { create(:user, :confirmed, :organization_admin) }
   let!(:organization_admin_to_remove) { organization.organization_admins.first }
   let(:admins_ids) { organization.reload.organization_admins.pluck(:id) }
+  let!(:e_intervention_admin) { organization.e_intervention_admins.first }
+  let!(:organization_admin) { organization.organization_admins.first }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -48,8 +50,11 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
           {
             'type' => 'organization',
             'attributes' => {
-              'name' => 'Oregano Public Health'
-            }
+              'name' => 'Oregano Public Health',
+              'health_systems_and_clinics' => { 'data' => [] }
+            },
+            'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'e_intervention_admin' }] },
+                                 'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'organization_admin' }] } }
           }
         )
       end

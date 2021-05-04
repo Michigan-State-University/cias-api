@@ -7,9 +7,13 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization) }
+  let!(:health_clinic) { health_system.health_clinics.first }
+
   let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
-  let!(:health_system_1) { create(:health_system, :with_health_system_admin, organization: organization_1, name: 'Test') }
+  let!(:health_system_1) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization_1, name: 'Test') }
+
+  let!(:health_system_admin) { health_system.health_system_admins.first }
 
   let(:roles_organization) do
     {
@@ -49,14 +53,46 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'id' => health_system.id.to_s,
             'type' => 'health_system',
             'attributes' => {
-              'name' => health_system.name
+              'name' => health_system.name,
+              'organization_id' => organization.id,
+              'health_clinics' => { 'data' => [
+                { 'attributes' => {
+                  'name' => health_clinic.name,
+                  'health_system_id' => health_clinic.health_system_id
+                },
+                  'id' => health_clinic.id,
+                  'type' => 'health_clinic' }
+              ] }
+            },
+            'relationships' => {
+              'health_system_admins' => {
+                'data' => [
+                  { 'id' => health_system_admin.id, 'type' => 'health_system_admin' }
+                ]
+              }
             }
           }
         )
       end
 
+      it 'returns proper include' do
+        expect(json_response['included'][0]).to include(
+          {
+            'id' => health_system_admin.id,
+            'type' => 'user',
+            'attributes' =>
+                include(
+                  'email' => health_system_admin.email,
+                  'roles' => ['health_system_admin'],
+                  'first_name' => health_system_admin.first_name,
+                  'last_name' => health_system_admin.last_name
+                )
+          }
+        )
+      end
+
       it 'returns proper collection size' do
-        expect(json_response.size).to eq(1)
+        expect(json_response.size).to eq(2)
       end
     end
 
