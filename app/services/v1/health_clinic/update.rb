@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class V1::HealthClinic::Update
   def self.call(health_clinic, health_clinic_params)
     new(health_clinic, health_clinic_params).call

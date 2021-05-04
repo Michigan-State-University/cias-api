@@ -73,7 +73,7 @@ class Question < ApplicationRecord
   end
 
   def remove_blocks_with_types(block_types_to_remove)
-    narrator['blocks'] = narrator['blocks'].filter { |block| !block_types_to_remove.include?(block['type']) }
+    narrator['blocks'] = narrator['blocks'].filter { |block| block_types_to_remove.exclude?(block['type']) }
   end
 
   def csv_header_names

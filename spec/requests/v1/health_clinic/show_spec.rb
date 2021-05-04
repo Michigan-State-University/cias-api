@@ -7,6 +7,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, name: 'Health Clinic', health_system: health_system) }
 
@@ -14,6 +15,13 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
     {
       'organization_admin' => organization.organization_admins.first,
       'e_intervention_admin' => organization.e_intervention_admins.first
+    }
+  end
+
+  let(:roles_organization_2) do
+    {
+      'organization_admin' => organization_2.organization_admins.first,
+      'e_intervention_admin' => organization_2.e_intervention_admins.first
     }
   end
 
@@ -89,6 +97,20 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
         let(:headers) { user.create_new_auth_token }
 
         it_behaves_like 'unpermitted user'
+      end
+    end
+
+    context 'when user is ' do
+      %w[organization_admin e_intervention_admin].each do |role|
+        context role.to_s do
+          let(:user) { roles_organization_2[role] }
+
+          before { request }
+
+          it 'returns proper error message' do
+            expect(json_response['message']).to include('Couldn\'t find HealthClinic with')
+          end
+        end
       end
     end
 

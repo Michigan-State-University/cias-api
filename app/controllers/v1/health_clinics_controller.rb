@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class V1::HealthClinicsController < V1Controller
   def index
     authorize! :read, HealthClinic
