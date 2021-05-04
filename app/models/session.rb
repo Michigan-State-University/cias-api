@@ -82,7 +82,7 @@ class Session < ApplicationRecord
 
   def invite_by_email(emails)
     users_exists = ::User.where(email: emails)
-    (emails - users_exists.pluck(:email)).each do |email|
+    (emails - users_exists.map(&:email)).each do |email|
       User.invite!(email: email)
     end
 

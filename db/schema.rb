@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_22_091757) do
+ActiveRecord::Schema.define(version: 2021_04_27_122010) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -139,6 +139,9 @@ ActiveRecord::Schema.define(version: 2021_04_22_091757) do
     t.string "invitable_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "email_ciphertext"
+    t.string "email_bidx"
+    t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
@@ -149,6 +152,7 @@ ActiveRecord::Schema.define(version: 2021_04_22_091757) do
     t.datetime "schedule_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "phone_ciphertext"
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -179,6 +183,7 @@ ActiveRecord::Schema.define(version: 2021_04_22_091757) do
     t.datetime "confirmed_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "number_ciphertext"
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
@@ -397,9 +402,16 @@ ActiveRecord::Schema.define(version: 2021_04_22_091757) do
     t.datetime "verification_code_created_at"
     t.uuid "organizable_id"
     t.boolean "confirmed_verification", default: false, null: false
+    t.text "email_ciphertext"
+    t.text "first_name_ciphertext"
+    t.text "last_name_ciphertext"
+    t.text "uid_ciphertext"
+    t.string "email_bidx"
+    t.string "uid_bidx"
     t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
@@ -412,6 +424,7 @@ ActiveRecord::Schema.define(version: 2021_04_22_091757) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
     t.index ["uid", "roles"], name: "index_users_on_uid_and_roles", using: :gin
     t.index ["uid"], name: "index_users_on_uid", unique: true
+    t.index ["uid_bidx"], name: "index_users_on_uid_bidx", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

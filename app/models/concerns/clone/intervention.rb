@@ -38,14 +38,19 @@ class Clone::Intervention < Clone::Base
 
   def update_object_pattern(object)
     object.formula['patterns'].map do |pattern|
-      pattern['target']['id'] = matching_outcome_target_id(pattern)
+      index = 0
+      pattern['target'].each do |current_target|
+        current_target['id'] = matching_outcome_target_id(pattern, index)
+        index += 1
+      end
+      pattern
       pattern
     end
   end
 
-  def matching_outcome_target_id(pattern)
-    target_id = pattern['target']['id']
-    return target_id if pattern['target']['type'] != 'Session' || target_id.empty?
+  def matching_outcome_target_id(pattern, index)
+    target_id = pattern['target'][index]['id']
+    return target_id if pattern['target'][index]['type'] != 'Session' || target_id.empty?
 
     matching_session_id(target_id)
   end

@@ -3,8 +3,7 @@
 RSpec.describe SmsPlans::SendSmsJob, type: :job do
   subject { described_class.perform_now('+48123123123', 'some content', user.id) }
 
-  let(:phone) { create(:phone, user: user) }
-  let(:message) { create(:message, :with_code, phone: phone) }
+  let(:message) { create(:message, :with_code) }
   let(:service) { Communication::Sms.new(message.id) }
 
   before do

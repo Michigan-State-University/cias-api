@@ -64,10 +64,9 @@ class V1::UsersController < V1Controller
   end
 
   def confirm_logging_code
-    code = params[:verification_code]
-    code = V1::Users::Verifications::Confirm.call(code)
-    if code.present?
-      render json: { verification_code: code }, status: :ok
+    result = V1::Users::Verifications::Confirm.call(code, email)
+    if result.present?
+      render json: { verification_code: result }, status: :ok
     else
       head :request_timeout
     end
@@ -89,6 +88,14 @@ class V1::UsersController < V1Controller
 
   def user_id
     params[:id]
+  end
+
+  def code
+    params[:verification_code]
+  end
+
+  def email
+    params[:email]
   end
 
   def phone_params

@@ -60,8 +60,14 @@ class User < ApplicationRecord
   scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
   scope :name_contains, lambda { |substring|
-    where("CONCAT(first_name, ' ', last_name) ILIKE :substring OR email ILIKE :substring", substring: "%#{substring.downcase}%") if substring.present?
+    if substring.present?
+      ids = select { |u| "#{u.first_name} #{u.last_name} #{u.email}" =~ /#{substring.downcase}/i }.map(&:id)
+      User.where(id: ids)
+    end
   }
+
+  encrypts :email, :first_name, :last_name, :uid, migrating: true
+  blind_index :email, :uid, migrating: true
 
   def self.detailed_search(params)
     scope = all

@@ -74,4 +74,20 @@ RSpec.describe V1::Users::Verifications::Create do
       expect(updated_user.verification_code).to eq '123'
     end
   end
+
+  context 'when exists verification code of another user in headers' do
+    let(:verification_code_from_headers) { '123' }
+    let!(:verification_code_created_at) { time }
+    let!(:another_user) do
+      create(:user, verification_code: verification_code_from_headers,
+             confirmed_verification: true, verification_code_created_at: verification_code_created_at)
+    end
+    let!(:user) do
+      create(:user, verification_code: nil, verification_code_created_at: nil, confirmed_verification: false)
+    end
+
+    it "generate new code and send email" do
+      expect { subject }.to change { user.verification_code }.from(nil).to('456')
+    end
+  end
 end

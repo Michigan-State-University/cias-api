@@ -7,12 +7,17 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:health_system) { create(:health_system, :with_clinics, organization: organization) }
+  let!(:health_clinic) { health_system.health_clinics.first }
   let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
+
+  let(:e_intervention_admin) { organization.e_intervention_admins.first }
+  let(:organization_admin) { organization.organization_admins.first }
 
   let(:roles_organization) do
     {
-      'organization_admin' => organization.organization_admins.first,
-      'e_intervention_admin' => organization.e_intervention_admins.first
+      'organization_admin' => organization_admin,
+      'e_intervention_admin' => e_intervention_admin
     }
   end
   let(:roles_organization_1) do
@@ -47,14 +52,85 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'id' => organization.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization.name
-            }
+              'name' => organization.name,
+              'health_systems_and_clinics' => {
+                'data' => [
+                  {
+                    'attributes' => {
+                      'health_clinics' => {
+                        'data' => [
+                          {
+                            'attributes' => {
+                              'health_system_id' => health_system.id,
+                              'name' => health_clinic.name
+                            },
+                            'id' => health_clinic.id,
+                            'type' => 'health_clinic'
+                          }
+                        ]
+                      },
+                      'name' => health_system.name,
+                      'organization_id' => health_system.organization_id
+                    },
+                    'id' => health_system.id,
+                    'type' => 'health_system',
+                    'relationships' => { 'health_system_admins' => { 'data' => [] } }
+                  }
+                ]
+              }
+            },
+            'relationships' =>
+                {
+                  'e_intervention_admins' =>
+                      {
+                        'data' =>
+                              [
+                                { 'id' => organization.e_intervention_admins.first.id, 'type' => 'e_intervention_admin' }
+                              ]
+                      },
+                  'organization_admins' =>
+                        {
+                          'data' =>
+                              [
+                                { 'id' => organization.organization_admins.first.id, 'type' => 'organization_admin' }
+                              ]
+                        }
+                }
+          }
+        )
+      end
+
+      it 'returns proper include' do
+        expect(json_response['included'][0]).to include(
+          {
+            'id' => e_intervention_admin.id,
+            'type' => 'user',
+            'attributes' =>
+                include(
+                  'email' => e_intervention_admin.email,
+                  'first_name' => e_intervention_admin.first_name,
+                  'last_name' => e_intervention_admin.last_name,
+                  'roles' => ['e_intervention_admin']
+                )
+          }
+        )
+        expect(json_response['included'][1]).to include(
+          {
+            'id' => organization_admin.id,
+            'type' => 'user',
+            'attributes' =>
+                  include(
+                    'email' => organization_admin.email,
+                    'first_name' => organization_admin.first_name,
+                    'last_name' => organization_admin.last_name,
+                    'roles' => ['organization_admin']
+                  )
           }
         )
       end
 
       it 'returns proper collection size' do
-        expect(json_response.size).to eq(1)
+        expect(json_response.size).to eq(2)
       end
     end
 

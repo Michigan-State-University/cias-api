@@ -32,6 +32,6 @@ class V1::Users::Verifications::Create
   def exists_user_with_verification_code?
     return false unless verification_code_from_headers
 
-    User.exists?(verification_code: verification_code_from_headers)
+    User.exists?(verification_code: verification_code_from_headers, email: user.email)
   end
 end

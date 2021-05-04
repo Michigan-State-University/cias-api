@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require 'sidekiq/web' if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+  require 'sidekiq/web'
+  Sidekiq::Web.use ActionDispatch::Cookies
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: "_interslice_session"
+end
 
 Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }

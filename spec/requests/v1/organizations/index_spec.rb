@@ -6,14 +6,19 @@ RSpec.describe 'GET /v1/organizations', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization_1) { create(:organization) }
+  let!(:health_clinic) { create(:health_clinic) }
+  let!(:health_system) { health_clinic.health_system }
+  let!(:organization_1) { health_system.organization }
   let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:organization_3) { create(:organization, name: 'Oregano Public Health') }
 
+  let!(:organization_admin) { organization_2.organization_admins.first }
+  let!(:e_intervention_admin) { organization_2.e_intervention_admins.first }
+
   let(:roles) do
     {
-      'organization_admin' => organization_2.organization_admins.first,
-      'e_intervention_admin' => organization_2.e_intervention_admins.first
+      'organization_admin' => organization_admin,
+      'e_intervention_admin' => e_intervention_admin
     }
   end
 
@@ -46,21 +51,61 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'id' => organization_1.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization_1.name
+              'name' => organization_1.name,
+              'health_systems_and_clinics' => {
+                'data' =>
+                    [
+                      {
+                        'attributes' => {
+                          'health_clinics' => {
+                            'data' => [
+                              {
+                                'attributes' => {
+                                  'health_system_id' => health_system.id,
+                                  'name' => health_clinic.name
+                                },
+                                'id' => health_clinic.id,
+                                'type' => 'health_clinic'
+                              }
+                            ]
+                          },
+                          'name' => health_system.name,
+                          'organization_id' => health_system.organization_id
+                        },
+                        'id' => health_system.id,
+                        'type' => 'health_system',
+                        'relationships' => { 'health_system_admins' => { 'data' => [] } }
+                      }
+                    ]
+              }
+            },
+            'relationships' => {
+              'e_intervention_admins' => { 'data' => [] },
+              'organization_admins' => { 'data' => [] }
             }
           },
           {
             'id' => organization_2.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization_2.name
+              'name' => organization_2.name,
+              'health_systems_and_clinics' => { 'data' => [] }
+            },
+            'relationships' => {
+              'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'e_intervention_admin' }] },
+              'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'organization_admin' }] }
             }
           },
           {
             'id' => organization_3.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization_3.name
+              'name' => organization_3.name,
+              'health_systems_and_clinics' => { 'data' => [] }
+            },
+            'relationships' => {
+              'e_intervention_admins' => { 'data' => [] },
+              'organization_admins' => { 'data' => [] }
             }
           }
         )
@@ -88,7 +133,12 @@ RSpec.describe 'GET /v1/organizations', type: :request do
                 'id' => organization_2.id.to_s,
                 'type' => 'organization',
                 'attributes' => {
-                  'name' => organization_2.name
+                  'name' => organization_2.name,
+                  'health_systems_and_clinics' => { 'data' => [] }
+                },
+                'relationships' => {
+                  'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'e_intervention_admin' }] },
+                  'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'organization_admin' }] }
                 }
               }
             )
