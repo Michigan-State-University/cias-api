@@ -21,8 +21,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
   let(:request) { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when auth' do
         context 'is invalid' do
           let(:request) { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
@@ -109,6 +108,12 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

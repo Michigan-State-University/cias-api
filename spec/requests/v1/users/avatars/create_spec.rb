@@ -24,8 +24,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
   before { post v1_user_avatars_path(user_id), params: params, headers: current_user.create_new_auth_token }
 
   context 'when current_user is admin' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:current_user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when current_user updates itself' do
         it { expect(response).to have_http_status(:created) }
 
@@ -45,6 +44,12 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
           )
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:current_user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
 
     context 'when current_user updates other user' do

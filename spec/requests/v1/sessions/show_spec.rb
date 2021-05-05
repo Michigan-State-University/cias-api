@@ -32,8 +32,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions/:id', type: :req
   end
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when response' do
         context 'is JSON' do
           before { request }
@@ -57,6 +56,12 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions/:id', type: :req
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

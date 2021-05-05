@@ -41,8 +41,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     end
 
     context 'when there are sms plans' do
-      %w[researcher researcher_with_multiple_roles].each do |role|
-        let(:user) { users[role] }
+      shared_examples 'permitted user' do
         context 'is valid' do
           before { request }
 
@@ -75,6 +74,12 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
             expect(Session.find(json_response['data']['id']).question_groups.first.questions.first.title).to eq(questions.first.title)
           end
         end
+      end
+
+      %w[researcher researcher_with_multiple_roles].each do |role|
+        let(:user) { users[role] }
+
+        it_behaves_like 'permitted user'
       end
     end
   end

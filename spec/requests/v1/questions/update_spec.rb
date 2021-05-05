@@ -53,8 +53,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
   end
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when response' do
         context 'is JSON' do
           before do
@@ -76,6 +75,12 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

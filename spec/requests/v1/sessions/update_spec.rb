@@ -31,21 +31,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
   let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-
-      context 'when auth' do
-        context 'is invalid' do
-          let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
-
-          it_behaves_like 'unauthorized user'
-        end
-
-        context 'is valid' do
-          it_behaves_like 'authorized user'
-        end
-      end
-
+    shared_examples 'permitted user' do
       context 'when params' do
         context 'valid' do
           before do
@@ -78,6 +64,24 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      context 'when auth' do
+        context 'is invalid' do
+          let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id) }
+
+          it_behaves_like 'unauthorized user'
+        end
+
+        context 'is valid' do
+          it_behaves_like 'authorized user'
+        end
+      end
+
+      it_behaves_like 'permitted user'
     end
   end
 end

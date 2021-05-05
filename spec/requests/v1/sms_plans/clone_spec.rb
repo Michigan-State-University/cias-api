@@ -32,8 +32,7 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
   end
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when user clones a sms_plan' do
         before { post clone_v1_sms_plan_path(id: sms_plan.id), headers: headers }
 
@@ -59,6 +58,12 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

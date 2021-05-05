@@ -21,8 +21,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id', type: :request 
   let(:headers) { user.create_new_auth_token }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when variant with given id exists' do
         it 'returns :no_content status' do
           request
@@ -56,6 +55,12 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id', type: :request 
           expect(response).to have_http_status(:method_not_allowed)
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

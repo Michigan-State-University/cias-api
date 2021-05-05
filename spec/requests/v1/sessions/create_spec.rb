@@ -37,20 +37,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
   let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-      context 'when auth' do
-        context 'is invalid' do
-          let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id) }
-
-          it_behaves_like 'unauthorized user'
-        end
-
-        context 'is valid' do
-          it_behaves_like 'authorized user'
-        end
-      end
-
+    shared_examples 'permitted user' do
       context 'when params' do
         context 'valid' do
           before do
@@ -86,6 +73,23 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+      context 'when auth' do
+        context 'is invalid' do
+          let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id) }
+
+          it_behaves_like 'unauthorized user'
+        end
+
+        context 'is valid' do
+          it_behaves_like 'authorized user'
+        end
+      end
+
+      it_behaves_like 'permitted user'
     end
   end
 end

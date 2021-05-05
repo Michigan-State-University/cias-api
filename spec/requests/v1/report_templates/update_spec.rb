@@ -22,8 +22,7 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
   let(:logo) { fixture_file_upload('images/logo.png', 'image/png') }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when params are valid' do
         let(:params) do
           {
@@ -79,6 +78,12 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

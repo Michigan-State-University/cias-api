@@ -99,11 +99,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   end
 
   context 'when one of the roles is researcher' do
-    %w[researcher user_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-
-      before { request }
-
+    shared_examples 'permitted user' do
       context 'intervention does not belong to him' do
         it { expect(response).to have_http_status(:not_found) }
       end
@@ -155,6 +151,14 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
           end
         end
       end
+    end
+
+    %w[researcher user_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      before { request }
+
+      it_behaves_like 'permitted user'
     end
   end
 

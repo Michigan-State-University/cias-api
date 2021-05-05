@@ -21,8 +21,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
   let(:headers) { user.create_new_auth_token }
 
   context 'admin has one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when params are valid' do
         it 'returns :no_content status' do
           request
@@ -36,6 +35,12 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
           expect(ReportTemplate.exists?(report_template.id)).to be false
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

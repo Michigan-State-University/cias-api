@@ -72,7 +72,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   let(:request) { post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |_role|
+    shared_examples 'permitted user' do
       context 'when auth' do
         context 'is invalid' do
           let(:request) { post v1_question_group_questions_path(question_group.id) }
@@ -161,6 +161,12 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

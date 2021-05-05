@@ -40,7 +40,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
   end
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |_role|
+    shared_examples 'permitted user' do
       context 'when response' do
         context 'is success' do
           before { request }
@@ -70,6 +70,12 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

@@ -18,8 +18,7 @@ RSpec.describe 'DELETE /v1/teams/:id', type: :request do
   let(:team_id) { team.id }
 
   context 'when team with given id exists' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       it 'returns :no_content status' do
         request
         expect(response).to have_http_status(:no_content)
@@ -45,6 +44,12 @@ RSpec.describe 'DELETE /v1/teams/:id', type: :request do
           expect { request }.to avoid_changing { team_admin.reload.roles }
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

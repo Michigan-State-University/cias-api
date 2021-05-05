@@ -20,12 +20,12 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let!(:researcher_interventions) { create_list(:intervention, 3, :published, user: researcher, shared_to: :invited) }
   let!(:interventions_for_guests) { create_list(:intervention, 2, :published) }
 
-  context 'when user' do
+  context 'when user is' do
     before { get v1_interventions_path, headers: user.create_new_auth_token }
 
     %w[admin user_with_admin_role].each do |role|
       let(:user) { users[role] }
-      context 'has role admin' do
+      context role do
         let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests }
 
         it 'returns proper interventions' do

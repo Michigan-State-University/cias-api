@@ -37,9 +37,7 @@ describe 'PATCH /v1/users/:id', type: :request do
   before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
 
   context 'when current_user is admin' do
-    %w[admin user_with_multiple_roles].each do |role|
-      let(:current_user) { users[role] }
-
+    shared_examples 'admin' do
       context 'when current_user updates itself' do
         it { expect(response).to have_http_status(:ok) }
 
@@ -139,12 +137,16 @@ describe 'PATCH /v1/users/:id', type: :request do
         end
       end
     end
+
+    %w[admin user_with_multiple_roles].each do |role|
+      let(:current_user) { users[role] }
+
+      it_behaves_like 'admin'
+    end
   end
 
   context 'when current_user is researcher' do
-    %w[researcher researcher_with_multiple_roles].each do |role|
-      let!(:current_user) { users[role] }
-
+    shared_examples 'researcher' do
       context 'when current_user updates itself' do
         it { expect(response).to have_http_status(:ok) }
 
@@ -281,6 +283,12 @@ describe 'PATCH /v1/users/:id', type: :request do
           expect(json_response['message']).to include "Couldn't find User with"
         end
       end
+    end
+
+    %w[researcher researcher_with_multiple_roles].each do |role|
+      let!(:current_user) { users[role] }
+
+      it_behaves_like 'researcher'
     end
   end
 

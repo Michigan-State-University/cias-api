@@ -16,12 +16,11 @@ RSpec.describe 'GET /v1/teams/:id', type: :request do
   let!(:team_1) { create(:team) }
 
   context 'when there is a team with given id' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-      before do
-        get v1_team_path(id: team_1.id), headers: headers
-      end
+    before do
+      get v1_team_path(id: team_1.id), headers: headers
+    end
 
+    shared_examples 'permitted user' do
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
       end
@@ -33,6 +32,12 @@ RSpec.describe 'GET /v1/teams/:id', type: :request do
           'attributes' => include('name' => team_1.name)
         )
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

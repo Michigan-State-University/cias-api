@@ -24,8 +24,7 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
   end
 
   context 'when params' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'valid' do
         it 'returns :ok status' do
           request
@@ -156,6 +155,12 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
           end
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

@@ -20,8 +20,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:id', type: :request do
   let(:sms_plan_id) { sms_plan.id }
 
   context 'when user have multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when sms plan with given id exists' do
         it 'returns :no_content status' do
           request
@@ -55,6 +54,12 @@ RSpec.describe 'DELETE /v1/sms_plans/:id', type: :request do
           expect(response).to have_http_status(:method_not_allowed)
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

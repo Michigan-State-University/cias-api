@@ -86,8 +86,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when auth' do
         context 'is invalid' do
           let(:request) { post v1_clone_session_path(id: session.id) }
@@ -319,6 +318,12 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
           )
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

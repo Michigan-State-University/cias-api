@@ -22,14 +22,13 @@ RSpec.describe 'GET /v1/teams', type: :request do
     let(:team_1_admin) { team_1.team_admin }
     let(:team_2_admin) { team_2.team_admin }
 
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-      before do
-        team_1.users << team_1_researcher
-        team_2.users << team_2_researcher
-        get v1_teams_path, headers: headers
-      end
+    before do
+      team_1.users << team_1_researcher
+      team_2.users << team_2_researcher
+      get v1_teams_path, headers: headers
+    end
 
+    shared_examples 'permitted user' do
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
       end
@@ -81,6 +80,12 @@ RSpec.describe 'GET /v1/teams', type: :request do
           'teams_size' => 2
         )
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

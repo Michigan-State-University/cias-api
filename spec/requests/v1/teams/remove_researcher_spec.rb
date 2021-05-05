@@ -17,14 +17,13 @@ RSpec.describe 'DELETE /v1/teams/:team_id/remove_researcher', type: :request do
   let!(:team) { create :team }
 
   context 'when params are valid' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-      let(:params) do
-        {
-          user_id: team_user.id
-        }
-      end
+    let(:params) do
+      {
+        user_id: team_user.id
+      }
+    end
 
+    shared_examples 'permitted user' do
       context 'user is team researcher' do
         let(:team_user) { create(:user, :confirmed, :researcher, team_id: team.id) }
 
@@ -42,6 +41,12 @@ RSpec.describe 'DELETE /v1/teams/:team_id/remove_researcher', type: :request do
           expect(response).to have_http_status(:not_found)
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

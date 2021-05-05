@@ -31,8 +31,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
   end
 
   context 'one or multiple roles' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'when there are report templates' do
         it 'has correct http code :ok' do
           expect(response).to have_http_status(:ok)
@@ -103,6 +102,12 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
           expect(json_response['data']).to be_empty
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

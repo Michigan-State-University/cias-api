@@ -32,38 +32,40 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   context 'when user' do
     before { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
 
+    shared_examples 'permitted user' do
+      it 'contains proper sessions collection' do
+        expect(attrs['sessions'].size).to eq sessions.size
+      end
+
+      context 'when intervention does not contain any report' do
+        it 'contains proper attributes' do
+          expect(attrs).to include(
+            'name' => 'Some intervention',
+            'shared_to' => shared_to,
+            'csv_link' => nil,
+            'csv_generated_at' => nil
+          )
+        end
+      end
+
+      context 'when intervention contains some report' do
+        let!(:reports) { [csv_attachment] }
+
+        it 'contains proper attributes' do
+          expect(attrs).to include(
+            'name' => 'Some intervention',
+            'shared_to' => shared_to,
+            'csv_link' => include('test_empty.csv'),
+            'csv_generated_at' => be_present
+          )
+        end
+      end
+    end
+
     %w[researcher user_with_multiple_roles].each do |role|
       let(:user) { users[role] }
 
-      context 'has role admin' do
-        it 'contains proper sessions collection' do
-          expect(attrs['sessions'].size).to eq sessions.size
-        end
-
-        context 'when intervention does not contain any report' do
-          it 'contains proper attributes' do
-            expect(attrs).to include(
-              'name' => 'Some intervention',
-              'shared_to' => shared_to,
-              'csv_link' => nil,
-              'csv_generated_at' => nil
-            )
-          end
-        end
-
-        context 'when intervention contains some report' do
-          let!(:reports) { [csv_attachment] }
-
-          it 'contains proper attributes' do
-            expect(attrs).to include(
-              'name' => 'Some intervention',
-              'shared_to' => shared_to,
-              'csv_link' => include('test_empty.csv'),
-              'csv_generated_at' => be_present
-            )
-          end
-        end
-      end
+      it_behaves_like 'permitted user'
     end
 
     context 'has role participant' do

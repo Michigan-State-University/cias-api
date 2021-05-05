@@ -27,8 +27,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
   end
 
   context 'when user has admin role' do
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'permitted user' do
       context 'valid params' do
         let(:expected_end_at) { Date.strptime('11/03/2021', '%d/%m/%Y') }
 
@@ -66,6 +65,12 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
           expect(response).to have_http_status(:method_not_allowed)
         end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 
