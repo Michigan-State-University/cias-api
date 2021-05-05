@@ -9,12 +9,6 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
-  let(:users) do
-    {
-      'researcher' => researcher,
-      'user_with_multiple_roles' => user_with_multiple_roles
-    }
-  end
   let(:headers) { user.create_new_auth_token }
 
   let(:params) do
@@ -153,8 +147,16 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       end
     end
 
-    %w[researcher user_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    context 'user is researcher' do
+      let(:user) { researcher }
+
+      before { request }
+
+      it_behaves_like 'permitted user'
+    end
+
+    context 'user has multiple roles' do
+      let(:user) { user_with_multiple_roles }
 
       before { request }
 

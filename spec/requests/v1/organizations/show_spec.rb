@@ -142,17 +142,15 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
       end
     end
 
-    context 'when user is admin' do
-      context 'one or multiple roles' do
-        %w[admin admin_with_multiple_roles].each do |role|
+    context 'when user is' do
+      %w[admin admin_with_multiple_roles].each do |role|
+        context role.to_s do
           let(:user) { users[role] }
 
           it_behaves_like 'permitted user'
         end
       end
-    end
 
-    context 'when user is' do
       %w[organization_admin e_intervention_admin].each do |role|
         context role.to_s do
           context 'refers to their organization' do

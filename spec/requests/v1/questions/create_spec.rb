@@ -6,12 +6,6 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
-  let(:users) do
-    {
-      'admin' => admin,
-      'admin_with_multiple_roles' => admin_with_multiple_roles
-    }
-  end
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
   let(:blocks) { [] }
@@ -113,7 +107,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         end
 
         it 'has correct patterns data' do
-          expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => { 'id' => '', 'type' => 'Question' })
+          expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => [{ 'id' => '', 'type' => 'Question', 'probability' => '100' }])
         end
 
         it 'has correct body data size' do
@@ -165,8 +159,12 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       end
     end
 
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    context 'when user is admin' do
+      it_behaves_like 'permitted user'
+    end
+
+    context 'when user has multiple roles' do
+      let(:user) { admin_with_multiple_roles }
 
       it_behaves_like 'permitted user'
     end

@@ -6,12 +6,6 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
   let(:user) { researcher }
-  let(:users) do
-    {
-      'researcher' => researcher,
-      'researcher_with_multiple_roles' => researcher_with_multiple_roles
-    }
-  end
   let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:other_session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
@@ -118,12 +112,14 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
       end
     end
 
-    context 'one or multiple roles' do
-      %w[researcher researcher_with_multiple_roles].each do |role|
-        let(:user) { users[role] }
+    context 'user is researcher' do
+      it_behaves_like 'permitted user'
+    end
 
-        it_behaves_like 'permitted user'
-      end
+    context 'user is researcher' do
+      let(:user) { researcher_with_multiple_roles }
+
+      it_behaves_like 'permitted user'
     end
   end
 end

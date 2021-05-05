@@ -6,12 +6,6 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
-  let(:users) do
-    {
-      'admin' => admin,
-      'admin_with_multiple_roles' => admin_with_multiple_roles
-    }
-  end
   let(:session) { create(:session) }
   let(:headers) { user.create_new_auth_token }
   let!(:sms_plan) { create(:sms_plan, name: 'Plan name', session: session) }
@@ -60,8 +54,12 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
       end
     end
 
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    context 'when user is admin' do
+      it_behaves_like 'permitted user'
+    end
+
+    context 'when user has multiple roles' do
+      let(:user) { admin_with_multiple_roles }
 
       it_behaves_like 'permitted user'
     end

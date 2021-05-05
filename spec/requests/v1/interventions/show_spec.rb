@@ -9,12 +9,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
-  let(:users) do
-    {
-      'researcher' => researcher,
-      'user_with_multiple_roles' => user_with_multiple_roles
-    }
-  end
 
   let(:shared_to) { 'registered' }
   let(:intervention_user) { admin }
@@ -62,8 +56,12 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
       end
     end
 
-    %w[researcher user_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    context 'user is admin' do
+      it_behaves_like 'permitted user'
+    end
+
+    context 'user has multiple roles' do
+      let(:user) { user_with_multiple_roles }
 
       it_behaves_like 'permitted user'
     end
