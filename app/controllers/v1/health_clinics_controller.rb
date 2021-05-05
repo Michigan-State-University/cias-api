@@ -16,21 +16,21 @@ class V1::HealthClinicsController < V1Controller
   def create
     authorize! :create, HealthClinic
 
-    clinic = V1::HealthClinic::Create.call(clinic_params)
+    clinic = V1::HealthClinics::Create.call(clinic_params)
     render json: serialized_response(clinic), status: :created
   end
 
   def update
     authorize! :update, HealthClinic
 
-    health_clinic = V1::HealthClinic::Update.call(clinic_load, clinic_params)
+    health_clinic = V1::HealthClinics::Update.call(clinic_load, clinic_params)
     render json: serialized_response(health_clinic)
   end
 
   def destroy
     authorize! :delete, HealthClinic
 
-    V1::HealthClinic::Destroy.call(clinic_load)
+    V1::HealthClinics::Destroy.call(clinic_load)
     head :no_content
   end
 

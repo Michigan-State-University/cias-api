@@ -3,7 +3,7 @@
 if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
   require 'sidekiq/web'
   Sidekiq::Web.use ActionDispatch::Cookies
-  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: "_interslice_session"
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session'
 end
 
 Rails.application.routes.draw do

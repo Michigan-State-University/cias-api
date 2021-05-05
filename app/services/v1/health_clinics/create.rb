@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::HealthClinic::Create
+class V1::HealthClinics::Create
   def self.call(health_clinic_params)
     new(health_clinic_params).call
   end

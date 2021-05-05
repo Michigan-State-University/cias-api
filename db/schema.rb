@@ -14,7 +14,6 @@ ActiveRecord::Schema.define(version: 2021_05_04_072909) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -344,9 +343,9 @@ ActiveRecord::Schema.define(version: 2021_05_04_072909) do
     t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
   end
 
-  create_table "user_health_clinics", force: :cascade do |t|
-    t.bigint "user_id"
-    t.bigint "health_clinic_id"
+  create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_clinic_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_health_clinics_on_health_clinic_id"
@@ -424,13 +423,13 @@ ActiveRecord::Schema.define(version: 2021_05_04_072909) do
     t.datetime "verification_code_created_at"
     t.uuid "organizable_id"
     t.boolean "confirmed_verification", default: false, null: false
+    t.string "organizable_type"
     t.text "email_ciphertext"
     t.text "first_name_ciphertext"
     t.text "last_name_ciphertext"
     t.text "uid_ciphertext"
     t.string "email_bidx"
     t.string "uid_bidx"
-    t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
