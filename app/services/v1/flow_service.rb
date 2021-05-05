@@ -3,6 +3,7 @@
 class V1::FlowService
   REFLECTION_MISS_MATCH = 'ReflectionMissMatch'
   NO_BRANCHING_TARGET = 'NoBranchingTarget'
+  RANDOMIZATION_MISS_MATCH = 'RandomizationMissMatch'
 
   def initialize(user_session)
     @user_session = user_session
@@ -51,8 +52,16 @@ class V1::FlowService
   end
 
   def branching_source_to_question(source)
-    branching_type = source['target']['type']
-    question_or_session = branching_type.safe_constantize.find_by(id: source['target']['id'])
+    source = V1::RandomizationService.new(source['target']).execute
+
+    if source.is_a?(Array)
+      self.warning = RANDOMIZATION_MISS_MATCH
+      return nil
+    end
+
+    branching_type = source['type']
+    question_or_session = branching_type.safe_constantize.find_by(id: source['id'])
+
     if question_or_session.nil?
       self.warning = NO_BRANCHING_TARGET
       return nil

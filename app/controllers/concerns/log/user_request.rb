@@ -37,5 +37,17 @@ module Log::UserRequest
     params.delete(:password)
     params.delete(:password_confirmation)
     params.delete(:registration)
+    params.delete(:phone_number)
+    params.delete(:email)
+    params[:user]&.delete(:first_name)
+    params[:user]&.delete(:last_name)
+    params[:user][:phone_attributes]&.delete(:number) if params[:user].present?
+    params.delete(:first_name)
+    params.delete(:last_name)
+    params[:answer]&.delete(:body)
+    params[:user_session]&.delete(:emails)
+    params[:session_invitation]&.delete(:emails)
+    params[:invitation]&.delete(:email)
+    params.delete(:current_password)
   end
 end

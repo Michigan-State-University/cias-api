@@ -10,7 +10,7 @@ class V1::OrganizationsController < V1Controller
   def show
     authorize! :read, Organization
 
-    render json: serialized_response(organization_load)
+    render json: organization_response(organization_load)
   end
 
   def create
@@ -45,5 +45,12 @@ class V1::OrganizationsController < V1Controller
 
   def organization_params
     params.require(:organization).permit(:name, :organization_admins_to_add, :organization_admins_to_remove)
+  end
+
+  def organization_response(organization)
+    V1::OrganizationSerializer.new(
+      organization,
+      { include: %i[e_intervention_admins organization_admins] }
+    )
   end
 end

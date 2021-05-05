@@ -11,8 +11,7 @@ RSpec.describe 'Session', type: :request do
   describe 'POST /v1/auth/sign_in' do
     context 'when login params is valid' do
       before do
-        cookies['verification_code'] = user.verification_code
-        post '/v1/auth/sign_in', params: params
+        post '/v1/auth/sign_in', params: params, headers: { 'Verification-Code' => user.verification_code.to_s }
       end
 
       it { expect(response).to have_http_status(:success) }

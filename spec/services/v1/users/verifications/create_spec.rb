@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Users::Verifications::Create do
-  subject { described_class.call(user, verification_code_from_cookies) }
+  subject { described_class.call(user, verification_code_from_headers) }
 
   let(:time) { Time.zone.local(2020, 2, 2, 12, 12) }
   let(:user) do
@@ -21,7 +21,7 @@ RSpec.describe V1::Users::Verifications::Create do
   end
 
   context 'when first login' do
-    let(:verification_code_from_cookies) { nil }
+    let(:verification_code_from_headers) { nil }
     let(:verification_code) { nil }
     let(:verification_code_created_at) { nil }
 
@@ -35,7 +35,7 @@ RSpec.describe V1::Users::Verifications::Create do
   end
 
   context 'when log in on other browser than previous login' do
-    let(:verification_code_from_cookies) { nil }
+    let(:verification_code_from_headers) { nil }
     let(:verification_code) { '123' }
     let!(:verification_code_created_at) { time }
 
@@ -49,7 +49,7 @@ RSpec.describe V1::Users::Verifications::Create do
   end
 
   context 'when verification_code is expired' do
-    let(:verification_code_from_cookies) { '123' }
+    let(:verification_code_from_headers) { '123' }
     let(:verification_code) { '123' }
     let(:verification_code_created_at) { Time.zone.local(2019, 2, 2, 12, 12) }
 
@@ -63,7 +63,7 @@ RSpec.describe V1::Users::Verifications::Create do
   end
 
   context 'when verification_code is present and is valid' do
-    let(:verification_code_from_cookies) { '123' }
+    let(:verification_code_from_headers) { '123' }
     let(:verification_code) { '123' }
     let!(:verification_code_created_at) { time }
 
@@ -72,6 +72,22 @@ RSpec.describe V1::Users::Verifications::Create do
       subject
       updated_user = user.reload
       expect(updated_user.verification_code).to eq '123'
+    end
+  end
+
+  context 'when exists verification code of another user in headers' do
+    let(:verification_code_from_headers) { '123' }
+    let!(:verification_code_created_at) { time }
+    let!(:another_user) do
+      create(:user, verification_code: verification_code_from_headers,
+             confirmed_verification: true, verification_code_created_at: verification_code_created_at)
+    end
+    let!(:user) do
+      create(:user, verification_code: nil, verification_code_created_at: nil, confirmed_verification: false)
+    end
+
+    it "generate new code and send email" do
+      expect { subject }.to change { user.verification_code }.from(nil).to('456')
     end
   end
 end

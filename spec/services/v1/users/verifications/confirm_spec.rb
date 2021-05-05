@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Users::Verifications::Confirm do
-  subject { described_class.call(verification_code) }
+  subject { described_class.call(verification_code, user.email) }
 
   let(:current_time) { Time.zone.local(2020, 2, 2, 12, 12) }
   let(:verification_code) { '1234' }
@@ -31,6 +31,15 @@ RSpec.describe V1::Users::Verifications::Confirm do
 
     it "don't confirm verification code" do
       expect { subject }.not_to change { user.reload.confirmed_verification }
+    end
+  end
+
+  context 'when user confirm the logging with code of another user' do
+    let!(:user) { create(:user, verification_code: '4567') }
+    let!(:user_2) { create(:user, verification_code: verification_code) }
+
+    it "don't confirm verification code" do
+      expect { subject }.to raise_exception(ActiveRecord::RecordNotFound)
     end
   end
 end

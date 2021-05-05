@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/users/confirm_logging_code', type: :request do
   let!(:user) { create(:user, verification_code: '123') }
-  let(:params) { { verification_code: '123' } }
+  let(:params) { { verification_code: '123', email: user.email } }
   let(:request) { patch v1_confirm_logging_code_path, params: params }
 
   before do

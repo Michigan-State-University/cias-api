@@ -33,7 +33,7 @@ RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
       end
 
       it 'creates correct session invites' do
-        expect(session.reload.invitations.pluck('email')).to match_array([invitation_email, participant.email])
+        expect(session.reload.invitations.map(&:email)).to match_array([invitation_email, participant.email])
       end
     end
 

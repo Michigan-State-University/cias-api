@@ -10,7 +10,7 @@ class V1::HealthSystemsController < V1Controller
   def show
     authorize! :read, HealthSystem
 
-    render json: serialized_response(health_system_load)
+    render json: health_system_response(health_system_load)
   end
 
   def create
@@ -45,5 +45,12 @@ class V1::HealthSystemsController < V1Controller
 
   def health_system_params
     params.require(:health_system).permit(:name, :organization_id, :health_system_admins_to_add, :health_system_admins_to_remove)
+  end
+
+  def health_system_response(health_system)
+    V1::HealthSystemSerializer.new(
+      health_system,
+      { include: %i[health_system_admins] }
+    )
   end
 end

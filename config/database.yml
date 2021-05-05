@@ -11,3 +11,9 @@ development:
 test:
   <<: *default
   database: cias_test
+
+production:
+  <<: *default
+  database: cias_production
+  username: <%= ENV['CIAS_DATABASE_USER'] %>
+  password: <%= ENV['CIAS_DATABASE_PASSWORD'] %>
