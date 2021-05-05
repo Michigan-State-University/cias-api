@@ -10,7 +10,7 @@ RSpec.describe HealthClinic, type: :model do
       let!(:existing_health_clinic) { create(:health_clinic) }
       let(:health_clinic) { build(:health_clinic) }
 
-      it 'organization is valid' do
+      it 'health_clinic is valid' do
         expect(health_clinic).to be_valid
       end
     end
@@ -19,7 +19,7 @@ RSpec.describe HealthClinic, type: :model do
       let!(:existing_health_clinic) { create(:health_clinic) }
       let(:health_clinic) { build_stubbed(:health_clinic, name: existing_health_clinic.name, health_system: existing_health_clinic.health_system) }
 
-      it 'team is invalid' do
+      it 'health clinic is invalid' do
         expect(health_clinic).not_to be_valid
         expect(health_clinic.errors.messages[:name]).to include(/has already been taken/)
       end

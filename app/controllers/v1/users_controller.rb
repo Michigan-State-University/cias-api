@@ -118,6 +118,7 @@ class V1::UsersController < V1Controller
         :active,
         :feedback_completed,
         :description,
+        :organizable_id,
         roles: [],
         phone_attributes: %i[iso prefix number]
       )
