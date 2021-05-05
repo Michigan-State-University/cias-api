@@ -137,9 +137,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   end
 
   context 'when one of the roles is researcher' do
-    %w[researcher user_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-
+    shared_examples 'permitted user' do
       before { request }
 
       context 'when params are VALID' do
@@ -156,7 +154,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
         it 'creates a intervention object' do
           expect(Intervention.last.attributes).to include(
             'name' => 'New Intervention',
-            'user_id' => user_with_multiple_roles.id,
+            'user_id' => user.id,
             'status' => 'draft',
             'shared_to' => 'anyone'
           )
@@ -182,6 +180,18 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           expect(Intervention.all.size).to eq 0
         end
       end
+    end
+
+    context 'user is researcher' do
+      let(:user) { researcher }
+
+      it_behaves_like 'permitted user'
+    end
+
+    context 'user is one of the roles is researcher' do
+      let(:user) { user_with_multiple_roles }
+
+      it_behaves_like 'permitted user'
     end
   end
 
