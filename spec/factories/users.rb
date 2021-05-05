@@ -80,6 +80,21 @@ FactoryBot.define do
       end
     end
 
+    trait :health_clinic_admin do
+      roles { %w[health_clinic_admin] }
+    end
+
+    trait :with_health_clinic do
+      after(:create, :build) do |health_clinic_admin|
+        if health_clinic_admin.role?('health_clinic_admin')
+          new_health_clinic = create(:health_clinic)
+          health_clinic_admin.organizable = new_health_clinic unless health_clinic_admin.organizable
+          health_clinic_admin.admins_health_clinics << new_health_clinic
+          new_health_clinic.health_clinic_admins << health_clinic_admin
+        end
+      end
+    end
+
     trait :e_intervention_admin do
       roles { %w[e_intervention_admin] }
     end

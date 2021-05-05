@@ -22,7 +22,17 @@ class V1::Users::Show < BaseSerializer
       feedback_completed: @user.feedback_completed,
       email_notification: @user.email_notification,
       sms_notification: @user.sms_notification,
-      description: @user.description
+      description: @user.description,
+      organizable_id: @user.organizable_id,
+      users_health_clinics: users_health_clinics
     }
+  end
+
+  private
+
+  def users_health_clinics
+    return unless @user.role?('health_clinic_admin')
+
+    @user.user_health_clinics.select(:id)
   end
 end

@@ -66,6 +66,36 @@ describe ReportingDashboard do
       it { should not_have_abilities(:create, described_class) }
     end
 
+    context 'health clinic admin' do
+      let!(:organization) { create(:organization) }
+      let!(:health_system) { create(:health_system, organization: organization) }
+      let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
+      let!(:dashboard) { health_clinic.health_system.organization.reporting_dashboard }
+
+      let!(:other_health_clinic) { create(:health_clinic, health_system: health_system) }
+      let!(:other_dashboard) { other_health_clinic.health_system.organization.reporting_dashboard }
+
+      let(:user) { health_clinic.health_clinic_admins.first }
+
+      it 'can read reporting dashboards of organizations that he is admin for' do
+        expect(subject).to have_abilities(
+          {
+            read: true
+          },
+          dashboard
+        )
+      end
+
+      it 'can\'t read other reporting dashboards' do
+        expect(subject).to not_have_abilities(
+          %i[read],
+          other_dashboard
+        )
+      end
+
+      it { should not_have_abilities(:create, described_class) }
+    end
+
     context 'user can\'t read reporting dashboards of any organization' do
       %i[team_admin researcher participant guest].each do |role|
         context "current user is #{role}" do

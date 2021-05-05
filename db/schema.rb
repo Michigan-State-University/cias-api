@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_27_122010) do
+ActiveRecord::Schema.define(version: 2021_05_04_072909) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -88,6 +89,18 @@ ActiveRecord::Schema.define(version: 2021_04_27_122010) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["google_tts_language_id"], name: "index_google_tts_voices_on_google_tts_language_id"
+  end
+
+  create_table "health_clinic_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_clinic_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_clinic_id"], name: "index_health_clinic_invitations_on_health_clinic_id"
+    t.index ["invitation_token"], name: "index_health_clinic_invitations_on_invitation_token"
+    t.index ["user_id"], name: "index_health_clinic_invitations_on_user_id"
   end
 
   create_table "health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -329,6 +342,15 @@ ActiveRecord::Schema.define(version: 2021_04_27_122010) do
     t.uuid "team_admin_id"
     t.index ["name"], name: "index_teams_on_name", unique: true
     t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
+  end
+
+  create_table "user_health_clinics", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "health_clinic_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_clinic_id"], name: "index_user_health_clinics_on_health_clinic_id"
+    t.index ["user_id"], name: "index_user_health_clinics_on_user_id"
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
