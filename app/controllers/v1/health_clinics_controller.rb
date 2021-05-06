@@ -10,7 +10,7 @@ class V1::HealthClinicsController < V1Controller
   def show
     authorize! :read, HealthClinic
 
-    render json: serialized_response(clinic_load)
+    render json: health_clinic_response(clinic_load)
   end
 
   def create
@@ -46,5 +46,12 @@ class V1::HealthClinicsController < V1Controller
 
   def clinic_params
     params.require(:health_clinic).permit(:name, :health_system_id)
+  end
+
+  def health_clinic_response(health_clinic)
+    V1::HealthClinicSerializer.new(
+      health_clinic,
+      { include: %i[health_clinic_admins] }
+    )
   end
 end

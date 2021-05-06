@@ -17,8 +17,8 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
     {
       health_system: {
         name: 'Health System 50',
-        organization_admins_to_remove: [health_system_admin_to_remove.id],
-        organization_admins_to_add: [new_health_system_admin.id]
+        health_system_admins_to_remove: [health_system_admin_to_remove.id],
+        health_system_admins_to_add: [new_health_system_admin.id]
       }
     }
   end
@@ -51,10 +51,12 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
             'type' => 'health_system',
             'attributes' => {
               'name' => 'Health System 50',
-              'health_clinics' => { 'data' => [] },
               'organization_id' => organization.id
             },
-            'relationships' => { 'health_system_admins' => { 'data' => [{ 'id' => health_system_admin_to_remove.id, 'type' => 'health_system_admin' }] } }
+            'relationships' => {
+              'health_system_admins' => { 'data' => [{ 'id' => new_health_system_admin.id, 'type' => 'user' }] },
+              'health_clinics' => { 'data' => [] }
+            }
           }
         )
       end

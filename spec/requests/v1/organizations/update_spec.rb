@@ -48,13 +48,15 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
       it 'returns proper data' do
         expect(json_response['data']).to include(
           {
+            'id' => organization.id,
             'type' => 'organization',
             'attributes' => {
-              'name' => 'Oregano Public Health',
-              'health_systems_and_clinics' => { 'data' => [] }
+              'name' => 'Oregano Public Health'
             },
-            'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'e_intervention_admin' }] },
-                                 'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'organization_admin' }] } }
+            'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
+                                 'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id, 'type' => 'user' }] },
+                                 'health_clinics' => { 'data' => [] },
+                                 'health_systems' => { 'data' => [] } }
           }
         )
       end

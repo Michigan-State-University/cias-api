@@ -3,10 +3,8 @@
 class V1::OrganizationSerializer < V1Serializer
   attributes :name
 
-  attribute :health_systems_and_clinics do |object|
-    V1::HealthSystemSerializer.new(object.health_systems)
-  end
-
-  has_many :e_intervention_admins, serializer: V1::UserSerializer
-  has_many :organization_admins, serializer: V1::UserSerializer
+  has_many :health_clinics, serializer: V1::HealthClinicSerializer
+  has_many :health_systems, serializer: V1::HealthSystemSerializer
+  has_many :e_intervention_admins, record_type: :user, serializer: V1::UserSerializer
+  has_many :organization_admins, record_type: :user, serializer: V1::UserSerializer
 end

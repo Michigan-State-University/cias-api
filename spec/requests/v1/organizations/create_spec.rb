@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/organizations', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:new_organization_admin) { create(:user, :confirmed, :e_intervention_admin) }
+  let(:new_organization_admin) { create(:user, :confirmed, :organization_admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let(:headers) { user.create_new_auth_token }
@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
     {
       organization: {
         name: 'New Organization',
-        organization_admins_to_add: [new_organization_admin.id.to_s]
+        organization_admins_to_add: [new_organization_admin.id]
       }
     }
   end
@@ -43,10 +43,12 @@ RSpec.describe 'POST /v1/organizations', type: :request do
           {
             'type' => 'organization',
             'attributes' => {
-              'name' => 'New Organization',
-              'health_systems_and_clinics' => { 'data' => [] }
+              'name' => 'New Organization'
             },
-            'relationships' => { 'e_intervention_admins' => { 'data' => [] }, 'organization_admins' => { 'data' => [] } }
+            'relationships' => { 'e_intervention_admins' => { 'data' => [] },
+                                 'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id, 'type' => 'user' }] },
+                                 'health_clinics' => { 'data' => [] },
+                                 'health_systems' => { 'data' => [] } }
           }
         )
       end

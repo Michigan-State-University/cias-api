@@ -9,7 +9,8 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
-  let!(:health_clinic) { create(:health_clinic, name: 'Health Clinic', health_system: health_system) }
+  let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let!(:health_clinic_admin) { health_clinic.health_clinic_admins.first }
 
   let(:roles_organization) do
     {
@@ -52,13 +53,31 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
             'attributes' => {
               'health_system_id' => health_system.id,
               'name' => health_clinic.name
+            },
+            'relationships' => {
+              'health_clinic_admins' => { 'data' => [{ 'id' => health_clinic_admin.id, 'type' => 'user' }] }
             }
           }
         )
       end
 
+      it 'returns proper include' do
+        expect(json_response['included'][0]).to include(
+          {
+            'id' => health_clinic_admin.id,
+            'type' => 'user',
+            'attributes' => include(
+              'email' => health_clinic_admin.email,
+              'first_name' => health_clinic_admin.first_name,
+              'last_name' => health_clinic_admin.last_name,
+              'roles' => ['health_clinic_admin']
+            )
+          }
+        )
+      end
+
       it 'returns proper collection size' do
-        expect(json_response.size).to eq(1)
+        expect(json_response.size).to eq(2)
       end
     end
 
