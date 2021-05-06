@@ -9,6 +9,7 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let!(:health_clinic_admin) { health_clinic.health_clinic_admins.first }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_health_clinic_path(health_clinic.id), headers: headers }
@@ -28,6 +29,11 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
   context 'when user is permitted' do
     shared_examples 'permitted user' do
       before { request }
+
+      it 'return correct organizable and user_health_clinics' do
+        expect(health_clinic_admin.reload.organizable_id).to eq(nil)
+        expect(health_clinic_admin.user_health_clinics).to match_array([])
+      end
 
       it 'returns correct status' do
         expect(response).to have_http_status(:no_content)
