@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_04_072909) do
+ActiveRecord::Schema.define(version: 2021_05_05_104537) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -66,13 +66,18 @@ ActiveRecord::Schema.define(version: 2021_05_04_072909) do
     t.string "report_for", default: "third_party", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.uuid "third_party_id"
     t.uuid "participant_id"
     t.index ["participant_id"], name: "index_generated_reports_on_participant_id"
     t.index ["report_for"], name: "index_generated_reports_on_report_for"
     t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"
-    t.index ["third_party_id"], name: "index_generated_reports_on_third_party_id"
     t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
+  end
+
+  create_table "generated_reports_third_party_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "generated_report_id"
+    t.uuid "third_party_id"
+    t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
+    t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
 
   create_table "google_tts_languages", force: :cascade do |t|

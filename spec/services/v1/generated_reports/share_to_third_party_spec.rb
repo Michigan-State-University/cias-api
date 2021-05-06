@@ -24,8 +24,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
     it 'invites new user with third party role to the system, shares generated report with the user' do
       expect { subject }.to change(User, :count).by(1)
-
-      expect(generated_report.reload.third_party_id).to eq(new_user.id)
+      expect(generated_report.reload.third_party_users).to include(new_user)
 
       expect(ActionMailer::MailDeliveryJob).to have_been_enqueued
       expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
@@ -43,7 +42,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     let!(:user) { create(:user, :confirmed, :third_party, email: 'johnny@example.com') }
 
     it 'sends information about new report to the user, shared the report with the user' do
-      expect { subject }.to change { generated_report.reload.third_party_id }.from(nil).to(user.id).and \
+      expect { subject }.to change { generated_report.reload.third_party_users }.from([]).to([user]).and \
         change { ActionMailer::Base.deliveries.size }.by(1).and \
           avoid_changing { User.count }
     end
@@ -51,11 +50,11 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
   context 'when report is not for third party' do
     before do
-      generated_report.update(report_for: 'participant')
+      generated_report.update!(report_for: 'participant')
     end
 
     it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { generated_report.reload.third_party_id }.and \
+      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }
     end
@@ -67,7 +66,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     end
 
     it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { generated_report.reload.third_party_id }.and \
+      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }
     end
@@ -79,7 +78,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     end
 
     it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { generated_report.reload.third_party_id }.and \
+      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }
     end
@@ -89,7 +88,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     let!(:user) { create(:user, :confirmed, :researcher, email: 'johnny@example.com') }
 
     it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { generated_report.reload.third_party_id }.and \
+      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }
     end
@@ -99,7 +98,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     let!(:user) { create(:user, :confirmed, :third_party, email: 'johnny@example.com', active: false) }
 
     it 'share report with third party but avoid sending email about new report' do
-      expect { subject }.to change { generated_report.reload.third_party_id }.from(nil).to(user.id).and \
+      expect { subject }.to change { generated_report.reload.third_party_users }.from([]).to([user]).and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }
     end

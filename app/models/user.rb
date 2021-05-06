@@ -49,6 +49,9 @@ class User < ApplicationRecord
   has_many :health_system_invitations, dependent: :destroy
   has_many :health_clinic_invitations, dependent: :destroy
 
+  has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
+                                                 dependent: :destroy
+
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
 

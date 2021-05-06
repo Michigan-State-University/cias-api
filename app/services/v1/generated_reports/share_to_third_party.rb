@@ -12,44 +12,58 @@ class V1::GeneratedReports::ShareToThirdParty
 
   def call
     return if third_party_reports.blank?
-    return if third_party_email.blank?
-    return if user_is_not_third_party?
+    return if third_party_emails.blank?
+    return if third_party_users.blank?
 
-    third_party_user = find_or_create_third_party
-
-    third_party_reports.update_all(third_party_id: third_party_user.id)
-
-    return if third_party_user&.deactivated?
-    return unless third_party_user.email_notification
-
-    if third_party_user.confirmed?
-      GeneratedReportMailer.new_report_available(third_party_user.email).deliver_now
-    else
-      SendNewReportNotificationJob.set(wait: 30.seconds)
-        .perform_later(third_party_user.email)
-    end
+    create_generated_reports_third_party_users
+    send_reports_emails
   end
 
   private
 
   attr_reader :user_session, :third_party_reports
 
-  def find_or_create_third_party
-    user || User.invite!(email: third_party_email, roles: ['third_party'])
+  def send_reports_emails
+    third_party_users.each do |user|
+      next if user.deactivated? || !user.email_notification
+
+      if user.confirmed?
+        GeneratedReportMailer.new_report_available(user.email).deliver_now
+      else
+        SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email)
+      end
+    end
   end
 
-  def user
-    @user ||= User.find_by(email: third_party_email)
+  def create_generated_reports_third_party_users
+    third_party_reports.each do |report|
+      third_party_users.each do |user|
+        report.generated_reports_third_party_users.create!(third_party_id: user.id)
+      end
+    end
   end
 
-  def user_is_not_third_party?
-    user&.not_a_third_party?
+  def third_party_users
+    @third_party_users ||= find_or_create_third_party_users
   end
 
-  def third_party_email
-    @third_party_email ||= Answer.find_by(
-      type: 'Answer::ThirdParty',
+  def find_or_create_third_party_users
+    [].tap do |users|
+      third_party_emails.each do |email|
+        next if email.blank?
+
+        user = User.find_by(email: email)
+        next if user.present? && user.roles.exclude?('third_party')
+
+        user ||= User.invite!(email: email, roles: ['third_party'])
+        users << user
+      end
+    end
+  end
+
+  def third_party_emails
+    @third_party_emails ||= Answer::ThirdParty.where(
       user_session_id: user_session.id
-    )&.body_data&.first&.dig('value')
+    ).map { |answer| answer.body_data&.first&.dig('value') }
   end
 end

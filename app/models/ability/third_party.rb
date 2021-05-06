@@ -9,6 +9,7 @@ class Ability::ThirdParty < Ability::Base
   private
 
   def third_party
-    can :read, GeneratedReport, third_party_id: user.id, report_for: 'third_party'
+    can :read, GeneratedReport, id: GeneratedReport.for_third_party_user(user).pluck(:id),
+                                report_for: 'third_party'
   end
 end
