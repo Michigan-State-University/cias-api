@@ -3,7 +3,7 @@
 if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
   require 'sidekiq/web'
   Sidekiq::Web.use ActionDispatch::Cookies
-  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: "_interslice_session"
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session'
 end
 
 Rails.application.routes.draw do
@@ -131,6 +131,9 @@ Rails.application.routes.draw do
       scope module: 'organizations' do
         post 'invitations/invite_organization_admin', to: 'invitations#invite_organization_admin'
         post 'invitations/invite_intervention_admin', to: 'invitations#invite_intervention_admin'
+        scope module: 'dashboard_sections' do
+          resources :dashboard_sections, only: %i[index show create update destroy], controller: :dashboard_sections
+        end
       end
     end
     get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm

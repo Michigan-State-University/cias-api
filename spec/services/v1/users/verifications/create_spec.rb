@@ -80,14 +80,14 @@ RSpec.describe V1::Users::Verifications::Create do
     let!(:verification_code_created_at) { time }
     let!(:another_user) do
       create(:user, verification_code: verification_code_from_headers,
-             confirmed_verification: true, verification_code_created_at: verification_code_created_at)
+                    confirmed_verification: true, verification_code_created_at: verification_code_created_at)
     end
     let!(:user) do
       create(:user, verification_code: nil, verification_code_created_at: nil, confirmed_verification: false)
     end
 
-    it "generate new code and send email" do
-      expect { subject }.to change { user.verification_code }.from(nil).to('456')
+    it 'generate new code and send email' do
+      expect { subject }.to change(user, :verification_code).from(nil).to('456')
     end
   end
 end

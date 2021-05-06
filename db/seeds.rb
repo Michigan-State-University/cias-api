@@ -2,7 +2,6 @@
 
 require 'faker'
 
-# rubocop:disable Style/ClassVars
 class SummonUsers
   class << self
     def onboarding
@@ -12,7 +11,7 @@ class SummonUsers
     private
 
     def summon_many
-      roles.each_with_index do |role, index|
+      roles.each_with_index do |role, _index|
         u = User.new(
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,

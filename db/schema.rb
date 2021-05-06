@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_05_104537) do
+ActiveRecord::Schema.define(version: 2021_05_05_135101) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -59,6 +58,15 @@ ActiveRecord::Schema.define(version: 2021_05_05_104537) do
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
   end
 
+  create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.uuid "reporting_dashboard_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
+  end
+
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "report_template_id"
@@ -76,6 +84,8 @@ ActiveRecord::Schema.define(version: 2021_05_05_104537) do
   create_table "generated_reports_third_party_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "generated_report_id"
     t.uuid "third_party_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
@@ -349,9 +359,9 @@ ActiveRecord::Schema.define(version: 2021_05_05_104537) do
     t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
   end
 
-  create_table "user_health_clinics", force: :cascade do |t|
-    t.bigint "user_id"
-    t.bigint "health_clinic_id"
+  create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_clinic_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_health_clinics_on_health_clinic_id"
