@@ -5,6 +5,8 @@ class OrganizableMailer < ApplicationMailer
     @invitation_token = invitation_token
     @organizable = organizable
 
-    mail(to: email, subject: I18n.t('organizable_mailer.invite_user.subject', organizable_type: organizable_type, organizable_name: organizable.name))
+    mail(to: email,
+         subject: I18n.t('organizable_mailer.invite_user.subject', organizable_type: organizable_type),
+         body: I18n.t('organizable_mailer.invite_user.body', organizable_name: @organizable.name))
   end
 end

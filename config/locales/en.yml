@@ -67,10 +67,10 @@ en:
       not_found: "%{organizable_type} Invitation not found"
   organizable_mailer:
     invite_user:
-      subject:      You've been invited to the %{organization_type}
-      header:       '%{organization_name} Invitation'
-      body:         "You've been invited to the %{organization_name}."
-      instruction:  'Click the link below to accept the invitation and join the %{organization_type}.'
+      subject:      You've been invited to the %{organizable_type}
+      header:       '%{organizable_type} Invitation'
+      body:         "You've been invited to the %{organizable_name}."
+      instruction:  'Click the link below to accept the invitation and join the %{organizable_type}.'
       button_text:  Accept the Invitation
   generated_report_mailer:
     new_report_available:
