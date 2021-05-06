@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_05_135101) do
+ActiveRecord::Schema.define(version: 2021_05_06_084750) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -84,8 +84,6 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
   create_table "generated_reports_third_party_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "generated_report_id"
     t.uuid "third_party_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
     t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
@@ -162,7 +160,6 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
   end
 
   create_table "invitations", force: :cascade do |t|
-    t.string "email"
     t.uuid "invitable_id"
     t.string "invitable_type"
     t.datetime "created_at", precision: 6, null: false
@@ -170,11 +167,9 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.text "email_ciphertext"
     t.string "email_bidx"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
-    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
   create_table "messages", force: :cascade do |t|
-    t.string "phone", null: false
     t.text "body", null: false
     t.string "status", default: "new", null: false
     t.datetime "schedule_at"
@@ -205,7 +200,6 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.uuid "user_id"
     t.string "iso", null: false
     t.string "prefix", null: false
-    t.string "number", null: false
     t.string "confirmation_code"
     t.boolean "confirmed", default: false, null: false
     t.datetime "confirmed_at"
@@ -397,10 +391,6 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "provider", default: "email", null: false
-    t.string "uid", default: "", null: false
-    t.string "first_name", default: "", null: false
-    t.string "last_name", default: "", null: false
-    t.string "email"
     t.string "time_zone"
     t.string "roles", default: [], array: true
     t.jsonb "tokens"
@@ -447,7 +437,6 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.string "uid_bidx"
     t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
-    t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
@@ -458,9 +447,6 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
     t.index ["team_id"], name: "index_users_on_team_id"
-    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
-    t.index ["uid", "roles"], name: "index_users_on_uid_and_roles", using: :gin
-    t.index ["uid"], name: "index_users_on_uid", unique: true
     t.index ["uid_bidx"], name: "index_users_on_uid_bidx", unique: true
   end
 

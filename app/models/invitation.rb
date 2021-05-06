@@ -3,8 +3,8 @@
 class Invitation < ApplicationRecord
   belongs_to :invitable, polymorphic: true
 
-  encrypts :email, migrating: true
-  blind_index :email, migrating: true
+  encrypts :email
+  blind_index :email
 
   def resend
     invited_user = User.find_by(email: email)

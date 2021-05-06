@@ -3,5 +3,5 @@
 class Message < ApplicationRecord
   validates :phone, :body, presence: true
 
-  encrypts :phone, migrating: true
+  encrypts :phone
 end
