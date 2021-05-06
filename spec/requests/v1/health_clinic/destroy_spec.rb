@@ -2,20 +2,21 @@
 
 require 'rails_helper'
 
-RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
+RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
-  let!(:health_system_admin_id) { health_system.health_system_admins.first.id }
+  let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let!(:health_clinic_admin) { health_clinic.health_clinic_admins.first }
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { delete v1_health_system_path(health_system.id), headers: headers }
+  let(:request) { delete v1_health_clinic_path(health_clinic.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { delete v1_health_system_path(health_system.id) }
+      let(:request) { delete v1_health_clinic_path(health_clinic.id) }
 
       it_behaves_like 'unauthorized user'
     end
@@ -29,16 +30,17 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
     shared_examples 'permitted user' do
       before { request }
 
+      it 'return correct organizable and user_health_clinics' do
+        expect(health_clinic_admin.reload.organizable_id).to eq(nil)
+        expect(health_clinic_admin.user_health_clinics).to match_array([])
+      end
+
       it 'returns correct status' do
         expect(response).to have_http_status(:no_content)
       end
 
-      it 'health system is deleted' do
-        expect(HealthSystem.find_by(id: health_system.id)).to eq(nil)
-      end
-
-      it 'health system admin doesn\'t belong to health system' do
-        expect(User.find(health_system_admin_id).organizable).to eq(nil)
+      it 'health clinic is deleted' do
+        expect(HealthClinic.find_by(id: health_system.id)).to eq(nil)
       end
     end
 
@@ -47,7 +49,7 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
 
       context 'when health system id is invalid' do
         before do
-          delete v1_health_system_path('wrong_id'), headers: headers
+          delete v1_health_clinic_path('wrong_id'), headers: headers
         end
 
         it 'error message is expected' do
@@ -72,7 +74,7 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       end
     end
 
-    %i[health_system_admin organization_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

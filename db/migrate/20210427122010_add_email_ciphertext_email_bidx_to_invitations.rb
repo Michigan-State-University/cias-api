@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddEmailCiphertextEmailBidxToInvitations < ActiveRecord::Migration[6.0]
   def change
     # encrypted data

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateHealthClinicInvitations < ActiveRecord::Migration[6.0]
   def change
     create_table :health_clinic_invitations, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|

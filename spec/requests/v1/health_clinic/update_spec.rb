@@ -2,20 +2,27 @@
 
 require 'rails_helper'
 
-RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
+RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
-  let!(:health_system_admin_id) { health_system.health_system_admins.first.id }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization) }
+  let!(:health_clinic) { create(:health_clinic, name: 'Health Clinic', health_system: health_system) }
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { delete v1_health_system_path(health_system.id), headers: headers }
+  let(:params) do
+    {
+      health_clinic: {
+        name: 'New name'
+      }
+    }
+  end
+  let(:request) { patch v1_health_clinic_path(health_clinic.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { delete v1_health_system_path(health_system.id) }
+      let(:request) { patch v1_health_clinic_path(health_system.id) }
 
       it_behaves_like 'unauthorized user'
     end
@@ -30,36 +37,42 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       before { request }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:no_content)
+        expect(response).to have_http_status(:ok)
       end
 
-      it 'health system is deleted' do
-        expect(HealthSystem.find_by(id: health_system.id)).to eq(nil)
-      end
-
-      it 'health system admin doesn\'t belong to health system' do
-        expect(User.find(health_system_admin_id).organizable).to eq(nil)
+      it 'returns proper data' do
+        expect(json_response['data']).to include(
+          {
+            'type' => 'health_clinic',
+            'attributes' => {
+              'health_system_id' => health_system.id,
+              'name' => 'New name'
+            }
+          }
+        )
       end
     end
 
     context 'when user is admin' do
-      it_behaves_like 'permitted user'
+      context 'when params are proper' do
+        it_behaves_like 'permitted user'
+      end
 
-      context 'when health system id is invalid' do
-        before do
-          delete v1_health_system_path('wrong_id'), headers: headers
-        end
+      context 'when params are invalid' do
+        let(:params) do
+          {
+            health_system: {
+              name: ''
+            }
+          }
 
-        it 'error message is expected' do
-          expect(response).to have_http_status(:not_found)
+          it { expect(response).to have_http_status(:unprocessable_entity) }
+
+          it 'response contains proper error message' do
+            expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+          end
         end
       end
-    end
-
-    context 'when user is e-intervention admin' do
-      let(:user) { organization.e_intervention_admins.first }
-
-      it_behaves_like 'permitted user'
     end
   end
 
