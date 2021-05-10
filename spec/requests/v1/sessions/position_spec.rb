@@ -57,7 +57,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', typ
       end
 
       it 'proper order' do
-        positions = json_response['sessions'].map { |session| session['position'] }
+        positions = json_response['data'].map { |session| session['attributes']['position'] }
         expect(positions).to eq [11, 22, 33]
       end
     end

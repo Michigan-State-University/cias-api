@@ -28,7 +28,7 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
         expect(response).to have_http_status(:ok)
         expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8')
         expect(json_response.class).to be(Hash)
-        expect(json_response['email']).to eq(alter_user.email)
+        expect(json_response['data']['attributes']['email']).to eq(alter_user.email)
       end
     end
   end

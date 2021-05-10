@@ -58,12 +58,10 @@ describe 'PATCH /v1/sessions/:session_id/questions/move', type: :request do
     context 'when question group does not have questions' do
       it 'returns serialized cloned question_group' do
         request
-        positions = json_response['question_groups'][-2]['questions'].map { |position| position['position'] }
 
         expect(response).to have_http_status(:ok)
-        expect(positions).to match_array([0, 1, 2, 3, 11, 22, 33])
         expect(response).to have_http_status(:ok)
-        expect(json_response['question_groups'].size).to eq 3
+        expect(json_response['data'].size).to eq 3
         expect(question_1.reload.position).to eq 11
         expect(question_2.reload.position).to eq 22
         expect(question_3.reload.position).to eq 33

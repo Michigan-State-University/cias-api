@@ -32,11 +32,12 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request d
         end
 
         it 'returns correct response size' do
-          expect(json_response['user_sessions'].size).to eq 2
+          expect(json_response['data'].size).to eq 2
         end
 
         it 'returns correct email addresses' do
-          expect(json_response['user_sessions'].pluck('email')).to match_array([participant.email, new_user_email])
+          emails = json_response['data'].map {|invitation| invitation['attributes']['email']}
+          expect(emails).to match_array([participant.email, new_user_email])
         end
 
         it 'does not create user account' do

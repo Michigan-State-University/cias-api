@@ -28,7 +28,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => current_user.email,
@@ -59,7 +59,7 @@ describe 'PATCH /v1/users/:id', type: :request do
         it { expect(response).to have_http_status(:ok) }
 
         it 'JSON response contains proper attributes' do
-          expect(json_response).to include(
+          expect(json_response['data']['attributes']).to include(
             'roles' => %w[admin guest],
             'active' => false
           )
@@ -80,7 +80,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => other_user.email,
@@ -108,7 +108,7 @@ describe 'PATCH /v1/users/:id', type: :request do
         it { expect(response).to have_http_status(:ok) }
 
         it 'JSON response contains proper attributes' do
-          expect(json_response).to include(
+          expect(json_response['data']['attributes']).to include(
             'roles' => %w[admin guest],
             'active' => false
           )
@@ -131,7 +131,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => current_user.email,
@@ -201,7 +201,7 @@ describe 'PATCH /v1/users/:id', type: :request do
             it { expect(response).to have_http_status(:ok) }
 
             it 'JSON response contains proper attributes' do
-              expect(json_response).to include(
+              expect(json_response['data']['attributes']).to include(
                 'roles' => %w[participant],
                 'active' => true
               )
@@ -245,7 +245,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => other_user.first_name,
           'last_name' => other_user.last_name,
           'email' => other_user.email,
@@ -281,7 +281,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => current_user.email,
@@ -333,7 +333,7 @@ describe 'PATCH /v1/users/:id', type: :request do
             it { expect(response).to have_http_status(:ok) }
 
             it 'JSON response contains proper attributes' do
-              expect(json_response).to include(
+              expect(json_response['data']['attributes']).to include(
                 'roles' => %w[participant],
                 'active' => false
               )
@@ -372,7 +372,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => current_user.email,
@@ -419,7 +419,7 @@ describe 'PATCH /v1/users/:id', type: :request do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response).to include(
+        expect(json_response['data']['attributes']).to include(
           'first_name' => 'John',
           'last_name' => 'Kowalski',
           'email' => current_user.email,
