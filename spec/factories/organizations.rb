@@ -23,5 +23,11 @@ FactoryBot.define do
         organization.health_systems << create(:health_system)
       end
     end
+
+    trait :with_dashboard_section do
+      after(:create) do |organization|
+        organization.reporting_dashboard.dashboard_sections << create(:dashboard_section)
+      end
+    end
   end
 end

@@ -11,27 +11,27 @@ class V1::Users::Verifications::Create
   end
 
   def call
-    return if exists_user_with_verification_code? && !code_expired?
+    return if verification_code_from_headers && verification_code && !code_expired?
 
-    user.update!(verification_code: verification_code, verification_code_created_at: Time.current)
-    UserMailer.send_verification_login_code(verification_code: verification_code, email: user.email).deliver_later
+    user.user_verification_codes.create!(code: code)
+    UserMailer.send_verification_login_code(verification_code: code, email: user.email).deliver_later
   end
 
   private
 
   attr_reader :user, :verification_code_from_headers
 
-  def verification_code
-    @verification_code ||= SecureRandom.base64(6)
+  def code
+    @code ||= SecureRandom.base64(6)
   end
 
   def code_expired?
-    user.verification_code_created_at + 30.days < Time.current
+    expired = verification_code.created_at + 30.days < Time.current
+    verification_code.delete if expired
+    expired
   end
 
-  def exists_user_with_verification_code?
-    return false unless verification_code_from_headers
-
-    User.exists?(verification_code: verification_code_from_headers, email: user.email)
+  def verification_code
+    @verification_code ||= user.user_verification_codes&.find_by(code: verification_code_from_headers)
   end
 end

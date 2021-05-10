@@ -60,49 +60,26 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'id' => organization.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization.name,
-              'health_systems_and_clinics' => {
-                'data' => [
-                  {
-                    'attributes' => {
-                      'health_clinics' => {
-                        'data' => [
-                          {
-                            'attributes' => {
-                              'health_system_id' => health_system.id,
-                              'name' => health_clinic.name
-                            },
-                            'id' => health_clinic.id,
-                            'type' => 'health_clinic'
-                          }
-                        ]
-                      },
-                      'name' => health_system.name,
-                      'organization_id' => health_system.organization_id
-                    },
-                    'id' => health_system.id,
-                    'type' => 'health_system',
-                    'relationships' => { 'health_system_admins' => { 'data' => [] } }
-                  }
-                ]
-              }
+              'name' => organization.name
             },
             'relationships' =>
                 {
                   'e_intervention_admins' =>
                       {
-                        'data' =>
-                              [
-                                { 'id' => organization.e_intervention_admins.first.id, 'type' => 'e_intervention_admin' }
-                              ]
+                        'data' => [{ 'id' => organization.e_intervention_admins.first.id, 'type' => 'user' }]
                       },
                   'organization_admins' =>
                         {
-                          'data' =>
-                              [
-                                { 'id' => organization.organization_admins.first.id, 'type' => 'organization_admin' }
-                              ]
-                        }
+                          'data' => [{ 'id' => organization.organization_admins.first.id, 'type' => 'user' }]
+                        },
+                  'health_systems' =>
+                      {
+                        'data' => [{ 'id' => health_system.id, 'type' => 'health_system' }]
+                      },
+                  'health_clinics' =>
+                      {
+                        'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }]
+                      }
                 }
           }
         )
@@ -123,6 +100,33 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
           }
         )
         expect(json_response['included'][1]).to include(
+          {
+            'id' => health_clinic.id,
+            'type' => 'health_clinic',
+            'attributes' => {
+              'health_system_id' => health_system.id,
+              'name' => health_clinic.name
+            }
+          }
+        )
+        expect(json_response['included'][2]).to include(
+          {
+            'id' => health_system.id,
+            'type' => 'health_system',
+            'attributes' =>
+                  {
+                    'name' => health_system.name,
+                    'organization_id' => health_system.organization_id
+                  },
+            'relationships' =>
+                  {
+                    'health_system_admins' => { 'data' => [] },
+                    'health_clinics' => { 'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }] }
+                  }
+          }
+        )
+
+        expect(json_response['included'][3]).to include(
           {
             'id' => organization_admin.id,
             'type' => 'user',

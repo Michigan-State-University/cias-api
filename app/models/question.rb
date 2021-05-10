@@ -32,7 +32,7 @@ class Question < ApplicationRecord
 
   delegate :session, to: :question_group
 
-  after_create :initialize_narrator
+  after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
 
   default_scope { order(:position) }

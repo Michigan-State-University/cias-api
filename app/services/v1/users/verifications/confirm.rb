@@ -13,8 +13,8 @@ class V1::Users::Verifications::Confirm
   def call
     return if code_expired?
 
-    user.update!(confirmed_verification: true)
-    verification_code
+    user_verification_code.update!(confirmed: true)
+    user_verification_code.code
   end
 
   private
@@ -22,10 +22,14 @@ class V1::Users::Verifications::Confirm
   attr_reader :verification_code, :email
 
   def user
-    @user ||= User.find_by!(verification_code: verification_code, email: email)
+    User.find_by!(email: email)
   end
 
   def code_expired?
-    user.verification_code_created_at + 30.minutes < Time.current
+    user_verification_code.created_at + 30.minutes < Time.current
+  end
+
+  def user_verification_code
+    @user_verification_code ||= user.user_verification_codes.find_by!(code: verification_code)
   end
 end

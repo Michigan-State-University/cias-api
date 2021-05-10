@@ -131,6 +131,9 @@ Rails.application.routes.draw do
       scope module: 'organizations' do
         post 'invitations/invite_organization_admin', to: 'invitations#invite_organization_admin'
         post 'invitations/invite_intervention_admin', to: 'invitations#invite_intervention_admin'
+        scope module: 'dashboard_sections' do
+          resources :dashboard_sections, only: %i[index show create update destroy], controller: :dashboard_sections
+        end
       end
     end
     get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
@@ -142,6 +145,13 @@ Rails.application.routes.draw do
     end
     get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm', as: :health_system_invitations_confirm
 
+    resources :health_clinics, controller: :health_clinics do
+      scope module: 'health_clinics' do
+        post 'invitations/invite_health_clinic_admin', to: 'invitations#invite_health_clinic_admin'
+      end
+    end
+    get 'health_clinic_invitations/confirm', to: 'health_clinics/invitations#confirm', as: :health_clinic_invitations_confirm
+
     resources :generated_reports, only: :index
 
     scope module: :google_tts do
@@ -150,7 +160,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :organizations, controller: :organizations
+    resources :health_clinics, controller: :health_clinics
   end
 
   if Rails.env.development?

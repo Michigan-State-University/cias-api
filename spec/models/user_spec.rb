@@ -117,6 +117,30 @@ describe User, type: :model do
     end
   end
 
+  context 'user has role health_system_admin' do
+    let(:user) { build_stubbed(:user, :health_system_admin) }
+
+    context 'user belongs to health system' do
+      include_examples 'with health system'
+    end
+
+    context 'user doesn\'t belong to health system' do
+      include_examples 'without health system'
+    end
+  end
+
+  context 'user has role health_clinic_admin' do
+    let(:user) { build_stubbed(:user, :health_clinic_admin) }
+
+    context 'user belongs to health clinic' do
+      include_examples 'with health clinic'
+    end
+
+    context 'user doesn\'t belong to health clinic' do
+      include_examples 'without health clinic'
+    end
+  end
+
   context 'user has role researcher' do
     let(:user) { build_stubbed(:user, :researcher) }
 

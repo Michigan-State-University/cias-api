@@ -9,9 +9,10 @@ FactoryBot.define do
     provider { 'email' }
     roles { %w[guest] }
     time_zone { 'Europe/Warsaw' }
-    sequence(:verification_code) { |s| "verification_code_#{s}" }
-    verification_code_created_at { Time.current }
-    confirmed_verification { true }
+
+    after(:create) do |user|
+      user.user_verification_codes.create(code: "verification_code_#{user.uid}", confirmed: true)
+    end
 
     transient do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }
@@ -76,6 +77,21 @@ FactoryBot.define do
           new_health_system = create(:health_system)
           health_system_admin.organizable = new_health_system
           new_health_system.health_system_admins << health_system_admin
+        end
+      end
+    end
+
+    trait :health_clinic_admin do
+      roles { %w[health_clinic_admin] }
+    end
+
+    trait :with_health_clinic do
+      after(:create, :build) do |health_clinic_admin|
+        if health_clinic_admin.role?('health_clinic_admin')
+          new_health_clinic = create(:health_clinic)
+          health_clinic_admin.organizable = new_health_clinic unless health_clinic_admin.organizable
+          health_clinic_admin.admins_health_clinics << new_health_clinic
+          new_health_clinic.health_clinic_admins << health_clinic_admin
         end
       end
     end

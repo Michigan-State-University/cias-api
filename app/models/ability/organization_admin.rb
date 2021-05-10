@@ -11,7 +11,9 @@ class Ability::OrganizationAdmin < Ability::Base
   def organization_admin
     can :read, Organization, organization_admins: { id: user.id }
     can :read, ReportingDashboard, organization: { organization_admins: { id: user.id } }
+    can :read, DashboardSection, reporting_dashboard: { organization: { organization_admins: { id: user.id } } }
     can :confirm_organization_membership, OrganizationInvitation, user_id: user.id
     can :read, HealthSystem, organization: { organization_admins: { id: user.id } }
+    can :read, HealthClinic, health_system: { organization: { organization_admins: { id: user.id } } }
   end
 end

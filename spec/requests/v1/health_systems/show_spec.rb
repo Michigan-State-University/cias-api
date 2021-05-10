@@ -54,21 +54,14 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'type' => 'health_system',
             'attributes' => {
               'name' => health_system.name,
-              'organization_id' => organization.id,
-              'health_clinics' => { 'data' => [
-                { 'attributes' => {
-                  'name' => health_clinic.name,
-                  'health_system_id' => health_clinic.health_system_id
-                },
-                  'id' => health_clinic.id,
-                  'type' => 'health_clinic' }
-              ] }
+              'organization_id' => organization.id
             },
             'relationships' => {
               'health_system_admins' => {
-                'data' => [
-                  { 'id' => health_system_admin.id, 'type' => 'health_system_admin' }
-                ]
+                'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }]
+              },
+              'health_clinics' => {
+                'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }]
               }
             }
           }
@@ -77,6 +70,17 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
 
       it 'returns proper include' do
         expect(json_response['included'][0]).to include(
+          {
+            'id' => health_clinic.id,
+            'type' => 'health_clinic',
+            'attributes' => {
+              'name' => health_clinic.name,
+              'health_system_id' => health_clinic.health_system_id
+            }
+          }
+        )
+
+        expect(json_response['included'][1]).to include(
           {
             'id' => health_system_admin.id,
             'type' => 'user',
