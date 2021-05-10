@@ -6,8 +6,8 @@ en:
       report_file: '%m_%d_%Y_%H_%M'
   question:
     finish:
-      subtitle: <h2>Finish Screen</h2>
-      title: Finish Screen
+      subtitle: '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
+      title: Enter title here
   question_group:
     finish:
       title: Finish Group
