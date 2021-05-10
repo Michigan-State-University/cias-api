@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class V1::Charts::Update
   def self.call(chart, chart_params)
     new(chart, chart_params).call
@@ -18,5 +20,4 @@ class V1::Charts::Update
 
   attr_reader :chart_params
   attr_accessor :chart
-
 end

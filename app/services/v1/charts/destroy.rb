@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class V1::Charts::Destroy
   def self.call(chart)
     new(chart).call
@@ -14,5 +16,4 @@ class V1::Charts::Destroy
   private
 
   attr_accessor :chart
-
 end

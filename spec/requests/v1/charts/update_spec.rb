@@ -2,16 +2,24 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/charts/:id', type: :request do
+RSpec.describe 'PATCH /v1/charts/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:chart) { create(:chart, name: 'Chart', description: 'Some description', organization_id: organization.id) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_chart_path(chart.id), headers: headers }
+  let(:params) do
+    {
+      chart: {
+        name: 'New name',
+        description: 'New description'
+      }
+    }
+  end
+  let(:request) { patch v1_chart_path(chart.id), params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
@@ -29,14 +37,18 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
     shared_examples 'permitted user' do
       before { request }
 
+      it 'returns correct status' do
+        expect(response).to have_http_status(:ok)
+      end
+
       it 'returns proper data' do
         expect(json_response['data']).to include(
           {
             'id' => chart.id.to_s,
             'type' => 'chart',
             'attributes' => {
-              'name' => chart.name,
-              'description' => chart.description,
+              'name' => 'New name',
+              'description' => 'New description',
               'status' => 'draft',
               'formula' => {
                 'payload' => '',
@@ -76,7 +88,7 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
       end
     end
 
-    %i[health_system_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest health_clinic_admin].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
@@ -84,25 +96,15 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
         it_behaves_like 'unpermitted user'
       end
     end
-  end
 
-  context 'when id is wrong' do
-    let(:request) { get v1_chart_path('Wrong_ID'), headers: headers }
+    context 'when user is preview user' do
+      let(:headers) { preview_user.create_new_auth_token }
 
-    before { request }
+      before { request }
 
-    it 'returns proper error message' do
-      expect(json_response['message']).to include('Couldn\'t find Chart with')
-    end
-  end
-
-  context 'when user is preview user' do
-    let(:headers) { preview_user.create_new_auth_token }
-
-    before { request }
-
-    it 'returns proper error message' do
-      expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
+      it 'returns proper error message' do
+        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
+      end
     end
   end
 end

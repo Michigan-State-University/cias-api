@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class V1::Charts::Create
   def self.call(chart_params)
     new(chart_params).call

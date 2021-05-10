@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Chart < ApplicationRecord
   extend DefaultValues
 
@@ -9,13 +11,13 @@ class Chart < ApplicationRecord
 
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
 
-  def json_schema_path
-    @json_schema_path ||= 'db/schema/chart'
-  end
-
   def integral_update
     return if published?
 
     save!
+  end
+
+  def json_schema_path
+    @json_schema_path ||= 'db/schema/chart'
   end
 end

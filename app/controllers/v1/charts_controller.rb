@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class V1::ChartsController < V1Controller
   def index
     authorize! :read, Chart
@@ -15,7 +17,7 @@ class V1::ChartsController < V1Controller
     authorize! :create, Chart
 
     chart = V1::Charts::Create.call(chart_params)
-    render json: serialized_response(chart), status: create
+    render json: serialized_response(chart), status: :created
   end
 
   def update
