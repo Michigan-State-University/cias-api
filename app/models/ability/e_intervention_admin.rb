@@ -42,5 +42,6 @@ class Ability::EInterventionAdmin < Ability::Base
     can :invite_health_clinic_admin, HealthClinic, health_system: { organization: { e_intervention_admins: { id: user.id } } }
     can :manage, ReportingDashboard, organization: { e_intervention_admins: { id: user.id } }
     can :manage, DashboardSection, reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } }
+    can :manage, Chart, organization: { e_intervention_admins: { id: user.id } }
   end
 end

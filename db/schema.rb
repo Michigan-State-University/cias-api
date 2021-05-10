@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_05_135101) do
+ActiveRecord::Schema.define(version: 2021_05_10_040015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -56,6 +56,18 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
+  end
+
+  create_table "charts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.string "status", default: "draft"
+    t.jsonb "formula"
+    t.uuid "organization_id"
+    t.datetime "published_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_charts_on_organization_id"
   end
 
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -439,13 +451,13 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.datetime "verification_code_created_at"
     t.uuid "organizable_id"
     t.boolean "confirmed_verification", default: false, null: false
-    t.string "organizable_type"
     t.text "email_ciphertext"
     t.text "first_name_ciphertext"
     t.text "last_name_ciphertext"
     t.text "uid_ciphertext"
     t.string "email_bidx"
     t.string "uid_bidx"
+    t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true

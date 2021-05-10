@@ -161,6 +161,8 @@ Rails.application.routes.draw do
     end
 
     resources :health_clinics, controller: :health_clinics
+
+    resources :charts, controller: :charts
   end
 
   if Rails.env.development?
