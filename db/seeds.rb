@@ -17,13 +17,11 @@ class SummonUsers
           last_name: Faker::GreekPhilosophers.name,
           email: "#{role}@#{ENV['DOMAIN_NAME']}",
           password: 'Password1!',
-          roles: [role],
-          confirmed_verification: true,
-          verification_code: SecureRandom.base64(6),
-          verification_code_created_at: Time.current
+          roles: [role]
         )
         u.confirm
         u.save
+        u.user_verification_codes.create(code: SecureRandom.base64(6), confirmed: true)
       end
     end
 
