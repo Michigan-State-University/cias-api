@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe OrganizableMailer, type: :mailer do
@@ -9,10 +11,10 @@ RSpec.describe OrganizableMailer, type: :mailer do
     let!(:organization_type) { 'Organization' }
 
     let(:mail) do
-      OrganizableMailer.new.invite_user(invitation_token: invitation.invitation_token,
-                                        email: email,
-                                        organizable: organization,
-                                        organizable_type: organization_type)
+      described_class.new.invite_user(invitation_token: invitation.invitation_token,
+                                      email: email,
+                                      organizable: organization,
+                                      organizable_type: organization_type)
     end
 
     it 'renders the headers' do

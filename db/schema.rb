@@ -439,13 +439,13 @@ ActiveRecord::Schema.define(version: 2021_05_05_135101) do
     t.datetime "verification_code_created_at"
     t.uuid "organizable_id"
     t.boolean "confirmed_verification", default: false, null: false
-    t.string "organizable_type"
     t.text "email_ciphertext"
     t.text "first_name_ciphertext"
     t.text "last_name_ciphertext"
     t.text "uid_ciphertext"
     t.string "email_bidx"
     t.string "uid_bidx"
+    t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true

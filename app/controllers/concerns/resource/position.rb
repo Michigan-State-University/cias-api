@@ -11,8 +11,7 @@ module Resource::Position
         values: position_params[:position],
         table: controller_name
       ).execute
-      invalidate_cache(send("#{controller_name}_scope"))
-      render_json(**response_scope, path: "v1/#{controller_name}", action: :index)
+      render json: serialized_response(response_scope["#{controller_name.classify.underscore}s"])
     end
   end
 
