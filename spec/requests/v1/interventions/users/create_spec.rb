@@ -36,7 +36,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request d
         end
 
         it 'returns correct email addresses' do
-          emails = json_response['data'].map {|invitation| invitation['attributes']['email']}
+          emails = json_response['data'].map { |invitation| invitation['attributes']['email'] }
           expect(emails).to match_array([participant.email, new_user_email])
         end
 
