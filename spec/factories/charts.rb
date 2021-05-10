@@ -4,6 +4,6 @@ FactoryBot.define do
   factory :chart do
     sequence(:name) { |s| "chart_#{s}" }
     description { 'This is description' }
-    association(:organization)
+    association(:dashboard_section)
   end
 end

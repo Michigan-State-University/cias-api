@@ -63,11 +63,11 @@ ActiveRecord::Schema.define(version: 2021_05_10_040015) do
     t.string "description"
     t.string "status", default: "draft"
     t.jsonb "formula"
-    t.uuid "organization_id"
+    t.uuid "dashboard_section_id"
     t.datetime "published_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["organization_id"], name: "index_charts_on_organization_id"
+    t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

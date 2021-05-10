@@ -8,6 +8,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
+  let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -15,7 +16,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
       chart: {
         name: 'New Chart',
         description: 'Description',
-        organization_id: organization.id
+        dashboard_section_id: dashboard_section.id
       }
     }
   end
@@ -44,7 +45,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
       it 'returns proper data' do
         expect(json_response['data']['attributes']).to include(
           {
-            'organization_id' => organization.id,
+            'dashboard_section_id' => dashboard_section.id,
             'name' => 'New Chart',
             'description' => 'Description'
           }

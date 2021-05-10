@@ -5,8 +5,10 @@ require 'cancan/matchers'
 describe Chart do
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:other_organization) { create(:organization) }
-  let!(:chart) { create(:chart, organization: organization) }
-  let!(:other_chart) { create(:chart, organization: other_organization) }
+  let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:other_dashboard_section) { create(:dashboard_section, reporting_dashboard: other_organization.reporting_dashboard) }
+  let!(:chart) { create(:chart, dashboard_section_id: dashboard_section.id) }
+  let!(:other_chart) { create(:chart, dashboard_section_id: other_dashboard_section.id) }
 
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }

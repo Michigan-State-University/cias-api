@@ -2,6 +2,7 @@
 
 class DashboardSection < ApplicationRecord
   belongs_to :reporting_dashboard
+  has_many :charts
 
   validates :name, presence: true, uniqueness: { scope: :reporting_dashboard }
 

@@ -7,7 +7,8 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:chart) { create(:chart, name: 'Chart', description: 'Some description', organization_id: organization.id) }
+  let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:chart) { create(:chart, name: 'Chart', description: 'Some description', dashboard_section_id: dashboard_section.id) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
 
   let(:headers) { user.create_new_auth_token }
@@ -54,7 +55,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
                 'payload' => '',
                 'patterns' => []
               },
-              'organization_id' => organization.id,
+              'dashboard_section_id' => dashboard_section.id,
               'published_at' => nil
             }
           }

@@ -7,7 +7,7 @@ class CreateCharts < ActiveRecord::Migration[6.0]
       t.string :description
       t.string :status, default: 'draft'
       t.jsonb :formula
-      t.uuid :organization_id, index: true, foreign_key: true
+      t.uuid :dashboard_section_id, index: true, foreign_key: true
       t.datetime :published_at
 
       t.timestamps

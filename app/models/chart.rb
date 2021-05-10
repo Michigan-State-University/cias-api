@@ -3,7 +3,7 @@
 class Chart < ApplicationRecord
   extend DefaultValues
 
-  belongs_to :organization
+  belongs_to :dashboard_section
 
   attribute :formula, :json, default: assign_default_values('formula')
 

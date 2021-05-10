@@ -8,9 +8,11 @@ RSpec.describe 'DELETE /v1/charts/:id', type: :request do
 
   let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:other_organization) { create(:organization, :with_e_intervention_admin, name: 'Other Organization') }
-  let!(:chart) { create(:chart, name: 'Chart1', organization_id: organization.id) }
-  let!(:other_chart) { create(:chart, name: 'Chart2', organization_id: organization.id) }
-  let!(:chart_in_other_organization) { create(:chart, name: 'Chart3', organization_id: other_organization.id) }
+  let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:other_dashboard_section) { create(:dashboard_section, reporting_dashboard: other_organization.reporting_dashboard) }
+  let!(:chart) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section.id) }
+  let!(:other_chart) { create(:chart, name: 'Chart2', dashboard_section_id: dashboard_section.id) }
+  let!(:chart_in_other_organization) { create(:chart, name: 'Chart3', dashboard_section_id: other_dashboard_section.id) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
   let!(:other_e_intervention_admin) { other_organization.e_intervention_admins.first }
 
