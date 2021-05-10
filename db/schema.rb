@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_06_115717) do
+ActiveRecord::Schema.define(version: 2021_05_10_163532) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -56,6 +56,17 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
+  end
+
+  create_table "chart_statistics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "label"
+    t.uuid "organization_id", null: false
+    t.uuid "health_system_id", null: false
+    t.uuid "health_clinic_id", null: false
+    t.uuid "chart_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe HealthClinic, type: :model do
   it { should belong_to(:health_system) }
+  it { should have_many(:chart_statistics) }
 
   describe '#name' do
     context 'name is unique' do

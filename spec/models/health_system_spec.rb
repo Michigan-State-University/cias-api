@@ -7,6 +7,7 @@ RSpec.describe HealthSystem, type: :model do
   it { should have_many(:health_clinics).dependent(:destroy) }
   it { should have_many(:health_system_admins) }
   it { should have_many(:health_system_invitations).dependent(:destroy) }
+  it { should have_many(:chart_statistics) }
 
   describe '#name' do
     context 'name is unique' do
