@@ -61,7 +61,7 @@ describe 'POST /v1/users/invitations', type: :request do
       end
 
       it 'returns correct email' do
-        expect(json_response['email']).to eq 'test@example.com'
+        expect(json_response['data']['attributes']['email']).to eq 'test@example.com'
       end
     end
 
