@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_06_115717) do
+ActiveRecord::Schema.define(version: 2021_05_11_124342) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -169,7 +169,9 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "email_ciphertext"
     t.string "email_bidx"
+    t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
+    t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
     t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
@@ -389,6 +391,8 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
     t.datetime "last_answer_at"
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
+    t.uuid "health_clinic_id"
+    t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
@@ -474,12 +478,14 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
   add_foreign_key "interventions", "users"
+  add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
+  add_foreign_key "user_sessions", "health_clinics"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "users"
 end
