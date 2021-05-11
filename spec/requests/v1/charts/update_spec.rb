@@ -16,7 +16,8 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
     {
       chart: {
         name: 'New name',
-        description: 'New description'
+        description: 'New description',
+        type: 'BarChart'
       }
     }
   end
@@ -51,6 +52,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
               'name' => 'New name',
               'description' => 'New description',
               'status' => 'draft',
+              'type' => 'BarChart',
               'formula' => {
                 'payload' => '',
                 'patterns' => []

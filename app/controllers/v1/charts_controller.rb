@@ -45,6 +45,6 @@ class V1::ChartsController < V1Controller
   end
 
   def chart_params
-    params.require(:chart).permit(:name, :description, :status, :dashboard_section_id, formula: {})
+    params.require(:chart).permit(:name, :description, :type, :status, :dashboard_section_id, formula: {})
   end
 end
