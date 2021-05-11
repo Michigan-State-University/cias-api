@@ -15,6 +15,7 @@ class V1::Organizations::Invitations::Confirm
     ActiveRecord::Base.transaction do
       user.update!(organizable: organization)
       if user.role?('organization_admin')
+        user.activate!
         organization.organization_admins << user
       else
         organization.e_intervention_admins << user

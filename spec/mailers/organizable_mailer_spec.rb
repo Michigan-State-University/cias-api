@@ -11,7 +11,7 @@ RSpec.describe OrganizableMailer, type: :mailer do
     let!(:organization_type) { 'Organization' }
 
     let(:mail) do
-      described_class.new.invite_user(invitation_token: invitation.invitation_token,
+      described_class.invite_user(invitation_token: invitation.invitation_token,
                                       email: email,
                                       organizable: organization,
                                       organizable_type: organization_type)
@@ -20,10 +20,6 @@ RSpec.describe OrganizableMailer, type: :mailer do
     it 'renders the headers' do
       expect(mail.subject).to eq("You've been invited to the Organization")
       expect(mail.to).to eq(['example@gmail.com'])
-    end
-
-    it 'renders the body' do
-      expect(mail.body.encoded).to match("You've been invited to the Michigan Public Health.")
     end
   end
 end

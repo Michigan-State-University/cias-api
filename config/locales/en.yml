@@ -68,7 +68,7 @@ en:
   organizable_mailer:
     invite_user:
       subject:      You've been invited to the %{organizable_type}
-      header:       '%{organizable_type} Invitation'
+      header:       '%{organizable_name} Invitation'
       body:         "You've been invited to the %{organizable_name}."
       instruction:  'Click the link below to accept the invitation and join the %{organizable_type}.'
       button_text:  Accept the Invitation

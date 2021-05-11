@@ -14,6 +14,7 @@ class V1::HealthSystems::Invitations::Confirm
   def call
     ActiveRecord::Base.transaction do
       user.update!(organizable: health_system)
+      user.activate!
       health_system.health_system_admins << user
 
       health_system_invitation.update!(
