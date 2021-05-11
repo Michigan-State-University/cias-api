@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ChangeOrganizationIdToOrganizableIdTuUsers < ActiveRecord::Migration[6.0]
   def change
     rename_column :users, :organization_id, :organizable_id

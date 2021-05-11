@@ -22,7 +22,7 @@ describe 'GET /v1/users/invitations', type: :request do
     end
 
     it 'returns correct pending invitations size' do
-      expect(json_response['invitations'].size).to eq 0
+      expect(json_response['data'].size).to eq 0
     end
   end
 
@@ -39,7 +39,7 @@ describe 'GET /v1/users/invitations', type: :request do
     end
 
     it 'returns correct pending invitations size' do
-      expect(json_response['invitations'].size).to eq 0
+      expect(json_response['data'].size).to eq 0
     end
   end
 
@@ -56,11 +56,11 @@ describe 'GET /v1/users/invitations', type: :request do
     end
 
     it 'returns correct pending invitations size' do
-      expect(json_response['invitations'].size).to eq 1
+      expect(json_response['data'].size).to eq 1
     end
 
     it 'returns correct email' do
-      expect(json_response['invitations'][0]['email']).to eq 'test@example.com'
+      expect(json_response['data'][0]['attributes']['email']).to eq 'test@example.com'
     end
   end
 end

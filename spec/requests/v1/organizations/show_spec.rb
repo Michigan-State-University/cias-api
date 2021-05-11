@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/organizations/:id', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
@@ -52,49 +60,26 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'id' => organization.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization.name,
-              'health_systems_and_clinics' => {
-                'data' => [
-                  {
-                    'attributes' => {
-                      'health_clinics' => {
-                        'data' => [
-                          {
-                            'attributes' => {
-                              'health_system_id' => health_system.id,
-                              'name' => health_clinic.name
-                            },
-                            'id' => health_clinic.id,
-                            'type' => 'health_clinic'
-                          }
-                        ]
-                      },
-                      'name' => health_system.name,
-                      'organization_id' => health_system.organization_id
-                    },
-                    'id' => health_system.id,
-                    'type' => 'health_system',
-                    'relationships' => { 'health_system_admins' => { 'data' => [] } }
-                  }
-                ]
-              }
+              'name' => organization.name
             },
             'relationships' =>
                 {
                   'e_intervention_admins' =>
                       {
-                        'data' =>
-                              [
-                                { 'id' => organization.e_intervention_admins.first.id, 'type' => 'e_intervention_admin' }
-                              ]
+                        'data' => [{ 'id' => organization.e_intervention_admins.first.id, 'type' => 'user' }]
                       },
                   'organization_admins' =>
                         {
-                          'data' =>
-                              [
-                                { 'id' => organization.organization_admins.first.id, 'type' => 'organization_admin' }
-                              ]
-                        }
+                          'data' => [{ 'id' => organization.organization_admins.first.id, 'type' => 'user' }]
+                        },
+                  'health_systems' =>
+                      {
+                        'data' => [{ 'id' => health_system.id, 'type' => 'health_system' }]
+                      },
+                  'health_clinics' =>
+                      {
+                        'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }]
+                      }
                 }
           }
         )
@@ -116,6 +101,33 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
         )
         expect(json_response['included'][1]).to include(
           {
+            'id' => health_clinic.id,
+            'type' => 'health_clinic',
+            'attributes' => {
+              'health_system_id' => health_system.id,
+              'name' => health_clinic.name
+            }
+          }
+        )
+        expect(json_response['included'][2]).to include(
+          {
+            'id' => health_system.id,
+            'type' => 'health_system',
+            'attributes' =>
+                  {
+                    'name' => health_system.name,
+                    'organization_id' => health_system.organization_id
+                  },
+            'relationships' =>
+                  {
+                    'health_system_admins' => { 'data' => [] },
+                    'health_clinics' => { 'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }] }
+                  }
+          }
+        )
+
+        expect(json_response['included'][3]).to include(
+          {
             'id' => organization_admin.id,
             'type' => 'user',
             'attributes' =>
@@ -134,11 +146,15 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
       end
     end
 
-    context 'when user is admin' do
-      it_behaves_like 'permitted user'
-    end
-
     context 'when user is' do
+      %w[admin admin_with_multiple_roles].each do |role|
+        context role.to_s do
+          let(:user) { users[role] }
+
+          it_behaves_like 'permitted user'
+        end
+      end
+
       %w[organization_admin e_intervention_admin].each do |role|
         context role.to_s do
           context 'refers to their organization' do

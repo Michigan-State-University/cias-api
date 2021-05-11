@@ -57,8 +57,7 @@ class V1::HealthSystems::ChangeHealthSystemAdmins
   end
 
   def health_system_admin(health_system_admin_id)
-    @health_system_admin ||= User.limit_to_roles(%w[health_system_admin])
-                                .find(health_system_admin_id)
+    User.limit_to_roles(%w[health_system_admin]).find(health_system_admin_id)
   end
 
   def current_health_system_admins

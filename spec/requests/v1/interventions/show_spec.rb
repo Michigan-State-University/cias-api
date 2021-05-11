@@ -7,12 +7,12 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:guest) { create(:user, :guest) }
+  let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
 
   let(:shared_to) { 'registered' }
   let(:intervention_user) { admin }
   let(:sessions) { create_list(:session, 2) }
-  let(:users) { [] }
   let!(:intervention) do
     create(:intervention, :published, name: 'Some intervention',
                                       user: intervention_user, sessions: sessions, shared_to: shared_to,
@@ -26,7 +26,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   context 'when user' do
     before { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
 
-    context 'has role admin' do
+    shared_examples 'permitted user' do
       it 'contains proper sessions collection' do
         expect(attrs['sessions'].size).to eq sessions.size
       end
@@ -54,6 +54,16 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           )
         end
       end
+    end
+
+    context 'user is admin' do
+      it_behaves_like 'permitted user'
+    end
+
+    context 'user has multiple roles' do
+      let(:user) { user_with_multiple_roles }
+
+      it_behaves_like 'permitted user'
     end
 
     context 'has role participant' do

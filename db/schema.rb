@@ -10,10 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_06_084750) do
+
+ActiveRecord::Schema.define(version: 2021_05_06_115717) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -389,6 +391,15 @@ ActiveRecord::Schema.define(version: 2021_05_06_084750) do
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
+  create_table "user_verification_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.string "code", null: false
+    t.boolean "confirmed", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_user_verification_codes_on_user_id"
+  end
+
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "provider", default: "email", null: false
     t.string "time_zone"
@@ -425,10 +436,7 @@ ActiveRecord::Schema.define(version: 2021_05_06_084750) do
     t.boolean "email_notification", default: true, null: false
     t.boolean "feedback_completed", default: false, null: false
     t.string "description", default: ""
-    t.string "verification_code"
-    t.datetime "verification_code_created_at"
     t.uuid "organizable_id"
-    t.boolean "confirmed_verification", default: false, null: false
     t.text "email_ciphertext"
     t.text "first_name_ciphertext"
     t.text "last_name_ciphertext"

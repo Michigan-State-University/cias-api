@@ -6,6 +6,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
@@ -91,61 +92,75 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     end
   end
 
-  context 'when user has role researcher' do
-    let(:user) { researcher }
+  context 'when one of the roles is researcher' do
+    shared_examples 'permitted user' do
+      context 'intervention does not belong to him' do
+        it { expect(response).to have_http_status(:not_found) }
+      end
 
-    before { request }
+      context 'intervention belongs to him' do
+        let(:intervention_user) { user }
 
-    context 'intervention does not belong to him' do
-      it { expect(response).to have_http_status(:not_found) }
+        context 'when params are VALID' do
+          it { expect(response).to have_http_status(:ok) }
+
+          it 'response contains proper attributes' do
+            expect(json_response['data']['attributes']).to include(
+              'name' => 'New Intervention',
+              'status' => 'published',
+              'shared_to' => 'anyone'
+            )
+          end
+
+          it 'updates a intervention object' do
+            expect(intervention.reload.attributes).to include(
+              'name' => 'New Intervention',
+              'status' => 'published',
+              'shared_to' => 'anyone'
+            )
+          end
+        end
+
+        context 'when params are INVALID' do
+          let(:params) do
+            {
+              intervention: {
+                name: ''
+              }
+            }
+          end
+
+          it { expect(response).to have_http_status(:unprocessable_entity) }
+
+          it 'response contains proper error message' do
+            expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+          end
+
+          it 'does not update a intervention object' do
+            expect(intervention.reload.attributes).to include(
+              'name' => 'Old Intervention',
+              'status' => 'draft',
+              'shared_to' => 'anyone'
+            )
+          end
+        end
+      end
     end
 
-    context 'intervention belongs to him' do
-      let(:intervention_user) { researcher }
+    context 'user is researcher' do
+      let(:user) { researcher }
 
-      context 'when params are VALID' do
-        it { expect(response).to have_http_status(:ok) }
+      before { request }
 
-        it 'response contains proper attributes' do
-          expect(json_response['data']['attributes']).to include(
-            'name' => 'New Intervention',
-            'status' => 'published',
-            'shared_to' => 'anyone'
-          )
-        end
+      it_behaves_like 'permitted user'
+    end
 
-        it 'updates a intervention object' do
-          expect(intervention.reload.attributes).to include(
-            'name' => 'New Intervention',
-            'status' => 'published',
-            'shared_to' => 'anyone'
-          )
-        end
-      end
+    context 'user has multiple roles' do
+      let(:user) { user_with_multiple_roles }
 
-      context 'when params are INVALID' do
-        let(:params) do
-          {
-            intervention: {
-              name: ''
-            }
-          }
-        end
+      before { request }
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
-
-        it 'response contains proper error message' do
-          expect(json_response['message']).to eq "Validation failed: Name can't be blank"
-        end
-
-        it 'does not update a intervention object' do
-          expect(intervention.reload.attributes).to include(
-            'name' => 'Old Intervention',
-            'status' => 'draft',
-            'shared_to' => 'anyone'
-          )
-        end
-      end
+      it_behaves_like 'permitted user'
     end
   end
 

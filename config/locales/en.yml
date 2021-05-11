@@ -6,8 +6,8 @@ en:
       report_file: '%m_%d_%Y_%H_%M'
   question:
     finish:
-      subtitle: <h2>Finish Screen</h2>
-      title: Finish Screen
+      subtitle: '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
+      title: Enter title here
   question_group:
     finish:
       title: Finish Group
@@ -67,10 +67,10 @@ en:
       not_found: "%{organizable_type} Invitation not found"
   organizable_mailer:
     invite_user:
-      subject:      You've been invited to the %{organization_type}
-      header:       '%{organization_name} Invitation'
-      body:         "You've been invited to the %{organization_name}."
-      instruction:  'Click the link below to accept the invitation and join the %{organization_type}.'
+      subject:      You've been invited to the %{organizable_type}
+      header:       '%{organizable_name} Invitation'
+      body:         "You've been invited to the %{organizable_name}."
+      instruction:  'Click the link below to accept the invitation and join the %{organizable_type}.'
       button_text:  Accept the Invitation
   generated_report_mailer:
     new_report_available:

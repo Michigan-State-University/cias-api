@@ -57,8 +57,7 @@ class V1::Organizations::ChangeOrganizationAdmins
   end
 
   def organization_admin(organization_admin_id)
-    @organization_admin ||= User.limit_to_roles(%w[organization_admin])
-                            .find(organization_admin_id)
+    User.limit_to_roles(%w[organization_admin]).find(organization_admin_id)
   end
 
   def current_organization_admins

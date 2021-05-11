@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateOrganizationInvitations < ActiveRecord::Migration[6.0]
   def change
     create_table :organization_invitations, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
