@@ -143,7 +143,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
       end
     end
 
-    %i[health_system_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
@@ -157,9 +157,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
 
       before { request }
 
-      it 'returns proper error message' do
-        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
-      end
+      it_behaves_like 'preview user'
     end
   end
 end

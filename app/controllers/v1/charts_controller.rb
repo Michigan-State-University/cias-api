@@ -16,7 +16,7 @@ class V1::ChartsController < V1Controller
   def create
     authorize! :create, Chart
 
-    chart = V1::Charts::Create.call(chart_params)
+    chart = Chart.create!(chart_params)
     render json: serialized_response(chart), status: :created
   end
 
@@ -30,7 +30,7 @@ class V1::ChartsController < V1Controller
   def destroy
     authorize! :delete, Chart
 
-    V1::Charts::Destroy.call(chart_load)
+    chart_load.destroy!
     head :no_content
   end
 

@@ -15,5 +15,6 @@ class Ability::OrganizationAdmin < Ability::Base
     can :confirm_organization_membership, OrganizationInvitation, user_id: user.id
     can :read, HealthSystem, organization: { organization_admins: { id: user.id } }
     can :read, HealthClinic, health_system: { organization: { organization_admins: { id: user.id } } }
+    can :read, Chart, dashboard_section: { reporting_dashboard: { organization: { organization_admins: { id: user.id } } } }
   end
 end

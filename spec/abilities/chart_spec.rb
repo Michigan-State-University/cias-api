@@ -3,7 +3,9 @@
 require 'cancan/matchers'
 
 describe Chart do
-  let!(:organization) { create(:organization, :with_e_intervention_admin) }
+  let!(:organization) { create(:organization, :with_e_intervention_admin, :with_organization_admin) }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
+  let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
   let!(:other_organization) { create(:organization) }
   let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:other_dashboard_section) { create(:dashboard_section, reporting_dashboard: other_organization.reporting_dashboard) }
@@ -24,6 +26,42 @@ describe Chart do
 
       it 'can manage chart for organization that he is admin for' do
         expect(subject).to have_abilities(:manage, chart)
+      end
+
+      it 'can\'t read chard from other organization' do
+        expect(subject).to not_have_abilities(:manage, other_organization)
+      end
+    end
+
+    context 'organization admin' do
+      let(:user) { organization.organization_admins.first }
+
+      it 'can manage chart for organization that he is admin for' do
+        expect(subject).to have_abilities(:read, chart)
+      end
+
+      it 'can\'t read chard from other organization' do
+        expect(subject).to not_have_abilities(:manage, other_organization)
+      end
+    end
+
+    context 'health_system admin' do
+      let(:user) { health_system.health_system_admins.first }
+
+      it 'can manage chart for organization that he is admin for' do
+        expect(subject).to have_abilities(:read, chart)
+      end
+
+      it 'can\'t read chard from other organization' do
+        expect(subject).to not_have_abilities(:manage, other_organization)
+      end
+    end
+
+    context 'health_clinic admin' do
+      let(:user) { health_clinic.health_clinic_admins.first }
+
+      it 'can manage chart for organization that he is admin for' do
+        expect(subject).to have_abilities(:read, chart)
       end
 
       it 'can\'t read chard from other organization' do
@@ -60,8 +98,16 @@ describe Chart do
       end
     end
 
-    context 'organization_admin' do
+    context 'e_intervention admin' do
       let(:user) { organization.e_intervention_admins.first }
+
+      it 'return all organization_admin\'s organizations' do
+        expect(subject).to include(chart).and not_include(other_chart)
+      end
+    end
+
+    context 'organization admin' do
+      let(:user) { organization.organization_admins.first }
 
       it 'return all organization_admin\'s organizations' do
         expect(subject).to include(chart).and not_include(other_chart)

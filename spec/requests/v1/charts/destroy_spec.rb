@@ -50,7 +50,7 @@ RSpec.describe 'DELETE /v1/charts/:id', type: :request do
 
       context 'when health system id is invalid' do
         before do
-          delete v1_health_clinic_path('wrong_id'), headers: headers
+          delete v1_chart_path('wrong_id'), headers: headers
         end
 
         it 'error message is expected' do
@@ -100,9 +100,7 @@ RSpec.describe 'DELETE /v1/charts/:id', type: :request do
 
       before { request }
 
-      it 'returns proper error message' do
-        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
-      end
+      it_behaves_like 'preview user'
     end
   end
 end

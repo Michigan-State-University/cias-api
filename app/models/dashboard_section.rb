@@ -2,7 +2,7 @@
 
 class DashboardSection < ApplicationRecord
   belongs_to :reporting_dashboard
-  has_many :charts
+  has_many :charts, dependent: :destroy
 
   validates :name, presence: true, uniqueness: { scope: :reporting_dashboard }
 

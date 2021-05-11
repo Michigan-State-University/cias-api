@@ -103,9 +103,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
 
       before { request }
 
-      it 'returns proper error message' do
-        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
-      end
+      it_behaves_like 'preview user'
     end
   end
 end

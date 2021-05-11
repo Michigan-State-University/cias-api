@@ -24,7 +24,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { post v1_health_clinics_path }
+      let(:request) { post v1_charts_path }
 
       it_behaves_like 'unauthorized user'
     end
@@ -103,9 +103,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
 
       before { request }
 
-      it 'returns proper error message' do
-        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
-      end
+      it_behaves_like 'preview user'
     end
   end
 end
