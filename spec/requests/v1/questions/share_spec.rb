@@ -6,7 +6,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
   let(:team) { team_admin.admins_teams.first }
   let(:user) { create(:user, :confirmed, :researcher, team_id: team.id) }
-  let(:researcher_1) { create(:user, :confirmed, :researcher, team_id: team.id) }
+  let(:researcher_1) { create(:user, :confirmed, roles: %w[participant researcher guest], team_id: team.id) }
   let(:researcher_2) { create(:user, :confirmed, :researcher, team_id: team.id) }
 
   let(:intervention) { create(:intervention, user: user) }

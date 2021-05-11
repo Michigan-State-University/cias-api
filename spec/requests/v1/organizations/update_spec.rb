@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
@@ -63,22 +71,27 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
     end
 
     context 'when user is admin' do
-      context 'when params are proper' do
-        it_behaves_like 'permitted user'
-      end
+      context 'one or multiple roles' do
+        %w[admin admin_with_multiple_roles].each do |role|
+          let(:user) { users[role] }
+          context 'when params are proper' do
+            it_behaves_like 'permitted user'
+          end
 
-      context 'when params are invalid' do
-        let(:params) do
-          {
-            organization: {
-              name: ''
-            }
-          }
+          context 'when params are invalid' do
+            let(:params) do
+              {
+                organization: {
+                  name: ''
+                }
+              }
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+              it { expect(response).to have_http_status(:unprocessable_entity) }
 
-          it 'response contains proper error message' do
-            expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+              it 'response contains proper error message' do
+                expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+              end
+            end
           end
         end
       end

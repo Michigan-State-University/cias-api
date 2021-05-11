@@ -27,33 +27,49 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
   end
 
   context 'when authenticated as admin user' do
-    let(:admin_user) { create(:user, :admin) }
-    let(:headers)    { admin_user.create_new_auth_token }
+    let(:admin) { create(:user, :confirmed, :admin) }
+    let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+    let(:user) { admin }
+    let(:users) do
+      {
+        'admin' => admin,
+        'admin_with_multiple_roles' => admin_with_multiple_roles
+      }
+    end
+    let(:headers) { user.create_new_auth_token }
 
-    context 'when new title is provided in params' do
-      it 'returns serialized question_group' do
-        request
+    shared_examples 'permitted user' do
+      context 'when new title is provided in params' do
+        it 'returns serialized question_group' do
+          request
 
-        expect(response).to have_http_status(:ok)
-        expect(json_response['data']['attributes']['title']).to eq 'New Title'
+          expect(response).to have_http_status(:ok)
+          expect(json_response['data']['attributes']['title']).to eq 'New Title'
+        end
+      end
+
+      context 'when new session_id is provided in params' do
+        let(:new_session) { create(:session) }
+        let(:params) do
+          {
+            question_group: {
+              session_id: new_session.id
+            }
+          }
+        end
+
+        it 'returns serialized question_group' do
+          request
+
+          expect(response).to have_http_status(:ok)
+          expect(json_response['data']['attributes']['session_id']).to eq new_session.id
+        end
       end
     end
 
-    context 'when new session_id is provided in params' do
-      let(:new_session) { create(:session) }
-      let(:params) do
-        {
-          question_group: {
-            session_id: new_session.id
-          }
-        }
-      end
-
-      it 'returns serialized question_group' do
-        request
-
-        expect(response).to have_http_status(:ok)
-        expect(json_response['data']['attributes']['session_id']).to eq new_session.id
+    context 'one or multiple roles' do
+      %w[admin admin_with_multiple_roles].each do |_role|
+        it_behaves_like 'permitted user'
       end
     end
   end

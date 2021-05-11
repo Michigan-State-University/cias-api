@@ -104,6 +104,12 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       it_behaves_like 'permitted user'
     end
 
+    context 'when admin has multiple roles' do
+      let(:user) { create(:user, :confirmed, roles: %w[admin participant]) }
+
+      it_behaves_like 'permitted user'
+    end
+
     context 'when user is' do
       %w[organization_admin e_intervention_admin].each do |role|
         context role.to_s do
