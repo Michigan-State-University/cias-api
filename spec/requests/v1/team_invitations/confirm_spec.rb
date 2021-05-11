@@ -7,7 +7,7 @@ RSpec.describe 'GET /v1/team_invitations/confirm', type: :request do
     get v1_team_invitations_confirm_path(invitation_token: invitation_token), params: params,
                                                                               headers: headers
   end
-  let!(:researcher) { create(:user, :confirmed, :researcher) }
+  let!(:researcher) { create(:user, :confirmed, roles: %w[researcher guest]) }
   let!(:team) { create(:team) }
   let(:params) { { invitation_token: invitation_token } }
   let(:success_message) do

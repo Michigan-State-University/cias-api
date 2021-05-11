@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group, title: 'First Question Group', session: session) }
   let!(:other_question_group) { create(:question_group, title: 'Second Question Group', session: session) }
@@ -31,33 +39,43 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
     end
   end
 
-  context 'when response' do
-    context 'is success' do
-      before { request }
+  context 'one or multiple roles' do
+    shared_examples 'permitted user' do
+      context 'when response' do
+        context 'is success' do
+          before { request }
 
-      it 'returns proper http status' do
-        expect(response).to have_http_status(:no_content)
-      end
+          it 'returns proper http status' do
+            expect(response).to have_http_status(:no_content)
+          end
 
-      it 'deletes questions' do
-        expect(Question.find_by(id: questions.first.id)).to eq(nil)
-      end
+          it 'deletes questions' do
+            expect(Question.find_by(id: questions.first.id)).to eq(nil)
+          end
 
-      it 'keeps last question' do
-        expect(Question.find_by(id: other_questions.last.id)).to eq(other_questions.last)
-      end
+          it 'keeps last question' do
+            expect(Question.find_by(id: other_questions.last.id)).to eq(other_questions.last)
+          end
 
-      it 'keeps second question_group' do
-        expect(QuestionGroup.find_by(id: other_question_group.id)).to eq(other_question_group)
-      end
+          it 'keeps second question_group' do
+            expect(QuestionGroup.find_by(id: other_question_group.id)).to eq(other_question_group)
+          end
 
-      it 'deletes first question_group' do
-        expect(QuestionGroup.find_by(id: question_group.id)).to eq(nil)
-      end
+          it 'deletes first question_group' do
+            expect(QuestionGroup.find_by(id: question_group.id)).to eq(nil)
+          end
 
-      it 'deletes answers' do
-        expect(Answer.find_by(id: answers.first.id)).to eq(nil)
+          it 'deletes answers' do
+            expect(Answer.find_by(id: answers.first.id)).to eq(nil)
+          end
+        end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
   end
 

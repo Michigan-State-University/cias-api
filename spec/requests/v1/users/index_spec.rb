@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/users', type: :request do
-  let(:user) { create(:user, :confirmed, :admin, first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
+  let(:user) { create(:user, :confirmed, roles: %w[participant admin guest], first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
   let(:researcher) { create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'mike.Wazowski@test.com', created_at: 4.days.ago) }
   let(:participant) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Lenon', email: 'john.lenon@test.com', created_at: 4.days.ago) }
   let(:participant_1) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com', created_at: 3.days.ago) }
@@ -33,7 +33,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     context 'without params' do
       let!(:params) { {} }
 
-      let!(:users) { [participant_3, participant_2, participant_1, researcher, user] }
+      let!(:users) { [participant_3, participant_2, participant_1, researcher, current_user] }
 
       before do
         request
