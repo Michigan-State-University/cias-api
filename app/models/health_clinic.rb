@@ -8,5 +8,5 @@ class HealthClinic < ApplicationRecord
 
   validates :name, presence: true, uniqueness: { scope: :health_system }
 
-  default_scope { order(:name) }
+  default_scope { order(created_at: :desc) }
 end

@@ -12,9 +12,9 @@ RSpec.describe OrganizableMailer, type: :mailer do
 
     let(:mail) do
       described_class.invite_user(invitation_token: invitation.invitation_token,
-                                      email: email,
-                                      organizable: organization,
-                                      organizable_type: organization_type)
+                                  email: email,
+                                  organizable: organization,
+                                  organizable_type: organization_type)
     end
 
     it 'renders the headers' do
