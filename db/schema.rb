@@ -67,6 +67,11 @@ ActiveRecord::Schema.define(version: 2021_05_10_163532) do
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
+    t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
+    t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
+    t.index ["organization_id"], name: "index_chart_statistics_on_organization_id"
+    t.index ["user_id"], name: "index_chart_statistics_on_user_id"
   end
 
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
