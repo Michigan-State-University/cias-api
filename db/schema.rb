@@ -14,6 +14,7 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -182,7 +183,9 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "email_ciphertext"
     t.string "email_bidx"
+    t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
+    t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
     t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
@@ -402,10 +405,21 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
     t.datetime "last_answer_at"
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
+    t.uuid "health_clinic_id"
+    t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
+  end
+
+  create_table "user_verification_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.string "code", null: false
+    t.boolean "confirmed", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_user_verification_codes_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -448,8 +462,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
     t.boolean "email_notification", default: true, null: false
     t.boolean "feedback_completed", default: false, null: false
     t.string "description", default: ""
-    t.string "verification_code"
-    t.datetime "verification_code_created_at"
     t.uuid "organizable_id"
     t.boolean "confirmed_verification", default: false, null: false
     t.text "email_ciphertext"
@@ -481,12 +493,14 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
   add_foreign_key "interventions", "users"
+  add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
+  add_foreign_key "user_sessions", "health_clinics"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "users"
 end

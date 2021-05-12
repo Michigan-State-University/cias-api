@@ -13,7 +13,8 @@ class V1::HealthClinics::Destroy
   def call
     ActiveRecord::Base.transaction do
       health_clinic_admins.each do |health_clinic_admin|
-        health_clinic_admin.deactivate!
+        health_clinic_admin.user_health_clinics.find_by(health_clinic_id: health_clinic.id).destroy!
+        health_clinic_admin.deactivate! if no_more_health_clinics?(health_clinic_admin)
         health_clinic_admins.delete(health_clinic_admin)
       end
 
@@ -24,4 +25,8 @@ class V1::HealthClinics::Destroy
   private
 
   attr_accessor :health_clinic, :health_clinic_admins
+
+  def no_more_health_clinics?(health_clinic_admin)
+    health_clinic_admin.user_health_clinics.empty?
+  end
 end

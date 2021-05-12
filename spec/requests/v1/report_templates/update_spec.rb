@@ -9,63 +9,81 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
   end
   let!(:report_template) { create(:report_template) }
   let(:session) { report_template.session }
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:headers) { user.create_new_auth_token }
   let(:logo) { fixture_file_upload('images/logo.png', 'image/png') }
 
-  context 'when params are valid' do
-    let(:params) do
-      {
-        report_template: {
-          name: 'New Report Template',
-          report_for: 'participant',
-          summary: 'Your session summary',
-          logo: logo
-        }
-      }
-    end
+  context 'one or multiple roles' do
+    shared_examples 'permitted user' do
+      context 'when params are valid' do
+        let(:params) do
+          {
+            report_template: {
+              name: 'New Report Template',
+              report_for: 'participant',
+              summary: 'Your session summary',
+              logo: logo
+            }
+          }
+        end
 
-    it 'returns :created status' do
-      request
-      expect(response).to have_http_status(:ok)
-    end
+        it 'returns :created status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
 
-    it 'updates report template with given attributes' do
-      expect { request }.to change(ActiveStorage::Attachment, :count).by(1).and \
-        change(ActiveStorage::Blob, :count).by(1).and \
-          avoid_changing(ReportTemplate, :count)
+        it 'updates report template with given attributes' do
+          expect { request }.to change(ActiveStorage::Attachment, :count).by(1).and \
+            change(ActiveStorage::Blob, :count).by(1).and \
+              avoid_changing(ReportTemplate, :count)
 
-      expect(ReportTemplate.last).to have_attributes(
-        name: 'New Report Template',
-        report_for: 'participant',
-        summary: 'Your session summary'
-      )
-    end
+          expect(ReportTemplate.last).to have_attributes(
+            name: 'New Report Template',
+            report_for: 'participant',
+            summary: 'Your session summary'
+          )
+        end
 
-    context 'logo is replaced' do
-      before do
-        report_template.update(logo: fixture_file_upload('images/logo.png'))
+        context 'logo is replaced' do
+          before do
+            report_template.update(logo: fixture_file_upload('images/logo.png'))
+          end
+
+          let(:old_logo) { report_template.logo }
+
+          it 'updated report template attachment logo' do
+            expect { request }.to change { ActiveStorage::Attachment.exists?(id: old_logo.id) }.from(true).to(false).and \
+              avoid_changing { ActiveStorage::Attachment.count }
+
+            expect(report_template.reload.logo).to be_present
+          end
+        end
       end
 
-      let(:old_logo) { report_template.logo }
+      context 'when params are invalid' do
+        context 'when report template params are missing' do
+          let(:params) { { report_template: {} } }
 
-      it 'updated report template attachment logo' do
-        expect { request }.to change { ActiveStorage::Attachment.exists?(id: old_logo.id) }.from(true).to(false).and \
-          avoid_changing { ActiveStorage::Attachment.count }
-
-        expect(report_template.reload.logo).to be_present
+          it 'does not update report template, returns :bad_request status' do
+            expect { request }.not_to change { report_template.reload.attributes }
+            expect(response).to have_http_status(:bad_request)
+          end
+        end
       end
     end
-  end
 
-  context 'when params are invalid' do
-    context 'when report template params are missing' do
-      let(:params) { { report_template: {} } }
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
 
-      it 'does not update report template, returns :bad_request status' do
-        expect { request }.not_to change { report_template.reload.attributes }
-        expect(response).to have_http_status(:bad_request)
-      end
+      it_behaves_like 'permitted user'
     end
   end
 

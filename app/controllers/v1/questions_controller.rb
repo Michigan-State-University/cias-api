@@ -38,8 +38,7 @@ class V1::QuestionsController < V1Controller
       values: position_params[:position]
     ).execute
     question_groups = question_service.question_groups_scope(session_id)
-    invalidate_cache(question_groups)
-    render_json question_groups: question_groups, path: 'v1/question_groups', action: :index
+    render json: serialized_response(question_groups, from_model = 'QuestionGroup')
   end
 
   def share

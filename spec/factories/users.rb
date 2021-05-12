@@ -9,9 +9,10 @@ FactoryBot.define do
     provider { 'email' }
     roles { %w[guest] }
     time_zone { 'Europe/Warsaw' }
-    sequence(:verification_code) { |s| "verification_code_#{s}" }
-    verification_code_created_at { Time.current }
-    confirmed_verification { true }
+
+    after(:create) do |user|
+      user.user_verification_codes.create(code: "verification_code_#{user.uid}", confirmed: true)
+    end
 
     transient do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }

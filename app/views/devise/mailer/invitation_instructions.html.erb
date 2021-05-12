@@ -165,9 +165,14 @@
                       <tr>
                         <td align="center" style="font-size: 0px; padding: 10px 25px; word-break: break-word;">
                           <div style="font-family: DM Sans, Helvetica, Arial; font-size: 20px; font-weight: 700; line-height: 1; text-align: center; color: #2f3850;">
-                            <%= t('devise.mailer.invitation_instructions.you_have_been_invited') %><br />
-                            <br />
                             <% user = User.find_by_invitation_token(@token, true) %>
+                            <% if user.organizable_id.present? %>
+                              <% organizable = user.organizable_type.safe_constantize.find(user.organizable_id) %>
+                              <%= t('devise.mailer.organizable_invitation_instructions.you_have_been_invited', organizable_name: organizable.name) %>
+                            <% else %>
+                              <%= t('devise.mailer.invitation_instructions.you_have_been_invited') %>
+                            <% end %>
+                            <br />
                             <% if user.team_id.present? %>
                               <%= t('devise.mailer.team_invitation_instructions.click_the_link', team_name: user.team.name) %>
                             <% else %>
