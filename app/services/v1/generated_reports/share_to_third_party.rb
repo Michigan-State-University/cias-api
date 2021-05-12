@@ -64,6 +64,6 @@ class V1::GeneratedReports::ShareToThirdParty
   def third_party_emails
     @third_party_emails ||= Answer::ThirdParty.where(
       user_session_id: user_session.id
-    ).map { |answer| answer.body_data&.first&.dig('value') }
+    ).map { |answer| answer.body_data&.first&.dig('value') }[0]&.delete(' ')&.split(',')
   end
 end
