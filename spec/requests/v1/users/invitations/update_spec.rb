@@ -35,7 +35,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
         request
 
         expect(response).to have_http_status(:ok)
-        expect(json_response['email']).to eq 'test@example.com'
+        expect(json_response['data']['attributes']['email']).to eq 'test@example.com'
         expect(user_with_pending_invitation.reload.invitation_accepted_at).to be_present
         expect(user_with_pending_invitation.confirmed_at).to be_present
       end

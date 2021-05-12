@@ -19,6 +19,8 @@ en:
     mailer:
       team_invitation_instructions:
         click_the_link: 'Click the link below to complete registration and join the %{team_name}.'
+      organizable_invitation_instructions:
+        you_have_been_invited: 'You have been invited to %{organizable_name}.'
       invitation_instructions:
         subject: "Welcome to CIAS!"
         you_have_been_invited: 'You have been invited to CIAS.'

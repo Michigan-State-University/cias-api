@@ -19,7 +19,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/invitations', type: :requ
     end
 
     it 'returns correct invitations size' do
-      expect(json_response['user_sessions'].size).to eq 3
+      expect(json_response['data'].size).to eq 3
     end
   end
 end

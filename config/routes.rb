@@ -159,8 +159,6 @@ Rails.application.routes.draw do
         resources :voices, only: :index
       end
     end
-
-    resources :health_clinics, controller: :health_clinics
   end
 
   if Rails.env.development?

@@ -21,13 +21,25 @@ describe 'DELETE /v1/sessions/:session_id/question_groups/:id', type: :request d
   end
 
   context 'when authenticated as admin user' do
-    let(:admin_user) { create(:user, :admin) }
-    let(:headers)    { admin_user.create_new_auth_token }
+    let(:admin) { create(:user, :confirmed, :admin) }
+    let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+    let(:user) { admin }
+    let(:users) do
+      {
+        'admin' => admin,
+        'admin_with_multiple_roles' => admin_with_multiple_roles
+      }
+    end
+    let(:headers) { user.create_new_auth_token }
 
-    it 'returns no_content status and removes QuestionGroup' do
-      expect { request }.to change(QuestionGroup, :count).by(-1)
+    context 'one or multiple roles' do
+      %w[admin admin_with_multiple_roles].each do |_role|
+        it 'returns no_content status and removes QuestionGroup' do
+          expect { request }.to change(QuestionGroup, :count).by(-1)
 
-      expect(response).to have_http_status(:no_content)
+          expect(response).to have_http_status(:no_content)
+        end
+      end
     end
   end
 end

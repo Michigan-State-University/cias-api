@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_10_113441) do
+ActiveRecord::Schema.define(version: 2021_05_11_124342) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -169,7 +170,9 @@ ActiveRecord::Schema.define(version: 2021_05_10_113441) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "email_ciphertext"
     t.string "email_bidx"
+    t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
+    t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
     t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
@@ -476,6 +479,7 @@ ActiveRecord::Schema.define(version: 2021_05_10_113441) do
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
   add_foreign_key "interventions", "users"
+  add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "google_tts_voices"
