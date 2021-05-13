@@ -52,6 +52,7 @@ class User < ApplicationRecord
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
                                                  dependent: :destroy
   has_many :user_verification_codes, dependent: :destroy
+  has_many :chart_statistics, dependent: :nullify
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
