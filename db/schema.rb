@@ -10,7 +10,6 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
 ActiveRecord::Schema.define(version: 2021_05_11_133009) do
 
   # These are extensions that must be enabled in order to support this database
@@ -114,6 +113,8 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
   create_table "generated_reports_third_party_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "generated_report_id"
     t.uuid "third_party_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
     t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
@@ -201,7 +202,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
     t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
-    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
   create_table "messages", force: :cascade do |t|
