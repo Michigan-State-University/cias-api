@@ -8,6 +8,7 @@ class Organization < ApplicationRecord
   has_many :organization_invitations, dependent: :destroy
   has_one :reporting_dashboard, dependent: :destroy
   has_many :charts, through: :reporting_dashboard
+  has_many :chart_statistics, through: :health_systems
 
   validates :name, presence: true, uniqueness: true
 

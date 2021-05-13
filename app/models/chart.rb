@@ -4,6 +4,7 @@ class Chart < ApplicationRecord
   extend DefaultValues
 
   belongs_to :dashboard_section
+  has_many :chart_statistics, dependent: :destroy
 
   attribute :formula, :json, default: assign_default_values('formula')
 
