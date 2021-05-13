@@ -28,14 +28,14 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
+    Intervention.without_organization.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
   end
 
   def intervention_load
-    interventions_scope.find(params[:id])
+    Intervention.accessible_by(current_ability).find(params[:id])
   end
 
   def intervention_params
-    params.require(:intervention).permit(:name, :status_event, :shared_to)
+    params.require(:intervention).permit(:name, :status_event, :shared_to, :organization_id)
   end
 end
