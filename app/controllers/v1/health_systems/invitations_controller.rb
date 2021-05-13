@@ -13,8 +13,6 @@ class V1::HealthSystems::InvitationsController < V1Controller
   end
 
   def confirm
-    authorize! :confirm_health_system_membership, HealthSystemInvitation
-
     V1::HealthSystems::Invitations::Confirm.call(health_system_invitation)
 
     redirect_to_web_app(

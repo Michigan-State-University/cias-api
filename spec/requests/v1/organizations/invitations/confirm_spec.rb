@@ -8,8 +8,8 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
                                                                                       headers: headers
   end
   let!(:organization) { create(:organization) }
-  let!(:intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
-  let!(:organization_admin) { create(:user, :confirmed, :organization_admin) }
+  let!(:intervention_admin) { create(:user, :confirmed, :e_intervention_admin, active: false) }
+  let!(:organization_admin) { create(:user, :confirmed, :organization_admin, active: false) }
 
   let(:params) { { invitation_token: invitation_token } }
   let(:success_message) do
@@ -45,6 +45,7 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
 
   context 'when user is organization admin' do
     context 'when invitation_token is valid' do
+      let(:headers) { organization_admin.create_new_auth_token }
       let!(:organization_invitation) { create(:organization_invitation, user_id: organization_admin.id, organization_id: organization.id) }
       let(:invitation_token) { organization_invitation.invitation_token }
 
