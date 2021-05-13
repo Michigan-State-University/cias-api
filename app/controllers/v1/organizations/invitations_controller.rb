@@ -24,8 +24,6 @@ class V1::Organizations::InvitationsController < V1Controller
   end
 
   def confirm
-    authorize! :confirm_organization_membership, OrganizationInvitation
-
     V1::Organizations::Invitations::Confirm.call(organization_invitation)
 
     redirect_to_web_app(

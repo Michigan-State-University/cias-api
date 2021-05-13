@@ -11,11 +11,10 @@
 # It's strongly recommended that you check this file into your version control system.
 
 
-ActiveRecord::Schema.define(version: 2021_05_06_115717) do
+ActiveRecord::Schema.define(version: 2021_05_11_133009) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -58,6 +57,35 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
+  end
+
+  create_table "chart_statistics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "label"
+    t.uuid "organization_id", null: false
+    t.uuid "health_system_id", null: false
+    t.uuid "health_clinic_id", null: false
+    t.uuid "chart_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
+    t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
+    t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
+    t.index ["organization_id"], name: "index_chart_statistics_on_organization_id"
+    t.index ["user_id"], name: "index_chart_statistics_on_user_id"
+  end
+
+  create_table "charts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.string "status", default: "draft"
+    t.jsonb "formula"
+    t.uuid "dashboard_section_id"
+    t.datetime "published_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "type"
+    t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -168,7 +196,10 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "email_ciphertext"
     t.string "email_bidx"
+    t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
+    t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
+    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
   create_table "messages", force: :cascade do |t|
@@ -385,6 +416,8 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
     t.datetime "last_answer_at"
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
+    t.uuid "health_clinic_id"
+    t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
@@ -462,12 +495,14 @@ ActiveRecord::Schema.define(version: 2021_05_06_115717) do
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
   add_foreign_key "interventions", "users"
+  add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
+  add_foreign_key "user_sessions", "health_clinics"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "users"
 end

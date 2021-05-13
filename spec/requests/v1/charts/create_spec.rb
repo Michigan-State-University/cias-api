@@ -2,27 +2,29 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id', type: :request do
+RSpec.describe 'POST /v1/charts', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_e_intervention_admin, :with_dashboard_section) }
-  let!(:dashboard_section) { organization.reporting_dashboard.dashboard_sections.first }
+  let!(:organization) { create(:organization, :with_e_intervention_admin) }
+  let!(:e_intervention_admin) { organization.e_intervention_admins.first }
+  let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      dashboard_section: {
-        name: 'New name',
-        description: 'New description'
+      chart: {
+        name: 'New Chart',
+        description: 'Description',
+        dashboard_section_id: dashboard_section.id
       }
     }
   end
-  let(:request) { patch v1_organization_dashboard_section_path(organization.id, dashboard_section.id), params: params, headers: headers }
+  let(:request) { post v1_charts_path, params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { patch v1_organization_dashboard_section_path(organization.id, dashboard_section.id) }
+      let(:request) { post v1_charts_path }
 
       it_behaves_like 'unauthorized user'
     end
@@ -37,34 +39,27 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
       before { request }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:created)
       end
 
       it 'returns proper data' do
-        expect(json_response['data']).to include(
+        expect(json_response['data']['attributes']).to include(
           {
-            'id' => dashboard_section.id,
-            'type' => 'dashboard_section',
-            'attributes' => {
-              'name' => 'New name',
-              'description' => 'New description',
-              'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
-            }
+            'dashboard_section_id' => dashboard_section.id,
+            'name' => 'New Chart',
+            'description' => 'Description'
           }
         )
       end
     end
 
     context 'when user is admin' do
-      context 'when params are proper' do
-        it_behaves_like 'permitted user'
-      end
+      it_behaves_like 'permitted user'
 
       context 'when params are invalid' do
         let(:params) do
           {
-            dashboard_section: {
+            chart: {
               name: ''
             }
           }
@@ -79,7 +74,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
     end
 
     context 'when user is e_intervention admin' do
-      let(:user) { organization.e_intervention_admins.first }
+      let(:user) { create(:user, :confirmed, :e_intervention_admin) }
 
       it_behaves_like 'permitted user'
     end
@@ -94,7 +89,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
       end
     end
 
-    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant guest].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest health_clinic_admin].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
@@ -108,9 +103,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
 
       before { request }
 
-      it 'returns proper error message' do
-        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
-      end
+      it_behaves_like 'preview user'
     end
   end
 end

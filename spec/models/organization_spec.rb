@@ -8,6 +8,7 @@ RSpec.describe Organization, type: :model do
   it { should have_many(:health_systems).dependent(:destroy) }
   it { should have_many(:organization_invitations).dependent(:destroy) }
   it { should have_one(:reporting_dashboard).dependent(:destroy) }
+  it { should have_many(:chart_statistics) }
 
   describe '#name' do
     context 'name is unique' do

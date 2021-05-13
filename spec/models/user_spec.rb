@@ -4,6 +4,7 @@ require 'rails_helper'
 
 describe User, type: :model do
   it { should have_many(:team_invitations).dependent(:destroy) }
+  it { should have_many(:chart_statistics) }
 
   describe 'participant' do
     subject { create(:user, :confirmed, :participant) }

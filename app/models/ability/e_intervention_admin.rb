@@ -35,12 +35,12 @@ class Ability::EInterventionAdmin < Ability::Base
     can :read, GoogleTtsVoice
     can :manage, Organization, e_intervention_admins: { id: user.id }
     can :invite_organization_admin, Organization, e_intervention_admins: { id: user.id }
-    can :confirm_organization_membership, OrganizationInvitation, user_id: user.id
     can :manage, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
     can :invite_health_system_admin, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
     can :manage, HealthClinic, health_system: { organization: { e_intervention_admins: { id: user.id } } }
     can :invite_health_clinic_admin, HealthClinic, health_system: { organization: { e_intervention_admins: { id: user.id } } }
     can :manage, ReportingDashboard, organization: { e_intervention_admins: { id: user.id } }
     can :manage, DashboardSection, reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } }
+    can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } } }
   end
 end
