@@ -11,6 +11,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
   let!(:dashboard_section_1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:dashboard_section_3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:chart) { create(:chart, name: 'Some chart', description: 'Some description', dashboard_section_id: dashboard_section_1.id) }
 
   let!(:organization_admin) { organization.organization_admins.first }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
@@ -56,6 +57,14 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'description' => dashboard_section_1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
+            },
+            'relationships' => {
+              'charts' => {
+                'data' => [
+                  'id' => chart.id,
+                  'type' => 'chart'
+                ]
+              }
             }
           },
           {
@@ -66,6 +75,11 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'description' => dashboard_section_2.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
+            },
+            'relationships' => {
+              'charts' => {
+                'data' => []
+              }
             }
           },
           {
@@ -76,6 +90,11 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'description' => dashboard_section_3.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
+            },
+            'relationships' => {
+              'charts' => {
+                'data' => []
+              }
             }
           }
         )

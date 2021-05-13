@@ -159,6 +159,8 @@ Rails.application.routes.draw do
         resources :voices, only: :index
       end
     end
+
+    resources :charts, controller: :charts
   end
 
   if Rails.env.development?

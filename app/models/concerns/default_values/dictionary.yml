@@ -24,6 +24,10 @@ question:
     patterns: []
   body:
     data: []
+chart:
+  formula:
+    payload: ''
+    patterns: []
 user:
   roles:
     - participant
