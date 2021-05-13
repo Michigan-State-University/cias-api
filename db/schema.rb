@@ -10,6 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+
 ActiveRecord::Schema.define(version: 2021_05_11_133009) do
 
   # These are extensions that must be enabled in order to support this database
@@ -183,8 +184,10 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
     t.string "shared_to", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.uuid "organization_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
+    t.index ["organization_id"], name: "index_interventions_on_organization_id"
     t.index ["shared_to"], name: "index_interventions_on_shared_to"
     t.index ["status"], name: "index_interventions_on_status"
     t.index ["user_id"], name: "index_interventions_on_user_id"
@@ -506,6 +509,7 @@ ActiveRecord::Schema.define(version: 2021_05_11_133009) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"

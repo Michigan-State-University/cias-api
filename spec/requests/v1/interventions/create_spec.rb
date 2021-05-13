@@ -10,6 +10,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
+  let(:organization) { create(:organization) }
   let(:users) do
     {
       'researcher' => researcher,
@@ -20,7 +21,8 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   let(:params) do
     {
       intervention: {
-        name: 'New Intervention'
+        name: 'New Intervention',
+        organization_id: organization.id
       }
     }
   end
@@ -63,7 +65,8 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           'name' => 'New Intervention',
           'user_id' => admin.id,
           'status' => 'draft',
-          'shared_to' => 'anyone'
+          'shared_to' => 'anyone',
+          'organization_id' => organization.id
         )
       end
     end

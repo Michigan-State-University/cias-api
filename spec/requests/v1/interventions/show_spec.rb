@@ -13,10 +13,11 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:shared_to) { 'registered' }
   let(:intervention_user) { admin }
   let(:sessions) { create_list(:session, 2) }
+  let(:organization) { create(:organization) }
   let!(:intervention) do
     create(:intervention, :published, name: 'Some intervention',
                                       user: intervention_user, sessions: sessions, shared_to: shared_to,
-                                      reports: reports)
+                                      organization: organization, reports: reports)
   end
   let(:reports) { [] }
   let(:csv_attachment) { fixture_file_upload(Rails.root.join('spec/factories/csv/test_empty.csv'), 'text/csv') }
@@ -37,7 +38,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
             'name' => 'Some intervention',
             'shared_to' => shared_to,
             'csv_link' => nil,
-            'csv_generated_at' => nil
+            'csv_generated_at' => nil,
+            'organization_id' => organization.id
           )
         end
       end

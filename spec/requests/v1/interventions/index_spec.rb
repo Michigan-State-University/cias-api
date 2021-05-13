@@ -19,6 +19,8 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let!(:admin_interventions) { create_list(:intervention, 3, :published, user: admin, shared_to: :registered) }
   let!(:researcher_interventions) { create_list(:intervention, 3, :published, user: researcher, shared_to: :invited) }
   let!(:interventions_for_guests) { create_list(:intervention, 2, :published) }
+  let(:organization) { create(:organization) }
+  let!(:intervention_for_organization) { create(:intervention, organization_id: organization.id) }
 
   context 'when user is' do
     before { get v1_interventions_path, headers: user.create_new_auth_token }

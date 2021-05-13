@@ -15,6 +15,12 @@ describe Intervention do
   let_it_be(:team2_intervention2) { create(:intervention, user_id: team2_researcher.id) }
   let_it_be(:team3_intervention1) { create(:intervention, user_id: team3_researcher.id) }
 
+  let_it_be(:organization1) { create(:organization) }
+  let_it_be(:organization2) { create(:organization) }
+
+  let_it_be(:intervention_with_organization1) { create(:intervention, organization_id: organization1.id) }
+  let_it_be(:intervention_with_organization2) { create(:intervention, organization_id: organization2.id) }
+
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }
 
@@ -56,7 +62,8 @@ describe Intervention do
 
       it 'can access all interventions' do
         expect(subject).to include(
-          team1_intervention1, team1_intervention2, team2_intervention1, team2_intervention2
+          team1_intervention1, team1_intervention2, team2_intervention1, team2_intervention2,
+          intervention_with_organization1, intervention_with_organization2
         )
       end
     end
@@ -118,6 +125,15 @@ describe Intervention do
       it 'can access only for draft intervention created for the preview session' do
         expect(subject).to include(draft_intervention)
         expect(subject).not_to include(published_intervention)
+      end
+    end
+
+    context 'e-intervention admin' do
+      let!(:user) { create(:user, :confirmed, :e_intervention_admin, organizable: organization1) }
+
+      it 'can access only for interventions of organization where user is administrator' do
+        expect(subject).to include(intervention_with_organization1)
+        expect(subject).not_to include(intervention_with_organization2)
       end
     end
   end

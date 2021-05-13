@@ -13,6 +13,7 @@ class Ability::EInterventionAdmin < Ability::Base
     can %i[read list_researchers], User, id: participants_and_researchers(user)
     can :create, :preview_session_user
     can :manage, Intervention, user_id: user.id
+    can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.organizable_id)
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability)

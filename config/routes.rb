@@ -134,6 +134,7 @@ Rails.application.routes.draw do
         scope module: 'dashboard_sections' do
           resources :dashboard_sections, only: %i[index show create update destroy], controller: :dashboard_sections
         end
+        resources :interventions, only: :index, controller: :interventions
       end
     end
     get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
