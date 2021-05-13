@@ -54,7 +54,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
             'attributes' => {
               'name' => dashboard_section_1.name,
               'description' => dashboard_section_1.description,
-              'reporting_dashboard_id' => organization.reporting_dashboard.id
+              'reporting_dashboard_id' => organization.reporting_dashboard.id,
+              'organization_id' => organization.id
             }
           },
           {
@@ -63,7 +64,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
             'attributes' => {
               'name' => dashboard_section_2.name,
               'description' => dashboard_section_2.description,
-              'reporting_dashboard_id' => organization.reporting_dashboard.id
+              'reporting_dashboard_id' => organization.reporting_dashboard.id,
+              'organization_id' => organization.id
             }
           },
           {
@@ -72,7 +74,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
             'attributes' => {
               'name' => dashboard_section_3.name,
               'description' => dashboard_section_3.description,
-              'reporting_dashboard_id' => organization.reporting_dashboard.id
+              'reporting_dashboard_id' => organization.reporting_dashboard.id,
+              'organization_id' => organization.id
             }
           }
         )

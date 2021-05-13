@@ -2,6 +2,7 @@
 
 class Invitation < ApplicationRecord
   belongs_to :invitable, polymorphic: true
+  belongs_to :health_clinic, optional: true
 
   encrypts :email, migrating: true
   blind_index :email, migrating: true

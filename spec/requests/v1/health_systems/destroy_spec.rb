@@ -56,6 +56,12 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       end
     end
 
+    context 'when user has multiple roles' do
+      let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+
+      it_behaves_like 'permitted user'
+    end
+
     context 'when user is e-intervention admin' do
       let(:user) { organization.e_intervention_admins.first }
 

@@ -12,7 +12,7 @@ class V1::UsersController < V1Controller
   end
 
   def show
-    render_json user: user_service.user_load(user_id)
+    render json: serialized_response(user_service.user_load(user_id))
   end
 
   def researchers
@@ -28,9 +28,8 @@ class V1::UsersController < V1Controller
 
     user = user_service.user_load(user_id)
     user.update!(user_params)
-    invalidate_cache(user)
 
-    render_json user: user, action: :show
+    render json: serialized_response(user)
   end
 
   def destroy

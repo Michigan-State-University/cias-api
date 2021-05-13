@@ -3,7 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/teams', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:user) { admin }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:headers) { user.create_new_auth_token }
 
   context 'when there are teams' do
@@ -20,56 +28,64 @@ RSpec.describe 'GET /v1/teams', type: :request do
       get v1_teams_path, headers: headers
     end
 
-    it 'has correct http code :ok' do
-      expect(response).to have_http_status(:ok)
+    shared_examples 'permitted user' do
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns list of teams with team admins details' do
+        expect(json_response['data']).to include(
+          'id' => team_1.id.to_s,
+          'type' => 'team',
+          'attributes' => include('name' => team_1.name, 'team_admin_id' => team_1_admin.id),
+          'relationships' => {
+            'team_admin' => {
+              'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
+            }
+          }
+        ).and include(
+          'id' => team_2.id.to_s,
+          'type' => 'team',
+          'attributes' => include('name' => team_2.name, 'team_admin_id' => team_2_admin.id),
+          'relationships' => {
+            'team_admin' => {
+              'data' => include('id' => team_2_admin.id, 'type' => 'team_admin')
+            }
+          }
+        )
+
+        expect(json_response['included']).to include(
+          'id' => team_2_admin.id,
+          'type' => 'user',
+          'attributes' => include(
+            'email' => team_2_admin.email,
+            'full_name' => team_2_admin.full_name,
+            'roles' => ['team_admin'],
+            'team_id' => nil,
+            'admins_team_ids' => [team_2.id]
+          )
+        ).and include(
+          'id' => team_1_admin.id,
+          'type' => 'user',
+          'attributes' => include(
+            'email' => team_1_admin.email,
+            'full_name' => team_1_admin.full_name,
+            'roles' => ['team_admin'],
+            'team_id' => nil,
+            'admins_team_ids' => [team_1.id]
+          )
+        )
+
+        expect(json_response['meta']).to include(
+          'teams_size' => 2
+        )
+      end
     end
 
-    it 'returns list of teams with team admins details' do
-      expect(json_response['data']).to include(
-        'id' => team_1.id.to_s,
-        'type' => 'team',
-        'attributes' => include('name' => team_1.name, 'team_admin_id' => team_1_admin.id),
-        'relationships' => {
-          'team_admin' => {
-            'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
-          }
-        }
-      ).and include(
-        'id' => team_2.id.to_s,
-        'type' => 'team',
-        'attributes' => include('name' => team_2.name, 'team_admin_id' => team_2_admin.id),
-        'relationships' => {
-          'team_admin' => {
-            'data' => include('id' => team_2_admin.id, 'type' => 'team_admin')
-          }
-        }
-      )
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:user) { users[role] }
 
-      expect(json_response['included']).to include(
-        'id' => team_2_admin.id,
-        'type' => 'user',
-        'attributes' => include(
-          'email' => team_2_admin.email,
-          'full_name' => team_2_admin.full_name,
-          'roles' => ['team_admin'],
-          'team_id' => nil,
-          'admins_team_ids' => [team_2.id]
-        )
-      ).and include(
-        'id' => team_1_admin.id,
-        'type' => 'user',
-        'attributes' => include(
-          'email' => team_1_admin.email,
-          'full_name' => team_1_admin.full_name,
-          'roles' => ['team_admin'],
-          'team_id' => nil,
-          'admins_team_ids' => [team_1.id]
-        )
-      )
-
-      expect(json_response['meta']).to include(
-        'teams_size' => 2
-      )
+      it_behaves_like 'permitted user'
     end
   end
 

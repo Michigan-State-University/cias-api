@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
-  let!(:user) { create(:user, :researcher) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
+  let(:user) { researcher }
   let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:other_session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
@@ -49,63 +51,75 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
   end
 
   context 'when authenticated as researcher user' do
-    context 'when both question_ids and questions are present' do
-      it 'returns serialized question_group' do
-        request
+    shared_examples 'permitted user' do
+      context 'when both question_ids and questions are present' do
+        it 'returns serialized question_group' do
+          request
 
-        expect(response).to have_http_status(:created)
-        expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
-        expect(json_response['data']['attributes']['position']).to eq 2
-        expect(json_response['data']['relationships']['questions']['data'].size).to eq 5
-        expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
-        expect(json_response['included'][4]['attributes']['title']).to eq 'Question Title 2'
+          expect(response).to have_http_status(:created)
+          expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+          expect(json_response['data']['attributes']['position']).to eq 2
+          expect(json_response['data']['relationships']['questions']['data'].size).to eq 5
+          expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
+          expect(json_response['included'][4]['attributes']['title']).to eq 'Question Title 2'
+        end
+      end
+
+      context 'when only question_ids are present' do
+        let(:params) do
+          {
+            question_group: {
+              title: 'QuestionGroup Title',
+              session_id: session.id,
+              question_ids: question_ids.pluck(:id)
+            }
+          }
+        end
+
+        it 'returns serialized question_group' do
+          request
+
+          expect(response).to have_http_status(:created)
+          expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+          expect(json_response['data']['attributes']['position']).to eq 2
+          expect(json_response['data']['relationships']['questions']['data'].size).to eq 3
+          expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
+          expect(json_response['included'][2]['attributes']['title']).to eq 'Question Id Title'
+        end
+      end
+
+      context 'when only questions are present' do
+        let(:params) do
+          {
+            question_group: {
+              title: 'QuestionGroup Title',
+              session_id: session.id,
+              questions: question_array_json
+            }
+          }
+        end
+
+        it 'returns serialized question_group' do
+          request
+
+          expect(response).to have_http_status(:created)
+          expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
+          expect(json_response['data']['attributes']['position']).to eq 2
+          expect(json_response['data']['relationships']['questions']['data'].size).to eq 2
+          expect(json_response['included'][0]['attributes']['title']).to eq 'Question Title 1'
+          expect(json_response['included'][1]['attributes']['title']).to eq 'Question Title 2'
+        end
       end
     end
 
-    context 'when only question_ids are present' do
-      let(:params) do
-        {
-          question_group: {
-            title: 'QuestionGroup Title',
-            session_id: session.id,
-            question_ids: question_ids.pluck(:id)
-          }
-        }
-      end
-
-      it 'returns serialized question_group' do
-        request
-
-        expect(response).to have_http_status(:created)
-        expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
-        expect(json_response['data']['attributes']['position']).to eq 2
-        expect(json_response['data']['relationships']['questions']['data'].size).to eq 3
-        expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
-        expect(json_response['included'][2]['attributes']['title']).to eq 'Question Id Title'
-      end
+    context 'user is researcher' do
+      it_behaves_like 'permitted user'
     end
 
-    context 'when only questions are present' do
-      let(:params) do
-        {
-          question_group: {
-            title: 'QuestionGroup Title',
-            session_id: session.id,
-            questions: question_array_json
-          }
-        }
-      end
+    context 'user is researcher' do
+      let(:user) { researcher_with_multiple_roles }
 
-      it 'returns serialized question_group' do
-        request
-
-        expect(response).to have_http_status(:created)
-        expect(json_response['data']['attributes']['title']).to eq 'QuestionGroup Title'
-        expect(json_response['data']['attributes']['position']).to eq 2
-        expect(json_response['data']['relationships']['questions']['data'].size).to eq 2
-        expect(json_response['included'][0]['attributes']['title']).to eq 'Question Title 1'
-        expect(json_response['included'][1]['attributes']['title']).to eq 'Question Title 2'
-      end
+      it_behaves_like 'permitted user'
     end
   end
 end

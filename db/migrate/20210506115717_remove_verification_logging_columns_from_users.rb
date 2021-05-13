@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RemoveVerificationLoggingColumnsFromUsers < ActiveRecord::Migration[6.0]
   def change
     reversible do |dir|

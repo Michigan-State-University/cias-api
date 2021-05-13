@@ -3,8 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
-  let(:current_user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:other_user) { create(:user, :confirmed, :participant) }
+  let(:users) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
   let(:params) do
     {
       avatar: {
@@ -17,24 +24,32 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
   before { post v1_user_avatars_path(user_id), params: params, headers: current_user.create_new_auth_token }
 
   context 'when current_user is admin' do
-    context 'when current_user updates itself' do
-      it { expect(response).to have_http_status(:created) }
+    shared_examples 'permitted user' do
+      context 'when current_user updates itself' do
+        it { expect(response).to have_http_status(:created) }
 
-      it 'JSON response contains proper attributes' do
-        avatar_url = polymorphic_url(current_user.reload.avatar).sub('http://www.example.com/', '')
-        expect(json_response['data']['attributes']).to include(
-          'email' => current_user.email,
-          'avatar_url' => include(avatar_url)
-        )
-      end
+        it 'JSON response contains proper attributes' do
+          avatar_url = polymorphic_url(current_user.reload.avatar).sub('http://www.example.com/', '')
+          expect(json_response['data']['attributes']).to include(
+            'email' => current_user.email,
+            'avatar_url' => include(avatar_url)
+          )
+        end
 
-      it 'attaches avatar to the current user' do
-        expect(current_user.avatar.attachment.attributes).to include(
-          'record_type' => 'User',
-          'record_id' => current_user.id,
-          'name' => 'avatar'
-        )
+        it 'attaches avatar to the current user' do
+          expect(current_user.avatar.attachment.attributes).to include(
+            'record_type' => 'User',
+            'record_id' => current_user.id,
+            'name' => 'avatar'
+          )
+        end
       end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      let(:current_user) { users[role] }
+
+      it_behaves_like 'permitted user'
     end
 
     context 'when current_user updates other user' do

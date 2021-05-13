@@ -30,7 +30,6 @@ RSpec.describe 'PATCH /v1/users/confirm_logging_code', type: :request do
     let!(:user) { create(:user) }
     let(:code) { 'invalid_code' }
 
-
     it 'return 404 status' do
       request
       expect(response).to have_http_status(:not_found)
