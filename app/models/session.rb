@@ -46,10 +46,6 @@ class Session < ApplicationRecord
     SessionJob::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
   end
 
-  def position_less_than
-    @position_less_than ||= intervention.sessions.where(position: ...position).order(:position)
-  end
-
   def position_grather_than
     @position_grather_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end
