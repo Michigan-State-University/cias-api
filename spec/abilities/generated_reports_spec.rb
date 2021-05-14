@@ -138,10 +138,8 @@ describe GeneratedReport do
     context 'admin' do
       let!(:user) { create(:user, :confirmed, :admin) }
 
-      it 'can access all generated reports' do
-        expect(subject).to include(
-          team1_generated_report1, team1_generated_report2, team2_generated_report1, team2_generated_report2
-        )
+      it 'cannot access all generated reports' do
+        expect(subject).to eq([])
       end
     end
 

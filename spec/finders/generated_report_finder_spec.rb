@@ -5,8 +5,11 @@ RSpec.describe GeneratedReportFinder do
 
   let(:filter_params) { {} }
   let(:current_user) { create(:user, :confirmed, :admin) }
-  let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant) }
-  let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party) }
+  let!(:intervention) {create(:intervention, user: current_user)}
+  let!(:session) {create(:session, intervention: intervention)}
+  let!(:user_session) {create(:user_session, session: session)}
+  let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant, user_session: user_session) }
+  let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session) }
 
   context 'filter by :report_for' do
     context 'reports only for participant' do
