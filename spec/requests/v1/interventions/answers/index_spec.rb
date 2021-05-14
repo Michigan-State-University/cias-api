@@ -4,15 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/interventions/:id/answers', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
-  let(:researcher) { create(:user, :confirmed, :researcher)}
+  let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: intervention_owner) }
   let(:sessions) { create_list(:session, 2, intervention_id: intervention.id) }
   let(:questions) { create_list(:question_single, 4, session_id: session.id) }
   let(:answers) { create_list(:session, 6, question_id: question.id) }
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_intervention_answers_path(intervention.id), headers: headers }
-  let(:intervention_owner) {admin}
-  let(:user) {admin}
+  let(:intervention_owner) { admin }
+  let(:user) { admin }
 
   context 'when auth' do
     context 'is invalid' do
@@ -28,7 +28,8 @@ RSpec.describe 'GET /v1/interventions/:id/answers', type: :request do
 
   context 'when admin access researcher intervention csv' do
     before { request }
-    let(:intervention_owner) {researcher}
+
+    let(:intervention_owner) { researcher }
 
     it 'returns forbidden status' do
       expect(response).to have_http_status(:forbidden)

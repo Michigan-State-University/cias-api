@@ -136,7 +136,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       end
 
       it 'origin and outcome same except variable' do
-        expect(session_was.except('variable')).to eq(session_cloned.except('variable'))
+        expect(session_was.except('variable', 'intervention_owner_id')).to eq(session_cloned.except('variable', 'intervention_owner_id'))
         expect(session_cloned['variable']).to eq "cloned_#{session.variable}_#{session_cloned_position}"
       end
 
