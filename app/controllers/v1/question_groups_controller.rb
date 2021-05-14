@@ -52,7 +52,7 @@ class V1::QuestionGroupsController < V1Controller
 
   def clone
     authorize! :create, QuestionGroup
-    cloned_question_group = question_group_service.question_group_load(question_group_id).clone(params: params.permit!, clean_formulas: true)
+    cloned_question_group = question_group_service.question_group_load(question_group_id).clone(clean_formulas: true)
 
     render json: question_group_response(cloned_question_group), action: :show, status: :ok
   end
