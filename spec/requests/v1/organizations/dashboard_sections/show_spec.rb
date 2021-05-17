@@ -10,6 +10,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
   let!(:dashboard_section_1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+  let!(:chart1) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section_1.id) }
 
   let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:organization_admin) { organization.organization_admins.first }
@@ -64,13 +65,54 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
               'description' => dashboard_section_1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
+            },
+            'relationships' => {
+              'charts' => {
+                'data' => [
+                  {
+                    'id' => chart1.id,
+                    'type' => 'chart'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      end
+
+      it 'returns proper include' do
+        expect(json_response['included'][0]).to include(
+          {
+            'id' => chart1.id,
+            'type' => 'chart',
+            'attributes' => {
+              'name' => chart1.name,
+              'description' => chart1.description,
+              'chart_type' => chart1.chart_type,
+              'status' => chart1.status,
+              'formula' => {
+                'payload' => '',
+                'patterns' => [
+                  {
+                    'color' => '#C766EA',
+                    'label' => 'Label1',
+                    'match' => ''
+                  }
+                ],
+                'default_pattern' => {
+                  'color' => '#E2B1F4',
+                  'label' => 'Other'
+                }
+              },
+              'dashboard_section_id' => chart1.dashboard_section_id,
+              'published_at' => nil
             }
           }
         )
       end
 
       it 'returns proper collection size' do
-        expect(json_response.size).to eq(1)
+        expect(json_response.size).to eq(2)
       end
     end
 

@@ -17,7 +17,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       chart: {
         name: 'New name',
         description: 'New description',
-        type: 'BarChart'
+        chart_type: 'pie_chart'
       }
     }
   end
@@ -52,10 +52,16 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
               'name' => 'New name',
               'description' => 'New description',
               'status' => 'draft',
-              'type' => 'BarChart',
+              'chart_type' => 'pie_chart',
               'formula' => {
                 'payload' => '',
-                'patterns' => []
+                'patterns' => [{ 'color' => '#C766EA',
+                                 'label' => 'Label1',
+                                 'match' => '' }],
+                'default_pattern' => {
+                  'color' => '#E2B1F4',
+                  'label' => 'Other'
+                }
               },
               'dashboard_section_id' => dashboard_section.id,
               'published_at' => nil
