@@ -11,6 +11,7 @@ class Chart < ApplicationRecord
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
 
   enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
+  enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart' }
 
   def integral_update
     return if published?

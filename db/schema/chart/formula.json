@@ -9,17 +9,28 @@
     "type": "array",
     "items": [
       {
-        "type": "array",
+        "type": "object",
         "properties": {
           "match": {
             "type": "string"
           },
           "label": {
             "type": "string"
+          },
+          "color": {
+            "type": "string"
           }
         }
       }
     ]
+    },
+    "default_pattern": {
+      "label": {
+        "type": "string"
+      },
+      "color": {
+        "type": "string"
+      }
     },
     "required": [
       "match"
