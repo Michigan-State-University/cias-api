@@ -6,13 +6,13 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
   def index
     authorize! :read, DashboardSection
 
-    render json: serialized_response(dashboard_section_scope)
+    render json: dashboard_section_response(dashboard_section_scope)
   end
 
   def show
     authorize! :read, DashboardSection
 
-    render json: serialized_response(dashboard_section_load)
+    render json: dashboard_section_response(dashboard_section_load)
   end
 
   def create
@@ -48,5 +48,12 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
 
   def dashboard_section_params
     params.require(:dashboard_section).permit(:name, :description)
+  end
+
+  def dashboard_section_response(response)
+    V1::DashboardSectionSerializer.new(
+      response,
+      { include: %i[charts] }
+    )
   end
 end
