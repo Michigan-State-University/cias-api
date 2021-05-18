@@ -43,6 +43,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => chart.name,
             'description' => chart.description,
             'status' => 'draft',
+            'trend_line' => false,
             'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
@@ -65,6 +66,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => other_chart.name,
             'description' => other_chart.description,
             'status' => 'draft',
+            'trend_line' => false,
             'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
@@ -87,6 +89,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => chart_in_other_organization.name,
             'description' => chart_in_other_organization.description,
             'status' => 'draft',
+            'trend_line' => false,
             'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
@@ -124,6 +127,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => chart.name,
             'description' => chart.description,
             'status' => 'draft',
+            'trend_line' => false,
             'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
@@ -148,6 +152,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => other_chart.name,
             'description' => other_chart.description,
             'status' => 'draft',
+            'trend_line' => false,
             'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',

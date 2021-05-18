@@ -52,6 +52,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
               'name' => 'New name',
               'description' => 'New description',
               'status' => 'draft',
+              'trend_line' => false,
               'chart_type' => 'pie_chart',
               'formula' => {
                 'payload' => '',

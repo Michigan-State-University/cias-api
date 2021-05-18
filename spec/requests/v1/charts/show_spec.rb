@@ -39,6 +39,7 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
               'name' => chart.name,
               'description' => chart.description,
               'status' => 'draft',
+              'trend_line' => false,
               'chart_type' => 'bar_chart',
               'formula' => {
                 'payload' => '',
