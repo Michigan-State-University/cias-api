@@ -43,10 +43,16 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => chart.name,
             'description' => chart.description,
             'status' => 'draft',
-            'type' => nil,
+            'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
-              'patterns' => []
+              'patterns' => [{ 'color' => '#C766EA',
+                               'label' => 'Label1',
+                               'match' => '' }],
+              'default_pattern' => {
+                'color' => '#E2B1F4',
+                'label' => 'Other'
+              }
             },
             'dashboard_section_id' => dashboard_section.id,
             'published_at' => nil
@@ -59,10 +65,16 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => other_chart.name,
             'description' => other_chart.description,
             'status' => 'draft',
-            'type' => nil,
+            'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
-              'patterns' => []
+              'patterns' => [{ 'color' => '#C766EA',
+                               'label' => 'Label1',
+                               'match' => '' }],
+              'default_pattern' => {
+                'color' => '#E2B1F4',
+                'label' => 'Other'
+              }
             },
             'dashboard_section_id' => dashboard_section.id,
             'published_at' => nil
@@ -75,10 +87,16 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => chart_in_other_organization.name,
             'description' => chart_in_other_organization.description,
             'status' => 'draft',
-            'type' => nil,
+            'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
-              'patterns' => []
+              'patterns' => [{ 'color' => '#C766EA',
+                               'label' => 'Label1',
+                               'match' => '' }],
+              'default_pattern' => {
+                'color' => '#E2B1F4',
+                'label' => 'Other'
+              }
             },
             'dashboard_section_id' => other_dashboard_section.id,
             'published_at' => nil
@@ -106,10 +124,18 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => chart.name,
             'description' => chart.description,
             'status' => 'draft',
-            'type' => nil,
+            'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
-              'patterns' => []
+              'patterns' => [
+                { 'color' => '#C766EA',
+                  'label' => 'Label1',
+                  'match' => '' }
+              ],
+              'default_pattern' => {
+                'color' => '#E2B1F4',
+                'label' => 'Other'
+              }
             },
             'dashboard_section_id' => dashboard_section.id,
             'published_at' => nil
@@ -122,10 +148,16 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'name' => other_chart.name,
             'description' => other_chart.description,
             'status' => 'draft',
-            'type' => nil,
+            'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
-              'patterns' => []
+              'patterns' => [{ 'color' => '#C766EA',
+                               'label' => 'Label1',
+                               'match' => '' }],
+              'default_pattern' => {
+                'color' => '#E2B1F4',
+                'label' => 'Other'
+              }
             },
             'dashboard_section_id' => dashboard_section.id,
             'published_at' => nil

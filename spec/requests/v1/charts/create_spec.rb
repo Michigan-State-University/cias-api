@@ -16,7 +16,8 @@ RSpec.describe 'POST /v1/charts', type: :request do
       chart: {
         name: 'New Chart',
         description: 'Description',
-        dashboard_section_id: dashboard_section.id
+        dashboard_section_id: dashboard_section.id,
+        chart_type: 'bar_chart'
       }
     }
   end

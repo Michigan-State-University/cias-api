@@ -27,7 +27,17 @@ question:
 chart:
   formula:
     payload: ''
-    patterns: []
+    patterns: [
+      {
+        match: '',
+        label: 'Label1',
+        color: '#C766EA'
+      }
+    ]
+    default_pattern: {
+      label: 'Other',
+      color: '#E2B1F4'
+    }
 user:
   roles:
     - participant
