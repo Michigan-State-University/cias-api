@@ -84,7 +84,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "chart_type", default: "bar_chart"
-    t.boolean "trend_line", default: false
+    t.boolean "trend_line", default: false, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
