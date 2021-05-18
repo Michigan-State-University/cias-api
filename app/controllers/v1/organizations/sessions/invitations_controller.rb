@@ -52,6 +52,6 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
   end
 
   def targets
-    session_invitation_params[:session_invitations]
+    session_invitations_params[:session_invitations]
   end
 end
