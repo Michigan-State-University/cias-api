@@ -8,7 +8,7 @@ class SessionInvitation < ApplicationRecord
   def resend
     return :unprocessable_entity unless session.published?
 
-    SessionMailer.inform_to_an_email(session, email).deliver_later
+    SessionMailer.inform_to_an_email(session, email, nil).deliver_later
     :ok
   end
 end

@@ -16,7 +16,8 @@ class SessionJob::Publish < SessionJob
     emails.each do |email|
       SessionMailer.inform_to_an_email(
         session,
-        email
+        email,
+        nil
       ).deliver_now
     end
   end

@@ -12,4 +12,11 @@ class SessionMailer < ApplicationMailer
     @email = email
     mail(to: @email, subject: I18n.t('session_mailer.inform_to_an_email.subject'))
   end
+
+  def inform_to_an_email_in_clinic(session, email, health_clinic)
+    @session = session
+    @email = email
+    @health_clinic = health_clinic
+    mail(to: @email, subject: I18n.t('session_mailer.inform_to_an_email_in_clinic.subject'))
+  end
 end
