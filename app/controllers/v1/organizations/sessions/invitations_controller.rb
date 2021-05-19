@@ -24,10 +24,6 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
     head :no_content
   end
 
-  def resend
-    head session_invitations_load.resend
-  end
-
   private
 
   def session_load

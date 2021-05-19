@@ -9,16 +9,7 @@ class SessionJob::Invitation < SessionJob
     users.each do |user|
       next unless user.email_notification
 
-      if health_clinic.nil?
-        SessionMailer.inform_to_an_email(
-          session,
-          user.email
-        ).deliver_now
-      end
-
-      next if health_clinic.blank?
-
-      SessionMailer.inform_to_an_email_in_clinic(
+      SessionMailer.inform_to_an_email(
         session,
         user.email,
         health_clinic

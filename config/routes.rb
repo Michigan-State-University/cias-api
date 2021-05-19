@@ -137,9 +137,7 @@ Rails.application.routes.draw do
         resources :interventions, only: :index, controller: :interventions
         scope module: 'sessions' do
           resources :sessions do
-            resources :invitations, only: %i[index create] do
-              get 'resend', on: :member
-            end
+            resources :invitations, only: %i[index create]
           end
         end
       end

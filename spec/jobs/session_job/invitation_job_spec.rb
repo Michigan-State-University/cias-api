@@ -30,7 +30,7 @@ RSpec.describe SessionJob::Invitation, type: :job do
 
     it 'return proper body' do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email_in_clinic.invitation_link',
+      expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_from_clinic',
                                                                                   domain: ENV['WEB_URL'],
                                                                                   intervention_id: intervention.id,
                                                                                   session_id: session.id,
