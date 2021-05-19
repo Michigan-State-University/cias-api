@@ -9,6 +9,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
   let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:chart) { create(:chart, name: 'Chart', description: 'Some description', dashboard_section_id: dashboard_section.id) }
+  let!(:published_chart) { create(:chart, name: 'Chart', description: 'Old description', status: :published, dashboard_section_id: dashboard_section.id) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
 
   let(:headers) { user.create_new_auth_token }
@@ -17,7 +18,8 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       chart: {
         name: 'New name',
         description: 'New description',
-        chart_type: 'pie_chart'
+        chart_type: 'pie_chart',
+        status: 'published'
       }
     }
   end
@@ -51,7 +53,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
             'attributes' => {
               'name' => 'New name',
               'description' => 'New description',
-              'status' => 'draft',
+              'status' => 'published',
               'trend_line' => false,
               'chart_type' => 'pie_chart',
               'formula' => {
@@ -69,6 +71,30 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
             }
           }
         )
+      end
+
+      it 'in database is correct data' do
+        expect(Chart.find(chart.id).status).to eq('published')
+      end
+
+      context 'when user want to change published chart' do
+        let(:params) do
+          {
+            chart: {
+              name: 'New name',
+              description: 'New description',
+              chart_type: 'pie_chart',
+              status: 'draft'
+            }
+          }
+        end
+
+        let(:request) { patch v1_chart_path(published_chart.id), params: params, headers: headers }
+
+        it 'not change the data' do
+          expect(Chart.find(published_chart.id).status).to eq('published')
+          expect(Chart.find(published_chart.id).description).to eq('Old description')
+        end
       end
     end
 
