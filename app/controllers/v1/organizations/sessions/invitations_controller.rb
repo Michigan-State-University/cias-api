@@ -3,8 +3,8 @@
 class V1::Organizations::Sessions::InvitationsController < V1Controller
   def index
     authorize! :read, Invitation
-    grouped_invitations = session_invitations_scope.group_by(&:health_clinic_id)
-    render json: grouped_invitations, each_serializer: V1::InvitationSerializer
+    grouped_invitations = session_invitations_scope.select(:health_clinic_id, :email, :id).group_by(&:health_clinic_id)
+    render json: grouped_invitations
   end
 
   def create
@@ -15,8 +15,8 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
       session_load.invite_by_email(target[:emails], target[:health_clinic_id])
     end
 
-    grouped_invitations = session_invitations_scope.group_by(&:health_clinic_id)
-    render json: grouped_invitations, each_serializer: V1::InvitationSerializer, status: :created
+    grouped_invitations = session_invitations_scope.select(:health_clinic_id, :email, :id).group_by(&:health_clinic_id)
+    render json: grouped_invitations
   end
 
   def destroy
