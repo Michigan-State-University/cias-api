@@ -16,7 +16,7 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
     end
 
     grouped_invitations = session_invitations_scope.select(:health_clinic_id, :email, :id).group_by(&:health_clinic_id)
-    render json: grouped_invitations
+    render json: grouped_invitations, status: :created
   end
 
   def destroy
