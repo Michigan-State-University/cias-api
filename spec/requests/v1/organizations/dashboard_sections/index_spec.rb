@@ -116,6 +116,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'description' => chart_1.description,
               'chart_type' => chart_1.chart_type,
               'status' => chart_1.status,
+              'trend_line' => false,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
@@ -145,6 +146,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'description' => chart_2.description,
               'chart_type' => chart_2.chart_type,
               'status' => chart_1.status,
+              'trend_line' => false,
               'formula' => {
                 'payload' => '',
                 'patterns' => [

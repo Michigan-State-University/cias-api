@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_17_040850) do
+ActiveRecord::Schema.define(version: 2021_05_18_101732) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -84,6 +84,7 @@ ActiveRecord::Schema.define(version: 2021_05_17_040850) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "chart_type", default: "bar_chart"
+    t.boolean "trend_line", default: false, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 

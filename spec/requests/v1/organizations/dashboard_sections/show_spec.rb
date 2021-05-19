@@ -90,6 +90,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
               'description' => chart1.description,
               'chart_type' => chart1.chart_type,
               'status' => chart1.status,
+              'trend_line' => false,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
