@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Team < ApplicationRecord
+  has_paper_trail
   has_many :users, dependent: :nullify
   belongs_to :team_admin, class_name: 'User'
   has_many :team_invitations, dependent: :destroy

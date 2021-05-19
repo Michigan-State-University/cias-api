@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Question < ApplicationRecord
+  has_paper_trail
   extend DefaultValues
   include BodyInterface
   include Clone

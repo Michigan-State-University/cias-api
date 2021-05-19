@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Chart < ApplicationRecord
+  has_paper_trail
   extend DefaultValues
 
   belongs_to :dashboard_section

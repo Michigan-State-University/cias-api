@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class UserSession < ApplicationRecord
+  has_paper_trail
   belongs_to :user, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
