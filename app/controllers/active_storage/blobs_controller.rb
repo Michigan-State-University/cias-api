@@ -25,7 +25,7 @@ class ActiveStorage::BlobsController < ActiveStorage::BaseController
     return true unless AUTHENTICABLE_ATTACHMENTS.include?(attachment.name)
     return false unless signed_in?
 
-    authorize! :show, record
+    authorize! :get_protected_attachment, record
   end
 
   def record

@@ -16,4 +16,8 @@ class V1::SessionSerializer < V1Serializer
   attribute :google_tts_voice do |object|
     GoogleTtsVoice.find(object.google_tts_voice_id)
   end
+
+  attribute :intervention_owner_id do |object|
+    object.intervention.user.id
+  end
 end

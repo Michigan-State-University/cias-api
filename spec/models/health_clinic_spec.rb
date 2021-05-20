@@ -8,7 +8,6 @@ RSpec.describe HealthClinic, type: :model do
   it { should have_many(:user_sessions) }
   it { should have_many(:invitations) }
 
-
   describe '#name' do
     context 'name is unique' do
       let!(:existing_health_clinic) { create(:health_clinic) }
