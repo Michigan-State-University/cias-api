@@ -76,7 +76,7 @@ class Session < ApplicationRecord
     nil
   end
 
-  def invite_by_email(emails, health_clinic_id)
+  def invite_by_email(emails, health_clinic_id = nil)
     users_exists = ::User.where(email: emails)
     (emails - users_exists.map(&:email)).each do |email|
       User.invite!(email: email)
@@ -94,7 +94,7 @@ class Session < ApplicationRecord
   def send_link_to_session(user)
     return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
-    SessionMailer.inform_to_an_email(self, user.email, nil).deliver_later
+    SessionMailer.inform_to_an_email(self, user.email).deliver_later
   end
 
   def first_question

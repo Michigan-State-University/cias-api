@@ -3,7 +3,7 @@
 class V1::Organizations::Sessions::InvitationsController < V1Controller
   def index
     authorize! :read, Invitation
-    grouped_invitations = session_invitations_scope.select(:health_clinic_id, :email, :id).group_by(&:health_clinic_id)
+
     render json: grouped_invitations
   end
 
@@ -15,7 +15,6 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
       session_load.invite_by_email(target[:emails], target[:health_clinic_id])
     end
 
-    grouped_invitations = session_invitations_scope.select(:health_clinic_id, :email, :id).group_by(&:health_clinic_id)
     render json: grouped_invitations, status: :created
   end
 
@@ -49,5 +48,9 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
 
   def targets
     session_invitations_params[:session_invitations]
+  end
+
+  def grouped_invitations
+    session_invitations_scope.select(:health_clinic_id, :email, :id).group_by(&:health_clinic_id)
   end
 end

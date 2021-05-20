@@ -9,7 +9,7 @@ class V1::Sessions::InvitationsController < V1Controller
     return head :not_acceptable unless session_load.published?
 
     authorize! :create, Invitation
-    session_load.invite_by_email(session_invitation_params[:emails], nil)
+    session_load.invite_by_email(session_invitation_params[:emails])
     render json: serialized_response(session_invitations_scope), status: :created
   end
 

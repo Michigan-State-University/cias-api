@@ -29,7 +29,7 @@ RSpec.describe V1::UserSessionScheduleService do
         end
 
         it 'sends an email' do
-          expect(SessionMailer).to receive(:inform_to_an_email).with(second_session, user.email, nil).and_return(message_delivery)
+          expect(SessionMailer).to receive(:inform_to_an_email).with(second_session, user.email).and_return(message_delivery)
         end
       end
 
