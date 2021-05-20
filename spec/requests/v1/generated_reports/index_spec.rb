@@ -213,7 +213,6 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     it 'has correct http code :ok' do
       expect(response).to have_http_status(:ok)
-      expect(json_response['data']).to be_empty
     end
 
     it 'returns empty reports list' do
