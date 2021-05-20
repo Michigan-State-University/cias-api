@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Answer < ApplicationRecord
+  has_paper_trail
   include BodyInterface
 
   belongs_to :question, inverse_of: :answers

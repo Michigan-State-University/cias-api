@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Chart < ApplicationRecord
+  has_paper_trail
   extend DefaultValues
 
   belongs_to :dashboard_section
@@ -11,10 +12,12 @@ class Chart < ApplicationRecord
   validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
 
   enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
+  enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
 
-  def integral_update
+  def integral_update(chart_params)
     return if published?
 
+    assign_attributes(chart_params)
     save!
   end
 

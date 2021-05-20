@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class SessionInvitation < ApplicationRecord
+  has_paper_trail
   belongs_to :session, inverse_of: :session_invitations
 
   validates :email, uniqueness: { scope: :session }

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class GeneratedReport < ApplicationRecord
+  has_paper_trail
   belongs_to :user_session
   belongs_to :report_template
   belongs_to :participant, optional: true, class_name: 'User'

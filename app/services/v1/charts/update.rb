@@ -11,8 +11,7 @@ class V1::Charts::Update
   end
 
   def call
-    chart.assign_attributes(chart_params)
-    chart.integral_update
+    chart.integral_update(chart_params)
     chart
   end
 

@@ -11,7 +11,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
   let!(:dashboard_section_1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:dashboard_section_3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:chart) { create(:chart, name: 'Some chart', description: 'Some description', dashboard_section_id: dashboard_section_1.id) }
+  let!(:chart_1) { create(:chart, name: 'Some chart 1', description: 'Some description 1', dashboard_section_id: dashboard_section_1.id) }
+  let!(:chart_2) { create(:chart, name: 'Some chart 2', description: 'Some description 2', dashboard_section_id: dashboard_section_2.id) }
 
   let!(:organization_admin) { organization.organization_admins.first }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
@@ -61,8 +62,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
             'relationships' => {
               'charts' => {
                 'data' => [
-                  'id' => chart.id,
-                  'type' => 'chart'
+                  { 'id' => chart_1.id,
+                    'type' => 'chart' }
                 ]
               }
             }
@@ -78,7 +79,12 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
             },
             'relationships' => {
               'charts' => {
-                'data' => []
+                'data' => [
+                  {
+                    'id' => chart_2.id,
+                    'type' => 'chart'
+                  }
+                ]
               }
             }
           },
@@ -95,6 +101,68 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'charts' => {
                 'data' => []
               }
+            }
+          }
+        )
+      end
+
+      it 'returns proper included data' do
+        expect(json_response['included'][0]).to include(
+          {
+            'id' => chart_1.id,
+            'type' => 'chart',
+            'attributes' => {
+              'name' => chart_1.name,
+              'description' => chart_1.description,
+              'chart_type' => chart_1.chart_type,
+              'status' => chart_1.status,
+              'trend_line' => false,
+              'formula' => {
+                'payload' => '',
+                'patterns' => [
+                  {
+                    'color' => '#C766EA',
+                    'label' => 'Label1',
+                    'match' => ''
+                  }
+                ],
+                'default_pattern' => {
+                  'color' => '#E2B1F4',
+                  'label' => 'Other'
+                }
+              },
+              'dashboard_section_id' => chart_1.dashboard_section_id,
+              'published_at' => nil
+            }
+          }
+        )
+
+        expect(json_response['included'][1]).to include(
+          {
+            'id' => chart_2.id,
+            'type' => 'chart',
+            'attributes' => {
+              'name' => chart_2.name,
+              'description' => chart_2.description,
+              'chart_type' => chart_2.chart_type,
+              'status' => chart_1.status,
+              'trend_line' => false,
+              'formula' => {
+                'payload' => '',
+                'patterns' => [
+                  {
+                    'color' => '#C766EA',
+                    'label' => 'Label1',
+                    'match' => ''
+                  }
+                ],
+                'default_pattern' => {
+                  'color' => '#E2B1F4',
+                  'label' => 'Other'
+                }
+              },
+              'dashboard_section_id' => chart_2.dashboard_section_id,
+              'published_at' => nil
             }
           }
         )

@@ -39,10 +39,17 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
               'name' => chart.name,
               'description' => chart.description,
               'status' => 'draft',
-              'type' => nil,
+              'trend_line' => false,
+              'chart_type' => 'bar_chart',
               'formula' => {
                 'payload' => '',
-                'patterns' => []
+                'patterns' => [{ 'color' => '#C766EA',
+                                 'label' => 'Label1',
+                                 'match' => '' }],
+                'default_pattern' => {
+                  'color' => '#E2B1F4',
+                  'label' => 'Other'
+                }
               },
               'dashboard_section_id' => dashboard_section.id,
               'published_at' => nil
