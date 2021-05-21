@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::Charts::ChartStatistics::Create
+class V1::ChartStatistics::CreateForUserSessions
   def self.call(chart_id)
     new(chart_id).call
   end
@@ -10,6 +10,7 @@ class V1::Charts::ChartStatistics::Create
   end
 
   def call
+    # service should be run when the chart is published
     user_sessions.each do |user_session|
       next unless user_session.session.intervention.published?
 

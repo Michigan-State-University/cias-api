@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::UserSessions::ChartStatistics::Create
+class V1::ChartStatistics::CreateForUserSession
   def self.call(user_session)
     new(user_session).call
   end
@@ -10,6 +10,7 @@ class V1::UserSessions::ChartStatistics::Create
   end
 
   def call
+    # service should be run for action when the user session is finished
     return unless intervention.published?
     return unless organization
 

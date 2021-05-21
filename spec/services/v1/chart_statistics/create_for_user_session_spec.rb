@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe V1::UserSessions::ChartStatistics::Create do
+RSpec.describe V1::ChartStatistics::CreateForUserSession do
   subject { described_class.call(user_session) }
 
   let_it_be(:organization) { create(:organization) }
@@ -137,4 +137,3 @@ RSpec.describe V1::UserSessions::ChartStatistics::Create do
     end
   end
 end
-

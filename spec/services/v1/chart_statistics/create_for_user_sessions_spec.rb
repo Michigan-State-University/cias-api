@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe V1::Charts::ChartStatistics::Create do
+RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   subject { described_class.call(pie_chart.id) }
 
   let_it_be(:organization) { create(:organization) }
@@ -30,7 +30,7 @@ RSpec.describe V1::Charts::ChartStatistics::Create do
 
   let_it_be(:pie_chart) do
     create(:chart, formula: formula, dashboard_section: dashboard_section, published_at: Time.current,
-                   chart_type: Chart.chart_types[:pie_chart])
+           chart_type: Chart.chart_types[:pie_chart])
   end
   let_it_be(:answer1) do
     create(:answer_single, user_session: user_session, body: { data: [{ var: 'color', value: '1' }] })
