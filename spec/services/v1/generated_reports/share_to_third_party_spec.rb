@@ -44,7 +44,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
     it 'sends information about new report to the users, shared the report with the users' do
       expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
-        User.where(id: [user.id, user2.id])
+        User.where(id: [user.id, user2.id]).order(:created_at)
       ).and \
         change { ActionMailer::Base.deliveries.size }.by(2).and \
           avoid_changing { User.count }
@@ -104,7 +104,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
     it 'share report with third party but avoid sending email about new report' do
       expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
-        User.where(id: [user.id, user2.id])
+        User.where(id: [user.id, user2.id]).order(:created_at)
       ).and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }

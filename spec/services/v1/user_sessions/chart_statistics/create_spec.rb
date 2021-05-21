@@ -6,7 +6,7 @@ RSpec.describe V1::UserSessions::ChartStatistics::Create do
   let_it_be(:organization) { create(:organization) }
   let_it_be(:health_system) { create(:health_system, organization: organization) }
   let_it_be(:health_clinic) { create(:health_clinic, health_system: health_system) }
-  let_it_be(:intervention) { create(:intervention, organization: organization) }
+  let_it_be(:intervention) { create(:intervention, :published, organization: organization) }
   let_it_be(:session) { create(:session, intervention: intervention) }
   let_it_be(:user) { create(:user) }
   let_it_be(:user_session) { create(:user_session, session: session, user: user, health_clinic: health_clinic) }

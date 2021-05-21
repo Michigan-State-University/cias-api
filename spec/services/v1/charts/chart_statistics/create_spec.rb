@@ -6,7 +6,7 @@ RSpec.describe V1::Charts::ChartStatistics::Create do
   let_it_be(:organization) { create(:organization) }
   let_it_be(:health_system) { create(:health_system, organization: organization) }
   let_it_be(:health_clinic) { create(:health_clinic, health_system: health_system) }
-  let_it_be(:intervention) { create(:intervention, organization: organization) }
+  let_it_be(:intervention) { create(:intervention, :published, organization: organization) }
   let_it_be(:session) { create(:session, intervention: intervention) }
   let_it_be(:user) { create(:user) }
   let_it_be(:user_session) { create(:user_session, session: session, user: user, health_clinic: health_clinic) }
@@ -30,7 +30,7 @@ RSpec.describe V1::Charts::ChartStatistics::Create do
 
   let_it_be(:pie_chart) do
     create(:chart, formula: formula, dashboard_section: dashboard_section, published_at: Time.current,
-           chart_type: Chart.chart_types[:pie_chart])
+                   chart_type: Chart.chart_types[:pie_chart])
   end
   let_it_be(:answer1) do
     create(:answer_single, user_session: user_session, body: { data: [{ var: 'color', value: '1' }] })

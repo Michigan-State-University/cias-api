@@ -18,7 +18,6 @@ class V1::AnswerService
       answer.save!
       user_session.on_answer
       answer.on_answer
-      V1::UserSessions::ChartStatistics::Create.call(user_session)
       answer
     end
   end
