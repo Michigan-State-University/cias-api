@@ -4,8 +4,9 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
+  let(:intervention) { create(:intervention) }
   let(:session) do
-    create(:session, :with_report_templates,
+    create(:session, :with_report_templates, intervention: intervention,
            formula: { 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => { 'id' => other_session.id, type: 'Session' } }
            ] },
@@ -13,7 +14,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
-  let!(:other_session) { create(:session) }
+  let!(:other_session) { create(:session, intervention: intervention) }
   let!(:question_group_1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
   let!(:question_group_2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
   let!(:question_1) do
@@ -66,7 +67,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let!(:question_6) do
     create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 6', position: 3,
                              formula: { 'payload' => '', 'patterns' => [
-                               { 'match' => '', 'target' => { 'id' => '', type: 'Question::Single' } }
+                               { 'match' => '', 'target' => { 'id' => 'invalid_id', type: 'Question::Single' } }
                              ] })
   end
 
@@ -130,7 +131,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
 
     it 'has correct position' do
-      expect(json_response['data']['attributes']['position']).to eq(2)
+      expect(json_response['data']['attributes']['position']).to eq(3)
     end
 
     it 'has cleared formula' do
@@ -142,7 +143,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
 
     it 'has correct number of sessions' do
-      expect(session.intervention.sessions.size).to eq(2)
+      expect(session.intervention.sessions.size).to eq(3)
     end
 
     it 'has correct number of question_groups' do

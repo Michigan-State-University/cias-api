@@ -44,4 +44,18 @@ class V1::SessionService
                        clean_formulas: true,
                        position: new_intervention.sessions.last&.position.to_i + 1).execute
   end
+
+
+  private
+
+  def clear_branching(object, session_id)
+    object.formula['patterns'].each do |pattern|
+      pattern['target'].each do |target|
+        if target['id'].eql?(session_id)
+          target['id'] = ''
+          object.save!
+        end
+      end
+    end
+  end
 end
