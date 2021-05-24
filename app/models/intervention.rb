@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Intervention < ApplicationRecord
+  has_paper_trail
   include Clone
 
   belongs_to :user, inverse_of: :interventions

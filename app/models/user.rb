@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  has_paper_trail skip: %i[
+    first_name last_name email uid migrated_first_name migrated_last_name migrated_email migrated_uid
+  ]
   before_save :invalidate_token_after_changes
 
   devise :confirmable,

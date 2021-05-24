@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Audio < ApplicationRecord
+  has_paper_trail
   has_one_attached :mp3, dependent: :purge_later
 
   def url

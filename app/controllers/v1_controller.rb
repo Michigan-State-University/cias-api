@@ -7,9 +7,14 @@ class V1Controller < ApplicationController
   include Resource
 
   before_action :authenticate_user!
+  before_action :set_paper_trail_whodunnit
 
   def current_v1_user
     @current_v1_user ||= super
+  end
+
+  def user_for_paper_trail
+    current_v1_user.id if signed_in?
   end
 
   def create_guest_user

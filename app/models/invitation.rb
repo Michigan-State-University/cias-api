@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Invitation < ApplicationRecord
+  has_paper_trail skip: %i[email migrated_email]
   belongs_to :invitable, polymorphic: true
   belongs_to :health_clinic, optional: true
 
