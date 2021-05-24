@@ -6,6 +6,7 @@ class UserSession < ApplicationRecord
   has_many :answers, dependent: :destroy
   belongs_to :name_audio, class_name: 'Audio', optional: true
   has_many :generated_reports, dependent: :destroy
+  belongs_to :health_clinic, optional: true
 
   before_destroy :decrement_audio_usage
 
