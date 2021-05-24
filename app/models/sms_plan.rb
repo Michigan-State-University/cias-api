@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class SmsPlan < ApplicationRecord
+  has_paper_trail
   include Clone
 
   belongs_to :session, counter_cache: true

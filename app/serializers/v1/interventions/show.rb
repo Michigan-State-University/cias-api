@@ -20,7 +20,8 @@ class V1::Interventions::Show < BaseSerializer
       user: {
         email: @intervention.user.email,
         first_name: @intervention.user.first_name,
-        last_name: @intervention.user.last_name
+        last_name: @intervention.user.last_name,
+        id: @intervention.user.id
       },
       sessions_size: @intervention.sessions.size
     }

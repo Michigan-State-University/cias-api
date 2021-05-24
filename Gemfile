@@ -44,6 +44,8 @@ gem 'blind_index'
 # for stop logging sensitive data
 gem 'logstop'
 gem 'countries'
+# for Audit trail and audit log
+gem 'paper_trail'
 
 group :development, :test do
   gem 'bundler-audit'

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Organization < ApplicationRecord
+  has_paper_trail
   has_many :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }, class_name: 'User', as: :organizable
   has_many :organization_admins, -> { limit_to_roles('organization_admin') }, class_name: 'User', as: :organizable
   has_many :health_systems, dependent: :destroy

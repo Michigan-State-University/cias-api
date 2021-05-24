@@ -3,6 +3,7 @@
 require 'cancan/matchers'
 
 describe GeneratedReport do
+  let_it_be(:admin) { create(:user, :confirmed, :admin) }
   let_it_be(:team1) { create(:team) }
   let_it_be(:team2) { create(:team) }
   let_it_be(:team3) { create(:team, team_admin: team1.team_admin) }
@@ -14,6 +15,7 @@ describe GeneratedReport do
   let_it_be(:team2_intervention1) { create(:intervention, user_id: team2.team_admin.id) }
   let_it_be(:team2_intervention2) { create(:intervention, user_id: team2_researcher.id) }
   let_it_be(:team3_intervention1) { create(:intervention, user_id: team3_researcher.id) }
+  let_it_be(:admin_intervention) { create(:intervention, user_id: admin.id) }
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
@@ -24,18 +26,21 @@ describe GeneratedReport do
       team2_session1 = create(:session, intervention: team2_intervention1)
       team2_session2 = create(:session, intervention: team2_intervention2)
       team3_session1 = create(:session, intervention: team3_intervention1)
+      admin_session = create(:session, intervention: admin_intervention)
 
       team1_user_session1 = create(:user_session, session: team1_session1)
       team1_user_session2 = create(:user_session, session: team1_session2)
       team2_user_session1 = create(:user_session, session: team2_session1)
       team2_user_session2 = create(:user_session, session: team2_session2)
       team3_user_session1 = create(:user_session, session: team3_session1)
+      admin_user_session = create(:user_session, session: admin_session)
 
       @team1_generated_report1 = create(:generated_report, user_session: team1_user_session1)
       @team1_generated_report2 = create(:generated_report, user_session: team1_user_session2)
       @team2_generated_report1 = create(:generated_report, user_session: team2_user_session1)
       @team2_generated_report2 = create(:generated_report, user_session: team2_user_session2)
       @team3_generated_report1 = create(:generated_report, user_session: team3_user_session1)
+      @admin_generated_report = create(:generated_report, user_session: admin_user_session)
     end
   end
 
@@ -44,6 +49,7 @@ describe GeneratedReport do
   let(:team2_generated_report1) { @team2_generated_report1 }
   let(:team2_generated_report2) { @team2_generated_report2 }
   let(:team3_generated_report1) { @team3_generated_report1 }
+  let(:admin_generated_report) { @admin_generated_report }
 
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }
@@ -136,12 +142,11 @@ describe GeneratedReport do
     let(:ability) { Ability.new(user) }
 
     context 'admin' do
-      let!(:user) { create(:user, :confirmed, :admin) }
+      let!(:user) { admin }
 
-      it 'can access all generated reports' do
-        expect(subject).to include(
-          team1_generated_report1, team1_generated_report2, team2_generated_report1, team2_generated_report2
-        )
+      it 'can access only reports generated in his interventions' do
+        expect(subject).to include(admin_generated_report).and \
+          not_include(team1_generated_report1, team1_generated_report2, team3_generated_report1, team2_generated_report1, team2_generated_report2)
       end
     end
 

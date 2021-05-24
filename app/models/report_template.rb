@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ReportTemplate < ApplicationRecord
+  has_paper_trail
   belongs_to :session, counter_cache: true
   has_many :sections, class_name: 'ReportTemplate::Section', dependent: :destroy
   has_many :variants, class_name: 'ReportTemplate::Section::Variant', through: :sections

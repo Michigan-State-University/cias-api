@@ -3,11 +3,9 @@
 Oj.default_options = { mode: :rails }
 Oj.optimize_rails
 
-module ActiveSupport::JSON::Encoding
-  class Oj < JSONGemEncoder
-    def encode(value)
-      ::Oj.dump(value.as_json)
-    end
+class ActiveSupport::JSON::Encoding::Oj < ActiveSupport::JSON::Encoding::JSONGemEncoder
+  def encode(value)
+    ::Oj.dump(value.as_json)
   end
 end
 
