@@ -3,6 +3,12 @@
 RSpec.describe V1::ChartStatistics::CreateForUserSession do
   subject { described_class.call(user_session) }
 
+  before_all do
+    RSpec::Mocks.with_temporary_scope do
+      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+    end
+  end
+
   let_it_be(:organization) { create(:organization) }
   let_it_be(:health_system) { create(:health_system, organization: organization) }
   let_it_be(:health_clinic) { create(:health_clinic, health_system: health_system) }
