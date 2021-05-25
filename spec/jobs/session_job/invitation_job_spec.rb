@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SessionJob::Invitation, type: :job do
+RSpec.describe SessionJobs::Invitation, type: :job do
   subject { described_class.perform_now(session.id, emails) }
 
   let(:user_with_notification) { create(:user, :confirmed) }

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SessionJob::Invitation < SessionJob
+class SessionJobs::Invitation < SessionJob
   def perform(session_id, emails)
     users = User.where(email: emails)
     session = Session.find(session_id)
