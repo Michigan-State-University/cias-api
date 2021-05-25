@@ -192,7 +192,7 @@
                             <tr>
                               <td align="center" bgcolor="#107969" role="presentation" style="border: 1px solid #107969; border-radius: 100px; cursor: auto; mso-padding-alt: 10px 25px; background: #107969;" valign="middle">
                                 <a
-                                  href="<%= t('.invitation_link', domain: ENV['WEB_URL'], intervention_id: @session.intervention_id, session_id: @session.id) %>"
+                                  href="<%= @health_clinic.nil? ? t('.invitation_link', domain: ENV['WEB_URL'], intervention_id: @session.intervention_id, session_id: @session.id) : t('.invitation_link_from_clinic', domain: ENV['WEB_URL'], intervention_id: @session.intervention_id, session_id: @session.id, health_clinic_id: @health_clinic.id) %>"
                                   style="
                                   display: inline-block;
                                     background: #107969;

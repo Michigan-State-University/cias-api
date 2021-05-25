@@ -77,7 +77,7 @@ class Session < ApplicationRecord
     nil
   end
 
-  def invite_by_email(emails)
+  def invite_by_email(emails, health_clinic_id = nil)
     users_exists = ::User.where(email: emails)
     (emails - users_exists.map(&:email)).each do |email|
       User.invite!(email: email)
@@ -85,7 +85,7 @@ class Session < ApplicationRecord
 
     Invitation.transaction do
       User.where(email: emails).find_each do |user|
-        invitations.create!(email: user.email)
+        invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
       end
     end
 
