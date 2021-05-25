@@ -59,3 +59,7 @@ jobs:
         run: |
             gem install bundler-audit
             bundle-audit check --update
+      - name: Rubocop
+        run:
+          command: |
+            bundle exec rubocp
