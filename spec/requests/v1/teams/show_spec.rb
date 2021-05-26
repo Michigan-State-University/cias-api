@@ -13,7 +13,7 @@ RSpec.describe 'GET /v1/teams/:id', type: :request do
     }
   end
   let(:headers) { user.create_new_auth_token }
-  let!(:team_1) { create(:team) }
+  let!(:team1) { create(:team) }
 
   context 'when there is a team with given id' do
     before do

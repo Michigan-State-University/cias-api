@@ -8,11 +8,17 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin, :with_organization_admin) }
-  let!(:dashboard_section_1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:dashboard_section_3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:chart_1) { create(:chart, name: 'Some chart 1', description: 'Some description 1', dashboard_section_id: dashboard_section_1.id) }
-  let!(:chart_2) { create(:chart, name: 'Some chart 2', description: 'Some description 2', dashboard_section_id: dashboard_section_2.id) }
+  let!(:dashboard_section1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:dashboard_section2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:dashboard_section3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:chart1) do
+    create(:chart, name: 'Some chart 1', description: 'Some description 1',
+                   dashboard_section_id: dashboard_section1.id)
+  end
+  let!(:chart2) do
+    create(:chart, name: 'Some chart 2', description: 'Some description 2',
+                   dashboard_section_id: dashboard_section2.id)
+  end
 
   let!(:organization_admin) { organization.organization_admins.first }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
@@ -51,29 +57,29 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
       it 'returns proper collection data' do
         expect(json_response['data']).to include(
           {
-            'id' => dashboard_section_1.id,
+            'id' => dashboard_section1.id,
             'type' => 'dashboard_section',
             'attributes' => {
-              'name' => dashboard_section_1.name,
-              'description' => dashboard_section_1.description,
+              'name' => dashboard_section1.name,
+              'description' => dashboard_section1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
             },
             'relationships' => {
               'charts' => {
                 'data' => [
-                  { 'id' => chart_1.id,
+                  { 'id' => chart1.id,
                     'type' => 'chart' }
                 ]
               }
             }
           },
           {
-            'id' => dashboard_section_2.id,
+            'id' => dashboard_section2.id,
             'type' => 'dashboard_section',
             'attributes' => {
-              'name' => dashboard_section_2.name,
-              'description' => dashboard_section_2.description,
+              'name' => dashboard_section2.name,
+              'description' => dashboard_section2.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
             },
@@ -81,7 +87,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'charts' => {
                 'data' => [
                   {
-                    'id' => chart_2.id,
+                    'id' => chart2.id,
                     'type' => 'chart'
                   }
                 ]
@@ -89,11 +95,11 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
             }
           },
           {
-            'id' => dashboard_section_3.id,
+            'id' => dashboard_section3.id,
             'type' => 'dashboard_section',
             'attributes' => {
-              'name' => dashboard_section_3.name,
-              'description' => dashboard_section_3.description,
+              'name' => dashboard_section3.name,
+              'description' => dashboard_section3.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
             },
@@ -109,13 +115,13 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
       it 'returns proper included data' do
         expect(json_response['included'][0]).to include(
           {
-            'id' => chart_1.id,
+            'id' => chart1.id,
             'type' => 'chart',
             'attributes' => {
-              'name' => chart_1.name,
-              'description' => chart_1.description,
-              'chart_type' => chart_1.chart_type,
-              'status' => chart_1.status,
+              'name' => chart1.name,
+              'description' => chart1.description,
+              'chart_type' => chart1.chart_type,
+              'status' => chart1.status,
               'trend_line' => false,
               'formula' => {
                 'payload' => '',
@@ -131,7 +137,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
                   'label' => 'Other'
                 }
               },
-              'dashboard_section_id' => chart_1.dashboard_section_id,
+              'dashboard_section_id' => chart1.dashboard_section_id,
               'published_at' => nil
             }
           }
@@ -139,13 +145,13 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
 
         expect(json_response['included'][1]).to include(
           {
-            'id' => chart_2.id,
+            'id' => chart2.id,
             'type' => 'chart',
             'attributes' => {
-              'name' => chart_2.name,
-              'description' => chart_2.description,
-              'chart_type' => chart_2.chart_type,
-              'status' => chart_1.status,
+              'name' => chart2.name,
+              'description' => chart2.description,
+              'chart_type' => chart2.chart_type,
+              'status' => chart1.status,
               'trend_line' => false,
               'formula' => {
                 'payload' => '',
@@ -161,7 +167,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
                   'label' => 'Other'
                 }
               },
-              'dashboard_section_id' => chart_2.dashboard_section_id,
+              'dashboard_section_id' => chart2.dashboard_section_id,
               'published_at' => nil
             }
           }

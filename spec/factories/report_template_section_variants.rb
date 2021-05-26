@@ -15,6 +15,7 @@ FactoryBot.define do
     trait :with_image do
       after(:create) do |report_template|
         report_template.update(
+          # image: fixture_file_upload(Rails.root.join('spec', 'fixtures', 'images', 'logo.png'), 'image/png')
           image: fixture_file_upload("#{Rails.root}/spec/fixtures/images/logo.png", 'image/png')
         )
       end

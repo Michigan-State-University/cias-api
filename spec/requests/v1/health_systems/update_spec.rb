@@ -7,7 +7,9 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization) }
+  let!(:health_system) do
+    create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization)
+  end
   let!(:new_health_system_admin) { create(:user, :confirmed, :health_system_admin) }
   let!(:health_system_admin_to_remove) { health_system.health_system_admins.first }
   let(:admins_ids) { health_system.reload.health_system_admins.pluck(:id) }
@@ -71,7 +73,7 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
         let(:params) do
           {
             health_system: {
-              name: ''
+              name: nil
             }
           }
 

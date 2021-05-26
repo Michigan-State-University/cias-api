@@ -7,7 +7,9 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
+  let!(:health_system) do
+    create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization)
+  end
   let!(:health_system_admin_id) { health_system.health_system_admins.first.id }
 
   let(:headers) { user.create_new_auth_token }
@@ -78,7 +80,8 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       end
     end
 
-    %i[health_system_admin organization_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest
+       health_clinic_admin].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

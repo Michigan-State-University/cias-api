@@ -17,7 +17,8 @@ RSpec.describe Question::Currency, type: :model do
           end
 
           it 'sets correct variable with passed taken variables' do
-            expect(question_currency.variable_clone_prefix(%w[clone_currency_var clone1_currency_var])).to eq('clone2_currency_var')
+            expect(question_currency.variable_clone_prefix(%w[clone_currency_var
+                                                              clone1_currency_var])).to eq('clone2_currency_var')
           end
         end
       end

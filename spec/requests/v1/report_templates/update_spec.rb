@@ -60,8 +60,10 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
           let(:old_logo) { report_template.logo }
 
           it 'updated report template attachment logo' do
-            expect { request }.to change { ActiveStorage::Attachment.exists?(id: old_logo.id) }.from(true).to(false).and \
-              avoid_changing { ActiveStorage::Attachment.count }
+            expect { request }.to change {
+                                    ActiveStorage::Attachment.exists?(id: old_logo.id)
+                                  }.from(true).to(false).and \
+                                    avoid_changing { ActiveStorage::Attachment.count }
 
             expect(report_template.reload.logo).to be_present
           end

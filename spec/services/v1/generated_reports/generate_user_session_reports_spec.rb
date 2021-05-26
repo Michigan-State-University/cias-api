@@ -35,8 +35,12 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
   end
 
   context 'when there are some variables in user sessions answers' do
-    let!(:answer1) { create(:answer_single, user_session: user_session, body: { data: [{ var: 'temp', value: '10' }] }) }
-    let!(:answer2) { create(:answer_single, user_session: user_session, body: { data: [{ var: 'temp2', value: '20' }] }) }
+    let!(:answer1) do
+      create(:answer_single, user_session: user_session, body: { data: [{ var: 'temp', value: '10' }] })
+    end
+    let!(:answer2) do
+      create(:answer_single, user_session: user_session, body: { data: [{ var: 'temp2', value: '20' }] })
+    end
     let!(:reloaded_values) { user_session.reload.all_var_values }
 
     it 'stores all the variables in the dentaku calculator memory' do

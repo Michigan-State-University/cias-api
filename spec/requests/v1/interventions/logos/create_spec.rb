@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request do
   let(:current_user) { create(:user, :confirmed, :admin) }
   let(:other_user) { create(:user, :confirmed, :participant) }
-  let(:other_user_2) { create(:user, :confirmed, :third_party) }
+  let(:other_user2) { create(:user, :confirmed, :third_party) }
   let(:intervention) { create(:intervention, user: current_user) }
   let(:params) do
     {
@@ -15,12 +15,17 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
     }
   end
   let(:intervention_id) { intervention.id }
-  let(:published_intervention) { create(:intervention, user: current_user, status: :published, logo: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:published_intervention) do
+    create(:intervention, user: current_user, status: :published,
+                          logo: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+  end
   let(:published_intervention_id) { published_intervention.id }
 
   context 'when current_user is admin' do
     context 'when current_user adds a logo' do
-      before { post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token }
+      before do
+        post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token
+      end
 
       it { expect(response).to have_http_status(:created) }
 
@@ -35,7 +40,9 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
 
   context 'when current_user is participant' do
     context 'when current_user try to add a logo' do
-      before { post v1_intervention_logo_path(intervention_id), params: params, headers: other_user.create_new_auth_token }
+      before do
+        post v1_intervention_logo_path(intervention_id), params: params, headers: other_user.create_new_auth_token
+      end
 
       it { expect(response).to have_http_status(:forbidden) }
     end
@@ -43,7 +50,9 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
 
   context 'when current_user is third_party' do
     context 'when current_user try to add a logo' do
-      before { post v1_intervention_logo_path(intervention_id), params: params, headers: other_user_2.create_new_auth_token }
+      before do
+        post v1_intervention_logo_path(intervention_id), params: params, headers: other_user2.create_new_auth_token
+      end
 
       it { expect(response).to have_http_status(:forbidden) }
     end

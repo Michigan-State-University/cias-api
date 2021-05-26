@@ -16,7 +16,8 @@ RSpec.describe Question::ExternalLink, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_external_link.variable_clone_prefix(%w[clone_external_link_var clone1_external_link_var])).to eq('clone2_external_link_var')
+          expect(question_external_link.variable_clone_prefix(%w[clone_external_link_var
+                                                                 clone1_external_link_var])).to eq('clone2_external_link_var')
         end
       end
     end

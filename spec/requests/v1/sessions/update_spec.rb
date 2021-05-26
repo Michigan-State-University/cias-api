@@ -28,7 +28,10 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       }
     }
   end
-  let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
+  let(:request) do
+    patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params,
+                                                                                          headers: headers
+  end
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do
@@ -57,7 +60,8 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             before do
               invalid_params = { session: {} }
               session.reload
-              patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: invalid_params, headers: headers
+              patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id),
+                    params: invalid_params, headers: headers
             end
 
             it { expect(response).to have_http_status(:bad_request) }

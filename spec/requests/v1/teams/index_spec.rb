@@ -15,16 +15,16 @@ RSpec.describe 'GET /v1/teams', type: :request do
   let(:headers) { user.create_new_auth_token }
 
   context 'when there are teams' do
-    let!(:team_1) { create(:team) }
+    let!(:team1) { create(:team) }
     let!(:team_1_researcher) { create(:user, :researcher) }
-    let!(:team_2) { create(:team) }
+    let!(:team2) { create(:team) }
     let!(:team_2_researcher) { create(:user, :researcher) }
     let(:team_1_admin) { team_1.team_admin }
     let(:team_2_admin) { team_2.team_admin }
 
     before do
-      team_1.users << team_1_researcher
-      team_2.users << team_2_researcher
+      team1.users << team_1_researcher
+      team2.users << team_2_researcher
       get v1_teams_path, headers: headers
     end
 
@@ -35,7 +35,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
 
       it 'returns list of teams with team admins details' do
         expect(json_response['data']).to include(
-          'id' => team_1.id.to_s,
+          'id' => team1.id.to_s,
           'type' => 'team',
           'attributes' => include('name' => team_1.name, 'team_admin_id' => team_1_admin.id),
           'relationships' => {
@@ -44,7 +44,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
             }
           }
         ).and include(
-          'id' => team_2.id.to_s,
+          'id' => team2.id.to_s,
           'type' => 'team',
           'attributes' => include('name' => team_2.name, 'team_admin_id' => team_2_admin.id),
           'relationships' => {
@@ -72,7 +72,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
             'full_name' => team_1_admin.full_name,
             'roles' => ['team_admin'],
             'team_id' => nil,
-            'admins_team_ids' => [team_1.id]
+            'admins_team_ids' => [team1.id]
           )
         )
 

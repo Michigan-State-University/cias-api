@@ -10,6 +10,7 @@ class Ability::HealthSystemAdmin < Ability::Base
 
   def health_system_admin
     can :read, ReportingDashboard, organization: { health_systems: { health_system_admins: { id: user.id } } }
-    can :read, Chart, dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } } }
+    can :read, Chart,
+        dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } } }
   end
 end

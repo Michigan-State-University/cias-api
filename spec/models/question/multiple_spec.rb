@@ -16,7 +16,8 @@ RSpec.describe Question::Multiple, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_multiple.variable_clone_prefix(%w[clone_answer_1 clone1_answer_1])[0]['variable']['name']).to eq('clone2_answer_1')
+          expect(question_multiple.variable_clone_prefix(%w[clone_answer_1
+                                                            clone1_answer_1])[0]['variable']['name']).to eq('clone2_answer_1')
         end
       end
     end

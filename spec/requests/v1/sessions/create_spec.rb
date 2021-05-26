@@ -34,7 +34,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
       }
     }
   end
-  let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers }
+  let(:request) do
+    post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers
+  end
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do
@@ -66,7 +68,8 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
           context 'params' do
             before do
               invalid_params = { session: {} }
-              post v1_intervention_sessions_path(intervention_id: intervention.id), params: invalid_params, headers: headers
+              post v1_intervention_sessions_path(intervention_id: intervention.id), params: invalid_params,
+                                                                                    headers: headers
             end
 
             it { expect(response).to have_http_status(:bad_request) }

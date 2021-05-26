@@ -21,7 +21,8 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin organization_admin researcher e_intervention_admin team_admin admin].freeze
+  APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
+                 organization_admin researcher e_intervention_admin team_admin admin].freeze
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
@@ -82,7 +83,12 @@ class User < ApplicationRecord
 
   def self.detailed_search(params)
     scope = all
-    scope = params[:user_roles].include?('researcher') ? users_for_researcher(params, scope) : scope.limit_to_roles(params[:roles])
+    scope = if params[:user_roles].include?('researcher')
+              users_for_researcher(params,
+                                   scope)
+            else
+              scope.limit_to_roles(params[:roles])
+            end
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
     scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && params[:user_roles].exclude?('researcher')
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment

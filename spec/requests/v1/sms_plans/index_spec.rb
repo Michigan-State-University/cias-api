@@ -16,8 +16,8 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
   let(:request) { get v1_sms_plans_path, headers: headers }
 
   context 'when there are sms plans' do
-    let!(:sms_plan_1) { create(:sms_plan) }
-    let!(:sms_plan_2) { create(:sms_plan) }
+    let!(:sms_plan1) { create(:sms_plan) }
+    let!(:sms_plan2) { create(:sms_plan) }
 
     before do
       request
@@ -31,7 +31,7 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
       it 'returns sms plans' do
         expect(
           json_response['data'].pluck('id')
-        ).to match_array [sms_plan_1.id, sms_plan_2.id]
+        ).to match_array [sms_plan1.id, sms_plan2.id]
       end
     end
 

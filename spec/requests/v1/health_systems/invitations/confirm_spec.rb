@@ -12,7 +12,8 @@ RSpec.describe 'GET /v1/health_system/confirm', type: :request do
 
   let(:params) { { invitation_token: invitation_token } }
   let(:success_message) do
-    { success: Base64.encode64(I18n.t('organizables.invitations.accepted', organizable_type: 'Health System', organizable_name: health_system.name)) }.to_query
+    { success: Base64.encode64(I18n.t('organizables.invitations.accepted', organizable_type: 'Health System',
+                                                                           organizable_name: health_system.name)) }.to_query
   end
   let(:success_path) do
     "#{ENV['WEB_URL']}?#{success_message}"
@@ -27,7 +28,9 @@ RSpec.describe 'GET /v1/health_system/confirm', type: :request do
 
   context 'when user is health system admin' do
     context 'when invitation_token is valid' do
-      let!(:health_system_invitation) { create(:health_system_invitation, user_id: health_system_admin.id, health_system_id: health_system.id) }
+      let!(:health_system_invitation) do
+        create(:health_system_invitation, user_id: health_system_admin.id, health_system_id: health_system.id)
+      end
       let(:invitation_token) { health_system_invitation.invitation_token }
 
       it 'confirms health system invitation and assign user to the health system' do
@@ -53,7 +56,8 @@ RSpec.describe 'GET /v1/health_system/confirm', type: :request do
 
     context 'when invitation token has been already accepted' do
       let!(:health_system_invitation) do
-        create(:health_system_invitation, :accepted, user_id: health_system_admin.id, health_system_id: health_system.id)
+        create(:health_system_invitation, :accepted, user_id: health_system_admin.id,
+                                                     health_system_id: health_system.id)
       end
       let(:invitation_token) { health_system_invitation.invitation_token }
 

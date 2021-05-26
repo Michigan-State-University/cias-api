@@ -18,7 +18,7 @@ RSpec.describe Invitation, type: :model do
       let(:invited) { create(:user, :confirmed, email: 'invited@test.org') }
 
       it 'send email' do
-        expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email).and_return(message_delivery)
+        allow(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email).and_return(message_delivery)
         subject.resend
       end
     end

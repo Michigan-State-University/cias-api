@@ -16,7 +16,9 @@ RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
       }
     }
   end
-  let(:request) { post v1_session_invitations_path(session_id: session.id), params: params, headers: user.create_new_auth_token }
+  let(:request) do
+    post v1_session_invitations_path(session_id: session.id), params: params, headers: user.create_new_auth_token
+  end
 
   context 'create session invitation' do
     context 'when intervention is published' do

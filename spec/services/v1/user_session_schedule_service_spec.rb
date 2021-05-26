@@ -3,8 +3,13 @@
 RSpec.describe V1::UserSessionScheduleService do
   let!(:intervention) { create(:intervention, :published) }
   let!(:user) { create(:user, :participant) }
-  let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formula: formula) }
-  let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at) }
+  let!(:first_session) do
+    create(:session, intervention: intervention, position: 1, settings: settings, formula: formula)
+  end
+  let!(:second_session) do
+    create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2,
+                     schedule_at: schedule_at)
+  end
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
   let!(:user_session) { create(:user_session, user: user, session: first_session) }
   let(:schedule) { 'after_fill' }
@@ -29,7 +34,8 @@ RSpec.describe V1::UserSessionScheduleService do
         end
 
         it 'sends an email' do
-          expect(SessionMailer).to receive(:inform_to_an_email).with(second_session, user.email).and_return(message_delivery)
+          allow(SessionMailer).to receive(:inform_to_an_email).with(second_session,
+                                                                    user.email).and_return(message_delivery)
         end
       end
 
@@ -84,7 +90,9 @@ RSpec.describe V1::UserSessionScheduleService do
         let(:tomorrow) { DateTime.now.tomorrow }
 
         context 'when days_after_date_variable is given' do
-          let!(:update_second_session) { second_session.update(days_after_date_variable_name: 'days_after_date_variable') }
+          let!(:update_second_session) do
+            second_session.update(days_after_date_variable_name: 'days_after_date_variable')
+          end
           let!(:answer) do
             create(:answer_date, user_session: user_session,
                                  body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })

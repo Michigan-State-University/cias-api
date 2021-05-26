@@ -12,7 +12,10 @@ class V1::Users::InvitationsController < V1Controller
   def create
     authorize! :create, User
 
-    return render json: { error: I18n.t('devise.failure.email_already_exists') }, status: :unprocessable_entity if User.exists?(email: invitation_params[:email])
+    if User.exists?(email: invitation_params[:email])
+      return render json: { error: I18n.t('devise.failure.email_already_exists') },
+                    status: :unprocessable_entity
+    end
 
     user = User.invite!(email: invitation_params[:email], roles: %w[researcher])
 
@@ -67,6 +70,7 @@ class V1::Users::InvitationsController < V1Controller
   end
 
   def accept_invitation_params
-    params.require(:invitation).permit(:invitation_token, :password, :password_confirmation, :first_name, :last_name, :time_zone)
+    params.require(:invitation).permit(:invitation_token, :password, :password_confirmation, :first_name, :last_name,
+                                       :time_zone)
   end
 end

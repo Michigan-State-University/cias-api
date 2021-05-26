@@ -27,11 +27,13 @@ RSpec.describe Calculations::DentakuService do
     let(:call) { subject.store_and_transform_values }
 
     it 'changes dentaku calculator memory' do
-      expect { call }.to change(dentaku_calculator, :memory).from({}).to({ 'var1' => 5, 'var2' => 5, 'var3' => 10, 'var4' => 5 })
+      expect do
+        call
+      end.to change(dentaku_calculator, :memory).from({}).to({ 'var1' => 5, 'var2' => 5, 'var3' => 10, 'var4' => 5 })
     end
 
     context 'all_var_values are empty' do
-      let(:all_var_values) {}
+      let(:all_var_values) { nil }
 
       it 'does not change dentaku calculator memory' do
         expect { call }.not_to change(dentaku_calculator, :memory)
@@ -74,7 +76,7 @@ RSpec.describe Calculations::DentakuService do
     end
 
     context 'formula is empty' do
-      let(:formula) {}
+      let(:formula) { nil }
 
       it 'throws proper error' do
         expect(call).to eq(nil)
@@ -86,7 +88,7 @@ RSpec.describe Calculations::DentakuService do
     end
 
     context 'variables are empty' do
-      let(:variants) {}
+      let(:variants) { nil }
 
       it 'throws proper error' do
         expect { call }.to raise_error(NoMethodError, 'undefined method `order\' for nil:NilClass')

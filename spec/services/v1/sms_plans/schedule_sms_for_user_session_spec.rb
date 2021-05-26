@@ -299,10 +299,10 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
     let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
     let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
     let!(:sms_plan) { create(:sms_plan, session: session, is_used_formula: true, formula: 'var1 + 1') }
-    let!(:variant_1) do
+    let!(:variant1) do
       create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '=2', content: 'variant 1 content')
     end
-    let!(:variant_2) do
+    let!(:variant2) do
       create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '>1', content: 'variant 2 content')
     end
 

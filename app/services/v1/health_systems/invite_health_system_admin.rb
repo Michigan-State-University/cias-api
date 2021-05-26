@@ -15,7 +15,8 @@ class V1::HealthSystems::InviteHealthSystemAdmin
     return if user_is_not_health_system_admin?
 
     if user.blank?
-      new_user = User.invite!(email: email, roles: ['health_system_admin'], organizable_id: health_system.id, organizable_type: 'HealthSystem')
+      new_user = User.invite!(email: email, roles: ['health_system_admin'], organizable_id: health_system.id,
+                              organizable_type: 'HealthSystem')
       health_system.health_system_admins << new_user
     else
       V1::HealthSystems::Invitations::Create.call(health_system, user)

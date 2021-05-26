@@ -16,7 +16,8 @@ class V1::HealthSystems::InvitationsController < V1Controller
     V1::HealthSystems::Invitations::Confirm.call(health_system_invitation)
 
     redirect_to_web_app(
-      success: I18n.t('organizables.invitations.accepted', organizable_type: 'Health System', organizable_name: health_system_invitation.health_system.name)
+      success: I18n.t('organizables.invitations.accepted', organizable_type: 'Health System',
+                                                           organizable_name: health_system_invitation.health_system.name)
     )
   rescue ActiveRecord::RecordNotFound
     redirect_to_web_app(

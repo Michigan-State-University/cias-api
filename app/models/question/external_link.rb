@@ -7,7 +7,10 @@ class Question::ExternalLink < Question
     return unless body['variable']['name'].presence
 
     new_variable = "clone_#{body['variable']['name']}"
-    new_variable = variable_with_clone_index(taken_variables, body['variable']['name']) if taken_variables.include?(new_variable)
+    if taken_variables.include?(new_variable)
+      new_variable = variable_with_clone_index(taken_variables,
+                                               body['variable']['name'])
+    end
     body['variable']['name'] = new_variable
   end
 end

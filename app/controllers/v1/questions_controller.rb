@@ -90,7 +90,8 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, narrator: {},
+                                                                                               settings: {}, formula: {}, body: {})
   end
 
   def position_params

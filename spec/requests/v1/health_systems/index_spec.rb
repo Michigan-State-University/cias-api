@@ -6,14 +6,16 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_health_system, :with_organization_admin, :with_e_intervention_admin) }
+  let!(:organization) do
+    create(:organization, :with_health_system, :with_organization_admin, :with_e_intervention_admin)
+  end
   let!(:health_system) { organization.health_systems.first }
-  let!(:health_system_2) { create(:health_system, :with_health_system_admin, name: 'Health System 2') }
-  let!(:organization_2) { health_system_2.organization }
+  let!(:health_system2) { create(:health_system, :with_health_system_admin, name: 'Health System 2') }
+  let!(:organization2) { health_system2.organization }
   let!(:health_clinic) { create(:health_clinic) }
-  let!(:health_system_3) { health_clinic.health_system }
+  let!(:health_system3) { health_clinic.health_system }
 
-  let!(:health_system_admin) { health_system_2.health_system_admins.first }
+  let!(:health_system_admin) { health_system2.health_system_admins.first }
 
   let(:roles) do
     {
@@ -61,11 +63,11 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
                 }
           },
           {
-            'id' => health_system_2.id.to_s,
+            'id' => health_system2.id.to_s,
             'type' => 'health_system',
             'attributes' => {
-              'name' => health_system_2.name,
-              'organization_id' => health_system_2.organization_id
+              'name' => health_system2.name,
+              'organization_id' => health_system2.organization_id
             },
             'relationships' => {
               'health_system_admins' => { 'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }] },
@@ -73,11 +75,11 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
             }
           },
           {
-            'id' => health_system_3.id,
+            'id' => health_system3.id,
             'type' => 'health_system',
             'attributes' => {
-              'name' => health_system_3.name,
-              'organization_id' => health_system_3.organization_id
+              'name' => health_system3.name,
+              'organization_id' => health_system3.organization_id
             },
             'relationships' => {
               'health_system_admins' => { 'data' => [] },
@@ -93,7 +95,7 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
             'id' => health_clinic.id,
             'type' => 'health_clinic',
             'attributes' => {
-              'health_system_id' => health_system_3.id,
+              'health_system_id' => health_system3.id,
               'name' => health_clinic.name
             }
           }

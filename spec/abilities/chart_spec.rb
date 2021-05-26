@@ -8,7 +8,9 @@ describe Chart do
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
   let!(:other_organization) { create(:organization) }
   let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:other_dashboard_section) { create(:dashboard_section, reporting_dashboard: other_organization.reporting_dashboard) }
+  let!(:other_dashboard_section) do
+    create(:dashboard_section, reporting_dashboard: other_organization.reporting_dashboard)
+  end
   let!(:chart) { create(:chart, dashboard_section_id: dashboard_section.id) }
   let!(:other_chart) { create(:chart, dashboard_section_id: other_dashboard_section.id) }
 

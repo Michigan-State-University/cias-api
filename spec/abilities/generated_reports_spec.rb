@@ -146,7 +146,8 @@ describe GeneratedReport do
 
       it 'can access only reports generated in his interventions' do
         expect(subject).to include(admin_generated_report).and \
-          not_include(team1_generated_report1, team1_generated_report2, team3_generated_report1, team2_generated_report1, team2_generated_report2)
+          not_include(team1_generated_report1, team1_generated_report2, team3_generated_report1,
+                      team2_generated_report1, team2_generated_report2)
       end
     end
 

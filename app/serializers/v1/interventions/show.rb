@@ -38,6 +38,7 @@ class V1::Interventions::Show < BaseSerializer
   end
 
   def newest_csv_link
-    ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(@intervention.newest_report, only_path: true)
+    ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(@intervention.newest_report,
+                                                                               only_path: true)
   end
 end

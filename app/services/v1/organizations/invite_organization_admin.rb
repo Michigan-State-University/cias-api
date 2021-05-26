@@ -15,7 +15,8 @@ class V1::Organizations::InviteOrganizationAdmin
     return if user_is_not_organization_admin?
 
     if user.blank?
-      new_user = User.invite!(email: email, roles: ['organization_admin'], organizable_id: organization.id, organizable_type: 'Organization')
+      new_user = User.invite!(email: email, roles: ['organization_admin'], organizable_id: organization.id,
+                              organizable_type: 'Organization')
       organization.organization_admins << new_user
     else
       V1::Organizations::Invitations::Create.call(organization, user)

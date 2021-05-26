@@ -7,10 +7,10 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
-  let!(:dashboard_section_1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
-  let!(:chart1) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section_1.id) }
+  let!(:dashboard_section1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:dashboard_section2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+  let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+  let!(:chart1) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section1.id) }
 
   let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:organization_admin) { organization.organization_admins.first }
@@ -21,19 +21,21 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
       'e_intervention_admin' => e_intervention_admin
     }
   end
-  let(:roles_organization_1) do
+  let(:roles_organization1) do
     {
-      'organization_admin' => organization_1.organization_admins.first,
-      'e_intervention_admin' => organization_1.e_intervention_admins.first
+      'organization_admin' => organization1.organization_admins.first,
+      'e_intervention_admin' => organization1.e_intervention_admins.first
     }
   end
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_organization_dashboard_section_path(organization.id, dashboard_section_1.id), headers: headers }
+  let(:request) do
+    get v1_organization_dashboard_section_path(organization.id, dashboard_section1.id), headers: headers
+  end
 
   context 'when auth' do
     context 'is invalid' do
-      let(:request) { get v1_organization_dashboard_section_path(organization.id, dashboard_section_1.id) }
+      let(:request) { get v1_organization_dashboard_section_path(organization.id, dashboard_section1.id) }
 
       it_behaves_like 'unauthorized user'
     end
@@ -58,11 +60,11 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
       it 'returns proper data' do
         expect(json_response['data']).to include(
           {
-            'id' => dashboard_section_1.id,
+            'id' => dashboard_section1.id,
             'type' => 'dashboard_section',
             'attributes' => {
-              'name' => dashboard_section_1.name,
-              'description' => dashboard_section_1.description,
+              'name' => dashboard_section1.name,
+              'description' => dashboard_section1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
               'organization_id' => organization.id
             },
@@ -131,7 +133,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
           end
 
           context 'doesn\'t refer to other organization' do
-            let(:user) { roles_organization_1[role] }
+            let(:user) { roles_organization1[role] }
 
             it_behaves_like 'unpermitted user'
           end

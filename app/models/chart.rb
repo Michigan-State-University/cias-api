@@ -9,7 +9,11 @@ class Chart < ApplicationRecord
 
   attribute :formula, :json, default: assign_default_values('formula')
 
-  validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
+  validates :formula, presence: true, json: { schema: lambda {
+                                                        Rails.root.join("#{json_schema_path}/formula.json").to_s
+                                                      }, message: lambda { |err|
+                                                                    err
+                                                                  } }
 
   enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
   enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }

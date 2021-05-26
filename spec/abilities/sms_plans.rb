@@ -14,30 +14,30 @@ describe SmsPlan do
 
     context 'team admin' do
       let!(:user) { create(:user, :confirmed, :team_admin) }
-      let!(:intervention_1) { create(:intervention, user: user) }
-      let!(:session_1) { create(:session, intervention: intervention_1) }
-      let!(:sms_plan_1) { create(:sms_plan, session: session_1) }
+      let!(:intervention1) { create(:intervention, user: user) }
+      let!(:session1) { create(:session, intervention: intervention1) }
+      let!(:sms_plan1) { create(:sms_plan, session: session1) }
 
-      let!(:user_2) { create(:user, :researcher, team_id: user.team_id) }
-      let!(:intervention_2) { create(:intervention, user: user_2) }
-      let!(:session_2) { create(:session, intervention: intervention_2) }
-      let!(:sms_plan_2) { create(:sms_plan, session: session_2) }
+      let!(:user2) { create(:user, :researcher, team_id: user.team_id) }
+      let!(:intervention2) { create(:intervention, user: user2) }
+      let!(:session2) { create(:session, intervention: intervention2) }
+      let!(:sms_plan2) { create(:sms_plan, session: session2) }
 
       let!(:another_team) { create(:team, team_admin: user) }
-      let!(:user_3) { create(:user, :researcher, team: another_team) }
-      let!(:intervention_3) { create(:intervention, user: user_3) }
-      let!(:session_3) { create(:session, intervention: intervention_3) }
-      let!(:sms_plan_3) { create(:sms_plan, session: session_3) }
+      let!(:user3) { create(:user, :researcher, team: another_team) }
+      let!(:intervention3) { create(:intervention, user: user3) }
+      let!(:session3) { create(:session, intervention: intervention3) }
+      let!(:sms_plan3) { create(:sms_plan, session: session3) }
 
       it { should have_abilities(:manage, described_class) }
 
       it 'can manage sms plans for sessions created by him' do
-        expect(subject).to have_abilities({ manage: true }, sms_plan_1)
+        expect(subject).to have_abilities({ manage: true }, sms_plan1)
       end
 
       it 'can manage sms plans for sessions created by users from his teams' do
-        expect(subject).to have_abilities({ manage: true }, sms_plan_2)
-        expect(subject).to have_abilities({ manage: true }, sms_plan_3)
+        expect(subject).to have_abilities({ manage: true }, sms_plan2)
+        expect(subject).to have_abilities({ manage: true }, sms_plan3)
       end
     end
 
@@ -75,27 +75,27 @@ describe SmsPlan do
 
     let(:ability) { Ability.new(user) }
 
-    let(:session_1) { create(:session) }
-    let(:session_2) { create(:session) }
-    let!(:sms_plan_1) { create(:sms_plan, session: session_1) }
-    let!(:sms_plan_2) { create(:sms_plan, session: session_2) }
+    let(:session1) { create(:session) }
+    let(:session2) { create(:session) }
+    let!(:sms_plan1) { create(:sms_plan, session: session1) }
+    let!(:sms_plan2) { create(:sms_plan, session: session2) }
 
     context 'admin' do
       let!(:user) { create(:user, :confirmed, :admin) }
 
       it 'can access all sms plans' do
-        expect(subject).to include(sms_plan_1, sms_plan_2)
+        expect(subject).to include(sms_plan1, sms_plan2)
       end
     end
 
     context 'researcher' do
       let!(:user) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention, user: user) }
-      let(:session_1) { create(:session, intervention: intervention) }
+      let(:session1) { create(:session, intervention: intervention) }
 
       it 'can access for sms plan connected with session of intervention created by researcher' do
-        expect(subject).to include(sms_plan_1)
-        expect(subject).not_to include(sms_plan_2)
+        expect(subject).to include(sms_plan1)
+        expect(subject).not_to include(sms_plan2)
       end
     end
 
@@ -104,11 +104,11 @@ describe SmsPlan do
       let!(:user) { team.team_admin }
       let(:team_intervention) { create(:intervention, user: user) }
 
-      let(:session_1) { create(:session, intervention: team_intervention) }
+      let(:session1) { create(:session, intervention: team_intervention) }
 
       it 'can access for sms plan connected with session of intervention from his team' do
-        expect(subject).to include(sms_plan_1)
-        expect(subject).not_to include(sms_plan_2)
+        expect(subject).to include(sms_plan1)
+        expect(subject).not_to include(sms_plan2)
       end
     end
   end

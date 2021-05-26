@@ -9,7 +9,9 @@ class Ability::HealthClinicAdmin < Ability::Base
   private
 
   def health_clinic_admin
-    can :read, ReportingDashboard, organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } }
-    can :read, Chart, dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } } } }
+    can :read, ReportingDashboard,
+        organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } }
+    can :read, Chart,
+        dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } } } }
   end
 end

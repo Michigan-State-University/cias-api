@@ -11,11 +11,12 @@ AllCops:
     - 'bin/*'
     - 'db/schema.rb'
     - 'config.ru'
+    - 'vendor/bundle/**/*'
 
 Bundler/OrderedGems:
   Enabled: false
 
-FactoryBot/FactoryClassName:
+RSpec/FactoryBot:
   Enabled: false
 
 Layout/DotPosition:
@@ -62,7 +63,7 @@ Lint/FloatComparison:
   Enabled: true
 
 Lint/MissingSuper:
-  Enabled: false
+  Enabled: true
 
 Lint/MixedRegexpCaptureTypes:
   Enabled: true

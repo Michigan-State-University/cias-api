@@ -16,16 +16,19 @@ RSpec.describe 'POST /v1/organizations/:organization_id/sessions/:session_id/inv
     {
       session_invitations:
         [{
-           health_clinic_id: health_clinic1.id,
-           emails: %w[test1@dom.com test2@com.com]
-         },
+          health_clinic_id: health_clinic1.id,
+          emails: %w[test1@dom.com test2@com.com]
+        },
          {
            health_clinic_id: health_clinic2.id,
            emails: %w[test3@dom.com test4@com.com]
          }]
     }
   end
-  let(:request) { post v1_organization_session_invitations_path(organization_id: organization.id, session_id: session.id), headers: headers, params: params }
+  let(:request) do
+    post v1_organization_session_invitations_path(organization_id: organization.id, session_id: session.id),
+         headers: headers, params: params
+  end
 
   context 'when user has permission' do
     context 'when intervention is published' do
@@ -42,8 +45,10 @@ RSpec.describe 'POST /v1/organizations/:organization_id/sessions/:session_id/inv
       end
 
       it 'create correct session invites' do
-        expect(session.reload.invitations.map(&:email)).to match_array(%w[test1@dom.com test2@com.com test3@dom.com test4@com.com])
-        expect(session.reload.invitations.map(&:health_clinic_id).uniq).to match_array([health_clinic1.id, health_clinic2.id])
+        expect(session.reload.invitations.map(&:email)).to match_array(%w[test1@dom.com test2@com.com test3@dom.com
+                                                                          test4@com.com])
+        expect(session.reload.invitations.map(&:health_clinic_id).uniq).to match_array([health_clinic1.id,
+                                                                                        health_clinic2.id])
       end
     end
 

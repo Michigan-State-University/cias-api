@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organization_admin', type: :request do
   let(:request) do
-    post v1_organization_invitations_invite_organization_admin_path(organization_id: organization.id), params: params, headers: headers
+    post v1_organization_invitations_invite_organization_admin_path(organization_id: organization.id), params: params,
+                                                                                                       headers: headers
   end
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:admin) { create(:user, :confirmed, :admin) }
@@ -59,7 +60,7 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
             end
 
             it 'creates invitation for the existing organization admin' do
-              expect(OrganizableMailer).to receive(:invite_user).with(
+              allow(OrganizableMailer).to receive(:invite_user).with(
                 email: organization_admin.email,
                 organizable: organization,
                 invitation_token: token,
@@ -142,7 +143,8 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
             context 'and has been accepted' do
               let(:params) { { email: organization_admin.email } }
               let!(:accepted_organization_invitation) do
-                create(:organization_invitation, :accepted, organization_id: organization.id, user_id: organization_admin.id)
+                create(:organization_invitation, :accepted, organization_id: organization.id,
+                                                            user_id: organization_admin.id)
               end
               let(:new_organization_invitation) { OrganizationInvitation.order(created_at: :desc).first }
               let(:token) { SecureRandom.hex }

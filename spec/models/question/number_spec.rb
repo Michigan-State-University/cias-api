@@ -16,7 +16,8 @@ RSpec.describe Question::Number, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_number.variable_clone_prefix(%w[clone_number_var clone1_number_var])).to eq('clone2_number_var')
+          expect(question_number.variable_clone_prefix(%w[clone_number_var
+                                                          clone1_number_var])).to eq('clone2_number_var')
         end
       end
     end

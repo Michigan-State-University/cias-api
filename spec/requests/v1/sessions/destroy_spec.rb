@@ -18,7 +18,9 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
   let!(:questions) { create_list(:question_single, 4, question_group: question_group) }
   let!(:answers) { create_list(:answer_single, 3, question: questions.first) }
   let(:headers) { user.create_new_auth_token }
-  let(:request) { delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers }
+  let(:request) do
+    delete v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers
+  end
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do

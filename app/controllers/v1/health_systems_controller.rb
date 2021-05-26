@@ -45,7 +45,8 @@ class V1::HealthSystemsController < V1Controller
   end
 
   def health_system_params
-    params.require(:health_system).permit(:name, :organization_id, health_system_admins_to_add: [], health_system_admins_to_remove: [])
+    params.require(:health_system).permit(:name, :organization_id, health_system_admins_to_add: [],
+                                                                   health_system_admins_to_remove: [])
   end
 
   def health_system_response(health_system)

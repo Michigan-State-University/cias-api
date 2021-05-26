@@ -18,7 +18,10 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
       }
     }
   end
-  let(:request) { patch v1_organization_dashboard_section_path(organization.id, dashboard_section.id), params: params, headers: headers }
+  let(:request) do
+    patch v1_organization_dashboard_section_path(organization.id, dashboard_section.id), params: params,
+                                                                                         headers: headers
+  end
 
   context 'when auth' do
     context 'is invalid' do
@@ -65,7 +68,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
         let(:params) do
           {
             dashboard_section: {
-              name: ''
+              name: nil
             }
           }
 
@@ -94,7 +97,8 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
       end
     end
 
-    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant guest].each do |role|
+    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant
+       guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

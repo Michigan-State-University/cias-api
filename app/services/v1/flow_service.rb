@@ -107,7 +107,10 @@ class V1::FlowService
   end
 
   def prepare_block_target_value(question, block)
-    return question.exploit_formula(all_var_values, block['payload'], block['reflections']) if block['type'].eql?('ReflectionFormula')
+    if block['type'].eql?('ReflectionFormula')
+      return question.exploit_formula(all_var_values, block['payload'],
+                                      block['reflections'])
+    end
 
     matched_reflections = []
     block['reflections'].each do |reflection|

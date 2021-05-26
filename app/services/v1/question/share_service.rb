@@ -12,7 +12,9 @@ class V1::Question::ShareService < V1::Question::BaseService
   def share(question_ids, researcher_ids)
     questions = chosen_questions(question_ids)
     researchers = chosen_researchers(researcher_ids)
-    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids) && proper_researchers?(researchers, researcher_ids)
+    raise ActiveRecord::RecordNotFound unless proper_questions?(questions,
+                                                                question_ids) && proper_researchers?(researchers,
+                                                                                                     researcher_ids)
 
     researchers.each do |researcher|
       question_group = prepare_question_group(researcher, questions.first.question_group_id)

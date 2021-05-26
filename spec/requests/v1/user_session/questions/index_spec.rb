@@ -10,7 +10,9 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
   let(:audio_id) { nil }
-  let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
+  let!(:user_session) do
+    create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id)
+  end
   let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
   let(:status) { 'draft' }
   let(:user) { participant }
@@ -82,7 +84,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
+                                                  'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -106,7 +109,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
+                                                  'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -156,7 +160,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
+                                                  'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -180,7 +185,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
+                                                  'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -271,10 +277,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => [{ 'id' => question_feedback.id, 'probability' => '100', 'type' => 'Question' }]
+                                 'target' => [{ 'id' => question_feedback.id, 'probability' => '100',
+                                                'type' => 'Question' }]
                                }
                              ] }
-        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
+                          'variable' => { 'name' => 'test' } }
         question.save
         question
       end
@@ -283,7 +291,9 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     end
 
     context 'response when branching is set to another session' do
-      let!(:other_session) { create(:session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at) }
+      let!(:other_session) do
+        create(:session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at)
+      end
       let!(:other_question_group) { create(:question_group, session_id: other_session.id) }
       let!(:other_question) { create(:question_single, question_group_id: other_question_group.id) }
 
@@ -300,7 +310,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                  'target' => [{ 'id' => other_session.id, 'probability' => '100', 'type' => 'Session' }]
                                }
                              ] }
-        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
+                          'variable' => { 'name' => 'test' } }
         question.save
         question
       end
@@ -387,10 +398,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100', 'type' => 'Question' }]
+                                 'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100',
+                                                'type' => 'Question' }]
                                }
                              ] }
-        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
+                          'variable' => { 'name' => 'test' } }
         question.save
         question
       end
