@@ -61,7 +61,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
         let(:params) do
           {
             chart: {
-              name: nil
+
             }
           }
 

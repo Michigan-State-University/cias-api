@@ -288,6 +288,9 @@ RSpec/ContextWording:
 RSpec/DescribeClass:
   Exclude:
     - 'spec/requests/**/*'
+    - 'spec/requests/v1/health_clinic/create_spec.rb'
+    - 'spec/requests/v1/health_systems/update_spec.rb'
+    - 'db/migrate/*'
 
 RSpec/ExampleLength:
   Enabled: false
@@ -296,7 +299,7 @@ RSpec/ImplicitExpect:
   EnforcedStyle: should
 
 RSpec/InstanceVariable:
-  AssignmentOnly: true
+  AssignmentOnly: false
 
 RSpec/LetSetup:
   Enabled: false

@@ -85,7 +85,7 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
             let(:params) do
               {
                 organization: {
-                  name: nil
+                  name: ''
                 }
               }
 

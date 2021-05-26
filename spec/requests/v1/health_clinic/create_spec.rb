@@ -64,7 +64,7 @@ RSpec.describe 'POST /v1/health_clinics', type: :request do
         let(:params) do
           {
             health_system: {
-              name: nil
+              name: ''
             }
           }
 

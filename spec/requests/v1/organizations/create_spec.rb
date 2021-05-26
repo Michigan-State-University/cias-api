@@ -62,7 +62,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
         let(:params) do
           {
             organization: {
-              name: nil
+              name: ''
             }
           }
 

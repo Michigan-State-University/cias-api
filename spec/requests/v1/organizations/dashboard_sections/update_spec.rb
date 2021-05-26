@@ -68,7 +68,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
         let(:params) do
           {
             dashboard_section: {
-              name: nil
+              name: ''
             }
           }
 
