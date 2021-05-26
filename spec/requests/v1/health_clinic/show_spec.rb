@@ -15,7 +15,8 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let(:roles_organization) do
     {
       'organization_admin' => organization.organization_admins.first,
-      'e_intervention_admin' => organization.e_intervention_admins.first
+      'e_intervention_admin' => organization.e_intervention_admins.first,
+      'health_clinic_admin' => health_clinic_admin
     }
   end
 
@@ -90,7 +91,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
     end
 
     context 'when user is' do
-      %w[organization_admin e_intervention_admin].each do |role|
+      %w[organization_admin e_intervention_admin health_clinic_admin].each do |role|
         context role.to_s do
           context 'refers to their health_system' do
             let(:user) { roles_organization[role] }
@@ -111,7 +112,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       end
     end
 
-    %i[health_system_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[health_system_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
