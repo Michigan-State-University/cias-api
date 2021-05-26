@@ -5,7 +5,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
-      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      allow_any_instance_of(::Question::Finish).to receive(:execute_narrator).and_return(true)
     end
   end
 

@@ -5,7 +5,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
 
   before_all do
     RSpec::Mocks.with_temporary_scope do
-      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      allow_any_instance_of(::Question::Finish).to receive(:execute_narrator).and_return(true)
     end
   end
 
@@ -14,7 +14,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   let_it_be(:health_system) { create(:health_system, organization: organization) }
   let_it_be(:health_clinic) { create(:health_clinic, health_system: health_system) }
   let_it_be(:intervention) { create(:intervention, :published, organization: organization) }
-  let_it_be(:session) { create(:session, intervention: intervention, settings: { narrator: { "voice": false } }) }
+  let_it_be(:session) { create(:session, intervention: intervention) }
   let_it_be(:user) { create(:user) }
   let_it_be(:user_session) { create(:user_session, session: session, user: user, health_clinic: health_clinic) }
   let_it_be(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
