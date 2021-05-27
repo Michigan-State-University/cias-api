@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SessionJob::Publish < SessionJob
+class SessionJobs::Publish < SessionJob
   def perform(id)
     session = Session.find(id)
     all_sessions = session.intervention.sessions.order(:position).includes([:session_invitations])

@@ -44,7 +44,7 @@ class Session < ApplicationRecord
   after_commit :create_core_childs, on: :create
 
   after_update_commit do
-    SessionJob::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
+    SessionJobs::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
   end
 
   def position_grather_than
@@ -77,7 +77,7 @@ class Session < ApplicationRecord
     nil
   end
 
-  def invite_by_email(emails)
+  def invite_by_email(emails, health_clinic_id = nil)
     users_exists = ::User.where(email: emails)
     (emails - users_exists.map(&:email)).each do |email|
       User.invite!(email: email)
@@ -85,17 +85,17 @@ class Session < ApplicationRecord
 
     Invitation.transaction do
       User.where(email: emails).find_each do |user|
-        invitations.create!(email: user.email)
+        invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
       end
     end
 
-    SessionJob::Invitation.perform_later(id, emails)
+    SessionJobs::Invitation.perform_later(id, emails)
   end
 
-  def send_link_to_session(user)
+  def send_link_to_session(user, health_clinic_id = nil)
     return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
-    SessionMailer.inform_to_an_email(self, user.email).deliver_later
+    SessionMailer.inform_to_an_email(self, user.email, health_clinic_id).deliver_later
   end
 
   def first_question

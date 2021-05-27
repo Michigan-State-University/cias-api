@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe SessionJob::ReloadAudio, type: :job do
+RSpec.describe SessionJobs::ReloadAudio, type: :job do
   let(:session) { create(:session) }
 
   describe '#perform_later' do
