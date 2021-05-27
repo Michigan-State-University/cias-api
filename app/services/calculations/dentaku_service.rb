@@ -28,6 +28,11 @@ class Calculations::DentakuService
     is_formula_interface ? json_formula(result, formula_cases) : variant_formula(result, formula_cases)
   end
 
+  def exist_missing_variables?
+    store_and_transform_values
+    dentaku_calculator.dependencies(formula).present?
+  end
+
   private
 
   def add_missing_variables(formula)

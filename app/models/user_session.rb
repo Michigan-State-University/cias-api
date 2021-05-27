@@ -22,6 +22,7 @@ class UserSession < ApplicationRecord
     decrement_audio_usage
     V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
+    V1::ChartStatistics::CreateForUserSession.call(self)
   end
 
   def on_answer
