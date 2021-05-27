@@ -44,7 +44,7 @@ class Session < ApplicationRecord
   after_commit :create_core_childs, on: :create
 
   after_update_commit do
-    SessionJob::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
+    SessionJobs::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
   end
 
   def position_grather_than
@@ -89,7 +89,7 @@ class Session < ApplicationRecord
       end
     end
 
-    SessionJob::Invitation.perform_later(id, emails, health_clinic_id)
+    SessionJobs::Invitation.perform_later(id, emails)
   end
 
   def send_link_to_session(user)

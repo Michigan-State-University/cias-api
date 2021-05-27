@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe LogJob::UserRequest, type: :job do
+RSpec.describe LogJobs::UserRequest, type: :job do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:params) do
     {

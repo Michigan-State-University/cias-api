@@ -34,7 +34,7 @@ class Intervention < ApplicationRecord
     return unless draft?
 
     published!
-    ::Intervention::PublishJob.perform_later(id)
+    ::Interventions::PublishJob.perform_later(id)
   end
 
   def close

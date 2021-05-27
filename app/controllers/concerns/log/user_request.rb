@@ -8,7 +8,7 @@ module Log::UserRequest
   end
 
   def leave_footprint
-    LogJob::UserRequest.perform_later(request_scope)
+    LogJobs::UserRequest.perform_later(request_scope)
   end
 
   private

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe SessionJob::Invitation, type: :job do
-  subject { described_class.perform_now(session.id, emails, nil) }
+RSpec.describe SessionJobs::Invitation, type: :job do
+  subject { described_class.perform_now(session.id, emails) }
 
   let(:user_with_notification) { create(:user, :confirmed) }
   let(:user_without_notification) { create(:user, :confirmed, email_notification: false) }
@@ -29,6 +29,7 @@ RSpec.describe SessionJob::Invitation, type: :job do
     let(:session) { create(:session, intervention_id: intervention.id) }
 
     it 'return proper body' do
+      # require 'pry'; binding.pry
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
       expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_from_clinic',
                                                                                   domain: ENV['WEB_URL'],
