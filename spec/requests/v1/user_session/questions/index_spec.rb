@@ -514,7 +514,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
 
         it 'swaps url correctly' do
-          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].second).to eq('phonetic_audio.mp3')
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].second)
+            .to eq('phonetic_audio.mp3')
         end
       end
 

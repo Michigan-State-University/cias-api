@@ -313,9 +313,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
         expect(outcome_report_template.sections.last.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY)).to eq report_template.sections.last.slice(
           *ReportTemplate::Section::ATTR_NAMES_TO_COPY
         )
-        expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)).to eq report_template.variants.last.slice(
-          *ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY
-        )
+        expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
+          .to eq report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)
       end
     end
   end

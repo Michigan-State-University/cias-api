@@ -14,7 +14,8 @@ describe 'GET /v1/users/invitations', type: :request do
   end
   let!(:user_with_accepted_invitation) do
     create(:user, :researcher, email: 'another@example.com',
-                               invitation_token: 'dsadasdas800b53e4ce6f1d369505e0958fff90e198363e26c9093e17774fc6ed8', invitation_accepted_at: Time.current)
+                               invitation_token: 'dsadasdas800b53e4ce6f1d369505e0958fff90e198363e26c9093e17774fc6ed8',
+                               invitation_accepted_at: Time.current)
   end
 
   context 'when authenticated as guest user' do

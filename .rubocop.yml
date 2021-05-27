@@ -12,6 +12,8 @@ AllCops:
     - 'db/schema.rb'
     - 'config.ru'
     - 'vendor/bundle/**/*'
+    - 'lib/tasks/one_time_use/*'
+    - 'db/migration'
 
 Bundler/OrderedGems:
   Enabled: false
@@ -26,7 +28,10 @@ Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: true
 
 Layout/LineLength:
-  Enabled: false
+  Enabled: true
+  Max: 150
+  Exclude:
+    - 'spec/requests/v1/questions/update_narrator_spec.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
@@ -104,6 +109,15 @@ Metrics/BlockLength:
 Metrics/MethodLength:
   Enabled: false
 
+Metrics/CyclomaticComplexity:
+  Max: 16
+
+Metrics/PerceivedComplexity:
+  Max: 16
+
+Metrics/ClassLength:
+  Max: 150
+
 Performance/AncestorsInclude:
   Enabled: true
 
@@ -127,6 +141,9 @@ Performance/Squeeze:
 
 Performance/StringInclude:
   Enabled: true
+
+Performance/CollectionLiteralInLoop:
+  Enabled: false
 
 Style/AccessorGrouping:
   Enabled: true
@@ -282,6 +299,9 @@ Rails/SkipsModelValidations:
 Rails/WhereExists:
   Enabled: true
 
+Rails/EnvironmentVariableAccess:
+  AllowReads: true
+
 RSpec/ContextWording:
   Enabled: false
 
@@ -300,6 +320,9 @@ RSpec/ImplicitExpect:
 
 RSpec/InstanceVariable:
   AssignmentOnly: false
+  Exclude:
+    - 'spec/services/v1/generated_reports/create_spec.rb'
+    - 'spec/services/v1/generated_reports/create_spec.rb'
 
 RSpec/LetSetup:
   Enabled: false
@@ -318,3 +341,15 @@ RSpec/NamedSubject:
 
 RSpec/NestedGroups:
   Enabled: false
+
+RSpec/VerifiedDoubles:
+  Exclude:
+    - 'spec/services/v1/report_templates/generate_pdf_preview_spec.rb'
+
+RSpec/FilePath:
+  Exclude:
+    - 'spec/services/v1/questions/clone_multiple_questions_spec.rb'
+
+RSpec/AnyInstance:
+  Exclude:
+    - 'spec/services/v1/generated_reports/create_spec.rb'

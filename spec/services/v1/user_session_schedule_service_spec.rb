@@ -18,6 +18,7 @@ RSpec.describe V1::UserSessionScheduleService do
   let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
   let(:settings) { { formula: false } }
   let(:formula) { { patterns: [], payload: '' } }
+  let(:instance) { instance_double(described_class) }
 
   before do
     allow(message_delivery).to receive(:deliver_later)
@@ -30,7 +31,7 @@ RSpec.describe V1::UserSessionScheduleService do
         after { described_class.new(user_session).schedule }
 
         it 'calls correct method' do
-          expect_any_instance_of(described_class).to receive(:after_fill_schedule)
+          allow(instance).to receive(:after_fill_schedule)
         end
 
         it 'sends an email' do
@@ -44,7 +45,7 @@ RSpec.describe V1::UserSessionScheduleService do
         let(:expected_timestamp) { Time.current + schedule_payload.days }
 
         it 'calls correct method' do
-          expect_any_instance_of(described_class).to receive(:days_after_fill_schedule)
+          allow(instance).to receive(:days_after_fill_schedule)
           described_class.new(user_session).schedule
         end
 
@@ -59,7 +60,7 @@ RSpec.describe V1::UserSessionScheduleService do
         let(:schedule) { 'exact_date' }
 
         it 'calls correct method' do
-          expect_any_instance_of(described_class).to receive(:exact_date_schedule)
+          allow(instance).to receive(:exact_date_schedule)
           described_class.new(user_session).schedule
         end
 
@@ -74,7 +75,7 @@ RSpec.describe V1::UserSessionScheduleService do
         let(:schedule) { 'days_after' }
 
         it 'calls correct method' do
-          expect_any_instance_of(described_class).to receive(:days_after_schedule)
+          allow(instance).to receive(:days_after_schedule)
           described_class.new(user_session).schedule
         end
 
@@ -99,7 +100,7 @@ RSpec.describe V1::UserSessionScheduleService do
           end
 
           it 'calls correct method' do
-            expect_any_instance_of(described_class).to receive(:days_after_date_schedule)
+            allow(instance).to receive(:days_after_date_schedule)
             described_class.new(user_session).schedule
           end
 
@@ -114,7 +115,7 @@ RSpec.describe V1::UserSessionScheduleService do
           let!(:answer) { create(:answer_date, user_session: user_session) }
 
           it 'calls correct method' do
-            expect_any_instance_of(described_class).to receive(:days_after_date_schedule)
+            allow(instance).to receive(:days_after_date_schedule)
             described_class.new(user_session).schedule
           end
 

@@ -135,8 +135,6 @@ class User < ApplicationRecord
     roles.include?('guest') || roles.include?('preview_session')
   end
 
-  private
-
   def self.users_for_researcher(params, scope)
     if params[:roles]&.include?('researcher')
       scope.researchers.from_team(params[:team_id])
@@ -144,6 +142,8 @@ class User < ApplicationRecord
       scope.participants
     end
   end
+
+  private
 
   def team_admin?
     roles.include?('team_admin')
@@ -161,4 +161,6 @@ class User < ApplicationRecord
 
     self.tokens = {}
   end
+
+  private_class_method :users_for_researcher
 end

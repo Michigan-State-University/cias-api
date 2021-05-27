@@ -44,7 +44,6 @@ class Clone::Intervention < Clone::Base
         index += 1
       end
       pattern
-      pattern
     end
   end
 

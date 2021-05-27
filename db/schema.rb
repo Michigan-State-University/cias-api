@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 2021_05_18_101732) do
+ActiveRecord::Schema.define(version: 2021_05_26_202119) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -95,6 +94,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.uuid "reporting_dashboard_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_dashboard_sections_on_name"
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
@@ -155,6 +155,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
+    t.index ["name"], name: "index_health_clinics_on_name"
   end
 
   create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -174,6 +175,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.uuid "organization_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_health_systems_on_name"
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 
@@ -234,6 +236,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_organizations_on_name"
   end
 
   create_table "phones", force: :cascade do |t|
@@ -428,7 +431,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
-    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
+    t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
