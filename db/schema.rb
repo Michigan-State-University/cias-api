@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema.define(version: 2021_05_18_101732) do
+ActiveRecord::Schema.define(version: 2021_05_24_044925) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -428,7 +427,7 @@ ActiveRecord::Schema.define(version: 2021_05_18_101732) do
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
-    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
+    t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
   end
 
