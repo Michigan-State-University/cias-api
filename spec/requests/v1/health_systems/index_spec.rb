@@ -95,7 +95,7 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
             'id' => health_clinic.id,
             'type' => 'health_clinic',
             'attributes' => {
-              'health_system_id' => health_system_3.id,
+              'health_system_id' => health_system3.id,
               'name' => health_clinic.name,
               'health_clinic_admins' => []
             }
@@ -158,11 +158,11 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
     it 'returns proper collection data' do
       expect(json_response['data']).to include(
         {
-          'id' => health_system_2.id.to_s,
+          'id' => health_system2.id.to_s,
           'type' => 'health_system',
           'attributes' => {
-            'name' => health_system_2.name,
-            'organization_id' => health_system_2.organization.id
+            'name' => health_system2.name,
+            'organization_id' => health_system2.organization.id
           },
           'relationships' => {
             'health_system_admins' => { 'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }] },
