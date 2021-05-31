@@ -11,7 +11,17 @@ RSpec.describe V1::UserSessionScheduleService do
                      schedule_at: schedule_at)
   end
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
-  let!(:user_session) { create(:user_session, user: user, session: first_session) }
+  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Health Organization') }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Heath System', organization: organization) }
+  let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let!(:user_session_not_belongs_to_organization) { create(:user_session, user: user, session: first_session) }
+  let!(:user_session_belongs_to_organization) { create(:user_session, user: user, session: first_session, health_clinic: health_clinic) }
+  let!(:user_sessions) do
+    {
+      'user_session_not_belongs_to_organization' => user_session_not_belongs_to_organization,
+      'user_session_belongs_to_organization' => user_session_belongs_to_organization
+    }
+  end
   let(:schedule) { 'after_fill' }
   let(:schedule_payload) { 2 }
   let(:schedule_at) { (DateTime.now + 4.days).to_s }
@@ -79,16 +89,14 @@ RSpec.describe V1::UserSessionScheduleService do
           described_class.new(user_session).schedule
         end
 
-        it 'schedules on correct time' do
-          expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                     .with(second_session.id, user.id)
-                                                                     .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
-        end
-      end
+          context 'when session has schedule days after fill' do
+            let(:schedule) { 'days_after_fill' }
+            let(:expected_timestamp) { Time.current + schedule_payload.days }
 
-      context 'when session has schedule days_after_date' do
-        let(:schedule) { 'days_after_date' }
-        let(:tomorrow) { DateTime.now.tomorrow }
+            it 'calls correct method' do
+              expect_any_instance_of(described_class).to receive(:days_after_fill_schedule)
+              described_class.new(user_session).schedule
+            end
 
         context 'when days_after_date_variable is given' do
           let!(:update_second_session) do
@@ -104,137 +112,177 @@ RSpec.describe V1::UserSessionScheduleService do
             described_class.new(user_session).schedule
           end
 
-          it 'schedules on correct time' do
-            expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                         .with(second_session.id, user.id)
-                                                                         .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
+            it 'schedules on correct time' do
+              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic_id)
+                                                                         .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+            end
           end
-        end
 
-        context 'when days_after_date_variable is not given' do
-          let!(:answer) { create(:answer_date, user_session: user_session) }
+          context 'when session has schedule days_after' do
+            let(:schedule) { 'days_after' }
 
           it 'calls correct method' do
             allow(instance).to receive(:days_after_date_schedule)
             described_class.new(user_session).schedule
           end
 
-          it 'does not schedule' do
-            expect(described_class.new(user_session).schedule).to eq(nil)
-          end
-        end
-      end
-    end
-
-    context 'session branching' do
-      let(:instance) { described_class.new(user_session) }
-
-      context 'formula settings is off' do
-        context 'formula is empty' do
-          it 'returns next session id' do
-            expect(instance.branch_to_session.id).to eq(second_session.id)
-          end
-        end
-
-        context 'formula is set up' do
-          let(:question_group) { create(:question_group, session: first_session) }
-          let(:question) { create(:question_single, question_group: question_group) }
-          let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
-          let(:formula) do
-            {
-              payload: 'test',
-              patterns: [{
-                match: '=2',
-                target: [{
-                  id: second_session.id,
-                  probability: '100',
-                  type: 'Session'
-                }]
-              },
-                         {
-                           match: '=1',
-                           target: [{
-                             id: third_session.id,
-                             probability: '100',
-                             type: 'Session'
-                           }]
-                         }]
-            }
+            it 'schedules on correct time' do
+              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic_id)
+                                                                         .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+            end
           end
 
-          it 'returns next session id' do
-            expect(instance.branch_to_session.id).to eq(second_session.id)
-          end
-        end
-      end
+          context 'when session has schedule days_after_date' do
+            let(:schedule) { 'days_after_date' }
+            let(:tomorrow) { DateTime.now.tomorrow }
 
-      context 'formula settings is on' do
-        let(:settings) { { formula: true } }
+            context 'when days_after_date_variable is given' do
+              let!(:update_second_session) { second_session.update(days_after_date_variable_name: 'days_after_date_variable') }
+              let!(:answer) do
+                create(:answer_date, user_session: user_session,
+                                     body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })
+              end
 
-        context 'branching is empty' do
-          it 'returns next session id' do
-            expect(instance.branch_to_session.id).to eq(second_session.id)
+              it 'calls correct method' do
+                expect_any_instance_of(described_class).to receive(:days_after_date_schedule)
+                described_class.new(user_session).schedule
+              end
+
+              it 'schedules on correct time' do
+                expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+                                                                             .with(second_session.id, user.id, user_session.health_clinic_id)
+                                                                             .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
+              end
+            end
+
+            context 'when days_after_date_variable is not given' do
+              let!(:answer) { create(:answer_date, user_session: user_session) }
+
+              it 'calls correct method' do
+                expect_any_instance_of(described_class).to receive(:days_after_date_schedule)
+                described_class.new(user_session).schedule
+              end
+
+              it 'does not schedule' do
+                expect(described_class.new(user_session).schedule).to eq(nil)
+              end
+            end
           end
         end
 
-        context 'branching is set up' do
-          let(:question_group) { create(:question_group, session: first_session) }
-          let(:question) { create(:question_single, question_group: question_group) }
-          let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+        context 'session branching' do
+          let(:instance) { described_class.new(user_session) }
 
-          context 'branches with match' do
-            let(:formula) do
-              {
-                payload: 'test',
-                patterns: [{
-                  match: '=2',
-                  target: [{
-                    id: second_session.id,
-                    probability: '100',
-                    type: 'Session'
-                  }]
-                },
-                           {
-                             match: '=1',
-                             target: [{
-                               id: third_session.id,
-                               probability: '100',
-                               type: 'Session'
+          context 'formula settings is off' do
+            context 'formula is empty' do
+              it 'returns next session id' do
+                expect(instance.branch_to_session.id).to eq(second_session.id)
+              end
+            end
+
+            context 'formula is set up' do
+              let(:question_group) { create(:question_group, session: first_session) }
+              let(:question) { create(:question_single, question_group: question_group) }
+              let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+              let(:formula) do
+                {
+                  payload: 'test',
+                  patterns: [{
+                    match: '=2',
+                    target: [{
+                      id: second_session.id,
+                      probability: '100',
+                      type: 'Session'
+                    }]
+                  },
+                             {
+                               match: '=1',
+                               target: [{
+                                 id: third_session.id,
+                                 probability: '100',
+                                 type: 'Session'
+                               }]
                              }]
-                           }]
-              }
-            end
+                }
+              end
 
-            it 'returns branched session id' do
-              expect(instance.branch_to_session.id).to eq third_session.id
+              it 'returns next session id' do
+                expect(instance.branch_to_session.id).to eq(second_session.id)
+              end
             end
           end
 
-          context 'branches with no match' do
-            let(:formula) do
-              {
-                payload: 'test',
-                patterns: [{
-                  match: '=2',
-                  target: [{
-                    id: second_session.id,
-                    probability: '100',
-                    type: 'Session'
-                  }]
-                },
-                           {
-                             match: '=3',
-                             target: [{
-                               id: third_session.id,
-                               probability: '100',
-                               type: 'Session'
-                             }]
-                           }]
-              }
+          context 'formula settings is on' do
+            let(:settings) { { formula: true } }
+
+            context 'branching is empty' do
+              it 'returns next session id' do
+                expect(instance.branch_to_session.id).to eq(second_session.id)
+              end
             end
 
-            it 'returns branched session id' do
-              expect(instance.branch_to_session.id).to eq second_session.id
+            context 'branching is set up' do
+              let(:question_group) { create(:question_group, session: first_session) }
+              let(:question) { create(:question_single, question_group: question_group) }
+              let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+
+              context 'branches with match' do
+                let(:formula) do
+                  {
+                    payload: 'test',
+                    patterns: [{
+                      match: '=2',
+                      target: [{
+                        id: second_session.id,
+                        probability: '100',
+                        type: 'Session'
+                      }]
+                    },
+                               {
+                                 match: '=1',
+                                 target: [{
+                                   id: third_session.id,
+                                   probability: '100',
+                                   type: 'Session'
+                                 }]
+                               }]
+                  }
+                end
+
+                it 'returns branched session id' do
+                  expect(instance.branch_to_session.id).to eq third_session.id
+                end
+              end
+
+              context 'branches with no match' do
+                let(:formula) do
+                  {
+                    payload: 'test',
+                    patterns: [{
+                      match: '=2',
+                      target: [{
+                        id: second_session.id,
+                        probability: '100',
+                        type: 'Session'
+                      }]
+                    },
+                               {
+                                 match: '=3',
+                                 target: [{
+                                   id: third_session.id,
+                                   probability: '100',
+                                   type: 'Session'
+                                 }]
+                               }]
+                  }
+                end
+
+                it 'returns branched session id' do
+                  expect(instance.branch_to_session.id).to eq second_session.id
+                end
+              end
             end
           end
         end

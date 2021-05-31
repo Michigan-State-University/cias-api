@@ -6,9 +6,10 @@ class V1::UserSessionScheduleService
     @all_var_values = V1::UserInterventionService.new(
       user_session.user.id, user_session.session.intervention_id, user_session.id
     ).var_values
+    @health_clinic_id = user_session.health_clinic_id
   end
 
-  attr_reader :user_session, :all_var_values
+  attr_reader :user_session, :all_var_values, :health_clinic_id
 
   def schedule
     next_session = branch_to_session
@@ -18,7 +19,7 @@ class V1::UserSessionScheduleService
   end
 
   def after_fill_schedule(next_session)
-    next_session.send_link_to_session(user_session.user)
+    next_session.send_link_to_session(user_session.user, health_clinic_id)
   end
 
   def days_after_schedule(next_session)

@@ -53,28 +53,17 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
           context 'when organization admin exists in the system' do
             let(:params) { { email: organization_admin.email } }
             let(:token) { SecureRandom.hex }
-            let(:organization_invitation) { OrganizationInvitation.order(created_at: :desc).first }
 
             before do
               allow_any_instance_of(OrganizationInvitation).to receive(:invitation_token).and_return(token)
             end
 
             it 'creates invitation for the existing organization admin' do
-              allow(OrganizableMailer).to receive(:invite_user).with(
-                email: organization_admin.email,
-                organizable: organization,
-                invitation_token: token,
-                organizable_type: 'Organization'
-              ).and_return(double(deliver_later: nil))
+              expect(OrganizableMailer).not_to receive(:invite_user)
 
-              expect { request }.to change(OrganizationInvitation, :count).by(1).and \
+              expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
                 avoid_changing(User, :count).and \
                   avoid_changing { organization.organization_admins.count }
-
-              expect(organization_invitation).to have_attributes(
-                user_id: organization_admin.id,
-                organization_id: organization.id
-              )
             end
           end
 
@@ -155,21 +144,11 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
               end
 
               it 'creates invitation for the existing organization_admin' do
-                expect(OrganizableMailer).to receive(:invite_user).with(
-                  email: organization_admin.email,
-                  organizable: organization,
-                  invitation_token: token,
-                  organizable_type: 'Organization'
-                ).and_return(double(deliver_later: nil))
+                expect(OrganizableMailer).not_to receive(:invite_user)
 
-                expect { request }.to change(OrganizationInvitation, :count).by(1).and \
+                expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
                   avoid_changing(User, :count).and \
                     avoid_changing { organization.reload.organization_admins.count }
-
-                expect(new_organization_invitation).to have_attributes(
-                  user_id: organization_admin.id,
-                  organization_id: organization.id
-                )
               end
             end
           end

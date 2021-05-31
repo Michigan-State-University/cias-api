@@ -10,10 +10,11 @@ class V1::FlowService
     @user = @user_session.user
     @warning = ''
     @next_user_session_id = ''
+    @health_clinic_id = user_session.health_clinic_id
   end
 
   attr_reader :user
-  attr_accessor :user_session, :warning, :next_user_session_id
+  attr_accessor :user_session, :warning, :next_user_session_id, :health_clinic_id
 
   def user_session_question(preview_question_id)
     question = question_to_display(preview_question_id)
@@ -73,7 +74,7 @@ class V1::FlowService
     user_session.finish(send_email: !session_available_now)
 
     if session_available_now
-      next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id)
+      next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id)
       next_user_session.save!
       self.next_user_session_id = next_user_session.id
       return question_or_session.first_question

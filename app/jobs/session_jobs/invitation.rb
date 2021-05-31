@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class SessionJob::Invitation < SessionJob
-  def perform(session_id, emails, health_clinic_id)
+class SessionJobs::Invitation < SessionJob
+  def perform(session_id, emails, health_clinic_id=nil)
     users = User.where(email: emails)
     session = Session.find(session_id)
     health_clinic = HealthClinic.find_by(id: health_clinic_id)
