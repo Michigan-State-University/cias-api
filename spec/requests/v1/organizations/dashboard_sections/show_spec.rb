@@ -9,7 +9,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
   let!(:dashboard_section_1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+  let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
   let!(:chart1) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section_1.id) }
 
   let(:e_intervention_admin) { organization.e_intervention_admins.first }
@@ -21,10 +21,10 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
       'e_intervention_admin' => e_intervention_admin
     }
   end
-  let(:roles_organization_1) do
+  let(:roles_organization1) do
     {
-      'organization_admin' => organization_1.organization_admins.first,
-      'e_intervention_admin' => organization_1.e_intervention_admins.first
+      'organization_admin' => organization1.organization_admins.first,
+      'e_intervention_admin' => organization1.e_intervention_admins.first
     }
   end
 
@@ -131,7 +131,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
           end
 
           context 'doesn\'t refer to other organization' do
-            let(:user) { roles_organization_1[role] }
+            let(:user) { roles_organization1[role] }
 
             it_behaves_like 'unpermitted user'
           end

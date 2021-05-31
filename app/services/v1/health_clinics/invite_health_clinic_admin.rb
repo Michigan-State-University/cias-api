@@ -16,7 +16,7 @@ class V1::HealthClinics::InviteHealthClinicAdmin
 
     if user.blank?
       new_user = User.invite!(email: email, roles: ['health_clinic_admin'], organizable_id: health_clinic.id, organizable_type: 'HealthClinic')
-      health_clinic.user_health_clinics << new_user
+      health_clinic.user_health_clinics << UserHealthClinic.new(user: new_user, health_clinic: health_clinic)
     else
       V1::HealthClinics::Invitations::Create.call(health_clinic, user)
     end

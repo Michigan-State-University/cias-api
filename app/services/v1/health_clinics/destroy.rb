@@ -14,9 +14,8 @@ class V1::HealthClinics::Destroy
     ActiveRecord::Base.transaction do
       user_health_clinics.each do |user_health_clinic|
         health_clinic_admin = user_health_clinic.user
-        health_clinic_admin.user_health_clinics.find_by(health_clinic_id: health_clinic.id).destroy!
+        user_health_clinic.destroy!
         health_clinic_admin.deactivate! if no_more_health_clinics?(health_clinic_admin)
-        user_health_clinic.delete(health_clinic_admin)
       end
 
       health_clinic.destroy!

@@ -17,7 +17,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_clinics, organization: organization) }
   let!(:health_clinic) { health_system.health_clinics.first }
-  let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
+  let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
 
   let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:organization_admin) { organization.organization_admins.first }
@@ -28,10 +28,10 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
       'e_intervention_admin' => e_intervention_admin
     }
   end
-  let(:roles_organization_1) do
+  let(:roles_organization1) do
     {
-      'organization_admin' => organization_1.organization_admins.first,
-      'e_intervention_admin' => organization_1.e_intervention_admins.first
+      'organization_admin' => organization1.organization_admins.first,
+      'e_intervention_admin' => organization1.e_intervention_admins.first
     }
   end
 
@@ -105,7 +105,8 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic.name
+              'name' => health_clinic.name,
+              'health_clinic_admins' => []
             }
           }
         )
@@ -164,7 +165,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
           end
 
           context 'doesn\'t refer to other organization' do
-            let(:user) { roles_organization_1[role] }
+            let(:user) { roles_organization1[role] }
 
             before { request }
 

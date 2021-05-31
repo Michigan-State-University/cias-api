@@ -10,8 +10,8 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
   let!(:health_system) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization) }
   let!(:health_clinic) { health_system.health_clinics.first }
 
-  let!(:organization_1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
-  let!(:health_system_1) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization_1, name: 'Test') }
+  let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
+  let!(:health_system1) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization1, name: 'Test') }
 
   let!(:health_system_admin) { health_system.health_system_admins.first }
 
@@ -21,10 +21,10 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       'e_intervention_admin' => organization.e_intervention_admins.first
     }
   end
-  let(:roles_organization_1) do
+  let(:roles_organization1) do
     {
-      'organization_admin' => organization_1.organization_admins.first,
-      'e_intervention_admin' => organization_1.e_intervention_admins.first
+      'organization_admin' => organization1.organization_admins.first,
+      'e_intervention_admin' => organization1.e_intervention_admins.first
     }
   end
 
@@ -75,7 +75,8 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'name' => health_clinic.name,
-              'health_system_id' => health_clinic.health_system_id
+              'health_system_id' => health_clinic.health_system_id,
+              'health_clinic_admins' => []
             }
           }
         )
@@ -120,7 +121,7 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
           end
 
           context 'doesn\'t refer to other health_system' do
-            let(:user) { roles_organization_1[role] }
+            let(:user) { roles_organization1[role] }
 
             before { request }
 
@@ -142,7 +143,7 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       end
     end
 
-    %i[health_system_admin team_admin researcher participant guest].each do |role|
+    %i[health_clinic_admin team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
