@@ -133,7 +133,7 @@ RSpec.describe Session, type: :model do
 
                 context 'email notification enabled' do
                   it 'schedules send email' do
-                    allow(SessionMailer).to receive(:inform_to_an_email).with(session, user.email).and_return(
+                    allow(SessionMailer).to receive(:inform_to_an_email).with(session, user.email, nil).and_return(
                       message_delivery
                     )
                   end

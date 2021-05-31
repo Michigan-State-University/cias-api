@@ -23,27 +23,23 @@ class V1::UserSessionScheduleService
   end
 
   def days_after_schedule(next_session)
-    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id,
-                                                                                         user_session.user.id)
+    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic_id)
   end
 
   def days_after_fill_schedule(next_session)
-    SessionEmailScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id,
-                                                                                        user_session.user.id)
+    SessionEmailScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id, health_clinic_id)
   end
 
   def exact_date_schedule(next_session)
-    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id,
-                                                                                         user_session.user.id)
+    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic_id)
   end
 
   def days_after_date_schedule(next_session)
     participant_date = all_var_values[next_session.days_after_date_variable_name]
-
-    return unless participant_date
-
-    SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
-        .perform_later(next_session.id, user_session.user.id)
+    if participant_date
+      SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
+                             .perform_later(next_session.id, user_session.user.id, health_clinic_id)
+    end
   end
 
   def branch_to_session

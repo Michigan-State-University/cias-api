@@ -403,6 +403,7 @@ RSpec/AnyInstance:
 RSpec/StubbedMock:
   Exclude:
     - 'spec/requests/v1/organizations/invitations/invite_organization_admin_spec.rb'
+    - 'spec/services/v1/user_session_schedule_service_spec.rb'
 
 Naming/AccessorMethodName:
   Exclude:
