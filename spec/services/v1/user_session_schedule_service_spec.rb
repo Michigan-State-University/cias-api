@@ -89,28 +89,28 @@ RSpec.describe V1::UserSessionScheduleService do
           described_class.new(user_session).schedule
         end
 
-          context 'when session has schedule days after fill' do
-            let(:schedule) { 'days_after_fill' }
-            let(:expected_timestamp) { Time.current + schedule_payload.days }
-
-            it 'calls correct method' do
-              expect_any_instance_of(described_class).to receive(:days_after_fill_schedule)
-              described_class.new(user_session).schedule
-            end
-
-        context 'when days_after_date_variable is given' do
-          let!(:update_second_session) do
-            second_session.update(days_after_date_variable_name: 'days_after_date_variable')
-          end
-          let!(:answer) do
-            create(:answer_date, user_session: user_session,
-                                 body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })
-          end
+        context 'when session has schedule days after fill' do
+          let(:schedule) { 'days_after_fill' }
+          let(:expected_timestamp) { Time.current + schedule_payload.days }
 
           it 'calls correct method' do
-            allow(instance).to receive(:days_after_date_schedule)
+            expect_any_instance_of(described_class).to receive(:days_after_fill_schedule)
             described_class.new(user_session).schedule
           end
+
+          context 'when days_after_date_variable is given' do
+            let!(:update_second_session) do
+              second_session.update(days_after_date_variable_name: 'days_after_date_variable')
+            end
+            let!(:answer) do
+              create(:answer_date, user_session: user_session,
+                                   body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })
+            end
+
+            it 'calls correct method' do
+              allow(instance).to receive(:days_after_date_schedule)
+              described_class.new(user_session).schedule
+            end
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
@@ -122,10 +122,10 @@ RSpec.describe V1::UserSessionScheduleService do
           context 'when session has schedule days_after' do
             let(:schedule) { 'days_after' }
 
-          it 'calls correct method' do
-            allow(instance).to receive(:days_after_date_schedule)
-            described_class.new(user_session).schedule
-          end
+            it 'calls correct method' do
+              allow(instance).to receive(:days_after_date_schedule)
+              described_class.new(user_session).schedule
+            end
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)

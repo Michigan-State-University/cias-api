@@ -2,6 +2,7 @@
 
 RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   subject { described_class.call(pie_chart.id) }
+
   let_it_be(:organization) { create(:organization) }
   let_it_be(:health_system) { create(:health_system, organization: organization) }
   let_it_be(:health_clinic) { create(:health_clinic, health_system: health_system) }
@@ -26,7 +27,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
 
   let_it_be(:pie_chart) do
     create(:chart, formula: formula, dashboard_section: dashboard_section, published_at: Time.current,
-           chart_type: Chart.chart_types[:pie_chart])
+                   chart_type: Chart.chart_types[:pie_chart])
   end
 
   before_all do
