@@ -46,10 +46,8 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => 'New name'
-            },
-            'relationships' => {
-              'health_clinic_admins' => { 'data' => [] }
+              'name' => 'New name',
+              'health_clinic_admins' => []
             }
           }
         )

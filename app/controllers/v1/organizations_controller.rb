@@ -3,8 +3,11 @@
 class V1::OrganizationsController < V1Controller
   def index
     authorize! :read, Organization
-
-    render json: organizations_response(organization_scope)
+    if current_v1_user.roles.include?('health_clinic_admin')
+      render json: simple_response(organization_scope)
+    else
+      render json: organizations_response(organization_scope)
+    end
   end
 
   def show
@@ -46,6 +49,10 @@ class V1::OrganizationsController < V1Controller
 
   def organization_params
     params.require(:organization).permit(:name, organization_admins_to_add: [], organization_admins_to_remove: [])
+  end
+
+  def simple_response(organization)
+    V1::SimpleOrganizationSerializer.new(organization)
   end
 
   def organization_response(organization)

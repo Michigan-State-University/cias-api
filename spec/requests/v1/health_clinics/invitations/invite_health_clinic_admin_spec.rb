@@ -42,7 +42,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
             it 'creates new health clinic admin assigned to the health clinic' do
               expect { request }.to change(User, :count).by(1).and \
-                change { health_clinic.reload.health_clinic_admins.count }.by(1)
+                change { health_clinic.reload.user_health_clinics.count }.by(1)
 
               expect(new_health_clinic_admin).to have_attributes(
                 email: params[:email],
@@ -71,7 +71,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to change(HealthClinicInvitation, :count).by(1).and \
                 avoid_changing(User, :count).and \
-                  avoid_changing { health_clinic.reload.health_clinic_admins.count }
+                  avoid_changing { health_clinic.reload.user_health_clinics.count }
 
               expect(health_clinic_invitation).to have_attributes(
                 user_id: health_clinic_admin.id,
@@ -83,7 +83,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
           context 'health_clinic admin is already in the health_clinic' do
             before do
               health_clinic_admin.update(organizable_id: health_clinic.id)
-              health_clinic.health_clinic_admins << health_clinic_admin
+              health_clinic.user_health_clinics << UserHealthClinic.new(health_clinic: health_clinic, user: health_clinic_admin)
             end
 
             it 'does not invite health_clinic admin once again' do
@@ -91,7 +91,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to avoid_changing(HealthClinicInvitation, :count).and \
                 avoid_changing(User, :count).and \
-                  avoid_changing { health_clinic.reload.health_clinic_admins.count }
+                  avoid_changing { health_clinic.reload.user_health_clinics.count }
             end
           end
 
@@ -104,7 +104,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to avoid_changing(HealthClinicInvitation, :count).and \
                 avoid_changing(User, :count).and \
-                  avoid_changing { health_clinic.reload.health_clinic_admins.count }
+                  avoid_changing { health_clinic.reload.user_health_clinics.count }
             end
           end
 
@@ -118,7 +118,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to avoid_changing(HealthClinicInvitation, :count).and \
                 avoid_changing(User, :count).and \
-                  avoid_changing { health_clinic.reload.health_clinic_admins.count }
+                  avoid_changing { health_clinic.reload.user_health_clinics.count }
             end
           end
 
@@ -133,7 +133,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
                 expect { request }.to avoid_changing(HealthClinicInvitation, :count).and \
                   avoid_changing(User, :count).and \
-                    avoid_changing { health_clinic.reload.health_clinic_admins.count }
+                    avoid_changing { health_clinic.reload.user_health_clinics.count }
               end
             end
 
@@ -159,7 +159,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
                 expect { request }.to change(HealthClinicInvitation, :count).by(1).and \
                   avoid_changing(User, :count).and \
-                    avoid_changing { health_clinic.reload.health_clinic_admins.count }
+                    avoid_changing { health_clinic.reload.user_health_clinics.count }
 
                 expect(new_health_clinic_invitation).to have_attributes(
                   user_id: health_clinic_admin.id,
@@ -181,7 +181,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
       it 'does not create new team, returns :bad_request status' do
         expect { request }.to avoid_changing(User, :count).and \
-          avoid_changing { health_clinic.reload.health_clinic_admins.count }
+          avoid_changing { health_clinic.reload.user_health_clinics.count }
         expect(response).to have_http_status(:bad_request)
       end
     end
@@ -191,14 +191,14 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
     let(:params) { { email: 'newhealthsystemadmin@gmail.com', health_clinic_id: health_clinic.id } }
 
     context 'when user has health_clinic admin role' do
-      let(:user) { health_clinic.health_clinic_admins.first }
+      let(:user) { health_clinic.user_health_clinics.first.user }
 
       it_behaves_like 'user who is not able to invite health_clinic admin to the health_clinic'
     end
 
     context 'when user is health_clinic admin of the other health_clinic' do
       let(:other_health_clinic) { create(:health_clinic, :with_health_clinic_admin) }
-      let(:user) { other_health_clinic.health_clinic_admins.first }
+      let(:user) { other_health_clinic.user_health_clinics.first.user }
 
       it_behaves_like 'user who is not able to invite health_clinic admin to the health_clinic'
     end

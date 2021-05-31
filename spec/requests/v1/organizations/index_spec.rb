@@ -16,12 +16,12 @@ RSpec.describe 'GET /v1/organizations', type: :request do
 
   let!(:health_clinic) { create(:health_clinic) }
   let!(:health_system) { health_clinic.health_system }
-  let!(:organization_1) { health_system.organization }
-  let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:organization_3) { create(:organization, name: 'Oregano Public Health') }
+  let!(:organization1) { health_system.organization }
+  let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization3) { create(:organization, name: 'Oregano Public Health') }
 
-  let!(:organization_admin) { organization_2.organization_admins.first }
-  let!(:e_intervention_admin) { organization_2.e_intervention_admins.first }
+  let!(:organization_admin) { organization2.organization_admins.first }
+  let!(:e_intervention_admin) { organization2.e_intervention_admins.first }
 
   let(:roles) do
     {
@@ -56,10 +56,10 @@ RSpec.describe 'GET /v1/organizations', type: :request do
       it 'returns proper collection data' do
         expect(json_response['data']).to include(
           {
-            'id' => organization_1.id.to_s,
+            'id' => organization1.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization_1.name
+              'name' => organization1.name
             },
             'relationships' => {
               'e_intervention_admins' => { 'data' => [] },
@@ -69,10 +69,10 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             }
           },
           {
-            'id' => organization_2.id.to_s,
+            'id' => organization2.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization_2.name
+              'name' => organization2.name
             },
             'relationships' => {
               'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
@@ -82,10 +82,10 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             }
           },
           {
-            'id' => organization_3.id.to_s,
+            'id' => organization3.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization_3.name
+              'name' => organization3.name
             },
             'relationships' => {
               'e_intervention_admins' => { 'data' => [] },
@@ -104,7 +104,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic.name
+              'name' => health_clinic.name,
+              'health_clinic_admins' => []
             }
           }
         )
@@ -149,10 +150,10 @@ RSpec.describe 'GET /v1/organizations', type: :request do
           it 'returns proper collection data' do
             expect(json_response['data']).to include(
               {
-                'id' => organization_2.id.to_s,
+                'id' => organization2.id.to_s,
                 'type' => 'organization',
                 'attributes' => {
-                  'name' => organization_2.name
+                  'name' => organization2.name
                 },
                 'relationships' => {
                   'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
@@ -198,6 +199,29 @@ RSpec.describe 'GET /v1/organizations', type: :request do
       it 'returns proper error message' do
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
       end
+    end
+  end
+
+  context 'when user is health clinic admin' do
+    let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin) }
+    let(:user) { health_clinic.user_health_clinics.first.user }
+
+    before { request }
+
+    it 'returns correct collection data size' do
+      expect(json_response['data'].size).to eq(1)
+    end
+
+    it 'returns correct data' do
+      expect(json_response['data']).to include(
+        {
+          'id' => organization1.id.to_s,
+          'type' => 'simple_organization',
+          'attributes' => {
+            'name' => organization1.name
+          }
+        }
+      )
     end
   end
 end

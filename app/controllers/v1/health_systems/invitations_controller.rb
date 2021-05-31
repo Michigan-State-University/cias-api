@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::HealthSystems::InvitationsController < V1Controller
+  before_action :authenticate_user!, except: [:confirm]
+
   def invite_health_system_admin
     authorize! :invite_health_system_admin, HealthSystem
 

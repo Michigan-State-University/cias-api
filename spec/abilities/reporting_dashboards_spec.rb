@@ -75,9 +75,9 @@ describe ReportingDashboard do
       let!(:other_health_clinic) { create(:health_clinic, health_system: health_system) }
       let!(:other_dashboard) { other_health_clinic.health_system.organization.reporting_dashboard }
 
-      let(:user) { health_clinic.health_clinic_admins.first }
+      let(:user) { health_clinic.user_health_clinics.first.user }
 
-      it 'can read reporting dashboards of organizations that he is admin for' do
+      it 'can read reporting dashboards of health clinic that he is admin for' do
         expect(subject).to have_abilities(
           {
             read: true

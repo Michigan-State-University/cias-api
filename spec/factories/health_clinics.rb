@@ -9,7 +9,6 @@ FactoryBot.define do
       after(:build) do |health_clinic|
         health_clinic_admin = create(:user, :confirmed, :health_clinic_admin)
         health_clinic_admin.organizable = health_clinic unless health_clinic_admin.organizable
-        health_clinic.health_clinic_admins << health_clinic_admin
         UserHealthClinic.create!(user: health_clinic_admin, health_clinic: health_clinic)
       end
     end
