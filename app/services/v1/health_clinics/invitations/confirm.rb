@@ -13,10 +13,8 @@ class V1::HealthClinics::Invitations::Confirm
 
   def call
     ActiveRecord::Base.transaction do
-      user.update!(organizable: health_clinic) unless user.organizable
       user.activate!
       UserHealthClinic.create!(user: user, health_clinic: health_clinic)
-      health_clinic.health_clinic_admins << user
 
       health_clinic_invitation.update!(
         accepted_at: Time.current,

@@ -60,7 +60,7 @@ describe Chart do
     end
 
     context 'health_clinic admin' do
-      let(:user) { health_clinic.health_clinic_admins.first }
+      let(:user) { health_clinic.user_health_clinics.first.user }
 
       it 'can manage chart for organization that he is admin for' do
         expect(subject).to have_abilities(:read, chart)

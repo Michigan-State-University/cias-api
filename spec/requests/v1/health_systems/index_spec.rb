@@ -95,8 +95,9 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
             'id' => health_clinic.id,
             'type' => 'health_clinic',
             'attributes' => {
-              'health_system_id' => health_system3.id,
-              'name' => health_clinic.name
+              'health_system_id' => health_system_3.id,
+              'name' => health_clinic.name,
+              'health_clinic_admins' => []
             }
           }
         )
@@ -145,6 +146,33 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
     end
   end
 
+  context 'when user is health system admin' do
+    let!(:user) { health_system_admin }
+
+    before { request }
+
+    it 'returns proper collection size' do
+      expect(json_response['data'].size).to eq(1)
+    end
+
+    it 'returns proper collection data' do
+      expect(json_response['data']).to include(
+        {
+          'id' => health_system_2.id.to_s,
+          'type' => 'health_system',
+          'attributes' => {
+            'name' => health_system_2.name,
+            'organization_id' => health_system_2.organization.id
+          },
+          'relationships' => {
+            'health_system_admins' => { 'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }] },
+            'health_clinics' => { 'data' => [] }
+          }
+        }
+      )
+    end
+  end
+
   context 'when user is not permitted' do
     shared_examples 'unpermitted user' do
       before { request }
@@ -154,7 +182,7 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
       end
     end
 
-    %i[health_system_admin team_admin researcher participant guest].each do |role|
+    %i[team_admin researcher participant guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

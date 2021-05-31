@@ -19,9 +19,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
   end
   let!(:health_system) { create(:health_system, :with_clinics, organization: organization) }
   let!(:health_clinic) { health_system.health_clinics.first }
-  let!(:organization1) do
-    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health')
-  end
+  let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
 
   let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:organization_admin) { organization.organization_admins.first }
@@ -109,7 +107,8 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic.name
+              'name' => health_clinic.name,
+              'health_clinic_admins' => []
             }
           }
         )

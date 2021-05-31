@@ -7,13 +7,9 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) do
-    create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization)
-  end
-  let!(:health_clinic) do
-    create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system)
-  end
-  let!(:health_clinic_admin) { health_clinic.health_clinic_admins.first }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
+  let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let!(:health_clinic_admin) { health_clinic.user_health_clinics.first.user }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_health_clinic_path(health_clinic.id), headers: headers }

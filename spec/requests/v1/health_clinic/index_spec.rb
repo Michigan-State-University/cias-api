@@ -32,7 +32,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
     it_behaves_like 'authorized user'
   end
 
-  context 'whe user is permitted' do
+  context 'when user is permitted' do
     shared_examples 'permitted user' do
       before { request }
 
@@ -47,10 +47,8 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic1.name
-            },
-            'relationships' => {
-              'health_clinic_admins' => { 'data' => [] }
+              'name' => health_clinic1.name,
+              'health_clinic_admins' => []
             }
           },
           {
@@ -58,10 +56,8 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic2.name
-            },
-            'relationships' => {
-              'health_clinic_admins' => { 'data' => [] }
+              'name' => health_clinic2.name,
+              'health_clinic_admins' => []
             }
           }
         )
@@ -99,7 +95,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
         end
       end
 
-      %i[health_system_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+      %i[health_system_admin team_admin researcher participant guest].each do |role|
         context "user is #{role}" do
           let(:user) { create(:user, :confirmed, role) }
           let(:headers) { user.create_new_auth_token }
@@ -117,6 +113,40 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
           expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
         end
       end
+    end
+  end
+
+  context 'when user is health_clinic_admin' do
+    let!(:health_clinic1) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 1', health_system: health_system) }
+    let!(:health_clinic2) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 2', health_system: health_system) }
+    let(:user) { health_clinic1.user_health_clinics.first.user }
+
+    before { request }
+
+    it 'returns correct health clinic size' do
+      expect(json_response['data'].size).to eq(1)
+    end
+
+    it 'return proper collection data' do
+      expect(json_response['data']).to include(
+        {
+          'id' => health_clinic1.id.to_s,
+          'type' => 'health_clinic',
+          'attributes' => {
+            'health_system_id' => health_system.id,
+            'name' => health_clinic1.name,
+            'health_clinic_admins' => [include({ 'id' => user.id })]
+          }
+        }
+      ).and not_include({
+                          'id' => health_clinic2.id.to_s,
+                          'type' => 'health_clinic',
+                          'attributes' => {
+                            'health_system_id' => health_system.id,
+                            'name' => health_clinic2.name,
+                            'health_clinic_admins' => []
+                          }
+                        })
     end
   end
 end
