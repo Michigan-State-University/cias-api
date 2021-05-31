@@ -16,9 +16,9 @@ RSpec.describe 'POST /v1/organizations/:organization_id/sessions/:session_id/inv
     {
       session_invitations:
         [{
-           health_clinic_id: health_clinic1.id,
-           emails: %w[test1@dom.com test2@com.com]
-         },
+          health_clinic_id: health_clinic1.id,
+          emails: %w[test1@dom.com test2@com.com]
+        },
          {
            health_clinic_id: health_clinic2.id,
            emails: %w[test3@dom.com test4@com.com]

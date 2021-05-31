@@ -3,8 +3,8 @@
 class V1::HealthClinicsController < V1Controller
   def index
     authorize! :read, HealthClinic
-
-    render json: serialized_response(clinic_scope)
+    health_clinics = clinic_scope.joins(:health_system).where(health_systems: { organization_id: filter_params })
+    render json: serialized_response(health_clinics)
   end
 
   def show
@@ -48,10 +48,13 @@ class V1::HealthClinicsController < V1Controller
     params.require(:health_clinic).permit(:name, :health_system_id)
   end
 
+  def filter_params
+    params.require(:organization_id)
+  end
+
   def health_clinic_response(health_clinic)
     V1::HealthClinicSerializer.new(
-      health_clinic,
-      { include: %i[health_clinic_admins] }
+      health_clinic
     )
   end
 end

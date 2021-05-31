@@ -16,7 +16,7 @@ class V1::HealthClinics::InviteHealthClinicAdmin
 
     if user.blank?
       new_user = User.invite!(email: email, roles: ['health_clinic_admin'], organizable_id: health_clinic.id, organizable_type: 'HealthClinic')
-      health_clinic.health_clinic_admins << new_user
+      health_clinic.user_health_clinics << new_user
     else
       V1::HealthClinics::Invitations::Create.call(health_clinic, user)
     end
@@ -27,7 +27,8 @@ class V1::HealthClinics::InviteHealthClinicAdmin
   attr_reader :health_clinic, :email
 
   def already_in_the_health_clinic?
-    health_clinic.health_clinic_admins.exists?(email: email)
+    user_id = User.find_by(email: email)
+    health_clinic.user_health_clinics.exists?(user_id: user_id)
   end
 
   def user_is_not_health_clinic_admin?

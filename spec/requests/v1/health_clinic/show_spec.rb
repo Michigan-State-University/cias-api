@@ -10,7 +10,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
-  let!(:health_clinic_admin) { health_clinic.health_clinic_admins.first }
+  let!(:health_clinic_admin) { health_clinic.user_health_clinics.first }
 
   let(:roles_organization) do
     {
