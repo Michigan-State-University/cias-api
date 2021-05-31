@@ -110,8 +110,9 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
 
         it 'has correct patterns data' do
           expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5',
-                                                                                           'target' => [{ 'id' => '',
-                                                                                                          'type' => 'Question', 'probability' => '100' }])
+                                                                                           'target' =>
+                                                                                             [{ 'id' => '', 'type' => 'Question',
+                                                                                                'probability' => '100' }])
         end
 
         it 'has correct body data size' do

@@ -13,7 +13,8 @@ AllCops:
     - 'config.ru'
     - 'vendor/bundle/**/*'
     - 'lib/tasks/one_time_use/*'
-    - 'db/migration'
+    - 'db/migrate/*'
+    - 'config/initializers/devise.rb'
 
 Bundler/OrderedGems:
   Enabled: false
@@ -29,9 +30,11 @@ Layout/EmptyLinesAroundAttributeAccessor:
 
 Layout/LineLength:
   Enabled: true
-  Max: 150
+  Max: 160
   Exclude:
     - 'spec/requests/v1/questions/update_narrator_spec.rb'
+    - 'spec/requests/v1/question_groups/share_spec.rb'
+    - 'spec/requests/v1/interventions/answers/index_spec.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
@@ -57,6 +60,15 @@ Lint/DuplicateRequire:
 
 Lint/DuplicateRescueException:
   Enabled: true
+
+Lint/DuplicateMethods:
+  Exclude:
+    - 'app/models/intervention/csv/harvester.rb'
+
+Lint/EmptyBlock:
+  Exclude:
+    - 'spec/factories/question_groups.rb'
+    - 'spec/models/intervention/csv_spec.rb'
 
 Lint/EmptyConditionalBody:
   Enabled: true
@@ -99,6 +111,11 @@ Lint/UnreachableLoop:
 
 Lint/UselessMethodDefinition:
   Enabled: true
+
+Lint/Void:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*'
 
 Metrics/AbcSize:
   Enabled: false
@@ -143,6 +160,9 @@ Performance/StringInclude:
   Enabled: true
 
 Performance/CollectionLiteralInLoop:
+  Enabled: false
+
+Performance/MethodObjectAsBlock:
   Enabled: false
 
 Style/AccessorGrouping:
@@ -205,7 +225,7 @@ Style/KeywordParametersOrder:
   Enabled: true
 
 Style/OptionalBooleanParameter:
-  Enabled: true
+  Enabled: false
 
 Style/RedundantAssignment:
   Enabled: true
@@ -241,6 +261,10 @@ Style/StructInheritance:
   Exclude:
     - 'app/policies/**/*'
 
+Style/DocumentDynamicEvalDefinition:
+  Exclude:
+    - 'app/controllers/v1/auth_controller.rb'
+
 Rails/ActiveRecordCallbacksOrder:
   Enabled: true
 
@@ -258,9 +282,15 @@ Rails/Inquiry:
 
 Rails/InverseOf:
   Enabled: true
+  Exclude:
+    - 'app/models/organization.rb'
+    - 'app/models/health_system.rb'
+    - 'app/models/health_clinic.rb'
 
 Rails/LexicallyScopedActionFilter:
   Enabled: true
+  Exclude:
+    - 'app/controllers/v1/auth/sessions_controller.rb'
 
 Rails/MailerName:
   Enabled: true
@@ -295,12 +325,22 @@ Rails/SkipsModelValidations:
     - 'lib/tasks/one_time_use/enable_sms_notification_for_users.rake'
     - 'app/models/question/narrator/**/*'
     - 'spec/**/*'
+    - 'app/services/v1/generated_reports/share_to_participant.rb'
+    - 'app/services/v1/report_templates/variants/update.rb'
+    - 'app/services/v1/audio_service.rb'
 
 Rails/WhereExists:
   Enabled: true
 
 Rails/EnvironmentVariableAccess:
   AllowReads: true
+
+Rails/FilePath:
+  Exclude:
+    - 'spec/factories/report_templates.rb'
+    - 'spec/factories/report_template_section_variants.rb'
+    - 'spec/factories/generated_reports.rb'
+    - 'spec/abilities/sms_plans.rb'
 
 RSpec/ContextWording:
   Enabled: false
@@ -321,8 +361,7 @@ RSpec/ImplicitExpect:
 RSpec/InstanceVariable:
   AssignmentOnly: false
   Exclude:
-    - 'spec/services/v1/generated_reports/create_spec.rb'
-    - 'spec/services/v1/generated_reports/create_spec.rb'
+    - 'spec/**/*'
 
 RSpec/LetSetup:
   Enabled: false
@@ -344,12 +383,27 @@ RSpec/NestedGroups:
 
 RSpec/VerifiedDoubles:
   Exclude:
-    - 'spec/services/v1/report_templates/generate_pdf_preview_spec.rb'
+    - 'spec/**/*'
 
 RSpec/FilePath:
   Exclude:
     - 'spec/services/v1/questions/clone_multiple_questions_spec.rb'
+    - 'spec/abilities/report_template_section_variants_spec.rb'
+    - 'spec/abilities/report_template_sections_spec.rb'
+    - 'spec/factories/generated_reports.rb'
+    - 'spec/factories/report_template_section_variants.rb'
+    - 'spec/factories/report_templates.rb'
+    - 'spec/models/question/participant_raport_spec.rb'
+    - 'spec/abilities/sms_plans.rb'
 
 RSpec/AnyInstance:
   Exclude:
-    - 'spec/services/v1/generated_reports/create_spec.rb'
+    - 'spec/**/*'
+
+RSpec/StubbedMock:
+  Exclude:
+    - 'spec/requests/v1/organizations/invitations/invite_organization_admin_spec.rb'
+
+Naming/AccessorMethodName:
+  Exclude:
+    - 'app/services/v1/users/phone_service.rb'

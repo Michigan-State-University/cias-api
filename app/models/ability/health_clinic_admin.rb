@@ -12,6 +12,8 @@ class Ability::HealthClinicAdmin < Ability::Base
     can :read, ReportingDashboard,
         organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } }
     can :read, Chart,
-        dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } } } }
+        dashboard_section: { reporting_dashboard: {
+          organization: { health_systems: { health_clinics: { health_clinic_admins: { id: user.id } } } }
+        } }
   end
 end

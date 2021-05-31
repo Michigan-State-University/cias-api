@@ -31,12 +31,12 @@ class Question < ApplicationRecord
                                          Rails.root.join("#{json_schema_path}/settings.json").to_s
                                        }, message: lambda { |err|
                                                      err
-                                                   }                                                                                                                   }
+                                                   } }
   validates :narrator, json: { schema: lambda {
                                          Rails.root.join("#{json_schema_path}/narrator.json").to_s
                                        }, message: lambda { |err|
                                                      err
-                                                   }                                                                                                                   }
+                                                   } }
   validates :video_url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :formula, presence: true, json: { schema: lambda {
                                                         Rails.root.join("#{json_schema_path}/formula.json").to_s

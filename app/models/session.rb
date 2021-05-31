@@ -28,7 +28,11 @@ class Session < ApplicationRecord
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
 
-  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill', days_after_date: 'days_after_date' },
+  enum schedule: { days_after: 'days_after',
+                   days_after_fill: 'days_after_fill',
+                   exact_date: 'exact_date',
+                   after_fill: 'after_fill',
+                   days_after_date: 'days_after_date' },
        _prefix: :schedule
 
   delegate :published?, to: :intervention
