@@ -59,22 +59,12 @@ RSpec.describe 'POST /v1/health_systems/:health_system_id/invitations/invite_hea
               allow_any_instance_of(HealthSystemInvitation).to receive(:invitation_token).and_return(token)
             end
 
-            it 'creates invitation for the existing health_system admin' do
-              expect(OrganizableMailer).to receive(:invite_user).with(
-                email: health_system_admin.email,
-                organizable: health_system,
-                invitation_token: token,
-                organizable_type: 'Health System'
-              ).and_return(double(deliver_later: nil))
+            it 'does not create invitation for the existing health_system admin' do
+              expect(OrganizableMailer).not_to receive(:invite_user)
 
-              expect { request }.to change(HealthSystemInvitation, :count).by(1).and \
+              expect { request }.to avoid_changing(HealthSystemInvitation, :count).and \
                 avoid_changing(User, :count).and \
                   avoid_changing { health_system.reload.health_system_admins.count }
-
-              expect(health_system_invitation).to have_attributes(
-                user_id: health_system_admin.id,
-                health_system_id: health_system.id
-              )
             end
           end
 
@@ -147,22 +137,12 @@ RSpec.describe 'POST /v1/health_systems/:health_system_id/invitations/invite_hea
                     and_return(token)
               end
 
-              it 'creates invitation for the existing health_system admin' do
-                expect(OrganizableMailer).to receive(:invite_user).with(
-                  email: health_system_admin.email,
-                  organizable: health_system,
-                  invitation_token: token,
-                  organizable_type: 'Health System'
-                ).and_return(double(deliver_later: nil))
+              it 'does not create invitation invitation for the existing health_system admin' do
+                expect(OrganizableMailer).not_to receive(:invite_user)
 
-                expect { request }.to change(HealthSystemInvitation, :count).by(1).and \
-                  avoid_changing(User, :count).and \
-                    avoid_changing { health_system.reload.health_system_admins.count }
-
-                expect(new_health_system_invitation).to have_attributes(
-                  user_id: health_system_admin.id,
-                  health_system_id: health_system.id
-                )
+                expect { request }.to avoid_changing(HealthSystemInvitation, :count).and \
+                avoid_changing(User, :count).and \
+                  avoid_changing { health_system.reload.health_system_admins.count }
               end
             end
           end
