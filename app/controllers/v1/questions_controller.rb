@@ -43,6 +43,7 @@ class V1::QuestionsController < V1Controller
 
   def share
     authorize! :create, Question
+
     share_service.share(question_ids, researcher_ids)
 
     head :created
@@ -50,6 +51,7 @@ class V1::QuestionsController < V1Controller
 
   def clone_multiple
     authorize! :create, Question
+
     cloned_questions = question_service.clone_multiple(session_id, question_ids)
 
     render json: serialized_response(cloned_questions), status: :created

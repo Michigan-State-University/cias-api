@@ -3,38 +3,48 @@
 class V1::SessionsController < V1Controller
   include Resource::Position
 
-  authorize_resource only: %i[create update destroy clone]
-
   def index
+    authorize! :index, Session
+
     render json: serialized_response(sessions_scope)
   end
 
   def show
+    authorize! :read, Session
+
     render json: serialized_response(session_service.session_load(session_id))
   end
 
   def create
+    authorize! :create, Session
+
     session = session_service.create(session_params)
     render json: serialized_response(session), status: :created
   end
 
   def update
+    authorize! :update, Session
+
     session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
   end
 
   def destroy
+    authorize! :destroy, Session
+
     session_service.destroy(session_id)
     head :no_content
   end
 
   def duplicate
+    authorize! :duplicate, Session
+
     session = session_service.duplicate(session_id, new_intervention_id)
     render json: serialized_response(session), status: :created
   end
 
   def clone
-    authorize! :update, Session
+    authorize! :clone, Session
 
     intervention = session_obj.intervention
     position = intervention.sessions.order(:position).last.position + 1
