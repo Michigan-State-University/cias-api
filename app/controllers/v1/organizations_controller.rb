@@ -3,6 +3,7 @@
 class V1::OrganizationsController < V1Controller
   def index
     authorize! :read, Organization
+
     if current_v1_user.roles.include?('health_clinic_admin')
       render json: simple_response(organization_scope)
     else

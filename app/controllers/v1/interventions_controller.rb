@@ -13,12 +13,14 @@ class V1::InterventionsController < V1Controller
 
   def create
     authorize! :create, Intervention
+
     intervention = current_v1_user.interventions.create!(intervention_params)
     render json: serialized_response(intervention), status: :created
   end
 
   def update
     authorize! :update, Intervention
+
     intervention = intervention_load
     intervention.assign_attributes(intervention_params)
     intervention.integral_update

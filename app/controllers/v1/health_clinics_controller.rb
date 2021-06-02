@@ -3,6 +3,7 @@
 class V1::HealthClinicsController < V1Controller
   def index
     authorize! :read, HealthClinic
+
     health_clinics = clinic_scope
     health_clinics = health_clinics.joins(:health_system).where(health_systems: { organization_id: filter_params }) unless filter_params.nil?
     render json: serialized_response(health_clinics)
