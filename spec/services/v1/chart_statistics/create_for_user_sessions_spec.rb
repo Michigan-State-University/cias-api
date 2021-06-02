@@ -2,6 +2,7 @@
 
 RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   subject { described_class.call(pie_chart.id) }
+
   let_it_be(:organization) { create(:organization) }
   let_it_be(:health_system) { create(:health_system, organization: organization) }
   let_it_be(:health_clinic) { create(:health_clinic, health_system: health_system) }
@@ -9,7 +10,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   let_it_be(:user) { create(:user) }
   let_it_be(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
   let_it_be(:dashboard_section) { create(:dashboard_section, reporting_dashboard: reporting_dashboard) }
-  let_it_be(:session_variable) {"session_var"}
+  let_it_be(:session_variable) { 'session_var' }
   let_it_be(:formula) do
     { 'payload' => "#{session_variable}.color + #{session_variable}.sport",
       'patterns' => [
@@ -27,7 +28,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
 
   let_it_be(:pie_chart) do
     create(:chart, formula: formula, dashboard_section: dashboard_section, published_at: Time.current,
-           chart_type: Chart.chart_types[:pie_chart])
+                   chart_type: Chart.chart_types[:pie_chart])
   end
 
   before_all do

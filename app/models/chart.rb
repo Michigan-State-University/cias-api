@@ -27,7 +27,6 @@ class Chart < ApplicationRecord
     return unless saved_change_to_attribute?(:status)
 
     CreateChartStatisticsJob.perform_later(id) if status == 'data_collection'
-
   end
 
   def json_schema_path
