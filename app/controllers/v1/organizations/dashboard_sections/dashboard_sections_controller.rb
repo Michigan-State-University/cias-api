@@ -6,7 +6,10 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
   def index
     authorize! :read, DashboardSection
 
-    render json: dashboard_section_response(dashboard_section_scope)
+    sections = dashboard_section_scope
+
+    sections = sections.joins(:charts).where(charts: { status: :published }) if filter_status
+    render json: dashboard_section_response(sections)
   end
 
   def show
@@ -50,10 +53,14 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
     params.require(:dashboard_section).permit(:name, :description)
   end
 
+  def filter_status
+    params[:published]
+  end
+
   def dashboard_section_response(response)
     V1::DashboardSectionSerializer.new(
       response,
-      { include: %i[charts] }
+      { include: %i[charts], params: { only_published: filter_status } }
     )
   end
 end
