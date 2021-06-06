@@ -15,7 +15,7 @@ class V1::ChartStatistics::CreateForUserSession
     return unless organization
 
     charts.each do |chart|
-      next unless chart.published_at
+      next if chart.status == 'draft'
 
       V1::ChartStatistics::Create.call(chart, user_session, organization)
     end

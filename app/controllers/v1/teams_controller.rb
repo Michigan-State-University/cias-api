@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class V1::TeamsController < V1Controller
-  authorize_resource only: %i[index show create update destroy]
-
   def index
+    authorize! :index, Team
+
     paginated_teams_scope = paginate(teams_scope, params)
 
     render json: V1::TeamSerializer.new(
@@ -13,20 +13,28 @@ class V1::TeamsController < V1Controller
   end
 
   def show
+    authorize! :show, Team
+
     render json: team_serialized_response(team)
   end
 
   def create
+    authorize! :create, Team
+
     new_team = V1::Teams::Create.call(team_params)
     render json: team_serialized_response(new_team), status: :created
   end
 
   def update
+    authorize! :update, Team
+
     updated_team = V1::Teams::Update.call(team, team_params, current_ability)
     render json: team_serialized_response(updated_team)
   end
 
   def destroy
+    authorize! :destroy, Team
+
     V1::Teams::Destroy.call(team)
     head :no_content
   end

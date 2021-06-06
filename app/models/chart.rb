@@ -18,11 +18,20 @@ class Chart < ApplicationRecord
   enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
   enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
 
+  after_update_commit :status_change
+
   def integral_update(chart_params)
     return if published?
 
     assign_attributes(chart_params)
     save!
+  end
+
+  def status_change
+    return unless saved_change_to_attribute?(:status)
+
+    CreateChartStatisticsJob.perform_later(id) if status == 'data_collection'
+
   end
 
   def json_schema_path

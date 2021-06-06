@@ -2,7 +2,7 @@
 
 class V1::Interventions::LogosController < V1Controller
   def create
-    authorize_user
+    authorize! :add_logo, Intervention
     return render status: :method_not_allowed if intervention_published?
 
     intervention_load.update!(logo: intervention_params[:file])
@@ -11,7 +11,7 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   def destroy
-    authorize_user
+    authorize! :add_logo, Intervention
     return render status: :method_not_allowed if intervention_published?
 
     intervention_load.logo.purge_later
@@ -20,10 +20,6 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   private
-
-  def authorize_user
-    authorize! :add_logo, Intervention
-  end
 
   def intervention_load
     Intervention.accessible_by(current_ability).find(params[:interventions_id])

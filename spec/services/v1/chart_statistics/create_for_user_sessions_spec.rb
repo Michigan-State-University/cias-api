@@ -10,8 +10,9 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   let_it_be(:user) { create(:user) }
   let_it_be(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
   let_it_be(:dashboard_section) { create(:dashboard_section, reporting_dashboard: reporting_dashboard) }
+  let_it_be(:session_variable) {"session_var"}
   let_it_be(:formula) do
-    { 'payload' => 'color + sport',
+    { 'payload' => "#{session_variable}.color + #{session_variable}.sport",
       'patterns' => [
         {
           'match' => '=2',
@@ -34,7 +35,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      session = create(:session, intervention: intervention)
+      session = create(:session, intervention: intervention, variable: session_variable)
       user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
 
       @answer1 = create(:answer_single, user_session: user_session, body: { data: [{ var: 'color', value: '1' }] })
