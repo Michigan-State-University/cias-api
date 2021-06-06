@@ -7,9 +7,7 @@ describe 'GET /v1/sessions/:session_id/question_groups/:id', type: :request do
 
   let!(:session) { create(:session, intervention: create(:intervention, :published)) }
   let!(:question_group) { create(:question_group, session: session, title: 'QuestionGroup Title') }
-  let!(:questions)      do
-    create_list(:question_free_response, 3, title: 'Question Title', question_group: question_group)
-  end
+  let!(:questions) { create_list(:question_free_response, 3, title: 'Question Title', question_group: question_group) }
 
   context 'when authenticated as admin user' do
     let(:guest_user) { create(:user, :admin) }
