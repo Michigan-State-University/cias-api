@@ -67,19 +67,19 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     end
     let_it_be(:pie_chart1) do
       create(:chart, formula: formula1, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:pie_chart])
+                     chart_type: Chart.chart_types[:pie_chart])
     end
     let_it_be(:pie_chart2) do
       create(:chart, formula: formula2, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:pie_chart])
+                     chart_type: Chart.chart_types[:pie_chart])
     end
     let_it_be(:bar_chart1) do
       create(:chart, formula: formula3, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:bar_chart])
+                     chart_type: Chart.chart_types[:bar_chart])
     end
     let_it_be(:bar_chart2) do
       create(:chart, formula: formula4, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:bar_chart])
+                     chart_type: Chart.chart_types[:bar_chart])
     end
     context 'when user session contains all values of chart formula' do
       before_all do

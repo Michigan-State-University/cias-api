@@ -10,7 +10,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
   let_it_be(:user) { create(:user) }
   let_it_be(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
   let_it_be(:dashboard_section) { create(:dashboard_section, reporting_dashboard: reporting_dashboard) }
-  let_it_be(:session_variable) {"session_var"}
+  let_it_be(:session_variable) { 'session_var' }
   let_it_be(:formula) do
     { 'payload' => "#{session_variable}.color + #{session_variable}.sport",
       'patterns' => [
