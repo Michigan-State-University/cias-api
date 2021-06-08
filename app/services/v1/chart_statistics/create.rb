@@ -12,6 +12,7 @@ class V1::ChartStatistics::Create
   end
 
   def call
+    return if health_clinic.nil?
     return if dentaku_service.exist_missing_variables?
 
     ChartStatistic.find_or_create_by!(

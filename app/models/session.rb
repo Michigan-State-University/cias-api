@@ -89,7 +89,7 @@ class Session < ApplicationRecord
       end
     end
 
-    SessionJobs::Invitation.perform_later(id, emails)
+    SessionJobs::Invitation.perform_later(id, emails, health_clinic_id)
   end
 
   def send_link_to_session(user, health_clinic_id = nil)
