@@ -6,7 +6,7 @@ class Phone < ApplicationRecord
   validates :iso, :prefix, :number, presence: true
   before_update :remove_confirmation, if: :number_changed?
 
-  encrypts :number
+  encrypts :number, migrating: true
 
   def token_correct?(code)
     code == confirmation_code
