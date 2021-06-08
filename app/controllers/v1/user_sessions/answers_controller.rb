@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 class V1::UserSessions::AnswersController < V1Controller
-  authorize_resource only: :create
-
   def index
+    authorize! :index, Answer
+
     render json: serialized_response(answers_scope)
   end
 
   def show
+    authorize! :read, Answer
+
     render json: serialized_response(answer_load)
   end
 

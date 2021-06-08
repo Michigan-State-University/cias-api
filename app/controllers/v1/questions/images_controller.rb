@@ -2,12 +2,16 @@
 
 class V1::Questions::ImagesController < V1Controller
   def create
+    authorize! :update, Question
+
     question_load.update!(image: question_params[:file])
     invalidate_cache(question_load)
     render json: serialized_response(question_load, 'Question'), status: :created
   end
 
   def destroy
+    authorize! :destroy, Question
+
     question_load.image.purge
     invalidate_cache(question_load)
     render json: serialized_response(question_load, 'Question')

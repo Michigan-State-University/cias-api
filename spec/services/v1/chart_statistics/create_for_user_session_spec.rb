@@ -67,19 +67,19 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     end
     let_it_be(:pie_chart1) do
       create(:chart, formula: formula1, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:pie_chart])
+                     chart_type: Chart.chart_types[:pie_chart])
     end
     let_it_be(:pie_chart2) do
       create(:chart, formula: formula2, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:pie_chart])
+                     chart_type: Chart.chart_types[:pie_chart])
     end
     let_it_be(:bar_chart1) do
       create(:chart, formula: formula3, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:bar_chart])
+                     chart_type: Chart.chart_types[:bar_chart])
     end
     let_it_be(:bar_chart2) do
       create(:chart, formula: formula4, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:bar_chart])
+                     chart_type: Chart.chart_types[:bar_chart])
     end
     context 'when user session contains all values of chart formula' do
       before_all do
@@ -133,16 +133,17 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       end
       let!(:chart_statistic2) do
         create(:chart_statistic, label: 'Other', organization: organization, health_system: health_system,
-               health_clinic: health_clinic, chart: pie_chart2, user: user)
+                                 health_clinic: health_clinic, chart: pie_chart2, user: user)
       end
       let!(:chart_statistic3) do
         create(:chart_statistic, label: 'Matched', organization: organization, health_system: health_system,
-               health_clinic: health_clinic, chart: bar_chart1, user: user)
+                                 health_clinic: health_clinic, chart: bar_chart1, user: user)
       end
       let!(:chart_statistic4) do
         create(:chart_statistic, label: 'NotMatched', organization: organization, health_system: health_system,
-               health_clinic: health_clinic, chart: bar_chart2, user: user)
+                                 health_clinic: health_clinic, chart: bar_chart2, user: user)
       end
+
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)

@@ -141,8 +141,8 @@ RSpec.describe 'POST /v1/health_systems/:health_system_id/invitations/invite_hea
                 expect(OrganizableMailer).not_to receive(:invite_user)
 
                 expect { request }.to avoid_changing(HealthSystemInvitation, :count).and \
-                avoid_changing(User, :count).and \
-                  avoid_changing { health_system.reload.health_system_admins.count }
+                  avoid_changing(User, :count).and \
+                    avoid_changing { health_system.reload.health_system_admins.count }
               end
             end
           end
