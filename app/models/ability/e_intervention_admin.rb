@@ -43,5 +43,6 @@ class Ability::EInterventionAdmin < Ability::Base
     can :manage, ReportingDashboard, organization: { e_intervention_admins: { id: user.id } }
     can :manage, DashboardSection, reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } }
     can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } } }
+    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } } } }
   end
 end

@@ -1,0 +1,103 @@
+# frozen_string_literal: true
+
+class V1::Organizations::ChartsData::ChartsDataController < V1Controller
+  def generate_charts_data
+    authorize! :read, ChartStatistic
+
+    data_collection = charts_data_collection
+
+    pie_charts_data = V1::ChartStatistics::GenerateStatistics.new(pie_charts_data_collection(data_collection))
+                                                             .generate_pie_chart_statistics
+
+    bar_charts_data = V1::ChartStatistics::GenerateStatistics.new(bar_charts_data_collection(data_collection))
+                                                             .generate_bar_chart_statistics
+
+    render json: charts_data_response(pie_charts_data, bar_charts_data)
+  end
+
+  def generate_chart_data
+    authorize! :read, ChartStatistic
+
+    chart = load_chart
+    data_collection = charts_data_collection
+    result = []
+
+    if chart&.pie_chart?
+      result = V1::ChartStatistics::GenerateStatistics.new(pie_chart_data_collection(data_collection))
+                                                      .generate_pie_chart_statistics
+    elsif chart&.bar_chart? || chart&.percentage_bar_chart?
+      result = V1::ChartStatistics::GenerateStatistics.new(bar_chart_data_collection(data_collection))
+                                                      .generate_bar_chart_statistics
+    end
+
+    render json: result.first
+  end
+
+  private
+
+  def organization
+    @organization ||= Organization.accessible_by(current_ability).find(params[:organization_id])
+  end
+
+  def charts_data_params
+    params.require(:charts_data).permit(:start_date, :end_date, clinic_ids: [])
+  end
+
+  def start_date
+    charts_data_params[:start_date]
+  end
+
+  def end_date
+    charts_data_params[:end_date]
+  end
+
+  def date_range
+    start_date.to_date.beginning_of_day..end_date.to_date.end_of_day
+  end
+
+  def clinic_ids
+    charts_data_params[:clinic_ids]
+  end
+
+  def chart_id
+    params[:chart_id]
+  end
+
+  def load_chart_statistics
+    ChartStatistic.accessible_by(current_ability).where(chart_id: chart_id)
+  end
+
+  def load_chart
+    Chart.find_by(id: params[:chart_id])
+  end
+
+  def charts_data_collection
+    data_collection = ChartStatistic.accessible_by(current_ability).where(organization_id: organization.id)
+    data_collection = data_collection&.where(health_clinic_id: clinic_ids) if clinic_ids.present?
+    data_collection = data_collection&.where(created_at: date_range) if start_date.present? && end_date.present?
+    data_collection&.joins(:chart)
+  end
+
+  def pie_charts_data_collection(data_collection)
+    data_collection&.where(charts: { chart_type: 'pie_chart' })
+  end
+
+  def bar_charts_data_collection(data_collection)
+    data_collection&.where(charts: { chart_type: %w[bar_chart percentage_bar_chart] })
+  end
+
+  def bar_chart_data_collection(data_collection)
+    bar_charts_data_collection(data_collection).where(chart_id: chart_id)
+  end
+
+  def pie_chart_data_collection(data_collection)
+    pie_charts_data_collection(data_collection).where(chart_id: chart_id)
+  end
+
+  def charts_data_response(pie_charts_data, bar_charts_data)
+    {
+      'pie_charts' => pie_charts_data,
+      'bar_charts' => bar_charts_data
+    }
+  end
+end
