@@ -77,8 +77,8 @@ class User < ApplicationRecord
     end
   }
 
-  encrypts :email, :first_name, :last_name, :uid
-  blind_index :email, :uid
+  encrypts :email, :first_name, :last_name, :uid, migrating: true
+  blind_index :email, :uid, migrating: true
 
   def self.detailed_search(params)
     scope = all

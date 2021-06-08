@@ -5,8 +5,8 @@ class Invitation < ApplicationRecord
   belongs_to :invitable, polymorphic: true
   belongs_to :health_clinic, optional: true
 
-  encrypts :email
-  blind_index :email
+  encrypts :email, migrating: true
+  blind_index :email, migrating: true
 
   def resend
     invited_user = User.find_by(email: email)
