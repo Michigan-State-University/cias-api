@@ -5,6 +5,6 @@ class RemoveVoiceColumnFromSessions < ActiveRecord::Migration[6.0]
     remove_column :sessions, :language_code, :string
     remove_column :sessions, :voice_name, :string
 
-    add_reference :sessions, :google_tts_voice, default: 43, null: true, foreign_key: true
+    add_reference :sessions, :google_tts_voice, default: null, null: true, foreign_key: true
   end
 end
