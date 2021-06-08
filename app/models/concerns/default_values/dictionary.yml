@@ -4,10 +4,10 @@ session:
       voice: true
       animation: true
   formula:
-    payload: ""
-    patterns: []
+    payload: ''
+    patterns: [ ]
   body:
-    data: []
+    data: [ ]
 question:
   settings:
     image: false
@@ -20,15 +20,24 @@ question:
       animation: true
     blocks: []
   formula:
-    payload: ""
+    payload: ''
     patterns: []
   body:
     data: []
 chart:
   formula:
-    payload: ""
-    patterns: [{ match: "", label: "Label1", color: "#C766EA" }]
-    default_pattern: { label: "Other", color: "#E2B1F4" }
+    payload: ''
+    patterns: [
+      {
+        match: '',
+        label: 'Label1',
+        color: '#C766EA'
+      }
+    ]
+    default_pattern: {
+      label: 'Other',
+      color: '#E2B1F4'
+    }
 user:
   roles:
     - participant
