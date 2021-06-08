@@ -3,6 +3,7 @@
 class V1::UserSessions::QuestionsController < V1Controller
   def index
     authorize! :read, user_session
+
     next_question = V1::FlowService.new(user_session).user_session_question(preview_question_id)
     response = serialized_hash(
       next_question[:question],

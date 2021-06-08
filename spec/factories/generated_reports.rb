@@ -9,6 +9,18 @@ FactoryBot.define do
 
     trait(:third_party) do
       report_for { 'third_party' }
+
+      transient do
+        third_party_id { nil }
+      end
+
+      after(:create) do |report, evaluator|
+        if evaluator.third_party_id
+          report.generated_reports_third_party_users.create(
+            third_party_id: evaluator.third_party_id
+          )
+        end
+      end
     end
 
     trait(:participant) do
@@ -24,7 +36,9 @@ FactoryBot.define do
     end
 
     trait(:shared_to_third_party) do
-      third_party_id { create(:user, :confirmed, :third_party).id }
+      after(:create) do |report, _|
+        report.third_party_users << create(:user, :confirmed, :third_party)
+      end
     end
 
     trait :with_pdf_report do

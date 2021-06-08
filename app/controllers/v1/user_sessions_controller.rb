@@ -4,7 +4,11 @@ class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
-    user_session = UserSession.find_or_initialize_by(session_id: user_session_params[:session_id], user_id: current_v1_user_or_guest_user.id)
+    user_session = UserSession.find_or_initialize_by(
+      session_id: session_id,
+      user_id: user_id,
+      health_clinic_id: health_clinic_id
+    )
     authorize! :create, user_session
     user_session.save!
     render json: serialized_response(user_session), status: :ok
@@ -27,6 +31,18 @@ class V1::UserSessionsController < V1Controller
   end
 
   def user_session_params
-    params.require(:user_session).permit(:session_id)
+    params.require(:user_session).permit(:session_id, :health_clinic_id)
+  end
+
+  def session_id
+    user_session_params[:session_id]
+  end
+
+  def health_clinic_id
+    user_session_params[:health_clinic_id]
+  end
+
+  def user_id
+    current_v1_user_or_guest_user.id
   end
 end

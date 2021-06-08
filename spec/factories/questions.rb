@@ -86,7 +86,7 @@ FactoryBot.define do
               patterns: [
                 {
                   match: '1',
-                  target: '1'
+                  target: ['1']
                 }
               ]
             }
@@ -294,10 +294,11 @@ FactoryBot.define do
           patterns: [
             {
               match: '=1',
-              target: {
+              target: [{
                 id: '',
+                probability: '100',
                 type: 'Question::Single'
-              }
+              }]
             }
           ]
         }
@@ -327,10 +328,10 @@ FactoryBot.define do
           payload: 'a1',
           patterns: [
             { match: '=2',
-              target: {
+              target: [{
                 id: '',
                 type: 'Session'
-              } }
+              }] }
           ]
         }
       end

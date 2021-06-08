@@ -6,7 +6,7 @@ class V1::Users::InvitationsController < V1Controller
   def index
     users = users_scope.invitation_not_accepted.limit_to_roles(['researcher'])
 
-    render_json users: users, status: :ok
+    render json: serialized_response(users)
   end
 
   def create
@@ -17,7 +17,7 @@ class V1::Users::InvitationsController < V1Controller
     user = User.invite!(email: invitation_params[:email], roles: %w[researcher])
 
     if user.valid?
-      render_json user: user, action: :show, status: :created
+      render json: serialized_response(user), status: :created
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
@@ -40,7 +40,7 @@ class V1::Users::InvitationsController < V1Controller
     user = User.accept_invitation!(accept_invitation_params)
 
     if user.persisted?
-      render_json user: user, status: :ok
+      render json: serialized_response(user)
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end

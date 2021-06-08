@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class User < ApplicationRecord
+  has_paper_trail skip: %i[
+    first_name last_name email uid migrated_first_name migrated_last_name migrated_email migrated_uid
+  ]
   before_save :invalidate_token_after_changes
 
   devise :confirmable,
@@ -18,7 +21,7 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest participant third_party researcher team_admin admin preview_session].freeze
+  APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin organization_admin researcher e_intervention_admin team_admin admin].freeze
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
@@ -39,9 +42,20 @@ class User < ApplicationRecord
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :user_log_requests, dependent: :destroy
   belongs_to :team, optional: true
+  belongs_to :organizable, polymorphic: true, optional: true
+  has_many :user_health_clinics, dependent: :destroy
   has_many :admins_teams, class_name: 'Team', dependent: :nullify,
                           foreign_key: :team_admin_id, inverse_of: :team_admin
+
   has_many :team_invitations, dependent: :destroy
+  has_many :organization_invitations, dependent: :destroy
+  has_many :health_system_invitations, dependent: :destroy
+  has_many :health_clinic_invitations, dependent: :destroy
+
+  has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
+                                                 dependent: :destroy
+  has_many :user_verification_codes, dependent: :destroy
+  has_many :chart_statistics, dependent: :nullify
 
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
@@ -57,8 +71,14 @@ class User < ApplicationRecord
   scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
   scope :name_contains, lambda { |substring|
-    where("CONCAT(first_name, ' ', last_name) ILIKE :substring OR email ILIKE :substring", substring: "%#{substring.downcase}%") if substring.present?
+    if substring.present?
+      ids = select { |u| "#{u.first_name} #{u.last_name} #{u.email}" =~ /#{substring.downcase}/i }.map(&:id)
+      User.where(id: ids)
+    end
   }
+
+  encrypts :email, :first_name, :last_name, :uid, migrating: true
+  blind_index :email, :uid, migrating: true
 
   def self.detailed_search(params)
     scope = all
@@ -83,6 +103,10 @@ class User < ApplicationRecord
 
   def deactivate!
     update!(active: false) if active
+  end
+
+  def activate!
+    update!(active: true) unless active
   end
 
   def active_for_authentication?

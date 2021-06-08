@@ -8,7 +8,7 @@ module Log::UserRequest
   end
 
   def leave_footprint
-    LogJob::UserRequest.perform_later(request_scope) if current_v1_user
+    LogJobs::UserRequest.perform_later(request_scope)
   end
 
   private
@@ -16,7 +16,7 @@ module Log::UserRequest
   def request_scope
     erase_from_params
     {
-      user_id: current_v1_user.id,
+      user_id: current_v1_user&.id,
       controller: params[:controller].to_s,
       action: params[:action].to_s,
       query_string: request.query_parameters,
@@ -34,5 +34,20 @@ module Log::UserRequest
     params[:report_template]&.delete(:logo)
     params[:variant]&.delete(:image)
     params[:logo]&.delete(:file)
+    params.delete(:password)
+    params.delete(:password_confirmation)
+    params.delete(:registration)
+    params.delete(:phone_number)
+    params.delete(:email)
+    params[:user]&.delete(:first_name)
+    params[:user]&.delete(:last_name)
+    params[:user][:phone_attributes]&.delete(:number) if params[:user].present?
+    params.delete(:first_name)
+    params.delete(:last_name)
+    params[:answer]&.delete(:body)
+    params[:user_session]&.delete(:emails)
+    params[:session_invitation]&.delete(:emails)
+    params[:invitation]&.delete(:email)
+    params.delete(:current_password)
   end
 end

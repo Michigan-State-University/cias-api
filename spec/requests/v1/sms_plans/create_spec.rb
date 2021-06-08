@@ -34,6 +34,16 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
       end
     end
 
+    context 'user_with_multiple_roles' do
+      let(:user) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
+      let!(:intervention) { create(:intervention, user: user) }
+
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+    end
+
     context 'team admin' do
       let(:user) { create(:user, :confirmed, :team_admin) }
       let!(:intervention) { create(:intervention, user: user) }

@@ -12,15 +12,13 @@ class V1::GeneratedReports::GenerateUserSessionReports
   def call
     return if session_preview?
 
-    dentaku_calculator.store(**all_var_values) if all_var_values.present?
-
-    dentaku_calculator.memory.transform_values! { |val| val.to_s.to_i }
+    dentaku_service.store_and_transform_values
 
     report_templates.each do |report_template|
       V1::GeneratedReports::Create.call(
         report_template,
         user_session,
-        dentaku_calculator
+        dentaku_service
       )
     end
 
@@ -39,6 +37,10 @@ class V1::GeneratedReports::GenerateUserSessionReports
 
   attr_reader :user_session
 
+  def dentaku_service
+    @dentaku_service ||= Calculations::DentakuService.new(all_var_values)
+  end
+
   def session_preview?
     user.role?('preview_session')
   end
@@ -55,15 +57,11 @@ class V1::GeneratedReports::GenerateUserSessionReports
     user_session.answers
   end
 
-  def dentaku_calculator
-    @dentaku_calculator ||= Dentaku::Calculator.new
-  end
-
   def report_templates
     session.report_templates.includes(sections: [variants: [image_attachment: :blob]])
   end
 
   def all_var_values
-    user_session.all_var_values
+    V1::UserInterventionService.new(user.id, user_session.session.intervention_id, user_session.id).var_values
   end
 end

@@ -32,6 +32,10 @@ class Ability::Base
     User.participants.select { |participant| Answer.user_answers(participant.id, result).any? }.pluck(:id)
   end
 
+  def participants_and_researchers(user)
+    participants_with_answers(user) + researchers_from_team(user.team_id)
+  end
+
   def logged_user_sessions(user)
     Session.where(intervention_id: user.interventions.select(:id)).pluck(:id)
   end

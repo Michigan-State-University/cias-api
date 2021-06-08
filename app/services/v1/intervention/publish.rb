@@ -33,7 +33,7 @@ class V1::Intervention::Publish
       end
 
       schedule_time += session.schedule_payload.days
-      next if session.schedule == 'days_after_fill'
+      next if %w[days_after_fill days_after_date].include?(session.schedule)
 
       if session.schedule == 'days_after'
         session.schedule_at = schedule_time.to_s

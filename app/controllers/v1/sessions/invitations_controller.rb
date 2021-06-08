@@ -2,15 +2,16 @@
 
 class V1::Sessions::InvitationsController < V1Controller
   def index
-    render_json invitations: session_invitations_scope
+    render json: serialized_response(session_invitations_scope)
   end
 
   def create
     return head :not_acceptable unless session_load.published?
 
     authorize! :create, Invitation
+
     session_load.invite_by_email(session_invitation_params[:emails])
-    render_json invitations: session_invitations_scope, action: :index, status: :created
+    render json: serialized_response(session_invitations_scope), status: :created
   end
 
   def destroy

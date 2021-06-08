@@ -38,12 +38,12 @@ class V1::QuestionsController < V1Controller
       values: position_params[:position]
     ).execute
     question_groups = question_service.question_groups_scope(session_id)
-    invalidate_cache(question_groups)
-    render_json question_groups: question_groups, path: 'v1/question_groups', action: :index
+    render json: serialized_response(question_groups, from_model = 'QuestionGroup')
   end
 
   def share
     authorize! :create, Question
+
     share_service.share(question_ids, researcher_ids)
 
     head :created
@@ -51,6 +51,7 @@ class V1::QuestionsController < V1Controller
 
   def clone_multiple
     authorize! :create, Question
+
     cloned_questions = question_service.clone_multiple(session_id, question_ids)
 
     render json: serialized_response(cloned_questions), status: :created

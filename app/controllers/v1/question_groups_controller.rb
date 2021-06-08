@@ -16,6 +16,7 @@ class V1::QuestionGroupsController < V1Controller
 
   def create
     authorize! :create, QuestionGroup
+
     qg_id = question_group_service.create(question_group_params, question_ids, new_questions_params)
     SqlQuery.new('question_group/question_group_pure_empty').execute
 
@@ -24,6 +25,7 @@ class V1::QuestionGroupsController < V1Controller
 
   def update
     authorize! :update, QuestionGroup
+
     question_group = question_group_service.update(question_group_id, question_group_params)
 
     render json: question_group_response(question_group), action: :show
@@ -31,6 +33,7 @@ class V1::QuestionGroupsController < V1Controller
 
   def destroy
     authorize! :destroy, QuestionGroup
+
     question_group_service.destroy(question_group_id)
 
     head :no_content
@@ -38,6 +41,7 @@ class V1::QuestionGroupsController < V1Controller
 
   def questions_change
     authorize! :update, QuestionGroup
+
     question_group = question_group_service.questions_change(question_group_id, question_ids)
 
     render json: question_group_response(question_group.reload), action: :show
@@ -45,6 +49,7 @@ class V1::QuestionGroupsController < V1Controller
 
   def remove_questions
     authorize! :update, QuestionGroup
+
     question_group_service.questions_scope(question_ids).destroy_all
 
     head :no_content
@@ -52,13 +57,15 @@ class V1::QuestionGroupsController < V1Controller
 
   def clone
     authorize! :create, QuestionGroup
-    cloned_question_group = question_group_service.question_group_load(question_group_id).clone(params: params.permit!, clean_formulas: true)
+
+    cloned_question_group = question_group_service.question_group_load(question_group_id).clone(clean_formulas: true)
 
     render json: question_group_response(cloned_question_group), action: :show, status: :ok
   end
 
   def share
     authorize! :create, QuestionGroup
+
     shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
 
     render json: question_group_response(shared_question_group), action: :show, status: :ok

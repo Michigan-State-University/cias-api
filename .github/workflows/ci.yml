@@ -53,3 +53,9 @@ jobs:
           bundle exec rails db:create db:schema:load --trace
       - name: Execute tests
         run: bundle exec rspec
+      - name: Analyze with Brakeman
+        run: bundle exec brakeman --skip-files app/controllers/concerns/exception_handler.rb,app/controllers/v1/users/invitations_controller.rb
+      - name: Analyze with bundler audit
+        run: |
+            gem install bundler-audit
+            bundle-audit check --update

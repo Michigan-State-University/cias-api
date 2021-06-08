@@ -20,6 +20,7 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
+    session.google_tts_voice_id = first_session_voice_id if first_session_voice_id.present?
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
@@ -39,10 +40,19 @@ class V1::SessionService
   def duplicate(session_id, new_intervention_id)
     new_intervention = Intervention.accessible_by(user.ability).find(new_intervention_id)
     old_session = session_load(session_id)
+    new_position = new_intervention.sessions.order(:position).last&.position.to_i + 1
+    new_variable = "duplicated_#{old_session.variable}_#{new_position}"
     Clone::Session.new(old_session,
                        intervention_id: new_intervention.id,
                        clean_formulas: true,
-                       position: new_intervention.sessions.last&.position.to_i + 1).execute
+                       variable: new_variable,
+                       position: new_position).execute
+  end
+
+  private
+
+  def first_session_voice_id
+    intervention.sessions.order(:position)&.first&.google_tts_voice_id
   end
 
 

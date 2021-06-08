@@ -26,9 +26,7 @@ class Audio::TextToSpeech < SimpleDelegator
   end
 
   def provider
-    @provider ||= begin
-      "Audio::TextToSpeech::#{require_provider.classify}".safe_constantize
-    end
+    @provider ||= "Audio::TextToSpeech::#{require_provider.classify}".safe_constantize
   end
 
   def fetch_speech_from_text

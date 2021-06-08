@@ -52,7 +52,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
   end
 
   context 'when params are valid, new team admin is team_admin' do
-    let!(:new_team_admin) { create(:user, :confirmed, :team_admin) }
+    let!(:new_team_admin) { create(:user, :confirmed, roles: %w[participant team_admin guest]) }
     let(:params) do
       {
         team: {

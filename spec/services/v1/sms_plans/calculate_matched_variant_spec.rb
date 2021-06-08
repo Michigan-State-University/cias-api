@@ -3,6 +3,8 @@
 RSpec.describe V1::SmsPlans::CalculateMatchedVariant do
   subject { described_class.call(formula, variants, all_var_answer_values) }
 
+  let!(:user) { create(:user) }
+
   context 'when there are no formula variables in the answers variables' do
     let!(:formula) { 'sport_var' }
     let!(:sms_plan) { create(:sms_plan, formula: formula, is_used_formula: true) }

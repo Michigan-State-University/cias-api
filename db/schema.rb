@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_24_074521) do
+ActiveRecord::Schema.define(version: 2021_05_24_044925) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -59,6 +58,45 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
   end
 
+  create_table "chart_statistics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "label"
+    t.uuid "organization_id", null: false
+    t.uuid "health_system_id", null: false
+    t.uuid "health_clinic_id", null: false
+    t.uuid "chart_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
+    t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
+    t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
+    t.index ["organization_id"], name: "index_chart_statistics_on_organization_id"
+    t.index ["user_id"], name: "index_chart_statistics_on_user_id"
+  end
+
+  create_table "charts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.string "status", default: "draft"
+    t.jsonb "formula"
+    t.uuid "dashboard_section_id"
+    t.datetime "published_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "chart_type", default: "bar_chart"
+    t.boolean "trend_line", default: false, null: false
+    t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
+  end
+
+  create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.uuid "reporting_dashboard_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
+  end
+
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "report_template_id"
@@ -66,13 +104,76 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.string "report_for", default: "third_party", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.uuid "third_party_id"
     t.uuid "participant_id"
     t.index ["participant_id"], name: "index_generated_reports_on_participant_id"
     t.index ["report_for"], name: "index_generated_reports_on_report_for"
     t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"
-    t.index ["third_party_id"], name: "index_generated_reports_on_third_party_id"
     t.index ["user_session_id"], name: "index_generated_reports_on_user_session_id"
+  end
+
+  create_table "generated_reports_third_party_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "generated_report_id"
+    t.uuid "third_party_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
+    t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
+  end
+
+  create_table "google_tts_languages", force: :cascade do |t|
+    t.string "language_name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "google_tts_voices", force: :cascade do |t|
+    t.integer "google_tts_language_id"
+    t.string "voice_label"
+    t.string "voice_type"
+    t.string "language_code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["google_tts_language_id"], name: "index_google_tts_voices_on_google_tts_language_id"
+  end
+
+  create_table "health_clinic_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_clinic_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_clinic_id"], name: "index_health_clinic_invitations_on_health_clinic_id"
+    t.index ["invitation_token"], name: "index_health_clinic_invitations_on_invitation_token"
+    t.index ["user_id"], name: "index_health_clinic_invitations_on_user_id"
+  end
+
+  create_table "health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.uuid "health_system_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
+  end
+
+  create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_system_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_system_id"], name: "index_health_system_invitations_on_health_system_id"
+    t.index ["invitation_token"], name: "index_health_system_invitations_on_invitation_token"
+    t.index ["user_id"], name: "index_health_system_invitations_on_user_id"
+  end
+
+  create_table "health_systems", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.uuid "organization_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -83,8 +184,10 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.string "shared_to", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.uuid "organization_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
+    t.index ["organization_id"], name: "index_interventions_on_organization_id"
     t.index ["shared_to"], name: "index_interventions_on_shared_to"
     t.index ["status"], name: "index_interventions_on_status"
     t.index ["user_id"], name: "index_interventions_on_user_id"
@@ -96,6 +199,11 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.string "invitable_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "email_ciphertext"
+    t.string "email_bidx"
+    t.uuid "health_clinic_id"
+    t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
+    t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
     t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
@@ -104,6 +212,25 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.text "body", null: false
     t.string "status", default: "new", null: false
     t.datetime "schedule_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.text "phone_ciphertext"
+  end
+
+  create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "organization_id"
+    t.string "invitation_token"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["invitation_token"], name: "index_organization_invitations_on_invitation_token"
+    t.index ["organization_id"], name: "index_organization_invitations_on_organization_id"
+    t.index ["user_id"], name: "index_organization_invitations_on_user_id"
+  end
+
+  create_table "organizations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -118,6 +245,7 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.datetime "confirmed_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "number_ciphertext"
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
@@ -187,6 +315,13 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.index ["session_id"], name: "index_report_templates_on_session_id"
   end
 
+  create_table "reporting_dashboards", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "organization_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_reporting_dashboards_on_organization_id"
+  end
+
   create_table "sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "intervention_id", null: false
     t.jsonb "settings"
@@ -202,6 +337,10 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.integer "report_templates_count"
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
+    t.string "variable"
+    t.string "days_after_date_variable_name"
+    t.bigint "google_tts_voice_id", default: 43
+    t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
     t.index ["name"], name: "index_sessions_on_name"
@@ -254,6 +393,15 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
   end
 
+  create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "health_clinic_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_clinic_id"], name: "index_user_health_clinics_on_health_clinic_id"
+    t.index ["user_id"], name: "index_user_health_clinics_on_user_id"
+  end
+
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.string "controller"
@@ -275,10 +423,21 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.datetime "last_answer_at"
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
+    t.uuid "health_clinic_id"
+    t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
-    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true
+    t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
+  end
+
+  create_table "user_verification_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.string "code", null: false
+    t.boolean "confirmed", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_user_verification_codes_on_user_id"
   end
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -320,11 +479,23 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.uuid "preview_session_id"
     t.boolean "email_notification", default: true, null: false
     t.boolean "feedback_completed", default: false, null: false
+    t.string "description", default: ""
+    t.uuid "organizable_id"
+    t.text "email_ciphertext"
+    t.text "first_name_ciphertext"
+    t.text "last_name_ciphertext"
+    t.text "uid_ciphertext"
+    t.string "email_bidx"
+    t.string "uid_bidx"
+    t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
+    t.index ["organizable_id", "organizable_type"], name: "index_users_on_organizable_id_and_organizable_type"
+    t.index ["organizable_id"], name: "index_users_on_organizable_id"
     t.index ["preview_session_id"], name: "index_users_on_preview_session_id"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
@@ -332,17 +503,32 @@ ActiveRecord::Schema.define(version: 2021_03_24_074521) do
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
     t.index ["uid", "roles"], name: "index_users_on_uid_and_roles", using: :gin
     t.index ["uid"], name: "index_users_on_uid", unique: true
+    t.index ["uid_bidx"], name: "index_users_on_uid_bidx", unique: true
+  end
+
+  create_table "versions", force: :cascade do |t|
+    t.string "item_type", null: false
+    t.bigint "item_id", null: false
+    t.string "event", null: false
+    t.string "whodunnit"
+    t.text "object"
+    t.datetime "created_at"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
+  add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
+  add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
+  add_foreign_key "user_sessions", "health_clinics"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "users"
 end

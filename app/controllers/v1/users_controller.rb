@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::UsersController < V1Controller
+  skip_before_action :authenticate_user!, only: %i[confirm_logging_code]
+
   def index
     authorize! :index, current_v1_user
 
@@ -10,7 +12,7 @@ class V1::UsersController < V1Controller
   end
 
   def show
-    render_json user: user_service.user_load(user_id)
+    render json: serialized_response(user_service.user_load(user_id))
   end
 
   def researchers
@@ -26,8 +28,8 @@ class V1::UsersController < V1Controller
 
     user = user_service.user_load(user_id)
     user.update!(user_params)
-    invalidate_cache(user)
-    render_json user: user, action: :show
+
+    render json: serialized_response(user)
   end
 
   def destroy
@@ -60,6 +62,15 @@ class V1::UsersController < V1Controller
     head :ok
   end
 
+  def confirm_logging_code
+    result = V1::Users::Verifications::Confirm.call(code, email)
+    if result.present?
+      render json: { verification_code: result }, status: :ok
+    else
+      head :request_timeout
+    end
+  end
+
   private
 
   def user_service
@@ -76,6 +87,14 @@ class V1::UsersController < V1Controller
 
   def user_id
     params[:id]
+  end
+
+  def code
+    params[:verification_code]
+  end
+
+  def email
+    params[:email]
   end
 
   def phone_params
@@ -97,6 +116,8 @@ class V1::UsersController < V1Controller
         :time_zone,
         :active,
         :feedback_completed,
+        :description,
+        :organizable_id,
         roles: [],
         phone_attributes: %i[iso prefix number]
       )

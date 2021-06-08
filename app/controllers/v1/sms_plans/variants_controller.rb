@@ -3,6 +3,7 @@
 class V1::SmsPlans::VariantsController < V1Controller
   def create
     authorize! :create, SmsPlan::Variant
+
     return render status: :method_not_allowed if sms_plan.session.intervention.published?
 
     variant = sms_plan.variants.create!(variant_params)
@@ -11,6 +12,7 @@ class V1::SmsPlans::VariantsController < V1Controller
 
   def update
     authorize! :update, variant
+
     return render status: :method_not_allowed if intervention_published?
 
     variant.update!(variant_params)
@@ -19,6 +21,7 @@ class V1::SmsPlans::VariantsController < V1Controller
 
   def destroy
     authorize! :destroy, variant
+
     return render status: :method_not_allowed if intervention_published?
 
     variant.destroy

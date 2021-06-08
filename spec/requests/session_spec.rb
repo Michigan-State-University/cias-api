@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Session', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
+  let(:code) { user.user_verification_codes.last.code }
   let(:params) do
     { email: user.email, password: user.password }
   end
@@ -11,7 +12,7 @@ RSpec.describe 'Session', type: :request do
   describe 'POST /v1/auth/sign_in' do
     context 'when login params is valid' do
       before do
-        post '/v1/auth/sign_in', params: params
+        post '/v1/auth/sign_in', params: params, headers: { 'Verification-Code' => code }
       end
 
       it { expect(response).to have_http_status(:success) }

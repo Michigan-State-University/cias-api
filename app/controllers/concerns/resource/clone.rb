@@ -20,13 +20,11 @@ module Resource::Clone
   end
 
   def to_permit
-    @to_permit ||= begin
-      {
-        intervention: [{ user_ids: [] }],
-        session: [],
-        question: [],
-        sms_plan: []
-      }
-    end
+    @to_permit ||= {
+      intervention: [{ user_ids: [] }],
+      session: [],
+      question: [],
+      sms_plan: []
+    }
   end
 end

@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class Intervention < ApplicationRecord
+  has_paper_trail
   include Clone
 
   belongs_to :user, inverse_of: :interventions
+  belongs_to :organization, optional: true
   has_many :sessions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
@@ -22,6 +24,8 @@ class Intervention < ApplicationRecord
     left_joins(:invitations).published.not_shared_to_invited
       .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
+  scope :without_organization, -> { where(organization_id: nil) }
+  scope :with_any_organization, -> { where.not(organization_id: nil) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -30,7 +34,7 @@ class Intervention < ApplicationRecord
     return unless draft?
 
     published!
-    ::Intervention::PublishJob.perform_later(id)
+    ::Interventions::PublishJob.perform_later(id)
   end
 
   def close

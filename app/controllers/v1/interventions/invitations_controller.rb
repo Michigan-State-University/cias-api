@@ -4,7 +4,7 @@
 # if intervention is shared to only selected registered participant;
 class V1::Interventions::InvitationsController < V1Controller
   def index
-    render_json user_sessions: user_with_access_scope, action: :index
+    render json: serialized_response(user_with_access_scope)
   end
 
   def create
@@ -13,7 +13,7 @@ class V1::Interventions::InvitationsController < V1Controller
     authorize! :create, Invitation
 
     intervention_load.give_user_access(user_session_params[:emails])
-    render_json user_sessions: user_with_access_scope, action: :index, status: :created
+    render json: serialized_response(user_with_access_scope), status: :created
   end
 
   def destroy

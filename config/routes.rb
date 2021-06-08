@@ -1,22 +1,27 @@
 # frozen_string_literal: true
 
-require 'sidekiq/web' if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+  require 'sidekiq/web'
+  Sidekiq::Web.use ActionDispatch::Cookies
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session'
+end
 
 Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
-      confirmations: 'v1/auth_controller/confirmations',
+      confirmations: 'v1/auth/confirmations',
       invitations: 'v1/users/invitations',
       passwords: 'v1/auth/passwords',
-      registrations: 'v1/auth_controller/registrations',
+      registrations: 'v1/auth/registrations',
       sessions: 'v1/auth/sessions'
     }
 
     scope :users do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
+      patch 'confirm_logging_code', to: 'users#confirm_logging_code'
       get 'researchers', to: 'users#researchers'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
@@ -122,7 +127,46 @@ Rails.application.routes.draw do
       post 'clone', on: :member
     end
 
+    resources :organizations, controller: :organizations do
+      scope module: 'organizations' do
+        post 'invitations/invite_organization_admin', to: 'invitations#invite_organization_admin'
+        post 'invitations/invite_intervention_admin', to: 'invitations#invite_intervention_admin'
+        scope module: 'dashboard_sections' do
+          resources :dashboard_sections, only: %i[index show create update destroy], controller: :dashboard_sections
+        end
+        resources :interventions, only: :index, controller: :interventions
+        scope module: 'sessions' do
+          resources :sessions do
+            resources :invitations, only: %i[index create]
+          end
+        end
+      end
+    end
+    get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
+
+    resources :health_systems, controller: :health_systems do
+      scope module: 'health_systems' do
+        post 'invitations/invite_health_system_admin', to: 'invitations#invite_health_system_admin'
+      end
+    end
+    get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm', as: :health_system_invitations_confirm
+
+    resources :health_clinics, controller: :health_clinics do
+      scope module: 'health_clinics' do
+        post 'invitations/invite_health_clinic_admin', to: 'invitations#invite_health_clinic_admin'
+      end
+    end
+    get 'health_clinic_invitations/confirm', to: 'health_clinics/invitations#confirm', as: :health_clinic_invitations_confirm
+
     resources :generated_reports, only: :index
+
+    scope module: :google_tts do
+      resources :languages, only: :index do
+        resources :voices, only: :index
+      end
+    end
+
+    resources :charts, controller: :charts
   end
 
   if Rails.env.development?

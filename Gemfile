@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.0'
+gem 'rails', '~> 6.0.3.7'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.0'
 
@@ -39,6 +39,13 @@ gem 'secure_headers'
 gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
+# for search on encrypted data
+gem 'blind_index'
+# for stop logging sensitive data
+gem 'logstop'
+gem 'countries'
+# for Audit trail and audit log
+gem 'paper_trail'
 
 group :development, :test do
   gem 'bundler-audit'
@@ -73,6 +80,7 @@ group :test do
   gem 'simplecov', require: false
   gem 'test-prof'
   gem 'timecop'
+  gem 'database_cleaner-active_record'
 end
 
 group :production do

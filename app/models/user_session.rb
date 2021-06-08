@@ -1,11 +1,13 @@
 # frozen_string_literal: true
 
 class UserSession < ApplicationRecord
+  has_paper_trail
   belongs_to :user, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
   belongs_to :name_audio, class_name: 'Audio', optional: true
   has_many :generated_reports, dependent: :destroy
+  belongs_to :health_clinic, optional: true
 
   before_destroy :decrement_audio_usage
 
@@ -20,6 +22,7 @@ class UserSession < ApplicationRecord
     decrement_audio_usage
     V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
+    V1::ChartStatistics::CreateForUserSession.call(self)
   end
 
   def on_answer
@@ -39,10 +42,11 @@ class UserSession < ApplicationRecord
     answers.order(:created_at).last
   end
 
-  def all_var_values
+  def all_var_values(include_session_var: true)
     answers.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|
-        var_values[obj['var']] = obj['value']
+        key = include_session_var ? "#{session.variable}.#{obj['var']}" : obj['var']
+        var_values[key] = obj['value']
       end
     end
   end

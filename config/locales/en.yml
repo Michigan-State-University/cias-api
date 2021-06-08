@@ -6,8 +6,8 @@ en:
       report_file: '%m_%d_%Y_%H_%M'
   question:
     finish:
-      subtitle: <h2>Finish Screen</h2>
-      title: Finish Screen
+      subtitle: '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
+      title: Enter title here
   question_group:
     finish:
       title: Finish Group
@@ -20,6 +20,7 @@ en:
           attributes:
             roles:
               team_id_is_required_for_team_admin: 'Team Admin must have a team'
+              organization_id_is_required_for_organization_admin: 'Organization Admin must have an organization'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
         team_invitation:
@@ -28,6 +29,18 @@ en:
               already_exists: already exists
         question_group:
           question: '%{question_type} can appear only once per session'
+        organization_invitation:
+          attributes:
+            user_id:
+              already_exists: already exists
+        health_system_invitation:
+          attributes:
+            user_id:
+              already_exists: already exists
+        session:
+          attributes:
+            variable:
+              already_exists: already exists
       messages:
         undestroyable: Forbidden operation
   interventions:
@@ -47,6 +60,17 @@ en:
       header:       '%{team_name} Invitation'
       body:         "You've been invited to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
+      button_text:  Accept the Invitation
+  organizables:
+    invitations:
+      accepted: "You've successfully joined %{organizable_type} %{organizable_name}."
+      not_found: "%{organizable_type} Invitation not found"
+  organizable_mailer:
+    invite_user:
+      subject:      You've been invited to the %{organizable_type}
+      header:       '%{organizable_name} Invitation'
+      body:         "You've been invited to the %{organizable_name}."
+      instruction:  'Click the link below to accept the invitation and join the %{organizable_type}.'
       button_text:  Accept the Invitation
   generated_report_mailer:
     new_report_available:
@@ -83,4 +107,11 @@ en:
       html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the link below to start the session'
       button_text: Start the session
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-
+      invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+  user_mailer:
+    send_verification_login_code:
+      subject: Verifiy your identify in CIAS
+      header: Verifiy your identify in CIAS
+      body_first_paragraph: You recently logged in to CIAS from a browser or app that we don't recognize or your last verification took place was over 30 days ago.
+      body_second_paragraph: To ensure your account's security, we need to verify your identify. Enter the following code where prompted by CIAS.
+      verification_code: 'Verification code: %{verification_code}'

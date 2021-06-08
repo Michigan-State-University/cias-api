@@ -10,6 +10,10 @@ FactoryBot.define do
     roles { %w[guest] }
     time_zone { 'Europe/Warsaw' }
 
+    after(:create) do |user|
+      user.user_verification_codes.create(code: "verification_code_#{user.uid}", confirmed: true)
+    end
+
     transient do
       allow_unconfirmed_period { Time.current - Devise.allow_unconfirmed_access_for }
     end
@@ -47,6 +51,53 @@ FactoryBot.define do
           team_admin.admins_teams = [new_team]
         end
       end
+    end
+
+    trait :organization_admin do
+      roles { %w[organization_admin] }
+    end
+
+    trait :with_organization do
+      after(:create, :build) do |organization_admin|
+        if organization_admin.role?('organization_admin')
+          new_organization = create(:organization)
+          organization_admin.organizable = new_organization
+          new_organization.organization_admins << organization_admin
+        end
+      end
+    end
+
+    trait :health_system_admin do
+      roles { %w[health_system_admin] }
+    end
+
+    trait :with_health_system do
+      after(:create, :build) do |health_system_admin|
+        if health_system_admin.role?('health_system_admin')
+          new_health_system = create(:health_system)
+          health_system_admin.organizable = new_health_system
+          new_health_system.health_system_admins << health_system_admin
+        end
+      end
+    end
+
+    trait :health_clinic_admin do
+      roles { %w[health_clinic_admin] }
+    end
+
+    trait :with_health_clinic do
+      after(:create, :build) do |health_clinic_admin|
+        if health_clinic_admin.role?('health_clinic_admin')
+          new_health_clinic = create(:health_clinic)
+          health_clinic_admin.organizable = new_health_clinic unless health_clinic_admin.organizable
+          health_clinic_admin.admins_health_clinics << new_health_clinic
+          new_health_clinic.health_clinic_admins << health_clinic_admin
+        end
+      end
+    end
+
+    trait :e_intervention_admin do
+      roles { %w[e_intervention_admin] }
     end
 
     trait :preview_session do

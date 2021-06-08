@@ -4,6 +4,7 @@ require 'rails_helper'
 
 describe User, type: :model do
   it { should have_many(:team_invitations).dependent(:destroy) }
+  it { should have_many(:chart_statistics) }
 
   describe 'participant' do
     subject { create(:user, :confirmed, :participant) }
@@ -35,6 +36,28 @@ describe User, type: :model do
 
         it 'is valid' do
           expect(user).to be_valid
+        end
+      end
+    end
+  end
+
+  describe 'organization_is_present?' do
+    context 'user has role organization admin' do
+      context 'organization admin has not assigned organization' do
+        let(:user) { build_stubbed(:user, :organization_admin) }
+
+        it 'is not valid' do
+          expect(user).to be_valid
+          expect(user.organizable).to be(nil)
+        end
+      end
+
+      context 'organization admin has assigned organization' do
+        let(:user) { build(:user, :organization_admin, :with_organization) }
+
+        it 'is valid' do
+          expect(user).to be_valid
+          expect(user.organizable).not_to be(nil)
         end
       end
     end
@@ -92,6 +115,30 @@ describe User, type: :model do
       it 'does not remove user tokens' do
         expect { user.update(active: true) }.not_to change { user.reload.tokens }
       end
+    end
+  end
+
+  context 'user has role health_system_admin' do
+    let(:user) { build_stubbed(:user, :health_system_admin) }
+
+    context 'user belongs to health system' do
+      include_examples 'with health system'
+    end
+
+    context 'user doesn\'t belong to health system' do
+      include_examples 'without health system'
+    end
+  end
+
+  context 'user has role health_clinic_admin' do
+    let(:user) { build_stubbed(:user, :health_clinic_admin) }
+
+    context 'user belongs to health clinic' do
+      include_examples 'with health clinic'
+    end
+
+    context 'user doesn\'t belong to health clinic' do
+      include_examples 'without health clinic'
     end
   end
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Question < ApplicationRecord
+  has_paper_trail
   extend DefaultValues
   include BodyInterface
   include Clone
@@ -32,7 +33,7 @@ class Question < ApplicationRecord
 
   delegate :session, to: :question_group
 
-  after_create :initialize_narrator
+  after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
 
   default_scope { order(:position) }
@@ -73,7 +74,7 @@ class Question < ApplicationRecord
   end
 
   def remove_blocks_with_types(block_types_to_remove)
-    narrator['blocks'] = narrator['blocks'].filter { |block| !block_types_to_remove.include?(block['type']) }
+    narrator['blocks'] = narrator['blocks'].filter { |block| block_types_to_remove.exclude?(block['type']) }
   end
 
   def csv_header_names
