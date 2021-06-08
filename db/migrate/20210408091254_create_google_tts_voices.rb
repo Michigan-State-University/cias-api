@@ -11,4 +11,5 @@ class CreateGoogleTtsVoices < ActiveRecord::Migration[6.0]
       t.timestamps
     end
   end
+  Rake::Task['google_tts_languages:fetch'].invoke
 end
