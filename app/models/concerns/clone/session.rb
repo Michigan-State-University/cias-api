@@ -71,9 +71,7 @@ class Clone::Session < Clone::Base
   end
 
   def check_if_session_exists(target_id)
-    if target_id.empty?
-      return ''
-    end
+    return '' if target_id.empty?
 
     source.intervention.sessions.find(target_id).id
   rescue ActiveRecord::RecordNotFound

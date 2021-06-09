@@ -55,9 +55,6 @@ class V1::SessionService
     intervention.sessions.order(:position)&.first&.google_tts_voice_id
   end
 
-
-  private
-
   def clear_branching(object, session_id)
     object.formula['patterns'].each do |pattern|
       pattern['target'].each do |target|

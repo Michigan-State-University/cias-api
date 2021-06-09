@@ -75,9 +75,9 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'name' => health_clinic.name,
-              'health_system_id' => health_clinic.health_system_id,
-              'health_clinic_admins' => []
-            }
+              'health_system_id' => health_clinic.health_system_id
+            },
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           }
         )
 
