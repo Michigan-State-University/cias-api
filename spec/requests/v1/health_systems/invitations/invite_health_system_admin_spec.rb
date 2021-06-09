@@ -110,6 +110,35 @@ RSpec.describe 'POST /v1/health_systems/:health_system_id/invitations/invite_hea
             end
           end
 
+          context 'health system admin is in system but is deactivated' do
+            let!(:health_system_admin) { create(:user, :confirmed, :health_system_admin, active: false) }
+            let(:params) { { email: health_system_admin.email } }
+            let(:token) { SecureRandom.hex }
+            let(:health_system_invitation) { HealthSystemInvitation.order(created_at: :desc).first }
+
+            before do
+              allow_any_instance_of(HealthSystemInvitation).to receive(:invitation_token).and_return(token)
+            end
+
+            it 'creates invitation for the existing health_system admin' do
+              expect(OrganizableMailer).to receive(:invite_user).with(
+                email: health_system_admin.email,
+                organizable: health_system,
+                invitation_token: token,
+                organizable_type: 'Health System'
+              ).and_return(double(deliver_later: nil))
+
+              expect { request }.to change(HealthSystemInvitation, :count).by(1).and \
+                avoid_changing(User, :count).and \
+                  avoid_changing { health_system.reload.health_system_admins.count }
+
+              expect(health_system_invitation).to have_attributes(
+                user_id: health_system_admin.id,
+                health_system_id: health_system.id
+              )
+            end
+          end
+
           context 'health_system invitation has been already sent' do
             context 'and not accepted yet' do
               let!(:health_system_invitation) do
