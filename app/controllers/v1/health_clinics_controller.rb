@@ -56,7 +56,8 @@ class V1::HealthClinicsController < V1Controller
 
   def health_clinic_response(health_clinic)
     V1::HealthClinicSerializer.new(
-      health_clinic
+      health_clinic,
+      { include: %i[health_clinic_admins] }
     )
   end
 end
