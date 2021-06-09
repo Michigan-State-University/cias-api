@@ -6,10 +6,10 @@ class V1::UserSessionScheduleService
     @all_var_values = V1::UserInterventionService.new(
       user_session.user.id, user_session.session.intervention_id, user_session.id
     ).var_values
-    @health_clinic_id = user_session.health_clinic_id
+    @health_clinic = user_session.health_clinic
   end
 
-  attr_reader :user_session, :all_var_values, :health_clinic_id
+  attr_reader :user_session, :all_var_values, :health_clinic
 
   def schedule
     next_session = branch_to_session
@@ -19,26 +19,26 @@ class V1::UserSessionScheduleService
   end
 
   def after_fill_schedule(next_session)
-    next_session.send_link_to_session(user_session.user, health_clinic_id)
+    next_session.send_link_to_session(user_session.user, health_clinic)
   end
 
   def days_after_schedule(next_session)
-    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic_id)
+    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic)
   end
 
   def days_after_fill_schedule(next_session)
-    SessionEmailScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id, health_clinic_id)
+    SessionEmailScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id, health_clinic)
   end
 
   def exact_date_schedule(next_session)
-    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic_id)
+    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic)
   end
 
   def days_after_date_schedule(next_session)
     participant_date = all_var_values[next_session.days_after_date_variable_name]
     if participant_date
       SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
-          .perform_later(next_session.id, user_session.user.id, health_clinic_id)
+          .perform_later(next_session.id, user_session.user.id, health_clinic)
     end
   end
 
