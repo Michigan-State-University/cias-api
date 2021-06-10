@@ -38,7 +38,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/sessions/:session_id/inv
       end
 
       it 'returns correct response data' do
-        expect(json_response.size).to eq(2)
+        expect(json_response['data'].size).to eq(4)
       end
 
       it 'create correct session invites' do

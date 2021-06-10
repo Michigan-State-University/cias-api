@@ -3,8 +3,5 @@
 class V1::HealthClinicSerializer < V1Serializer
   attributes :name, :health_system_id
 
-  attribute :health_clinic_admins do |object|
-    user_ids = object.user_health_clinics.select(:user_id)
-    User.where(id: user_ids)
-  end
+  has_many :health_clinic_admins, record_type: :user, serializer: V1::UserSerializer
 end

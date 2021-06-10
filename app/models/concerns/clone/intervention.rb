@@ -64,9 +64,7 @@ class Clone::Intervention < Clone::Base
   end
 
   def check_if_question_exists(target_id, question)
-    if target_id.empty?
-      return ''
-    end
+    return '' if target_id.empty?
 
     question.session.questions.find(target_id).id
   rescue ActiveRecord::RecordNotFound
