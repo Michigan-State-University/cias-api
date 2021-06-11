@@ -14,6 +14,7 @@ question:
     video: false
     title: true
     subtitle: true
+    narratorSkippable: false
   narrator:
     settings:
       voice: true
