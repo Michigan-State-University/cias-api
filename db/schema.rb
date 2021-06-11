@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_08_064827) do
+ActiveRecord::Schema.define(version: 2021_06_10_120702) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -120,6 +120,13 @@ ActiveRecord::Schema.define(version: 2021_06_08_064827) do
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
 
+  create_table "google_languages", force: :cascade do |t|
+    t.string "language_code"
+    t.string "language_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "google_tts_languages", force: :cascade do |t|
     t.string "language_name", null: false
     t.datetime "created_at", precision: 6, null: false
@@ -185,6 +192,8 @@ ActiveRecord::Schema.define(version: 2021_06_08_064827) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "organization_id"
+    t.bigint "google_language_id"
+    t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
     t.index ["organization_id"], name: "index_interventions_on_organization_id"
@@ -507,6 +516,7 @@ ActiveRecord::Schema.define(version: 2021_06_08_064827) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"

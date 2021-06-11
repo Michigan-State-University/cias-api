@@ -5,8 +5,9 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request do
   let(:current_user) { create(:user, :confirmed, :admin) }
   let(:other_user) { create(:user, :confirmed, :participant) }
-  let(:other_user_2) { create(:user, :confirmed, :third_party) }
-  let(:intervention) { create(:intervention, user: current_user) }
+  let(:other_user2) { create(:user, :confirmed, :third_party) }
+  let(:language) { create(:google_language) }
+  let(:intervention) { create(:intervention, user: current_user, google_language: language) }
   let(:params) do
     {
       logo: {
@@ -15,7 +16,10 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
     }
   end
   let(:intervention_id) { intervention.id }
-  let(:published_intervention) { create(:intervention, user: current_user, status: :published, logo: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:published_intervention) do
+    create(:intervention, user: current_user, status: :published,
+                          logo: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true), google_language: language)
+  end
   let(:published_intervention_id) { published_intervention.id }
 
   context 'when current_user is admin' do
@@ -43,7 +47,7 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
 
   context 'when current_user is third_party' do
     context 'when current_user try to add a logo' do
-      before { post v1_intervention_logo_path(intervention_id), params: params, headers: other_user_2.create_new_auth_token }
+      before { post v1_intervention_logo_path(intervention_id), params: params, headers: other_user2.create_new_auth_token }
 
       it { expect(response).to have_http_status(:forbidden) }
     end

@@ -17,6 +17,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'google/cloud/text_to_speech/v1/text_to_speech'
 require 'google/cloud/text_to_speech/v1/version'
+require 'google/cloud/translate/v2'
 require 'faker'
 require 'active_storage_validations/matchers'
 require 'rake'

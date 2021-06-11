@@ -6,6 +6,7 @@ class Intervention < ApplicationRecord
 
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
+  belongs_to :google_language, optional: true
   has_many :sessions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
@@ -29,6 +30,8 @@ class Intervention < ApplicationRecord
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
+
+  before_create :set_default_language
 
   def broadcast
     return unless draft?
@@ -68,5 +71,10 @@ class Intervention < ApplicationRecord
 
   def newest_report
     reports.attachments.order(created_at: :desc).first
+  end
+
+  def set_default_language
+    default_language = GoogleLanguage.find_by(language_code: 'en')
+    self.google_language = default_language
   end
 end

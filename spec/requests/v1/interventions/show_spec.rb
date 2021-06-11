@@ -14,10 +14,11 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:intervention_user) { admin }
   let(:sessions) { create_list(:session, 2) }
   let(:organization) { create(:organization) }
+  let(:language) { create(:google_language) }
   let!(:intervention) do
     create(:intervention, :published, name: 'Some intervention',
                                       user: intervention_user, sessions: sessions, shared_to: shared_to,
-                                      organization: organization, reports: reports)
+                                      organization: organization, reports: reports, google_language: language)
   end
   let(:reports) { [] }
   let(:csv_attachment) { fixture_file_upload(Rails.root.join('spec/factories/csv/test_empty.csv'), 'text/csv') }
