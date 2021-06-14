@@ -15,7 +15,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
   let(:params) do
     {
       avatar: {
-        file: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+        file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
       }
     }
   end

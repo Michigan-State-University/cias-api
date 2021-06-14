@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
   let(:params) do
     {
       image: {
-        file: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+        file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
       }
     }
   end
