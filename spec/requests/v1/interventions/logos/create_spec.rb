@@ -10,12 +10,12 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
   let(:params) do
     {
       logo: {
-        file: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+        file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
       }
     }
   end
   let(:intervention_id) { intervention.id }
-  let(:published_intervention) { create(:intervention, user: current_user, status: :published, logo: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:published_intervention) { create(:intervention, user: current_user, status: :published, logo: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
   let(:published_intervention_id) { published_intervention.id }
 
   context 'when current_user is admin' do
