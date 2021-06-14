@@ -28,7 +28,7 @@ class V1::OrganizationsController < V1Controller
     authorize! :update, Organization
 
     organization = V1::Organizations::Update.call(organization_load, organization_params)
-    render json: serialized_response(organization)
+    render json: organization_response(organization)
   end
 
   def destroy
