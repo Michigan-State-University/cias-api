@@ -13,7 +13,7 @@ class V1::HealthSystems::InviteHealthSystemAdmin
   def call
     return if already_in_any_organization?
     return if user_is_not_health_system_admin?
-    return if active_health_system_admin?
+    return if active_user?
 
     if user.blank?
       new_user = User.invite!(email: email, roles: ['health_system_admin'], organizable_id: health_system.id, organizable_type: 'HealthSystem')
@@ -35,7 +35,7 @@ class V1::HealthSystems::InviteHealthSystemAdmin
     user&.roles&.exclude?('health_system_admin')
   end
 
-  def active_health_system_admin?
+  def active_user?
     user&.active?
   end
 

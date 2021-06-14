@@ -13,7 +13,7 @@ class V1::Organizations::InviteOrganizationAdmin
   def call
     return if already_in_any_organization?
     return if user_is_not_organization_admin?
-    return if active_organization_admin?
+    return if active_user?
 
     if user.blank?
       new_user = User.invite!(email: email, roles: ['organization_admin'], organizable_id: organization.id, organizable_type: 'Organization')
@@ -35,7 +35,7 @@ class V1::Organizations::InviteOrganizationAdmin
     user&.roles&.exclude?('organization_admin')
   end
 
-  def active_organization_admin?
+  def active_user?
     user&.active?
   end
 
