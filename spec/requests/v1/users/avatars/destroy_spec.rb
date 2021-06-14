@@ -59,7 +59,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   end
 
   context 'when current_user is researcher' do
-    let(:current_user) { create(:user, :confirmed, :researcher, avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+    let(:current_user) { create(:user, :confirmed, :researcher, avatar: FactoryHelpers.upload_filew('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
 
     context 'when current_user updates own avatar' do
       it { expect(response).to have_http_status(:ok) }
@@ -88,7 +88,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   end
 
   context 'when current_user is participant' do
-    let(:current_user) { create(:user, :confirmed, :participant, avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+    let(:current_user) { create(:user, :confirmed, :participant, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
 
     context 'when current_user updates own avatar' do
       it { expect(response).to have_http_status(:ok) }
@@ -113,7 +113,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   end
 
   context 'when current_user is guest' do
-    let(:current_user) { create(:user, :confirmed, :guest, avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+    let(:current_user) { create(:user, :confirmed, :guest, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
 
     context 'when current_user updates own avatar' do
       it { expect(response).to have_http_status(:ok) }

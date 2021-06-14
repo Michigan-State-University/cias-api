@@ -250,7 +250,7 @@ FactoryBot.define do
   factory :question_single, class: Question::Single do
     title { 'Single' }
     type { Question::Single }
-    image { Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
+    image { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
     body do
       {
         data: [
