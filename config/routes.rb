@@ -106,7 +106,7 @@ Rails.application.routes.draw do
     post 'questions/share', to: 'questions#share', as: :share_questions
     scope 'questions/:question_id', as: 'question' do
       scope module: 'questions' do
-        resource :images, only: %i[create destroy]
+        resource :images, only: %i[create destroy update]
       end
     end
 
