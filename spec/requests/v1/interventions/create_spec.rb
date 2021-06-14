@@ -56,7 +56,9 @@ RSpec.describe 'POST /v1/interventions', type: :request do
         expect(json_response['data']['attributes']).to include(
           'name' => 'New Intervention',
           'status' => 'draft',
-          'shared_to' => 'anyone'
+          'shared_to' => 'anyone',
+          'language_name' => 'English',
+          'language_code' => 'en'
         )
       end
 
@@ -66,7 +68,8 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           'user_id' => admin.id,
           'status' => 'draft',
           'shared_to' => 'anyone',
-          'organization_id' => organization.id
+          'organization_id' => organization.id,
+          'google_language_id' => 22
         )
       end
     end
