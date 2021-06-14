@@ -18,7 +18,7 @@ FactoryBot.define do
     trait :with_logo do
       after(:create) do |report_template|
         report_template.update(
-          logo: fixture_file_upload("#{Rails.root}/spec/fixtures/images/logo.png", 'image/png')
+          logo: FactoryHelpers.upload_file('spec/fixtures/images/logo.png', 'image/png', true)
         )
       end
     end

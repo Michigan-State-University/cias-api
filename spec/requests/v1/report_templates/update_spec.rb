@@ -19,7 +19,7 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
     }
   end
   let(:headers) { user.create_new_auth_token }
-  let(:logo) { fixture_file_upload('images/logo.png', 'image/png') }
+  let(:logo) { FactoryHelpers.upload_file('spec/fixtures/images/logo.png', 'image/png', true) }
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do
@@ -54,7 +54,7 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
 
         context 'logo is replaced' do
           before do
-            report_template.update(logo: fixture_file_upload('images/logo.png'))
+            report_template.update(logo: FactoryHelpers.upload_file('spec/fixtures/images/logo.png', 'image/png', true) )
           end
 
           let(:old_logo) { report_template.logo }

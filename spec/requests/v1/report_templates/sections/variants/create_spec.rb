@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/report_templates/sections/:section_id/variants', type: 
   let!(:report_template_section) { create(:report_template_section, report_template: report_template) }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
-  let(:image) { fixture_file_upload('images/logo.png', 'image/png') }
+  let(:image) { FactoryHelpers.upload_file('spec/fixtures/images/logo.png', 'image/png', true)}
 
   context 'when params are valid' do
     let(:params) do
