@@ -44,7 +44,7 @@ FactoryBot.define do
     trait :with_pdf_report do
       after(:create) do |report_template|
         report_template.update(
-          pdf_report: fixture_file_upload("#{Rails.root}/spec/fixtures/pdf/example_report.pdf", 'application/pdf')
+          pdf_report: FactoryHelpers.upload_file('spec/fixtures/pdf/example_report.pdf', 'application/pdf', true)
         )
       end
     end
