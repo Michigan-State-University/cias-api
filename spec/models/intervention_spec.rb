@@ -10,7 +10,7 @@ RSpec.describe Intervention, type: :model do
 
     it { should belong_to(:user) }
     it { should have_many(:sessions) }
-    it { should belong_to(:google_language).optional }
+    it { should belong_to(:google_language) }
     it { should be_valid }
     it { expect(initial_status.draft?).to be true }
   end

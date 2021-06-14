@@ -21,8 +21,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   end
 
   let(:intervention_user) { admin }
-  let(:language) { create(:google_language) }
-  let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft', google_language: language) }
+  let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
   let(:intervention_id) { intervention.id }
 
   let(:request) { patch v1_intervention_path(intervention_id), params: params, headers: headers }

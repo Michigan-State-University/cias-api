@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :google_language do
-    language_name { 'English' }
-    language_code { 'en' }
+    language_name { 'French' }
+    language_code { 'fr' }
   end
 end

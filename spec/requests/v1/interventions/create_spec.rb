@@ -9,7 +9,6 @@ RSpec.describe 'POST /v1/interventions', type: :request do
   let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
-  let!(:language) { create(:google_language) }
   let(:headers) { user.create_new_auth_token }
   let(:organization) { create(:organization) }
   let(:users) do
@@ -70,7 +69,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           'status' => 'draft',
           'shared_to' => 'anyone',
           'organization_id' => organization.id,
-          'google_language_id' => language.id
+          'google_language_id' => 22
         )
       end
     end

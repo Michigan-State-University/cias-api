@@ -192,7 +192,7 @@ ActiveRecord::Schema.define(version: 2021_06_10_120702) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "organization_id"
-    t.bigint "google_language_id"
+    t.bigint "google_language_id", default: 22, null: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"

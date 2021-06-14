@@ -4,8 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
-  let(:language) { create(:google_language) }
-  let(:intervention) { create(:intervention, google_language: language) }
+  let(:intervention) { create(:intervention) }
   let!(:session) { create(:session, intervention: intervention, position: 1) }
   let!(:other_session) do
     create(:session, intervention: intervention, position: 2,
