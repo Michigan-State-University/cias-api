@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
-  let(:other_user) { create(:user, :confirmed, :participant, avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:other_user) { create(:user, :confirmed, :participant, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
   let(:user_id) { current_user.id }
   let(:users) do
     {
