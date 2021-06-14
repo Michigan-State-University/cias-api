@@ -11,7 +11,7 @@ class V1::HealthSystems::InviteHealthSystemAdmin
   end
 
   def call
-    return if already_in_the_health_system?
+    return if already_in_any_organization?
     return if user_is_not_health_system_admin?
     return if active_health_system_admin?
 
@@ -27,8 +27,8 @@ class V1::HealthSystems::InviteHealthSystemAdmin
 
   attr_reader :health_system, :email
 
-  def already_in_the_health_system?
-    health_system.health_system_admins.exists?(email: email)
+  def already_in_any_organization?
+    user&.organizable.present?
   end
 
   def user_is_not_health_system_admin?

@@ -11,7 +11,7 @@ class V1::Organizations::InviteOrganizationAdmin
   end
 
   def call
-    return if already_in_the_organization?
+    return if already_in_any_organization?
     return if user_is_not_organization_admin?
     return if active_organization_admin?
 
@@ -27,8 +27,8 @@ class V1::Organizations::InviteOrganizationAdmin
 
   attr_reader :organization, :email
 
-  def already_in_the_organization?
-    organization.organization_admins.where(email: email).any?
+  def already_in_any_organization?
+    user&.organizable.present?
   end
 
   def user_is_not_organization_admin?
