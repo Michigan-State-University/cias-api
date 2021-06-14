@@ -9,7 +9,7 @@ RSpec.describe 'PATCH /v1/questions/:question_id/images', type: :request do
   let(:params) do
     {
       image: {
-        description: 'Some description'
+        image_alt: 'Some description'
       }
     }
   end
@@ -43,7 +43,7 @@ RSpec.describe 'PATCH /v1/questions/:question_id/images', type: :request do
       end
 
       it 'return description for image' do
-        expect(json_response['data']['attributes']['img_description']).to eq('Some description')
+        expect(json_response['data']['attributes']['image_alt']).to eq('Some description')
       end
     end
   end

@@ -12,7 +12,7 @@ class V1::Questions::ImagesController < V1Controller
   def update
     authorize! :update, Question
 
-    question_load.image_blob&.update!(description: question_params[:description])
+    question_load.image_blob&.update!(description: question_params[:image_alt])
     render json: serialized_response(question_load, 'Question')
   end
 
@@ -31,6 +31,6 @@ class V1::Questions::ImagesController < V1Controller
   end
 
   def question_params
-    params.require(:image).permit(:file, :description)
+    params.require(:image).permit(:file, :image_alt)
   end
 end
