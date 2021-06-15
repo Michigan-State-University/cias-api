@@ -31,22 +31,5 @@ class SummonUsers
   end
 end
 
-class GoogleTtsVoices
-  class << self
-    def onboarding
-      Rake::Task['google_tts_languages:fetch'].invoke
-    end
-  end
-end
-
-class GoogleLanguages
-  class << self
-    def onboarding
-      Rake::Task['google_languages:fetch'].invoke
-    end
-  end
-end
-
 SummonUsers.onboarding
 GoogleTtsVoices.onboarding
-GoogleLanguages.onboarding
