@@ -169,6 +169,7 @@ Rails.application.routes.draw do
     end
 
     resources :charts, controller: :charts
+    post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
   end
 
   if Rails.env.development?

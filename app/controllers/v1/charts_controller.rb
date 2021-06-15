@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::ChartsController < V1Controller
+  include Resource::Clone
+
   def index
     authorize! :read, Chart
 

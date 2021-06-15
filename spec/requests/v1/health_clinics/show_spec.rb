@@ -53,17 +53,20 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic.name,
-              'health_clinic_admins' => [include('id' => health_clinic_admin.id)]
+              'name' => health_clinic.name
+            },
+            'relationships' => {
+              'health_clinic_admins' => {
+                'data' => [include('id' => health_clinic_admin.id)]
+              }
             }
           }
         )
       end
 
       it 'returns proper include' do
-        expect(json_response['data']['attributes']['health_clinic_admins'][0]).to include(
+        expect(json_response['included'][0]['attributes']).to include(
           {
-            'id' => health_clinic_admin.id,
             'email' => health_clinic_admin.email,
             'first_name' => health_clinic_admin.first_name,
             'last_name' => health_clinic_admin.last_name,
@@ -73,7 +76,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       end
 
       it 'returns proper collection size' do
-        expect(json_response.size).to eq(1)
+        expect(json_response.size).to eq(2)
       end
     end
 
