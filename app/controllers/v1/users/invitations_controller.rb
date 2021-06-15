@@ -38,6 +38,7 @@ class V1::Users::InvitationsController < V1Controller
   # link, thus there is no need for authorization
   def update
     user = User.accept_invitation!(accept_invitation_params)
+    user.activate!
 
     if user.persisted?
       render json: serialized_response(user, controller_name.classify, { only_email: true })
