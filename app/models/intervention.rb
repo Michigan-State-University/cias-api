@@ -6,6 +6,7 @@ class Intervention < ApplicationRecord
 
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
+  belongs_to :google_language
   has_many :sessions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy

@@ -22,6 +22,7 @@ gem 'devise_token_auth'
 gem 'faker', require: false
 gem 'fast_jsonapi'
 gem 'google-cloud-text_to_speech'
+gem 'google-cloud-translate-v2'
 gem 'hiredis'
 gem 'oj'
 gem 'pagy'

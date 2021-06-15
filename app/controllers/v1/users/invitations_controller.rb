@@ -31,7 +31,7 @@ class V1::Users::InvitationsController < V1Controller
     # and there is no version with !
     raise ActiveRecord::RecordNotFound if user.blank?
 
-    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}"
+    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}&role=#{user.roles.first}"
   end
 
   # This endpoint is hit from registration page to register new user from invitation

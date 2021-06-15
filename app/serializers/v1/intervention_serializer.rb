@@ -11,6 +11,14 @@ class V1::InterventionSerializer < V1Serializer
     object.newest_report.created_at if object.reports.attached?
   end
 
+  attribute :language_name do |object|
+    object.google_language.language_name
+  end
+
+  attribute :language_code do |object|
+    object.google_language.language_code
+  end
+
   attributes :logo_url do |object|
     url_for(object.logo) if object.logo.attached?
   end

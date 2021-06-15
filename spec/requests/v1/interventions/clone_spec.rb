@@ -23,13 +23,13 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
                              [{ 'id' => '', 'type' => 'Session' }] }] })
   end
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
-  let!(:question_1) do
+  let!(:question1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
                              formula: { 'payload' => 'var + 3', 'patterns' => [
-                               { 'match' => '=7', 'target' => [{ 'id' => question_2.id, type: 'Question::Single' }] }
+                               { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
                              ] })
   end
-  let!(:question_2) do
+  let!(:question2) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
                              formula: { 'payload' => 'var + 4', 'patterns' => [
                                { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
