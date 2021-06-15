@@ -48,7 +48,7 @@ Rails.application.routes.draw do
 
     scope 'interventions/:interventions_id', as: 'intervention' do
       scope module: 'interventions' do
-        resource :logo, only: %i[create destroy]
+        resource :logo, only: %i[create destroy update]
       end
     end
 
