@@ -2,32 +2,31 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request do
+RSpec.describe 'PATCH  /v1/interventions/:interventions_id/logo', type: :request do
   let(:current_user) { create(:user, :confirmed, :admin) }
   let(:other_user) { create(:user, :confirmed, :participant) }
   let(:other_user2) { create(:user, :confirmed, :third_party) }
-  let(:intervention) { create(:intervention, user: current_user) }
+  let(:intervention) { create(:intervention_with_logo, user: current_user) }
   let(:params) do
     {
       logo: {
-        file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+        image_alt: 'New logo'
       }
     }
   end
   let(:intervention_id) { intervention.id }
-  let(:published_intervention) { create(:intervention, user: current_user, status: :published, logo: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:published_intervention) { create(:intervention_with_logo, user: current_user, status: :published) }
   let(:published_intervention_id) { published_intervention.id }
 
-  context 'when current_user is admin' do
-    context 'when current_user adds a logo' do
-      before { post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token }
+  let(:request) { patch v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token }
 
-      it { expect(response).to have_http_status(:created) }
+  context 'when current_user is admin' do
+    context 'when current_user adds a description' do
+      before { request }
 
       it 'JSON response contains proper attributes' do
-        logo_url = polymorphic_url(intervention.reload.logo).sub('http://www.example.com/', '')
         expect(json_response['data']['attributes']).to include(
-          'logo_url' => include(logo_url)
+          'image_alt' => 'New logo'
         )
       end
     end
