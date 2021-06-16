@@ -42,7 +42,8 @@ RSpec.describe 'POST/v1/organizations/:organization_id/invitations/invite_organi
                 email: params[:email],
                 confirmed_at: nil,
                 organizable_id: organization.id,
-                roles: ['organization_admin']
+                roles: ['organization_admin'],
+                active: false
               )
 
               expect(organization.reload.organization_admins.last).to eq(new_organization_admin)

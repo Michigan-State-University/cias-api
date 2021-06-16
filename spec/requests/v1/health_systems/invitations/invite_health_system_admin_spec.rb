@@ -46,7 +46,8 @@ RSpec.describe 'POST /v1/health_systems/:health_system_id/invitations/invite_hea
                 email: params[:email],
                 organizable_id: health_system.id,
                 confirmed_at: nil,
-                roles: ['health_system_admin']
+                roles: ['health_system_admin'],
+                active: false
               )
             end
           end
