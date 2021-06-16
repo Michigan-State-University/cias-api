@@ -73,18 +73,6 @@ RSpec.describe 'POST /v1/organizations', type: :request do
         end
       end
     end
-
-    context 'when user is e_intervention admin' do
-      let(:user) { create(:user, :confirmed, :e_intervention_admin) }
-
-      it_behaves_like 'permitted user'
-    end
-
-    context 'when the user has multiple roles and one of it is e_intervention admin' do
-      let(:user) { create(:user, :confirmed, roles: %w[participant e_intervention_admin guest]) }
-
-      it_behaves_like 'permitted user'
-    end
   end
 
   context 'when user is not permitted' do
@@ -96,7 +84,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
       end
     end
 
-    %i[organization_admin team_admin researcher participant guest].each do |role|
+    %i[organization_admin team_admin researcher participant guest e_intervention_admin].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
