@@ -4,15 +4,14 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   def generate_charts_data
     authorize! :read, ChartStatistic
 
+
     data_collection = charts_data_collection
+    charts = load_charts
 
-    pie_charts_data = V1::ChartStatistics::GenerateStatistics.new(pie_charts_data_collection(data_collection))
-                                                             .generate_pie_chart_statistics
+    charts_data = V1::ChartStatistics::GenerateStatistics.new(data_collection, charts)
+                                                             .generate_statistics
 
-    bar_charts_data = V1::ChartStatistics::GenerateStatistics.new(bar_charts_data_collection(data_collection))
-                                                             .generate_bar_chart_statistics
-
-    render json: charts_data_response(pie_charts_data, bar_charts_data)
+    render json: charts_data_response(charts_data)
   end
 
   def generate_chart_data
@@ -20,15 +19,9 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
 
     chart = load_chart
     data_collection = charts_data_collection
-    result = []
 
-    if chart&.pie_chart?
-      result = V1::ChartStatistics::GenerateStatistics.new(pie_chart_data_collection(data_collection))
-                                                      .generate_pie_chart_statistics
-    elsif chart&.bar_chart? || chart&.percentage_bar_chart?
-      result = V1::ChartStatistics::GenerateStatistics.new(bar_chart_data_collection(data_collection))
-                                                      .generate_bar_chart_statistics
-    end
+    result = V1::ChartStatistics::GenerateStatistics.new(data_collection, chart)
+                                                         .generate_statistics
 
     render json: result.first
   end
@@ -71,6 +64,10 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     Chart.find_by(id: params[:chart_id])
   end
 
+  def load_charts
+    Chart.accessible_by(current_ability)
+  end
+
   def charts_data_collection
     data_collection = ChartStatistic.accessible_by(current_ability).where(organization_id: organization.id)
     data_collection = data_collection&.where(health_clinic_id: clinic_ids) if clinic_ids.present?
@@ -94,10 +91,9 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     pie_charts_data_collection(data_collection).where(chart_id: chart_id)
   end
 
-  def charts_data_response(pie_charts_data, bar_charts_data)
+  def charts_data_response(charts_data)
     {
-      'pie_charts' => pie_charts_data,
-      'bar_charts' => bar_charts_data
+      'data_for_charts' => charts_data
     }
   end
 end
