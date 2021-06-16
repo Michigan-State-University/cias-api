@@ -66,7 +66,7 @@ module BlockHelper
     {
       'action' => 'NO_ACTION',
       'animation' => 'rest',
-      'text' => ['Finish Screen'],
+      'text' => ['Enter main text for screen here. This is the last screen participants will see in this session'],
       'audio_urls' => [],
       'sha256' => [],
       'type' => READ_QUESTION_BLOCK,
