@@ -13,4 +13,12 @@ class V1::UserSessionSerializer < V1Serializer
     intervention = Intervention.find(intervention_id)
     intervention.logo_blob.description if intervention.logo_blob.present?
   end
+
+  attribute :language_name do |object|
+    object.session.intervention.google_language.language_name
+  end
+
+  attribute :language_code do |object|
+    object.session.intervention.google_language.language_code
+  end
 end
