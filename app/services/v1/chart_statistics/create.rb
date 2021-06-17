@@ -32,11 +32,7 @@ class V1::ChartStatistics::Create
   def label
     result = dentaku_service.calculate
 
-    if chart.chart_type == Chart.chart_types[:bar_chart]
-      result ? 'Matched' : 'NotMatched'
-    else
-      result ? result['label'] : chart.formula['default_pattern']['label']
-    end
+    result ? result['label'] : chart.formula['default_pattern']['label']
   end
 
   def dentaku_service
