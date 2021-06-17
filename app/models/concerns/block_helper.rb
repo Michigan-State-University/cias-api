@@ -66,7 +66,7 @@ module BlockHelper
     {
       'action' => 'NO_ACTION',
       'animation' => 'rest',
-      'text' => ['Enter main text for screen here. This is the last screen participants will see in this session'],
+      'text' => [I18n.t('question.finish.text_to_speech')],
       'audio_urls' => [],
       'sha256' => [],
       'type' => READ_QUESTION_BLOCK,
