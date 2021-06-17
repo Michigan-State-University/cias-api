@@ -9,7 +9,6 @@ class V1::ChartStatistics::GenerateStatistics
   end
 
   def generate_statistics
-
     percentage_bar_chart_statistics = generate_percentage_bar_chart_statistics
     numeric_bar_chart_statistics = generate_numeric_bar_chart_statistics
     pie_chart_statistics = generate_pie_chart_statistics
@@ -65,6 +64,7 @@ class V1::ChartStatistics::GenerateStatistics
     aggregated_data.each do |label, value|
       statistics << data_for_pie_chart(label, value, patterns, default_pattern)
     end
+    statistics = statistics.sort_by { |statistic| statistic['label'].to_time }
 
     add_basic_information(chart, chart_statistic, statistics)
     chart_statistic
@@ -76,11 +76,8 @@ class V1::ChartStatistics::GenerateStatistics
 
     data['value'] = value
     current_pattern = patterns.find { |pattern| pattern['label'] == label }
-    if current_pattern.present?
-      data['color'] = current_pattern['color']
-    else
-      data['color'] = default_pattern['color']
-    end
+    data['color'] = current_pattern.present? ? current_pattern['color'] : default_pattern['color']
+
     data
   end
 
@@ -94,6 +91,7 @@ class V1::ChartStatistics::GenerateStatistics
     aggregated_data.each do |month, value|
       statistics << monthly_data_for_numeric_bar_chart(month, value, patterns, default_pattern)
     end
+    statistics = statistics.sort_by { |statistic| statistic['label'].to_time }
 
     add_basic_information(chart, chart_statistic, statistics)
     chart_statistic
