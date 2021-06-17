@@ -21,7 +21,7 @@ class V1::ChartStatistics::GenerateStatistics
 
   def generate_percentage_bar_chart_statistics
     aggregated_data = generate_bar_chart_hash
-    bar_charts = charts.where(chart_type: 'percentage_bar_chart')
+    bar_charts = charts.where(chart_type: 'percentage_bar_chart', status: 'published')
     charts_statistic = []
 
     bar_charts.each do |chart|
@@ -33,7 +33,7 @@ class V1::ChartStatistics::GenerateStatistics
 
   def generate_numeric_bar_chart_statistics
     aggregated_data = generate_bar_chart_hash
-    bar_charts = charts.where(chart_type: 'bar_chart')
+    bar_charts = charts.where(chart_type: 'bar_chart', status: 'published')
     charts_statistic = []
 
     bar_charts.each do |chart|
@@ -45,7 +45,7 @@ class V1::ChartStatistics::GenerateStatistics
 
   def generate_pie_chart_statistics
     aggregated_data = generate_pie_chart_hash
-    pie_charts = charts.where(chart_type: 'pie_chart')
+    pie_charts = charts.where(chart_type: 'pie_chart', status: 'published')
 
     charts_statistic = []
 
@@ -127,13 +127,6 @@ class V1::ChartStatistics::GenerateStatistics
     chart_statistic
   end
 
-  def add_basic_information(chart, chart_statistic, statistics)
-    chart_statistic['chart_id'] = chart.id
-    chart_statistic['data'] = statistics
-    chart_statistic['population'] = charts_data_collection.where(chart_id: chart.id).count
-    chart_statistic['dashboard_section_id'] = chart.dashboard_section_id
-  end
-
   def monthly_data_for_percentage_bar_char(date, values, patterns, default_pattern)
     monthly_data = {}
     monthly_data['label'] = date
@@ -145,8 +138,16 @@ class V1::ChartStatistics::GenerateStatistics
 
     other_label = default_pattern['label']
     monthly_data['population'] = values[other_label] + monthly_data['value']
-    monthly_data['value'] = monthly_data['value'].to_f / monthly_data['population']
+    monthly_data['value'] = (monthly_data['value'].to_f / monthly_data['population'] * 100).round(2)
+
     monthly_data
+  end
+
+  def add_basic_information(chart, chart_statistic, statistics)
+    chart_statistic['chart_id'] = chart.id
+    chart_statistic['data'] = statistics
+    chart_statistic['population'] = charts_data_collection.where(chart_id: chart.id).count
+    chart_statistic['dashboard_section_id'] = chart.dashboard_section_id
   end
 
   def generate_bar_chart_hash
