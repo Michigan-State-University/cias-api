@@ -33,7 +33,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   end
 
   def charts_data_params
-    params.require(:charts_data).permit(:start_date, :end_date, clinic_ids: [])
+    params.permit(:start_date, :end_date, clinic_ids: [])
   end
 
   def start_date
