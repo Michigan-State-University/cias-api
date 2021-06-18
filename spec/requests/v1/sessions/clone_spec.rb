@@ -268,7 +268,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       it 'finish question has only one speech' do
         expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'].size).to eq(1)
         expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'][0]).to include(
-          'text' => ['Finish Screen'],
+          'text' => ['Enter main text for screen here. This is the last screen participants will see in this session'],
           'type' => 'ReadQuestion',
           'action' => 'NO_ACTION',
           'animation' => 'rest',

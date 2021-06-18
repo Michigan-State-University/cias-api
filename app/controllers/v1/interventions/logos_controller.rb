@@ -10,6 +10,14 @@ class V1::Interventions::LogosController < V1Controller
     render json: serialized_response(intervention_load, 'Intervention'), status: :created
   end
 
+  def update
+    authorize! :add_logo, Intervention
+    return render status: :method_not_allowed if intervention_published?
+
+    intervention_load.logo_blob&.update!(description: intervention_params[:image_alt])
+    render json: serialized_response(intervention_load, 'Intervention')
+  end
+
   def destroy
     authorize! :add_logo, Intervention
     return render status: :method_not_allowed if intervention_published?
@@ -26,7 +34,7 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   def intervention_params
-    params.require(:logo).permit(:file)
+    params.require(:logo).permit(:file, :image_alt)
   end
 
   def intervention_published?

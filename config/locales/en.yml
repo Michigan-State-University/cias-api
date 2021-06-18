@@ -7,6 +7,7 @@ en:
   question:
     finish:
       subtitle: '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
+      text_to_speech: 'Enter main text for screen here. This is the last screen participants will see in this session'
       title: Enter title here
   question_group:
     finish:

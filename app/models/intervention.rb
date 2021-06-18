@@ -6,12 +6,17 @@ class Intervention < ApplicationRecord
 
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
+  belongs_to :google_language
   has_many :sessions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
 
   has_many_attached :reports
   has_one_attached :logo, dependent: :purge_later
+
+  has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
+  has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
+
 
   attr_accessor :status_event
 

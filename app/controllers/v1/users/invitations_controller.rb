@@ -31,13 +31,14 @@ class V1::Users::InvitationsController < V1Controller
     # and there is no version with !
     raise ActiveRecord::RecordNotFound if user.blank?
 
-    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}"
+    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}&role=#{user.roles.first}"
   end
 
   # This endpoint is hit from registration page to register new user from invitation
   # link, thus there is no need for authorization
   def update
     user = User.accept_invitation!(accept_invitation_params)
+    user.activate!
 
     if user.persisted?
       render json: serialized_response(user, controller_name.classify, { only_email: true })

@@ -48,7 +48,8 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
                 email: params[:email],
                 organizable_id: health_clinic.id,
                 confirmed_at: nil,
-                roles: ['health_clinic_admin']
+                roles: ['health_clinic_admin'],
+                active: false
               )
             end
           end
