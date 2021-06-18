@@ -33,19 +33,23 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   end
 
   def charts_data_params
-    params.permit(:start_date, :end_date, clinic_ids: [])
+    params.permit(:date_offset, clinic_ids: [])
+  end
+
+  def date_offset
+    charts_data_params[:date_offset].to_i
   end
 
   def start_date
-    charts_data_params[:start_date]
+    Time.current - date_offset.days
   end
 
   def end_date
-    charts_data_params[:end_date]
+    Time.current
   end
 
   def date_range
-    start_date.to_date.beginning_of_day..end_date.to_date.end_of_day
+    start_date.beginning_of_day..end_date.end_of_day
   end
 
   def clinic_ids
@@ -71,7 +75,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   def charts_data_collection
     data_collection = ChartStatistic.accessible_by(current_ability).where(organization_id: organization.id)
     data_collection = data_collection&.where(health_clinic_id: clinic_ids) if clinic_ids.present?
-    data_collection = data_collection&.where(created_at: date_range) if start_date.present? && end_date.present?
+    data_collection = data_collection&.where(created_at: date_range) if date_offset.present?
     data_collection&.joins(:chart)
   end
 
