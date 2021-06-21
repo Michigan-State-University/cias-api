@@ -48,11 +48,11 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',
-                               'label' => 'Label1',
+                               'label' => 'Matched',
                                'match' => '' }],
               'default_pattern' => {
                 'color' => '#E2B1F4',
-                'label' => 'Other'
+                'label' => 'NotMatched'
               }
             },
             'dashboard_section_id' => dashboard_section.id,
@@ -71,11 +71,11 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',
-                               'label' => 'Label1',
+                               'label' => 'Matched',
                                'match' => '' }],
               'default_pattern' => {
                 'color' => '#E2B1F4',
-                'label' => 'Other'
+                'label' => 'NotMatched'
               }
             },
             'dashboard_section_id' => dashboard_section.id,
@@ -94,11 +94,11 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',
-                               'label' => 'Label1',
+                               'label' => 'Matched',
                                'match' => '' }],
               'default_pattern' => {
                 'color' => '#E2B1F4',
-                'label' => 'Other'
+                'label' => 'NotMatched'
               }
             },
             'dashboard_section_id' => other_dashboard_section.id,
@@ -133,12 +133,12 @@ RSpec.describe 'GET /v1/charts', type: :request do
               'payload' => '',
               'patterns' => [
                 { 'color' => '#C766EA',
-                  'label' => 'Label1',
+                  'label' => 'Matched',
                   'match' => '' }
               ],
               'default_pattern' => {
                 'color' => '#E2B1F4',
-                'label' => 'Other'
+                'label' => 'NotMatched'
               }
             },
             'dashboard_section_id' => dashboard_section.id,
@@ -157,11 +157,11 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',
-                               'label' => 'Label1',
+                               'label' => 'Matched',
                                'match' => '' }],
               'default_pattern' => {
                 'color' => '#E2B1F4',
-                'label' => 'Other'
+                'label' => 'NotMatched'
               }
             },
             'dashboard_section_id' => dashboard_section.id,

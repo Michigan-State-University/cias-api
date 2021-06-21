@@ -65,7 +65,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   end
 
   def load_chart
-    Chart.find_by(id: params[:chart_id])
+    Chart.find_by(id: chart_id)
   end
 
   def load_charts
