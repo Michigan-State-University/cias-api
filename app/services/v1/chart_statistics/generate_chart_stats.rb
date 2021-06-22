@@ -10,6 +10,7 @@ class V1::ChartStatistics::GenerateChartStats
 
   def generate
     aggregated_data = generate_hash
+    charts = current_chart_type_collection
 
     charts.map do |chart|
       chart_statistics(aggregated_data[chart.id], chart)
@@ -20,7 +21,7 @@ class V1::ChartStatistics::GenerateChartStats
     return unless chart.published?
 
     aggregated_data = generate_hash
-    chart_statistics(aggregated_data, chart)
+    chart_statistics(aggregated_data[chart.id], chart)
   end
 
   private
@@ -34,6 +35,10 @@ class V1::ChartStatistics::GenerateChartStats
   end
 
   def data_for_chart(_label, _value, _patterns, _default_pattern)
+    raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
+  end
+
+  def current_chart_type_collection
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 

@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats < V1::ChartStatistics::GenerateChartStats
-  def initialize(charts_data_collection, charts)
-    @charts_data_collection = charts_data_collection
-    @charts = charts.where(chart_type: 'pie_chart', status: 'published')
-  end
-
   private
 
   def chart_statistics(aggregated_data, chart)
@@ -29,6 +24,10 @@ class V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats < V1::Chart
     data['color'] = current_pattern.present? ? current_pattern['color'] : default_pattern['color']
 
     data
+  end
+
+  def current_chart_type_collection
+    charts.where(chart_type: 'pie_chart', status: 'published')
   end
 
   def generate_hash

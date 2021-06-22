@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats do
-  subject { described_class.new(data_collection, charts).generate }
-
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
@@ -19,42 +17,72 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats do
   let(:data_collection) { ChartStatistic.all }
   let(:charts) { Chart.all }
 
-  context 'when charts are publish' do
-    it 'return correct aggreagted data' do
-      expect(subject).to include(
-        {
-          'chart_id' => pie_chart1.id,
-          'data' => include(
-            {
-              'label' => 'Matched',
-              'value' => 10,
-              'color' => '#C766EA'
-            },
-            {
-              'label' => 'NotMatched',
-              'value' => 8,
-              'color' => '#E2B1F4'
-            }
-          ),
-          'population' => 18,
-          'dashboard_section_id' => pie_chart1.dashboard_section_id
-        },
-        {
-          'chart_id' => pie_chart2.id,
-          'data' => [],
-          'population' => 0,
-          'dashboard_section_id' => pie_chart2.dashboard_section_id
-        }
-      )
+  context 'for collection' do
+    subject { described_class.new(data_collection, charts).generate }
+
+    context 'when charts are publish' do
+      it 'return correct aggreagted data' do
+        expect(subject).to include(
+          {
+            'chart_id' => pie_chart1.id,
+            'data' => include(
+              {
+                'label' => 'Matched',
+                'value' => 10,
+                'color' => '#C766EA'
+              },
+              {
+                'label' => 'NotMatched',
+                'value' => 8,
+                'color' => '#E2B1F4'
+              }
+            ),
+            'population' => 18,
+            'dashboard_section_id' => pie_chart1.dashboard_section_id
+          },
+          {
+            'chart_id' => pie_chart2.id,
+            'data' => [],
+            'population' => 0,
+            'dashboard_section_id' => pie_chart2.dashboard_section_id
+          }
+        )
+      end
+    end
+
+    context 'when charts are draft' do
+      let!(:pie_chart1) { create(:chart, name: 'pie_chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
+      let!(:pie_chart2) { create(:chart, name: 'pie_chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
+
+      it 'return empty array' do
+        expect(subject).to eql([])
+      end
     end
   end
 
-  context 'when charts are draft' do
-    let!(:pie_chart1) { create(:chart, name: 'pie_chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
-    let!(:pie_chart2) { create(:chart, name: 'pie_chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
+  context 'for one chart' do
+    subject { described_class.new(data_collection, chart).generate_for_chart }
 
-    it 'return empty array' do
-      expect(subject).to eql([])
+    let(:chart) { pie_chart1 }
+
+    it 'return correct data' do
+      expect(subject).to include(
+        'chart_id' => chart.id,
+        'data' => include(
+          {
+            'label' => 'NotMatched',
+            'value' => 8,
+            'color' => '#E2B1F4'
+          },
+          {
+            'label' => 'Matched',
+            'value' => 10,
+            'color' => '#C766EA'
+          }
+        ),
+        'population' => 18,
+        'dashboard_section_id' => chart.dashboard_section_id
+      )
     end
   end
 end
