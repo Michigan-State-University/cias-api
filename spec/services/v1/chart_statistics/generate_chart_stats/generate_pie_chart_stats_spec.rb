@@ -59,30 +59,4 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats do
       end
     end
   end
-
-  context 'for one chart' do
-    subject { described_class.new(data_collection, chart).generate_for_chart }
-
-    let(:chart) { pie_chart1 }
-
-    it 'return correct data' do
-      expect(subject).to include(
-        'chart_id' => chart.id,
-        'data' => include(
-          {
-            'label' => 'NotMatched',
-            'value' => 8,
-            'color' => '#E2B1F4'
-          },
-          {
-            'label' => 'Matched',
-            'value' => 10,
-            'color' => '#C766EA'
-          }
-        ),
-        'population' => 18,
-        'dashboard_section_id' => chart.dashboard_section_id
-      )
-    end
-  end
 end
