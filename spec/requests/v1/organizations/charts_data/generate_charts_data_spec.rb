@@ -60,7 +60,6 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
       end
 
       it 'return proper data' do
-        p json_response['data_for_charts']
         expect(json_response['data_for_charts']).to include(
           {
             'chart_id' => percentage_bar_chart.id,

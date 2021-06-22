@@ -72,9 +72,9 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
 
   def charts_data_collection
     data_collection = ChartStatistic.accessible_by(current_ability).where(organization_id: organization.id)
-    data_collection = data_collection&.where(health_clinic_id: clinic_ids) if clinic_ids.present?
+    data_collection = data_collection&.by_health_clinic_ids(clinic_ids) if clinic_ids.present?
     data_collection = data_collection&.where(chart_id: chart_id) if chart_id.present?
-    data_collection = data_collection&.where(created_at: date_range) if date_offset.present?
+    data_collection = data_collection&.created_between(date_range) if date_offset.present?
     data_collection&.joins(:chart)
   end
 

@@ -74,124 +74,123 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
         end
 
         it 'return correct size' do
-          expect(json_response.first.size).to be(4)
+          expect(json_response.size).to be(1)
         end
       end
 
-      # context 'bar chart' do
-      #   let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
-      #
-      #   it 'returns proper data' do
-      #     expect(json_response).to include({
-      #                                        'chart_id' => chart.id,
-      #                                        'data' => include(
-      #                                          {
-      #                                            'label' => 3.months.ago.strftime('%B %Y'),
-      #                                            'value' => 4,
-      #                                            'color' => '#C766EA',
-      #                                            'notMatchedValue' => 5
-      #                                          },
-      #                                          {
-      #                                            'label' => 2.months.ago.strftime('%B %Y'),
-      #                                            'value' => 10,
-      #                                            'color' => '#C766EA',
-      #                                            'notMatchedValue' => 3
-      #                                          }
-      #                                        ),
-      #                                        'population' => 22,
-      #                                        'dashboard_section_id' => chart.dashboard_section_id
-      #                                      })
-      #   end
-      #
-      #   it 'return correct size' do
-      #     expect(json_response.size).to be(4)
-      #   end
-      # end
-      #
-      # context 'percentage bar chart' do
-      #   let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart', status: 'published') }
-      #
-      #   it 'returns proper data' do
-      #     expect(json_response).to include({
-      #                                        'chart_id' => chart.id,
-      #                                        'data' => include(
-      #                                          {
-      #                                            'label' => 3.months.ago.strftime('%B %Y'),
-      #                                            'value' => 44.44,
-      #                                            'color' => '#C766EA',
-      #                                            'population' => 9
-      #                                          },
-      #                                          {
-      #                                            'label' => 2.months.ago.strftime('%B %Y'),
-      #                                            'value' => 76.92,
-      #                                            'color' => '#C766EA',
-      #                                            'population' => 13
-      #                                          }
-      #                                        ),
-      #                                        'population' => 22,
-      #                                        'dashboard_section_id' => chart.dashboard_section_id
-      #                                      })
-      #   end
-      #
-      #   it 'return correct size' do
-      #     expect(json_response.size).to be(4)
-      #   end
-      # end
+      context 'bar chart' do
+        let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
 
-      # context 'return data from a specific period of time' do
-      #   let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
-      #   let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
-      #
-      #   let(:params) do
-      #     {
-      #       date_offset: 10
-      #     }
-      #   end
-      #
-      #   it 'return correct data' do
-      #     expect(json_response).to include({
-      #                                        'chart_id' => chart.id,
-      #                                        'data' => include(
-      #                                          {
-      #                                            'label' => 'Matched',
-      #                                            'value' => 4,
-      #                                            'color' => '#C766EA'
-      #                                          },
-      #                                          {
-      #                                            'label' => 'NotMatched',
-      #                                            'value' => 3,
-      #                                            'color' => '#E2B1F4'
-      #                                          }
-      #                                        ),
-      #                                        'population' => 7,
-      #                                        'dashboard_section_id' => chart.dashboard_section_id
-      #                                      })
-      #   end
-      # end
-      #
-      # context 'when params are INVALID' do
-      #   let(:params) do
-      #     {
-      #       date_offset: -1
-      #     }
-      #   end
-      #
-      #   it 'return empty list' do
-      #     expect(json_response).to include(
-      #       {
-      #         'chart_id' => chart.id,
-      #         'data' => [],
-      #         'population' => 0,
-      #         'dashboard_section_id' => chart.dashboard_section_id
-      #       }
-      #     )
-      #   end
-      # end
+        it 'returns proper data' do
+          expect(json_response).to include({
+                                             'chart_id' => chart.id,
+                                             'data' => include(
+                                               {
+                                                 'label' => 3.months.ago.strftime('%B %Y'),
+                                                 'value' => 4,
+                                                 'color' => '#C766EA',
+                                                 'notMatchedValue' => 5
+                                               },
+                                               {
+                                                 'label' => 2.months.ago.strftime('%B %Y'),
+                                                 'value' => 10,
+                                                 'color' => '#C766EA',
+                                                 'notMatchedValue' => 3
+                                               }
+                                             ),
+                                             'population' => 22,
+                                             'dashboard_section_id' => chart.dashboard_section_id
+                                           })
+        end
+
+        it 'return correct size' do
+          expect(json_response.size).to be(1)
+        end
+      end
+
+      context 'percentage bar chart' do
+        let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart', status: 'published') }
+
+        it 'returns proper data' do
+          expect(json_response).to include({
+                                             'chart_id' => chart.id,
+                                             'data' => include(
+                                               {
+                                                 'label' => 3.months.ago.strftime('%B %Y'),
+                                                 'value' => 44.44,
+                                                 'color' => '#C766EA',
+                                                 'population' => 9
+                                               },
+                                               {
+                                                 'label' => 2.months.ago.strftime('%B %Y'),
+                                                 'value' => 76.92,
+                                                 'color' => '#C766EA',
+                                                 'population' => 13
+                                               }
+                                             ),
+                                             'population' => 22,
+                                             'dashboard_section_id' => chart.dashboard_section_id
+                                           })
+        end
+
+        it 'return correct size' do
+          expect(json_response.size).to be(1)
+        end
+      end
+
+      context 'return data from a specific period of time' do
+        let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
+        let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
+
+        let(:params) do
+          {
+            date_offset: 10
+          }
+        end
+
+        it 'return correct data' do
+          expect(json_response).to include({
+                                             'chart_id' => chart.id,
+                                             'data' => include(
+                                               {
+                                                 'label' => 'Matched',
+                                                 'value' => 4,
+                                                 'color' => '#C766EA'
+                                               },
+                                               {
+                                                 'label' => 'NotMatched',
+                                                 'value' => 3,
+                                                 'color' => '#E2B1F4'
+                                               }
+                                             ),
+                                             'population' => 7,
+                                             'dashboard_section_id' => chart.dashboard_section_id
+                                           })
+        end
+      end
+
+      context 'when params are INVALID' do
+        let(:params) do
+          {
+            date_offset: -1
+          }
+        end
+
+        it 'return empty list' do
+          expect(json_response).to include(
+            {
+              'chart_id' => chart.id,
+              'data' => [],
+              'population' => 0,
+              'dashboard_section_id' => chart.dashboard_section_id
+            }
+          )
+        end
+      end
     end
 
     context 'when user is' do
-      # %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
-      %w[admin].each do |role|
+      %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
         context role.to_s do
           let(:user) { roles[role] }
 
