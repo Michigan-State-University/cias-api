@@ -10,18 +10,12 @@ class V1::ChartStatistics::GenerateChartStats
 
   def generate
     aggregated_data = generate_hash
-    charts = current_chart_type_collection
+    collection = charts.is_a?(Chart) ? [charts] : current_chart_type_collection
 
-    charts.map do |chart|
-      chart_statistics(aggregated_data[chart.id], chart)
+    collection.map do |chart|
+      statistics = chart_statistics(aggregated_data[chart.id], chart)
+      add_basic_information(chart, statistics)
     end
-  end
-
-  def generate_for_chart
-    return unless chart.published?
-
-    aggregated_data = generate_hash
-    chart_statistics(aggregated_data[chart.id], chart)
   end
 
   private
@@ -42,15 +36,12 @@ class V1::ChartStatistics::GenerateChartStats
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 
-  def add_basic_information(chart, chart_statistic, statistics)
+  def add_basic_information(chart, statistics)
+    chart_statistic = {}
     chart_statistic['chart_id'] = chart.id
     chart_statistic['data'] = statistics
     chart_statistic['population'] = charts_data_collection.where(chart_id: chart.id).count
     chart_statistic['dashboard_section_id'] = chart.dashboard_section_id
     chart_statistic
-  end
-
-  def chart
-    charts
   end
 end

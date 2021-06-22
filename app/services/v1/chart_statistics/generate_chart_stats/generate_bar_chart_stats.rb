@@ -10,14 +10,10 @@ class V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats < V1::Chart
   end
 
   def chart_statistics(aggregated_data, chart)
-    chart_statistic = {}
-
     patterns = chart.formula['patterns']
     default_pattern = chart.formula['default_pattern']
 
-    statistics = monthly_statistics(aggregated_data, patterns, default_pattern)
-
-    add_basic_information(chart, chart_statistic, statistics)
+    monthly_statistics(aggregated_data, patterns, default_pattern)
   end
 
   def generate_hash
