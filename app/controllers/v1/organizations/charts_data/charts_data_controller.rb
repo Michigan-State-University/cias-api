@@ -8,7 +8,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     data_collection = charts_data_collection
     charts = load_charts
 
-    charts_data = V1::ChartStatistics::GenerateStatistics.new(data_collection, charts)
+    charts_data = V1::ChartStatistics::GenerateStatistics.new(data_collection, charts, date_offset)
                                                              .generate_statistics
 
     render json: charts_data_response(charts_data)
