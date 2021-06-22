@@ -4,15 +4,12 @@ class V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats < V1::Chart
   private
 
   def chart_statistics(aggregated_data, chart)
-    chart_statistic = {}
     patterns = chart.formula['patterns']
     default_pattern = chart.formula['default_pattern']
 
-    statistics = aggregated_data.map do |label, value|
+    aggregated_data.map do |label, value|
       data_for_chart(label, value, patterns, default_pattern)
     end
-
-    add_basic_information(chart, chart_statistic, statistics)
   end
 
   def data_for_chart(label, value, patterns, default_pattern)
