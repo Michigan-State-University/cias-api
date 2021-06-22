@@ -13,7 +13,7 @@ class V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats < V1::Chart
     patterns = chart.formula['patterns']
     default_pattern = chart.formula['default_pattern']
 
-    monthly_statistics(aggregated_data, patterns, default_pattern)
+    monthly_statistics(aggregated_data, patterns, default_pattern, chart.id)
   end
 
   def generate_hash
@@ -24,13 +24,13 @@ class V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats < V1::Chart
     end
   end
 
-  def monthly_statistics(aggregated_data, patterns, default_pattern)
+  def monthly_statistics(aggregated_data, patterns, default_pattern, chart_id)
     statistics = []
     if data_offset.present?
       current_month = Time.current - data_offset.to_i.days
       current_month = current_month.beginning_of_month
     else
-      current_month = first_month(aggregated_data)
+      current_month = first_month(chart_id)
     end
 
     return [] if current_month.nil?
@@ -47,14 +47,7 @@ class V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats < V1::Chart
     statistics
   end
 
-  def first_month(aggregated_data)
-    first = nil
-    aggregated_data.each do |month, _value|
-      first = month if first.nil?
-
-      first = month if first.to_date > month.to_date
-    end
-
-    first
+  def first_month(chart_id)
+    charts_data_collection.where(chart_id: chart_id)&.order(created_at: :asc)&.first&.created_at&.strftime('%B %Y')
   end
 end
