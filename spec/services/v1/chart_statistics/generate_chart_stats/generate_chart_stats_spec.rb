@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# app/services/v1/chart_statistics/generate_chart_stats/generate_pie_chart_stats.rb
 RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats do
   subject { described_class.new(data_collection, charts).generate }
 

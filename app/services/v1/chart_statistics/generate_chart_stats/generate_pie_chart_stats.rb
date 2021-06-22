@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats < V1::ChartStatistics::GenerateChartStats
-  def generate
-    aggregated_data = generate_hash
-    pie_charts = charts.where(chart_type: 'pie_chart', status: 'published')
-
-    pie_charts.map do |chart|
-      numeric_pie_chart_statistics(aggregated_data[chart.id], chart)
-    end
+  def initialize(charts_data_collection, charts)
+    @charts_data_collection = charts_data_collection
+    @charts = charts.where(chart_type: 'pie_chart', status: 'published')
   end
 
-  def numeric_pie_chart_statistics(aggregated_data, chart)
+  private
+
+  def chart_statistics(aggregated_data, chart)
     chart_statistic = {}
     patterns = chart.formula['patterns']
     default_pattern = chart.formula['default_pattern']
