@@ -168,6 +168,8 @@ Rails.application.routes.draw do
 
     resources :charts, controller: :charts
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
+
+    get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
   end
 
   if Rails.env.development?
