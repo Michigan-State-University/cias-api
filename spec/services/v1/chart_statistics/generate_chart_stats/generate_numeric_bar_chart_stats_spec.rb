@@ -25,7 +25,7 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
     subject { described_class.new(data_collection, charts).generate }
 
     context 'when charts are publish' do
-      it 'return correct aggreagted data' do
+      it 'return correct aggregated data' do
         expect(subject).to include(
           {
             'chart_id' => bar_chart1.id,
@@ -41,6 +41,12 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
                 'value' => 3,
                 'color' => '#C766EA',
                 'notMatchedValue' => 5
+              },
+              {
+                'label' => Time.current.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'notMatchedValue' => 0
               }
             ),
             'population' => 23,
@@ -66,28 +72,33 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
     end
   end
 
-  context 'for one chart'
-
-  it 'return correct data' do
-    p subject
-    expect(subject).to include({
-                                 'chart_id' => chart.id,
-                                 'data' => [
-                                   {
-                                     'label' => chart_matched_statistic1.first.created_at.strftime('%B %Y'),
-                                     'value' => 10,
-                                     'color' => '#C766EA',
-                                     'notMatchedValue' => 5
-                                   },
-                                   {
-                                     'label' => chart_matched_statistic2.first.created_at.strftime('%B %Y'),
-                                     'value' => 3,
-                                     'color' => '#C766EA',
-                                     'notMatchedValue' => 5
-                                   }
-                                 ],
-                                 'population' => 23,
-                                 'dashboard_section_id' => chart.dashboard_section_id
-                               })
+  context 'for one chart' do
+    it 'return correct data' do
+      expect(subject).to include({
+                                   'chart_id' => chart.id,
+                                   'data' => [
+                                     {
+                                       'label' => chart_matched_statistic1.first.created_at.strftime('%B %Y'),
+                                       'value' => 10,
+                                       'color' => '#C766EA',
+                                       'notMatchedValue' => 5
+                                     },
+                                     {
+                                       'label' => chart_matched_statistic2.first.created_at.strftime('%B %Y'),
+                                       'value' => 3,
+                                       'color' => '#C766EA',
+                                       'notMatchedValue' => 5
+                                     },
+                                     {
+                                       'label' => Time.current.strftime('%B %Y'),
+                                       'value' => 0,
+                                       'color' => '#C766EA',
+                                       'notMatchedValue' => 0
+                                     }
+                                   ],
+                                   'population' => 23,
+                                   'dashboard_section_id' => chart.dashboard_section_id
+                                 })
+    end
   end
 end
