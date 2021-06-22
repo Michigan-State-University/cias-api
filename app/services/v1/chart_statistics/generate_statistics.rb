@@ -19,11 +19,11 @@ class V1::ChartStatistics::GenerateStatistics
 
   def generate_statistic_for_chart
     if charts.bar_chart?
-      V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GenerateNumericBarChartStats.new(charts_data_collection, charts, date_offset).generate_for_chart
+      V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GenerateNumericBarChartStats.new(charts_data_collection, charts, date_offset).generate
     elsif charts.pie_chart?
-      V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats.new(charts_data_collection, charts).generate_for_chart
+      V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats.new(charts_data_collection, charts).generate
     else
-      V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GeneratePercentageBarChartStats.new(charts_data_collection, charts, date_offset).generate_for_chart
+      V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GeneratePercentageBarChartStats.new(charts_data_collection, charts, date_offset).generate
     end
   end
 end
