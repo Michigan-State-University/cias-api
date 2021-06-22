@@ -10,6 +10,15 @@ class V1::ChartStatistics::GenerateChartStats::GeneratePercentageBarChartStats <
     end
   end
 
+  def generate_for_chart
+    chart = charts
+
+    return unless chart.published?
+
+    aggregated_data = generate_hash
+    percentage_bar_chart_statistics(aggregated_data[chart.id], chart)
+  end
+
   def percentage_bar_chart_statistics(aggregated_data, chart)
     chart_statistic = {}
 

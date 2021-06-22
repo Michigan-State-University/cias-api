@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', type: :request do
+RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/generate', type: :request do
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
@@ -31,73 +31,140 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
     }
   end
 
-  let!(:chart1) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
-  let!(:chart2) { create(:chart, name: 'chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
-  let!(:bar_chart) { create(:chart, name: 'chart3', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
+  let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
+  let!(:other) { create(:chart, name: 'chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
 
-  let!(:chart_statistic1) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic2) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic3) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic4) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 1.month.ago) }
-  let!(:chart_statistic5) { create(:chart_statistic, label: 'other1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 1.month.ago) }
-  let!(:chart_statistic6) { create(:chart_statistic, label: 'label2', organization: organization, health_system: health_system, chart: chart2, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic7) { create(:chart_statistic, label: 'other2', organization: organization, health_system: health_system, chart: chart2, health_clinic: health_clinic, created_at: 3.months.ago) }
+  let!(:chart_matched_statistic) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 2.months.ago) }
+  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 3.months.ago) }
+  let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 3.months.ago) }
+  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 2.months.ago) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      charts_data: {
-        clinic_ids: [health_clinic.id]
-      }
+      clinic_ids: [health_clinic.id]
     }
   end
 
-  let(:request) { get v1_organization_chart_data_generate_path(organization_id: organization.id, chart_id: chart1.id), headers: headers, params: params }
+  let(:request) { get v1_organization_chart_data_generate_path(organization_id: organization.id, chart_id: chart.id), headers: headers, params: params }
 
   context 'when user is permitted' do
     shared_examples 'permitted user' do
       before { request }
 
-      it 'returns proper data' do
-        expect(json_response).to include({
-                                           'chart_id' => chart1.id,
-                                           'chart_data' => include(
-                                             {
-                                               'label' => 'label1',
-                                               'value' => 4
-                                             },
-                                             {
-                                               'label' => 'other1',
-                                               'value' => 1
-                                             }
-                                           )
-                                         })
+      context 'pie chart' do
+        it 'returns proper data' do
+          expect(json_response).to include({
+                                             'chart_id' => chart.id,
+                                             'data' => include(
+                                               {
+                                                 'label' => 'Matched',
+                                                 'value' => 14,
+                                                 'color' => '#C766EA'
+                                               },
+                                               {
+                                                 'label' => 'NotMatched',
+                                                 'value' => 8,
+                                                 'color' => '#E2B1F4'
+                                               }
+                                             ),
+                                             'population' => 22,
+                                             'dashboard_section_id' => chart.dashboard_section_id
+                                           })
+        end
+
+        it 'return correct size' do
+          expect(json_response.size).to be(4)
+        end
+      end
+
+      context 'bar chart' do
+        let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
+
+        it 'returns proper data' do
+          expect(json_response).to include({
+                                             'chart_id' => chart.id,
+                                             'data' => include(
+                                               {
+                                                 'label' => 3.months.ago.strftime('%B %Y'),
+                                                 'value' => 4,
+                                                 'color' => '#C766EA',
+                                                 'notMatchedValue' => 5
+                                               },
+                                               {
+                                                 'label' => 2.months.ago.strftime('%B %Y'),
+                                                 'value' => 10,
+                                                 'color' => '#C766EA',
+                                                 'notMatchedValue' => 3
+                                               }
+                                             ),
+                                             'population' => 22,
+                                             'dashboard_section_id' => chart.dashboard_section_id
+                                           })
+        end
+
+        it 'return correct size' do
+          expect(json_response.size).to be(4)
+        end
+      end
+
+      context 'percentage bar chart' do
+        let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart', status: 'published') }
+
+        it 'returns proper data' do
+          expect(json_response).to include({
+                                             'chart_id' => chart.id,
+                                             'data' => include(
+                                               {
+                                                 'label' => 3.months.ago.strftime('%B %Y'),
+                                                 'value' => 44.44,
+                                                 'color' => '#C766EA',
+                                                 'population' => 9
+                                               },
+                                               {
+                                                 'label' => 2.months.ago.strftime('%B %Y'),
+                                                 'value' => 76.92,
+                                                 'color' => '#C766EA',
+                                                 'population' => 13
+                                               }
+                                             ),
+                                             'population' => 22,
+                                             'dashboard_section_id' => chart.dashboard_section_id
+                                           })
+        end
+
+        it 'return correct size' do
+          expect(json_response.size).to be(4)
+        end
       end
 
       context 'return data from a specific period of time' do
+        let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
+        let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
+
         let(:params) do
           {
-            charts_data: {
-              clinic_ids: [health_clinic.id],
-              start_date: 1.month.ago,
-              end_date: Time.zone.now
-            }
+            date_offset: 10
           }
         end
 
         it 'return correct data' do
           expect(json_response).to include({
-                                             'chart_id' => chart1.id,
-                                             'chart_data' => include(
+                                             'chart_id' => chart.id,
+                                             'data' => include(
                                                {
-                                                 'label' => 'label1',
-                                                 'value' => 1
+                                                 'label' => 'Matched',
+                                                 'value' => 4,
+                                                 'color' => '#C766EA'
                                                },
                                                {
-                                                 'label' => 'other1',
-                                                 'value' => 1
+                                                 'label' => 'NotMatched',
+                                                 'value' => 3,
+                                                 'color' => '#E2B1F4'
                                                }
-                                             )
+                                             ),
+                                             'population' => 7,
+                                             'dashboard_section_id' => chart.dashboard_section_id
                                            })
         end
       end
@@ -105,20 +172,25 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
       context 'when params are INVALID' do
         let(:params) do
           {
-            charts_data: {
-              clinic_ids: ['wrong_clinic_id']
-            }
+            date_offset: -1
           }
         end
 
         it 'return empty list' do
-          expect(json_response).to eq(nil)
+          expect(json_response).to include(
+            {
+              'chart_id' => chart.id,
+              'data' => [],
+              'population' => 0,
+              'dashboard_section_id' => chart.dashboard_section_id
+            }
+          )
         end
       end
     end
 
     context 'when user is' do
-      %w[admin organization_admin e_intervention_admin health_clinic_admin admin].each do |role|
+      %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
         context role.to_s do
           let(:user) { roles[role] }
 

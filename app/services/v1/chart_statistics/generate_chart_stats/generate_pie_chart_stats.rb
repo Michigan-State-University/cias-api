@@ -10,6 +10,15 @@ class V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats < V1::Chart
     end
   end
 
+  def generate_for_chart
+    chart = charts
+
+    return unless chart.published?
+
+    aggregated_data = generate_hash
+    numeric_pie_chart_statistics(aggregated_data[chart.id], chart)
+  end
+
   def numeric_pie_chart_statistics(aggregated_data, chart)
     chart_statistic = {}
     patterns = chart.formula['patterns']

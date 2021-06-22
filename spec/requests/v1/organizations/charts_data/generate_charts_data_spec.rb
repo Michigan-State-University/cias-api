@@ -31,29 +31,21 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
     }
   end
 
-  let!(:chart1) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
-  let!(:chart2) { create(:chart, name: 'chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
-  let!(:bar_chart) { create(:chart, name: 'chart3', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
+  let!(:pie_chart) { create(:chart, name: 'pie_chart', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
+  let!(:bar_chart) { create(:chart, name: 'bar_chart', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
+  let!(:percentage_bar_chart) { create(:chart, name: 'percentage_bar_chart', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart', status: 'published') }
 
-  let!(:chart_statistic1) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic2) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic3) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic4) { create(:chart_statistic, label: 'label1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 1.month.ago) }
-  let!(:chart_statistic5) { create(:chart_statistic, label: 'other1', organization: organization, health_system: health_system, chart: chart1, health_clinic: health_clinic, created_at: 1.month.ago) }
-  let!(:chart_statistic6) { create(:chart_statistic, label: 'label2', organization: organization, health_system: health_system, chart: chart2, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_statistic7) { create(:chart_statistic, label: 'other2', organization: organization, health_system: health_system, chart: chart2, health_clinic: health_clinic, created_at: 3.months.ago) }
-  let!(:chart_statistic8) { create(:chart_statistic, label: 'other2', organization: organization, health_system: health_system, chart: chart2, health_clinic: health_clinic, created_at: 3.months.ago) }
-  let!(:chart_statistic9) { create(:chart_statistic, label: 'other2', organization: organization, health_system: health_system, chart: chart2, health_clinic: health_clinic, created_at: 3.months.ago) }
-  let!(:chart_statistic10) { create(:chart_statistic, label: 'label_bar_chart', organization: organization, health_system: health_system, chart: bar_chart, health_clinic: health_clinic, created_at: 4.months.ago) }
-  let!(:chart_statistic11) { create(:chart_statistic, label: 'label_bar_chart', organization: organization, health_system: health_system, chart: bar_chart, health_clinic: health_clinic, created_at: 4.months.ago) }
-  let!(:chart_statistic12) { create(:chart_statistic, label: 'label_bar_chart', organization: organization, health_system: health_system, chart: bar_chart, health_clinic: health_clinic, created_at: 4.months.ago) }
+  let!(:chart_matched_statistic1) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: pie_chart, health_clinic: health_clinic, created_at: 2.months.ago) }
+  let!(:chart_not_matched_statistic1) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: pie_chart, health_clinic: health_clinic, created_at: 2.months.ago) }
+  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart, health_clinic: health_clinic, created_at: 3.months.ago) }
+  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart, health_clinic: health_clinic, created_at: 3.months.ago) }
+  let!(:chart_matched_statistic3) { create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: percentage_bar_chart, health_clinic: health_clinic, created_at: 1.month.ago) }
+  let!(:chart_not_matched_statistic3) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: percentage_bar_chart, health_clinic: health_clinic, created_at: 1.month.ago) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      charts_data: {
-        clinic_ids: [health_clinic.id]
-      }
+      clinic_ids: [health_clinic.id]
     }
   end
 
@@ -64,133 +56,91 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
       before { request }
 
       it 'returns proper collection size' do
-        expect(json_response.size).to eq(2)
-      end
-
-      it 'returns proper collection size and hash key' do
-        expect(json_response['pie_charts'].size).to eq(2)
-        expect(json_response['pie_charts'].first).to have_key('chart_id') and have_key('chart_data')
-        expect(json_response['bar_charts'].size).to eq(1)
-        expect(json_response['bar_charts'].first).to have_key('chart_id') and have_key('chart_data')
+        expect(json_response['data_for_charts'].size).to eq(3)
       end
 
       it 'return proper data' do
-        expect(json_response).to include({
-                                           'pie_charts' => include(
-                                             {
-                                               'chart_id' => chart2.id,
-                                               'chart_data' => include(
-                                                 {
-                                                   'label' => 'other2',
-                                                   'value' => 3
-                                                 },
-                                                 {
-                                                   'label' => 'label2',
-                                                   'value' => 1
-                                                 }
-                                               )
-                                             },
-                                             {
-                                               'chart_id' => chart1.id,
-                                               'chart_data' => include(
-                                                 {
-                                                   'label' => 'label1',
-                                                   'value' => 4
-                                                 },
-                                                 {
-                                                   'label' => 'other1',
-                                                   'value' => 1
-                                                 }
-                                               )
-                                             }
-                                           ),
-                                           'bar_charts' => include(
-                                             {
-                                               'chart_id' => bar_chart.id,
-                                               'chart_data' => [
-                                                 {
-                                                   'date' => 4.months.ago.strftime('%B %Y'),
-                                                   'data' => [
-                                                     {
-                                                       'label' => 'label_bar_chart',
-                                                       'value' => 3
-                                                     }
-                                                   ]
-                                                 }
-                                               ]
-                                             }
-                                           )
-                                         })
-      end
-
-      it 'return proper bar chart data' do
-        expect(json_response['bar_charts'][0]['chart_data'].first).to have_key('date') and have_key('data')
-        expect(json_response['bar_charts'][0]).to include({
-                                                            'chart_id' => bar_chart.id,
-                                                            'chart_data' => [
-                                                              {
-                                                                'date' => 4.months.ago.strftime('%B %Y'),
-                                                                'data' => [
-                                                                  {
-                                                                    'label' => 'label_bar_chart',
-                                                                    'value' => 3
-                                                                  }
-                                                                ]
-                                                              }
-                                                            ]
-                                                          })
-      end
-
-      context 'return data from a specific period of time' do
-        let(:params) do
+        expect(json_response['data_for_charts']).to include(
           {
-            charts_data: {
-              clinic_ids: [health_clinic.id],
-              start_date: 1.month.ago,
-              end_date: Time.zone.now
-            }
+            'chart_id' => percentage_bar_chart.id,
+            'data' => [
+              {
+                'label' => 1.month.ago.strftime('%B %Y'),
+                'value' => 37.5,
+                'color' => '#C766EA',
+                'population' => 8
+              }
+            ],
+            'population' => 8,
+            'dashboard_section_id' => percentage_bar_chart.dashboard_section_id
+          },
+          {
+            'chart_id' => bar_chart.id,
+            'data' => [
+              {
+                'label' => 3.months.ago.strftime('%B %Y'),
+                'value' => 3,
+                'color' => '#C766EA',
+                'notMatchedValue' => 5
+              }
+            ],
+            'population' => 8,
+            'dashboard_section_id' => bar_chart.dashboard_section_id
+          },
+          {
+            'chart_id' => pie_chart.id,
+            'data' => include(
+              {
+                'label' => 'Matched',
+                'value' => 10,
+                'color' => '#C766EA'
+              },
+              {
+                'label' => 'NotMatched',
+                'value' => 5,
+                'color' => '#E2B1F4'
+              }
+            ),
+            'population' => 15,
+            'dashboard_section_id' => pie_chart.dashboard_section_id
           }
-        end
-
-        it 'return correct size' do
-          expect(json_response['pie_charts'].size).to eq(1)
-        end
-
-        it 'return correct data' do
-          expect(json_response['pie_charts'].first).to include({
-                                                                 'chart_id' => chart1.id,
-                                                                 'chart_data' => include(
-                                                                   {
-                                                                     'label' => 'other1',
-                                                                     'value' => 1
-                                                                   },
-                                                                   {
-                                                                     'label' => 'label1',
-                                                                     'value' => 1
-                                                                   }
-                                                                 )
-                                                               })
-        end
+        )
       end
 
       context 'when params are INVALID' do
         let(:params) do
           {
-            charts_data: {
-              clinic_ids: ['wrong_clinic_id']
-            }
+            clinic_ids: ['wrong_clinic_id']
           }
         end
 
         it 'return empty list' do
-          expect(json_response['bar_charts']).to eq([])
-          expect(json_response['pie_charts']).to eq([])
+          expect(json_response['data_for_charts']).to include(
+            {
+              'chart_id' => pie_chart.id,
+              'data' => [],
+              'population' => 0,
+              'dashboard_section_id' => pie_chart.dashboard_section_id
+            },
+            {
+              'chart_id' => bar_chart.id,
+              'data' => [],
+              'population' => 0,
+              'dashboard_section_id' => bar_chart.dashboard_section_id
+            },
+            {
+              'chart_id' => percentage_bar_chart.id,
+              'data' => [],
+              'population' => 0,
+              'dashboard_section_id' => percentage_bar_chart.dashboard_section_id
+            }
+          )
         end
       end
     end
 
     context 'when user is' do
-      %w[admin organization_admin e_intervention_admin health_clinic_admin admin].each do |role|
+        %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
         context role.to_s do
           let(:user) { roles[role] }
 
@@ -242,4 +192,3 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
     end
   end
 end
-

@@ -10,6 +10,15 @@ class V1::ChartStatistics::GenerateChartStats::GenerateNumericBarChartStats < V1
     end
   end
 
+  def generate_for_chart
+    chart = charts
+
+    return unless chart.published?
+
+    aggregated_data = generate_hash
+    numeric_bar_chart_statistics(aggregated_data[chart.id], chart)
+  end
+
   def numeric_bar_chart_statistics(aggregated_data, chart)
     chart_statistic = {}
 

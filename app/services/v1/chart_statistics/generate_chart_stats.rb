@@ -12,9 +12,15 @@ class V1::ChartStatistics::GenerateChartStats
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 
+  def generate_for_chart
+    raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
+  end
+
   def generate_hash
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
+
+  private
 
   def add_basic_information(chart, chart_statistic, statistics)
     chart_statistic['chart_id'] = chart.id

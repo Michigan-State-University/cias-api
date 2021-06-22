@@ -16,14 +16,12 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
 
   def generate_chart_data
     authorize! :read, ChartStatistic
-
     chart = load_chart
     data_collection = charts_data_collection
 
     result = V1::ChartStatistics::GenerateStatistics.new(data_collection, chart)
-                                                         .generate_statistics
-
-    render json: result.first
+                                                         .generate_statistic_for_chart
+    render json: result
   end
 
   private
@@ -37,11 +35,11 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   end
 
   def date_offset
-    charts_data_params[:date_offset].to_i
+    charts_data_params[:date_offset]
   end
 
   def start_date
-    Time.current - date_offset.days
+    Time.current - date_offset.to_i.days
   end
 
   def end_date
@@ -75,6 +73,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   def charts_data_collection
     data_collection = ChartStatistic.accessible_by(current_ability).where(organization_id: organization.id)
     data_collection = data_collection&.where(health_clinic_id: clinic_ids) if clinic_ids.present?
+    data_collection = data_collection&.where(chart_id: chart_id) if chart_id.present?
     data_collection = data_collection&.where(created_at: date_range) if date_offset.present?
     data_collection&.joins(:chart)
   end
