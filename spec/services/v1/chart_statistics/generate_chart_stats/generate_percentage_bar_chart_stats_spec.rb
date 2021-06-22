@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# app/services/v1/chart_statistics/generate_chart_stats/generate_pie_chart_stats.rb
-RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePercentageBarChartStats do
+RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GeneratePercentageBarChartStats do
   subject { described_class.new(data_collection, charts).generate }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
@@ -37,6 +36,12 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePercentageBarCha
               'value' => 37.5,
               'color' => '#C766EA',
               'population' => 8
+            },
+            {
+              'label' => Time.current.strftime('%B %Y'),
+              'value' => 0,
+              'color' => '#C766EA',
+              'population' => 0
             }
           ),
           'population' => 23,
@@ -46,9 +51,91 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePercentageBarCha
           'chart_id' => bar_chart2.id,
           'data' => [],
           'population' => 0,
-          'dashboard_section_id' => bar_chart1.dashboard_section_id
+          'dashboard_section_id' => bar_chart2.dashboard_section_id
         }
       )
+    end
+
+    context 'with data offset' do
+      subject { described_class.new(data_collection, charts, 35).generate }
+
+      it 'return correct data' do
+        p subject
+        expect(subject).to include(
+          {
+            'chart_id' => bar_chart1.id,
+            'data' => [
+              {
+                'label' => 1.month.ago.strftime('%B %Y'),
+                'value' => 37.5,
+                'color' => '#C766EA',
+                'population' => 8
+              },
+              {
+                'label' => Time.current.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'population' => 0
+              }
+            ],
+            'population' => 23,
+            'dashboard_section_id' => bar_chart1.dashboard_section_id
+          },
+          {
+            'chart_id' => bar_chart2.id,
+            'data' => [
+              {
+                'label' => 1.month.ago.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'population' => 0
+              },
+              {
+                'label' => Time.current.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'population' => 0
+              }
+            ],
+            'population' => 0,
+            'dashboard_section_id' => bar_chart2.dashboard_section_id
+          }
+        )
+      end
+    end
+  end
+
+  context 'for one chart' do
+    subject { described_class.new(data_collection, chart).generate_for_chart }
+
+    let(:chart) { bar_chart1 }
+
+    it 'return correct data' do
+      expect(subject).to include({
+                                   'chart_id' => chart.id,
+                                   'data' => [
+                                     {
+                                       'label' => 2.months.ago.strftime('%B %Y'),
+                                       'value' => 66.67,
+                                       'color' => '#C766EA',
+                                       'population' => 15
+                                     },
+                                     {
+                                       'label' => 1.month.ago.strftime('%B %Y'),
+                                       'value' => 37.5,
+                                       'color' => '#C766EA',
+                                       'population' => 8
+                                     },
+                                     {
+                                       'label' => Time.current.strftime('%B %Y'),
+                                       'value' => 0,
+                                       'color' => '#C766EA',
+                                       'population' => 0
+                                     }
+                                   ],
+                                   'population' => 23,
+                                   'dashboard_section_id' => chart.dashboard_section_id
+                                 })
     end
   end
 
