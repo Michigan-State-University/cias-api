@@ -72,7 +72,7 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
     end
 
     context 'with data offset' do
-      subject { described_class.new(data_collection, chart, 35).generate_for_chart }
+      subject { described_class.new(data_collection, chart, 35).generate }
 
       it 'return correct data' do
         expect(subject).to include(
@@ -97,36 +97,6 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
           }
         )
       end
-    end
-  end
-
-  context 'for one chart' do
-    it 'return correct data' do
-      expect(subject).to include({
-                                   'chart_id' => chart.id,
-                                   'data' => [
-                                     {
-                                       'label' => chart_matched_statistic1.first.created_at.strftime('%B %Y'),
-                                       'value' => 10,
-                                       'color' => '#C766EA',
-                                       'notMatchedValue' => 5
-                                     },
-                                     {
-                                       'label' => chart_matched_statistic2.first.created_at.strftime('%B %Y'),
-                                       'value' => 3,
-                                       'color' => '#C766EA',
-                                       'notMatchedValue' => 5
-                                     },
-                                     {
-                                       'label' => Time.current.strftime('%B %Y'),
-                                       'value' => 0,
-                                       'color' => '#C766EA',
-                                       'notMatchedValue' => 0
-                                     }
-                                   ],
-                                   'population' => 23,
-                                   'dashboard_section_id' => chart.dashboard_section_id
-                                 })
     end
   end
 end

@@ -10,9 +10,9 @@ class V1::ChartStatistics::GenerateChartStats
 
   def generate
     aggregated_data = generate_hash
-    charts = current_chart_type_collection
+    collection = charts.is_a?(Chart) ? [charts] : current_chart_type_collection
 
-    charts.map do |chart|
+    collection.map do |chart|
       statistics = chart_statistics(aggregated_data[chart.id], chart)
       add_basic_information(chart, statistics)
     end
