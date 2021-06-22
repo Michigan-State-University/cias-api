@@ -70,6 +70,34 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
         expect(subject).to eql([])
       end
     end
+
+    context 'with data offset' do
+      subject { described_class.new(data_collection, chart, 35).generate_for_chart }
+
+      it 'return correct data' do
+        expect(subject).to include(
+          {
+            'chart_id' => chart.id,
+            'data' => [
+              {
+                'label' => 1.month.ago.strftime('%B %Y'),
+                'value' => 3,
+                'color' => '#C766EA',
+                'notMatchedValue' => 5
+              },
+              {
+                'label' => Time.current.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'notMatchedValue' => 0
+              }
+            ],
+            'population' => 23,
+            'dashboard_section_id' => chart.dashboard_section_id
+          }
+        )
+      end
+    end
   end
 
   context 'for one chart' do
