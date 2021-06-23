@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats < V1::ChartStatistics::GenerateChartStats
+class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   attr_reader :data_offset
 
   def initialize(charts_data_collection, charts, data_offset = nil)

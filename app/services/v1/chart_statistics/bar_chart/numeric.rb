@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GenerateNumericBarChartStats < V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats
+class V1::ChartStatistics::BarChart::Numeric < V1::ChartStatistics::BarChart
   private
 
   def data_for_chart(month, value, patterns, default_pattern)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats do
+RSpec.describe V1::ChartStatistics::PieChart do
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }

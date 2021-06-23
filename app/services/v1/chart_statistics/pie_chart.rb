@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::ChartStatistics::GenerateChartStats::GeneratePieChartStats < V1::ChartStatistics::GenerateChartStats
+class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
   private
 
   def chart_statistics(aggregated_data, chart)

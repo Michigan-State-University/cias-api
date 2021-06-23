@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::GeneratePercentageBarChartStats do
+RSpec.describe V1::ChartStatistics::BarChart::Percentage do
   subject { described_class.new(data_collection, charts).generate }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
