@@ -200,45 +200,45 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
     end
   end
 
-  # context 'when user is not permitted' do
-  #   shared_examples 'unpermitted user' do
-  #     before { request }
-  #
-  #     it 'returns proper error message' do
-  #       expect(json_response['message']).to eq('You are not authorized to access this page.')
-  #     end
-  #   end
-  #
-  #   %i[researcher participant].each do |role|
-  #     context "user is #{role}" do
-  #       let(:user) { create(:user, :confirmed, role) }
-  #       let(:headers) { user.create_new_auth_token }
-  #
-  #       it_behaves_like 'unpermitted user'
-  #     end
-  #   end
-  #
-  #   context 'when user belongs to other organization' do
-  #     let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
-  #     let(:other_organization_admin) { organization2.organization_admins.first }
-  #
-  #     let(:headers) { other_organization_admin.create_new_auth_token }
-  #
-  #     before { request }
-  #
-  #     it 'returns proper error message' do
-  #       expect(json_response['message']).to include('Couldn\'t find Organization with')
-  #     end
-  #   end
-  #
-  #   context 'when user is preview user' do
-  #     let(:headers) { preview_user.create_new_auth_token }
-  #
-  #     before { request }
-  #
-  #     it 'returns proper error message' do
-  #       expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
-  #     end
-  #   end
-  # end
+  context 'when user is not permitted' do
+    shared_examples 'unpermitted user' do
+      before { request }
+
+      it 'returns proper error message' do
+        expect(json_response['message']).to eq('You are not authorized to access this page.')
+      end
+    end
+
+    %i[researcher participant].each do |role|
+      context "user is #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+        let(:headers) { user.create_new_auth_token }
+
+        it_behaves_like 'unpermitted user'
+      end
+    end
+
+    context 'when user belongs to other organization' do
+      let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
+      let(:other_organization_admin) { organization2.organization_admins.first }
+
+      let(:headers) { other_organization_admin.create_new_auth_token }
+
+      before { request }
+
+      it 'returns proper error message' do
+        expect(json_response['message']).to include('Couldn\'t find Organization with')
+      end
+    end
+
+    context 'when user is preview user' do
+      let(:headers) { preview_user.create_new_auth_token }
+
+      before { request }
+
+      it 'returns proper error message' do
+        expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
+      end
+    end
+  end
 end
