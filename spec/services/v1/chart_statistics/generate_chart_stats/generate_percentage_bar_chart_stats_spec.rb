@@ -21,7 +21,6 @@ RSpec.describe V1::ChartStatistics::GenerateChartStats::GenerateBarChartStats::G
 
   context 'when charts are publish' do
     it 'return correct aggreagted data' do
-      p subject
       expect(subject).to include(
         {
           'chart_id' => bar_chart1.id,
