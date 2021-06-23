@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 namespace :questions do
-  desc 'Enable sms notifications for all users'
+  desc 'Set narratorSkippable option'
   task add_narrator_skippable_setting: :environment do
     question_count = Question.count
     Question.all.each_with_index do |question, index|
