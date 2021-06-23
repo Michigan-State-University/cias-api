@@ -166,6 +166,10 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :google do
+      resources :languages, only: :index
+    end
+
     resources :charts, controller: :charts
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
 
