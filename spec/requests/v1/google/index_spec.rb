@@ -61,22 +61,13 @@ RSpec.describe 'GET /v1/google/languages', type: :request do
       it_behaves_like 'permitted user'
     end
 
-    context 'when user is team_admin' do
-      let(:headers) { team_admin.create_new_auth_token }
+    %i[team_admin researcher e_intervention_admin admin].each do |role|
+      context "user is #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+        let(:headers) { user.create_new_auth_token }
 
-      it_behaves_like 'permitted user'
-    end
-
-    context 'when user is researcher' do
-      let(:headers) { researcher.create_new_auth_token }
-
-      it_behaves_like 'permitted user'
-    end
-
-    context 'when user is e_intervention_admin' do
-      let(:headers) { e_intervention_admin.create_new_auth_token }
-
-      it_behaves_like 'permitted user'
+        it_behaves_like 'permitted user'
+      end
     end
   end
 
@@ -89,16 +80,13 @@ RSpec.describe 'GET /v1/google/languages', type: :request do
       end
     end
 
-    context 'when user is participant' do
-      let(:headers) { participant.create_new_auth_token }
+    %i[participant guest].each do |role|
+      context "user is #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+        let(:headers) { user.create_new_auth_token }
 
-      it_behaves_like 'unpermitted user'
-    end
-
-    context 'when user is guest user' do
-      let(:headers) { guest.create_new_auth_token }
-
-      it_behaves_like 'unpermitted user'
+        it_behaves_like 'unpermitted user'
+      end
     end
 
     context 'when user is preview user' do
