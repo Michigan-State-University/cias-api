@@ -55,12 +55,6 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
       end
     end
 
-    context 'when user is e-intervention admin' do
-      let(:user) { organization.e_intervention_admins.first }
-
-      it_behaves_like 'permitted user'
-    end
-
     context 'when one of the multiple roles is admin' do
       let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
 
@@ -84,6 +78,12 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
 
         it_behaves_like 'unpermitted user'
       end
+    end
+
+    context 'when user is e-intervention admin' do
+      let(:user) { organization.e_intervention_admins.first }
+
+      it_behaves_like 'unpermitted user'
     end
 
     context 'when user is preview user' do
