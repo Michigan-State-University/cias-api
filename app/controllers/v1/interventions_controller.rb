@@ -38,6 +38,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:name, :status_event, :shared_to, :organization_id)
+    params.require(:intervention).permit(:name, :status_event, :shared_to, :organization_id, :google_language_id)
   end
 end
