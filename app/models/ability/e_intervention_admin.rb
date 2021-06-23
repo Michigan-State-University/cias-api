@@ -35,7 +35,7 @@ class Ability::EInterventionAdmin < Ability::Base
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
     can :read, GoogleLanguage
-    can %i[read update delete], Organization, e_intervention_admins: { id: user.id }
+    can %i[read update], Organization, e_intervention_admins: { id: user.id }
     can :invite_organization_admin, Organization, e_intervention_admins: { id: user.id }
     can :manage, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
     can :invite_health_system_admin, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
