@@ -2,6 +2,8 @@
 
 class HealthClinic < ApplicationRecord
   has_paper_trail
+  acts_as_paranoid
+
   belongs_to :health_system
   has_many :health_clinic_invitations, dependent: :destroy
   has_many :user_health_clinics, dependent: :destroy
