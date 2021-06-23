@@ -407,6 +407,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     context 'response with name mp3 override' do
       let(:audio) { create(:audio) }
       let(:audio_id) { audio.id }
+      let!(:name_question) { create(:question_name, question_group: question_group) }
+      let!(:name_answer) { create(:answer_name, question: name_question, user_session: user_session, body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] }) }
 
       context 'for speech block' do
         let!(:question_with_speech_block) do
@@ -442,6 +444,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
         it 'swaps url correctly' do
           expect(json_response['data']['attributes']['narrator']['blocks'].first['audio_urls'].first).to eq('phonetic_audio.mp3')
+        end
+
+        it 'swaps name correctly' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['text'].first).to eq('Michał')
         end
       end
 
@@ -503,6 +509,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         it 'swaps url correctly' do
           expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].second).to eq('phonetic_audio.mp3')
         end
+
+        it 'swaps name correctly' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['text'].second).to eq('Michał')
+        end
       end
 
       context 'for reflection block' do
@@ -553,6 +563,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
         it 'swaps url correctly' do
           expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].first).to eq('phonetic_audio.mp3')
+        end
+
+        it 'swaps name correctly' do
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['text'].first).to eq('Michał')
         end
       end
     end
