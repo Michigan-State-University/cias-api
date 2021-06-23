@@ -54,7 +54,6 @@ module BlockHelper
   end
 
   def swap_name_into_block(block, mp3url, name_text)
-    # require 'pry'; binding.pry
     block['text'].each_with_index do |text, index|
       next text unless text == ':name:.'
 

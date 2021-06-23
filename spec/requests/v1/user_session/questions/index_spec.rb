@@ -407,12 +407,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     context 'response with name mp3 override' do
       let(:audio) { create(:audio) }
       let(:audio_id) { audio.id }
-      let!(:name_question) { create(:question_name, question_group: question_group) }
-      let!(:name_answer) { create(:answer_name, question: name_question, user_session: user_session, body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] }) }
+      let!(:name_question) { create(:question_name, question_group: question_group, position: 1) }
+      let!(:name_answer) { create(:answer_name, question: name_question, user_session: user_session, created_at: DateTime.now - 1.day, body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] }) }
 
       context 'for speech block' do
         let!(:question_with_speech_block) do
-          create(:question_single, question_group: question_group, position: 2,
+          create(:question_single, question_group: question_group, position: 3,
                                    narrator: {
                                      blocks: [
                                        {
@@ -435,7 +435,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                      }
                                    })
         end
-        let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+        let!(:question) { create(:question_single, question_group: question_group, position: 2) }
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
@@ -453,7 +453,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
       context 'for ReflectionFormula block' do
         let!(:question_with_reflection_formula) do
-          create(:question_single, question_group: question_group, position: 2,
+          create(:question_single, question_group: question_group, position: 3,
                                    narrator: {
                                      blocks: [
                                        {
@@ -499,7 +499,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                    })
         end
 
-        let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+        let!(:question) { create(:question_single, question_group: question_group, position: 2) }
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
@@ -517,7 +517,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
       context 'for reflection block' do
         let!(:question_with_reflection_formula) do
-          create(:question_single, question_group: question_group, position: 2,
+          create(:question_single, question_group: question_group, position: 3,
                                    narrator: {
                                      blocks: [
                                        {
@@ -554,7 +554,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                    })
         end
 
-        let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+        let!(:question) { create(:question_single, question_group: question_group, position: 2) }
 
         before do
           allow_any_instance_of(Audio).to receive(:url).and_return('phonetic_audio.mp3')
