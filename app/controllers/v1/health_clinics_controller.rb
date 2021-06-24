@@ -25,13 +25,11 @@ class V1::HealthClinicsController < V1Controller
   def update
     authorize! :update, HealthClinic
 
+    return head :forbidden if clinic_load.deleted?
+
     health_clinic = V1::HealthClinics::Update.call(clinic_load, clinic_params)
 
-    if health_clinic.nil?
-      head :forbidden
-    else
-      render json: serialized_response(health_clinic)
-    end
+    render json: serialized_response(health_clinic)
   end
 
   def destroy

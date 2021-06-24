@@ -11,8 +11,6 @@ class V1::HealthClinics::Update
   end
 
   def call
-    return if health_clinic.deleted?
-
     health_clinic.update!(name: health_clinic_params[:name]) if name_changed?
 
     health_clinic.reload
