@@ -26,7 +26,12 @@ class V1::HealthClinicsController < V1Controller
     authorize! :update, HealthClinic
 
     health_clinic = V1::HealthClinics::Update.call(clinic_load, clinic_params)
-    render json: serialized_response(health_clinic)
+
+    if health_clinic.nil?
+      head :forbidden
+    else
+      render json: serialized_response(health_clinic)
+    end
   end
 
   def destroy
@@ -39,6 +44,8 @@ class V1::HealthClinicsController < V1Controller
   private
 
   def clinic_scope
+    return HealthClinic.accessible_by(current_ability).with_deleted if with_deleted
+
     HealthClinic.accessible_by(current_ability)
   end
 
@@ -50,8 +57,16 @@ class V1::HealthClinicsController < V1Controller
     params.require(:health_clinic).permit(:name, :health_system_id)
   end
 
+  def with_deleted
+    to_boolean(params[:with_deleted])
+  end
+
   def filter_params
     params[:organization_id]
+  end
+
+  def to_boolean(value)
+    ActiveRecord::Type::Boolean.new.cast(value)
   end
 
   def health_clinic_response(health_clinic)
