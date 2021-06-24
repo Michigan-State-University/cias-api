@@ -48,6 +48,8 @@ gem 'logstop'
 gem 'countries'
 # for Audit trail and audit log
 gem 'paper_trail'
+# for soft delete
+gem 'paranoia', '~> 2.4', '>= 2.4.3'
 
 group :development, :test do
   gem 'bundler-audit'
