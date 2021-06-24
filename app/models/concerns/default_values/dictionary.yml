@@ -14,7 +14,7 @@ question:
     video: false
     title: true
     subtitle: true
-    narratorSkippable: false
+    narrator_skippable: false
   narrator:
     settings:
       voice: true
@@ -31,12 +31,12 @@ chart:
     patterns: [
       {
         match: '',
-        label: 'Label1',
+        label: 'Matched',
         color: '#C766EA'
       }
     ]
     default_pattern: {
-      label: 'Other',
+      label: 'NotMatched',
       color: '#E2B1F4'
     }
 user:

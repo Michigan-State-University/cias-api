@@ -51,6 +51,16 @@ class UserSession < ApplicationRecord
     end
   end
 
+  def search_var(var_to_look_for, include_session_var: false)
+    answers.each do |answer|
+      answer.body_data.each do |obj|
+        var_name = include_session_var ? "#{session.variable}.#{obj['var']}" : obj['var']
+        return obj['value'] if var_name.eql?(var_to_look_for)
+      end
+    end
+    nil
+  end
+
   private
 
   def session_next

@@ -129,6 +129,8 @@ Rails.application.routes.draw do
 
     resources :organizations, controller: :organizations do
       scope module: 'organizations' do
+        get 'charts_data/generate', to: 'charts_data/charts_data#generate_charts_data'
+        get 'charts_data/:chart_id/generate', to: 'charts_data/charts_data#generate_chart_data', as: :chart_data_generate
         post 'invitations/invite_organization_admin', to: 'invitations#invite_organization_admin'
         post 'invitations/invite_intervention_admin', to: 'invitations#invite_intervention_admin'
         scope module: 'dashboard_sections' do
