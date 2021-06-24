@@ -123,13 +123,13 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
                 'patterns' => [
                   {
                     'color' => '#C766EA',
-                    'label' => 'Label1',
+                    'label' => 'Matched',
                     'match' => ''
                   }
                 ],
                 'default_pattern' => {
                   'color' => '#E2B1F4',
-                  'label' => 'Other'
+                  'label' => 'NotMatched'
                 }
               },
               'dashboard_section_id' => chart_1.dashboard_section_id,
@@ -153,13 +153,13 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
                 'patterns' => [
                   {
                     'color' => '#C766EA',
-                    'label' => 'Label1',
+                    'label' => 'Matched',
                     'match' => ''
                   }
                 ],
                 'default_pattern' => {
                   'color' => '#E2B1F4',
-                  'label' => 'Other'
+                  'label' => 'NotMatched'
                 }
               },
               'dashboard_section_id' => chart_2.dashboard_section_id,
