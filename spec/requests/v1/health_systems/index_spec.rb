@@ -116,7 +116,6 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
         before { request }
 
         it 'return proper collection size' do
-          p json_response
           expect(json_response['data'].size).to eq(4)
         end
 
