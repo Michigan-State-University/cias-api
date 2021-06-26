@@ -5,7 +5,7 @@ class Organization < ApplicationRecord
   has_many :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }, class_name: 'User', as: :organizable
   has_many :organization_admins, -> { limit_to_roles('organization_admin') }, class_name: 'User', as: :organizable
   has_many :health_systems, -> { with_deleted }, dependent: :destroy
-  has_many :health_clinics,-> { with_deleted }, through: :health_systems
+  has_many :health_clinics, -> { with_deleted }, through: :health_systems
   has_many :organization_invitations, dependent: :destroy
   has_one :reporting_dashboard, dependent: :destroy
   has_many :charts, through: :reporting_dashboard
