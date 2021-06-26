@@ -10,6 +10,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let!(:deleted_health_clinic) { create(:health_clinic, name: 'Deleted Health Clinic', health_system: health_system, deleted_at: Time.current) }
   let!(:health_clinic_admin) { health_clinic.user_health_clinics.first.user }
 
   let(:roles_organization) do
@@ -53,7 +54,8 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic.name
+              'name' => health_clinic.name,
+              'deleted' => false
             },
             'relationships' => {
               'health_clinic_admins' => {
@@ -80,6 +82,42 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       end
     end
 
+    shared_examples 'permitted behavior with a deleted clinic' do
+      let(:request) { get v1_health_clinic_path(deleted_health_clinic.id), headers: headers, params: params }
+      before { request }
+
+      context 'with flag' do
+        let(:params) do
+          {
+            with_deleted: true
+          }
+        end
+
+        it 'return correct data' do
+          expect(json_response['data']).to include(
+            {
+              'id' => deleted_health_clinic.id.to_s,
+              'type' => 'health_clinic',
+              'attributes' => {
+                'health_system_id' => health_system.id,
+                'name' => deleted_health_clinic.name,
+                'deleted' => true
+              },
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            }
+          )
+        end
+      end
+
+      context 'without flag' do
+        let(:request) { get v1_health_clinic_path(deleted_health_clinic.id), headers: headers}
+
+        it 'return error message' do
+          expect(json_response['message']).to include('Couldn\'t find HealthClinic with')
+        end
+      end
+    end
+
     context 'when user is admin' do
       it_behaves_like 'permitted user'
     end
@@ -95,6 +133,16 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
             let(:user) { roles_organization[role] }
 
             it_behaves_like 'permitted user'
+          end
+        end
+      end
+
+      %w[organization_admin e_intervention_admin].each do |role|
+        context role.to_s do
+          context 'refers to their health_system' do
+            let(:user) { roles_organization[role] }
+
+            it_behaves_like 'permitted behavior with a deleted clinic'
           end
         end
       end
