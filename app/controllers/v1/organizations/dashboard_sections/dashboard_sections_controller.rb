@@ -7,7 +7,7 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
   def index
     authorize! :read, DashboardSection
 
-    sections = dashboard_section_scope
+    sections = dashboard_sections_scope
 
     sections = sections.joins(:charts).where(charts: { status: :published }) if filter_status
     render json: dashboard_section_response(sections)
