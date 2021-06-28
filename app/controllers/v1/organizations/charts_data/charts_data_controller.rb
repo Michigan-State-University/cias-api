@@ -4,7 +4,6 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   def generate_charts_data
     authorize! :read, ChartStatistic
 
-
     data_collection = charts_data_collection
     charts = load_charts
 

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/position', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:organization) { create(:organization) }
-  let(:reporting_dashboard) {organization.reporting_dashboard}
+  let(:reporting_dashboard) { organization.reporting_dashboard }
   let(:dashboard_section1) { create(:dashboard_section, position: 4, reporting_dashboard: reporting_dashboard) }
   let(:dashboard_section2) { create(:dashboard_section, position: 5, reporting_dashboard: reporting_dashboard) }
   let(:dashboard_section3) { create(:dashboard_section, position: 6, reporting_dashboard: reporting_dashboard) }

@@ -71,10 +71,10 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'population' => 8
               },
               {
-                "label"=>Time.current.strftime("%B %Y"),
-                "value"=>0,
-                "color"=>"#C766EA",
-                "population"=>0
+                'label' => Time.current.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'population' => 0
               }
             ],
             'population' => 8,
@@ -90,22 +90,22 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'notMatchedValue' => 5
               },
               {
-                "label"=>2.months.ago.strftime('%B %Y'),
-                "value"=>0,
-                "color"=>"#C766EA",
-                "notMatchedValue"=>0
+                'label' => 2.months.ago.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'notMatchedValue' => 0
               },
               {
-                "label"=>1.months.ago.strftime('%B %Y'),
-                "value"=>0,
-                "color"=>"#C766EA",
-                "notMatchedValue"=>0
+                'label' => 1.month.ago.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'notMatchedValue' => 0
               },
               {
-                "label"=>Time.current.strftime('%B %Y'),
-                "value"=>0,
-                "color"=>"#C766EA",
-                "notMatchedValue"=>0
+                'label' => Time.current.strftime('%B %Y'),
+                'value' => 0,
+                'color' => '#C766EA',
+                'notMatchedValue' => 0
               }
             ],
             'population' => 8,
@@ -164,7 +164,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
     end
 
     context 'when user is' do
-        %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
+      %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
         context role.to_s do
           let(:user) { roles[role] }
 

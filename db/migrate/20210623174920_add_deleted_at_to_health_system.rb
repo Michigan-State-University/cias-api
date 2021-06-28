@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddDeletedAtToHealthSystem < ActiveRecord::Migration[6.0]
   def change
     add_column :health_systems, :deleted_at, :datetime
