@@ -19,6 +19,7 @@ class V1::Organizations::InviteOrganizationAdmin
       new_user = User.invite!(email: email, roles: ['organization_admin'], organizable_id: organization.id, organizable_type: 'Organization', active: false)
       organization.organization_admins << new_user
     else
+      organization.organization_admins << user
       V1::Organizations::Invitations::Create.call(organization, user)
     end
   end
