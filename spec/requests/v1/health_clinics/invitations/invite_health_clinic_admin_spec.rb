@@ -72,7 +72,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to change(HealthClinicInvitation, :count).by(1).and \
                 avoid_changing(User, :count).and \
-                  change{ health_clinic.reload.user_health_clinics.count }.by(1)
+                  change { health_clinic.reload.user_health_clinics.count }.by(1)
 
               expect(health_clinic_invitation).to have_attributes(
                 user_id: health_clinic_admin.id,
@@ -105,7 +105,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to avoid_changing(HealthClinicInvitation, :count).and \
                 avoid_changing(User, :count).and \
-                  change{ health_clinic.reload.user_health_clinics.count }.by(1)
+                  change { health_clinic.reload.user_health_clinics.count }.by(1)
             end
           end
 
@@ -119,7 +119,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
               expect { request }.to avoid_changing(HealthClinicInvitation, :count).and \
                 avoid_changing(User, :count).and \
-                  avoid_changing{ health_clinic.reload.user_health_clinics.count }
+                  avoid_changing { health_clinic.reload.user_health_clinics.count }
             end
           end
 
@@ -160,7 +160,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
                 expect { request }.to change(HealthClinicInvitation, :count).by(1).and \
                   avoid_changing(User, :count).and \
-                     change{ health_clinic.reload.user_health_clinics.count }.by(1)
+                    change { health_clinic.reload.user_health_clinics.count }.by(1)
 
                 expect(new_health_clinic_invitation).to have_attributes(
                   user_id: health_clinic_admin.id,

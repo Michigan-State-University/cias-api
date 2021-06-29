@@ -58,7 +58,7 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
       context 'when clinic is deleted' do
         let(:request) { patch v1_health_clinic_path(deleted_health_clinic.id), headers: headers }
 
-        it 'return correct status'do
+        it 'return correct status' do
           expect(response).to have_http_status(:not_found)
         end
 

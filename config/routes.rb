@@ -174,6 +174,12 @@ Rails.application.routes.draw do
       resources :languages, only: :index
     end
 
+    resources :dashboard_sections, only: [], controller: :dashboard_sections do
+      resources :charts, only: [], controller: :charts do
+        patch :position, to: 'charts#position', on: :collection
+      end
+    end
+
     resources :charts, controller: :charts
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
 

@@ -131,7 +131,7 @@ RSpec.describe 'POST /v1/health_systems/:health_system_id/invitations/invite_hea
 
               expect { request }.to change(HealthSystemInvitation, :count).by(1).and \
                 avoid_changing(User, :count).and \
-                  change{ health_system.reload.health_system_admins.count }.by(1)
+                  change { health_system.reload.health_system_admins.count }.by(1)
 
               expect(health_system_invitation).to have_attributes(
                 user_id: health_system_admin.id,

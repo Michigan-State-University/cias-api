@@ -10,9 +10,9 @@ RSpec.describe 'GET /v1/charts', type: :request do
   let!(:other_organization) { create(:organization, :with_e_intervention_admin, name: 'Other Organization') }
   let!(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
   let!(:other_dashboard_section) { create(:dashboard_section, reporting_dashboard: other_organization.reporting_dashboard) }
-  let!(:chart) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section.id) }
-  let!(:other_chart) { create(:chart, name: 'Chart2', dashboard_section_id: dashboard_section.id) }
-  let!(:chart_in_other_organization) { create(:chart, name: 'Chart3', dashboard_section_id: other_dashboard_section.id) }
+  let!(:chart) { create(:chart, name: 'Chart1', dashboard_section_id: dashboard_section.id, position: 1) }
+  let!(:other_chart) { create(:chart, name: 'Chart2', dashboard_section_id: dashboard_section.id, position: 2) }
+  let!(:chart_in_other_organization) { create(:chart, name: 'Chart3', dashboard_section_id: other_dashboard_section.id, position: 3) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
 
   let(:headers) { user.create_new_auth_token }
@@ -44,6 +44,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'description' => chart.description,
             'status' => 'draft',
             'trend_line' => false,
+            'position' => 1,
             'chart_type' => 'bar_chart',
             'formula' => {
               'payload' => '',
@@ -68,6 +69,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'status' => 'draft',
             'trend_line' => false,
             'chart_type' => 'bar_chart',
+            'position' => 2,
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',
@@ -91,6 +93,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'status' => 'draft',
             'trend_line' => false,
             'chart_type' => 'bar_chart',
+            'position' => 3,
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',
@@ -129,6 +132,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'status' => 'draft',
             'trend_line' => false,
             'chart_type' => 'bar_chart',
+            'position' => 1,
             'formula' => {
               'payload' => '',
               'patterns' => [
@@ -154,6 +158,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
             'status' => 'draft',
             'trend_line' => false,
             'chart_type' => 'bar_chart',
+            'position' => 2,
             'formula' => {
               'payload' => '',
               'patterns' => [{ 'color' => '#C766EA',

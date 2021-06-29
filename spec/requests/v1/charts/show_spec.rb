@@ -41,6 +41,7 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
               'status' => 'draft',
               'trend_line' => false,
               'chart_type' => 'bar_chart',
+              'position' => 1,
               'formula' => {
                 'payload' => '',
                 'patterns' => [{ 'color' => '#C766EA',

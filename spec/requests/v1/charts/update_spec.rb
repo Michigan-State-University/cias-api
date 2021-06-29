@@ -56,6 +56,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
               'status' => 'published',
               'trend_line' => false,
               'chart_type' => 'pie_chart',
+              'position' => 1,
               'formula' => {
                 'payload' => '',
                 'patterns' => [{ 'color' => '#C766EA',
