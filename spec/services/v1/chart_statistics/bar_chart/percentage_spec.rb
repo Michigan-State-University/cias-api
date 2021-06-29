@@ -20,28 +20,22 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
   let(:charts) { Chart.all }
 
   context 'when charts are publish' do
-    it 'return correct aggreagted data' do
+    it 'return correct aggregated data' do
       expect(subject).to include(
         {
           'chart_id' => bar_chart1.id,
           'data' => include(
             {
-              'label' => chart_matched_statistic1.first.created_at.strftime('%B %Y'),
+              'label' => chart_matched_statistic1.first.filled_at.strftime('%B %Y'),
               'value' => 66.67,
               'color' => '#C766EA',
               'population' => 15
             },
             {
-              'label' => chart_matched_statistic2.first.created_at.strftime('%B %Y'),
+              'label' => chart_matched_statistic2.first.filled_at.strftime('%B %Y'),
               'value' => 37.5,
               'color' => '#C766EA',
               'population' => 8
-            },
-            {
-              'label' => Time.current.strftime('%B %Y'),
-              'value' => 0,
-              'color' => '#C766EA',
-              'population' => 0
             }
           ),
           'population' => 23,
@@ -124,12 +118,6 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
                                        'value' => 37.5,
                                        'color' => '#C766EA',
                                        'population' => 8
-                                     },
-                                     {
-                                       'label' => Time.current.strftime('%B %Y'),
-                                       'value' => 0,
-                                       'color' => '#C766EA',
-                                       'population' => 0
                                      }
                                    ],
                                    'population' => 23,

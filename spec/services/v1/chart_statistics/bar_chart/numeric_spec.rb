@@ -41,12 +41,6 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
                 'value' => 3,
                 'color' => '#C766EA',
                 'notMatchedValue' => 5
-              },
-              {
-                'label' => Time.current.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
               }
             ),
             'population' => 23,
