@@ -82,6 +82,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
         let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
 
         it 'returns proper data' do
+          p json_response
           expect(json_response).to include({
                                              'chart_id' => chart.id,
                                              'data' => include(
@@ -139,8 +140,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
       end
 
       context 'return data from a specific period of time' do
-        let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
-        let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
+        let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: Time.current) }
+        let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: Time.current) }
 
         let(:params) do
           {

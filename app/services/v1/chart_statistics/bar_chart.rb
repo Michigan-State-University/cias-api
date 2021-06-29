@@ -48,6 +48,6 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   end
 
   def first_month(chart_id)
-    charts_data_collection.where(chart_id: chart_id)&.order(created_at: :asc)&.first&.created_at&.strftime('%B %Y')
+    charts_data_collection.where(chart_id: chart_id)&.order(filled_at: :asc)&.first&.filled_at&.strftime('%B %Y')
   end
 end
