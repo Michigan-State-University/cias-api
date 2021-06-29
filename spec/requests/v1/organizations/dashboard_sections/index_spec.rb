@@ -12,7 +12,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
   let!(:dashboard_section_2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard, position: 2) }
   let!(:dashboard_section_3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard, position: 3) }
   let!(:chart_1) { create(:chart, name: 'Some chart 1', description: 'Some description 1', dashboard_section_id: dashboard_section_1.id, status: 'published') }
-  let!(:chart_2) { create(:chart, name: 'Some chart 2', description: 'Some description 2', dashboard_section_id: dashboard_section_2.id) }
+  let!(:chart_2) { create(:chart, name: 'Some chart 2', description: 'Some description 2', dashboard_section_id: dashboard_section_2.id, position: 2) }
 
   let!(:organization_admin) { organization.organization_admins.first }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
@@ -121,6 +121,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'chart_type' => chart_1.chart_type,
               'status' => chart_1.status,
               'trend_line' => false,
+              'position' => 1,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
@@ -151,6 +152,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'chart_type' => chart_2.chart_type,
               'status' => chart_2.status,
               'trend_line' => false,
+              'position' => 2,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
