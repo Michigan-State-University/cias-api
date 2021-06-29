@@ -19,7 +19,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       charts_data_collection.find_each do |data_statistic|
-        hash[data_statistic.chart_id][data_statistic.created_at.strftime('%B %Y')][data_statistic.label] += 1
+        hash[data_statistic.chart_id][data_statistic.filled_at.strftime('%B %Y')][data_statistic.label] += 1
       end
     end
   end

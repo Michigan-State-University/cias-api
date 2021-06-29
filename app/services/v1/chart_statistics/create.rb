@@ -21,7 +21,8 @@ class V1::ChartStatistics::Create
       health_system: health_system,
       health_clinic: health_clinic,
       chart: chart,
-      user: user_session.user
+      user: user_session.user,
+      filled_at: user_session.created_at
     )
   end
 
