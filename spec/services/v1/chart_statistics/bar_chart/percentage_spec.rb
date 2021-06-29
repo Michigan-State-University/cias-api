@@ -26,13 +26,13 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
           'chart_id' => bar_chart1.id,
           'data' => include(
             {
-              'label' => chart_matched_statistic1.first.created_at.strftime('%B %Y'),
+              'label' => chart_matched_statistic1.first.filled_at.strftime('%B %Y'),
               'value' => 66.67,
               'color' => '#C766EA',
               'population' => 15
             },
             {
-              'label' => chart_matched_statistic2.first.created_at.strftime('%B %Y'),
+              'label' => chart_matched_statistic2.first.filled_at.strftime('%B %Y'),
               'value' => 37.5,
               'color' => '#C766EA',
               'population' => 8
