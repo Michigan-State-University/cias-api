@@ -2,11 +2,12 @@
 
 class V1::ChartsController < V1Controller
   include Resource::Clone
+  include Resource::Position
 
   def index
     authorize! :read, Chart
 
-    render json: serialized_response(chart_scope)
+    render json: serialized_response(charts_scope)
   end
 
   def show
@@ -38,12 +39,12 @@ class V1::ChartsController < V1Controller
 
   private
 
-  def chart_scope
+  def charts_scope
     Chart.accessible_by(current_ability)
   end
 
   def chart_load
-    chart_scope.find(params[:id])
+    charts_scope.find(params[:id])
   end
 
   def chart_params

@@ -110,7 +110,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       end
 
       context 'without flag' do
-        let(:request) { get v1_health_clinic_path(deleted_health_clinic.id), headers: headers}
+        let(:request) { get v1_health_clinic_path(deleted_health_clinic.id), headers: headers }
 
         it 'return error message' do
           expect(json_response['message']).to include('Couldn\'t find HealthClinic with')
