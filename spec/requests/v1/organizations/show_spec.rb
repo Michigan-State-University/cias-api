@@ -16,6 +16,8 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_clinics, organization: organization) }
+  let!(:deleted_health_system) { create(:health_system, organization: organization, deleted_at: Time.current, name: 'Deleted health system') }
+  let!(:deleted_health_clinic) { create(:health_clinic, health_system: deleted_health_system, deleted_at: Time.current, name: 'Deleted healt clinic') }
   let!(:health_clinic) { health_system.health_clinics.first }
   let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
 
@@ -74,11 +76,17 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                         },
                   'health_systems' =>
                       {
-                        'data' => [{ 'id' => health_system.id, 'type' => 'health_system' }]
+                        'data' => include(
+                          { 'id' => health_system.id, 'type' => 'health_system' },
+                          { 'id' => deleted_health_system.id, 'type' => 'health_system' }
+                        )
                       },
                   'health_clinics' =>
                       {
-                        'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }]
+                        'data' => include(
+                          { 'id' => health_clinic.id, 'type' => 'health_clinic' },
+                          { 'id' => deleted_health_clinic.id, 'type' => 'health_clinic' }
+                        )
                       }
                 }
           }
@@ -100,6 +108,20 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
           }
         )
         expect(json_response['included'][1]).to include(
+          'id' => deleted_health_clinic.id,
+          'type' => 'health_clinic',
+          'attributes' => {
+            'name' => 'Deleted healt clinic',
+            'health_system_id' => deleted_health_system.id,
+            'deleted' => true
+          },
+          'relationships' => {
+            'health_clinic_admins' => {
+              'data' => []
+            }
+          }
+        )
+        expect(json_response['included'][2]).to include(
           {
             'id' => health_clinic.id,
             'type' => 'health_clinic',
@@ -111,7 +133,29 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           }
         )
-        expect(json_response['included'][2]).to include(
+        expect(json_response['included'][3]).to include(
+          {
+            'id' => deleted_health_system.id,
+            'type' => 'health_system',
+            'attributes' =>
+              {
+                'name' => deleted_health_system.name,
+                'organization_id' => health_system.organization_id,
+                'deleted' => true
+              },
+            'relationships' =>
+              {
+                'health_system_admins' => { 'data' => [] },
+                'health_clinics' => { 'data' => [
+                  {
+                    'id' => deleted_health_clinic.id,
+                    'type' => 'health_clinic'
+                  }
+                ] }
+              }
+          }
+        )
+        expect(json_response['included'][4]).to include(
           {
             'id' => health_system.id,
             'type' => 'health_system',
@@ -128,8 +172,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                   }
           }
         )
-
-        expect(json_response['included'][3]).to include(
+        expect(json_response['included'][5]).to include(
           {
             'id' => organization_admin.id,
             'type' => 'user',

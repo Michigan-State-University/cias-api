@@ -42,7 +42,7 @@ class V1::HealthClinicsController < V1Controller
   private
 
   def clinic_scope
-    return HealthClinic.accessible_by(current_ability).with_deleted if with_deleted
+    return HealthClinic.accessible_by(current_ability).with_deleted if with_deleted?
 
     HealthClinic.accessible_by(current_ability)
   end
@@ -55,7 +55,7 @@ class V1::HealthClinicsController < V1Controller
     params.require(:health_clinic).permit(:name, :health_system_id)
   end
 
-  def with_deleted
+  def with_deleted?
     to_boolean(params[:with_deleted])
   end
 
