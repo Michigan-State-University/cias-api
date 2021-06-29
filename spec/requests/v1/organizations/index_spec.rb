@@ -117,7 +117,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'attributes' =>
                   {
                     'name' => health_system.name,
-                    'organization_id' => health_system.organization_id
+                    'organization_id' => health_system.organization_id,
+                    'deleted' => false
                   },
             'relationships' =>
                   {
