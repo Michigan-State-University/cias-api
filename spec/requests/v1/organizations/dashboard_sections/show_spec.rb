@@ -64,7 +64,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
               'name' => dashboard_section1.name,
               'description' => dashboard_section1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 1
             },
             'relationships' => {
               'charts' => {

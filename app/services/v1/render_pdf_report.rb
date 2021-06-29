@@ -24,7 +24,7 @@ class V1::RenderPdfReport
         content: report_header_html
       },
       footer: {
-          content: report_footer_html
+        content: report_footer_html
       }
     )
   end
@@ -54,10 +54,10 @@ class V1::RenderPdfReport
 
   def report_footer_html
     action_controller.render_to_string(
-        template: 'report_templates/report_footer.html.erb',
-        locals: {
-            datetime_content: "Completed on #{DateTime.now.to_s(:db)}"
-        }
+      template: 'report_templates/report_footer.html.erb',
+      locals: {
+        datetime_content: "Completed on #{DateTime.now.to_s(:db)}"
+      }
     )
   end
 end
