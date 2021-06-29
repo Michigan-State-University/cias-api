@@ -82,7 +82,6 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
         let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
 
         it 'returns proper data' do
-          p json_response
           expect(json_response).to include({
                                              'chart_id' => chart.id,
                                              'data' => include(
