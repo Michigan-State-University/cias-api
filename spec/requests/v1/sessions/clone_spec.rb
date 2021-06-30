@@ -16,7 +16,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   end
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
-  let!(:other_session) { create(:session) }
+  let!(:other_session) { create(:session, intervention: intervention) }
   let!(:question_group1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
   let!(:question_group2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
   let!(:question1) do
@@ -136,9 +136,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       end
 
       it 'origin and outcome same except variable' do
-        expect(session_was.except('variable',
-                                  'intervention_owner_id')).to eq(session_cloned.except('variable',
-                                                                                        'intervention_owner_id'))
+        expect(session_was.except('variable', 'intervention_owner_id')).to eq(session_cloned.except('variable', 'intervention_owner_id'))
         expect(session_cloned['variable']).to eq "cloned_#{session.variable}_#{session_cloned_position}"
       end
 
@@ -186,8 +184,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
               'payload' => 'var + 3',
               'patterns' => [
                 { 'match' => '=7',
-                  'target' => [{ 'id' => cloned_questions_collection.second.id, 'type' => 'Question::Single',
-                                 'probability' => '100' }] }
+                  'target' => [{ 'id' => cloned_questions_collection.second.id, 'type' => 'Question::Single', 'probability' => '100' }] }
               ]
             }
           ),
@@ -201,7 +198,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
               'payload' => 'var + 4',
               'patterns' => [
                 { 'match' => '=3',
-                  'target' => [{ 'id' => other_session.id, 'type' => 'Session', 'probability' => '100' }] }
+                  'target' => [{ 'id' => other_session.id, 'type' => 'Session',
+                                 'probability' => '100' }] }
               ]
             }
           ),
@@ -215,8 +213,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
               'payload' => 'var + 2',
               'patterns' => [
                 { 'match' => '=4',
-                  'target' => [{ 'id' => cloned_questions_collection.fourth.id, 'type' => 'Question::Single',
-                                 'probability' => '100' }] }
+                  'target' => [{ 'id' => cloned_questions_collection.fourth.id,
+                                 'type' => 'Question::Single', 'probability' => '100' }] }
               ]
             }
           ),
@@ -230,8 +228,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
               'payload' => 'var + 7',
               'patterns' => [
                 { 'match' => '=11',
-                  'target' => [{ 'id' => cloned_questions_collection.first.id, 'type' => 'Question::Single',
-                                 'probability' => '100' }] }
+                  'target' => [{ 'id' => cloned_questions_collection.first.id,
+                                 'type' => 'Question::Single', 'probability' => '100' }] }
               ]
             }
           ),
@@ -263,7 +261,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
             'formula' => {
               'payload' => '',
               'patterns' => [
-                { 'match' => '', 'target' => [{ 'id' => '', 'type' => 'Question::Single', 'probability' => '100' }] }
+                { 'match' => '',
+                  'target' => [{ 'id' => '', 'type' => 'Question::Single', 'probability' => '100' }] }
               ]
             }
           ),
@@ -313,8 +312,9 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
         expect(outcome_report_template.sections.last.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY)).to eq report_template.sections.last.slice(
           *ReportTemplate::Section::ATTR_NAMES_TO_COPY
         )
-        expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
-          .to eq report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)
+        expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)).to eq report_template.variants.last.slice(
+          *ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY
+        )
       end
     end
   end

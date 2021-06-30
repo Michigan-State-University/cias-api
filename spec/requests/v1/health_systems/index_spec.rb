@@ -10,9 +10,9 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
     create(:organization, :with_health_system, :with_organization_admin, :with_e_intervention_admin)
   end
   let!(:health_system) { organization.health_systems.first }
-  let!(:health_system_2) { create(:health_system, :with_health_system_admin, name: 'Health System 2') }
+  let!(:health_system2) { create(:health_system, :with_health_system_admin, name: 'Health System 2') }
   let!(:deleted_health_system) { create(:health_system, name: 'Deleted Health System', deleted_at: Time.current) }
-  let!(:organization_2) { health_system_2.organization }
+  let!(:organization2) { health_system2.organization }
   let!(:health_clinic) { create(:health_clinic) }
   let!(:health_system3) { health_clinic.health_system }
 
@@ -68,8 +68,8 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
             'id' => health_system2.id.to_s,
             'type' => 'health_system',
             'attributes' => {
-              'name' => health_system_2.name,
-              'organization_id' => health_system_2.organization_id,
+              'name' => health_system2.name,
+              'organization_id' => health_system2.organization_id,
               'deleted' => false
             },
             'relationships' => {
@@ -81,8 +81,8 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
             'id' => health_system3.id,
             'type' => 'health_system',
             'attributes' => {
-              'name' => health_system_3.name,
-              'organization_id' => health_system_3.organization_id,
+              'name' => health_system3.name,
+              'organization_id' => health_system3.organization_id,
               'deleted' => false
             },
             'relationships' => {
@@ -139,11 +139,11 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
                 }
             },
             {
-              'id' => health_system_2.id.to_s,
+              'id' => health_system2.id.to_s,
               'type' => 'health_system',
               'attributes' => {
-                'name' => health_system_2.name,
-                'organization_id' => health_system_2.organization_id,
+                'name' => health_system2.name,
+                'organization_id' => health_system2.organization_id,
                 'deleted' => false
               },
               'relationships' => {
@@ -152,11 +152,11 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
               }
             },
             {
-              'id' => health_system_3.id,
+              'id' => health_system3.id,
               'type' => 'health_system',
               'attributes' => {
-                'name' => health_system_3.name,
-                'organization_id' => health_system_3.organization_id,
+                'name' => health_system3.name,
+                'organization_id' => health_system3.organization_id,
                 'deleted' => false
               },
               'relationships' => {
@@ -240,8 +240,8 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
           'id' => health_system2.id.to_s,
           'type' => 'health_system',
           'attributes' => {
-            'name' => health_system_2.name,
-            'organization_id' => health_system_2.organization.id,
+            'name' => health_system2.name,
+            'organization_id' => health_system2.organization.id,
             'deleted' => false
           },
           'relationships' => {

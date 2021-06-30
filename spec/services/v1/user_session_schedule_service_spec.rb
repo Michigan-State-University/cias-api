@@ -59,8 +59,8 @@ RSpec.describe V1::UserSessionScheduleService do
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                     .with(second_session.id, user.id, user_session.health_clinic)
-                                                     .at(a_value_within(1.second).of(expected_timestamp))
+                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .at(a_value_within(1.second).of(expected_timestamp))
             end
           end
 
@@ -112,7 +112,7 @@ RSpec.describe V1::UserSessionScheduleService do
 
               it 'schedules on correct time' do
                 expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                           .with(second_session.id, user.id, user_session.health_clinic_id)
+                                                                           .with(second_session.id, user.id, user_session.health_clinic)
                                                                            .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
               end
             end

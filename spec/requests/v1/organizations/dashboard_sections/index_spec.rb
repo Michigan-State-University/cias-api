@@ -9,16 +9,10 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
 
   let!(:organization) { create(:organization, :with_e_intervention_admin, :with_organization_admin) }
   let!(:dashboard_section1) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:dashboard_section2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:dashboard_section3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
-  let!(:chart1) do
-    create(:chart, name: 'Some chart 1', description: 'Some description 1',
-                   dashboard_section_id: dashboard_section1.id)
-  end
-  let!(:chart2) do
-    create(:chart, name: 'Some chart 2', description: 'Some description 2',
-                   dashboard_section_id: dashboard_section2.id)
-  end
+  let!(:dashboard_section2) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard, position: 2) }
+  let!(:dashboard_section3) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard, position: 3) }
+  let!(:chart1) { create(:chart, name: 'Some chart 1', description: 'Some description 1', dashboard_section_id: dashboard_section1.id, status: 'published') }
+  let!(:chart2) { create(:chart, name: 'Some chart 2', description: 'Some description 2', dashboard_section_id: dashboard_section2.id, position: 2) }
 
   let!(:organization_admin) { organization.organization_admins.first }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
@@ -57,127 +51,127 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
 
       it 'returns proper collection data' do
         expect(json_response['data']).to include(
-          {
-            'id' => dashboard_section1.id,
-            'type' => 'dashboard_section',
-            'attributes' => {
-              'name' => dashboard_section1.name,
-              'description' => dashboard_section1.description,
-              'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id,
-              'position' => 1
-            },
-            'relationships' => {
-              'charts' => {
-                'data' => [
-                  { 'id' => chart1.id,
-                    'type' => 'chart' }
-                ]
-              }
-            }
-          },
-          {
-            'id' => dashboard_section2.id,
-            'type' => 'dashboard_section',
-            'attributes' => {
-              'name' => dashboard_section2.name,
-              'description' => dashboard_section2.description,
-              'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id,
-              'position' => 2
-            },
-            'relationships' => {
-              'charts' => {
-                'data' => [
-                  {
-                    'id' => chart2.id,
-                    'type' => 'chart'
-                  }
-                ]
-              }
-            }
-          },
-          {
-            'id' => dashboard_section3.id,
-            'type' => 'dashboard_section',
-            'attributes' => {
-              'name' => dashboard_section3.name,
-              'description' => dashboard_section3.description,
-              'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id,
-              'position' => 3
-            },
-            'relationships' => {
-              'charts' => {
-                'data' => []
-              }
-            }
-          }
-        )
+                                           {
+                                             'id' => dashboard_section1.id,
+                                             'type' => 'dashboard_section',
+                                             'attributes' => {
+                                               'name' => dashboard_section1.name,
+                                               'description' => dashboard_section1.description,
+                                               'reporting_dashboard_id' => organization.reporting_dashboard.id,
+                                               'organization_id' => organization.id,
+                                               'position' => 1
+                                             },
+                                             'relationships' => {
+                                               'charts' => {
+                                                 'data' => [
+                                                   { 'id' => chart1.id,
+                                                     'type' => 'chart' }
+                                                 ]
+                                               }
+                                             }
+                                           },
+                                           {
+                                             'id' => dashboard_section2.id,
+                                             'type' => 'dashboard_section',
+                                             'attributes' => {
+                                               'name' => dashboard_section2.name,
+                                               'description' => dashboard_section2.description,
+                                               'reporting_dashboard_id' => organization.reporting_dashboard.id,
+                                               'organization_id' => organization.id,
+                                               'position' => 2
+                                             },
+                                             'relationships' => {
+                                               'charts' => {
+                                                 'data' => [
+                                                   {
+                                                     'id' => chart2.id,
+                                                     'type' => 'chart'
+                                                   }
+                                                 ]
+                                               }
+                                             }
+                                           },
+                                           {
+                                             'id' => dashboard_section3.id,
+                                             'type' => 'dashboard_section',
+                                             'attributes' => {
+                                               'name' => dashboard_section3.name,
+                                               'description' => dashboard_section3.description,
+                                               'reporting_dashboard_id' => organization.reporting_dashboard.id,
+                                               'organization_id' => organization.id,
+                                               'position' => 3
+                                             },
+                                             'relationships' => {
+                                               'charts' => {
+                                                 'data' => []
+                                               }
+                                             }
+                                           }
+                                         )
       end
 
       it 'returns proper included data' do
         expect(json_response['included'][0]).to include(
-          {
-            'id' => chart1.id,
-            'type' => 'chart',
-            'attributes' => {
-              'name' => chart1.name,
-              'description' => chart1.description,
-              'chart_type' => chart1.chart_type,
-              'status' => chart1.status,
-              'trend_line' => false,
-              'position' => 1,
-              'formula' => {
-                'payload' => '',
-                'patterns' => [
-                  {
-                    'color' => '#C766EA',
-                    'label' => 'Matched',
-                    'match' => ''
-                  }
-                ],
-                'default_pattern' => {
-                  'color' => '#E2B1F4',
-                  'label' => 'NotMatched'
-                }
-              },
-              'dashboard_section_id' => chart1.dashboard_section_id,
-              'published_at' => nil
-            }
-          }
-        )
+                                                  {
+                                                    'id' => chart1.id,
+                                                    'type' => 'chart',
+                                                    'attributes' => {
+                                                      'name' => chart1.name,
+                                                      'description' => chart1.description,
+                                                      'chart_type' => chart1.chart_type,
+                                                      'status' => chart1.status,
+                                                      'trend_line' => false,
+                                                      'position' => 1,
+                                                      'formula' => {
+                                                        'payload' => '',
+                                                        'patterns' => [
+                                                          {
+                                                            'color' => '#C766EA',
+                                                            'label' => 'Matched',
+                                                            'match' => ''
+                                                          }
+                                                        ],
+                                                        'default_pattern' => {
+                                                          'color' => '#E2B1F4',
+                                                          'label' => 'NotMatched'
+                                                        }
+                                                      },
+                                                      'dashboard_section_id' => chart1.dashboard_section_id,
+                                                      'published_at' => nil
+                                                    }
+                                                  }
+                                                )
 
         expect(json_response['included'][1]).to include(
-          {
-            'id' => chart2.id,
-            'type' => 'chart',
-            'attributes' => {
-              'name' => chart2.name,
-              'description' => chart2.description,
-              'chart_type' => chart2.chart_type,
-              'status' => chart1.status,
-              'trend_line' => false,
-              'position' => 2,
-              'formula' => {
-                'payload' => '',
-                'patterns' => [
-                  {
-                    'color' => '#C766EA',
-                    'label' => 'Matched',
-                    'match' => ''
-                  }
-                ],
-                'default_pattern' => {
-                  'color' => '#E2B1F4',
-                  'label' => 'NotMatched'
-                }
-              },
-              'dashboard_section_id' => chart2.dashboard_section_id,
-              'published_at' => nil
-            }
-          }
-        )
+                                                  {
+                                                    'id' => chart2.id,
+                                                    'type' => 'chart',
+                                                    'attributes' => {
+                                                      'name' => chart2.name,
+                                                      'description' => chart2.description,
+                                                      'chart_type' => chart2.chart_type,
+                                                      'status' => chart2.status,
+                                                      'trend_line' => false,
+                                                      'position' => 2,
+                                                      'formula' => {
+                                                        'payload' => '',
+                                                        'patterns' => [
+                                                          {
+                                                            'color' => '#C766EA',
+                                                            'label' => 'Matched',
+                                                            'match' => ''
+                                                          }
+                                                        ],
+                                                        'default_pattern' => {
+                                                          'color' => '#E2B1F4',
+                                                          'label' => 'NotMatched'
+                                                        }
+                                                      },
+                                                      'dashboard_section_id' => chart2.dashboard_section_id,
+                                                      'published_at' => nil
+                                                    }
+                                                  }
+                                                )
       end
     end
 
@@ -249,19 +243,19 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
 
           it 'returns correct data' do
             expect(json_response['data'][0]).to include(
-              {
-                'id' => dashboard_section_1.id,
-                'type' => 'dashboard_section',
-                'attributes' => {
-                  'name' => dashboard_section_1.name,
-                  'description' => dashboard_section_1.description,
-                  'reporting_dashboard_id' => organization.reporting_dashboard.id,
-                  'organization_id' => organization.id,
-                  'position' => 1,
-                  'charts' => [include('id' => chart_1.id, 'status' => 'published')]
-                }
-              }
-            )
+                                                  {
+                                                    'id' => dashboard_section1.id,
+                                                    'type' => 'dashboard_section',
+                                                    'attributes' => {
+                                                      'name' => dashboard_section1.name,
+                                                      'description' => dashboard_section1.description,
+                                                      'reporting_dashboard_id' => organization.reporting_dashboard.id,
+                                                      'organization_id' => organization.id,
+                                                      'position' => 1,
+                                                      'charts' => [include('id' => chart1.id, 'status' => 'published')]
+                                                    }
+                                                  }
+                                                )
           end
         end
       end
