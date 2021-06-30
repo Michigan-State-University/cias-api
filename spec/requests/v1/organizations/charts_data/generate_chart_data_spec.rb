@@ -34,10 +34,10 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
   let!(:chart) { create(:chart, name: 'chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
   let!(:other) { create(:chart, name: 'chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
 
-  let!(:chart_matched_statistic) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 3.months.ago) }
-  let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 3.months.ago) }
-  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, created_at: 2.months.ago) }
+  let!(:chart_matched_statistic) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: 2.months.ago) }
+  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: 3.months.ago) }
+  let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: 3.months.ago) }
+  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: 2.months.ago) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -139,8 +139,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
       end
 
       context 'return data from a specific period of time' do
-        let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
-        let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic) }
+        let!(:chart_matched_statistic) { create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: Time.current) }
+        let!(:chart_not_matched_statistic) { create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic, filled_at: Time.current) }
 
         let(:params) do
           {

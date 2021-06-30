@@ -13,10 +13,10 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   let!(:other_chart) { create(:chart, name: 'pie_chart', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
   let(:chart) { bar_chart1 }
 
-  let!(:chart_matched_statistic1) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_not_matched_statistic1) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, created_at: 2.months.ago) }
-  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, created_at: 1.month.ago) }
-  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, created_at: 1.month.ago) }
+  let!(:chart_matched_statistic1) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 2.months.ago) }
+  let!(:chart_not_matched_statistic1) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 2.months.ago) }
+  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 1.month.ago) }
+  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 1.month.ago) }
 
   let(:data_collection) { ChartStatistic.all }
   let(:charts) { Chart.all }
@@ -31,13 +31,13 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
             'chart_id' => bar_chart1.id,
             'data' => include(
               {
-                'label' => chart_matched_statistic1.first.created_at.strftime('%B %Y'),
+                'label' => chart_matched_statistic1.first.filled_at.strftime('%B %Y'),
                 'value' => 10,
                 'color' => '#C766EA',
                 'notMatchedValue' => 5
               },
               {
-                'label' => chart_matched_statistic2.first.created_at.strftime('%B %Y'),
+                'label' => chart_matched_statistic2.first.filled_at.strftime('%B %Y'),
                 'value' => 3,
                 'color' => '#C766EA',
                 'notMatchedValue' => 5

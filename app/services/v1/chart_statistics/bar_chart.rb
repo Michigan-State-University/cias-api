@@ -19,7 +19,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       charts_data_collection.find_each do |data_statistic|
-        hash[data_statistic.chart_id][data_statistic.created_at.strftime('%B %Y')][data_statistic.label] += 1
+        hash[data_statistic.chart_id][data_statistic.filled_at.strftime('%B %Y')][data_statistic.label] += 1
       end
     end
   end
@@ -48,6 +48,6 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   end
 
   def first_month(chart_id)
-    charts_data_collection.where(chart_id: chart_id)&.order(created_at: :asc)&.first&.created_at&.strftime('%B %Y')
+    charts_data_collection.where(chart_id: chart_id)&.order(filled_at: :asc)&.first&.filled_at&.strftime('%B %Y')
   end
 end
