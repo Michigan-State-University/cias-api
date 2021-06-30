@@ -24,7 +24,7 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
   end
 
   def current_chart_type_collection
-    charts.where(chart_type: 'pie_chart', status: 'published')
+    charts.where(chart_type: 'pie_chart')
   end
 
   def generate_hash

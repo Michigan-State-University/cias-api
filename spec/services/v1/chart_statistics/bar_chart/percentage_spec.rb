@@ -20,7 +20,7 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
   let(:charts) { Chart.all }
 
   context 'when charts are publish' do
-    it 'return correct aggreagted data' do
+    it 'return correct aggregated data' do
       expect(subject).to include(
         {
           'chart_id' => bar_chart1.id,
@@ -36,12 +36,6 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
               'value' => 37.5,
               'color' => '#C766EA',
               'population' => 8
-            },
-            {
-              'label' => Time.current.strftime('%B %Y'),
-              'value' => 0,
-              'color' => '#C766EA',
-              'population' => 0
             }
           ),
           'population' => 23,
@@ -124,12 +118,6 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
                                        'value' => 37.5,
                                        'color' => '#C766EA',
                                        'population' => 8
-                                     },
-                                     {
-                                       'label' => Time.current.strftime('%B %Y'),
-                                       'value' => 0,
-                                       'color' => '#C766EA',
-                                       'population' => 0
                                      }
                                    ],
                                    'population' => 23,
@@ -138,9 +126,9 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
     end
   end
 
-  context 'when charts are draft' do
-    let!(:bar_chart1) { create(:chart, name: 'bar_chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
-    let!(:bar_chart2) { create(:chart, name: 'bar_chart2', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
+  context 'when charts are different type' do
+    let!(:bar_chart1) { create(:chart, name: 'bar_chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
+    let!(:bar_chart2) { create(:chart, name: 'bar_chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
 
     it 'return empty array' do
       expect(subject).to eql([])

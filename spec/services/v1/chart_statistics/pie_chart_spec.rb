@@ -50,9 +50,9 @@ RSpec.describe V1::ChartStatistics::PieChart do
       end
     end
 
-    context 'when charts are draft' do
-      let!(:pie_chart1) { create(:chart, name: 'pie_chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
-      let!(:pie_chart2) { create(:chart, name: 'pie_chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
+    context 'when charts are different type' do
+      let!(:pie_chart1) { create(:chart, name: 'pie_chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
+      let!(:pie_chart2) { create(:chart, name: 'pie_chart2', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
 
       it 'return empty array' do
         expect(subject).to eql([])

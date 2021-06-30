@@ -45,7 +45,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      clinic_ids: [health_clinic.id]
+      clinic_ids: [health_clinic.id],
+      statuses: ['published']
     }
   end
 
@@ -69,12 +70,6 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'value' => 37.5,
                 'color' => '#C766EA',
                 'population' => 8
-              },
-              {
-                'label' => Time.current.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'population' => 0
               }
             ],
             'population' => 8,
@@ -88,24 +83,6 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'value' => 3,
                 'color' => '#C766EA',
                 'notMatchedValue' => 5
-              },
-              {
-                'label' => 2.months.ago.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
-              },
-              {
-                'label' => 1.month.ago.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
-              },
-              {
-                'label' => Time.current.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
               }
             ],
             'population' => 8,
@@ -134,7 +111,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
       context 'when params are INVALID' do
         let(:params) do
           {
-            clinic_ids: ['wrong_clinic_id']
+            clinic_ids: ['wrong_clinic_id'],
+            statuses: ['published']
           }
         end
 
@@ -157,6 +135,45 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
               'data' => [],
               'population' => 0,
               'dashboard_section_id' => percentage_bar_chart.dashboard_section_id
+            }
+          )
+        end
+      end
+
+      context 'with draft chart' do
+        let!(:draft_pie_chart) { create(:chart, name: 'pie_chart', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'data_collection') }
+        let!(:chart_matched_statistic1) { create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: draft_pie_chart, health_clinic: health_clinic, filled_at: 2.months.ago) }
+        let!(:chart_not_matched_statistic1) { create_list(:chart_statistic, 2, label: 'NotMatched', organization: organization, health_system: health_system, chart: draft_pie_chart, health_clinic: health_clinic, filled_at: 2.months.ago) }
+
+        let(:params) do
+          {
+            clinic_ids: [health_clinic.id],
+            statuses: %w[data_collection published]
+          }
+        end
+
+        it 'returns proper collection size' do
+          expect(json_response['data_for_charts'].size).to eq(4)
+        end
+
+        it 'return proper data' do
+          expect(json_response['data_for_charts']).to include(
+            {
+              'chart_id' => draft_pie_chart.id,
+              'data' => include(
+                {
+                  'label' => 'Matched',
+                  'value' => 3,
+                  'color' => '#C766EA'
+                },
+                {
+                  'label' => 'NotMatched',
+                  'value' => 2,
+                  'color' => '#E2B1F4'
+                }
+              ),
+              'population' => 5,
+              'dashboard_section_id' => draft_pie_chart.dashboard_section_id
             }
           )
         end
