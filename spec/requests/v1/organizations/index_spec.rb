@@ -105,8 +105,9 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'attributes' => {
               'health_system_id' => health_system.id,
               'name' => health_clinic.name,
-              'health_clinic_admins' => []
-            }
+              'deleted' => false
+            },
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           }
         )
         expect(json_response['included'][1]).to include(
@@ -116,7 +117,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'attributes' =>
                   {
                     'name' => health_system.name,
-                    'organization_id' => health_system.organization_id
+                    'organization_id' => health_system.organization_id,
+                    'deleted' => false
                   },
             'relationships' =>
                   {

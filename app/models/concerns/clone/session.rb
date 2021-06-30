@@ -53,17 +53,35 @@ class Clone::Session < Clone::Base
 
   def matching_outcome_target_id(pattern, index)
     target_id = pattern['target'][index]['id']
-    return target_id if pattern['target'][index]['type'] == 'Session' || target_id.empty?
+    return check_if_session_exists(target_id) if pattern['target'][index]['type'] == 'Session' || target_id.empty?
 
     matching_question_id(target_id)
   end
 
   def matching_question_id(target_id)
-    target = source.questions.find(target_id)
-    outcome.questions
-           .joins(:question_group)
-           .where(question_groups: { position: target.question_group.position })
-           .find_by!(position: target.position).id
+    target = check_if_question_exists(target_id)
+    if target
+      outcome.questions
+          .joins(:question_group)
+          .where(question_groups: { position: target.question_group.position })
+          .find_by!(position: target.position).id
+    else
+      ''
+    end
+  end
+
+  def check_if_session_exists(target_id)
+    return '' if target_id.empty?
+
+    source.intervention.sessions.find(target_id).id
+  rescue ActiveRecord::RecordNotFound
+    ''
+  end
+
+  def check_if_question_exists(target_id)
+    source.questions.find(target_id)
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def reassign_reflections

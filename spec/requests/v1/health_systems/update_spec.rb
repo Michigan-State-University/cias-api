@@ -7,9 +7,8 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) do
-    create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization)
-  end
+  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization) }
+  let!(:deleted_health_system) { create(:health_system, name: 'Deleted Health System', organization: organization, deleted_at: Time.current) }
   let!(:new_health_system_admin) { create(:user, :confirmed, :health_system_admin) }
   let!(:health_system_admin_to_remove) { health_system.health_system_admins.first }
   let(:admins_ids) { health_system.reload.health_system_admins.pluck(:id) }
@@ -53,7 +52,8 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
             'type' => 'health_system',
             'attributes' => {
               'name' => 'Health System 50',
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'deleted' => false
             },
             'relationships' => {
               'health_system_admins' => { 'data' => [{ 'id' => new_health_system_admin.id, 'type' => 'user' }] },
@@ -61,6 +61,29 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
             }
           }
         )
+      end
+
+      context 'when health system is deleted' do
+        let(:request) { patch v1_health_system_path(deleted_health_system.id), params: params, headers: headers }
+
+        it 'return error message' do
+          expect(json_response['message']).to include('Couldn\'t find HealthSystem with')
+        end
+
+        context 'with flag' do
+          let(:params) do
+            {
+              health_system: {
+                name: 'Health System 50'
+              },
+              with_deleted: true
+            }
+          end
+
+          it 'return forbidden status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
       end
     end
 

@@ -9,6 +9,13 @@ class V1::Questions::ImagesController < V1Controller
     render json: serialized_response(question_load, 'Question'), status: :created
   end
 
+  def update
+    authorize! :update, Question
+
+    question_load.image_blob&.update!(description: question_params[:image_alt])
+    render json: serialized_response(question_load, 'Question')
+  end
+
   def destroy
     authorize! :destroy, Question
 
@@ -24,6 +31,6 @@ class V1::Questions::ImagesController < V1Controller
   end
 
   def question_params
-    params.require(:image).permit(:file)
+    params.require(:image).permit(:file, :image_alt)
   end
 end

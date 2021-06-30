@@ -23,8 +23,14 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   let(:intervention_user) { admin }
   let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
   let(:intervention_id) { intervention.id }
-
   let(:request) { patch v1_intervention_path(intervention_id), params: params, headers: headers }
+  let(:participant) { create(:user, :confirmed, :participant) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
+  let(:guest) { create(:user, :guest) }
+  let(:user) { admin }
+
+  let_it_be(:language) { create(:google_language) }
 
   context 'when auth' do
     context 'is invalid' do
@@ -64,6 +70,29 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
           'status' => 'published',
           'shared_to' => 'anyone'
         )
+      end
+
+      context 'change language' do
+        let(:params) do
+          {
+            intervention: {
+              google_language_id: language.id
+            }
+          }
+        end
+
+        it 'update a intervention object' do
+          expect(intervention.reload.attributes).to include(
+            'google_language_id' => language.id
+          )
+        end
+
+        it 'return correct data' do
+          expect(json_response['data']['attributes']).to include(
+            'language_name' => 'French',
+            'language_code' => 'fr'
+          )
+        end
       end
     end
 

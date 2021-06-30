@@ -32,7 +32,8 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
             email: params[:email],
             organizable_id: organization.id,
             confirmed_at: nil,
-            roles: ['e_intervention_admin']
+            roles: ['e_intervention_admin'],
+            active: false
           )
         end
       end
@@ -56,7 +57,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
 
           expect { request }.to change(OrganizationInvitation, :count).by(1).and \
             avoid_changing(User, :count).and \
-              avoid_changing { organization.reload.e_intervention_admins.count }
+              change { organization.reload.e_intervention_admins.count }.by(1)
 
           expect(organization_invitation).to have_attributes(
             user_id: intervention_admin.id,
@@ -91,7 +92,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
 
           expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
             avoid_changing(User, :count).and \
-              avoid_changing { organization.reload.e_intervention_admins.count }
+              change { organization.reload.e_intervention_admins.count }.by(1)
         end
       end
 
@@ -124,7 +125,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
 
             expect { request }.to avoid_changing(OrganizationInvitation, :count).and \
               avoid_changing(User, :count).and \
-                avoid_changing { organization.reload.e_intervention_admins.count }
+                change { organization.reload.e_intervention_admins.count }.by(1)
           end
         end
 
@@ -152,7 +153,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
 
             expect { request }.to change(OrganizationInvitation, :count).by(1).and \
               avoid_changing(User, :count).and \
-                avoid_changing { organization.reload.e_intervention_admins.count }
+                change { organization.reload.e_intervention_admins.count }.by(1)
 
             expect(new_organization_invitation).to have_attributes(
               user_id: intervention_admin.id,

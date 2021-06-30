@@ -6,7 +6,7 @@ class V1::Users::InvitationsController < V1Controller
   def index
     users = users_scope.invitation_not_accepted.limit_to_roles(['researcher'])
 
-    render json: serialized_response(users)
+    render json: serialized_response(users, controller_name.classify, { only_email: true })
   end
 
   def create
@@ -20,7 +20,7 @@ class V1::Users::InvitationsController < V1Controller
     user = User.invite!(email: invitation_params[:email], roles: %w[researcher])
 
     if user.valid?
-      render json: serialized_response(user), status: :created
+      render json: serialized_response(user, controller_name.classify, { only_email: true }), status: :created
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
@@ -34,16 +34,17 @@ class V1::Users::InvitationsController < V1Controller
     # and there is no version with !
     raise ActiveRecord::RecordNotFound if user.blank?
 
-    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}"
+    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{params[:invitation_token]}&email=#{user.email}&role=#{user.roles.first}"
   end
 
   # This endpoint is hit from registration page to register new user from invitation
   # link, thus there is no need for authorization
   def update
     user = User.accept_invitation!(accept_invitation_params)
+    user.activate!
 
     if user.persisted?
-      render json: serialized_response(user)
+      render json: serialized_response(user, controller_name.classify, { only_email: true })
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end

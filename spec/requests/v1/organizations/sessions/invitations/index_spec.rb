@@ -36,16 +36,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/sessions/:session_id/invi
     end
 
     it 'return correct data size' do
-      expect(json_response.size).to eq(2)
-    end
-
-    it 'return correct key' do
-      expect(json_response).to include(health_clinic1.id, health_clinic2.id)
-    end
-
-    it 'return correct invitation size to clinic' do
-      expect(json_response[health_clinic1.id].size).to eq(3)
-      expect(json_response[health_clinic2.id].size).to eq(2)
+      expect(json_response['data'].size).to eq(5)
     end
   end
 end

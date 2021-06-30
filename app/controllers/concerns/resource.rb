@@ -7,9 +7,9 @@ module Resource
     @model_constant ||= controller_name.classify.demodulize.safe_constantize
   end
 
-  def serialized_response(collection, from_model = controller_name.classify)
+  def serialized_response(collection, from_model = controller_name.classify, params = {})
     "V1::#{from_model}Serializer".safe_constantize.
-      new(collection).serialized_json
+      new(collection, params: params).serialized_json
   end
 
   def serialized_hash(collection, from_model = controller_name.classify)

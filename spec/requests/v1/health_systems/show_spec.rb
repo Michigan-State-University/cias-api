@@ -10,6 +10,7 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
     create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
   end
   let!(:health_system) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization) }
+  let!(:deleted_health_system) { create(:health_system, organization: organization, name: 'Deleted health system', deleted_at: Time.current) }
   let!(:health_clinic) { health_system.health_clinics.first }
 
   let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
@@ -56,7 +57,8 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'type' => 'health_system',
             'attributes' => {
               'name' => health_system.name,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'deleted' => false
             },
             'relationships' => {
               'health_system_admins' => {
@@ -78,8 +80,9 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'attributes' => {
               'name' => health_clinic.name,
               'health_system_id' => health_clinic.health_system_id,
-              'health_clinic_admins' => []
-            }
+              'deleted' => false
+            },
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           }
         )
 
@@ -100,6 +103,44 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
 
       it 'returns proper collection size' do
         expect(json_response.size).to eq(2)
+      end
+
+      context 'when clinic is deleted' do
+        let(:request) { get v1_health_system_path(deleted_health_system.id), headers: headers }
+
+        it 'without flag' do
+          expect(json_response['message']).to include('Couldn\'t find HealthSystem with')
+        end
+
+        context 'with flat' do
+          let(:params) do
+            {
+              with_deleted: true
+            }
+
+            it 'return health system' do
+              expect(json_response['data']).to include(
+                {
+                  'id' => deleted_health_system.id.to_s,
+                  'type' => 'health_system',
+                  'attributes' => {
+                    'name' => deleted_health_system.name,
+                    'organization_id' => organization.id,
+                    'deleted' => false
+                  },
+                  'relationships' => {
+                    'health_system_admins' => {
+                      'data' => []
+                    },
+                    'health_clinics' => {
+                      'data' => []
+                    }
+                  }
+                }
+              )
+            end
+          end
+        end
       end
     end
 

@@ -45,14 +45,15 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
               'status' => 'draft',
               'trend_line' => false,
               'chart_type' => 'bar_chart',
+              'position' => 1,
               'formula' => {
                 'payload' => '',
                 'patterns' => [{ 'color' => '#C766EA',
-                                 'label' => 'Label1',
+                                 'label' => 'Matched',
                                  'match' => '' }],
                 'default_pattern' => {
                   'color' => '#E2B1F4',
-                  'label' => 'Other'
+                  'label' => 'NotMatched'
                 }
               },
               'dashboard_section_id' => dashboard_section.id,

@@ -46,7 +46,8 @@ RSpec.describe 'POST /v1/organizations/:organization_id/dashboard_sections', typ
               'name' => 'New Dashboard Section',
               'description' => 'New Dashboard Section Description',
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 1
             }
           }
         )

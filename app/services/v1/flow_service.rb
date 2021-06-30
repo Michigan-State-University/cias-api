@@ -91,7 +91,10 @@ class V1::FlowService
       name_audio_url = ''
       name_audio_url = user_session.name_audio.url unless user_session.name_audio.nil?
 
-      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, name_audio_url)
+      name_answer = user_session.search_var('.:name:.')
+      name_text = name_answer.nil? ? 'name' : name_answer['name']
+
+      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, name_audio_url, name_text)
       block
     end
     question

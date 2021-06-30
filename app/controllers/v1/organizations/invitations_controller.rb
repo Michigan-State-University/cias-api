@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Organizations::InvitationsController < V1Controller
+  skip_before_action :authenticate_user!, only: %i[confirm]
+
   def invite_intervention_admin
     authorize! :invite_e_intervention_admin, Organization
 

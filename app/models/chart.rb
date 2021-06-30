@@ -3,11 +3,13 @@
 class Chart < ApplicationRecord
   has_paper_trail
   extend DefaultValues
+  include Clone
 
   belongs_to :dashboard_section
   has_many :chart_statistics, dependent: :destroy
 
   attribute :formula, :json, default: assign_default_values('formula')
+  attribute :position, :integer, default: 1
 
   validates :formula, presence: true, json: { schema: lambda {
                                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
@@ -18,6 +20,7 @@ class Chart < ApplicationRecord
   enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
   enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
 
+  default_scope { order(:position) }
   after_update_commit :status_change
 
   def integral_update(chart_params)

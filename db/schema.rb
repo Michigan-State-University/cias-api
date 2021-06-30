@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_26_202119) do
+ActiveRecord::Schema.define(version: 2021_06_29_085519) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -33,6 +33,7 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.bigint "byte_size", null: false
     t.string "checksum", null: false
     t.datetime "created_at", null: false
+    t.string "description"
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -67,6 +68,7 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "filled_at"
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
@@ -85,6 +87,7 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
+    t.integer "position", default: 1, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
@@ -95,6 +98,7 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
+    t.integer "position", default: 1, null: false
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
@@ -119,6 +123,13 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
+  end
+
+  create_table "google_languages", force: :cascade do |t|
+    t.string "language_code"
+    t.string "language_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "google_tts_languages", force: :cascade do |t|
@@ -154,6 +165,8 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.uuid "health_system_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
     t.index ["name", "health_system_id"], name: "index_health_clinics_on_name_and_health_system_id", unique: true
   end
@@ -176,6 +189,8 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["name", "organization_id"], name: "index_health_systems_on_name_and_organization_id", unique: true
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 
@@ -188,6 +203,8 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "organization_id"
+    t.bigint "google_language_id", default: 22, null: false
+    t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
     t.index ["organization_id"], name: "index_interventions_on_organization_id"
@@ -197,7 +214,6 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
   end
 
   create_table "invitations", force: :cascade do |t|
-    t.string "email"
     t.uuid "invitable_id"
     t.string "invitable_type"
     t.datetime "created_at", precision: 6, null: false
@@ -207,11 +223,9 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
-    t.index ["invitable_type", "invitable_id", "email"], name: "index_invitations_on_invitable_type_and_invitable_id_and_email", unique: true
   end
 
   create_table "messages", force: :cascade do |t|
-    t.string "phone", null: false
     t.text "body", null: false
     t.string "status", default: "new", null: false
     t.datetime "schedule_at"
@@ -243,7 +257,6 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.uuid "user_id"
     t.string "iso", null: false
     t.string "prefix", null: false
-    t.string "number", null: false
     t.string "confirmation_code"
     t.boolean "confirmed", default: false, null: false
     t.datetime "confirmed_at"
@@ -446,10 +459,6 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
 
   create_table "users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "provider", default: "email", null: false
-    t.string "uid", default: "", null: false
-    t.string "first_name", default: "", null: false
-    t.string "last_name", default: "", null: false
-    t.string "email"
     t.string "time_zone"
     t.string "roles", default: [], array: true
     t.jsonb "tokens"
@@ -493,7 +502,6 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.string "uid_bidx"
     t.string "organizable_type"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
-    t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
@@ -504,9 +512,6 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
     t.index ["team_id"], name: "index_users_on_team_id"
-    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
-    t.index ["uid", "roles"], name: "index_users_on_uid_and_roles", using: :gin
-    t.index ["uid"], name: "index_users_on_uid", unique: true
     t.index ["uid_bidx"], name: "index_users_on_uid_bidx", unique: true
   end
 
@@ -523,6 +528,7 @@ ActiveRecord::Schema.define(version: 2021_05_26_202119) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"

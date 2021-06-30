@@ -10,7 +10,7 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
   let(:params) do
     {
       logo: {
-        file: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+        file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
       }
     }
   end
@@ -50,9 +50,7 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
 
   context 'when current_user is third_party' do
     context 'when current_user try to add a logo' do
-      before do
-        post v1_intervention_logo_path(intervention_id), params: params, headers: other_user2.create_new_auth_token
-      end
+      before { post v1_intervention_logo_path(intervention_id), params: params, headers: other_user2.create_new_auth_token }
 
       it { expect(response).to have_http_status(:forbidden) }
     end

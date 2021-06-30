@@ -29,9 +29,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
   end
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) do
-    get v1_organization_dashboard_section_path(organization.id, dashboard_section1.id), headers: headers
-  end
+  let(:request) { get v1_organization_dashboard_section_path(organization.id, dashboard_section1.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
@@ -66,7 +64,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
               'name' => dashboard_section1.name,
               'description' => dashboard_section1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 1
             },
             'relationships' => {
               'charts' => {
@@ -92,19 +91,20 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections/:id', 
               'description' => chart1.description,
               'chart_type' => chart1.chart_type,
               'status' => chart1.status,
+              'position' => 1,
               'trend_line' => false,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
                   {
                     'color' => '#C766EA',
-                    'label' => 'Label1',
+                    'label' => 'Matched',
                     'match' => ''
                   }
                 ],
                 'default_pattern' => {
                   'color' => '#E2B1F4',
-                  'label' => 'Other'
+                  'label' => 'NotMatched'
                 }
               },
               'dashboard_section_id' => chart1.dashboard_section_id,

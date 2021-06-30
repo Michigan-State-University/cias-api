@@ -22,7 +22,9 @@ gem 'devise_token_auth'
 gem 'faker', require: false
 gem 'fast_jsonapi'
 gem 'google-cloud-text_to_speech'
+gem 'google-cloud-translate-v2'
 gem 'hiredis'
+gem 'metainspector', '~> 1.15'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
@@ -46,6 +48,8 @@ gem 'logstop'
 gem 'countries'
 # for Audit trail and audit log
 gem 'paper_trail'
+# for soft delete
+gem 'paranoia', '~> 2.4', '>= 2.4.3'
 
 group :development, :test do
   gem 'bundler-audit'

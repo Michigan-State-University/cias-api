@@ -17,6 +17,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'google/cloud/text_to_speech/v1/text_to_speech'
 require 'google/cloud/text_to_speech/v1/version'
+require 'google/cloud/translate/v2'
 require 'faker'
 require 'active_storage_validations/matchers'
 require 'rake'
@@ -70,14 +71,14 @@ RSpec.configure do |config|
   end
 
   config.before :suite do
-    DatabaseCleaner.strategy = :truncation, { except: %w[google_tts_voice google_tts_language] }
+    DatabaseCleaner.strategy = :truncation, { except: %w[google_tts_voice google_tts_language google_language] }
     DatabaseCleaner.clean_with :truncation
 
     language = GoogleTtsLanguage.create(language_name: 'English (United States)')
-    GoogleTtsVoice.create(id: 43, voice_label: 'Standard-female-1', voice_type: 'en-US-Standard-C',
-                          language_code: 'en-US', google_tts_language: language)
-    GoogleTtsVoice.create(id: 44, voice_label: 'Standard-female-2', voice_type: 'en-US-Standard-B',
-                          language_code: 'en-US', google_tts_language: language)
+    GoogleTtsVoice.create(id: 43, voice_label: 'Standard-female-1', voice_type: 'en-US-Standard-C', language_code: 'en-US', google_tts_language: language)
+    GoogleTtsVoice.create(id: 44, voice_label: 'Standard-female-2', voice_type: 'en-US-Standard-B', language_code: 'en-US', google_tts_language: language)
+
+    GoogleLanguage.create(id: 22, language_name: 'English', language_code: 'en')
   end
   # The settings below are suggested to provide a good initial experience
   # with RSpec, but feel free to customize to your heart's content.

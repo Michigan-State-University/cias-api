@@ -69,7 +69,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let!(:question6) do
     create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 6', position: 3,
                              formula: { 'payload' => '', 'patterns' => [
-                               { 'match' => '', 'target' => [{ 'id' => '', 'probability' => '100', type: 'Question::Single' }] }
+                               { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
                              ] })
   end
 
@@ -143,7 +143,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       end
 
       it 'has correct position' do
-        expect(json_response['data']['attributes']['position']).to eq(2)
+        expect(json_response['data']['attributes']['position']).to eq(3)
       end
 
       it 'has cleared formula' do
@@ -159,7 +159,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       end
 
       it 'has correct number of sessions' do
-        expect(session.intervention.sessions.size).to eq(2)
+        expect(session.intervention.sessions.size).to eq(3)
       end
 
       it 'has correct number of question_groups' do
@@ -277,7 +277,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       it 'finish question has only one speech' do
         expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'].size).to eq(1)
         expect(cloned_questions_collection.where(type: 'Question::Finish').first.narrator['blocks'][0]).to include(
-          'text' => ['Finish Screen'],
+          'text' => ['Enter main text for screen here. This is the last screen participants will see in this session'],
           'type' => 'ReadQuestion',
           'action' => 'NO_ACTION',
           'animation' => 'rest',

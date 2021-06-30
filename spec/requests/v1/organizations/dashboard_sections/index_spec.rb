@@ -30,9 +30,10 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
       'admin' => admin
     }
   end
+  let(:params) { {} }
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_organization_dashboard_sections_path(organization.id), headers: headers }
+  let(:request) { get v1_organization_dashboard_sections_path(organization.id), headers: headers, params: params }
 
   context 'when auth' do
     context 'is invalid' do
@@ -63,7 +64,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'name' => dashboard_section1.name,
               'description' => dashboard_section1.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 1
             },
             'relationships' => {
               'charts' => {
@@ -81,7 +83,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'name' => dashboard_section2.name,
               'description' => dashboard_section2.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 2
             },
             'relationships' => {
               'charts' => {
@@ -101,7 +104,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'name' => dashboard_section3.name,
               'description' => dashboard_section3.description,
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 3
             },
             'relationships' => {
               'charts' => {
@@ -123,18 +127,19 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'chart_type' => chart1.chart_type,
               'status' => chart1.status,
               'trend_line' => false,
+              'position' => 1,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
                   {
                     'color' => '#C766EA',
-                    'label' => 'Label1',
+                    'label' => 'Matched',
                     'match' => ''
                   }
                 ],
                 'default_pattern' => {
                   'color' => '#E2B1F4',
-                  'label' => 'Other'
+                  'label' => 'NotMatched'
                 }
               },
               'dashboard_section_id' => chart1.dashboard_section_id,
@@ -153,18 +158,19 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
               'chart_type' => chart2.chart_type,
               'status' => chart1.status,
               'trend_line' => false,
+              'position' => 2,
               'formula' => {
                 'payload' => '',
                 'patterns' => [
                   {
                     'color' => '#C766EA',
-                    'label' => 'Label1',
+                    'label' => 'Matched',
                     'match' => ''
                   }
                 ],
                 'default_pattern' => {
                   'color' => '#E2B1F4',
-                  'label' => 'Other'
+                  'label' => 'NotMatched'
                 }
               },
               'dashboard_section_id' => chart2.dashboard_section_id,
@@ -211,6 +217,53 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
 
       it 'returns proper error message' do
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
+      end
+    end
+  end
+
+  context 'when user accesses dashboard in dashboard view' do
+    let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
+    let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
+    let(:health_clinic_admin) { health_clinic.user_health_clinics.first.user }
+    let(:health_system_admin) { health_system.health_system_admins.first }
+    let(:params) { { published: true } }
+
+    let(:roles) do
+      {
+        'organization_admin' => organization_admin,
+        'health_system_admin' => health_system_admin,
+        'health_clinic_admin' => health_clinic_admin
+      }
+    end
+
+    context 'when user is' do
+      %w[organization_admin health_system_admin health_clinic_admin].each do |role|
+        context role.to_s do
+          let(:user) { roles[role] }
+
+          before { request }
+
+          it 'returns correct dashboard sections size' do
+            expect(json_response['data'].size).to eq(1)
+          end
+
+          it 'returns correct data' do
+            expect(json_response['data'][0]).to include(
+              {
+                'id' => dashboard_section_1.id,
+                'type' => 'dashboard_section',
+                'attributes' => {
+                  'name' => dashboard_section_1.name,
+                  'description' => dashboard_section_1.description,
+                  'reporting_dashboard_id' => organization.reporting_dashboard.id,
+                  'organization_id' => organization.id,
+                  'position' => 1,
+                  'charts' => [include('id' => chart_1.id, 'status' => 'published')]
+                }
+              }
+            )
+          end
+        end
       end
     end
   end

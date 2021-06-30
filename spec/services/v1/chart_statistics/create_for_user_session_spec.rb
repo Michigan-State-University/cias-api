@@ -46,10 +46,12 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
         'patterns' => [
           {
             'match' => '=2',
+            'label' => 'Matched',
             'color' => '#C766EA'
           }
         ],
         'default_pattern' => {
+          'label' => 'NotMatched',
           'color' => '#E2B1F4'
         } }
     end
@@ -58,10 +60,12 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
         'patterns' => [
           {
             'match' => '=4',
+            'label' => 'Matched',
             'color' => '#C766EA'
           }
         ],
         'default_pattern' => {
+          'label' => 'NotMatched',
           'color' => '#E2B1F4'
         } }
     end

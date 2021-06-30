@@ -5,7 +5,8 @@ class Question::FreeResponse < Question
 
   def self.assign_default_values(attr)
     super(attr).merge(
-      { 'required' => true }
+      { 'required' => true,
+        'text_limit' => 250 }
     )
   end
 

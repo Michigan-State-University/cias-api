@@ -23,6 +23,8 @@ class V1::HealthSystemsController < V1Controller
   def update
     authorize! :update, HealthSystem
 
+    return head :forbidden if health_system_load.deleted?
+
     health_system = V1::HealthSystems::Update.call(health_system_load, health_system_params)
     render json: serialized_response(health_system)
   end
@@ -37,6 +39,8 @@ class V1::HealthSystemsController < V1Controller
   private
 
   def health_system_scope
+    return HealthSystem.accessible_by(current_ability).with_deleted if with_deleted?
+
     HealthSystem.accessible_by(current_ability)
   end
 
@@ -47,6 +51,14 @@ class V1::HealthSystemsController < V1Controller
   def health_system_params
     params.require(:health_system).permit(:name, :organization_id, health_system_admins_to_add: [],
                                                                    health_system_admins_to_remove: [])
+  end
+
+  def with_deleted?
+    to_boolean(params[:with_deleted])
+  end
+
+  def to_boolean(value)
+    ActiveRecord::Type::Boolean.new.cast(value)
   end
 
   def health_system_response(health_system)

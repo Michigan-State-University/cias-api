@@ -40,22 +40,40 @@ class Clone::Intervention < Clone::Base
     object.formula['patterns'].map do |pattern|
       index = 0
       pattern['target'].each do |current_target|
-        current_target['id'] = matching_outcome_target_id(pattern, index)
+        current_target['id'] = matching_outcome_target_id(pattern, index, object)
         index += 1
       end
       pattern
     end
   end
 
-  def matching_outcome_target_id(pattern, index)
+  def matching_outcome_target_id(pattern, index, object)
     target_id = pattern['target'][index]['id']
-    return target_id if pattern['target'][index]['type'] != 'Session' || target_id.empty?
+    return check_if_question_exists(target_id, object) if pattern['target'][index]['type'] != 'Session' || target_id.empty?
 
     matching_session_id(target_id)
   end
 
   def matching_session_id(target_id)
-    target_position = source.sessions.find(target_id).position
-    outcome.sessions.find_by!(position: target_position).id
+    target = check_if_session_exists(target_id)
+    if target
+      outcome.sessions.find_by!(position: target.position).id
+    else
+      ''
+    end
+  end
+
+  def check_if_question_exists(target_id, question)
+    return '' if target_id.empty?
+
+    question.session.questions.find(target_id).id
+  rescue ActiveRecord::RecordNotFound
+    ''
+  end
+
+  def check_if_session_exists(target_id)
+    source.sessions.find(target_id)
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 end

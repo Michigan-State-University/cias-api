@@ -44,7 +44,7 @@ describe Organization do
       it 'can read for organization that he is admin for' do
         expect(subject).to have_abilities(
           {
-            manage: true, invite_organization_admin: true
+            read: true, update: true, invite_organization_admin: true, add: false, delete: false
           },
           organization
         )

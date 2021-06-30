@@ -39,6 +39,7 @@ class Ability::TeamAdmin < Ability::Base
         user_session: { session: { intervention: { user_id: team_members_ids } } }
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
+    can :read, GoogleLanguage
   end
 
   def team_members_ids

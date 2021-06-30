@@ -105,6 +105,39 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
 
       it_behaves_like 'permitted user'
     end
+
+    context 'organization with health system' do
+      let!(:health_system) { create(:health_system, organization: organization) }
+      let(:params) do
+        {
+          organization: {
+            name: 'Oregano Public Health'
+          }
+        }
+      end
+
+      before { request }
+
+      it 'include organization structure' do
+        expect(json_response['included']).to include({
+                                                       'id' => health_system.id,
+                                                       'type' => 'health_system',
+                                                       'attributes' => {
+                                                         'name' => health_system.name,
+                                                         'organization_id' => organization.id,
+                                                         'deleted' => false
+                                                       },
+                                                       'relationships' => {
+                                                         'health_clinics' => {
+                                                           'data' => []
+                                                         },
+                                                         'health_system_admins' => {
+                                                           'data' => []
+                                                         }
+                                                       }
+                                                     })
+      end
+    end
   end
 
   context 'when user is not permitted' do
