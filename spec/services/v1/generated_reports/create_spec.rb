@@ -7,7 +7,8 @@ RSpec.describe V1::GeneratedReports::Create do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      session = create(:session)
+      intervention = create(:intervention)
+      session = create(:session, intervention: intervention)
       @user_session = create(:user_session, session: session)
       @report_template = create(:report_template, session: session)
       section1 = create(:report_template_section, report_template: @report_template,
@@ -140,6 +141,34 @@ RSpec.describe V1::GeneratedReports::Create do
         ).and_return('PDF TEMPLATE')
 
         subject
+      end
+    end
+
+    context 'when other variable is used' do
+      context 'variable belongs to current session' do
+        let!(:answer_receive_report_true) do
+          create(:answer_number, user_session: user_session,
+                                 body: { data: [
+                                   { 'var' => 'number', 'value' => '1234' }
+                                 ] })
+        end
+
+        before do
+          section1_variant1.update(content: 'This is your chosen number: .:number:.')
+          section2_variant1.update(content: 'This is your chosen number: .:number:.')
+        end
+
+        it 'replace number variable with number variable value in variants contents' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [
+              variant_with_content('This is your chosen number: 1234'),
+              variant_with_content('This is your chosen number: 1234')
+            ]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
       end
     end
   end

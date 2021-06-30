@@ -23,7 +23,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   private
 
-  attr_reader :user_session
+  attr_reader :user_session, :user_intervention_service
 
   def session
     @session ||= user_session.session
@@ -52,6 +52,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     content = sms_content(plan)
     return if content.blank?
 
+    content = insert_variables_into_variant(content)
     finish_date = plan.end_at
 
     if frequency == SmsPlan.frequencies[:once]
@@ -72,6 +73,33 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   def matched_variant(plan)
     all_var_values = V1::UserInterventionService.new(user.id, session.intervention_id, user_session.id).var_values
     V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, all_var_values)
+  end
+
+  def name_variable
+    @name_variable ||= Answer::Name.find_by(
+      user_session_id: user_session.id
+    )&.body_data&.first&.dig('value').presence&.dig('name')
+  end
+
+  def insert_name_into_variant(content)
+    content.gsub!('.:name:.', name_variable.presence || 'Participant')
+  end
+
+  def insert_variables_into_variant(content)
+    insert_name_into_variant(content)
+
+    user_intervention_answer_vars.each do |variable, value|
+      content.gsub!(".:#{variable}:.", value || 'Unknown')
+    end
+    content
+  end
+
+  def user_intervention_service
+    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_id, user_session.session.intervention_id, user_session.id)
+  end
+
+  def user_intervention_answer_vars
+    user_intervention_service.var_values
   end
 
   def number_days

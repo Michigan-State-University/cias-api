@@ -21,7 +21,7 @@ class V1::GeneratedReports::Create
 
     return if variants_to_generate.blank?
 
-    insert_name_into_variants(variants_to_generate)
+    insert_variables_into_variants(variants_to_generate)
 
     GeneratedReport.transaction do
       generated_report = GeneratedReport.create!(
@@ -41,7 +41,7 @@ class V1::GeneratedReports::Create
 
   private
 
-  attr_reader :report_template, :user_session, :dentaku_service
+  attr_reader :report_template, :user_session, :dentaku_service, :user_intervention_service
 
   def render_pdf_report(variants_to_generate)
     V1::RenderPdfReport.call(
@@ -58,6 +58,26 @@ class V1::GeneratedReports::Create
 
   def insert_name_into_variants(variants_to_generate)
     variants_to_generate.each { |variant| variant.content.gsub!('.:name:.', name_variable.presence || 'Participant') }
+  end
+
+  def insert_variable_into_variants(variable_name, variable_value, variants_to_generate)
+    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value || 'Unknown') }
+  end
+
+  def insert_variables_into_variants(variants_to_generate)
+    insert_name_into_variants(variants_to_generate)
+
+    user_intervention_answer_vars.each do |variable, value|
+      insert_variable_into_variants(variable, value, variants_to_generate)
+    end
+  end
+
+  def user_intervention_service
+    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_id, user_session.session.intervention_id, user_session.id)
+  end
+
+  def user_intervention_answer_vars
+    user_intervention_service.var_values
   end
 
   def report_name
