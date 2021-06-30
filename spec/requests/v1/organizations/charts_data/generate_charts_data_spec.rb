@@ -69,12 +69,6 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'value' => 37.5,
                 'color' => '#C766EA',
                 'population' => 8
-              },
-              {
-                'label' => Time.current.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'population' => 0
               }
             ],
             'population' => 8,
@@ -88,24 +82,6 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'value' => 3,
                 'color' => '#C766EA',
                 'notMatchedValue' => 5
-              },
-              {
-                'label' => 2.months.ago.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
-              },
-              {
-                'label' => 1.month.ago.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
-              },
-              {
-                'label' => Time.current.strftime('%B %Y'),
-                'value' => 0,
-                'color' => '#C766EA',
-                'notMatchedValue' => 0
               }
             ],
             'population' => 8,
