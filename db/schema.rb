@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_14_101208) do
+ActiveRecord::Schema.define(version: 2021_06_30_101708) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(version: 2021_06_14_101208) do
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "filled_at"
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
@@ -86,6 +87,7 @@ ActiveRecord::Schema.define(version: 2021_06_14_101208) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
+    t.integer "position", default: 1, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
@@ -95,6 +97,7 @@ ActiveRecord::Schema.define(version: 2021_06_14_101208) do
     t.uuid "reporting_dashboard_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "position", default: 1, null: false
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
@@ -161,6 +164,8 @@ ActiveRecord::Schema.define(version: 2021_06_14_101208) do
     t.uuid "health_system_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
   end
 
@@ -181,6 +186,8 @@ ActiveRecord::Schema.define(version: 2021_06_14_101208) do
     t.uuid "organization_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 

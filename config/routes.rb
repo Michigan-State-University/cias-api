@@ -129,10 +129,14 @@ Rails.application.routes.draw do
 
     resources :organizations, controller: :organizations do
       scope module: 'organizations' do
+        get 'charts_data/generate', to: 'charts_data/charts_data#generate_charts_data'
+        get 'charts_data/:chart_id/generate', to: 'charts_data/charts_data#generate_chart_data', as: :chart_data_generate
         post 'invitations/invite_organization_admin', to: 'invitations#invite_organization_admin'
         post 'invitations/invite_intervention_admin', to: 'invitations#invite_intervention_admin'
         scope module: 'dashboard_sections' do
-          resources :dashboard_sections, only: %i[index show create update destroy], controller: :dashboard_sections
+          resources :dashboard_sections, only: %i[index show create update destroy], controller: :dashboard_sections do
+            patch :position, to: 'dashboard_sections#position', on: :collection
+          end
         end
         resources :interventions, only: :index, controller: :interventions
         scope module: 'sessions' do
@@ -166,8 +170,20 @@ Rails.application.routes.draw do
       end
     end
 
+    namespace :google do
+      resources :languages, only: :index
+    end
+
+    resources :dashboard_sections, only: [], controller: :dashboard_sections do
+      resources :charts, only: [], controller: :charts do
+        patch :position, to: 'charts#position', on: :collection
+      end
+    end
+
     resources :charts, controller: :charts
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
+
+    get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
   end
 
   if Rails.env.development?

@@ -5,7 +5,9 @@ class DashboardSection < ApplicationRecord
   belongs_to :reporting_dashboard
   has_many :charts, dependent: :destroy
 
+  attribute :position, :integer, default: 1
+
   validates :name, presence: true, uniqueness: { scope: :reporting_dashboard }
 
-  default_scope { order(:name) }
+  default_scope { order(:position) }
 end

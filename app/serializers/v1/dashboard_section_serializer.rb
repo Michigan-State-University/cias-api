@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::DashboardSectionSerializer < V1Serializer
-  attributes :name, :description, :reporting_dashboard_id
+  attributes :name, :description, :reporting_dashboard_id, :position
 
   has_many :charts, serializer: V1::ChartSerializer, if: proc { |_record, params| params[:only_published] != 'true' }
 

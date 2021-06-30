@@ -47,7 +47,8 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
             'type' => 'health_system',
             'attributes' => {
               'name' => 'New Health System',
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'deleted' => false
             },
             'relationships' => {
               'health_system_admins' => { 'data' => [{ 'id' => new_health_system_admin.id, 'type' => 'user' }] },

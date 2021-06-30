@@ -23,6 +23,14 @@ RSpec.describe Question::FreeResponse, type: :model do
       end
     end
 
+    describe '#text_limit' do
+      let(:question_free_response) { create(:question_free_response) }
+
+      it 'contains text_limit variable' do
+        expect(question_free_response.settings['text_limit']).to eq(250)
+      end
+    end
+
     describe 'fails when body is empty' do
       let(:with_empty) { build(:question_free_response, :body_data_empty) }
 

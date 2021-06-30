@@ -49,7 +49,8 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
               'name' => 'New name',
               'description' => 'New description',
               'reporting_dashboard_id' => organization.reporting_dashboard.id,
-              'organization_id' => organization.id
+              'organization_id' => organization.id,
+              'position' => 1
             }
           }
         )

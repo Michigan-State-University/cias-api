@@ -2,11 +2,12 @@
 
 class V1::Organizations::DashboardSections::DashboardSectionsController < V1Controller
   load_and_authorize_resource :organization
+  include Resource::Position
 
   def index
     authorize! :read, DashboardSection
 
-    sections = dashboard_section_scope
+    sections = dashboard_sections_scope
 
     sections = sections.joins(:charts).where(charts: { status: :published }) if filter_status
     render json: dashboard_section_response(sections)
@@ -41,12 +42,12 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
 
   private
 
-  def dashboard_section_scope
-    @dashboard_section_scope ||= @organization.reporting_dashboard.dashboard_sections
+  def dashboard_sections_scope
+    @dashboard_sections_scope ||= @organization.reporting_dashboard.dashboard_sections
   end
 
   def dashboard_section_load
-    @dashboard_section_load ||= dashboard_section_scope.find(params[:id])
+    @dashboard_section_load ||= dashboard_sections_scope.find(params[:id])
   end
 
   def dashboard_section_params

@@ -121,7 +121,8 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
                                                        'type' => 'health_system',
                                                        'attributes' => {
                                                          'name' => health_system.name,
-                                                         'organization_id' => organization.id
+                                                         'organization_id' => organization.id,
+                                                         'deleted' => false
                                                        },
                                                        'relationships' => {
                                                          'health_clinics' => {

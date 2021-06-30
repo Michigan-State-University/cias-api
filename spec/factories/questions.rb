@@ -574,7 +574,7 @@ FactoryBot.define do
           }
         ],
         variable: {
-          name: ''
+          name: '.:name:.'
         }
       }
     end

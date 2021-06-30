@@ -20,7 +20,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
                                       organization: organization, reports: reports)
   end
   let(:reports) { [] }
-  let(:csv_attachment) {  FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }
+  let(:csv_attachment) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }
 
   let(:attrs) { json_response['data']['attributes'] }
 

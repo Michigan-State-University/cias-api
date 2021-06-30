@@ -17,7 +17,6 @@ namespace :google_languages do
     end
   end
 
-
   def credentials
     if Rails.env.development?
       Oj.load_file(ENV['GOOGLE_APPLICATION_CREDENTIALS'])

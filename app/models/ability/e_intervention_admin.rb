@@ -34,7 +34,8 @@ class Ability::EInterventionAdmin < Ability::Base
         user_session: { session: { intervention: { user_id: user.id } } }
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
-    can %i[read update delete], Organization, e_intervention_admins: { id: user.id }
+    can :read, GoogleLanguage
+    can %i[read update], Organization, e_intervention_admins: { id: user.id }
     can :invite_organization_admin, Organization, e_intervention_admins: { id: user.id }
     can :manage, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
     can :invite_health_system_admin, HealthSystem, organization: { e_intervention_admins: { id: user.id } }
@@ -43,5 +44,6 @@ class Ability::EInterventionAdmin < Ability::Base
     can :manage, ReportingDashboard, organization: { e_intervention_admins: { id: user.id } }
     can :manage, DashboardSection, reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } }
     can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } } }
+    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { e_intervention_admins: { id: user.id } } } } }
   end
 end

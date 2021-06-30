@@ -19,6 +19,7 @@ class V1::HealthSystems::InviteHealthSystemAdmin
       new_user = User.invite!(email: email, roles: ['health_system_admin'], organizable_id: health_system.id, organizable_type: 'HealthSystem', active: false)
       health_system.health_system_admins << new_user
     else
+      health_system.health_system_admins << user
       V1::HealthSystems::Invitations::Create.call(health_system, user)
     end
   end

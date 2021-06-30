@@ -7,8 +7,9 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
   let!(:health_system) { create(:health_system, name: 'Gotham Health System', organization: organization) }
-  let!(:health_clinic_1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
-  let!(:health_clinic_2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
+  let!(:health_clinic1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
+  let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
+  let!(:deleted_health_clinic) { create(:health_clinic, name: 'Deleted Health Clinic', health_system: health_system, deleted_at: Time.current) }
 
   let(:roles) do
     {
@@ -43,24 +44,76 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
       it 'return proper collection data' do
         expect(json_response['data']).to include(
           {
-            'id' => health_clinic_1.id.to_s,
+            'id' => health_clinic1.id.to_s,
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic_1.name
+              'name' => health_clinic1.name,
+              'deleted' => false
             },
             'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           },
           {
-            'id' => health_clinic_2.id.to_s,
+            'id' => health_clinic2.id.to_s,
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => health_clinic_2.name
+              'name' => health_clinic2.name,
+              'deleted' => false
             },
             'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           }
         )
+      end
+
+      context 'with deleted clinic' do
+        let(:params) do
+          {
+            with_deleted: true
+          }
+        end
+        let(:request) { get v1_health_clinics_path, headers: headers, params: params }
+
+        before { request }
+
+        it 'return proper collection size' do
+          expect(json_response['data'].size).to eq(3)
+        end
+
+        it 'return proper collection data' do
+          expect(json_response['data']).to include(
+            {
+              'id' => health_clinic1.id.to_s,
+              'type' => 'health_clinic',
+              'attributes' => {
+                'health_system_id' => health_system.id,
+                'name' => health_clinic1.name,
+                'deleted' => false
+              },
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            },
+            {
+              'id' => health_clinic2.id.to_s,
+              'type' => 'health_clinic',
+              'attributes' => {
+                'health_system_id' => health_system.id,
+                'name' => health_clinic2.name,
+                'deleted' => false
+              },
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            },
+            {
+              'id' => deleted_health_clinic.id.to_s,
+              'type' => 'health_clinic',
+              'attributes' => {
+                'health_system_id' => health_system.id,
+                'name' => deleted_health_clinic.name,
+                'deleted' => true
+              },
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            }
+          )
+        end
       end
     end
 
@@ -117,9 +170,9 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
   end
 
   context 'when user is health_clinic_admin' do
-    let!(:health_clinic_1) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 1', health_system: health_system) }
-    let!(:health_clinic_2) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 2', health_system: health_system) }
-    let(:user) { health_clinic_1.user_health_clinics.first.user }
+    let!(:health_clinic1) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 1', health_system: health_system) }
+    let!(:health_clinic2) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 2', health_system: health_system) }
+    let(:user) { health_clinic1.user_health_clinics.first.user }
 
     before { request }
 
@@ -130,20 +183,21 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
     it 'return proper collection data' do
       expect(json_response['data']).to include(
         {
-          'id' => health_clinic_1.id.to_s,
+          'id' => health_clinic1.id.to_s,
           'type' => 'health_clinic',
           'attributes' => {
             'health_system_id' => health_system.id,
-            'name' => health_clinic_1.name
+            'name' => health_clinic1.name,
+            'deleted' => false
           },
           'relationships' => { 'health_clinic_admins' => { 'data' => [include({ 'id' => user.id })] } }
         }
       ).and not_include({
-                          'id' => health_clinic_2.id.to_s,
+                          'id' => health_clinic2.id.to_s,
                           'type' => 'health_clinic',
                           'attributes' => {
                             'health_system_id' => health_system.id,
-                            'name' => health_clinic_2.name
+                            'name' => health_clinic2.name
                           }
                         })
     end

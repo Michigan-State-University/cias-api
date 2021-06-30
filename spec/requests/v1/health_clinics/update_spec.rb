@@ -9,6 +9,7 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization) }
   let!(:health_clinic) { create(:health_clinic, name: 'Health Clinic', health_system: health_system) }
+  let!(:deleted_health_clinic) { create(:health_clinic, name: 'Deleted Health Clinic', health_system: health_system, deleted_at: Time.current) }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -46,11 +47,40 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
             'type' => 'health_clinic',
             'attributes' => {
               'health_system_id' => health_system.id,
-              'name' => 'New name'
+              'name' => 'New name',
+              'deleted' => false
             },
             'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
           }
         )
+      end
+
+      context 'when clinic is deleted' do
+        let(:request) { patch v1_health_clinic_path(deleted_health_clinic.id), headers: headers }
+
+        it 'return correct status' do
+          expect(response).to have_http_status(:not_found)
+        end
+
+        it 'return error message' do
+          expect(json_response['message']).to include('Couldn\'t find HealthClinic with')
+        end
+
+        context 'with flag' do
+          let(:params) do
+            {
+              with_deleted: true,
+              health_clinic: {
+                name: 'New name'
+              }
+            }
+          end
+          let(:request) { patch v1_health_clinic_path(deleted_health_clinic.id), headers: headers, params: params }
+
+          it 'return sth' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
       end
     end
 
