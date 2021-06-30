@@ -29,15 +29,18 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
     if data_offset.present?
       current_month = Time.current - data_offset.to_i.days
       current_month = current_month.beginning_of_month
+      end_month = Time.current.beginning_of_month
     else
-      current_month = first_month(chart_id)
+      ordered_data = charts_data_collection.ordered_data_for_chart(chart_id)
+      current_month = first_month(ordered_data)&.beginning_of_month
+      end_month = last_month(ordered_data)&.beginning_of_month
     end
 
     return [] if current_month.nil?
 
     current_month = current_month.to_date
 
-    while current_month <= Time.current.beginning_of_month
+    while current_month <= end_month
       month = current_month.strftime('%B %Y')
       value = aggregated_data[month]
       statistics << data_for_chart(month, value, patterns, default_pattern)
@@ -47,7 +50,11 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
     statistics
   end
 
-  def first_month(chart_id)
-    charts_data_collection.where(chart_id: chart_id)&.order(filled_at: :asc)&.first&.filled_at&.strftime('%B %Y')
+  def first_month(ordered_data)
+    ordered_data&.first&.filled_at
+  end
+
+  def last_month(ordered_data)
+    ordered_data&.last&.filled_at
   end
 end
