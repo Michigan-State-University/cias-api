@@ -36,10 +36,11 @@ class V1::UserSessionScheduleService
 
   def days_after_date_schedule(next_session)
     participant_date = all_var_values[next_session.days_after_date_variable_name]
-    if participant_date
-      SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
-          .perform_later(next_session.id, user_session.user.id, health_clinic)
-    end
+
+    return unless participant_date
+
+    SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
+        .perform_later(next_session.id, user_session.user.id, health_clinic)
   end
 
   def branch_to_session

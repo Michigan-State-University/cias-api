@@ -20,7 +20,9 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
   let!(:url) { 'https://guides.rubyonrails.org/active_record_migrations.html' }
   let!(:url2) { 'amazon.com' }
   let(:title) { 'Active Record Migrations — Ruby on Rails Guides' }
-  let(:description) { 'Active Record MigrationsMigrations are a feature of Active Record that allows you to evolve your database schema over time. Rather than write schema modifications in pure SQL, migrations allow you to use a Ruby DSL to describe changes to your tables.After reading this guide, you will know: The generators you can use to create them. The methods Active Record provides to manipulate your database. The rails commands that manipulate migrations and your schema. How migrations relate to schema.rb.' }
+  let(:description) do
+    'Active Record MigrationsMigrations are a feature of Active Record that allows you to evolve your database schema over time. Rather than write schema modifications in pure SQL, migrations allow you to use a Ruby DSL to describe changes to your tables.After reading this guide, you will know: The generators you can use to create them. The methods Active Record provides to manipulate your database. The rails commands that manipulate migrations and your schema. How migrations relate to schema.rb.' # rubocop:disable Layout/LineLength
+  end
   let(:image) { 'https://avatars.githubusercontent.com/u/4223' }
 
   let(:headers) { current_user.create_new_auth_token }

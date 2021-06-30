@@ -29,7 +29,9 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/posi
       }
     }
   end
-  let(:request) { patch position_v1_organization_dashboard_sections_path(organization_id: organization.id), params: params, headers: user.create_new_auth_token }
+  let(:request) do
+    patch position_v1_organization_dashboard_sections_path(organization_id: organization.id), params: params, headers: user.create_new_auth_token
+  end
 
   context 'when auth' do
     context 'is invalid' do

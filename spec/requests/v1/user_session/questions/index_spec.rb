@@ -421,7 +421,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       let(:audio) { create(:audio) }
       let(:audio_id) { audio.id }
       let!(:name_question) { create(:question_name, question_group: question_group, position: 1) }
-      let!(:name_answer) { create(:answer_name, question: name_question, user_session: user_session, created_at: DateTime.now - 1.day, body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] }) }
+      let!(:name_answer) do
+        create(:answer_name, question: name_question, user_session: user_session, created_at: DateTime.now - 1.day,
+                             body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] })
+      end
 
       context 'for speech block' do
         let!(:question_with_speech_block) do
