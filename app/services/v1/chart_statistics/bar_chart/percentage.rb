@@ -19,6 +19,6 @@ class V1::ChartStatistics::BarChart::Percentage < V1::ChartStatistics::BarChart
   end
 
   def current_chart_type_collection
-    charts.where(chart_type: 'percentage_bar_chart', status: 'published')
+    charts.where(chart_type: 'percentage_bar_chart')
   end
 end

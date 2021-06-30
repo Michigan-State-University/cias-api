@@ -42,7 +42,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
-      clinic_ids: [health_clinic.id]
+      clinic_ids: [health_clinic.id],
+      statuses: ['published']
     }
   end
 
@@ -144,7 +145,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
 
         let(:params) do
           {
-            date_offset: 10
+            date_offset: 10,
+            statuses: ['published']
           }
         end
 
@@ -172,7 +174,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
       context 'when params are INVALID' do
         let(:params) do
           {
-            date_offset: -1
+            date_offset: -1,
+            statuses: ['published']
           }
         end
 

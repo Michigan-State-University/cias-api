@@ -30,7 +30,11 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
   end
 
   def charts_data_params
-    params.permit(:date_offset, clinic_ids: [])
+    params.permit(:date_offset, clinic_ids: [], statuses: [])
+  end
+
+  def statuses
+    charts_data_params[:statuses]
   end
 
   def date_offset
@@ -61,12 +65,12 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     ChartStatistic.accessible_by(current_ability).where(chart_id: chart_id)
   end
 
-  def load_chart
-    Chart.find_by(id: chart_id)
+  def load_charts
+    Chart.accessible_by(current_ability).where(status: statuses)
   end
 
-  def load_charts
-    Chart.accessible_by(current_ability)
+  def load_chart
+    load_charts.find_by(id: chart_id)
   end
 
   def charts_data_collection
@@ -75,22 +79,6 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     data_collection = data_collection&.where(chart_id: chart_id) if chart_id.present?
     data_collection = data_collection&.filled_between(date_range) if date_offset.present?
     data_collection&.joins(:chart)
-  end
-
-  def pie_charts_data_collection(data_collection)
-    data_collection&.where(charts: { chart_type: 'pie_chart' })
-  end
-
-  def bar_charts_data_collection(data_collection)
-    data_collection&.where(charts: { chart_type: %w[bar_chart percentage_bar_chart] })
-  end
-
-  def bar_chart_data_collection(data_collection)
-    bar_charts_data_collection(data_collection).where(chart_id: chart_id)
-  end
-
-  def pie_chart_data_collection(data_collection)
-    pie_charts_data_collection(data_collection).where(chart_id: chart_id)
   end
 
   def charts_data_response(charts_data)

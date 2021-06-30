@@ -126,9 +126,9 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
     end
   end
 
-  context 'when charts are draft' do
-    let!(:bar_chart1) { create(:chart, name: 'bar_chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
-    let!(:bar_chart2) { create(:chart, name: 'bar_chart2', dashboard_section: dashboard_sections, chart_type: 'bar_chart') }
+  context 'when charts are different type' do
+    let!(:bar_chart1) { create(:chart, name: 'bar_chart1', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
+    let!(:bar_chart2) { create(:chart, name: 'bar_chart2', dashboard_section: dashboard_sections, chart_type: 'pie_chart') }
 
     it 'return empty array' do
       expect(subject).to eql([])
