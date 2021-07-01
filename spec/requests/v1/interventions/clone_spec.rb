@@ -78,6 +78,10 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
         expect(intervention_cloned['status']).to eq('draft')
       end
 
+      it 'have correct prefix' do
+        expect(intervention_cloned['name']).to include('Copy of')
+      end
+
       it 'correctly clone questions to cloned session' do
         expect(cloned_questions.map(&:attributes)).to include(
           include(
