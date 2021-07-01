@@ -3,6 +3,7 @@
 class Clone::Intervention < Clone::Base
   def execute
     outcome.status = :draft
+    outcome.name = "Copy of #{outcome.name}"
     outcome.save!
     create_sessions
     reassign_branching
