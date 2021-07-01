@@ -64,6 +64,8 @@ Lint/DuplicateRescueException:
 Lint/DuplicateMethods:
   Exclude:
     - 'app/models/intervention/csv/harvester.rb'
+    - 'app/services/v1/generated_reports/create.rb'
+    - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
 
 Lint/EmptyBlock:
   Exclude:
@@ -406,6 +408,7 @@ RSpec/StubbedMock:
     - 'spec/services/v1/user_session_schedule_service_spec.rb'
     - 'spec/models/invitation_spec.rb'
     - 'spec/requests/v1/health_systems/invitations/invite_health_system_admin_spec.rb'
+    - 'spec/services/v1/generated_reports/create_spec.rb'
 
 RSpec/OverwritingSetup:
   Exclude:
