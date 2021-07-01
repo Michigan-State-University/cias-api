@@ -14,7 +14,6 @@ class V1::HealthClinics::Invitations::Confirm
   def call
     ActiveRecord::Base.transaction do
       user.activate!
-      UserHealthClinic.create!(user: user, health_clinic: health_clinic)
 
       health_clinic_invitation.update!(
         accepted_at: Time.current,

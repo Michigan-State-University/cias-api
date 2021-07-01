@@ -42,6 +42,10 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
       it 'health clinic is deleted' do
         expect(HealthClinic.find_by(id: health_system.id)).to eq(nil)
       end
+
+      it 'health_clinic admin active status is false' do
+        expect(health_clinic_admin.reload.active?).to eq(false)
+      end
     end
 
     context 'when user is admin' do
