@@ -8,6 +8,10 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
 
   let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:intervention_admin_id) { organization.e_intervention_admins.first.id }
+  let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
+  let!(:health_system_admin_id) { health_system.health_system_admins.first.id }
+  let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
+  let!(:health_clinic_admin_id) { health_clinic.health_clinic_admins.first.id }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_organization_path(organization.id), headers: headers }
@@ -38,6 +42,35 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
 
       it 'intervention admins doesn\'t belongs to organization' do
         expect(User.find(intervention_admin_id).organizable_id).to eq(nil)
+      end
+
+      it 'intervention admin active status is true' do
+        expect(User.find(intervention_admin_id).active?).to eq(true)
+      end
+
+      it 'health_system is deleted' do
+        expect(HealthSystem.find_by(id: health_system.id)).to eq(nil)
+      end
+
+      it 'health_system admins doesn\'t belongs to health_system' do
+        expect(User.find(health_system_admin_id).organizable_id).to eq(nil)
+      end
+
+      it 'health_system admin active status is false' do
+        expect(User.find(health_system_admin_id).active?).to eq(false)
+      end
+
+      it 'health_clinic is deleted' do
+        expect(HealthClinic.find_by(id: health_clinic.id)).to eq(nil)
+      end
+
+      it 'health_clinic admins doesn\'t belongs to health_clinic' do
+        expect(User.find(health_clinic_admin_id).organizable_id).to eq(nil)
+        expect(User.find(health_clinic_admin_id).user_health_clinics).to eq([])
+      end
+
+      it 'health_clinic admin active status is false' do
+        expect(User.find(health_clinic_admin_id).active?).to eq(false)
       end
     end
 

@@ -14,6 +14,7 @@ class Organization < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   after_create :initialize_reporting_dashboard
+  before_destroy :deactivate_organization_and_intervention_admins
 
   default_scope { order(:name) }
 
@@ -21,5 +22,16 @@ class Organization < ApplicationRecord
 
   def initialize_reporting_dashboard
     self.reporting_dashboard = ReportingDashboard.new
+  end
+
+  def deactivate_organization_and_intervention_admins
+    organization_admins.each do |organization_admin|
+      organization_admin.deactivate!
+      organization_admins.delete(organization_admin)
+    end
+
+    e_intervention_admins.each do |intervention_admin|
+      e_intervention_admins.delete(intervention_admin)
+    end
   end
 end

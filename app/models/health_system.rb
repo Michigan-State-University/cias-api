@@ -13,4 +13,14 @@ class HealthSystem < ApplicationRecord
   validates :name, presence: true, uniqueness: { scope: :organization }
 
   default_scope { order(created_at: :desc) }
+  before_destroy :deactivate_health_system_admins
+
+  private
+
+  def deactivate_health_system_admins
+    health_system_admins.each do |health_system_admin|
+      health_system_admin.deactivate!
+      health_system_admins.delete(health_system_admin)
+    end
+  end
 end

@@ -51,7 +51,9 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
     end
 
     context 'with data offset' do
-      subject { described_class.new(data_collection, charts, 35).generate }
+      subject { described_class.new(data_collection, charts, data_offset).generate }
+
+      let(:data_offset) { ((Time.current - 1.month.ago) / 1.day).to_i }
 
       it 'return correct data' do
         expect(subject).to include(
