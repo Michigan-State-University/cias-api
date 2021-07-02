@@ -28,10 +28,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       }
     }
   end
-  let(:request) do
-    patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params,
-                                                                                          headers: headers
-  end
+  let(:request) { patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do

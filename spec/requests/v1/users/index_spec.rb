@@ -4,29 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/users', type: :request do
   let(:user) do
-    create(:user, :confirmed, roles: %w[participant admin guest], first_name: 'John', last_name: 'Twain',
-                              email: 'john.twain@test.com', created_at: 5.days.ago)
+    create(:user, :confirmed, roles: %w[participant admin guest], first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago)
   end
   let(:researcher) do
-    create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'mike.Wazowski@test.com',
-                                           created_at: 4.days.ago)
+    create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'mike.Wazowski@test.com', created_at: 4.days.ago)
   end
-  let(:participant) do
-    create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Lenon', email: 'john.lenon@test.com',
-                                            created_at: 4.days.ago)
-  end
-  let(:participant1) do
-    create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com',
-                                            created_at: 3.days.ago)
-  end
-  let(:participant2) do
-    create(:user, :confirmed, :participant, first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@test.com',
-                                            created_at: 2.days.ago)
-  end
-  let(:participant3) do
-    create(:user, :confirmed, :participant, first_name: 'Mark', last_name: 'Smith', email: 'mark.smith@test.com',
-                                            created_at: 1.day.ago)
-  end
+  let(:participant) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Lenon', email: 'john.lenon@test.com', created_at: 4.days.ago) }
+  let(:participant1) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com', created_at: 3.days.ago) }
+  let(:participant2) { create(:user, :confirmed, :participant, first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@test.com', created_at: 2.days.ago) }
+  let(:participant3) { create(:user, :confirmed, :participant, first_name: 'Mark', last_name: 'Smith', email: 'mark.smith@test.com', created_at: 1.day.ago) }
   let(:users_deactivated) { create_list(:user, 2, active: false, roles: %w[participant]) }
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_users_path, headers: headers }

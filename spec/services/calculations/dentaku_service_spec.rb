@@ -33,7 +33,7 @@ RSpec.describe Calculations::DentakuService do
     end
 
     context 'all_var_values are empty' do
-      let(:all_var_values) { nil }
+      let(:all_var_values) {}
 
       it 'does not change dentaku calculator memory' do
         expect { call }.not_to change(dentaku_calculator, :memory)
@@ -76,7 +76,7 @@ RSpec.describe Calculations::DentakuService do
     end
 
     context 'formula is empty' do
-      let(:formula) { nil }
+      let(:formula) {}
 
       it 'throws proper error' do
         expect(call).to eq(nil)
@@ -88,7 +88,7 @@ RSpec.describe Calculations::DentakuService do
     end
 
     context 'variables are empty' do
-      let(:variants) { nil }
+      let(:variants) {}
 
       it 'throws proper error' do
         expect { call }.to raise_error(NoMethodError, 'undefined method `order\' for nil:NilClass')

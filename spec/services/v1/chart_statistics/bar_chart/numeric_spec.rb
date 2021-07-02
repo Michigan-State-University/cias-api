@@ -14,16 +14,16 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   let(:chart) { bar_chart1 }
 
   let!(:chart_matched_statistic1) do
-    create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic,
-                                      filled_at: 2.months.ago)
+    create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                      health_clinic: health_clinic, filled_at: 2.months.ago)
   end
   let!(:chart_not_matched_statistic1) do
     create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
                                      health_clinic: health_clinic, filled_at: 2.months.ago)
   end
   let!(:chart_matched_statistic2) do
-    create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic,
-                                     filled_at: 1.month.ago)
+    create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                     health_clinic: health_clinic, filled_at: 1.month.ago)
   end
   let!(:chart_not_matched_statistic2) do
     create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
@@ -78,7 +78,9 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
     end
 
     context 'with data offset' do
-      subject { described_class.new(data_collection, chart, 35).generate }
+      subject { described_class.new(data_collection, chart, data_offset).generate }
+
+      let(:data_offset) { ((Time.current - 1.month.ago) / 1.day).to_i }
 
       it 'return correct data' do
         expect(subject).to include(

@@ -48,10 +48,7 @@ RSpec::Matchers.define :not_have_abilities do |actions, obj|
 
   match do |ability|
     verify_ability_type(ability)
-    if actions.is_a?(Hash)
-      raise ArgumentError,
-            'You cannot pass a hash to not_have_abilities. Use have_abilities instead.'
-    end
+    raise ArgumentError, 'You cannot pass a hash to not_have_abilities. Use have_abilities instead.' if actions.is_a?(Hash)
 
     @expected_hash = build_expected_hash(actions, default_expectation: false)
     @obj = obj

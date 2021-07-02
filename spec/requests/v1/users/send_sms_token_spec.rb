@@ -123,9 +123,7 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
 
     context 'user is logged in but phone number is not uniq' do
       let!(:other_user) { create(:user, :confirmed, :participant) }
-      let!(:other_phone) do
-        create(:phone, :confirmed, number: phone_number, prefix: prefix, iso: iso, user: other_user)
-      end
+      let!(:other_phone) { create(:phone, :confirmed, number: phone_number, prefix: prefix, iso: iso, user: other_user) }
       let(:message) { create(:message, :with_code) }
       let(:service) { Communication::Sms.new(message.id) }
 

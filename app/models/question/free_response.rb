@@ -14,10 +14,7 @@ class Question::FreeResponse < Question
     return unless body['variable']['name'].presence
 
     new_variable = "clone_#{body['variable']['name']}"
-    if taken_variables.include?(new_variable)
-      new_variable = variable_with_clone_index(taken_variables,
-                                               body['variable']['name'])
-    end
+    new_variable = variable_with_clone_index(taken_variables, body['variable']['name']) if taken_variables.include?(new_variable)
     body['variable']['name'] = new_variable
   end
 end

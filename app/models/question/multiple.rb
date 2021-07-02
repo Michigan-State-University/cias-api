@@ -18,10 +18,7 @@ class Question::Multiple < Question
       next unless payload['variable']['name'].presence
 
       new_variable = "clone_#{payload['variable']['name']}"
-      if taken_variables.include?(new_variable)
-        new_variable = variable_with_clone_index(taken_variables,
-                                                 payload['variable']['name'])
-      end
+      new_variable = variable_with_clone_index(taken_variables, payload['variable']['name']) if taken_variables.include?(new_variable)
       payload['variable']['name'] = new_variable
     end
   end

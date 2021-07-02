@@ -12,9 +12,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   let(:intervention_user) { admin }
   let(:shared_to) { :anyone }
   let(:status) { :draft }
-  let(:intervention) do
-    create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations)
-  end
+  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations) }
   let(:session) { create(:session, intervention: intervention) }
   let(:invitations) { [] }
 

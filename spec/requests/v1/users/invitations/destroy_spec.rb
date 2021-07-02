@@ -5,9 +5,7 @@ require 'rails_helper'
 describe 'DELETE /v1/users/invitations', type: :request do
   let(:request) { delete v1_invitation_path(user_with_pending_invitation), headers: headers }
 
-  let!(:user_with_pending_invitation) do
-    create(:user, email: 'test@example.com', invitation_token: 'EXAMPLE_TOKEN', invitation_accepted_at: nil)
-  end
+  let!(:user_with_pending_invitation) { create(:user, email: 'test@example.com', invitation_token: 'EXAMPLE_TOKEN', invitation_accepted_at: nil) }
 
   context 'when authenticated as guest user' do
     let(:guest_user) { create(:user, :guest) }

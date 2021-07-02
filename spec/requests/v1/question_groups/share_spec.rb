@@ -188,7 +188,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       end
 
       context 'when question group does not have questions' do
-        let!(:other_question_ids) { nil }
+        let!(:other_question_ids) {}
 
         before { request }
 

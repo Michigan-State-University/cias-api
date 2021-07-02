@@ -10,9 +10,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
   let(:audio_id) { nil }
-  let!(:user_session) do
-    create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id)
-  end
+  let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
   let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
   let(:status) { 'draft' }
   let(:user) { participant }
@@ -84,8 +82,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
-                                                  'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -109,8 +106,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
-                                                  'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -160,8 +156,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
-                                                  'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save
@@ -185,8 +180,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                'patterns' => [
                                  {
                                    'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100',
-                                                  'type' => 'Question' }]
+                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
                                  }
                                ] }
           question.save

@@ -8,13 +8,8 @@ RSpec.describe V1::Intervention::Publish do
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
   let!(:answers) { create_list(:answer_single, 4, question: question) }
-  let!(:second_session) do
-    create(:session, intervention: intervention, schedule: schedule, schedule_at: schedule_at,
-                     schedule_payload: schedule_payload)
-  end
-  let!(:third_session) do
-    create(:session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload)
-  end
+  let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
+  let!(:third_session) { create(:session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload) }
   let(:schedule) { 'after_fill' }
   let(:schedule_at) { Date.current + 10.days }
   let(:schedule_payload) { 7 }

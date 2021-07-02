@@ -6,17 +6,11 @@ RSpec.describe V1::QuestionService do
 
     let(:user) { create(:user, :confirmed, :admin) }
     let(:session) { create(:session, intervention: create(:intervention, user: user)) }
-    let!(:question_group) do
-      create(:question_group_plain, title: 'Question Group Title', position: 1, session: session)
-    end
-    let!(:question_group2) do
-      create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session)
-    end
+    let!(:question_group) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
+    let!(:question_group2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
 
     let!(:questions) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group) }
-    let!(:questions2) do
-      create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group2)
-    end
+    let!(:questions2) { create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group2) }
     let(:question_ids) { questions.pluck(:id) }
 
     context 'questions are from one question group' do

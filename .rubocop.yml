@@ -71,6 +71,8 @@ Lint/EmptyBlock:
   Exclude:
     - 'spec/factories/question_groups.rb'
     - 'spec/models/intervention/csv_spec.rb'
+    - 'spec/requests/v1/question_groups/share_spec.rb'
+    - 'spec/services/calculations/dentaku_service_spec.rb'
 
 Lint/EmptyConditionalBody:
   Enabled: true

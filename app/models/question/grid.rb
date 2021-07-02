@@ -18,10 +18,7 @@ class Question::Grid < Question
       next unless row['variable']['name'].presence
 
       new_variable = "clone_#{row['variable']['name']}"
-      if taken_variables.include?(new_variable)
-        new_variable = variable_with_clone_index(taken_variables,
-                                                 row['variable']['name'])
-      end
+      new_variable = variable_with_clone_index(taken_variables, row['variable']['name']) if taken_variables.include?(new_variable)
       row['variable']['name'] = new_variable
     end
   end
