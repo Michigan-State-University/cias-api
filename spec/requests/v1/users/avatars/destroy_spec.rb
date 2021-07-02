@@ -7,7 +7,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:other_user) do
     create(:user, :confirmed, :participant,
-           avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+           avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
   end
   let(:user_id) { current_user.id }
   let(:users) do
@@ -64,7 +64,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   context 'when current_user is researcher' do
     let(:current_user) do
       create(:user, :confirmed, :researcher,
-             avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+             avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
     end
 
     context 'when current_user updates own avatar' do
@@ -96,7 +96,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   context 'when current_user is participant' do
     let(:current_user) do
       create(:user, :confirmed, :participant,
-             avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+             avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
     end
 
     context 'when current_user updates own avatar' do
@@ -124,7 +124,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   context 'when current_user is guest' do
     let(:current_user) do
       create(:user, :confirmed, :guest,
-             avatar: Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+             avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
     end
 
     context 'when current_user updates own avatar' do
