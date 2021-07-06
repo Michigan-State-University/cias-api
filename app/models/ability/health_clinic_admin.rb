@@ -13,7 +13,7 @@ class Ability::HealthClinicAdmin < Ability::Base
     can :read, DashboardSection, reporting_dashboard: { organization: { health_systems: { health_clinics: { user_health_clinics: { user_id: user.id } } } } }
     can :read, HealthClinic, user_health_clinics: { user_id: user.id }
     can :read, ReportingDashboard, organization: { health_systems: { health_clinics: { user_health_clinics: { user_id: user.id } } } }
-    can :read, Chart, dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_clinics: { user_health_clinics: { user_id: user.id } } } } } }
-    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_clinics: { user_health_clinics: { user_id: user.id } } } } } } }
+    can :read, Chart, dashboard_section: { reporting_dashboard: { organization: { health_clinics: { user_health_clinics: { user_id: user.id } } } } }
+    can :read, ChartStatistic, health_clinic: { user_health_clinics: { user_id: user.id } }
   end
 end
