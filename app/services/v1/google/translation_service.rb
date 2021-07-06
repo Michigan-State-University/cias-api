@@ -2,21 +2,9 @@
 
 require 'google/cloud/translate/v2'
 
-class V1::Translation
-  attr_reader :text, :from, :to
-
-  def initialize(text, from, to)
-    @text = text
-    @from = from
-    @to = to
-  end
-
-  def self.call(text, from, to)
-    new(text, from, to).translate
-  end
-
-  def translate
-    client.translate(text, from: from, to: to).text
+class V1::Google::TranslationService
+  def translate(text, source_language_name_short, destination_language_name_short)
+    client.translate(text, from: source_language_name_short, to: destination_language_name_short).text
   end
 
   private
