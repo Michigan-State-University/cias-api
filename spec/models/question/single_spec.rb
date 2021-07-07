@@ -21,6 +21,58 @@ RSpec.describe Question::Single, type: :model do
           end
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_single.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_single.title).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => 'Single'
+            }.to_s
+          )
+        end
+
+        it '#translate_subtitle' do
+          question_single.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_single.subtitle).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => nil
+            }.to_s
+          )
+        end
+
+        it '#translate_body' do
+          question_single.translate_body(translator, source_language_name_short, destination_language_name_short)
+          expect(question_single.body['data']).to include(
+            {
+              'payload' => {
+                'from' => 'en',
+                'to' => 'pl',
+                'text' => ''
+              },
+              'value' => '',
+              'original_text' => ''
+            },
+            {
+              'payload' => {
+                'from' => 'en',
+                'to' => 'pl',
+                'text' => 'example2'
+              },
+              'value' => '',
+              'original_text' => 'example2'
+            }
+          )
+        end
+      end
     end
 
     describe 'fails when body is empty' do

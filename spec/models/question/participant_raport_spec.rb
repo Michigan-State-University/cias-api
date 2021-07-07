@@ -19,6 +19,34 @@ RSpec.describe Question::ParticipantReport, type: :model do
           expect(question_participant_report.variable_clone_prefix(%w[clone_free_response_var clone1_free_response_var])).to eq(nil)
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_participant_report.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_participant_report.title).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => 'ParticipantReport'
+            }.to_s
+          )
+        end
+
+        it '#translate_subtitle' do
+          question_participant_report.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_participant_report.subtitle).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => nil
+            }.to_s
+          )
+        end
+      end
     end
   end
 end

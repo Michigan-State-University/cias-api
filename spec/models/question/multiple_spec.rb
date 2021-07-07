@@ -19,6 +19,88 @@ RSpec.describe Question::Multiple, type: :model do
           expect(question_multiple.variable_clone_prefix(%w[clone_answer_1 clone1_answer_1])[0]['variable']['name']).to eq('clone2_answer_1')
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_multiple.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_multiple.title).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => 'Multiple'
+            }.to_s
+          )
+        end
+
+        it '#translate_subtitle' do
+          question_multiple.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_multiple.subtitle).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => nil
+            }.to_s
+          )
+        end
+
+        it '#translate_body' do
+          question_multiple.translate_body(translator, source_language_name_short, destination_language_name_short)
+          expect(question_multiple.body['data']).to include(
+            {
+              'payload' => {
+                'from' => 'en',
+                'to' => 'pl',
+                'text' => ''
+              },
+              'variable' => {
+                'name' => 'answer_1',
+                'value' => ''
+              },
+              'original_text' => ''
+            },
+            {
+              'payload' => {
+                'from' => 'en',
+                'to' => 'pl',
+                'text' => ''
+              },
+              'variable' => {
+                'name' => 'answer_2',
+                'value' => ''
+              },
+              'original_text' => ''
+            },
+            {
+              'payload' => {
+                'from' => 'en',
+                'to' => 'pl',
+                'text' => ''
+              },
+              'variable' => {
+                'name' => 'answer_3',
+                'value' => ''
+              },
+              'original_text' => ''
+            },
+            {
+              'payload' => {
+                'from' => 'en',
+                'to' => 'pl',
+                'text' => ''
+              },
+              'variable' => {
+                'name' => 'answer_4',
+                'value' => ''
+              },
+              'original_text' => ''
+            }
+          )
+        end
+      end
     end
   end
 end
