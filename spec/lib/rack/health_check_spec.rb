@@ -14,11 +14,11 @@ RSpec.describe HealthCheck do
       end
 
       it 'return system details in json response' do
-        expect(json_response).to eq 'database' => true
+        expect(json_response).to eq({ 'database' => true, 'redis' => true })
       end
     end
 
-    context 'when systems are not operational' do
+    context 'when database is not operational' do
       before do
         expect(ActiveRecord::Base.connection)
           .to receive(:execute)
@@ -30,7 +30,23 @@ RSpec.describe HealthCheck do
       end
 
       it 'return system details in json response' do
-        expect(json_response).to eq 'database' => false
+        expect(json_response).to eq ({ 'database' => false, 'redis' => true })
+      end
+    end
+
+    context 'when redis is not operational' do
+      before do
+        expect(Sidekiq)
+          .to receive(:redis)
+                .and_raise(ActiveRecord::StatementInvalid)
+      end
+
+      it 'returns 200 response' do
+        expect(status).to eq 200
+      end
+
+      it 'return system details in json response' do
+        expect(json_response).to eq ({ 'database' => true, 'redis' => false })
       end
     end
   end
