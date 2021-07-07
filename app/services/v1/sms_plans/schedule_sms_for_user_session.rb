@@ -87,6 +87,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def insert_variables_into_variant(content)
     insert_name_into_variant(content)
+
     user_intervention_answer_vars.each do |variable, value|
       content.gsub!(".:#{variable}:.", value.to_s || 'Unknown')
     end
