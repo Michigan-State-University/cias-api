@@ -3,13 +3,13 @@
 class V1::UserSessionScheduleService
   def initialize(user_session)
     @user_session = user_session
-    @all_var_values = V1::UserInterventionService.new(
-      user_session.user.id, user_session.session.intervention_id, user_session.id
-    ).var_values
+    @user_intervention_service = V1::UserInterventionService.new(user_session.user.id, user_session.session.intervention_id, user_session.id)
+    @all_var_values = @user_intervention_service.var_values
+    @all_var_values_with_session_variables = @user_intervention_service.var_values(true)
     @health_clinic = user_session.health_clinic
   end
 
-  attr_reader :user_session, :all_var_values, :health_clinic
+  attr_reader :user_session, :all_var_values, :all_var_values_with_session_variables, :health_clinic
 
   def schedule
     next_session = branch_to_session
@@ -35,7 +35,8 @@ class V1::UserSessionScheduleService
   end
 
   def days_after_date_schedule(next_session)
-    participant_date = all_var_values[next_session.days_after_date_variable_name]
+    participant_date = all_var_values_with_session_variables[next_session.days_after_date_variable_name]
+
     if participant_date
       SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
           .perform_later(next_session.id, user_session.user.id, health_clinic)
