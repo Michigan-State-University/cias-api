@@ -14,11 +14,12 @@ RSpec.describe 'GET /v1/organizations', type: :request do
   end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:health_clinic) { create(:health_clinic) }
-  let!(:health_system) { health_clinic.health_system }
-  let!(:organization1) { health_system.organization }
-  let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:organization3) { create(:organization, name: 'Oregano Public Health') }
+  let!(:organization1) { create(:organization, name: 'organization_1', created_at: DateTime.now - 10.days) }
+  let!(:health_system) { create(:health_system, name: 'Vatican Healthcare', organization: organization1) }
+  let!(:health_clinic) { create(:health_clinic, name: 'Best Health Clinic', health_system: health_system) }
+  let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health', created_at: DateTime.now - 5.days) }
+  let!(:organization3) { create(:organization, name: 'Oregano Public Health', created_at: DateTime.now - 1.days) }
+  let(:expected_organization_order) { [organization3, organization2, organization1].map(&:id) }
 
   let!(:organization_admin) { organization2.organization_admins.first }
   let!(:e_intervention_admin) { organization2.e_intervention_admins.first }
@@ -95,6 +96,11 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             }
           }
         )
+      end
+
+      it 'returns data in correct order' do
+        result = json_response['data'].map { |org_json| org_json['id'] }
+        expect(result).to eq(expected_organization_order)
       end
 
       it 'returns proper included data' do
@@ -205,7 +211,7 @@ RSpec.describe 'GET /v1/organizations', type: :request do
   end
 
   context 'when user is health clinic admin' do
-    let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin) }
+    let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
     let(:user) { health_clinic.user_health_clinics.first.user }
 
     before { request }
