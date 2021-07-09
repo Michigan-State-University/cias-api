@@ -38,13 +38,7 @@ RSpec.describe Question::FollowUpContact, type: :model do
 
         it '#translate_subtitle' do
           question_follow_up_contact.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-          expect(question_follow_up_contact.subtitle).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => nil
-            }.to_s
-          )
+          expect(question_follow_up_contact.subtitle).to equal(nil)
         end
       end
     end

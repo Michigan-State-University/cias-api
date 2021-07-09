@@ -97,6 +97,25 @@ class Question < ApplicationRecord
     update!(subtitle: new_subtitle)
   end
 
+  def translate_image_description(translator, source_language_name_short, destination_language_name_short)
+    return unless image.attached?
+
+    original_description = image_blob.description
+    original_text['image_description'] = original_description
+    new_description = translator.translate(original_description, source_language_name_short, destination_language_name_short)
+    image_blob.description = new_description
+
+    image_blob.save!
+  end
+
+  def translate_speech_blocks(translator, source_language_name_short, destination_language_name_short)
+    narrator['blocks'].each do |block|
+      text = block['text']
+      block['original_text'] = text
+      block['text'] = [translator.translate(text, source_language_name_short, destination_language_name_short)]
+    end
+  end
+
   def translate_body(_translator, _source_language_name_short, _destination_language_name_short) end
 
   private

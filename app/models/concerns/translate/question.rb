@@ -5,6 +5,8 @@ class Translate::Question < Translate::Base
     source.translate_title(translator, source_language_name_short, destination_language_name_short)
     source.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
     source.translate_body(translator, source_language_name_short, destination_language_name_short)
+    source.translate_image_description(translator, source_language_name_short, destination_language_name_short)
+    source.translate_speech_blocks(translator, source_language_name_short, destination_language_name_short)
     source.save!
   end
 end

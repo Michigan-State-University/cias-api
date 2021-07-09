@@ -4,6 +4,8 @@ require 'google/cloud/translate/v2'
 
 class V1::Google::TranslationService
   def translate(text, source_language_name_short, destination_language_name_short)
+    return if text.nil?
+
     client.translate(text, from: source_language_name_short, to: destination_language_name_short).text
   end
 

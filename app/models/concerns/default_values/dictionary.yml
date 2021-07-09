@@ -28,7 +28,8 @@ question:
   original_text:
     {
       title : '',
-      subtitle: ''
+      subtitle: '',
+      image_description: ''
     }
 chart:
   formula:

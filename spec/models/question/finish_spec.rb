@@ -46,6 +46,21 @@ RSpec.describe Question::Finish, type: :model do
             }.to_s
           )
         end
+
+        it '#translate_speech_blocks' do
+          question_finish.translate_speech_blocks(translator, source_language_name_short, destination_language_name_short)
+          expect(question_finish.narrator['blocks'].first).to include(
+            'text' =>
+              [
+                {
+                  'from' => 'en',
+                  'to' => 'pl',
+                  'text' => ['Enter main text for screen here. This is the last screen participants will see in this session']
+                }
+              ],
+            'original_text' => ['Enter main text for screen here. This is the last screen participants will see in this session']
+          )
+        end
       end
     end
   end

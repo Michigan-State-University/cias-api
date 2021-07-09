@@ -38,13 +38,7 @@ RSpec.describe Question::Multiple, type: :model do
 
         it '#translate_subtitle' do
           question_multiple.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-          expect(question_multiple.subtitle).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => nil
-            }.to_s
-          )
+          expect(question_multiple.subtitle).to equal(nil)
         end
 
         it '#translate_body' do
