@@ -56,6 +56,20 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           )
         end
       end
+
+      context 'when intervention has field from_deleted_organization set on true' do
+        let!(:intervention_with_deleted_organization) do
+          create(:intervention, name: 'Some intervention with deleted organization',
+                                user: intervention_user, from_deleted_organization: true)
+        end
+
+        it 'does not contain intervention from deleted organization' do
+          expect(attrs).not_to include(
+            'name' => 'Some intervention with deleted organization',
+            'organization_id' => nil
+          )
+        end
+      end
     end
 
     context 'user is admin' do
