@@ -16,5 +16,10 @@ RSpec.describe V1::Translations::VariableExclusiveTranslationService do
         'text' => input_with_variable_names
       }.to_s)
     end
+
+    it 'return blank text if given blank input' do
+      output = variable_exclusive_translation_service.translate('', source_language_name_short, destination_language_name_short)
+      expect(output).to eq('')
+    end
   end
 end
