@@ -23,7 +23,7 @@ class V1::UserSessionScheduleService
   end
 
   def days_after_schedule(next_session)
-    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic)
+    schedule_until(next_session.schedule_at.noon, next_session)
   end
 
   def days_after_fill_schedule(next_session)
@@ -31,16 +31,13 @@ class V1::UserSessionScheduleService
   end
 
   def exact_date_schedule(next_session)
-    SessionEmailScheduleJob.set(wait_until: next_session.schedule_at.noon).perform_later(next_session.id, user_session.user.id, health_clinic)
+    schedule_until(next_session.schedule_at.noon, next_session)
   end
 
   def days_after_date_schedule(next_session)
     participant_date = all_var_values_with_session_variables[next_session.days_after_date_variable_name]
 
-    if participant_date
-      SessionEmailScheduleJob.set(wait_until: (participant_date.to_datetime + next_session.schedule_payload&.days).noon)
-          .perform_later(next_session.id, user_session.user.id, health_clinic)
-    end
+    schedule_until((participant_date.to_datetime + next_session.schedule_payload&.days).noon, next_session) if participant_date
   end
 
   def branch_to_session
@@ -52,5 +49,11 @@ class V1::UserSessionScheduleService
       next_session = Session.find(target['id']) if target.is_a?(Hash) && !target['id'].nil?
     end
     next_session
+  end
+
+  def schedule_until(date_of_schedule, next_session)
+    return next_session.send_link_to_session(user_session.user, health_clinic) if date_of_schedule.past?
+
+    SessionEmailScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic)
   end
 end
