@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class HealthCheck
   # It return system details in JSON response.
   #

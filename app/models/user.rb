@@ -129,6 +129,14 @@ class User < ApplicationRecord
     roles.include?('guest') || roles.include?('preview_session')
   end
 
+  def accepted_health_clinic_ids
+    return unless role?('health_clinic_admin')
+
+    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map { |hci| hci.health_clinic_id }
+    health_clinic_ids.append(organizable.id) if organizable
+    health_clinic_ids
+  end
+
   private
 
   def self.users_for_researcher(params, scope)

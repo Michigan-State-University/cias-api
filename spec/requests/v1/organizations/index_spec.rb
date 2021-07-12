@@ -18,7 +18,7 @@ RSpec.describe 'GET /v1/organizations', type: :request do
   let!(:health_system) { create(:health_system, name: 'Vatican Healthcare', organization: organization1) }
   let!(:health_clinic) { create(:health_clinic, name: 'Best Health Clinic', health_system: health_system) }
   let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health', created_at: DateTime.now - 5.days) }
-  let!(:organization3) { create(:organization, name: 'Oregano Public Health', created_at: DateTime.now - 1.days) }
+  let!(:organization3) { create(:organization, name: 'Oregano Public Health', created_at: DateTime.now - 1.day) }
   let(:expected_organization_order) { [organization3, organization2, organization1].map(&:id) }
 
   let!(:organization_admin) { organization2.organization_admins.first }
@@ -113,7 +113,7 @@ RSpec.describe 'GET /v1/organizations', type: :request do
               'name' => health_clinic.name,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
         )
         expect(json_response['included'][1]).to include(
@@ -212,9 +212,16 @@ RSpec.describe 'GET /v1/organizations', type: :request do
 
   context 'when user is health clinic admin' do
     let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
+    let!(:other_organization) { create(:organization, name: 'Other Organization', created_at: DateTime.now - 10.days) }
+    let!(:other_health_system) { create(:health_system, name: 'Other Health System', organization: other_organization) }
+    let!(:other_health_clinic) { create(:health_clinic, name: 'Health Clinic 1234', health_system: other_health_system) }
     let(:user) { health_clinic.user_health_clinics.first.user }
 
-    before { request }
+    before do
+      other_health_clinic.user_health_clinics << UserHealthClinic.create!(user: user, health_clinic: other_health_clinic)
+      HealthClinicInvitation.create!(user: user, health_clinic: other_health_clinic)
+      request
+    end
 
     it 'returns correct collection data size' do
       expect(json_response['data'].size).to eq(1)
@@ -229,7 +236,13 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'name' => organization1.name
           }
         }
-      )
+      ).and not_include({
+                          'id' => other_organization.id.to_s,
+                          'type' => 'simple_organization',
+                          'attributes' => {
+                            'name' => other_organization.name
+                          }
+                        })
     end
   end
 end

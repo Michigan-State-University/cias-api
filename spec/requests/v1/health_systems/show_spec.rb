@@ -80,7 +80,7 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
               'health_system_id' => health_clinic.health_system_id,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
         )
 

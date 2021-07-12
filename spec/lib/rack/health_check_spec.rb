@@ -30,7 +30,7 @@ RSpec.describe HealthCheck do
       end
 
       it 'return system details in json response' do
-        expect(json_response).to eq ({ 'database' => false, 'redis' => true })
+        expect(json_response).to eq({ 'database' => false, 'redis' => true })
       end
     end
 
@@ -46,7 +46,7 @@ RSpec.describe HealthCheck do
       end
 
       it 'return system details in json response' do
-        expect(json_response).to eq ({ 'database' => true, 'redis' => false })
+        expect(json_response).to eq({ 'database' => true, 'redis' => false })
       end
     end
   end
