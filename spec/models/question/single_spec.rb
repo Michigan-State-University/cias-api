@@ -47,11 +47,7 @@ RSpec.describe Question::Single, type: :model do
           question_single.translate_body(translator, source_language_name_short, destination_language_name_short)
           expect(question_single.body['data']).to include(
             {
-              'payload' => {
-                'from' => 'en',
-                'to' => 'pl',
-                'text' => ''
-              },
+              'payload' => '',
               'value' => '',
               'original_text' => ''
             },

@@ -45,11 +45,7 @@ RSpec.describe Question::Multiple, type: :model do
           question_multiple.translate_body(translator, source_language_name_short, destination_language_name_short)
           expect(question_multiple.body['data']).to include(
             {
-              'payload' => {
-                'from' => 'en',
-                'to' => 'pl',
-                'text' => ''
-              },
+              'payload' => '',
               'variable' => {
                 'name' => 'answer_1',
                 'value' => ''
@@ -57,11 +53,7 @@ RSpec.describe Question::Multiple, type: :model do
               'original_text' => ''
             },
             {
-              'payload' => {
-                'from' => 'en',
-                'to' => 'pl',
-                'text' => ''
-              },
+              'payload' => '',
               'variable' => {
                 'name' => 'answer_2',
                 'value' => ''
@@ -69,11 +61,7 @@ RSpec.describe Question::Multiple, type: :model do
               'original_text' => ''
             },
             {
-              'payload' => {
-                'from' => 'en',
-                'to' => 'pl',
-                'text' => ''
-              },
+              'payload' => '',
               'variable' => {
                 'name' => 'answer_3',
                 'value' => ''
@@ -81,11 +69,7 @@ RSpec.describe Question::Multiple, type: :model do
               'original_text' => ''
             },
             {
-              'payload' => {
-                'from' => 'en',
-                'to' => 'pl',
-                'text' => ''
-              },
+              'payload' => '',
               'variable' => {
                 'name' => 'answer_4',
                 'value' => ''

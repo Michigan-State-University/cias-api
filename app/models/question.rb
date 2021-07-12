@@ -108,14 +108,6 @@ class Question < ApplicationRecord
     image_blob.save!
   end
 
-  def translate_speech_blocks(translator, source_language_name_short, destination_language_name_short)
-    narrator['blocks'].each do |block|
-      text = block['text']
-      block['original_text'] = text
-      block['text'] = [translator.translate(text, source_language_name_short, destination_language_name_short)]
-    end
-  end
-
   def translate_body(_translator, _source_language_name_short, _destination_language_name_short) end
 
   private

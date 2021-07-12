@@ -49,22 +49,14 @@ RSpec.describe Question::Grid, type: :model do
                 'columns' => [
                   {
                     'original_text' => '',
-                    'payload' => {
-                      'from' => 'en',
-                      'text' => '',
-                      'to' => 'pl'
-                    },
+                    'payload' => '',
                     'variable' => {
                       'value' => '1'
                     }
                   },
                   {
                     'original_text' => '',
-                    'payload' => {
-                      'from' => 'en',
-                      'text' => '',
-                      'to' => 'pl'
-                    },
+                    'payload' => '',
                     'variable' => {
                       'value' => '1'
                     }
@@ -73,11 +65,7 @@ RSpec.describe Question::Grid, type: :model do
                 'rows' => [
                   {
                     'original_text' => '',
-                    'payload' => {
-                      'from' => 'en',
-                      'text' => '',
-                      'to' => 'pl'
-                    },
+                    'payload' => '',
                     'variable' => {
                       'name' => 'row1'
                     }
