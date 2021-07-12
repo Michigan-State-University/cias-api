@@ -16,4 +16,13 @@ class Question::Single < Question
     new_variable = variable_with_clone_index(taken_variables, body['variable']['name']) if taken_variables.include?(new_variable)
     body['variable']['name'] = new_variable
   end
+
+  def translate_body(translator, source_language_name_short, destination_language_name_short)
+    body['data'].each do |row|
+      row['original_text'] = row['payload']
+
+      translated_text = translator.translate(row['payload'], source_language_name_short, destination_language_name_short)
+      row['payload'] = translated_text
+    end
+  end
 end

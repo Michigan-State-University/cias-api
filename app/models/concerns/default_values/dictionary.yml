@@ -25,6 +25,12 @@ question:
     patterns: []
   body:
     data: []
+  original_text:
+    {
+      title : '',
+      subtitle: '',
+      image_description: ''
+    }
 chart:
   formula:
     payload: ''
