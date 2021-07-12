@@ -31,6 +31,18 @@ question:
       subtitle: '',
       image_description: ''
     }
+report_template:
+  original_text:
+    {
+      summary : '',
+      name: ''
+    }
+report_template/section:
+  original_text:
+    {
+      title : '',
+      content: ''
+    }
 chart:
   formula:
     payload: ''

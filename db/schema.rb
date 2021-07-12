@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_06_095838) do
+ActiveRecord::Schema.define(version: 2021_07_12_073031) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -306,6 +307,7 @@ ActiveRecord::Schema.define(version: 2021_07_06_095838) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
     t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end
@@ -325,6 +327,7 @@ ActiveRecord::Schema.define(version: 2021_07_06_095838) do
     t.text "summary"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"

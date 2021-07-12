@@ -49,4 +49,32 @@ RSpec.describe ReportTemplate, type: :model do
       end
     end
   end
+
+  describe 'translation' do
+    let(:translator) { V1::Google::TranslationService.new }
+    let(:source_language_short) { 'en' }
+    let(:destination_language_short) { 'pl' }
+
+    let(:translation_test_report_template) do
+      create(:report_template, summary: 'Translation test summary', name: 'Test report template name')
+    end
+
+    it '#translate_summary' do
+      translation_test_report_template.translate_summary(translator, source_language_short, destination_language_short)
+      expect(translation_test_report_template.summary).to include({
+        'from' => source_language_short,
+        'to' => destination_language_short,
+        'text' => 'Translation test summary'
+      }.to_s)
+    end
+
+    it '#translate_name' do
+      translation_test_report_template.translate_name(translator, source_language_short, destination_language_short)
+      expect(translation_test_report_template.name).to include({
+        'from' => source_language_short,
+        'to' => destination_language_short,
+        'text' => 'Test report template name'
+      }.to_s)
+    end
+  end
 end
