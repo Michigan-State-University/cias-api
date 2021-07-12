@@ -6,6 +6,7 @@ class V1::Translations::VariableExclusiveTranslationService
 
   def translate(text, src_language_name_short, dest_language_name_short)
     return text if text.blank?
+
     variable_names = extract_variable_names(text)
     new_text = @translator.translate(text, src_language_name_short, dest_language_name_short)
     insert_variable_names(new_text, variable_names)
