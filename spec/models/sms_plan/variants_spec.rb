@@ -7,6 +7,7 @@ RSpec.describe SmsPlan::Variant, type: :model do
 
   describe 'translation' do
     let(:translation_client) { V1::Google::TranslationService.new }
+    let(:translation_service) { V1::Translations::VariableExclusiveTranslationService.new(translation_client) }
     let(:source_language_short_name) { 'en' }
     let(:dest_language_short_name) { 'pl' }
     let(:test_sms_plan_variants) do
@@ -24,7 +25,7 @@ RSpec.describe SmsPlan::Variant, type: :model do
 
     it 'properly translate sms message without variables' do
       test_sms_plan_variants.each do |variant|
-        variant.translate_content(translation_client, source_language_short_name, dest_language_short_name)
+        variant.translate_content(translation_service, source_language_short_name, dest_language_short_name)
         results << variant.content.include?({
           'from' => source_language_short_name,
           'to' => dest_language_short_name,
@@ -35,7 +36,7 @@ RSpec.describe SmsPlan::Variant, type: :model do
     end
 
     it 'return blank text when given blank input' do
-      variant_with_blank_content.translate_content(translation_client, source_language_short_name, dest_language_short_name)
+      variant_with_blank_content.translate_content(translation_service, source_language_short_name, dest_language_short_name)
 
       expect(variant_with_blank_content.content).to eq('         ')
     end

@@ -9,7 +9,7 @@ class SmsPlan::Variant < ApplicationRecord
 
   ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
 
-  def translate_content(translator, src_language_name_short, dest_language_name_short)
+  def translate(translator, src_language_name_short, dest_language_name_short)
     original_text['content'] = content
     new_content = translator.translate(content, src_language_name_short, dest_language_name_short)
 
