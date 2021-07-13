@@ -5,7 +5,7 @@ class SmsPlan::Variant < ApplicationRecord
   has_paper_trail
   belongs_to :sms_plan
 
-  attribute :original_text, :json, default: { 'original_text' => {} }
+  attribute :original_text, :json, default: { 'content' => {} }
 
   ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
 
