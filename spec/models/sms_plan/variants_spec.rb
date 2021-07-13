@@ -13,7 +13,10 @@ RSpec.describe SmsPlan::Variant, type: :model do
       [
         create(:sms_plan_variant, content: 'This is first SMS message'),
         create(:sms_plan_variant, content: 'And this is second'),
-        create(:sms_plan_variant, content: 'And here be dragons')
+        create(:sms_plan_variant, content: 'And here be dragons'),
+        create(:sms_plan_variant, content: 'Hello .:name:. How are you? Do you like your .:fruit:.'),
+        create(:sms_plan_variant, content: 'I am .:name:. from .:city:..'),
+        create(:sms_plan_variant, content: 'I am .:age:. years old.')
       ]
     end
     let(:variant_with_blank_content) { create(:sms_plan_variant, content: '         ') }
