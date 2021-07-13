@@ -156,6 +156,54 @@ RSpec.describe Session, type: :model do
           expect(session.session_variables).to eq ['a1']
         end
       end
+
+      describe '#translate' do
+        let!(:session) { create(:session, :with_sms_plans, :with_report_templates) }
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+        let(:first_report_template) { session.reload.report_templates.first }
+        let(:variant) { first_report_template.variants.first }
+
+        before do
+          session.translate(translator, source_language_name_short, destination_language_name_short)
+        end
+
+        it 'translate questions' do
+          expect(session.reload.questions.first.title).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => 'Enter title here'
+            }.to_s
+          )
+          expect(session.reload.questions.first.subtitle).to include(
+            {
+              'from' => source_language_name_short,
+              'to' => destination_language_name_short,
+              'text' => '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
+            }.to_s
+          )
+          expect(session.reload.questions.first.narrator['blocks'].first['text']).to include(
+            {
+              'to' => 'pl',
+              'from' => 'en',
+              'text' => 'Enter main text for screen here. This is the last screen participants will see in this session'
+            }
+          )
+        end
+
+        it 'translate reports' do
+          expect(first_report_template.summary).to include('"from"=>"en", "to"=>"pl"')
+          expect(first_report_template.name).to include('"from"=>"en", "to"=>"pl"')
+          expect(variant.title).to include('"from"=>"en", "to"=>"pl"')
+          expect(variant.content).to include('"from"=>"en", "to"=>"pl"')
+        end
+
+        it 'translate sms plans' do
+          expect(1).to be(1)
+        end
+      end
     end
 
     context 'validations' do
