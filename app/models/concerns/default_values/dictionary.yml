@@ -43,11 +43,6 @@ report_template/section:
       title : '',
       content: ''
     }
-sms_plan/variant:
-  original_text:
-    {
-      content: ''
-    }
 chart:
   formula:
     payload: ''

@@ -2,11 +2,10 @@
 
 class SmsPlan::Variant < ApplicationRecord
   include Translate
-  extend DefaultValues
   has_paper_trail
   belongs_to :sms_plan
 
-  attribute :original_text, :json, default: assign_default_values('original_text')
+  attribute :original_text, :json, default: { 'original_text' => {} }
 
   ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
 
