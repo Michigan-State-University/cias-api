@@ -96,4 +96,33 @@ RSpec.describe Intervention, type: :model do
       end
     end
   end
+
+  describe 'instance methods' do
+    describe 'translation' do
+      let(:intervention) { create(:intervention_with_logo) }
+      let(:translator) { V1::Google::TranslationService.new }
+      let(:source_language_name_short) { 'en' }
+      let(:destination_language_name_short) { 'pl' }
+
+      before do
+        intervention.translate(translator, source_language_name_short, destination_language_name_short)
+      end
+
+      describe '#translation_prefix' do
+        it 'add correct prefix' do
+          expect(intervention.reload.name).to include("(#{destination_language_name_short.upcase})")
+        end
+      end
+
+      describe '#translate_logo_description' do
+        it 'add original text' do
+          expect(intervention.original_text['logo_description']).to equal(nil)
+        end
+
+        it 'have correct description' do
+          expect(intervention.logo_blob.description).to equal(nil)
+        end
+      end
+    end
+  end
 end

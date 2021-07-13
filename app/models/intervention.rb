@@ -3,6 +3,8 @@
 class Intervention < ApplicationRecord
   has_paper_trail
   include Clone
+  include Translate
+  extend DefaultValues
 
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
@@ -20,6 +22,7 @@ class Intervention < ApplicationRecord
   attr_accessor :status_event
 
   attribute :shared_to, :string, default: 'anyone'
+  attribute :original_text, :json, default: assign_default_values('original_text')
 
   validates :name, :shared_to, presence: true
   validates :status_event, inclusion: { in: %w[broadcast close to_archive] }, allow_nil: true
@@ -72,5 +75,26 @@ class Intervention < ApplicationRecord
 
   def newest_report
     reports.attachments.order(created_at: :desc).first
+  end
+
+  def translate_logo_description(translator, source_language_name_short, destination_language_name_short)
+    return unless logo.attached?
+
+    original_description = logo_blob.description
+    original_text['logo_description'] = original_description
+    new_description = translator.translate(original_description, source_language_name_short, destination_language_name_short)
+    logo_blob.description = new_description
+
+    logo_blob.save!
+  end
+
+  def translation_prefix(destination_language_name_short)
+    update!(name: "(#{destination_language_name_short.upcase}) #{name}")
+  end
+
+  def translate_sessions(translator, source_language_name_short, destination_language_name_short)
+    sessions.each do |session|
+      session.translate(translator, source_language_name_short, destination_language_name_short)
+    end
   end
 end
