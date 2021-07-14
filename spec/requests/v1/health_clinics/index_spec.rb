@@ -51,7 +51,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
               'name' => health_clinic1.name,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           },
           {
             'id' => health_clinic2.id.to_s,
@@ -61,7 +61,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
               'name' => health_clinic2.name,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
         )
       end
@@ -90,7 +90,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
                 'name' => health_clinic1.name,
                 'deleted' => false
               },
-              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
             },
             {
               'id' => health_clinic2.id.to_s,
@@ -100,7 +100,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
                 'name' => health_clinic2.name,
                 'deleted' => false
               },
-              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
             },
             {
               'id' => deleted_health_clinic.id.to_s,
@@ -110,7 +110,7 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
                 'name' => deleted_health_clinic.name,
                 'deleted' => true
               },
-              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
             }
           )
         end
@@ -172,34 +172,78 @@ RSpec.describe 'GET /v1/health_clinics', type: :request do
   context 'when user is health_clinic_admin' do
     let!(:health_clinic1) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 1', health_system: health_system) }
     let!(:health_clinic2) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic 2', health_system: health_system) }
+    let!(:health_clinic3) { create(:health_clinic, name: 'Health Clinic 3', health_system: health_system) }
     let(:user) { health_clinic1.user_health_clinics.first.user }
+    let(:health_clinic1_invitation) { health_clinic1.health_clinic_invitations.first }
 
-    before { request }
+    context 'when health clinics have different clinic admins' do
+      before { request }
 
-    it 'returns correct health clinic size' do
-      expect(json_response['data'].size).to eq(1)
+      it 'returns correct health clinic size' do
+        expect(json_response['data'].size).to eq(1)
+      end
+
+      it 'return proper collection data' do
+        expect(json_response['data']).to include(
+          {
+            'id' => health_clinic1.id.to_s,
+            'type' => 'health_clinic',
+            'attributes' => {
+              'health_system_id' => health_system.id,
+              'name' => health_clinic1.name,
+              'deleted' => false
+            },
+            'relationships' => {
+              'health_clinic_admins' => { 'data' => [include({ 'id' => user.id })] },
+              'health_clinic_invitations' => { 'data' => [include({ 'id' => health_clinic1_invitation.id })] }
+            }
+          }
+        ).and not_include({
+                            'id' => health_clinic2.id.to_s,
+                            'type' => 'health_clinic',
+                            'attributes' => {
+                              'health_system_id' => health_system.id,
+                              'name' => health_clinic2.name
+                            }
+                          })
+      end
     end
 
-    it 'return proper collection data' do
-      expect(json_response['data']).to include(
-        {
-          'id' => health_clinic1.id.to_s,
-          'type' => 'health_clinic',
-          'attributes' => {
-            'health_system_id' => health_system.id,
-            'name' => health_clinic1.name,
-            'deleted' => false
-          },
-          'relationships' => { 'health_clinic_admins' => { 'data' => [include({ 'id' => user.id })] } }
-        }
-      ).and not_include({
-                          'id' => health_clinic2.id.to_s,
-                          'type' => 'health_clinic',
-                          'attributes' => {
-                            'health_system_id' => health_system.id,
-                            'name' => health_clinic2.name
-                          }
-                        })
+    context 'when user did not accepted invitation to other clinic' do
+      before do
+        health_clinic3.user_health_clinics << UserHealthClinic.create!(user: user, health_clinic: health_clinic3)
+        HealthClinicInvitation.create!(user: user, health_clinic: health_clinic3)
+        request
+      end
+
+      it 'returns correct health clinic size' do
+        expect(json_response['data'].size).to eq(1)
+      end
+
+      it 'return proper collection data' do
+        expect(json_response['data']).to include(
+          {
+            'id' => health_clinic1.id.to_s,
+            'type' => 'health_clinic',
+            'attributes' => {
+              'health_system_id' => health_system.id,
+              'name' => health_clinic1.name,
+              'deleted' => false
+            },
+            'relationships' => {
+              'health_clinic_admins' => { 'data' => [include({ 'id' => user.id })] },
+              'health_clinic_invitations' => { 'data' => [include({ 'id' => health_clinic1_invitation.id })] }
+            }
+          }
+        ).and not_include({
+                            'id' => health_clinic3.id.to_s,
+                            'type' => 'health_clinic',
+                            'attributes' => {
+                              'health_system_id' => health_system.id,
+                              'name' => health_clinic3.name
+                            }
+                          })
+      end
     end
   end
 end

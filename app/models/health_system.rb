@@ -8,7 +8,7 @@ class HealthSystem < ApplicationRecord
   has_many :health_clinics, -> { with_deleted }, dependent: :destroy
   has_many :health_system_invitations, dependent: :destroy
   has_many :health_system_admins, -> { limit_to_roles('health_system_admin') }, class_name: 'User', as: :organizable
-  has_many :chart_statistics, through: :health_clinics
+  has_many :chart_statistics, through: :health_clinics, dependent: nil
 
   validates :name, presence: true, uniqueness: { scope: :organization }
 

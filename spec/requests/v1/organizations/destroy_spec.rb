@@ -6,12 +6,14 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization) { create(:organization, :with_e_intervention_admin, :with_organization_admin, name: 'Michigan Public Health') }
   let!(:intervention_admin_id) { organization.e_intervention_admins.first.id }
+  let!(:organization_admin_id) { organization.organization_admins.first.id }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_system_admin_id) { health_system.health_system_admins.first.id }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
   let!(:health_clinic_admin_id) { health_clinic.health_clinic_admins.first.id }
+  let!(:intervention) { create(:intervention, organization_id: organization.id) }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_organization_path(organization.id), headers: headers }
@@ -44,8 +46,16 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
         expect(User.find(intervention_admin_id).organizable_id).to eq(nil)
       end
 
-      it 'intervention admin active status is true' do
+      it 'intervention admin active status is false' do
         expect(User.find(intervention_admin_id).active?).to eq(true)
+      end
+
+      it 'organization admins doesn\'t belongs to organization' do
+        expect(User.find(organization_admin_id).organizable_id).to eq(nil)
+      end
+
+      it 'organization admin active status is true' do
+        expect(User.find(organization_admin_id).active?).to eq(false)
       end
 
       it 'health_system is deleted' do
@@ -71,6 +81,10 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
 
       it 'health_clinic admin active status is false' do
         expect(User.find(health_clinic_admin_id).active?).to eq(false)
+      end
+
+      it 'intervention of deleted organization changed field from_deleted_organization from false to true' do
+        expect(intervention.reload.from_deleted_organization).to be(true)
       end
     end
 
