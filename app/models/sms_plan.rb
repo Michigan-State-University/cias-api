@@ -3,6 +3,7 @@
 class SmsPlan < ApplicationRecord
   has_paper_trail
   include Clone
+  include Translate
   extend DefaultValues
 
   belongs_to :session, counter_cache: true
@@ -33,5 +34,9 @@ class SmsPlan < ApplicationRecord
     new_no_formula_text = translator.translate(no_formula_text, source_language_name_short, destination_language_name_short)
 
     update!(no_formula_text: new_no_formula_text)
+  end
+
+  def translate_variants(translator, src_language_name_short, dest_language_name_short)
+    variants.each { |variant| variant.translate(translator, src_language_name_short, dest_language_name_short) }
   end
 end
