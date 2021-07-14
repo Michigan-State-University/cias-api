@@ -144,11 +144,11 @@ class Session < ApplicationRecord
     end
   end
 
-  # def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
-  #   sms_plans.each do |sms_plan|
-  #     sms_plan.translate(translator, source_language_name_short, destination_language_name_short)
-  #   end
-  # end
+  def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
+    sms_plans.each do |sms_plan|
+      sms_plan.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
 
   def translate_report_templates(translator, source_language_name_short, destination_language_name_short)
     report_templates.each do |report_template|

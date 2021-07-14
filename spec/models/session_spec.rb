@@ -164,6 +164,7 @@ RSpec.describe Session, type: :model do
         let(:destination_language_name_short) { 'pl' }
         let(:first_report_template) { session.reload.report_templates.first }
         let(:variant) { first_report_template.variants.first }
+        let(:first_sms_plan) { session.reload.sms_plans.first }
 
         before do
           session.translate(translator, source_language_name_short, destination_language_name_short)
@@ -201,7 +202,7 @@ RSpec.describe Session, type: :model do
         end
 
         it 'translate sms plans' do
-          expect(1).to be(1)
+          expect(first_sms_plan.no_formula_text).to include('"from"=>"en", "to"=>"pl"')
         end
       end
     end
