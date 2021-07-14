@@ -27,7 +27,7 @@ RSpec.describe Question::Grid, type: :model do
 
         it '#translate_title' do
           question_grid.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_grid.title).to include('from => en to => pl text => Grid')
+          expect(question_grid.title).to include('from=>en to=>pl text=>Grid')
         end
 
         it '#translate_subtitle' do

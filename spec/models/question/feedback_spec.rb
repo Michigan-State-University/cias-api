@@ -27,7 +27,7 @@ RSpec.describe Question::Feedback, type: :model do
 
         it '#translate_title' do
           question_feedback.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_feedback.title).to include('from => en to => pl text => Feedback')
+          expect(question_feedback.title).to include('from=>en to=>pl text=>Feedback')
         end
 
         it '#translate_subtitle' do

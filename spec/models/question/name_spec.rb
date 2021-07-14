@@ -27,7 +27,7 @@ RSpec.describe Question::Name, type: :model do
 
         it '#translate_title' do
           question_name.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_name.title).to include('from => en to => pl text => Name screen')
+          expect(question_name.title).to include('from=>en to=>pl text=>Name screen')
         end
 
         it '#translate_subtitle' do

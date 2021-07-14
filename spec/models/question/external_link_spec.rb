@@ -27,7 +27,7 @@ RSpec.describe Question::ExternalLink, type: :model do
 
         it '#translate_title' do
           question_external_link.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_external_link.title).to include('from => en to => pl text => External Link')
+          expect(question_external_link.title).to include('from=>en to=>pl text=>External Link')
         end
 
         it '#translate_subtitle' do

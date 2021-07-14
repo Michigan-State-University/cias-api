@@ -61,12 +61,12 @@ RSpec.describe ReportTemplate, type: :model do
 
     it '#translate_summary' do
       translation_test_report_template.translate_summary(translator, source_language_short, destination_language_short)
-      expect(translation_test_report_template.summary).to include('from => en to => pl text => Translation test summary')
+      expect(translation_test_report_template.summary).to include('from=>en to=>pl text=>Translation test summary')
     end
 
     it '#translate_name' do
       translation_test_report_template.translate_name(translator, source_language_short, destination_language_short)
-      expect(translation_test_report_template.name).to include('from => en to => pl text => Test report template name')
+      expect(translation_test_report_template.name).to include('from=>en to=>pl text=>Test report template name')
     end
   end
 end

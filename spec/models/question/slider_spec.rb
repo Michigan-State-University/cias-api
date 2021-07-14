@@ -27,7 +27,7 @@ RSpec.describe Question::Slider, type: :model do
 
         it '#translate_title' do
           question_slider.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_slider.title).to include('from => en to => pl text => Slider')
+          expect(question_slider.title).to include('from=>en to=>pl text=>Slider')
         end
 
         it '#translate_subtitle' do
