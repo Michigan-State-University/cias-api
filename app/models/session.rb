@@ -156,6 +156,10 @@ class Session < ApplicationRecord
     end
   end
 
+  def clear_speech_blocks
+    questions.each(&:clear_audio)
+  end
+
   private
 
   def translate_questions_in_group(group, translator, source_language_name_short, destination_language_name_short)

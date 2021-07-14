@@ -27,24 +27,12 @@ RSpec.describe Question::Finish, type: :model do
 
         it '#translate_title' do
           question_finish.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_finish.title).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => 'Enter title here'
-            }.to_s
-          )
+          expect(question_finish.title).to include('from => en to => pl text => Enter title here')
         end
 
         it '#translate_subtitle' do
           question_finish.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-          expect(question_finish.subtitle).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
-            }.to_s
-          )
+          expect(question_finish.subtitle).to include('from => en to => pl text => <h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>')
         end
       end
     end

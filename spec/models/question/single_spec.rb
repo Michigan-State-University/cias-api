@@ -29,13 +29,7 @@ RSpec.describe Question::Single, type: :model do
 
         it '#translate_title' do
           question_single.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_single.title).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => 'Single'
-            }.to_s
-          )
+          expect(question_single.title).to include('from => en to => pl text => Single')
         end
 
         it '#translate_subtitle' do
@@ -52,11 +46,7 @@ RSpec.describe Question::Single, type: :model do
               'original_text' => ''
             },
             {
-              'payload' => {
-                'from' => 'en',
-                'to' => 'pl',
-                'text' => 'example2'
-              },
+              'payload' => 'from=>en to=>pl text=>example2',
               'value' => '',
               'original_text' => 'example2'
             }

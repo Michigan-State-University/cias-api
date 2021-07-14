@@ -28,13 +28,7 @@ RSpec.describe Question::FreeResponse, type: :model do
 
           it '#translate_title' do
             question_free_response.translate_title(translator, source_language_name_short, destination_language_name_short)
-            expect(question_free_response.title).to include(
-              {
-                'from' => source_language_name_short,
-                'to' => destination_language_name_short,
-                'text' => 'Free Response'
-              }.to_s
-            )
+            expect(question_free_response.title).to include('from => en to => pl text => Free Response')
           end
 
           it '#translate_subtitle' do
