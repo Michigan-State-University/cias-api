@@ -3,6 +3,7 @@
 RSpec.describe V1::UserSessionScheduleService do
   let!(:intervention) { create(:intervention, :published) }
   let!(:user) { create(:user, :participant) }
+  let!(:preview_user) { create(:user, :preview_session) }
   let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formula: formula) }
   let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at) }
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
@@ -27,6 +28,43 @@ RSpec.describe V1::UserSessionScheduleService do
   before do
     allow(message_delivery).to receive(:deliver_later)
     ActiveJob::Base.queue_adapter = :test
+  end
+
+  context 'when user is preview_session' do
+    let!(:user_session_not_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session) }
+    let!(:user_session_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session, health_clinic: health_clinic) }
+    let!(:user_sessions) do
+      {
+          'user_session_not_belongs_to_organization' => user_session_not_belongs_to_organization,
+          'user_session_belongs_to_organization' => user_session_belongs_to_organization
+      }
+    end
+
+    context 'check behavior to user session belongs and doesn\'t belongs to organization ' do
+      %w[user_session_not_belongs_to_organization user_session_belongs_to_organization].each do |specific_user_session|
+        let(:user_session) { user_sessions[specific_user_session] }
+
+        context 'when session has schedule after fill' do
+          after { described_class.new(user_session).schedule }
+
+          it 'does not send an email' do
+            expect(SessionMailer).not_to receive(:inform_to_an_email).with(second_session, preview_user.email, user_session.health_clinic)
+          end
+        end
+
+        context 'when scheduling uses schedule_at which is nil' do
+          let(:schedule_at) { nil }
+
+          ['exact_date', 'days_after'].each do |schedule_type|
+            context "when session has schedule #{schedule_type}" do
+              it 'does not schedule at all' do
+                expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionEmailScheduleJob)
+              end
+            end
+          end
+        end
+      end
+    end
   end
 
   context 'check behavior to user session belongs and doesn\'t belongs to organization ' do
