@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class SmsPlan::Variant < ApplicationRecord
-  include Translate
   has_paper_trail
   belongs_to :sms_plan
 
-  attribute :original_text, :json, default: { 'content' => {} }
+  attribute :original_text, :json, default: { 'content' => '' }
 
   ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
 
