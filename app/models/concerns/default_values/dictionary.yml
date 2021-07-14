@@ -45,9 +45,9 @@ report_template/section:
     }
 sms_plan:
   original_text:
-  {
-    no_formula_text: ''
-  }
+    {
+      no_formula_text: ''
+    }
 chart:
   formula:
     payload: ''
