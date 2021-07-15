@@ -27,13 +27,7 @@ RSpec.describe Question::Information, type: :model do
 
         it '#translate_title' do
           question_information.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_information.title).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => 'Information'
-            }.to_s
-          )
+          expect(question_information.title).to include('from=>en to=>pl text=>Information')
         end
 
         it '#translate_subtitle' do

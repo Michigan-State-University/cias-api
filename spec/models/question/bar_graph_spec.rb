@@ -27,13 +27,7 @@ RSpec.describe Question::BarGraph, type: :model do
 
         it '#translate_title' do
           question_bar_graph.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_bar_graph.title).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => 'Bar Graph'
-            }.to_s
-          )
+          expect(question_bar_graph.title).to include('from=>en to=>pl text=>Bar Graph')
         end
 
         it '#translate_subtitle' do

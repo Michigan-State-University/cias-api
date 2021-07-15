@@ -156,6 +156,10 @@ class Session < ApplicationRecord
     end
   end
 
+  def clear_speech_blocks
+    questions.each(&:clear_audio)
+  end
+
   private
 
   def create_core_childs

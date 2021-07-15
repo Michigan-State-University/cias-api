@@ -27,13 +27,7 @@ RSpec.describe Question::FollowUpContact, type: :model do
 
         it '#translate_title' do
           question_follow_up_contact.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_follow_up_contact.title).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => 'Follow-up contact'
-            }.to_s
-          )
+          expect(question_follow_up_contact.title).to include('from=>en to=>pl text=>Follow-up contact')
         end
 
         it '#translate_subtitle' do

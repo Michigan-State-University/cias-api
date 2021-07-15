@@ -28,13 +28,7 @@ RSpec.describe Question::Currency, type: :model do
 
           it '#translate_title' do
             question_currency.translate_title(translator, source_language_name_short, destination_language_name_short)
-            expect(question_currency.title).to include(
-              {
-                'from' => source_language_name_short,
-                'to' => destination_language_name_short,
-                'text' => 'Currency'
-              }.to_s
-            )
+            expect(question_currency.reload.title).to eq('from=>en to=>pl text=>Currency')
           end
 
           it '#translate_subtitle' do

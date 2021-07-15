@@ -15,19 +15,11 @@ RSpec.describe V1::Translations::NarratorBlocks do
 
     it 'changed text to speech' do
       expect(q_narrator_blocks_types.reload.narrator['blocks'].first).to include(
-        { 'text' => include(
-          {
-            'to' => 'pl',
-            'from' => 'en',
-            'text' => 'Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.'
-          },
-          {
-            'to' => 'pl',
-            'from' => 'en',
-            'text' => 'Working together as an interdisciplinary team, many highly trained health professionals'
-          },
+        'text' => include(
+          'from=>en to=>pl text=>Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.',
+          'from=>en to=>pl text=>Working together as an interdisciplinary team, many highly trained health professionals',
           '.:name:.'
-        ) }
+        )
       )
     end
   end

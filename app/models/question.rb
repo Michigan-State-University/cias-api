@@ -110,6 +110,15 @@ class Question < ApplicationRecord
 
   def translate_body(_translator, _source_language_name_short, _destination_language_name_short) end
 
+  def clear_audio
+    narrator['blocks'].each do |block|
+      block['sha256'] = []
+      block['audio_urls'] = []
+    end
+
+    save!
+  end
+
   private
 
   def initialize_narrator

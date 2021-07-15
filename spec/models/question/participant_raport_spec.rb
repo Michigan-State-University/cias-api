@@ -27,13 +27,7 @@ RSpec.describe Question::ParticipantReport, type: :model do
 
         it '#translate_title' do
           question_participant_report.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_participant_report.title).to include(
-            {
-              'from' => source_language_name_short,
-              'to' => destination_language_name_short,
-              'text' => 'ParticipantReport'
-            }.to_s
-          )
+          expect(question_participant_report.title).to include('from=>en to=>pl text=>ParticipantReport')
         end
 
         it '#translate_subtitle' do

@@ -40,11 +40,7 @@ class Google::Cloud::Translate::V2::Translation::Fake
   def translate(text, to: nil, from: nil, format: nil, model: nil)
     raise Google::Cloud::InvalidArgumentError if to.nil?
 
-    Translator.new({
-                     'from' => from,
-                     'to' => to,
-                     'text' => text
-                   })
+    Translator.new("from=>#{from} to=>#{to} text=>#{text}")
   end
 end
 

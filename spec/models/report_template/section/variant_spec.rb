@@ -18,11 +18,9 @@ RSpec.describe ReportTemplate::Section::Variant, type: :model do
     it '#translate_title' do
       variants.each do |variant|
         variant.translate_title(translator, source_language_short, destination_language_short)
-        results << variant.title.include?({
-          'from' => source_language_short,
-          'to' => destination_language_short,
-          'text' => variant.original_text['title']
-        }.to_s)
+        results << variant.title.include?(
+          "from=>#{source_language_short} to=>#{destination_language_short} text=>#{variant.original_text['title']}".to_s
+        )
       end
       expect(results).to all(be_truthy)
     end
@@ -30,11 +28,9 @@ RSpec.describe ReportTemplate::Section::Variant, type: :model do
     it '#translate_content' do
       variants.each do |variant|
         variant.translate_content(translator, source_language_short, destination_language_short)
-        results << variant.content.include?({
-          'from' => source_language_short,
-          'to' => destination_language_short,
-          'text' => variant.original_text['content']
-        }.to_s)
+        results << variant.content.include?(
+          "from=>#{source_language_short} to=>#{destination_language_short} text=>#{variant.original_text['content']}"
+        )
       end
       expect(results).to all(be_truthy)
     end
