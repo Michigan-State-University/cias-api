@@ -158,7 +158,7 @@ RSpec.describe Session, type: :model do
       end
 
       describe '#translate' do
-        let!(:session) { create(:session, :with_sms_plans, :with_report_templates) }
+        let!(:session) { create(:session, :with_sms_plans_with_text, :with_report_templates) }
         let(:translator) { V1::Google::TranslationService.new }
         let(:source_language_name_short) { 'en' }
         let(:destination_language_name_short) { 'pl' }
