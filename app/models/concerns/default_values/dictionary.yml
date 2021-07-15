@@ -48,6 +48,11 @@ report_template/section:
       title : '',
       content: ''
     }
+sms_plan:
+  original_text:
+    {
+      no_formula_text: ''
+    }
 chart:
   formula:
     payload: ''

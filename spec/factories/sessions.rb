@@ -23,6 +23,10 @@ FactoryBot.define do
       sms_plans { create_list(:sms_plan, 2) }
     end
 
+    trait :with_sms_plans_with_text do
+      sms_plans { create_list(:sms_plan_with_text, 2) }
+    end
+
     trait :days_after do
       schedule { 'days_after' }
       schedule_payload { 7 }

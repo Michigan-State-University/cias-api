@@ -138,17 +138,17 @@ class Session < ApplicationRecord
     end
   end
 
-  def translate_question_groups(translator, source_language_name_short, destination_language_name_short)
-    question_groups.each do |group|
-      translate_questions_in_group(group, translator, source_language_name_short, destination_language_name_short)
+  def translate_questions(translator, source_language_name_short, destination_language_name_short)
+    questions.each do |question|
+      question.translate(translator, source_language_name_short, destination_language_name_short)
     end
   end
 
-  # def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
-  #   sms_plans.each do |sms_plan|
-  #     sms_plan.translate(translator, source_language_name_short, destination_language_name_short)
-  #   end
-  # end
+  def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
+    sms_plans.each do |sms_plan|
+      sms_plan.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
 
   def translate_report_templates(translator, source_language_name_short, destination_language_name_short)
     report_templates.each do |report_template|
@@ -157,12 +157,6 @@ class Session < ApplicationRecord
   end
 
   private
-
-  def translate_questions_in_group(group, translator, source_language_name_short, destination_language_name_short)
-    group.questions.each do |question|
-      question.translate(translator, source_language_name_short, destination_language_name_short)
-    end
-  end
 
   def create_core_childs
     return if question_group_finish
