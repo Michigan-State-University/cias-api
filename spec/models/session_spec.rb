@@ -184,7 +184,7 @@ RSpec.describe Session, type: :model do
         end
 
         it 'translate sms plans' do
-          expect(first_sms_plan.no_formula_text).to include('"from"=>"en", "to"=>"pl"')
+          expect(first_sms_plan.no_formula_text).to include('from=>en to=>pl')
         end
       end
     end

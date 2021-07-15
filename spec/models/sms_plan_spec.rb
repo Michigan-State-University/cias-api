@@ -57,11 +57,7 @@ RSpec.describe SmsPlan, type: :model do
 
     it '#translate_no_formula_text' do
       sms_plan.translate_no_formula_text(variable_exclusive_translation_service, source_language_name_short, destination_language_name_short)
-      expect(sms_plan.no_formula_text).to eq({
-        'from' => source_language_name_short,
-        'to' => destination_language_name_short,
-        'text' => sms_plan.original_text['no_formula_text']
-      }.to_s)
+      expect(sms_plan.no_formula_text).to eq('from=>en to=>pl text=>There is nothing to see here')
     end
   end
 end

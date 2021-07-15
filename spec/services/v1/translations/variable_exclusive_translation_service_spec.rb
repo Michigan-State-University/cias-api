@@ -10,11 +10,7 @@ RSpec.describe V1::Translations::VariableExclusiveTranslationService do
 
     it 'ignore variable names during translation' do
       output = variable_exclusive_translation_service.translate(input_with_variable_names, source_language_name_short, destination_language_name_short)
-      expect(output).to eq({
-        'from' => source_language_name_short,
-        'to' => destination_language_name_short,
-        'text' => input_with_variable_names
-      }.to_s)
+      expect(output).to eq("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=>#{input_with_variable_names}")
     end
 
     it 'return blank text if given blank input' do

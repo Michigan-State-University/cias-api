@@ -26,11 +26,7 @@ RSpec.describe SmsPlan::Variant, type: :model do
     it 'properly translate sms message without variables' do
       test_sms_plan_variants.each do |variant|
         variant.translate(translation_service, source_language_short_name, dest_language_short_name)
-        results << variant.content.include?({
-          'from' => source_language_short_name,
-          'to' => dest_language_short_name,
-          'text' => variant.original_text['content']
-        }.to_s)
+        results << variant.content.include?("from=>#{source_language_short_name} to=>#{dest_language_short_name} text=>#{variant.original_text['content']}")
       end
       expect(results).to all(be_truthy)
     end

@@ -121,7 +121,7 @@ RSpec.describe Intervention, type: :model do
         end
 
         it 'have correct description' do
-          expect(intervention.logo_blob.description).to eq('{"from"=>"en", "to"=>"pl", "text"=>"This is the description"}')
+          expect(intervention.logo_blob.description).to eq('from=>en to=>pl text=>This is the description')
         end
       end
     end
