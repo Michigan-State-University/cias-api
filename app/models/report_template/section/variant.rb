@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class ReportTemplate::Section::Variant < ApplicationRecord
-  include Translate
   has_paper_trail
   extend DefaultValues
+
   belongs_to :report_template_section, class_name: 'ReportTemplate::Section'
   has_one_attached :image
 
@@ -30,5 +30,10 @@ class ReportTemplate::Section::Variant < ApplicationRecord
     new_content = translator.translate(content, source_language_name_short, destination_language_name_short)
 
     update!(content: new_content)
+  end
+
+  def translate(translator, source_language_name_short, destination_language_name_short)
+    translate_title(translator, source_language_name_short, destination_language_name_short)
+    translate_content(translator, source_language_name_short, destination_language_name_short)
   end
 end
