@@ -138,6 +138,8 @@ Metrics/PerceivedComplexity:
 
 Metrics/ClassLength:
   Max: 150
+  Exclude:
+    - 'app/models/session.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

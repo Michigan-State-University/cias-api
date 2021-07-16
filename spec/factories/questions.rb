@@ -441,9 +441,11 @@ FactoryBot.define do
           },
           blocks: [
             {
+              # rubocop:disable Layout/LineLength
               text: ['Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.', 'Working together as an interdisciplinary team, many highly trained health professionals', '.:name:.'],
               sha256: %w[80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2 cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046 80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2],
               audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3', 'spec/factories/audio/cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046.mp3', 'spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3'],
+              # rubocop:enable Layout/LineLength
               type: 'Speech'
             },
             {

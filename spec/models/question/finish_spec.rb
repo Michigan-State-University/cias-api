@@ -33,7 +33,7 @@ RSpec.describe Question::Finish, type: :model do
 
         it '#translate_subtitle' do
           question_finish.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-          expect(question_finish.subtitle).to include('from=>en to=>pl text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>')
+          expect(question_finish.subtitle).to include('from=>en to=>pl text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>') # rubocop:disable Layout/LineLength
         end
       end
     end

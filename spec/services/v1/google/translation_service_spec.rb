@@ -3,7 +3,7 @@
 RSpec.describe V1::Google::TranslationService do
   context 'test parameters' do
     it 'return correct data' do
-      expect(described_class.new.translate(text = 'Hello world!', 'en', 'la')).to eq("from=>en to=>la text=>Hello world!")
+      expect(described_class.new.translate('Hello world!', 'en', 'la')).to eq('from=>en to=>la text=>Hello world!')
     end
 
     it 'without target language' do

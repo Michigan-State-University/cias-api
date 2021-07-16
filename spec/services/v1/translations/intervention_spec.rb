@@ -46,7 +46,6 @@ RSpec.describe V1::Translations::Intervention do
         expect(first_question.narrator['blocks'].first['audio_urls']).to eq([])
         expect(first_question.narrator['blocks'].first['sha256']).to eq([])
       end
-
     end
   end
 end
