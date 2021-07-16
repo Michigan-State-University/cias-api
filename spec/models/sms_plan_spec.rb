@@ -47,4 +47,17 @@ RSpec.describe SmsPlan, type: :model do
       end
     end
   end
+
+  context 'translation' do
+    let(:source_language_name_short) { 'en' }
+    let(:destination_language_name_short) { 'pl' }
+    let(:translation_service) { V1::Google::TranslationService.new }
+    let(:variable_exclusive_translation_service) { V1::Translations::VariableExclusiveTranslationService.new(translation_service) }
+    let(:sms_plan) { create(:sms_plan, no_formula_text: 'There is nothing to see here') }
+
+    it '#translate_no_formula_text' do
+      sms_plan.translate_no_formula_text(variable_exclusive_translation_service, source_language_name_short, destination_language_name_short)
+      expect(sms_plan.no_formula_text).to eq('from=>en to=>pl text=>There is nothing to see here')
+    end
+  end
 end

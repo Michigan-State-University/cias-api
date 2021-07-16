@@ -10,10 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_05_091352) do
+ActiveRecord::Schema.define(version: 2021_07_14_073541) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -202,6 +203,7 @@ ActiveRecord::Schema.define(version: 2021_07_05_091352) do
     t.uuid "organization_id"
     t.bigint "google_language_id", default: 22, null: false
     t.boolean "from_deleted_organization", default: false, null: false
+    t.jsonb "original_text"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -290,6 +292,7 @@ ActiveRecord::Schema.define(version: 2021_07_05_091352) do
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["question_group_id"], name: "index_questions_on_question_group_id"
     t.index ["title"], name: "index_questions_on_title"
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
@@ -305,6 +308,7 @@ ActiveRecord::Schema.define(version: 2021_07_05_091352) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
     t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end
@@ -324,6 +328,7 @@ ActiveRecord::Schema.define(version: 2021_07_05_091352) do
     t.text "summary"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"
@@ -368,6 +373,7 @@ ActiveRecord::Schema.define(version: 2021_07_05_091352) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
   end
 
@@ -383,6 +389,7 @@ ActiveRecord::Schema.define(version: 2021_07_05_091352) do
     t.boolean "is_used_formula", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 

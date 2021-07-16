@@ -6,6 +6,7 @@ class Session < ApplicationRecord
   include BodyInterface
   include Clone
   include FormulaInterface
+  include Translate
 
   belongs_to :intervention, inverse_of: :sessions, touch: true
   belongs_to :google_tts_voice
@@ -135,6 +136,28 @@ class Session < ApplicationRecord
         end
       end
     end
+  end
+
+  def translate_questions(translator, source_language_name_short, destination_language_name_short)
+    questions.each do |question|
+      question.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
+
+  def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
+    sms_plans.each do |sms_plan|
+      sms_plan.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
+
+  def translate_report_templates(translator, source_language_name_short, destination_language_name_short)
+    report_templates.each do |report_template|
+      report_template.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
+
+  def clear_speech_blocks
+    questions.each(&:clear_audio)
   end
 
   private

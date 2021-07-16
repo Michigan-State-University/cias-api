@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::InterventionSerializer < V1Serializer
-  attributes :name, :user_id, :sessions, :status, :shared_to, :organization_id, :google_language_id
+  attributes :name, :user_id, :sessions, :status, :shared_to, :organization_id, :google_language_id, :original_text
 
   attribute :csv_link do |object|
     newest_csv_link(object) if object.reports.attached?

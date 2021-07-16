@@ -19,6 +19,22 @@ RSpec.describe Question::Finish, type: :model do
           expect(question_finish.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq(nil)
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_finish.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_finish.title).to include('from=>en to=>pl text=>Enter title here')
+        end
+
+        it '#translate_subtitle' do
+          question_finish.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_finish.subtitle).to include('from=>en to=>pl text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>')
+        end
+      end
     end
   end
 end

@@ -19,6 +19,22 @@ RSpec.describe Question::BarGraph, type: :model do
           expect(question_bar_graph.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq(nil)
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_bar_graph.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_bar_graph.title).to include('from=>en to=>pl text=>Bar Graph')
+        end
+
+        it '#translate_subtitle' do
+          question_bar_graph.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_bar_graph.subtitle).to equal(nil)
+        end
+      end
     end
   end
 end

@@ -28,6 +28,22 @@ class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   end
 end
 
+class Google::Cloud::Translate::V2::Translation::Fake
+  class Translator
+    attr_reader :text
+
+    def initialize(text)
+      @text = text
+    end
+  end
+
+  def translate(text, to: nil, from: nil, format: nil, model: nil)
+    raise Google::Cloud::InvalidArgumentError if to.nil?
+
+    Translator.new("from=>#{from} to=>#{to} text=>#{text}")
+  end
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -68,6 +84,9 @@ RSpec.configure do |config|
 
     allow(Google::Cloud::TextToSpeech).to receive(:text_to_speech).and_return(tts_instance)
     allow(tts_instance).to receive(:synthesize_speech).and_return(speech_response_instance)
+
+    google_translator = Google::Cloud::Translate::V2::Translation::Fake.new
+    allow(Google::Cloud::Translate::V2).to receive(:new).and_return(google_translator)
   end
 
   config.before :suite do

@@ -1,3 +1,8 @@
+intervention:
+  original_text:
+    {
+      logo_description: ''
+    }
 session:
   settings:
     narrator:
@@ -25,6 +30,29 @@ question:
     patterns: []
   body:
     data: []
+  original_text:
+    {
+      title : '',
+      subtitle: '',
+      image_description: ''
+    }
+report_template:
+  original_text:
+    {
+      summary : '',
+      name: ''
+    }
+report_template/section:
+  original_text:
+    {
+      title : '',
+      content: ''
+    }
+sms_plan:
+  original_text:
+    {
+      no_formula_text: ''
+    }
 chart:
   formula:
     payload: ''

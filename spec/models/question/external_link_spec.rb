@@ -19,6 +19,22 @@ RSpec.describe Question::ExternalLink, type: :model do
           expect(question_external_link.variable_clone_prefix(%w[clone_external_link_var clone1_external_link_var])).to eq('clone2_external_link_var')
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_external_link.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_external_link.title).to include('from=>en to=>pl text=>External Link')
+        end
+
+        it '#translate_subtitle' do
+          question_external_link.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_external_link.subtitle).to equal(nil)
+        end
+      end
     end
   end
 end

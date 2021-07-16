@@ -43,6 +43,7 @@ Rails.application.routes.draw do
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
+      post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy]
     end
 

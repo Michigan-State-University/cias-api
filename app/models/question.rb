@@ -7,6 +7,7 @@ class Question < ApplicationRecord
   include Clone
   include FormulaInterface
   include BlockHelper
+  include Translate
 
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
@@ -15,6 +16,7 @@ class Question < ApplicationRecord
   attribute :position, :integer, default: 0
   attribute :formula, :json, default: assign_default_values('formula')
   attribute :body, :json, default: assign_default_values('body')
+  attribute :original_text, :json, default: assign_default_values('original_text')
   attribute :duplicated, :boolean, default: false
 
   has_one_attached :image
@@ -79,6 +81,42 @@ class Question < ApplicationRecord
 
   def csv_header_names
     [body_variable['name']]
+  end
+
+  def translate_title(translator, source_language_name_short, destination_language_name_short)
+    original_text['title'] = title
+    new_title = translator.translate(title, source_language_name_short, destination_language_name_short)
+
+    update!(title: new_title)
+  end
+
+  def translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+    original_text['subtitle'] = subtitle
+    new_subtitle = translator.translate(subtitle, source_language_name_short, destination_language_name_short)
+
+    update!(subtitle: new_subtitle)
+  end
+
+  def translate_image_description(translator, source_language_name_short, destination_language_name_short)
+    return unless image.attached?
+
+    original_description = image_blob.description
+    original_text['image_description'] = original_description
+    new_description = translator.translate(original_description, source_language_name_short, destination_language_name_short)
+    image_blob.description = new_description
+
+    image_blob.save!
+  end
+
+  def translate_body(_translator, _source_language_name_short, _destination_language_name_short) end
+
+  def clear_audio
+    narrator['blocks'].each do |block|
+      block['sha256'] = []
+      block['audio_urls'] = []
+    end
+
+    save!
   end
 
   private

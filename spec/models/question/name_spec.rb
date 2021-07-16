@@ -19,6 +19,22 @@ RSpec.describe Question::Name, type: :model do
           expect(question_name.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq(nil)
         end
       end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_name.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_name.title).to include('from=>en to=>pl text=>Name screen')
+        end
+
+        it '#translate_subtitle' do
+          question_name.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_name.subtitle).to equal(nil)
+        end
+      end
     end
   end
 end
