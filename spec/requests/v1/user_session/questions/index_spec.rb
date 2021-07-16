@@ -271,10 +271,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => [{ 'id' => question_feedback.id, 'probability' => '100', 'type' => 'Question' }]
+                                 'target' => [{ 'id' => question_feedback.id, 'probability' => '100',
+                                                'type' => 'Question' }]
                                }
                              ] }
-        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
+                          'variable' => { 'name' => 'test' } }
         question.save
         question
       end
@@ -283,7 +285,9 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     end
 
     context 'response when branching is set to another session' do
-      let!(:other_session) { create(:session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at) }
+      let!(:other_session) do
+        create(:session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at)
+      end
       let!(:other_question_group) { create(:question_group, session_id: other_session.id) }
       let!(:other_question) { create(:question_single, question_group_id: other_question_group.id) }
 
@@ -300,7 +304,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                  'target' => [{ 'id' => other_session.id, 'probability' => '100', 'type' => 'Session' }]
                                }
                              ] }
-        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
+                          'variable' => { 'name' => 'test' } }
         question.save
         question
       end
@@ -387,10 +392,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                              'patterns' => [
                                {
                                  'match' => '=1',
-                                 'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100', 'type' => 'Question' }]
+                                 'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100',
+                                                'type' => 'Question' }]
                                }
                              ] }
-        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }], 'variable' => { 'name' => 'test' } }
+        question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
+                          'variable' => { 'name' => 'test' } }
         question.save
         question
       end
@@ -408,7 +415,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       let(:audio) { create(:audio) }
       let(:audio_id) { audio.id }
       let!(:name_question) { create(:question_name, question_group: question_group, position: 1) }
-      let!(:name_answer) { create(:answer_name, question: name_question, user_session: user_session, created_at: DateTime.now - 1.day, body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] }) }
+      let!(:name_answer) do
+        create(:answer_name, question: name_question, user_session: user_session, created_at: DateTime.now - 1.day,
+                             body: { data: [{ var: '.:name:.', value: { name: 'Michał', phonetic_name: 'Michał' } }] })
+      end
 
       context 'for speech block' do
         let!(:question_with_speech_block) do
@@ -507,7 +517,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
 
         it 'swaps url correctly' do
-          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].second).to eq('phonetic_audio.mp3')
+          expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['audio_urls'].second)
+            .to eq('phonetic_audio.mp3')
         end
 
         it 'swaps name correctly' do

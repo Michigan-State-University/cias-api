@@ -16,7 +16,8 @@ RSpec.describe Question::ParticipantReport, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_participant_report.variable_clone_prefix(%w[clone_free_response_var clone1_free_response_var])).to eq(nil)
+          expect(question_participant_report.variable_clone_prefix(%w[clone_free_response_var
+                                                                      clone1_free_response_var])).to eq(nil)
         end
       end
 

@@ -65,7 +65,9 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       }
     }
   end
-  let(:request) { post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json }
+  let(:request) do
+    post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
+  end
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do
@@ -107,7 +109,10 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         end
 
         it 'has correct patterns data' do
-          expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => [{ 'id' => '', 'type' => 'Question', 'probability' => '100' }])
+          expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5',
+                                                                                           'target' =>
+                                                                                             [{ 'id' => '', 'type' => 'Question',
+                                                                                                'probability' => '100' }])
         end
 
         it 'has correct body data size' do
@@ -115,7 +120,9 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         end
 
         it 'has correct body data attributes' do
-          expect(json_response['data']['attributes']['body']['data'][0]).to include('payload' => 'create1', 'variable' => { 'value' => '1', 'name' => 'test1' })
+          expect(json_response['data']['attributes']['body']['data'][0]).to include('payload' => 'create1',
+                                                                                    'variable' => { 'value' => '1',
+                                                                                                    'name' => 'test1' })
         end
       end
 

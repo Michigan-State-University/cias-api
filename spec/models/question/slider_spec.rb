@@ -16,7 +16,8 @@ RSpec.describe Question::Slider, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_slider.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq('clone2_question_slider_var')
+          expect(question_slider.variable_clone_prefix(%w[clone_question_slider_var
+                                                          clone1_question_slider_var])).to eq('clone2_question_slider_var')
         end
       end
 

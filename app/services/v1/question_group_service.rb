@@ -4,7 +4,8 @@ class V1::QuestionGroupService
   def initialize(user, session_id)
     @user = user
     @session_id = session_id
-    @question_groups = QuestionGroup.includes(:session, :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
+    @question_groups = QuestionGroup.includes(:session,
+                                              :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
   end
 
   attr_reader :user, :session_id
@@ -58,7 +59,8 @@ class V1::QuestionGroupService
     questions_params.each do |question_params|
       Question.create!(question_group_id: question_group.id,
                        position: question_group.questions.last&.position.to_i + 1,
-                       **question_params.permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {}))
+                       **question_params.permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {},
+                                                                                      formula: {}, body: {}))
     end
   end
 end

@@ -16,7 +16,8 @@ RSpec.describe Question::Grid, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_grid.variable_clone_prefix(%w[clone_row1 clone1_row1])[0]['variable']['name']).to eq('clone2_row1')
+          expect(question_grid.variable_clone_prefix(%w[clone_row1
+                                                        clone1_row1])[0]['variable']['name']).to eq('clone2_row1')
         end
       end
 

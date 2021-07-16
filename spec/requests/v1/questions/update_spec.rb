@@ -38,7 +38,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       }
     }
   end
-  let(:request) { patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params, headers: headers }
+  let(:request) do
+    patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params,
+                                                                                                  headers: headers
+  end
 
   context 'when auth' do
     context 'is invalid' do
@@ -57,7 +60,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'when response' do
         context 'is JSON' do
           before do
-            patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers
+            patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id),
+                  headers: headers
           end
 
           it { expect(response.headers['Content-Type']).to eq('application/json; charset=utf-8') }

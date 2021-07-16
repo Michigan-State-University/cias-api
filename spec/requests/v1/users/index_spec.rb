@@ -3,12 +3,16 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/users', type: :request do
-  let(:user) { create(:user, :confirmed, roles: %w[participant admin guest], first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago) }
-  let(:researcher) { create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'mike.Wazowski@test.com', created_at: 4.days.ago) }
+  let(:user) do
+    create(:user, :confirmed, roles: %w[participant admin guest], first_name: 'John', last_name: 'Twain', email: 'john.twain@test.com', created_at: 5.days.ago)
+  end
+  let(:researcher) do
+    create(:user, :confirmed, :researcher, first_name: 'Mike', last_name: 'Wazowski', email: 'mike.Wazowski@test.com', created_at: 4.days.ago)
+  end
   let(:participant) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Lenon', email: 'john.lenon@test.com', created_at: 4.days.ago) }
-  let(:participant_1) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com', created_at: 3.days.ago) }
-  let(:participant_2) { create(:user, :confirmed, :participant, first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@test.com', created_at: 2.days.ago) }
-  let(:participant_3) { create(:user, :confirmed, :participant, first_name: 'Mark', last_name: 'Smith', email: 'mark.smith@test.com', created_at: 1.day.ago) }
+  let(:participant1) { create(:user, :confirmed, :participant, first_name: 'John', last_name: 'Doe', email: 'john.doe@test.com', created_at: 3.days.ago) }
+  let(:participant2) { create(:user, :confirmed, :participant, first_name: 'Jane', last_name: 'Doe', email: 'jane.doe@test.com', created_at: 2.days.ago) }
+  let(:participant3) { create(:user, :confirmed, :participant, first_name: 'Mark', last_name: 'Smith', email: 'mark.smith@test.com', created_at: 1.day.ago) }
   let(:users_deactivated) { create_list(:user, 2, active: false, roles: %w[participant]) }
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_users_path, headers: headers }
@@ -33,7 +37,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     context 'without params' do
       let!(:params) { {} }
 
-      let!(:users) { [participant_3, participant_2, participant_1, researcher, current_user] }
+      let!(:users) { [participant3, participant2, participant1, researcher, current_user] }
 
       before do
         request
@@ -54,7 +58,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with pagination params' do
       let!(:params) { { page: 1, per_page: 2 } }
-      let!(:users) { [participant_3, participant_2] }
+      let!(:users) { [participant3, participant2] }
 
       before { request }
 
@@ -73,7 +77,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with filters params' do
       let!(:params) { { name: 'John', roles: %w[admin participant] } }
-      let!(:users) { [participant_1, user] }
+      let!(:users) { [participant1, user] }
 
       before { request }
 
@@ -116,7 +120,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with filters deactivated users' do
       let(:params) { { active: false } }
-      let(:users) { [participant_1, participant_2, participant_3] }
+      let(:users) { [participant1, participant2, participant3] }
 
       before { request }
 
@@ -150,12 +154,15 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
     let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
     let!(:question) { create(:question_slider, question_group: question_group) }
-    let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: participant_1, session: session)) }
+    let!(:answer) do
+      create(:answer_slider, question: question,
+                             user_session: create(:user_session, user: participant1, session: session))
+    end
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
 
     context 'without params' do
       let!(:params) { {} }
-      let!(:users) { [participant_1] }
+      let!(:users) { [participant1] }
 
       before { request }
 
@@ -174,7 +181,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with pagination params' do
       let!(:params) { { page: 1, per_page: 2 } }
-      let!(:users) { [participant_1] }
+      let!(:users) { [participant1] }
 
       before { request }
 
@@ -193,7 +200,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with filters params' do
       let!(:params) { { name: 'John', roles: %w[admin participant] } }
-      let!(:users) { [participant_1] }
+      let!(:users) { [participant1] }
 
       before { request }
 
@@ -215,7 +222,10 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
       let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
       let!(:question) { create(:question_slider, question_group: question_group) }
-      let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: participant_1, session: session)) }
+      let!(:answer) do
+        create(:answer_slider, question: question,
+                               user_session: create(:user_session, user: participant1, session: session))
+      end
 
       before { request }
 
@@ -229,7 +239,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
       let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
       let!(:question) { create(:question_slider, question_group: question_group) }
-      let!(:answer) {}
+      let!(:answer) { nil }
 
       before { request }
 
@@ -240,10 +250,13 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'when researcher wants to see other researchers from team' do
       let!(:team) { create(:team) }
-      let!(:researcher_1) { create(:user, :confirmed, :researcher, first_name: 'Oliver', last_name: 'Wood', email: 'oliver.Wood@test.com', created_at: 4.days.ago, team_id: team.id) }
+      let!(:researcher1) do
+        create(:user, :confirmed, :researcher, first_name: 'Oliver', last_name: 'Wood', email: 'oliver.Wood@test.com',
+                                               created_at: 4.days.ago, team_id: team.id)
+      end
       let!(:add_current_user_to_team) { researcher.team_id = team.id }
       let!(:params) { { roles: %w[researcher], team_id: team.id } }
-      let!(:users) { [researcher_1, current_user] }
+      let!(:users) { [researcher1, current_user] }
 
       before { request }
 
@@ -293,7 +306,10 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
     let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
     let!(:question) { create(:question_slider, question_group: question_group) }
-    let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant, session: session)) }
+    let!(:answer) do
+      create(:answer_slider, question: question,
+                             user_session: create(:user_session, user: team_participant, session: session))
+    end
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
     let(:expected_users_ids) { [*team1.users.pluck(:id), current_user.id] }
 

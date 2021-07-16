@@ -98,6 +98,7 @@ ActiveRecord::Schema.define(version: 2021_07_14_073541) do
     t.uuid "reporting_dashboard_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.integer "position", default: 1, null: false
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
@@ -168,6 +169,7 @@ ActiveRecord::Schema.define(version: 2021_07_14_073541) do
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
+    t.index ["name", "health_system_id"], name: "index_health_clinics_on_name_and_health_system_id", unique: true
   end
 
   create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -187,6 +189,7 @@ ActiveRecord::Schema.define(version: 2021_07_14_073541) do
     t.uuid "organization_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name", "organization_id"], name: "index_health_systems_on_name_and_organization_id", unique: true
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
@@ -250,6 +253,7 @@ ActiveRecord::Schema.define(version: 2021_07_14_073541) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_organizations_on_name", unique: true
   end
 
   create_table "phones", force: :cascade do |t|

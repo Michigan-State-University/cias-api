@@ -16,7 +16,8 @@ RSpec.describe Question::Name, type: :model do
         end
 
         it 'returns nil with passed taken variables' do
-          expect(question_name.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq(nil)
+          expect(question_name.variable_clone_prefix(%w[clone_question_slider_var
+                                                        clone1_question_slider_var])).to eq(nil)
         end
       end
 

@@ -5,7 +5,8 @@ class V1::AudioController < V1Controller
     text = audio_params[:text]
     language_code = current_language_code
     voice_type = current_voice_type
-    audio_url = V1::AudioService.new(text, preview: true, language_code: language_code, voice_type: voice_type).execute.url
+    audio_url = V1::AudioService.new(text, preview: true, language_code: language_code,
+                                           voice_type: voice_type).execute.url
 
     render json: { url: audio_url }
   end

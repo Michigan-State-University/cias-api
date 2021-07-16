@@ -90,7 +90,8 @@ RSpec.describe 'POST /v1/organizations/:organization_id/dashboard_sections', typ
       end
     end
 
-    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant guest].each do |role|
+    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant
+       guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

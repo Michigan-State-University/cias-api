@@ -25,7 +25,8 @@ RSpec.describe V1::Users::Verifications::Create do
     end
 
     it 'generate new code and send email' do
-      expect(UserMailer).to receive(:send_verification_login_code).with(verification_code: '456', email: user.email).and_return(message_delivery)
+      allow(UserMailer).to receive(:send_verification_login_code).with(verification_code: '456',
+                                                                       email: user.email).and_return(message_delivery)
       subject
       user_verification_codes = user.reload.user_verification_codes
       expect(user_verification_codes.count).to eq 1
@@ -37,7 +38,7 @@ RSpec.describe V1::Users::Verifications::Create do
     let(:verification_code_from_headers) { nil }
 
     it 'generate new code and send email' do
-      expect(UserMailer).to receive(:send_verification_login_code).with(
+      allow(UserMailer).to receive(:send_verification_login_code).with(
         verification_code: '456', email: user.email
       ).and_return(message_delivery)
       subject
@@ -54,7 +55,7 @@ RSpec.describe V1::Users::Verifications::Create do
     end
 
     it 'generate new code and send email' do
-      expect(UserMailer).to receive(:send_verification_login_code).with(
+      allow(UserMailer).to receive(:send_verification_login_code).with(
         verification_code: '456', email: user.email
       ).and_return(message_delivery)
       subject

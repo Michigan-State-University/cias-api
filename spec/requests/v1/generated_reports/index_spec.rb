@@ -17,13 +17,17 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
   context 'when there are generated reports' do
     let!(:intervention_owner) { user }
     let!(:intervention) { create(:intervention, user: intervention_owner) }
-    let!(:session_1) { create(:session, intervention: intervention) }
-    let!(:session_2) { create(:session, intervention: intervention) }
-    let!(:user_session_1) { create(:user_session, user: user, session: session_1) }
-    let!(:user_session_2) { create(:user_session, user: user, session: session_2) }
-    let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant, user_session: user_session_1) }
+    let!(:session1) { create(:session, intervention: intervention) }
+    let!(:session2) { create(:session, intervention: intervention) }
+    let!(:user_session1) { create(:user_session, user: user, session: session1) }
+    let!(:user_session2) { create(:user_session, user: user, session: session2) }
+    let!(:participant_report) do
+      create(:generated_report, :with_pdf_report, :participant, user_session: user_session1)
+    end
     let(:params) { {} }
-    let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session_2) }
+    let!(:third_party_report) do
+      create(:generated_report, :with_pdf_report, :third_party, user_session: user_session2)
+    end
 
     before do
       get v1_generated_reports_path, params: params, headers: headers
@@ -38,8 +42,10 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'reports per session' do
-      let(:params) { { report_for: %w[participant third_party], session_id: session_1.id } }
-      let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session_1) }
+      let(:params) { { report_for: %w[participant third_party], session_id: session1.id } }
+      let!(:third_party_report) do
+        create(:generated_report, :with_pdf_report, :third_party, user_session: user_session1)
+      end
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -70,7 +76,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'report filtred by id_session for participant report' do
-      let(:params) { { report_for: ['participant'], session_id: session_1.id } }
+      let(:params) { { report_for: ['participant'], session_id: session1.id } }
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -83,9 +89,13 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     end
 
     context 'report filtred by id_session for third part report' do
-      let!(:participant_report) { create(:generated_report, :with_pdf_report, :participant, user_session: user_session_1) }
-      let!(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, user_session: user_session_2) }
-      let(:params) { { report_for: %w[participant third_party], session_id: session_2.id } }
+      let!(:participant_report) do
+        create(:generated_report, :with_pdf_report, :participant, user_session: user_session1)
+      end
+      let!(:third_party_report) do
+        create(:generated_report, :with_pdf_report, :third_party, user_session: user_session2)
+      end
+      let(:params) { { report_for: %w[participant third_party], session_id: session2.id } }
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -129,8 +139,14 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     context 'order parameter is asc' do
       let(:params) { { order: 'asc', report_for: %w[participant third_party] } }
-      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago, user_session: user_session_1) }
-      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago, user_session: user_session_1) }
+      let(:participant_report) do
+        create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago,
+                                                                  user_session: user_session1)
+      end
+      let(:third_party_report) do
+        create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago,
+                                                                  user_session: user_session1)
+      end
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -145,8 +161,14 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     context 'order parameter is desc' do
       let(:params) { { order: 'desc', report_for: %w[participant third_party] } }
-      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago, user_session: user_session_1) }
-      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago, user_session: user_session_1) }
+      let(:participant_report) do
+        create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago,
+                                                                  user_session: user_session1)
+      end
+      let(:third_party_report) do
+        create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago,
+                                                                  user_session: user_session1)
+      end
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -161,8 +183,14 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     context 'with pagination' do
       let(:params) { { per_page: 1, order: 'desc', report_for: %w[participant third_party] } }
-      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago, user_session: user_session_1) }
-      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago, user_session: user_session_1) }
+      let(:participant_report) do
+        create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago,
+                                                                  user_session: user_session1)
+      end
+      let(:third_party_report) do
+        create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago,
+                                                                  user_session: user_session1)
+      end
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)
@@ -177,8 +205,14 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
     context 'with pagination and page' do
       let(:params) { { per_page: 1, order: 'desc', page: 2, report_for: %w[participant third_party] } }
-      let(:participant_report) { create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago, user_session: user_session_1) }
-      let(:third_party_report) { create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago, user_session: user_session_1) }
+      let(:participant_report) do
+        create(:generated_report, :with_pdf_report, :participant, created_at: 10.minutes.ago,
+                                                                  user_session: user_session1)
+      end
+      let(:third_party_report) do
+        create(:generated_report, :with_pdf_report, :third_party, created_at: 30.minutes.ago,
+                                                                  user_session: user_session1)
+      end
 
       it 'has correct http code :ok' do
         expect(response).to have_http_status(:ok)

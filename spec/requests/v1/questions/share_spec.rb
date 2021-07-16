@@ -6,8 +6,8 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
   let(:team) { team_admin.admins_teams.first }
   let(:user) { create(:user, :confirmed, :researcher, team_id: team.id) }
-  let(:researcher_1) { create(:user, :confirmed, roles: %w[participant researcher guest], team_id: team.id) }
-  let(:researcher_2) { create(:user, :confirmed, :researcher, team_id: team.id) }
+  let(:researcher1) { create(:user, :confirmed, roles: %w[participant researcher guest], team_id: team.id) }
+  let(:researcher2) { create(:user, :confirmed, :researcher, team_id: team.id) }
 
   let(:intervention) { create(:intervention, user: user) }
   let(:session) { create(:session, intervention: intervention) }
@@ -19,7 +19,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
   let(:params) do
     {
       ids: questions.pluck(:id)[1, 2] << other_questions.pluck(:id)[1],
-      researcher_ids: [researcher_1.id, researcher_2.id]
+      researcher_ids: [researcher1.id, researcher2.id]
     }
   end
   let(:headers) { user.create_new_auth_token }
@@ -47,31 +47,31 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
       end
 
       shared_examples 'records are created' do
-        let(:researcher_1_last_intervention) { researcher_1.interventions.reload.last }
-        let(:researcher_1_last_session) { researcher_1_last_intervention.sessions.last }
-        let(:researcher_1_first_question_group) { researcher_2_last_session.question_groups.first }
+        let(:researcher1_last_intervention) { researcher1.interventions.reload.last }
+        let(:researcher1_last_session) { researcher1_last_intervention.sessions.last }
+        let(:researcher1_first_question_group) { researcher_2_last_session.question_groups.first }
 
-        let(:researcher_2_last_intervention) { researcher_2.interventions.reload.last }
+        let(:researcher_2_last_intervention) { researcher2.interventions.reload.last }
         let(:researcher_2_last_session) { researcher_2_last_intervention.sessions.last }
         let(:researcher_2_first_question_group) { researcher_2_last_session.question_groups.first }
 
         it 'researchers have new intervention with proper name' do
-          expect(researcher_1_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{user.full_name}")
+          expect(researcher1_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{user.full_name}")
           expect(researcher_2_last_intervention.attributes).to include('name' => "Copy of #{intervention.name} from #{user.full_name}")
         end
 
         it 'researchers have new session with proper name' do
-          expect(researcher_1_last_session.attributes).to include('name' => 'Copied Session')
+          expect(researcher1_last_session.attributes).to include('name' => 'Copied Session')
           expect(researcher_2_last_session.attributes).to include('name' => 'Copied Session')
         end
 
         it 'researchers have new question_group with proper title' do
-          expect(researcher_1_first_question_group.attributes).to include('title' => 'Copied Slides')
+          expect(researcher1_first_question_group.attributes).to include('title' => 'Copied Slides')
           expect(researcher_2_first_question_group.attributes).to include('title' => 'Copied Slides')
         end
 
         it 'researchers have proper number of questions' do
-          expect(researcher_1_first_question_group.questions.count).to be(3)
+          expect(researcher1_first_question_group.questions.count).to be(3)
           expect(researcher_2_first_question_group.questions.count).to be(3)
         end
       end
@@ -114,7 +114,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
           let(:params) do
             {
               ids: questions.pluck(:id)[1, 2],
-              researcher_ids: [researcher_1.id, other_researcher.id]
+              researcher_ids: [researcher1.id, other_researcher.id]
             }
           end
 
@@ -161,7 +161,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
               let(:params) do
                 {
                   ids: questions.pluck(:id)[1, 2],
-                  researcher_ids: [researcher_1.id, team_admin.id]
+                  researcher_ids: [researcher1.id, team_admin.id]
                 }
               end
 
@@ -175,15 +175,17 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
             end
 
             context 'one question doesn\'t belong to current researcher' do
-              let(:researcher_1_intervention) { create(:intervention, user: researcher_1) }
-              let(:researcher_1_session) { create(:session, intervention: researcher_1_intervention) }
-              let(:researcher_1_question_group) { create(:question_group, session: researcher_1_session) }
-              let(:researcher_1_questions) { create_list(:question_single, 3, question_group: researcher_1_question_group) }
+              let(:researcher1_intervention) { create(:intervention, user: researcher1) }
+              let(:researcher1_session) { create(:session, intervention: researcher1_intervention) }
+              let(:researcher1_question_group) { create(:question_group, session: researcher1_session) }
+              let(:researcher1_questions) do
+                create_list(:question_single, 3, question_group: researcher1_question_group)
+              end
 
               let(:params) do
                 {
-                  ids: questions.pluck(:id)[1, 2] << researcher_1_questions.pluck(:id)[1],
-                  researcher_ids: [researcher_1.id, researcher_2.id]
+                  ids: questions.pluck(:id)[1, 2] << researcher1_questions.pluck(:id)[1],
+                  researcher_ids: [researcher1.id, researcher2.id]
                 }
               end
 
@@ -216,7 +218,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
               context 'only researchers_ids are given' do
                 let(:params) do
                   {
-                    researcher_ids: [researcher_1.id, researcher_2.id]
+                    researcher_ids: [researcher1.id, researcher2.id]
                   }
                 end
 

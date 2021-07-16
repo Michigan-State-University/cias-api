@@ -272,7 +272,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       it 'save variable and the clicking on the link to csv' do
         subject.collect
         expect(subject.header).to eq [:user_id, :email, 'date']
-        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12']]
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s,
+                                     '2012-12-12']]
       end
     end
 
@@ -301,7 +302,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       it 'save variable and the value to csv' do
         subject.collect
         expect(subject.header).to eq [:user_id, :email, 'phone']
-        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123']]
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s,
+                                     '+48123123123']]
       end
     end
 
@@ -368,21 +370,21 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           ]
         }
       end
-      let!(:question_1) do
+      let!(:question1) do
         create(:question_single, question_group: question_group, body: question_1_body, position: 1)
       end
-      let!(:question_2) do
+      let!(:question2) do
         create(:question_multiple, question_group: question_group, body: question_2_body, position: 2)
       end
-      let!(:question_3) { create(:question_name, position: 3) }
+      let!(:question3) { create(:question_name, position: 3) }
       let!(:questions) do
-        Question.joins(:question_group).where(id: [question_1.id, question_2.id, question_3.id]).order(:position)
+        Question.joins(:question_group).where(id: [question1.id, question2.id, question3.id]).order(:position)
       end
-      let!(:answer_1) do
-        create(:answer_single, question: question_1, body: answer_1_body, user_session: user_session)
+      let!(:answer1) do
+        create(:answer_single, question: question1, body: answer_1_body, user_session: user_session)
       end
-      let!(:answer_2) do
-        create(:answer_name, user_session: user_session, question: question_3, body: { data: [
+      let!(:answer2) do
+        create(:answer_name, user_session: user_session, question: question3, body: { data: [
                  { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
                ] })
       end
@@ -392,8 +394,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         expect(subject.header).to eq [:user_id, :email, 'var_1', 'var_2', 'var_3', 'phoneticName']
         expect(subject.rows).to eq [
           [
-            answer_1.user_session.user_id.to_s,
-            answer_1.user_session.user.email.to_s,
+            answer1.user_session.user_id.to_s,
+            answer1.user_session.user.email.to_s,
             '1', nil, nil, { 'name' => 'John', 'phoneticName' => 'John' }
           ]
         ]
@@ -403,16 +405,16 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
     context 'when we have the two sessions of the same intervention' do
       let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
       let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
-      let!(:question_2) { create(:question_single, question_group: question_group_2, body: question_body_2) }
-      let!(:answer_2) do
-        create(:answer_single, question: question_2, body: answer_body_2, user_session: user_session_2)
+      let!(:question2) { create(:question_single, question_group: question_group2, body: question_body2) }
+      let!(:answer2) do
+        create(:answer_single, question: question2, body: answer_body2, user_session: user_session2)
       end
       let!(:questions) do
-        Question.joins(:question_group).where(id: [question.id, question_2.id]).order(:position)
+        Question.joins(:question_group).where(id: [question.id, question2.id]).order(:position)
       end
-      let!(:session_2) { create(:session, intervention: intervention) }
-      let!(:user_session_2) { create(:user_session, user: user, session: session_2) }
-      let!(:question_group_2) { create(:question_group_plain, session: session_2) }
+      let!(:session2) { create(:session, intervention: intervention) }
+      let!(:user_session2) { create(:user_session, user: user, session: session2) }
+      let!(:question_group2) { create(:question_group_plain, session: session2) }
       let(:question_body) do
         {
           'data' => [
@@ -432,7 +434,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           ]
         }
       end
-      let(:question_body_2) do
+      let(:question_body2) do
         {
           'data' => [
             { 'value' => '3', 'payload' => '' },
@@ -441,7 +443,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           'variable' => { 'name' => 'test_2' }
         }
       end
-      let(:answer_body_2) do
+      let(:answer_body2) do
         {
           'data' => [
             {

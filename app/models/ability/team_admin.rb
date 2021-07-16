@@ -19,7 +19,8 @@ class Ability::TeamAdmin < Ability::Base
     can :manage, Session, intervention: { user_id: team_members_ids }
     can :create, Invitation
     can %i[read update destroy], Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability).ids
-    can %i[read update destroy], Invitation, invitable_type: 'Intervention', invitable_id: Intervention.accessible_by(ability).ids
+    can %i[read update destroy], Invitation, invitable_type: 'Intervention',
+                                             invitable_id: Intervention.accessible_by(ability).ids
     can :manage, QuestionGroup, session: { intervention: { user_id: team_members_ids } }
     can :manage, Question, question_group: { session: { intervention: { user_id: team_members_ids } } }
     can :manage, Answer, question: { question_group: { session: { intervention: { user_id: team_members_ids } } } }

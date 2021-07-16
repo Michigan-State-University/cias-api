@@ -27,9 +27,13 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
         narrator: {
           blocks: [
             {
-              text: ['Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.', 'Working together as an interdisciplinary team, many highly trained health professionals'],
-              sha256: %w[80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2 cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046],
-              audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3', 'spec/factories/audio/cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046.mp3'],
+              text: [
+                'Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.', 'Working together as an interdisciplinary team, many highly trained health professionals'
+              ],
+              sha256: %w[80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2
+                         cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046],
+              audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3',
+                           'spec/factories/audio/cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046.mp3'],
               type: 'Speech'
             },
             {
@@ -123,9 +127,12 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
             {
               text: ['Farewell.', 'Mind yourself.'],
               type: 'Speech',
-              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87 7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
+              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87
+                         7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
               animation: '',
-              audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
+              audio_urls: [
+                '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3'
+              ]
             },
             {
               text: ["That chip of yours, I wouldn't wager it on Blackjack...Unless the dealer has a five of six showing."],
@@ -210,9 +217,12 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
             {
               text: ['Farewell.', 'Mind yourself.'],
               type: 'Speech',
-              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87 7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
+              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87
+                         7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
               animation: '',
-              audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
+              audio_urls: [
+                '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3'
+              ]
             },
             {
               text: [],
@@ -270,7 +280,9 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
                     'Hello'
                   ],
                   sha256: [],
-                  audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
+                  audio_urls: [
+                    '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3'
+                  ]
                 }
               ],
               animation: 'rest',
@@ -332,9 +344,12 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
             {
               text: ['Farewell.', 'Mind yourself.'],
               type: 'Speech',
-              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87 7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
+              sha256: %w[52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87
+                         7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d],
               animation: '',
-              audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3']
+              audio_urls: [
+                '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3', '/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWt3WWpnNFpEUTVOQzFsTlRBMExUUmxaV1l0T1RNNE1TMWlZbVprWkRKaE4yRTJOalFHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--eb8a91e9b042434f6142608b388efe99b5a266d7/7bffc2b191a07860fbcaae942775be40389b953b290aa774dbeabf57b57ba59d.mp3'
+              ]
             }
           ],
           settings: {
@@ -417,7 +432,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
   let(:narrator) { json_response['data']['attributes']['narrator'] }
 
   before do
-    patch v1_question_group_question_path(question_group_id: question_group_id, id: question_id), headers: headers, params: params, as: :json
+    patch v1_question_group_question_path(question_group_id: question_group_id, id: question_id), headers: headers,
+                                                                                                  params: params, as: :json
   end
 
   context 'switching narrator' do

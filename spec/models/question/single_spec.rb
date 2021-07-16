@@ -17,7 +17,8 @@ RSpec.describe Question::Single, type: :model do
           end
 
           it 'sets correct variable with passed taken variables' do
-            expect(question_single.variable_clone_prefix(%w[clone_single_var clone1_single_var])).to eq('clone2_single_var')
+            expect(question_single.variable_clone_prefix(%w[clone_single_var
+                                                            clone1_single_var])).to eq('clone2_single_var')
           end
         end
       end

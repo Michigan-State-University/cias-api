@@ -4,7 +4,9 @@ RSpec.describe V1::UserSessionScheduleService do
   let!(:intervention) { create(:intervention, :published) }
   let!(:user) { create(:user, :participant) }
   let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formula: formula) }
-  let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at) }
+  let!(:second_session) do
+    create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at)
+  end
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Health Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Heath System', organization: organization) }
@@ -57,8 +59,8 @@ RSpec.describe V1::UserSessionScheduleService do
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                     .with(second_session.id, user.id, user_session.health_clinic)
-                                                     .at(a_value_within(1.second).of(expected_timestamp))
+                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .at(a_value_within(1.second).of(expected_timestamp))
             end
           end
 
@@ -110,8 +112,8 @@ RSpec.describe V1::UserSessionScheduleService do
 
               it 'schedules on correct time' do
                 expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                             .with(second_session.id, user.id, user_session.health_clinic)
-                                                                             .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
+                                                                           .with(second_session.id, user.id, user_session.health_clinic)
+                                                                           .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
               end
             end
 

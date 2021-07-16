@@ -7,10 +7,10 @@ RSpec.describe V1::QuestionService do
     let(:user) { create(:user, :confirmed, :admin) }
     let(:session) { create(:session, intervention: create(:intervention, user: user)) }
     let!(:question_group) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
-    let!(:question_group_2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
+    let!(:question_group2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
 
     let!(:questions) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group) }
-    let!(:questions_2) { create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group_2) }
+    let!(:questions2) { create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group2) }
     let(:question_ids) { questions.pluck(:id) }
 
     context 'questions are from one question group' do
@@ -34,7 +34,7 @@ RSpec.describe V1::QuestionService do
     end
 
     context 'questions are from different question groups' do
-      let(:question_ids) { [questions.first.id, questions_2.first.id] }
+      let(:question_ids) { [questions.first.id, questions2.first.id] }
       let(:copied_questions) { Question.where(id: question_ids) }
       let(:result) { subject.clone_multiple(session.id, question_ids) }
 
@@ -90,11 +90,15 @@ RSpec.describe V1::QuestionService do
       context 'specific question type can appear only once per session' do
         let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
         let!(:session_id) { session.id }
-        let!(:question_group_1) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
-        let!(:question_group_2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
+        let!(:question_group1) do
+          create(:question_group_plain, title: 'Question Group Title', position: 1, session: session)
+        end
+        let!(:question_group2) do
+          create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session)
+        end
 
-        let!(:question) { create(:question_name, title: 'Name::Question', question_group: question_group_1) }
-        let!(:question_2) { create(:question_name, title: 'Name::Question', question_group: question_group_2) }
+        let!(:question) { create(:question_name, title: 'Name::Question', question_group: question_group1) }
+        let!(:question2) { create(:question_name, title: 'Name::Question', question_group: question_group2) }
         let(:question_ids) { [question.id] }
 
         let(:result) do
@@ -105,12 +109,12 @@ RSpec.describe V1::QuestionService do
 
         it 'return warning when copied question is Question::Name' do
           expect(result).to eq('Question::Name can appear only once per session')
-          expect(question_group_1.reload.questions.size).to be(1)
+          expect(question_group1.reload.questions.size).to be(1)
         end
 
         context 'one of questions is Question::Name' do
-          let!(:question_3) { create(:question_single, title: 'Single::Question', question_group: question_group_2) }
-          let(:question_ids) { [question.id, question_3.id] }
+          let!(:question3) { create(:question_single, title: 'Single::Question', question_group: question_group2) }
+          let(:question_ids) { [question.id, question3.id] }
 
           it 'return appropriate message' do
             expect(result).to eq('Question::Name can appear only once per session')

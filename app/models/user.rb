@@ -21,7 +21,8 @@ class User < ApplicationRecord
   include EnumerateForConcern
 
   # Order of roles is important because final authorization is the sum of all roles
-  APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin organization_admin researcher e_intervention_admin team_admin admin].freeze
+  APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
+                 organization_admin researcher e_intervention_admin team_admin admin].freeze
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
@@ -129,8 +130,6 @@ class User < ApplicationRecord
     roles.include?('guest') || roles.include?('preview_session')
   end
 
-  private
-
   def self.users_for_researcher(params, scope)
     if params[:roles]&.include?('researcher')
       scope.researchers.from_team(params[:team_id])
@@ -138,6 +137,8 @@ class User < ApplicationRecord
       scope.participants
     end
   end
+
+  private
 
   def team_admin?
     roles.include?('team_admin')
@@ -155,4 +156,6 @@ class User < ApplicationRecord
 
     self.tokens = {}
   end
+
+  private_class_method :users_for_researcher
 end

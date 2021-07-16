@@ -20,7 +20,8 @@ class V1::QuestionGroupsController < V1Controller
     qg_id = question_group_service.create(question_group_params, question_ids, new_questions_params)
     SqlQuery.new('question_group/question_group_pure_empty').execute
 
-    render json: question_group_response(question_group_service.question_group_load(qg_id).reload), action: :show, status: :created
+    render json: question_group_response(question_group_service.question_group_load(qg_id).reload), action: :show,
+           status: :created
   end
 
   def update

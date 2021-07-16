@@ -13,7 +13,9 @@ class Ability::HealthSystemAdmin < Ability::Base
     can :read, DashboardSection, reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } }
     can :read, HealthSystem, health_system_admins: { id: user.id }
     can :read, ReportingDashboard, organization: { health_systems: { health_system_admins: { id: user.id } } }
-    can :read, Chart, dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } } }
-    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } } } }
+    can :read, Chart,
+        dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } } }
+    can :read, ChartStatistic,
+        chart: { dashboard_section: { reporting_dashboard: { organization: { health_systems: { health_system_admins: { id: user.id } } } } } }
   end
 end

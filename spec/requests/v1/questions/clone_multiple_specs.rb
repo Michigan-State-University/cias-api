@@ -6,10 +6,14 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
-  let!(:question_group_2) { create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session) }
+  let!(:question_group2) do
+    create(:question_group_plain, title: 'Question Group 2 Title', position: 2, session: session)
+  end
 
   let!(:questions) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group) }
-  let!(:questions_2) { create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group_2) }
+  let!(:questions2) do
+    create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group_2)
+  end
 
   let(:question_ids) { questions.pluck(:id) }
   let(:headers) { user.create_new_auth_token }
@@ -75,7 +79,7 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
       end
 
       context 'questions are from different question_groups' do
-        let(:question_ids) { [questions.last.id, questions_2.last.id] }
+        let(:question_ids) { [questions.last.id, questions2.last.id] }
 
         before { request }
 

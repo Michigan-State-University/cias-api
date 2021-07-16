@@ -46,7 +46,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
         end
 
         it 'creates invitation for the existing researcher' do
-          expect(TeamMailer).to receive(:invite_user).with(
+          allow(TeamMailer).to receive(:invite_user).with(
             email: researcher.email,
             team: team,
             invitation_token: token
@@ -139,7 +139,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
           end
 
           it 'creates invitation for the existing researcher' do
-            expect(TeamMailer).to receive(:invite_user).with(
+            allow(TeamMailer).to receive(:invite_user).with(
               email: researcher.email,
               team: team,
               invitation_token: token

@@ -7,7 +7,9 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization) }
+  let!(:health_system) do
+    create(:health_system, :with_health_system_admin, name: 'Health System 1', organization: organization)
+  end
   let!(:health_clinic) { create(:health_clinic, name: 'Health Clinic', health_system: health_system) }
   let!(:deleted_health_clinic) { create(:health_clinic, name: 'Deleted Health Clinic', health_system: health_system, deleted_at: Time.current) }
 
@@ -116,7 +118,8 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
       end
     end
 
-    %i[health_system_admin organization_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest
+       health_clinic_admin].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
