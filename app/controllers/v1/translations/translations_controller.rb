@@ -6,7 +6,7 @@ class V1::Translations::TranslationsController < V1Controller
 
     intervention = find_intervention(intervention_id)
     translated_intervention = V1::Translations::Intervention.call(intervention, destination_language_id, destination_tts_language_id)
-    render json: serialized_response(translated_intervention,'Intervention'), status: :created
+    render json: serialized_response(translated_intervention, 'Intervention'), status: :created
   end
 
   private
