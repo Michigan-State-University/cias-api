@@ -18,10 +18,20 @@ class V1::UserSessions::AnswersController < V1Controller
     render json: serialized_response(answer), status: :created
   end
 
+  def user_answers
+    authorize! :get_user_answers, Answer
+
+    render json: serialized_response(user_session_answers_scope)
+  end
+
   private
 
   def answers_scope
     Answer.includes(:question, :user_session).accessible_by(current_ability).where(user_session_id: user_session_id)
+  end
+
+  def user_session_answers_scope
+    Answer.accessible_by(current_ability).where(user_session_id: user_session_id)
   end
 
   def answer_load

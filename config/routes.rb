@@ -114,6 +114,7 @@ Rails.application.routes.draw do
     resources :user_sessions, only: %i[create] do
       resources :questions, only: %i[index], module: 'user_sessions'
       resources :answers, only: %i[index show create], module: 'user_sessions'
+      get 'user_answers', to: 'user_sessions/answers#user_answers'
     end
 
     resources :teams, only: %i[index show create update destroy] do
