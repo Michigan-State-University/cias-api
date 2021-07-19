@@ -14,7 +14,9 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
   end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
+  end
   let!(:new_organization_admin) { create(:user, :confirmed, :organization_admin) }
   let!(:organization_admin_to_remove) { organization.organization_admins.first }
   let(:admins_ids) { organization.reload.organization_admins.pluck(:id) }
@@ -62,7 +64,8 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
               'name' => 'Oregano Public Health'
             },
             'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
-                                 'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id, 'type' => 'user' }] },
+                                 'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id,
+                                                                         'type' => 'user' }] },
                                  'health_clinics' => { 'data' => [] },
                                  'health_systems' => { 'data' => [] } }
           }

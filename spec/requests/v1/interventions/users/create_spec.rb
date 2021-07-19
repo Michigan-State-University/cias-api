@@ -16,7 +16,10 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request d
     }
   end
 
-  let(:request) { post v1_intervention_invitations_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
+  let(:request) do
+    post v1_intervention_invitations_path(intervention_id: intervention.id), params: params,
+                                                                             headers: user.create_new_auth_token
+  end
 
   context 'create user access' do
     %w[draft published].each do |status|

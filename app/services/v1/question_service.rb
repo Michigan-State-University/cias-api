@@ -2,11 +2,13 @@
 
 class V1::QuestionService < V1::Question::BaseService
   def question_groups_scope(session_id)
-    Session.includes(%i[question_groups questions]).accessible_by(user.ability).find(session_id).question_groups.order(:position)
+    Session.includes(%i[question_groups
+                        questions]).accessible_by(user.ability).find(session_id).question_groups.order(:position)
   end
 
   def questions_scope_by_session(session_id)
-    Session.includes(%i[question_groups questions]).accessible_by(user.ability).find(session_id).questions.order(:position)
+    Session.includes(%i[question_groups
+                        questions]).accessible_by(user.ability).find(session_id).questions.order(:position)
   end
 
   def create(question_group_id, question_params)
@@ -61,7 +63,11 @@ class V1::QuestionService < V1::Question::BaseService
     question_group_questions = question_group.questions
 
     questions.each do |question|
-      raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_must_be_unique(question)
+      if question_type_must_be_unique(question)
+        raise ActiveRecord::RecordNotUnique,
+              (I18n.t 'activerecord.errors.models.question_group.question',
+                      question_type: question.type)
+      end
 
       cloned = question.clone
       cloned.position = question_group_questions.last&.position.to_i + 1

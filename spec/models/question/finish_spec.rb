@@ -16,7 +16,8 @@ RSpec.describe Question::Finish, type: :model do
         end
 
         it 'returns nil with passed taken variables' do
-          expect(question_finish.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq(nil)
+          expect(question_finish.variable_clone_prefix(%w[clone_question_slider_var
+                                                          clone1_question_slider_var])).to eq(nil)
         end
       end
 
@@ -32,7 +33,7 @@ RSpec.describe Question::Finish, type: :model do
 
         it '#translate_subtitle' do
           question_finish.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-          expect(question_finish.subtitle).to include('from=>en to=>pl text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>')
+          expect(question_finish.subtitle).to include('from=>en to=>pl text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>') # rubocop:disable Layout/LineLength
         end
       end
     end

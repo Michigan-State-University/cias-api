@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', type: :request do
-  let(:user) { create(:user, :confirmed, :researcher) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
   let(:user) { researcher }
@@ -14,7 +13,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     }
   end
   let!(:intervention) { create(:intervention, user: user) }
-  let!(:intervention_2) { create(:intervention, user: user) }
+  let!(:intervention2) { create(:intervention, user: user) }
   let(:other_session) { create(:session, intervention: intervention) }
   let!(:session) do
     create(:session, intervention: intervention,
@@ -27,15 +26,20 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
   let!(:params) do
     {
-      new_intervention_id: intervention_2.id
+      new_intervention_id: intervention2.id
     }
   end
   let!(:headers) { user.create_new_auth_token }
-  let(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
+  let(:request) do
+    post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params,
+                                                                                                   headers: headers
+  end
 
   context 'when auth' do
     context 'is invalid' do
-      let!(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params }
+      let!(:request) do
+        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params
+      end
 
       it_behaves_like 'unauthorized user'
     end
@@ -49,12 +53,12 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
           it 'session is duplicated' do
             expect(json_response['data']['attributes']).to include(
-              'intervention_id' => intervention_2.id,
-              'position' => intervention_2.sessions.size,
+              'intervention_id' => intervention2.id,
+              'position' => intervention2.sessions.size,
               'name' => session.name,
               'schedule' => session.schedule,
               'schedule_payload' => session.schedule_payload,
-              'variable' => "duplicated_#{session.variable}_#{intervention_2.sessions.last&.position.to_i}"
+              'variable' => "duplicated_#{session.variable}_#{intervention2.sessions.last&.position.to_i}"
             )
           end
 
@@ -86,7 +90,8 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
   context 'when intervention_id is invalid' do
     before do
-      post v1_intervention_duplicate_session_path(intervention_id: 9000, id: session.id), params: params, headers: headers
+      post v1_intervention_duplicate_session_path(intervention_id: 9000, id: session.id), params: params,
+                                                                                          headers: headers
     end
 
     it 'error message is expected' do
@@ -96,7 +101,8 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
   context 'when session_id is invalid' do
     before do
-      post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: 9000), params: params, headers: headers
+      post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: 9000), params: params,
+                                                                                               headers: headers
     end
 
     it 'error message is expected' do
@@ -112,7 +118,8 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     end
 
     before do
-      post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
+      post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params,
+                                                                                                     headers: headers
     end
 
     it 'error message is expected' do
@@ -123,15 +130,16 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   context 'when all params are valid and response' do
     context 'is success' do
       before do
-        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
+        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params,
+                                                                                                       headers: headers
       end
 
       it { expect(response).to have_http_status(:created) }
 
       it 'session is duplicated' do
         expect(json_response['data']['attributes']).to include(
-          'intervention_id' => intervention_2.id,
-          'position' => intervention_2.sessions.size,
+          'intervention_id' => intervention2.id,
+          'position' => intervention2.sessions.size,
           'name' => session.name,
           'schedule' => session.schedule,
           'schedule_payload' => session.schedule_payload

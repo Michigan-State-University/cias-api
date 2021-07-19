@@ -5,7 +5,10 @@ require 'rails_helper'
 RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
-  let(:other_user) { create(:user, :confirmed, :participant, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:other_user) do
+    create(:user, :confirmed, :participant,
+           avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+  end
   let(:user_id) { current_user.id }
   let(:users) do
     {
@@ -59,7 +62,10 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   end
 
   context 'when current_user is researcher' do
-    let(:current_user) { create(:user, :confirmed, :researcher, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+    let(:current_user) do
+      create(:user, :confirmed, :researcher,
+             avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+    end
 
     context 'when current_user updates own avatar' do
       it { expect(response).to have_http_status(:ok) }
@@ -88,7 +94,10 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   end
 
   context 'when current_user is participant' do
-    let(:current_user) { create(:user, :confirmed, :participant, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+    let(:current_user) do
+      create(:user, :confirmed, :participant,
+             avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+    end
 
     context 'when current_user updates own avatar' do
       it { expect(response).to have_http_status(:ok) }
@@ -113,7 +122,10 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
   end
 
   context 'when current_user is guest' do
-    let(:current_user) { create(:user, :confirmed, :guest, avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+    let(:current_user) do
+      create(:user, :confirmed, :guest,
+             avatar: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+    end
 
     context 'when current_user updates own avatar' do
       it { expect(response).to have_http_status(:ok) }

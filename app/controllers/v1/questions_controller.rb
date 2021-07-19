@@ -38,7 +38,7 @@ class V1::QuestionsController < V1Controller
       values: position_params[:position]
     ).execute
     question_groups = question_service.question_groups_scope(session_id)
-    render json: serialized_response(question_groups, from_model = 'QuestionGroup')
+    render json: serialized_response(question_groups, 'QuestionGroup')
   end
 
   def share
@@ -92,7 +92,8 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, narrator: {}, settings: {}, formula: {}, body: {})
+    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, narrator: {},
+                                                                                               settings: {}, formula: {}, body: {})
   end
 
   def position_params

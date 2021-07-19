@@ -27,7 +27,9 @@ RSpec.describe Calculations::DentakuService do
     let(:call) { subject.store_and_transform_values }
 
     it 'changes dentaku calculator memory' do
-      expect { call }.to change(dentaku_calculator, :memory).from({}).to({ 'var1' => 5, 'var2' => 5, 'var3' => 10, 'var4' => 5 })
+      expect do
+        call
+      end.to change(dentaku_calculator, :memory).from({}).to({ 'var1' => 5, 'var2' => 5, 'var3' => 10, 'var4' => 5 })
     end
 
     context 'all_var_values are empty' do

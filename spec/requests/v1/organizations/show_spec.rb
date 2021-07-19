@@ -14,7 +14,9 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
   end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
+  end
   let!(:health_system) { create(:health_system, :with_clinics, organization: organization) }
   let!(:deleted_health_system) { create(:health_system, organization: organization, deleted_at: Time.current, name: 'Deleted health system') }
   let!(:deleted_health_clinic) { create(:health_clinic, health_system: deleted_health_system, deleted_at: Time.current, name: 'Deleted healt clinic') }

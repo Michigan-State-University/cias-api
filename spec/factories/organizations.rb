@@ -14,7 +14,8 @@ FactoryBot.define do
 
     trait :with_e_intervention_admin do
       after(:build) do |organization|
-        organization.e_intervention_admins << create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id)
+        organization.e_intervention_admins << create(:user, :confirmed, :e_intervention_admin,
+                                                     organizable_id: organization.id)
       end
     end
 

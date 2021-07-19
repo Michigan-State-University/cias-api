@@ -72,7 +72,8 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
 
     context 'guest does not want to receive the report' do
       before do
-        answer_participant_report.update(body: { data: [{ value: { receive_report: false, email: 'johhny@example.com' } }] })
+        answer_participant_report.update(body: { data: [{ value: { receive_report: false,
+                                                                   email: 'johhny@example.com' } }] })
       end
 
       it 'does not create new user, does not share report with the user' do

@@ -17,7 +17,8 @@ RSpec.describe Question::FreeResponse, type: :model do
           end
 
           it 'sets correct variable with passed taken variables' do
-            expect(question_free_response.variable_clone_prefix(%w[clone_free_response_var clone1_free_response_var])).to eq('clone2_free_response_var')
+            expect(question_free_response.variable_clone_prefix(%w[clone_free_response_var
+                                                                   clone1_free_response_var])).to eq('clone2_free_response_var')
           end
         end
 

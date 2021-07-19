@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_intervention_admin', type: :request do
   let(:request) do
-    post v1_organization_invitations_invite_intervention_admin_path(organization_id: organization.id), params: params, headers: headers
+    post v1_organization_invitations_invite_intervention_admin_path(organization_id: organization.id), params: params,
+                                                                                                       headers: headers
   end
   let!(:organization) { create(:organization, :with_organization_admin) }
   let(:headers) { user.create_new_auth_token }
@@ -47,7 +48,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         end
 
         it 'creates invitation for the existing e-intervention admin' do
-          expect(OrganizableMailer).to receive(:invite_user).with(
+          allow(OrganizableMailer).to receive(:invite_user).with(
             email: intervention_admin.email,
             organizable: organization,
             invitation_token: token,
@@ -131,7 +132,8 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         context 'and has been accepted' do
           let(:params) { { email: intervention_admin.email } }
           let!(:accepted_organization_invitation) do
-            create(:organization_invitation, :accepted, organization_id: organization.id, user_id: intervention_admin.id)
+            create(:organization_invitation, :accepted, organization_id: organization.id,
+                                                        user_id: intervention_admin.id)
           end
           let(:new_organization_invitation) { OrganizationInvitation.order(created_at: :desc).first }
           let(:token) { SecureRandom.hex }
@@ -142,7 +144,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
           end
 
           it 'creates invitation for the existing intervention_admin' do
-            expect(OrganizableMailer).to receive(:invite_user).with(
+            allow(OrganizableMailer).to receive(:invite_user).with(
               email: intervention_admin.email,
               organizable: organization,
               invitation_token: token,

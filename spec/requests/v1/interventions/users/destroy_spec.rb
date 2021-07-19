@@ -7,7 +7,10 @@ describe 'DELETE /v1/interventions/:intervention_id/users/:id', type: :request d
   let!(:participant) { create(:user, :participant) }
   let!(:intervention) { create(:intervention, user_id: user.id, invitations: [user_with_access]) }
   let!(:user_with_access) { create(:intervention_invitation) }
-  let(:request) { delete v1_intervention_invitation_path(intervention_id: intervention.id, id: user_with_access.id), headers: user.create_new_auth_token }
+  let(:request) do
+    delete v1_intervention_invitation_path(intervention_id: intervention.id, id: user_with_access.id),
+           headers: user.create_new_auth_token
+  end
 
   context 'remove user with access' do
     before do

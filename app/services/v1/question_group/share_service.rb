@@ -6,7 +6,8 @@ class V1::QuestionGroup::ShareService
     @session = Session.accessible_by(user.ability).find(session_id)
     @intervention = Intervention.accessible_by(user.ability).find(session.intervention_id)
     @all_user_questions = Question.accessible_by(user.ability)
-    @question_groups = QuestionGroup.includes(:session, :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
+    @question_groups = QuestionGroup.includes(:session,
+                                              :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
   end
 
   attr_reader :user, :intervention, :session, :all_user_questions
@@ -65,9 +66,16 @@ class V1::QuestionGroup::ShareService
   end
 
   def validate_uniqueness(question, question_group)
-    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
+    return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty,
+                   ::Question::Phone].member? question.class
 
-    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type) if question_type_exist_in_session(question, question_group)
+    if question_type_exist_in_session(
+      question, question_group
+    )
+      raise ActiveRecord::RecordNotUnique,
+            (I18n.t 'activerecord.errors.models.question_group.question',
+                    question_type: question.type)
+    end
   end
 
   def question_type_exist_in_session(question, question_group)

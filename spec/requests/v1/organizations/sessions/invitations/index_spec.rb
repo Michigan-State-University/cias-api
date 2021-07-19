@@ -11,11 +11,20 @@ RSpec.describe 'GET /v1/organizations/:organization_id/sessions/:session_id/invi
   let!(:intervention_status) { :published }
   let(:intervention) { create(:intervention, status: intervention_status) }
   let(:session) { create(:session, intervention_id: intervention.id) }
-  let!(:session_invitations1) { create_list(:session_invitation, 3, health_clinic_id: health_clinic1.id, invitable_id: session.id, invitable_type: 'Session') }
-  let!(:session_invitations2) { create_list(:session_invitation, 2, health_clinic_id: health_clinic2.id, invitable_id: session.id, invitable_type: 'Session') }
+  let!(:session_invitations1) do
+    create_list(:session_invitation, 3, health_clinic_id: health_clinic1.id, invitable_id: session.id,
+                                        invitable_type: 'Session')
+  end
+  let!(:session_invitations2) do
+    create_list(:session_invitation, 2, health_clinic_id: health_clinic2.id, invitable_id: session.id,
+                                        invitable_type: 'Session')
+  end
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_organization_session_invitations_path(organization_id: organization.id, session_id: session.id), headers: headers }
+  let(:request) do
+    get v1_organization_session_invitations_path(organization_id: organization.id, session_id: session.id),
+        headers: headers
+  end
 
   context 'will retrieve all associated session invitations' do
     before do

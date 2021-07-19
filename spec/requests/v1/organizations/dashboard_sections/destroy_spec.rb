@@ -10,7 +10,9 @@ RSpec.describe 'DELETE /v1/organizations/:organization_id/dashboard_sections/:id
   let(:dashboard_section) { organization.reporting_dashboard.dashboard_sections.first }
 
   let(:headers) { user.create_new_auth_token }
-  let(:request) { delete v1_organization_dashboard_section_path(organization.id, dashboard_section.id), headers: headers }
+  let(:request) do
+    delete v1_organization_dashboard_section_path(organization.id, dashboard_section.id), headers: headers
+  end
 
   context 'when auth' do
     context 'is invalid' do
@@ -67,7 +69,8 @@ RSpec.describe 'DELETE /v1/organizations/:organization_id/dashboard_sections/:id
       end
     end
 
-    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant guest].each do |role|
+    %i[organization_admin health_system_admin health_clinic_admin team_admin researcher participant
+       guest].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

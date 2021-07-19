@@ -6,12 +6,12 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
   let(:intervention) { create(:intervention, :published) }
   let(:session) { create(:session, intervention: intervention) }
-  let(:session_2) { create(:session, intervention: intervention) }
+  let(:session2) { create(:session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session, no_formula_text: 'test') }
   let(:user) { create(:user, :confirmed) }
   let!(:phone) { create(:phone, :confirmed, user: user) }
   let(:user_session) { create(:user_session, session: session, user: user) }
-  let(:user_session_2) { create(:user_session, session: session_2, user: user) }
+  let(:user_session2) { create(:user_session, session: session2, user: user) }
   let(:current_time) { Time.zone.parse('2021-07-20 20:02') }
 
   before do
@@ -309,10 +309,10 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                                { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
                              ] })
       end
-      let!(:variant_1) do
+      let!(:variant1) do
         create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '=2', content: 'Hello .:name:.!')
       end
-      let!(:variant_2) do
+      let!(:variant2) do
         create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '>1', content: 'Hello .:name:.!')
       end
 
@@ -328,16 +328,18 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
     context 'with other variable' do
       let!(:answer_receive_report_true) do
-        create(:answer_number, user_session: user_session_2,
+        create(:answer_number, user_session: user_session2,
                                body: { data: [
                                  { 'var' => 'number', 'value' => '1234' }
                                ] })
       end
-      let!(:variant_1) do
-        create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '=2', content: "variant 1 content, value: .:var1:., prev_value: .:#{session_2.variable}.number:.")
+      let!(:variant1) do
+        create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '=2',
+                                  content: "variant 1 content, value: .:var1:., prev_value: .:#{session2.variable}.number:.")
       end
-      let!(:variant_2) do
-        create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '>1', content: "variant 1 content, value: .:var1:., prev_value: .:#{session_2.variable}.number:.")
+      let!(:variant2) do
+        create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '>1',
+                                  content: "variant 1 content, value: .:var1:., prev_value: .:#{session2.variable}.number:.")
       end
 
       context 'when two variants match to formula' do

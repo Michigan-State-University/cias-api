@@ -27,9 +27,11 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
     charts.where(chart_type: 'pie_chart')
   end
 
+  # rubocop:disable Lint/ShadowingOuterLocalVariable
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, label| hash[label] = 0 } }.tap do |hash|
       charts_data_collection.find_each { |data_statistic| hash[data_statistic.chart_id][data_statistic.label] += 1 }
     end
   end
+  # rubocop:enable Lint/ShadowingOuterLocalVariable
 end

@@ -147,21 +147,24 @@ Rails.application.routes.draw do
         end
       end
     end
-    get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
+    get 'organization_invitations/confirm', to: 'organizations/invitations#confirm',
+                                            as: :organization_invitations_confirm
 
     resources :health_systems, controller: :health_systems do
       scope module: 'health_systems' do
         post 'invitations/invite_health_system_admin', to: 'invitations#invite_health_system_admin'
       end
     end
-    get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm', as: :health_system_invitations_confirm
+    get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm',
+                                             as: :health_system_invitations_confirm
 
     resources :health_clinics, controller: :health_clinics do
       scope module: 'health_clinics' do
         post 'invitations/invite_health_clinic_admin', to: 'invitations#invite_health_clinic_admin'
       end
     end
-    get 'health_clinic_invitations/confirm', to: 'health_clinics/invitations#confirm', as: :health_clinic_invitations_confirm
+    get 'health_clinic_invitations/confirm', to: 'health_clinics/invitations#confirm',
+                                             as: :health_clinic_invitations_confirm
 
     resources :generated_reports, only: :index
 
@@ -196,8 +199,10 @@ Rails.application.routes.draw do
   if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
     scope 'rails' do
       Sidekiq::Web.use Rack::Auth::Basic do |username, password|
-        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
-          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
+        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username),
+                                                    ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
+          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password),
+                                                      ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
       end
       mount Sidekiq::Web => '/workers'
     end

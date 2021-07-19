@@ -5,30 +5,33 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: user) }
-  let(:session_1) { create(:session, position: 4, intervention: intervention) }
-  let(:session_2) { create(:session, position: 5, intervention: intervention) }
-  let(:session_3) { create(:session, position: 6, intervention: intervention) }
+  let(:session1) { create(:session, position: 4, intervention: intervention) }
+  let(:session2) { create(:session, position: 5, intervention: intervention) }
+  let(:session3) { create(:session, position: 6, intervention: intervention) }
   let(:params) do
     {
       session: {
         position: [
           {
-            id: session_1.id,
+            id: session1.id,
             position: 11
           },
           {
-            id: session_2.id,
+            id: session2.id,
             position: 22
           },
           {
-            id: session_3.id,
+            id: session3.id,
             position: 33
           }
         ]
       }
     }
   end
-  let(:request) { patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
+  let(:request) do
+    patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params,
+                                                                                    headers: user.create_new_auth_token
+  end
 
   context 'when auth' do
     context 'is invalid' do

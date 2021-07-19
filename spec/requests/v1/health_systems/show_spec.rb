@@ -6,7 +6,9 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
+  let!(:organization) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
+  end
   let!(:health_system) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization) }
   let!(:deleted_health_system) { create(:health_system, organization: organization, name: 'Deleted health system', deleted_at: Time.current) }
   let!(:health_clinic) { health_system.health_clinics.first }

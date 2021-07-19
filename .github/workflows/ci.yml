@@ -51,6 +51,8 @@ jobs:
           bundle config set path 'vendor/bundle'
           bundle install
           bundle exec rails db:create db:schema:load --trace
+      - name: Analyze with RuboCop
+        run: bundle exec rubocop
       - name: Execute tests
         run: bundle exec rspec
       - name: Analyze with Brakeman
