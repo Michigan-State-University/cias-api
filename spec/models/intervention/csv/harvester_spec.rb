@@ -374,7 +374,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       let!(:question2) do
         create(:question_multiple, question_group: question_group, body: question_2_body, position: 2)
       end
-      let!(:question_3) { create(:question_name, question_group: question_group, position: 3) }
+      let!(:question3) { create(:question_name, question_group: question_group, position: 3) }
       let!(:questions) do
         Question.joins(:question_group).where(id: [question1.id, question2.id, question3.id]).order(:position)
       end

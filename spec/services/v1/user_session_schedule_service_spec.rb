@@ -37,8 +37,8 @@ RSpec.describe V1::UserSessionScheduleService do
     let!(:user_session_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session, health_clinic: health_clinic) }
     let!(:user_sessions) do
       {
-          'user_session_not_belongs_to_organization' => user_session_not_belongs_to_organization,
-          'user_session_belongs_to_organization' => user_session_belongs_to_organization
+        'user_session_not_belongs_to_organization' => user_session_not_belongs_to_organization,
+        'user_session_belongs_to_organization' => user_session_belongs_to_organization
       }
     end
 
@@ -57,7 +57,7 @@ RSpec.describe V1::UserSessionScheduleService do
         context 'when scheduling uses schedule_at which is nil' do
           let(:schedule_at) { nil }
 
-          ['exact_date', 'days_after'].each do |schedule_type|
+          %w[exact_date days_after].each do |schedule_type|
             context "when session has schedule #{schedule_type}" do
               it 'does not schedule at all' do
                 expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionEmailScheduleJob)

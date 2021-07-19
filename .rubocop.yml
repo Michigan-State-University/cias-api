@@ -15,6 +15,7 @@ AllCops:
     - 'lib/tasks/one_time_use/*'
     - 'db/migrate/*'
     - 'config/initializers/devise.rb'
+    - 'spec/lib/rack/health_check_spec.rb'
 
 Bundler/OrderedGems:
   Enabled: false

@@ -17,7 +17,9 @@ RSpec.describe 'GET /v1/organizations', type: :request do
   let!(:organization1) { create(:organization, name: 'organization_1', created_at: DateTime.now - 10.days) }
   let!(:health_system) { create(:health_system, name: 'Vatican Healthcare', organization: organization1) }
   let!(:health_clinic) { create(:health_clinic, name: 'Best Health Clinic', health_system: health_system) }
-  let!(:organization2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health', created_at: DateTime.now - 5.days) }
+  let!(:organization2) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health', created_at: DateTime.now - 5.days)
+  end
   let!(:organization3) { create(:organization, name: 'Oregano Public Health', created_at: DateTime.now - 1.day) }
   let(:expected_organization_order) { [organization3, organization2, organization1].map(&:id) }
 

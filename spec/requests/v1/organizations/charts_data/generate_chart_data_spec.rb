@@ -266,21 +266,27 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
       let(:headers) { health_clinic_admin.create_new_auth_token }
       let(:params) do
         {
-          clinic_ids: [health_clinic.id, health_clinic_2.id],
+          clinic_ids: [health_clinic.id, health_clinic2.id],
           statuses: ['published']
         }
       end
       let(:request) { get v1_organization_chart_data_generate_path(organization_id: organization.id, chart_id: chart_hc2.id), headers: headers, params: params }
 
-      let!(:health_clinic_2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
+      let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
 
       let!(:chart_hc2) { create(:chart, name: 'chart_hc2', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
-      let!(:chart_matched_statistic_hc2) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart_hc2, health_clinic: health_clinic_2, filled_at: 2.months.ago) }
-      let!(:chart_not_matched_statistic_hc2) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart_hc2, health_clinic: health_clinic_2, filled_at: 3.months.ago) }
+      let!(:chart_matched_statistic_hc2) do
+        create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart_hc2,
+                                          health_clinic: health_clinic2, filled_at: 2.months.ago)
+      end
+      let!(:chart_not_matched_statistic_hc2) do
+        create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart_hc2,
+                                         health_clinic: health_clinic2, filled_at: 3.months.ago)
+      end
 
       before do
-        health_clinic_2.user_health_clinics << UserHealthClinic.create!(user: health_clinic_admin, health_clinic: health_clinic_2)
-        HealthClinicInvitation.create!(user: health_clinic_admin, health_clinic: health_clinic_2)
+        health_clinic2.user_health_clinics << UserHealthClinic.create!(user: health_clinic_admin, health_clinic: health_clinic2)
+        HealthClinicInvitation.create!(user: health_clinic_admin, health_clinic: health_clinic2)
         request
       end
 

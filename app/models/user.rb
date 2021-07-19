@@ -133,7 +133,7 @@ class User < ApplicationRecord
   def accepted_health_clinic_ids
     return unless role?('health_clinic_admin')
 
-    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map { |hci| hci.health_clinic_id }
+    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
     health_clinic_ids.append(organizable.id) if organizable
     health_clinic_ids
   end
@@ -147,8 +147,6 @@ class User < ApplicationRecord
       scope.participants
     end
   end
-
-  private
 
   def team_admin?
     roles.include?('team_admin')

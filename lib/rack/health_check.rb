@@ -26,7 +26,7 @@ class HealthCheck
   end
 
   def redis
-    Sidekiq.redis { |conn| conn.ping }
+    Sidekiq.redis(&:ping)
     true
   rescue StandardError
     false

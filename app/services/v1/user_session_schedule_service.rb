@@ -53,8 +53,8 @@ class V1::UserSessionScheduleService
 
   def schedule_until(date_of_schedule, next_session)
     return next_session.send_link_to_session(user_session.user, health_clinic) if date_of_schedule&.past?
+    return unless date_of_schedule
 
-    SessionEmailScheduleJob.set(wait_until: date_of_schedule)
-        .perform_later(next_session.id, user_session.user.id, health_clinic) if date_of_schedule
+    SessionEmailScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic)
   end
 end
