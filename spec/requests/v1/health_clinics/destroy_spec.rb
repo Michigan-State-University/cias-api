@@ -10,6 +10,7 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
   let!(:health_clinic_admin) { health_clinic.user_health_clinics.first.user }
+  let!(:chart_statistic) { create(:chart_statistic, health_clinic: health_clinic) }
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { delete v1_health_clinic_path(health_clinic.id), headers: headers }
@@ -45,6 +46,10 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
 
       it 'health_clinic admin active status is false' do
         expect(health_clinic_admin.reload.active?).to eq(false)
+      end
+
+      it 'does not change chart statistic count' do
+        expect { request }.to avoid_changing(ChartStatistic, :count)
       end
     end
 

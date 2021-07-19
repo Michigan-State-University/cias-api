@@ -22,11 +22,16 @@ class Intervention::Csv::Harvester
 
   def set_headers
     questions.each_with_index do |question, index|
-      header.insert(index, question.csv_header_names)
+      header.insert(index, add_session_variable_to_question_variables(question))
     end
     header.flatten!
     header.unshift(:email)
     header.unshift(:user_id)
+  end
+
+  def add_session_variable_to_question_variables(question)
+    session_variable = question.question_group.session.variable
+    question.csv_header_names.map { |question_variable| "#{session_variable}.#{question_variable}" }
   end
 
   def set_rows
@@ -37,7 +42,7 @@ class Intervention::Csv::Harvester
         set_user_data(row_index, user_session) if index.zero?
         user_session.answers.each do |answer|
           answer.body_data&.each do |data|
-            var_index = header.index(answer.csv_header_name(data))
+            var_index = header.index("#{user_session.session.variable}.#{answer.csv_header_name(data)}")
             next if var_index.blank?
 
             var_value = answer.csv_row_value(data)

@@ -50,7 +50,7 @@ RSpec.describe 'POST /v1/health_clinics', type: :request do
               'name' => 'New Health Clinic',
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
         )
       end

@@ -6,7 +6,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
-  let!(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
+  let!(:reporting_dashboard) { organization.reporting_dashboard }
   let!(:dashboard_sections) { create(:dashboard_section, name: 'Dashboard section', reporting_dashboard: reporting_dashboard) }
 
   let(:admin) { create(:user, :confirmed, :admin) }
@@ -259,6 +259,44 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
 
       it 'returns proper error message' do
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
+      end
+    end
+
+    context 'when user is health_clinic_admin and one health clinic invitation is not accepted' do
+      let(:headers) { health_clinic_admin.create_new_auth_token }
+      let(:params) do
+        {
+          clinic_ids: [health_clinic.id, health_clinic2.id],
+          statuses: ['published']
+        }
+      end
+      let(:request) { get v1_organization_chart_data_generate_path(organization_id: organization.id, chart_id: chart_hc2.id), headers: headers, params: params }
+
+      let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
+
+      let!(:chart_hc2) { create(:chart, name: 'chart_hc2', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
+      let!(:chart_matched_statistic_hc2) do
+        create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart_hc2,
+                                          health_clinic: health_clinic2, filled_at: 2.months.ago)
+      end
+      let!(:chart_not_matched_statistic_hc2) do
+        create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart_hc2,
+                                         health_clinic: health_clinic2, filled_at: 3.months.ago)
+      end
+
+      before do
+        health_clinic2.user_health_clinics << UserHealthClinic.create!(user: health_clinic_admin, health_clinic: health_clinic2)
+        HealthClinicInvitation.create!(user: health_clinic_admin, health_clinic: health_clinic2)
+        request
+      end
+
+      it 'returns proper data' do
+        expect(json_response).to include({
+                                           'chart_id' => chart_hc2.id,
+                                           'data' => [],
+                                           'population' => 0,
+                                           'dashboard_section_id' => chart_hc2.dashboard_section_id
+                                         })
       end
     end
   end
