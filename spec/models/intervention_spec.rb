@@ -114,16 +114,6 @@ RSpec.describe Intervention, type: :model do
           expect(intervention.reload.name).to include("(#{destination_language_name_short.upcase}) New intervention")
         end
       end
-
-      describe '#translate_logo_description' do
-        it 'add original text' do
-          expect(intervention.original_text['logo_description']).to eq('This is the description')
-        end
-
-        it 'have correct description' do
-          expect(intervention.logo_blob.description).to eq('from=>en to=>pl text=>This is the description')
-        end
-      end
     end
   end
 end
