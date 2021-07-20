@@ -44,7 +44,7 @@ class Intervention < ApplicationRecord
   def export_answers_as(type:)
     raise ArgumentError, 'Undefined type of data export.' unless %w[csv].include?(type.downcase)
 
-    Intervention::Csv.new(self).execute
+    ::Intervention::Csv.new(self).execute
   end
 
   def integral_update
