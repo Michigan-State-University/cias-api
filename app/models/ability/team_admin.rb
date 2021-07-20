@@ -40,6 +40,7 @@ class Ability::TeamAdmin < Ability::Base
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
     can :read, GoogleLanguage
+    can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: team_members_ids } } }
   end
 
   def team_members_ids

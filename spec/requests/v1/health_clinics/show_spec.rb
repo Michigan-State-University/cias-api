@@ -16,6 +16,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
   let!(:deleted_health_clinic) { create(:health_clinic, name: 'Deleted Health Clinic', health_system: health_system, deleted_at: Time.current) }
   let!(:health_clinic_admin) { health_clinic.user_health_clinics.first.user }
+  let!(:health_clinic_invitation) { health_clinic_admin.health_clinic_invitations.first }
 
   let(:roles_organization) do
     {
@@ -64,19 +65,32 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
             'relationships' => {
               'health_clinic_admins' => {
                 'data' => [include('id' => health_clinic_admin.id)]
+              },
+              'health_clinic_invitations' => {
+                'data' => [include('id' => health_clinic_invitation.id)]
               }
             }
           }
         )
       end
 
-      it 'returns proper include' do
+      it 'returns proper include for health_clinic_admin' do
         expect(json_response['included'][0]['attributes']).to include(
           {
             'email' => health_clinic_admin.email,
             'first_name' => health_clinic_admin.first_name,
             'last_name' => health_clinic_admin.last_name,
             'roles' => ['health_clinic_admin']
+          }
+        )
+      end
+
+      it 'returns proper include for health_clinic_invitation' do
+        expect(json_response['included'][1]['attributes']).to include(
+          {
+            'health_clinic_id' => health_clinic.id,
+            'user_id' => health_clinic_admin.id,
+            'is_accepted' => true
           }
         )
       end
@@ -107,7 +121,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
                 'name' => deleted_health_clinic.name,
                 'deleted' => true
               },
-              'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
             }
           )
         end

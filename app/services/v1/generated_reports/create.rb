@@ -61,7 +61,7 @@ class V1::GeneratedReports::Create
   end
 
   def insert_variable_into_variants(variable_name, variable_value, variants_to_generate)
-    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value || 'Unknown') }
+    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value.to_s || 'Unknown') }
   end
 
   def insert_variables_into_variants(variants_to_generate)

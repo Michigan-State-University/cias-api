@@ -7,18 +7,18 @@ class CsvJob::Answers < CsvJob
     user = User.find(user_id)
 
     intervention = Intervention.find(intervention_id)
-    preview_csv_content = intervention.export_answers_as(type: module_name)
+    csv_content = intervention.export_answers_as(type: module_name)
     MetaOperations::FilesKeeper.new(
-      stream: preview_csv_content, add_to: intervention,
+      stream: csv_content, add_to: intervention,
       macro: :reports, ext: :csv, type: 'text/csv', user: user
     ).execute
 
     return unless user.email_notification
 
     if intervention.draft?
-      CsvMailer::Answers.csv_answers_preview(user, intervention, preview_csv_content, requested_at).deliver_now
+      CsvMailer::Answers.csv_answers_preview(user, intervention, csv_content, requested_at).deliver_now
     else
-      CsvMailer::Answers.csv_answers(user, intervention, requested_at).deliver_now
+      CsvMailer::Answers.csv_answers(user, intervention, csv_content, requested_at).deliver_now
     end
   end
 end

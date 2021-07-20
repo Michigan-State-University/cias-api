@@ -25,6 +25,13 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
 
   let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:organization_admin) { organization.organization_admins.first }
+  let!(:health_clinic_admin) do
+    user = create(:user, :confirmed, :health_clinic_admin)
+    user.organizable = health_clinic unless user.organizable
+    UserHealthClinic.create!(user: user, health_clinic: health_clinic)
+    HealthClinicInvitation.create!(user: user, health_clinic: health_clinic, accepted_at: Time.zone.now)
+    user
+  end
 
   let(:roles_organization) do
     {
@@ -120,6 +127,9 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
           'relationships' => {
             'health_clinic_admins' => {
               'data' => []
+            },
+            'health_clinic_invitations' => {
+              'data' => []
             }
           }
         )
@@ -132,7 +142,21 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
               'name' => health_clinic.name,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => {
+              'health_clinic_admins' => {
+                'data' => [{
+                  'id' => health_clinic_admin.id,
+                  'type' => 'user'
+
+                }]
+              },
+              'health_clinic_invitations' => {
+                'data' => [{
+                  'id' => health_clinic_admin.health_clinic_invitations.last.id,
+                  'type' => 'health_clinic_invitation'
+                }]
+              }
+            }
           }
         )
         expect(json_response['included'][3]).to include(
@@ -219,6 +243,29 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             it 'returns proper error message' do
               expect(json_response['message']).to include('Couldn\'t find Organization with')
             end
+          end
+        end
+      end
+
+      context 'when user is health clinic admin' do
+        context 'when health clinic is available' do
+          let(:headers) { health_clinic_admin.create_new_auth_token }
+
+          before do
+            request
+          end
+
+          it_behaves_like 'permitted user'
+        end
+
+        context 'when health clinic is not available' do
+          let(:health_clinic_admin) { create(:user, :confirmed, :health_clinic_admin) }
+          let(:headers) { health_clinic_admin.create_new_auth_token }
+
+          before { request }
+
+          it 'returns proper error message' do
+            expect(json_response['message']).to include('Couldn\'t find Organization with \'id\'')
           end
         end
       end
