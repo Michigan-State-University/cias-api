@@ -16,7 +16,7 @@ class Organization < ApplicationRecord
   after_create :initialize_reporting_dashboard
   before_destroy :deactivate_organization_and_intervention_admins, :update_interventions_from_deleted_organization
 
-  default_scope { order(:name) }
+  default_scope { order(created_at: :desc) }
 
   private
 

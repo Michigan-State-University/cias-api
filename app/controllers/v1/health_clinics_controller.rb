@@ -70,7 +70,7 @@ class V1::HealthClinicsController < V1Controller
   def health_clinic_response(health_clinic)
     V1::HealthClinicSerializer.new(
       health_clinic,
-      { include: %i[health_clinic_admins] }
+      { include: %i[health_clinic_admins health_clinic_invitations] }
     )
   end
 end

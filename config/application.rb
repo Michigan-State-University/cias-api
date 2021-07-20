@@ -40,5 +40,6 @@ module CiasApi
     config.filter_parameters << :password_confirmation
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
     routes.default_url_options = { host: ENV['APP_HOSTNAME'] }
+    config.eager_load_paths += %W[#{config.root}/lib/rack]
   end
 end

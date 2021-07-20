@@ -103,7 +103,7 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
               'name' => health_clinic.name,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
         )
       end

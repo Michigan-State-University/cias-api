@@ -37,7 +37,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'test']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test"]
         expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1]]
       end
     end
@@ -76,7 +76,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'test_1', 'test_2']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2"]
         expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1 2]]
       end
     end
@@ -107,7 +107,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'test_1']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1"]
         expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1]]
       end
     end
@@ -136,7 +136,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'test_1']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1"]
         expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1]]
       end
     end
@@ -179,7 +179,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'test_1', 'test_2']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2"]
         expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1 2]]
       end
     end
@@ -211,7 +211,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'test_1']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1"]
         expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1]]
       end
     end
@@ -242,7 +242,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save variable and the clicking on the link to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'site']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.site"]
         expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, true]]
       end
     end
@@ -271,9 +271,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save variable and the clicking on the link to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'date']
-        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s,
-                                     '2012-12-12']]
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.date"]
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12']]
       end
     end
 
@@ -301,9 +300,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save variable and the value to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'phone']
-        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s,
-                                     '+48123123123']]
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.phone"]
+        expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123']]
       end
     end
 
@@ -331,7 +329,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save variable and the value to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'currency']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.currency"]
         expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD']]
       end
     end
@@ -376,7 +374,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       let!(:question2) do
         create(:question_multiple, question_group: question_group, body: question_2_body, position: 2)
       end
-      let!(:question3) { create(:question_name, position: 3) }
+      let!(:question3) { create(:question_name, question_group: question_group, position: 3) }
       let!(:questions) do
         Question.joins(:question_group).where(id: [question1.id, question2.id, question3.id]).order(:position)
       end
@@ -391,7 +389,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save nil values for each variable unanswered questions' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, 'var_1', 'var_2', 'var_3', 'phoneticName']
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.var_1", "#{session.variable}.var_2", "#{session.variable}.var_3",
+                                      "#{session.variable}.phoneticName"]
         expect(subject.rows).to eq [
           [
             answer1.user_session.user_id.to_s,

@@ -34,5 +34,6 @@ class Ability::Researcher < Ability::Base
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
     can :read, GoogleLanguage
+    can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
   end
 end

@@ -52,7 +52,7 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
               'name' => 'New name',
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] } }
+            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
         )
       end
