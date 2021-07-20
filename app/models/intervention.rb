@@ -19,12 +19,9 @@ class Intervention < ApplicationRecord
   has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
 
-  attr_accessor :status_event
-
   attribute :shared_to, :string, default: 'anyone'
 
   validates :name, :shared_to, presence: true
-  validates :status_event, inclusion: { in: %w[broadcast close to_archive] }, allow_nil: true
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:invitations).published.not_shared_to_invited
@@ -36,25 +33,18 @@ class Intervention < ApplicationRecord
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
 
-  def broadcast
-    return unless draft?
+  after_update_commit :status_change
 
-    published!
-    ::Interventions::PublishJob.perform_later(id)
-  end
+  def status_change
+    return unless saved_change_to_attribute?(:status)
 
-  def close
-    closed! if published?
-  end
-
-  def to_archive
-    archived! if closed? || draft?
+    ::Interventions::PublishJob.perform_later(id) if status == 'published'
   end
 
   def export_answers_as(type:)
     raise ArgumentError, 'Undefined type of data export.' unless %w[csv].include?(type.downcase)
 
-    "Intervention::#{type.classify}".constantize.new(self).execute
+    Intervention::Csv.new(self).execute
   end
 
   def integral_update

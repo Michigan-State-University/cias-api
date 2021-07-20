@@ -23,7 +23,7 @@ class V1::InterventionsController < V1Controller
 
     intervention = intervention_load
     intervention.assign_attributes(intervention_params)
-    intervention.integral_update
+    intervention.save!
     render json: serialized_response(intervention)
   end
 
@@ -38,6 +38,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:name, :status_event, :shared_to, :organization_id, :google_language_id)
+    params.require(:intervention).permit(:name, :status, :shared_to, :organization_id, :google_language_id)
   end
 end
