@@ -34,8 +34,6 @@ Layout/LineLength:
   Max: 160
   Exclude:
     - 'spec/requests/v1/questions/update_narrator_spec.rb'
-    - 'spec/requests/v1/question_groups/share_spec.rb'
-    - 'spec/requests/v1/interventions/answers/index_spec.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
