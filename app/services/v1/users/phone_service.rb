@@ -10,7 +10,7 @@ class V1::Users::PhoneService
 
   attr_reader :user, :phone_number, :iso, :prefix
 
-  def get_phone
+  def phone
     user_without_phone? ? new_phone : user_with_phone
   end
 
