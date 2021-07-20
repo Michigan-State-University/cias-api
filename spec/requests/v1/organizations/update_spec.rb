@@ -22,6 +22,7 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
   let(:admins_ids) { organization.reload.organization_admins.pluck(:id) }
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
   let!(:organization_admin) { organization.organization_admins.first }
+  let(:e_intervention_admin_invitation) { e_intervention_admin.organization_invitations.first }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -61,7 +62,19 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
             'id' => organization.id,
             'type' => 'organization',
             'attributes' => {
-              'name' => 'Oregano Public Health'
+              'name' => 'Oregano Public Health',
+              'e_intervention_admin_invitations' => {
+                'data' => [{
+                  'id' => e_intervention_admin_invitation.id,
+                  'type' => 'organizable_invitation',
+                  'attributes' =>
+                                  include(
+                                    'user_id' => e_intervention_admin_invitation.user_id,
+                                    'organizable_id' => e_intervention_admin_invitation.organization_id,
+                                    'is_accepted' => true
+                                  )
+                }]
+              }
             },
             'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
                                  'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id,

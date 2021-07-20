@@ -138,6 +138,10 @@ class User < ApplicationRecord
     health_clinic_ids
   end
 
+  def accepted_organizable_id
+    organizable_id
+  end
+
   private
 
   def self.users_for_researcher(params, scope)

@@ -88,7 +88,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       it 'returns proper include for health_clinic_invitation' do
         expect(json_response['included'][1]['attributes']).to include(
           {
-            'health_clinic_id' => health_clinic.id,
+            'organizable_id' => health_clinic.id,
             'user_id' => health_clinic_admin.id,
             'is_accepted' => true
           }
