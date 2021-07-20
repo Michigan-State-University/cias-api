@@ -308,10 +308,6 @@ Rails/MatchRoute:
 Rails/NegateInclude:
   Enabled: true
 
-Rails/Output:
-  Exclude:
-    - 'db/seeds.rb'
-
 Rails/Pluck:
   Enabled: true
 
@@ -343,20 +339,13 @@ Rails/EnvironmentVariableAccess:
   AllowReads: true
 
 Rails/FilePath:
-  Exclude:
-    - 'spec/factories/report_templates.rb'
-    - 'spec/factories/report_template_section_variants.rb'
-    - 'spec/factories/generated_reports.rb'
-    - 'spec/abilities/sms_plans.rb'
+  Enabled: true
 
 RSpec/ContextWording:
   Enabled: false
 
 RSpec/DescribeClass:
   Exclude:
-    - 'spec/requests/**/*'
-    - 'spec/requests/v1/health_clinic/create_spec.rb'
-    - 'spec/requests/v1/health_systems/update_spec.rb'
     - 'db/migrate/*'
 
 RSpec/ExampleLength:
@@ -393,15 +382,7 @@ RSpec/VerifiedDoubles:
     - 'spec/**/*'
 
 RSpec/FilePath:
-  Exclude:
-    - 'spec/services/v1/questions/clone_multiple_questions_spec.rb'
-    - 'spec/abilities/report_template_section_variants_spec.rb'
-    - 'spec/abilities/report_template_sections_spec.rb'
-    - 'spec/factories/generated_reports.rb'
-    - 'spec/factories/report_template_section_variants.rb'
-    - 'spec/factories/report_templates.rb'
-    - 'spec/models/question/participant_raport_spec.rb'
-    - 'spec/abilities/sms_plans.rb'
+  Enabled: true
 
 RSpec/AnyInstance:
   Exclude:
@@ -420,5 +401,4 @@ RSpec/OverwritingSetup:
     - 'spec/requests/v1/interventions/update_spec.rb'
 
 Naming/AccessorMethodName:
-  Exclude:
-    - 'app/services/v1/users/phone_service.rb'
+  Enabled: true
