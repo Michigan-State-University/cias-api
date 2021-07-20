@@ -14,11 +14,12 @@ describe SmsPlan do
 
     context 'team admin' do
       let!(:user) { create(:user, :confirmed, :team_admin) }
+      let!(:team) { create(:team, team_admin: user) }
       let!(:intervention1) { create(:intervention, user: user) }
       let!(:session1) { create(:session, intervention: intervention1) }
       let!(:sms_plan1) { create(:sms_plan, session: session1) }
 
-      let!(:user2) { create(:user, :researcher, team_id: user.team_id) }
+      let!(:user2) { create(:user, :researcher, team: team) }
       let!(:intervention2) { create(:intervention, user: user2) }
       let!(:session2) { create(:session, intervention: intervention2) }
       let!(:sms_plan2) { create(:sms_plan, session: session2) }
