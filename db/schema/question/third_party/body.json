@@ -14,11 +14,18 @@
             },
             "value": {
               "type": "string"
+            },
+            "report_template_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
             }
           },
           "required": [
             "payload",
-            "value"
+            "value",
+            "report_template_ids"
           ],
           "additionalProperties": false
         }

@@ -23,7 +23,7 @@ class V1::UserSessionScheduleService
   end
 
   def days_after_schedule(next_session)
-    schedule_until(next_session.schedule_at.noon, next_session)
+    schedule_until(next_session.schedule_at&.noon, next_session)
   end
 
   def days_after_fill_schedule(next_session)
@@ -31,7 +31,7 @@ class V1::UserSessionScheduleService
   end
 
   def exact_date_schedule(next_session)
-    schedule_until(next_session.schedule_at.noon, next_session)
+    schedule_until(next_session.schedule_at&.noon, next_session)
   end
 
   def days_after_date_schedule(next_session)
@@ -52,8 +52,9 @@ class V1::UserSessionScheduleService
   end
 
   def schedule_until(date_of_schedule, next_session)
-    return next_session.send_link_to_session(user_session.user, health_clinic) if date_of_schedule.past?
+    return next_session.send_link_to_session(user_session.user, health_clinic) if date_of_schedule&.past?
 
-    SessionEmailScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic)
+    SessionEmailScheduleJob.set(wait_until: date_of_schedule)
+        .perform_later(next_session.id, user_session.user.id, health_clinic) if date_of_schedule
   end
 end

@@ -9,7 +9,7 @@ class Ability::ThirdParty < Ability::Base
   private
 
   def third_party
-    can :read, GeneratedReport, id: GeneratedReport.for_third_party_user(user).pluck(:id),
+    can %i[read get_protected_attachment], GeneratedReport, id: GeneratedReport.for_third_party_user(user).pluck(:id),
                                 report_for: 'third_party'
   end
 end
