@@ -176,7 +176,9 @@ Rails.application.routes.draw do
     end
 
     namespace :google do
-      resources :languages, only: :index
+      resources :languages, only: :index do
+        resources :voices, only: :index
+      end
     end
 
     resources :dashboard_sections, only: [], controller: :dashboard_sections do
