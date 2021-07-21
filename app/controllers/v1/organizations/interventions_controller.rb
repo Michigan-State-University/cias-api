@@ -3,7 +3,9 @@
 class V1::Organizations::InterventionsController < V1Controller
   def index
     authorize! :read, Intervention
-    render_json interventions: interventions_scope, path: v1_interventions_path
+    collection = interventions_scope
+    paginated_collection = paginate(collection, params)
+    render_json interventions: paginated_collection, interventions_size: collection.size, path: v1_interventions_path
   end
 
   private
