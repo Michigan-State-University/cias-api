@@ -339,12 +339,14 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         create(:question_group_plain, session: other_session_with_name, position: 1)
       end
 
+      # rubocop:disable Layout/LineLength
       let!(:request1) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params, headers: user.create_new_auth_token }
       let!(:request2) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params, headers: user.create_new_auth_token }
       let!(:request3) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params, headers: user.create_new_auth_token }
       let!(:request4) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
       let!(:request5) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
       let!(:request6) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      # rubocop:enable Layout/LineLength
 
       let(:params) do
         {

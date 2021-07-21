@@ -40,7 +40,7 @@ class V1::UsersController < V1Controller
   def send_sms_token
     authorize! :update, current_v1_user
 
-    phone = phone_service.get_phone
+    phone = phone_service.phone
     head :expectation_failed and return unless phone
 
     phone.refresh_confirmation_code
