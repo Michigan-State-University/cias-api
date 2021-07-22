@@ -15,7 +15,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     {
       intervention: {
         name: 'New Intervention',
-        status_event: 'broadcast'
+        status: 'published'
       }
     }
   end
