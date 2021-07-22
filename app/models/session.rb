@@ -55,14 +55,14 @@ class Session < ApplicationRecord
   validate :unique_variable, on: %i[create update]
 
   before_validation :set_default_variable
-  after_commit :create_core_childs, on: :create
+  after_commit :create_core_children, on: :create
 
   after_update_commit do
     SessionJobs::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
   end
 
-  def position_grather_than
-    @position_grather_than ||= intervention.sessions.where('position > ?', position).order(:position)
+  def position_greater_than
+    @position_greater_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end
 
   def next_session
@@ -85,10 +85,6 @@ class Session < ApplicationRecord
 
     propagate_settings
     save!
-  end
-
-  def perform_narrator_reflection(_placeholder)
-    nil
   end
 
   def invite_by_email(emails, health_clinic_id = nil)
@@ -175,7 +171,7 @@ class Session < ApplicationRecord
 
   private
 
-  def create_core_childs
+  def create_core_children
     return if question_group_finish
 
     qg_finish = ::QuestionGroup::Finish.new(session_id: id)
