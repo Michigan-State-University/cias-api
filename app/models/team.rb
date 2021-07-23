@@ -7,4 +7,6 @@ class Team < ApplicationRecord
   has_many :team_invitations, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
+
+  default_scope { order(created_at: :desc) }
 end

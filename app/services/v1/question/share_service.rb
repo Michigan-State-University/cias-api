@@ -74,9 +74,9 @@ class V1::Question::ShareService < V1::Question::BaseService
   def prepare_researchers(user)
     all_researchers = User.researchers
     @researchers = if user.role?('researcher') && user.team_id.present?
-                     all_researchers.where(team_id: user.team_id)
+                     all_researchers.from_team(user.team_id)
                    elsif user.role?('team_admin')
-                     all_researchers.where(team_id: user.admins_team_ids)
+                     all_researchers.from_team(user.admins_team_ids)
                    elsif user.role?('admin')
                      all_researchers
                    else

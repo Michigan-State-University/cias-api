@@ -99,7 +99,7 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
           researcher.update(roles: ['participant'])
         end
 
-        it 'researcher shouldn\'t be invited again' do
+        it 'user shouldn\'t be invited' do
           expect(TeamMailer).not_to receive(:invite_user)
 
           expect { request }.to avoid_changing(TeamInvitation, :count).and \

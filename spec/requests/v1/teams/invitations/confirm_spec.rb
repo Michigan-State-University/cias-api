@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET /v1/team_invitations/confirm', type: :request do
+RSpec.describe 'GET /v1/teams/invitations/confirm', type: :request do
   let(:request) do
     get v1_team_invitations_confirm_path(invitation_token: invitation_token), params: params,
                                                                               headers: headers

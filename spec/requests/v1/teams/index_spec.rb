@@ -33,7 +33,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'returns list of teams with team admins details' do
+      it 'returns list of teams' do
         expect(json_response['data']).to include(
           'id' => team1.id.to_s,
           'type' => 'team',
@@ -53,7 +53,9 @@ RSpec.describe 'GET /v1/teams', type: :request do
             }
           }
         )
+      end
 
+      it 'returns team admins details' do
         expect(json_response['included']).to include(
           'id' => team_2_admin.id,
           'type' => 'user',
@@ -75,17 +77,77 @@ RSpec.describe 'GET /v1/teams', type: :request do
             'admins_team_ids' => [team1.id]
           )
         )
+      end
 
+      it 'returns proper size of collection' do
         expect(json_response['meta']).to include(
           'teams_size' => 2
         )
       end
     end
 
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'non-permitted user' do
+      it 'returns :forbidden status' do
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
 
-      it_behaves_like 'permitted user'
+    %w[admin admin_with_multiple_roles].each do |role|
+      context 'permitted user' do
+        let(:user) { users[role] }
+
+        it_behaves_like 'permitted user'
+      end
+    end
+
+    %w[researcher participant e_intervention_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+      describe '#non-permitted user' do
+        let(:user) { create(:user, :confirmed, roles: [role]) }
+
+        it_behaves_like 'non-permitted user'
+      end
+    end
+
+    context 'when user is team admin with one team' do
+      let(:user) { team_1_admin }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns list of teams' do
+        expect(json_response['data'].size).to be 1
+        expect(json_response['data']).to include(
+          'id' => team1.id.to_s,
+          'type' => 'team',
+          'attributes' => include('name' => team1.name, 'team_admin_id' => team_1_admin.id),
+          'relationships' => {
+            'team_admin' => {
+              'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
+            }
+          }
+        )
+      end
+
+      it 'returns team admins details' do
+        expect(json_response['included']).to include(
+          'id' => team_1_admin.id,
+          'type' => 'user',
+          'attributes' => include(
+            'email' => team_1_admin.email,
+            'full_name' => team_1_admin.full_name,
+            'roles' => ['team_admin'],
+            'team_id' => nil,
+            'admins_team_ids' => [team1.id]
+          )
+        )
+      end
+
+      it 'returns proper size of collection' do
+        expect(json_response['meta']).to include(
+          'teams_size' => 1
+        )
+      end
     end
   end
 

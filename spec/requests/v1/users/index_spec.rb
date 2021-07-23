@@ -301,9 +301,10 @@ RSpec.describe 'GET /v1/users', type: :request do
   context 'when current_user is team_admin' do
     let!(:team1) { create(:team) }
     let(:current_user) { team1.team_admin }
-    let(:team_participant) { create(:user, :participant, team_id: team1.id) }
-    let(:other_team_participant) { create(:user, :participant, team_id: team1.id) }
-    let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+    let(:team_participant) { create(:user, :participant, :confirmed) }
+    let(:other_team_participant) { create(:user, :participant, :confirmed, team_id: team1.id) }
+    let(:team_researcher) { create(:user, :researcher, :confirmed, team_id: team1.id) }
+    let!(:session) { create(:session, intervention: create(:intervention, user: team_researcher)) }
     let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
     let!(:question) { create(:question_slider, question_group: question_group) }
     let!(:answer) do
@@ -311,7 +312,7 @@ RSpec.describe 'GET /v1/users', type: :request do
                              user_session: create(:user_session, user: team_participant, session: session))
     end
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
-    let(:expected_users_ids) { [*team1.users.pluck(:id), current_user.id] }
+    let(:expected_users_ids) { [*team1.users.pluck(:id), current_user.id, team_participant.id] }
 
     context 'without params' do
       let!(:team2) { create(:team) }

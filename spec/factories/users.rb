@@ -47,7 +47,6 @@ FactoryBot.define do
       after(:build) do |team_admin|
         if team_admin.admins_teams.blank?
           new_team = build(:team, team_admin: team_admin)
-          new_team.team_admin = team_admin
           team_admin.admins_teams = [new_team]
         end
       end

@@ -22,7 +22,7 @@ class Ability::Base
   end
 
   def researchers_from_team(team_id)
-    team_id ? User.researchers.where(team_id: team_id).pluck(:id) : User.none
+    team_id ? User.researchers.from_team(team_id).pluck(:id) : User.none
   end
 
   def participants_with_answers(user)

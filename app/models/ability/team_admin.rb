@@ -12,7 +12,7 @@ class Ability::TeamAdmin < Ability::Base
     can %i[read update invite_researcher remove_researcher], Team, team_admin_id: user.id
     can %i[read update active], User, id: team_members_and_researchers_participants
     can :create, :preview_session_user
-    can :list_researchers, User, team_id: user.team_id
+    can :list_researchers, User, team_id: team_admin_teams_ids
 
     can :manage, Intervention, user_id: team_members_ids
     can :manage, UserSession, session: { intervention: { user_id: team_members_ids } }
@@ -44,17 +44,18 @@ class Ability::TeamAdmin < Ability::Base
   end
 
   def team_members_ids
-    @team_members_ids ||= User.select(:id)
-      .where(team_id: Team.select(:id).where(team_admin_id: user.id))
-      .or(User.select(:id).where(id: user.id))
-      .pluck(:id)
+    @team_members_ids ||= team_members.pluck(:id)
+  end
+
+  def team_members
+    @team_members ||= User.where('team_id in (?) OR id=?', team_admin_teams_ids, user.id)
+  end
+
+  def team_admin_teams_ids
+    @team_admin_teams_ids ||= Team.where(team_admin_id: user.id).pluck(:id)
   end
 
   def team_members_and_researchers_participants
-    members_ids = team_members_ids
-    User.where(id: members_ids).researchers.each do |researcher|
-      members_ids << participants_with_answers(researcher)
-    end
-    members_ids
+    team_members_ids + team_members.researchers.flat_map { |researcher| participants_with_answers(researcher) }
   end
 end

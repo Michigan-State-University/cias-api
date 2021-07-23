@@ -20,7 +20,7 @@ en:
         user:
           attributes:
             roles:
-              team_id_is_required_for_team_admin: 'Team Admin must have a team'
+              team_admin_must_have_a_team: 'Team Admin must have a team'
               organization_id_is_required_for_organization_admin: 'Organization Admin must have an organization'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'

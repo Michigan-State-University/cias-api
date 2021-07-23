@@ -66,7 +66,7 @@ class User < ApplicationRecord
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
   scope :third_parties, -> { limit_to_roles('third_party') }
-  scope :from_team, ->(team_id) { where(team_id: team_id) }
+  scope :from_team, ->(team_id) { where(team_id: team_id) } # only researchers
   scope :team_admins, -> { limit_to_roles('team_admin') }
   scope :participants, -> { limit_to_roles('participant') }
   scope :limit_to_active, -> { where(active: true) }
@@ -159,7 +159,7 @@ class User < ApplicationRecord
   def team_is_present?
     return if Team.exists?(team_admin_id: id)
 
-    errors.add(:roles, :team_id_is_required_for_team_admin)
+    errors.add(:roles, :team_admin_must_have_a_team)
   end
 
   def invalidate_token_after_changes

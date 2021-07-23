@@ -6,17 +6,16 @@ RSpec.describe 'POST /v1/teams', type: :request do
   let(:request) { post v1_teams_path, params: params, headers: headers }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
-
-  context 'when params are valid, new team admin is researcher' do
-    let(:new_team_admin) { create(:user, :confirmed, :researcher) }
-    let(:params) do
-      {
-        team: {
-          name: 'Best Team',
-          user_id: new_team_admin.id
-        }
+  let(:params) do
+    {
+      team: {
+        name: 'Best Team',
+        user_id: new_team_admin.id
       }
-    end
+    }
+  end
+
+  shared_examples 'new team created properly' do
     let(:new_team) { Team.order(:created_at).last }
 
     it 'returns :created status' do
@@ -24,7 +23,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
       expect(response).to have_http_status(:created)
     end
 
-    it 'creates new team with proper name, sets researcher as team admin' do
+    it 'creates new team with proper name, sets user as team admin' do
       expect { request }.to change(Team, :count).by(1)
 
       expect(new_team).to have_attributes(
@@ -36,6 +35,22 @@ RSpec.describe 'POST /v1/teams', type: :request do
         team_id: nil
       )
     end
+  end
+
+  shared_examples 'new team is forbidden to create' do
+    let(:params) { {} }
+
+    it 'returns :forbidden status and not authorized message' do
+      request
+      expect(response).to have_http_status(:forbidden)
+      expect(json_response['message']).to eq('You are not authorized to access this page.')
+    end
+  end
+
+  context 'when params are valid, new team admin is researcher' do
+    let(:new_team_admin) { create(:user, :confirmed, :researcher) }
+
+    it_behaves_like 'new team created properly'
 
     context 'when there are waiting team invitations for researcher' do
       let!(:team_invitation1) { create(:team_invitation, user: new_team_admin) }
@@ -53,33 +68,8 @@ RSpec.describe 'POST /v1/teams', type: :request do
 
   context 'when params are valid, new team admin is team_admin' do
     let!(:new_team_admin) { create(:user, :confirmed, roles: %w[participant team_admin guest]) }
-    let(:params) do
-      {
-        team: {
-          name: 'Best Team',
-          user_id: new_team_admin.id
-        }
-      }
-    end
-    let(:new_team) { Team.order(:created_at).last }
 
-    it 'returns :created status' do
-      request
-      expect(response).to have_http_status(:created)
-    end
-
-    it 'creates new team with proper name, sets team admin as team\'s admin' do
-      expect { request }.to change(Team, :count).by(1)
-
-      expect(new_team).to have_attributes(
-        name: 'Best Team',
-        team_admin_id: new_team_admin.id
-      )
-      expect(new_team_admin.reload).to have_attributes(
-        roles: ['team_admin'],
-        team_id: nil
-      )
-    end
+    it_behaves_like 'new team created properly'
   end
 
   context 'when params are invalid' do
@@ -111,15 +101,18 @@ RSpec.describe 'POST /v1/teams', type: :request do
     end
   end
 
-  context 'when user is not super admin' do
-    let(:user) { create(:user, :confirmed, :researcher) }
-    let(:headers) { user.create_new_auth_token }
-    let(:params) { {} }
+  %w[researcher participant e_intervention_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+    context 'when user is not super admin' do
+      let(:user) { create(:user, :confirmed, roles: [role]) }
 
-    it 'returns :forbidden status and not authorized message' do
-      request
-      expect(response).to have_http_status(:forbidden)
-      expect(json_response['message']).to eq('You are not authorized to access this page.')
+      it_behaves_like 'new team is forbidden to create'
     end
+  end
+
+  context 'when user is team admin' do
+    let!(:team) { create(:team) }
+    let(:user) { team.team_admin }
+
+    it_behaves_like 'new team is forbidden to create'
   end
 end

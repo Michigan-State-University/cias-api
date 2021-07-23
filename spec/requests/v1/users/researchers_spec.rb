@@ -97,6 +97,8 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     before do
       create(:user, :researcher, team_id: team2.id)
       create(:user, :researcher, team_id: team2.id)
+      create(:user, :participant, team_id: team2.id)
+      create(:user, :participant, team_id: team.id)
       request
     end
 
