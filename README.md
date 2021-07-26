@@ -48,3 +48,12 @@
 * `localhost:3000/rails/browse_emails`
 * `localhost:3000/rails/info/routes`
 * `localhost:3000/rails/workers - if SIDEKIQ_WEB_INTERFACE=1`
+
+
+### COMMON ISSUES
+* bug with generate audio 
+  * error message: `objc[4918]: +[__NSCFConstantString initialize] may have been in progress in another thread when fork() was called.`
+  * How to fix:    
+    * open `.zshrc`
+    * add `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES` 
+    * call in project terminal `source ~/.zshrc`

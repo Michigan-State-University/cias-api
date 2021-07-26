@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
 
   let!(:questions) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group) }
   let!(:questions2) do
-    create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group_2)
+    create_list(:question_slider, 3, title: 'Question 2 Id Title', question_group: question_group2)
   end
 
   let(:question_ids) { questions.pluck(:id) }

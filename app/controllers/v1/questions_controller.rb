@@ -4,28 +4,38 @@ class V1::QuestionsController < V1Controller
   include Resource::Clone
 
   def index
+    authorize! :read, Question
+
     render json: serialized_response(questions_scope)
   end
 
   def show
-    render json: serialized_response(question_service.question_load(question_group_id, question_id))
+    authorize! :read, Question
+
+    render json: serialized_response(question_load)
   end
 
   def create
-    question = question_service.create(question_group_id, question_params)
+    authorize! :create, Question
+
+    question = V1::Question::Create.call(questions_scope, question_params)
 
     render json: serialized_response(question), status: :created
   end
 
   def update
-    question = question_service.update(question_group_id, question_id, question_params)
-    invalidate_cache(question_service.question_load(question_group_id, question_id))
+    authorize! :update, Question
+
+    question = V1::Question::Update.call(question_load, question_params)
+    invalidate_cache(question)
 
     render json: serialized_response(question)
   end
 
   def destroy
-    question_service.destroy(session_id, question_ids)
+    authorize! :delete, Question
+
+    V1::Question::Destroy.call(chosen_questions, question_ids)
 
     head :no_content
   end
@@ -37,14 +47,13 @@ class V1::QuestionsController < V1Controller
       'resource/question_bulk_update',
       values: position_params[:position]
     ).execute
-    question_groups = question_service.question_groups_scope(session_id)
-    render json: serialized_response(question_groups, 'QuestionGroup')
+    render json: serialized_response(question_groups_scope, 'QuestionGroup')
   end
 
   def share
     authorize! :create, Question
 
-    share_service.share(question_ids, researcher_ids)
+    V1::Question::ShareService.call(current_v1_user, question_ids, chosen_questions, researcher_ids)
 
     head :created
   end
@@ -52,23 +61,37 @@ class V1::QuestionsController < V1Controller
   def clone_multiple
     authorize! :create, Question
 
-    cloned_questions = question_service.clone_multiple(session_id, question_ids)
+    cloned_questions = V1::Question::CloneMultiple.call(question_ids, chosen_questions)
 
     render json: serialized_response(cloned_questions), status: :created
   end
 
   private
 
-  def question_service
-    @question_service ||= V1::QuestionService.new(current_v1_user)
-  end
-
-  def share_service
-    @share_service ||= V1::Question::ShareService.new(current_v1_user)
+  def question_group_load
+    QuestionGroup.includes(:questions).accessible_by(current_ability).find(question_group_id)
   end
 
   def questions_scope
-    question_service.questions_scope(question_group_id)
+    question_group_load.questions.order(:position)
+  end
+
+  def question_load
+    questions_scope.find(question_id)
+  end
+
+  def chosen_questions
+    Question.accessible_by(current_ability).where(id: question_ids)
+  end
+
+  def questions_scope_by_session
+    Session.includes(%i[question_groups
+                        questions]).accessible_by(current_ability).find(session_id).questions.order(:position)
+  end
+
+  def question_groups_scope
+    Session.includes(%i[question_groups
+                        questions]).accessible_by(current_ability).find(session_id).question_groups.order(:position)
   end
 
   def question_group_id
