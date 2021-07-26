@@ -26,9 +26,26 @@ RSpec.describe HealthSystem, type: :model do
                                       organization: existing_health_system.organization)
       end
 
-      it 'team is invalid' do
+      it 'health system is invalid' do
         expect(health_system).not_to be_valid
         expect(health_system.errors.messages[:name]).to include(/has already been taken/)
+      end
+    end
+  end
+
+  describe '#health_clinics' do
+    context 'when health_system has one deleted clinic and one not' do
+      let!(:health_system) { create(:health_system) }
+      let!(:deleted_health_clinic) { create(:health_clinic, health_system: health_system, deleted_at: Time.current) }
+      let!(:health_clinic) { create(:health_clinic, health_system: health_system) }
+      let(:health_clinic_ids) { [health_clinic.id, deleted_health_clinic.id] }
+
+      it 'returns one health clinic with deleted one' do
+        expect(health_system.health_clinics.size).to eq 2
+      end
+
+      it 'returns proper records' do
+        expect(health_system.health_clinics.with_deleted.pluck(:id)).to eql(health_clinic_ids)
       end
     end
   end

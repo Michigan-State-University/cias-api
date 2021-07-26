@@ -3,9 +3,19 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/health_systems', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
-  let(:new_health_system_admin) { create(:user, :confirmed, :health_system_admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
+  let(:user) { admin }
+
+  let(:roles) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles,
+      'e_intervention_admin' => e_intervention_admin
+    }
+  end
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
 
@@ -14,8 +24,7 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
     {
       health_system: {
         name: 'New Health System',
-        organization_id: organization.id,
-        health_system_admins_to_add: [new_health_system_admin.id.to_s]
+        organization_id: organization.id
       }
     }
   end
@@ -51,16 +60,12 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
               'deleted' => false
             },
             'relationships' => {
-              'health_system_admins' => { 'data' => [{ 'id' => new_health_system_admin.id, 'type' => 'user' }] },
+              'health_system_admins' => { 'data' => [] },
               'health_clinics' => { 'data' => [] }
             }
           }
         )
       end
-    end
-
-    context 'when user is admin' do
-      it_behaves_like 'permitted user'
 
       context 'when params are invalid' do
         let(:params) do
@@ -79,16 +84,12 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
       end
     end
 
-    context 'when user has multiple roles' do
-      let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+    %w[admin admin_with_multiple_roles e_intervention_admin].each do |role|
+      context "when user is #{role}" do
+        let(:user) { roles[role] }
 
-      it_behaves_like 'permitted user'
-    end
-
-    context 'when user is e_intervention admin' do
-      let(:user) { create(:user, :confirmed, :e_intervention_admin) }
-
-      it_behaves_like 'permitted user'
+        it_behaves_like 'permitted user'
+      end
     end
   end
 
@@ -101,7 +102,7 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
       end
     end
 
-    %i[health_system_admin organization_admin team_admin researcher participant guest].each do |role|
+    %i[health_system_admin health_clinic_admin organization_admin team_admin researcher participant guest third_party].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

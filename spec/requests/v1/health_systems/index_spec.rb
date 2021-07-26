@@ -3,8 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/health_systems', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
+  let(:user) { admin }
 
   let!(:organization) do
     create(:organization, :with_health_system, :with_organization_admin, :with_e_intervention_admin)
@@ -20,8 +22,11 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
 
   let(:roles) do
     {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles,
       'organization_admin' => organization.organization_admins.first,
-      'e_intervention_admin' => organization.e_intervention_admins.first
+      'e_intervention_admin' => organization.e_intervention_admins.first,
+      'health_system_admin' => health_system_admin
     }
   end
 
@@ -182,74 +187,49 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
       end
     end
 
-    context 'when user is admin' do
-      it_behaves_like 'permitted user'
-    end
+    shared_examples 'permitted user with one health system' do
+      before { request }
 
-    context 'when admin has multiple roles' do
-      let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+      it 'returns proper collection size' do
+        expect(json_response['data'].size).to eq(1)
+      end
 
-      it_behaves_like 'permitted user'
-    end
-
-    context 'when user is' do
-      %w[organization_admin e_intervention_admin].each do |role|
-        context role.to_s do
-          let(:user) { roles[role] }
-
-          before { request }
-
-          it 'returns proper collection size' do
-            expect(json_response['data'].size).to eq(1)
-          end
-
-          it 'returns proper collection data' do
-            expect(json_response['data']).to include(
-              {
-                'id' => health_system.id.to_s,
-                'type' => 'health_system',
-                'attributes' => {
-                  'name' => health_system.name,
-                  'organization_id' => organization.id,
-                  'deleted' => false
-                },
-                'relationships' => {
-                  'health_system_admins' => { 'data' => [] },
-                  'health_clinics' => { 'data' => [] }
-                }
-              }
-            )
-          end
-        end
+      it 'returns proper collection data' do
+        expect(json_response['data']).to include(
+          {
+            'id' => chosen_health_system.id.to_s,
+            'type' => 'health_system',
+            'attributes' => {
+              'name' => chosen_health_system.name,
+              'organization_id' => chosen_health_system.organization_id,
+              'deleted' => false
+            },
+            'relationships' => {
+              'health_system_admins' => { 'data' => chosen_admins_data },
+              'health_clinics' => { 'data' => [] }
+            }
+          }
+        )
       end
     end
-  end
 
-  context 'when user is health system admin' do
-    let!(:user) { health_system_admin }
+    %w[admin admin_with_multiple_roles].each do |role|
+      context "when user is #{role}" do
+        let(:user) { roles[role] }
 
-    before { request }
-
-    it 'returns proper collection size' do
-      expect(json_response['data'].size).to eq(1)
+        it_behaves_like 'permitted user'
+      end
     end
 
-    it 'returns proper collection data' do
-      expect(json_response['data']).to include(
-        {
-          'id' => health_system2.id.to_s,
-          'type' => 'health_system',
-          'attributes' => {
-            'name' => health_system2.name,
-            'organization_id' => health_system2.organization.id,
-            'deleted' => false
-          },
-          'relationships' => {
-            'health_system_admins' => { 'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }] },
-            'health_clinics' => { 'data' => [] }
-          }
-        }
-      )
+    %w[organization_admin e_intervention_admin health_system_admin].each do |role|
+      context "when user is #{role}" do
+        let!(:user) { roles[role] }
+
+        it_behaves_like 'permitted user with one health system' do
+          let(:chosen_health_system) { role.eql?('health_system_admin') ? health_system2 : health_system }
+          let(:chosen_admins_data) { role.eql?('health_system_admin') ? [{ 'id' => health_system_admin.id, 'type' => 'user' }] : [] }
+        end
+      end
     end
   end
 
@@ -262,7 +242,7 @@ RSpec.describe 'GET /v1/health_systems', type: :request do
       end
     end
 
-    %i[team_admin researcher participant guest].each do |role|
+    %i[team_admin researcher participant guest third_party health_clinic_admin].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

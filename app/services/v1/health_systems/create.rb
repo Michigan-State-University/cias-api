@@ -16,12 +16,6 @@ class V1::HealthSystems::Create
         organization_id: health_system_params[:organization_id]
       )
 
-      V1::HealthSystems::ChangeHealthSystemAdmins.call(
-        health_system,
-        health_system_params[:health_system_admins_to_add],
-        nil
-      )
-
       health_system
     end
   end

@@ -18,9 +18,7 @@ class HealthSystem < ApplicationRecord
   private
 
   def deactivate_health_system_admins
-    health_system_admins.each do |health_system_admin|
-      health_system_admin.deactivate!
-      health_system_admins.delete(health_system_admin)
-    end
+    health_system_admins.each(&:deactivate!)
+    health_system_admins.delete_all
   end
 end
