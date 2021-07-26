@@ -10,56 +10,56 @@ RSpec.describe V1::Question::Create do
   let(:blocks) { [] }
   let(:question_params) do
     {
-        type: 'Question::Multiple',
-        position: 99,
-        title: 'Question Test 1',
-        subtitle: 'test 1',
-        formula: {
-          payload: 'test',
-          patterns: [
-            {
-              match: '= 5',
-              target: [{
-                type: 'Session',
-                probability: '100',
-                id: ''
-              }]
-            },
-            {
-              match: '> 5',
-              target: [{
-                type: 'Question',
-                probability: '100',
-                id: ''
-              }]
-            }
-          ]
-        },
-        body: {
-          data: [
-            {
-              payload: 'create1',
-              variable: {
-                name: 'test1',
-                value: '1'
-              }
-            },
-            {
-              payload: 'create2',
-              variable: {
-                name: 'test2',
-                value: '2'
-              }
-            }
-          ]
-        },
-        narrator: {
-          blocks: blocks,
-          settings: {
-            voice: true,
-            animation: true
+      type: 'Question::Multiple',
+      position: 99,
+      title: 'Question Test 1',
+      subtitle: 'test 1',
+      formula: {
+        payload: 'test',
+        patterns: [
+          {
+            match: '= 5',
+            target: [{
+              type: 'Session',
+              probability: '100',
+              id: ''
+            }]
+          },
+          {
+            match: '> 5',
+            target: [{
+              type: 'Question',
+              probability: '100',
+              id: ''
+            }]
           }
+        ]
+      },
+      body: {
+        data: [
+          {
+            payload: 'create1',
+            variable: {
+              name: 'test1',
+              value: '1'
+            }
+          },
+          {
+            payload: 'create2',
+            variable: {
+              name: 'test2',
+              value: '2'
+            }
+          }
+        ]
+      },
+      narrator: {
+        blocks: blocks,
+        settings: {
+          voice: true,
+          animation: true
         }
+      }
     }
   end
   let(:last_question) { question_group.reload.questions.last }
