@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_27_063054) do
+ActiveRecord::Schema.define(version: 2021_07_13_112213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -98,7 +98,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position", default: 1, null: false
-    t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
@@ -168,7 +167,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
-    t.index ["name", "health_system_id"], name: "index_health_clinics_on_name_and_health_system_id", unique: true
   end
 
   create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -190,7 +188,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
-    t.index ["name", "organization_id"], name: "index_health_systems_on_name_and_organization_id", unique: true
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 
@@ -205,7 +202,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.uuid "organization_id"
     t.bigint "google_language_id", default: 22, null: false
     t.boolean "from_deleted_organization", default: false, null: false
-    t.jsonb "original_text"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -252,7 +248,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["name"], name: "index_organizations_on_name", unique: true
   end
 
   create_table "phones", force: :cascade do |t|
@@ -295,7 +290,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.jsonb "original_text"
     t.index ["question_group_id"], name: "index_questions_on_question_group_id"
     t.index ["title"], name: "index_questions_on_title"
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
@@ -311,7 +305,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.jsonb "original_text"
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
     t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end
@@ -331,7 +324,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.text "summary"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.jsonb "original_text"
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"
@@ -376,7 +368,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.jsonb "original_text"
     t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
   end
 
@@ -392,7 +383,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.boolean "is_used_formula", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.jsonb "original_text"
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
@@ -508,8 +498,6 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.string "email_bidx"
     t.string "uid_bidx"
     t.string "organizable_type"
-    t.boolean "terms", default: false, null: false
-    t.datetime "terms_confirmed_at"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
