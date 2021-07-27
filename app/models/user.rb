@@ -5,7 +5,6 @@ class User < ApplicationRecord
     first_name last_name email uid migrated_first_name migrated_last_name migrated_email migrated_uid
   ]
   before_save :invalidate_token_after_changes
-  after_create :set_terms_confirmed_date
 
   devise :confirmable,
          :database_authenticatable,
@@ -33,7 +32,6 @@ class User < ApplicationRecord
 
   validates :time_zone, inclusion: { in: TIME_ZONES }
   validate :team_is_present?, if: :team_admin?, on: :update
-  validates :terms, acceptance: { on: :create, accept: true }
 
   has_one :phone, dependent: :destroy
   accepts_nested_attributes_for :phone, update_only: true
@@ -134,13 +132,9 @@ class User < ApplicationRecord
   def accepted_health_clinic_ids
     return unless role?('health_clinic_admin')
 
-    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
+    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map { |hci| hci.health_clinic_id }
     health_clinic_ids.append(organizable.id) if organizable
     health_clinic_ids
-  end
-
-  def set_terms_confirmed_date
-    self.terms_confirmed_at = Time.current
   end
 
   private

@@ -100,7 +100,7 @@ describe 'POST /v1/users/invitations', type: :request do
       end
 
       it 'returns correct error message' do
-        expect(json_response['error']).to eq 'Email is not an email and Terms must be accepted'
+        expect(json_response['error']).to eq 'Email is not an email'
       end
     end
   end
