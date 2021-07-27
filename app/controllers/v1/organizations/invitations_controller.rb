@@ -8,7 +8,7 @@ class V1::Organizations::InvitationsController < V1Controller
 
     V1::Organizations::InviteEInterventionAdmin.call(
       organization,
-      params.require(:email)
+      email_params
     )
 
     render status: :created
@@ -19,7 +19,7 @@ class V1::Organizations::InvitationsController < V1Controller
 
     V1::Organizations::InviteOrganizationAdmin.call(
       organization,
-      params.require(:email)
+      email_params
     )
 
     render status: :created
@@ -42,7 +42,7 @@ class V1::Organizations::InvitationsController < V1Controller
 
   def organization_invitation
     @organization_invitation ||= OrganizationInvitation.not_accepted.
-        find_by!(invitation_token: params.require(:invitation_token))
+        find_by!(invitation_token: invitation_token_params)
   end
 
   def redirect_to_web_app(**message)
@@ -53,5 +53,13 @@ class V1::Organizations::InvitationsController < V1Controller
 
   def organization
     @organization ||= Organization.accessible_by(current_ability).find(params[:organization_id])
+  end
+
+  def email_params
+    params.require(:email)
+  end
+
+  def invitation_token_params
+    params.require(:invitation_token)
   end
 end
