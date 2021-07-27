@@ -141,7 +141,6 @@ class User < ApplicationRecord
 
   def set_terms_confirmed_date
     self.terms_confirmed_at = Time.current
-    save!
   end
 
   private
