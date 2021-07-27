@@ -62,12 +62,15 @@ RSpec.describe V1::Question::Create do
       }
     }
   end
-  let(:last_question) { question_group.reload.questions.last }
+  let!(:position) { question_group.questions.last.position }
 
   describe 'params are valid' do
+    let(:result) do
+      described_class.call(questions_scope, question_params)
+    end
+
     it 'question have right position' do
-      subject
-      expect(last_question.position).to eq(4)
+      expect(result.position).to be(position + 1)
     end
 
     it 'change question count by 1' do
