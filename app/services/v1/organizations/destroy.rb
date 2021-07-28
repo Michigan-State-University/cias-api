@@ -10,9 +10,7 @@ class V1::Organizations::Destroy
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      organization.destroy!
-    end
+    organization.destroy!
   end
 
   private

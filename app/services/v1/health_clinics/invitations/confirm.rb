@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::HealthClinics::Invitations::Confirm
+  prepend Database::Transactional
+
   def self.call(health_clinic_invitation)
     new(health_clinic_invitation).call
   end
@@ -12,14 +14,12 @@ class V1::HealthClinics::Invitations::Confirm
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      user.activate!
+    user.activate!
 
-      health_clinic_invitation.update!(
-        accepted_at: Time.current,
-        invitation_token: nil
-      )
-    end
+    health_clinic_invitation.update!(
+      accepted_at: Time.current,
+      invitation_token: nil
+    )
   end
 
   private

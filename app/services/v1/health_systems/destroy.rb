@@ -10,9 +10,7 @@ class V1::HealthSystems::Destroy
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      health_system.destroy!
-    end
+    health_system.destroy!
   end
 
   private
