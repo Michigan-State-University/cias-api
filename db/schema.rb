@@ -205,7 +205,6 @@ ActiveRecord::Schema.define(version: 2021_07_28_063431) do
     t.uuid "organization_id"
     t.bigint "google_language_id", default: 22, null: false
     t.boolean "from_deleted_organization", default: false, null: false
-    t.jsonb "original_text"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
