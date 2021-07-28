@@ -86,6 +86,7 @@ group :test do
   gem 'test-prof'
   gem 'timecop'
   gem 'database_cleaner-active_record'
+  gem 'action-cable-testing', '~> 0.6.1'
 end
 
 group :production do

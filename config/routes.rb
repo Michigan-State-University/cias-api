@@ -211,4 +211,6 @@ Rails.application.routes.draw do
       mount Sidekiq::Web => '/workers'
     end
   end
+
+  mount ActionCable.server => '/cable'
 end

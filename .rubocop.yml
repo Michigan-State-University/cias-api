@@ -187,6 +187,7 @@ Style/ClassAndModuleChildren:
   EnforcedStyle: compact
   Exclude:
     - 'config/application.rb'
+    - 'app/channels/application_cable/connection.rb'
 
 Style/CombinableLoops:
   Enabled: true
