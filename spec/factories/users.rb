@@ -7,6 +7,7 @@ FactoryBot.define do
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
     provider { 'email' }
+    terms { true }
     roles { %w[guest] }
     time_zone { 'Europe/Warsaw' }
 
