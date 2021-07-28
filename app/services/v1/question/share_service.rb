@@ -1,23 +1,26 @@
 # frozen_string_literal: true
 
-class V1::Question::ShareService < V1::Question::BaseService
-  def initialize(user)
-    super(user)
-    @questions = Question.accessible_by(user.ability)
-    @researchers = prepare_researchers(user)
+class V1::Question::ShareService
+  def self.call(user, question_ids, questions, researcher_ids)
+    new(user, question_ids, questions, researcher_ids).call
+  end
+
+  def initialize(user, question_ids, questions, researcher_ids)
+    @user = user
+    @questions = questions
+    @researchers = chosen_researchers(prepare_researchers(user), researcher_ids)
+    @question_ids = question_ids
+    @researcher_ids = researcher_ids
   end
 
   attr_accessor :questions, :researchers
+  attr_reader :question_ids, :researcher_ids, :user
 
-  def share(question_ids, researcher_ids)
-    questions = chosen_questions(question_ids)
-    researchers = chosen_researchers(researcher_ids)
-    raise ActiveRecord::RecordNotFound unless proper_questions?(questions,
-                                                                question_ids) && proper_researchers?(researchers,
-                                                                                                     researcher_ids)
+  def call
+    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids) && proper_researchers?(researchers, researcher_ids) # here
 
     researchers.each do |researcher|
-      question_group = prepare_question_group(researcher, questions.first.question_group_id)
+      question_group = prepare_question_group(researcher, questions.first.question_group)
       question_group_questions = question_group.questions
 
       questions.each do |question|
@@ -28,7 +31,7 @@ class V1::Question::ShareService < V1::Question::BaseService
     end
   end
 
-  def chosen_researchers(researcher_ids)
+  def chosen_researchers(researchers, researcher_ids)
     researchers.where(id: researcher_ids)
   end
 
@@ -38,15 +41,13 @@ class V1::Question::ShareService < V1::Question::BaseService
 
   private
 
-  def prepare_question_group(researcher, question_group_id)
-    intervention = question_group_intervention(question_group_id)
+  def prepare_question_group(researcher, question_group)
+    intervention = question_group_intervention(question_group)
     create_new_question_group(researcher, intervention)
   end
 
-  def question_group_intervention(question_group_id)
-    question_group = question_group_load(question_group_id)
-    session = Session.accessible_by(user.ability).find(question_group.session_id)
-    Intervention.accessible_by(user.ability).find(session.intervention_id)
+  def question_group_intervention(question_group)
+    question_group.session.intervention
   end
 
   def create_new_question_group(researcher, intervention)
@@ -65,6 +66,10 @@ class V1::Question::ShareService < V1::Question::BaseService
         session: new_session
       )
     end
+  end
+
+  def proper_questions?(questions, question_ids)
+    question_ids && questions.size == question_ids.size
   end
 
   def proper_researchers?(researchers, researcher_ids)
