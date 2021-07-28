@@ -138,7 +138,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report_2.report_template.id] }] })
+                                                       report_template_ids: [generated_report2.report_template.id] }] })
         end
 
         it_behaves_like 'user third_party role invitation, generating report sharing', 2, 4, 2
@@ -148,7 +148,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
         end
 
         it_behaves_like 'user third_party role invitation, generating report sharing', 2, 4, 2
@@ -159,12 +159,12 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
         end
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny3@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report_3.report_template.id] }] })
+                                                       report_template_ids: [generated_report3.report_template.id] }] })
         end
 
         it_behaves_like 'user third_party role invitation, generating report sharing', 3, 6, 3
@@ -179,14 +179,14 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report_2.report_template.id] }] })
+                                                       report_template_ids: [generated_report2.report_template.id] }] })
         end
 
         it 'sends information about new report to the users, shared the report with the users' do
           expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
             User.where(id: [user.id, user2.id]).order(:created_at)
           ).and \
-            change { generated_report_2.reload.third_party_users.order(:created_at) }.from([]).to(
+            change { generated_report2.reload.third_party_users.order(:created_at) }.from([]).to(
               User.where(id: [user.id, user2.id]).order(:created_at)
             ).and \
               change { ActionMailer::Base.deliveries.size }.by(2).and \
@@ -198,7 +198,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
         end
 
         it 'sends information about new report to the users, shared the report with the users' do
@@ -216,22 +216,22 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
         end
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny3@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report_3.report_template.id] }] })
+                                                       report_template_ids: [generated_report3.report_template.id] }] })
         end
 
         it 'sends information about new report to the users, shared the report with the users' do
           expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
             User.where(id: [user.id, user2.id]).order(:created_at)
           ).and \
-            change { generated_report_2.reload.third_party_users.order(:created_at) }.from([]).to(
+            change { generated_report2.reload.third_party_users.order(:created_at) }.from([]).to(
               User.where(id: [user.id, user2.id]).order(:created_at)
             ).and \
-              change { generated_report_3.reload.third_party_users.order(:created_at) }.from([]).to(
+              change { generated_report3.reload.third_party_users.order(:created_at) }.from([]).to(
                 User.where(id: [user2.id, user3.id]).order(:created_at)
               ).and \
                 change { ActionMailer::Base.deliveries.size }.by(3).and \
