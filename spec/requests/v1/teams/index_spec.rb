@@ -128,7 +128,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
           'attributes' => include('name' => team1.name, 'team_admin_id' => team_1_admin.id),
           'relationships' => {
             'team_admin' => {
-              'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
+              'data' => include('id' => team_1_admin.id, 'type' => 'user')
             }
           }
         )
