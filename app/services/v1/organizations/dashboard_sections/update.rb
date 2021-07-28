@@ -11,13 +11,11 @@ class V1::Organizations::DashboardSections::Update
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      dashboard_section.name = dashboard_section_params[:name] if name_changed?
-      dashboard_section.description = dashboard_section_params[:description] if description_changed?
-      dashboard_section.save!
+    dashboard_section.name = dashboard_section_params[:name] if name_changed?
+    dashboard_section.description = dashboard_section_params[:description] if description_changed?
+    dashboard_section.save!
 
-      dashboard_section.reload
-    end
+    dashboard_section.reload
   end
 
   private

@@ -10,9 +10,7 @@ class V1::Organizations::DashboardSections::Destroy
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      reporting_dashboard.destroy!
-    end
+    reporting_dashboard.destroy!
   end
 
   private
