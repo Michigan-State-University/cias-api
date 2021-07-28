@@ -4,7 +4,9 @@ class V1::InterventionsController < V1Controller
   include Resource::Clone
 
   def index
-    render_json interventions: interventions_scope
+    collection = interventions_scope
+    paginated_collection = paginate(collection, params)
+    render_json interventions: paginated_collection, interventions_size: collection.size
   end
 
   def show

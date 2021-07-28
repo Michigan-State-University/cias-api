@@ -649,7 +649,8 @@ FactoryBot.define do
         data: [
           {
             payload: '',
-            value: ''
+            value: '',
+            report_template_ids: []
           }
         ]
       }

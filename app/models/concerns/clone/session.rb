@@ -12,6 +12,7 @@ class Clone::Session < Clone::Base
       create_report_templates
       reassign_branching
       reassign_reflections
+      reassign_report_templates_to_third_party_screens
     end
     outcome
   end
@@ -136,6 +137,24 @@ class Clone::Session < Clone::Base
           new_variant.image.attach(variant.image.blob) if variant.image.attachment
         end
       end
+    end
+  end
+
+  def reassign_report_templates_to_third_party_screens
+    source_third_party_report_templates = source.report_templates.third_party
+    outcome_third_party_report_templates = outcome.report_templates.third_party
+
+    Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
+      third_party_question.body_data.each do |third_party_question_body_data_element|
+        report_template_ids = third_party_question_body_data_element.dig('report_template_ids')
+        new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids|
+          source_report_template = source_third_party_report_templates.find(report_template_id)
+          outcome_report_template_id = outcome_third_party_report_templates.find_by(name: source_report_template.name)&.id
+          new_report_template_ids << outcome_report_template_id
+        end
+        third_party_question_body_data_element['report_template_ids'] = new_report_template_ids
+      end
+      third_party_question.save!
     end
   end
 end

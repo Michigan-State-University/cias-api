@@ -110,7 +110,7 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
         expect(participant_report.reload.participant_id).to eq(participant.id)
         expect(ActionMailer::Base.deliveries.first).to have_attributes(
           to: include(participant.email),
-          subject: 'New report in the system is ready for you'
+          subject: 'New reports in the system are ready for you'
         )
       end
     end

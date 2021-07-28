@@ -7,7 +7,8 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
   let!(:generated_report) { create(:generated_report, :third_party, user_session: user_session) }
   let!(:answer_third_party) do
     create(:answer_third_party, user_session: user_session,
-                                body: { data: [{ value: 'johnny@example.com, johnny2@example.com' }] })
+                                body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
+                                                 report_template_ids: [generated_report.report_template.id] }] })
   end
 
   before do
@@ -19,8 +20,17 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     Timecop.return
   end
 
+  shared_examples "won't share report with third party" do
+    it 'won\'t share report with third party' do
+      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
+        avoid_changing { ActionMailer::Base.deliveries.size }.and \
+          avoid_changing { User.count }
+    end
+  end
+
   context 'when users with the emails not exist in the system' do
     let(:new_user) { User.third_parties.first }
+    let(:number_of_generated_reports) { 1 }
 
     it 'invites new users with third party role to the system, shares generated report with the users' do
       expect { subject }.to change(User, :count).by(2)
@@ -28,7 +38,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
       expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.twice
       expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
-            .with(new_user.email)
+            .with(new_user.email, number_of_generated_reports)
 
       expect(new_user).to have_attributes(
         roles: ['third_party'],
@@ -56,23 +66,23 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
       generated_report.update!(report_for: 'participant')
     end
 
-    it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
-        avoid_changing { ActionMailer::Base.deliveries.size }.and \
-          avoid_changing { User.count }
-    end
+    it_behaves_like "won't share report with third party"
   end
 
   context 'when email is not provided in the third party screen' do
     before do
-      answer_third_party.update(body: { data: [{ value: '' }] })
+      answer_third_party.update(body: { data: [{ value: '', report_template_ids: [generated_report.report_template.id] }] })
     end
 
-    it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
-        avoid_changing { ActionMailer::Base.deliveries.size }.and \
-          avoid_changing { User.count }
+    it_behaves_like "won't share report with third party"
+  end
+
+  context 'when report_template id is not provided in the third party screen' do
+    before do
+      answer_third_party.update(body: { data: [{ value: 'johnny@example.com, johnny2@example.com', report_template_ids: [] }] })
     end
+
+    it_behaves_like "won't share report with third party"
   end
 
   context 'when there is no third party screen' do
@@ -80,22 +90,14 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
       answer_third_party.destroy
     end
 
-    it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
-        avoid_changing { ActionMailer::Base.deliveries.size }.and \
-          avoid_changing { User.count }
-    end
+    it_behaves_like "won't share report with third party"
   end
 
   context 'when users with provided emails are researchers' do
     let!(:user) { create(:user, :confirmed, :researcher, email: 'johnny@example.com') }
     let!(:user2) { create(:user, :confirmed, :researcher, email: 'johnny2@example.com') }
 
-    it 'won\'t share report with third party' do
-      expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
-        avoid_changing { ActionMailer::Base.deliveries.size }.and \
-          avoid_changing { User.count }
-    end
+    it_behaves_like "won't share report with third party"
   end
 
   context 'when users are third party but with deactivated accounts' do
@@ -116,6 +118,123 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
     it "don't send email" do
       expect { subject }.to avoid_changing { ActionMailer::Base.deliveries.size }
+    end
+  end
+
+  context 'when user_session has many generated reports' do
+    let!(:generated_report_2) { create(:generated_report, :third_party, user_session: user_session) }
+    let!(:generated_report_3) { create(:generated_report, :third_party, user_session: user_session) }
+
+    context 'when users don\'t exist in the system' do
+      shared_examples 'user third_party role invitation, generating report sharing' do |user_number, generated_reports_third_party_user_number, mail_number|
+        it 'invites new users with third party role to the system, shares generated report with the users' do
+          expect { subject }.to change(User, :count).by(user_number).and \
+            change(GeneratedReportsThirdPartyUser, :count).by(generated_reports_third_party_user_number)
+          expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.exactly(mail_number)
+        end
+      end
+
+      context 'when the same email occurs in two different answers with two different report templates' do
+        let!(:answer_third_party_2) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny@example.com, johnny2@example.com', report_template_ids: [generated_report_2.report_template.id] }] })
+        end
+
+        it_behaves_like 'user third_party role invitation, generating report sharing', 2, 4, 2
+      end
+
+      context 'when many emails occurs with many report templates in one answer' do
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
+                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+        end
+
+        it_behaves_like 'user third_party role invitation, generating report sharing', 2, 4, 2
+      end
+
+      context 'when many emails have many different report templates' do
+        let!(:generated_report_4) { create(:generated_report, :third_party, user_session: user_session) }
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
+                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+        end
+        let!(:answer_third_party_2) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny3@example.com, johnny2@example.com',
+                                                       report_template_ids: [generated_report_3.report_template.id] }] })
+        end
+
+        it_behaves_like 'user third_party role invitation, generating report sharing', 3, 6, 3
+      end
+    end
+
+    context 'when users exists in the system' do
+      let!(:user) { create(:user, :confirmed, :third_party, email: 'johnny@example.com') }
+      let!(:user2) { create(:user, :confirmed, :third_party, email: 'johnny2@example.com') }
+
+      context 'when the same email occurs in two different answers with two different report templates' do
+        let!(:answer_third_party_2) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny@example.com, johnny2@example.com', report_template_ids: [generated_report_2.report_template.id] }] })
+        end
+
+        it 'sends information about new report to the users, shared the report with the users' do
+          expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
+            User.where(id: [user.id, user2.id]).order(:created_at)
+          ).and \
+            change { generated_report_2.reload.third_party_users.order(:created_at) }.from([]).to(
+              User.where(id: [user.id, user2.id]).order(:created_at)
+            ).and \
+              change { ActionMailer::Base.deliveries.size }.by(2).and \
+                avoid_changing { User.count }
+        end
+      end
+
+      context 'when many emails occurs with many report templates in one answer' do
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
+                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+        end
+
+        it 'sends information about new report to the users, shared the report with the users' do
+          expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
+            User.where(id: [user.id, user2.id]).order(:created_at)
+          ).and \
+            change { ActionMailer::Base.deliveries.size }.by(2).and \
+              avoid_changing { User.count }
+        end
+      end
+
+      context 'when many emails have many different report templates' do
+        let!(:user3) { create(:user, :confirmed, :third_party, email: 'johnny3@example.com') }
+        let!(:generated_report_4) { create(:generated_report, :third_party, user_session: user_session) }
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
+                                                       report_template_ids: [generated_report.report_template.id, generated_report_2.report_template.id] }] })
+        end
+        let!(:answer_third_party_2) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: 'johnny3@example.com, johnny2@example.com', report_template_ids: [generated_report_3.report_template.id] }] })
+        end
+
+        it 'sends information about new report to the users, shared the report with the users' do
+          expect { subject }.to change { generated_report.reload.third_party_users.order(:created_at) }.from([]).to(
+            User.where(id: [user.id, user2.id]).order(:created_at)
+          ).and \
+            change { generated_report_2.reload.third_party_users.order(:created_at) }.from([]).to(
+              User.where(id: [user.id, user2.id]).order(:created_at)
+            ).and \
+              change { generated_report_3.reload.third_party_users.order(:created_at) }.from([]).to(
+                User.where(id: [user2.id, user3.id]).order(:created_at)
+              ).and \
+                change { ActionMailer::Base.deliveries.size }.by(3).and \
+                  avoid_changing { User.count }
+        end
+      end
     end
   end
 end

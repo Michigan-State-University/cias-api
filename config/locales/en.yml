@@ -75,9 +75,9 @@ en:
       button_text:  Accept the Invitation
   generated_report_mailer:
     new_report_available:
-      subject:      "New report in the system is ready for you"
-      header:       "New report in the system is ready for you"
-      body:         "You have a new report available for download in your dashboard. Click the link below to visit your dashboard."
+      subject:      "New reports in the system are ready for you"
+      header:       "New reports in the system are ready for you"
+      body:         "You have %{number_of_generated_reports} new report(s) available for download in your dashboard. Click the link below to visit your dashboard."
       button_text:  Visit Dashboard
   report_template_mailer:
     template_preview:
