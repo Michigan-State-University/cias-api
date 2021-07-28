@@ -3,7 +3,8 @@
 class V1::Organizations::InterventionsController < V1Controller
   def index
     authorize! :read, Intervention
-    render_json interventions: interventions_scope, path: v1_interventions_path
+
+    render json: serialized_response(interventions_scope)
   end
 
   private

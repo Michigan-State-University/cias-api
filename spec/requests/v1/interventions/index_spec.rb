@@ -22,6 +22,18 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let(:organization) { create(:organization) }
   let!(:intervention_for_organization) { create(:intervention, organization_id: organization.id) }
 
+  shared_examples 'proper interventions' do
+    it 'returns proper interventions' do
+      expect(json_response['data'].pluck('id')).to match_array interventions_scope.map(&:id)
+    end
+  end
+
+  shared_examples 'proper error message' do
+    it 'returns proper error message' do
+      expect(json_response['data'].pluck('id')).to match_array []
+    end
+  end
+
   context 'when user is' do
     before { get v1_interventions_path, headers: user.create_new_auth_token }
 
@@ -30,9 +42,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       context role do
         let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests }
 
-        it 'returns proper interventions' do
-          expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.map(&:id)
-        end
+        it_behaves_like 'proper interventions'
       end
     end
 
@@ -40,18 +50,14 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       let(:user) { participant }
       let(:interventions_scope) { admin_interventions + interventions_for_guests }
 
-      it 'returns proper error message' do
-        expect(json_response['interventions'].pluck('id')).to match_array []
-      end
+      it_behaves_like 'proper error message'
     end
 
     context 'has role researcher' do
       let(:user) { researcher }
       let(:interventions_scope) { researcher_interventions }
 
-      it 'returns proper interventions' do
-        expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.map(&:id)
-      end
+      it_behaves_like 'proper interventions'
     end
 
     context 'has role guest' do
@@ -59,7 +65,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       let(:interventions_scope) { interventions_for_guests }
 
       it 'returns proper interventions' do
-        expect(json_response['interventions'].pluck('id')).to match_array []
+        expect(json_response['data'].pluck('id')).to match_array []
       end
     end
   end

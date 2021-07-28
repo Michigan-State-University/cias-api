@@ -75,4 +75,8 @@ class Intervention < ApplicationRecord
       session.translate(translator, source_language_name_short, destination_language_name_short)
     end
   end
+
+  def cache_key
+    "intervention/#{id}-#{updated_at&.to_s(:number)}"
+  end
 end

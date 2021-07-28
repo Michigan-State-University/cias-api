@@ -35,21 +35,26 @@ RSpec.describe 'GET /v1/teams', type: :request do
 
       it 'returns list of teams' do
         expect(json_response['data']).to include(
-          'id' => team1.id.to_s,
-          'type' => 'team',
-          'attributes' => include('name' => team1.name, 'team_admin_id' => team_1_admin.id),
-          'relationships' => {
-            'team_admin' => {
-              'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
+          {
+            'id' => team1.id.to_s,
+            'type' => 'team',
+            'attributes' => include('name' => team1.name, 'team_admin_id' => team_1_admin.id),
+            'relationships' => {
+              'team_admin' => {
+                # if this stops working and for some reason returns team_admin then change it back to team_admin
+                'data' => include('id' => team_1_admin.id, 'type' => 'user')
+              }
             }
           }
         ).and include(
-          'id' => team2.id.to_s,
-          'type' => 'team',
-          'attributes' => include('name' => team2.name, 'team_admin_id' => team_2_admin.id),
-          'relationships' => {
-            'team_admin' => {
-              'data' => include('id' => team_2_admin.id, 'type' => 'team_admin')
+          {
+            'id' => team2.id.to_s,
+            'type' => 'team',
+            'attributes' => include('name' => team2.name, 'team_admin_id' => team_2_admin.id),
+            'relationships' => {
+              'team_admin' => {
+                'data' => include('id' => team_2_admin.id, 'type' => 'user') # ditto
+              }
             }
           }
         )

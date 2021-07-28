@@ -138,6 +138,10 @@ class User < ApplicationRecord
     health_clinic_ids
   end
 
+  def cache_key
+    "user/#{id}-#{updated_at&.to_s(:number)}"
+  end
+
   def accepted_organizable_id
     organizable_id
   end

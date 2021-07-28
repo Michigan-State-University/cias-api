@@ -4,7 +4,7 @@ class V1::InterventionsController < V1Controller
   include Resource::Clone
 
   def index
-    render_json interventions: interventions_scope
+    render json: serialized_response(interventions_scope)
   end
 
   def show

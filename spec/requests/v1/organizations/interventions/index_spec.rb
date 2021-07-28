@@ -17,7 +17,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/interventions', type: :re
   it { expect(response).to have_http_status(:ok) }
 
   it 'returns interventions of organization' do
-    data = json_response['interventions']
+    data = json_response['data']
     expect(data.size).to eq 2
     expect(data[0]['id']).to eq interventions_with_organization.first.id
     expect(data[1]['id']).to eq interventions_with_organization.last.id

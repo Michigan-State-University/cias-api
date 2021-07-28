@@ -20,7 +20,7 @@ gem 'devise-argon2'
 gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
-gem 'fast_jsonapi'
+gem 'jsonapi-serializer'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'hiredis'

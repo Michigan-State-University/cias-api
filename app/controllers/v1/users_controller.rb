@@ -8,7 +8,7 @@ class V1::UsersController < V1Controller
 
     collection = users_scope.detailed_search(params.merge(user_roles: current_v1_user.roles)).order(created_at: :desc)
     paginated_collection = paginate(collection, params)
-    render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
+    render json: serialized_hash(paginated_collection).merge({ users_size: collection.size }).to_json
   end
 
   def show
@@ -20,7 +20,7 @@ class V1::UsersController < V1Controller
 
     collection = UserFinder.available_researchers(current_v1_user)
     paginated_collection = paginate(collection, params)
-    render_json users: paginated_collection, users_size: collection.size, query_string: query_string_digest
+    render json: serialized_hash(paginated_collection).merge({ users_size: collection.size }).to_json
   end
 
   def update
