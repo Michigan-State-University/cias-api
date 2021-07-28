@@ -146,8 +146,8 @@ class Clone::Session < Clone::Base
 
     Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
       third_party_question.body_data.each do |third_party_question_body_data_element|
-        report_template_ids = third_party_question_body_data_element.dig('report_template_ids')
-        new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids|
+        report_template_ids = third_party_question_body_data_element['report_template_ids']
+        new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids| # rubocop:disable Lint/ShadowingOuterLocalVariable
           source_report_template = source_third_party_report_templates.find(report_template_id)
           outcome_report_template_id = outcome_third_party_report_templates.find_by(name: source_report_template.name)&.id
           new_report_template_ids << outcome_report_template_id

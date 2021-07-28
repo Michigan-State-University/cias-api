@@ -143,7 +143,7 @@ class User < ApplicationRecord
   def accepted_organizable_id
     organizable_id
   end
-  
+
   def set_terms_confirmed_date
     self.terms_confirmed_at = Time.current
   end
