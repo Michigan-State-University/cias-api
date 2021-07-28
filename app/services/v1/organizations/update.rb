@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Organizations::Update
+  prepend Database::Transactional
+
   def self.call(organization, organization_params)
     new(organization, organization_params).call
   end
@@ -11,17 +13,15 @@ class V1::Organizations::Update
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      organization.update!(name: organization_params[:name]) if name_changed?
+    organization.update!(name: organization_params[:name]) if name_changed?
 
-      V1::Organizations::ChangeOrganizationAdmins.call(
-        organization,
-        organization_params[:organization_admins_to_add],
-        organization_params[:organization_admins_to_remove]
-      )
+    V1::Organizations::ChangeOrganizationAdmins.call(
+      organization,
+      organization_params[:organization_admins_to_add],
+      organization_params[:organization_admins_to_remove]
+    )
 
-      organization.reload
-    end
+    organization.reload
   end
 
   private

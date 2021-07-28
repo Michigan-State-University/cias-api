@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Organizations::Invitations::Confirm
+  prepend Database::Transactional
+
   def self.call(organization_invitation)
     new(organization_invitation).call
   end
@@ -12,15 +14,13 @@ class V1::Organizations::Invitations::Confirm
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      user.update!(organizable: organization)
-      user.activate! if user.role?('organization_admin')
+    user.update!(organizable: organization)
+    user.activate! if user.role?('organization_admin')
 
-      organization_invitation.update!(
-        accepted_at: Time.current,
-        invitation_token: nil
-      )
-    end
+    organization_invitation.update!(
+      accepted_at: Time.current,
+      invitation_token: nil
+    )
   end
 
   private
