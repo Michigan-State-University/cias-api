@@ -17,6 +17,24 @@ RSpec.describe 'GET /v1/users', type: :request do
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_users_path, headers: headers }
 
+  shared_examples 'correct users response' do
+    before do
+      request
+    end
+
+    it 'returns correct http status' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns correct user ids' do
+      expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
+    end
+
+    it 'returns correct users list size' do
+      expect(json_response['data'].size).to eq users.size
+    end
+  end
+
   context 'when auth' do
     context 'is invalid' do
       let(:request) { get v1_users_path }
@@ -39,83 +57,35 @@ RSpec.describe 'GET /v1/users', type: :request do
 
       let!(:users) { [participant3, participant2, participant1, researcher, current_user] }
 
-      before do
-        request
-      end
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'with pagination params' do
       let!(:params) { { page: 1, per_page: 2 } }
       let!(:users) { [participant3, participant2] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'with filters params' do
       let!(:params) { { name: 'John', roles: %w[admin participant] } }
       let!(:users) { [participant1, user] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'with team_id filter params' do
       let!(:team1) { create(:team) }
       let!(:team2) { create(:team) }
       let(:params) { { team_id: team1.id } }
+      let(:users) { team1.users }
 
       before do
         create(:user, :researcher, team_id: team1.id)
         create(:user, :researcher, team_id: team2.id)
-        request
       end
 
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to match_array(team1.users.pluck(:id))
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq team1.users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'with filters deactivated users' do
@@ -129,7 +99,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq 0
+        expect(json_response['data'].size).to eq 0
       end
     end
 
@@ -144,7 +114,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
+        expect(json_response['data'].size).to eq users.size
       end
     end
   end
@@ -164,57 +134,21 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { {} }
       let!(:users) { [participant1] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'with pagination params' do
       let!(:params) { { page: 1, per_page: 2 } }
       let!(:users) { [participant1] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'with filters params' do
       let!(:params) { { name: 'John', roles: %w[admin participant] } }
       let!(:users) { [participant1] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
 
     context 'when researcher does not have any session but participant answered other user question' do
@@ -230,7 +164,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       before { request }
 
       it 'returns empty list of users' do
-        expect(json_response['users'].size).to eq 0
+        expect(json_response['data'].size).to eq 0
       end
     end
 
@@ -244,7 +178,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       before { request }
 
       it 'returns empty list of users' do
-        expect(json_response['users'].size).to eq 0
+        expect(json_response['data'].size).to eq 0
       end
     end
 
@@ -258,19 +192,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:params) { { roles: %w[researcher], team_id: team.id } }
       let!(:users) { [researcher1, current_user] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
   end
 
@@ -282,19 +204,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let(:params) { {} }
       let(:users) { [participant] }
 
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to eq users.pluck(:id)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq users.size
-      end
+      it_behaves_like 'correct users response'
     end
   end
 
@@ -329,11 +239,11 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
 
       it 'returns users only from his team' do
-        expect(json_response['users'].pluck('id')).to match_array(expected_users_ids)
+        expect(json_response['data'].pluck('id')).to match_array(expected_users_ids)
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq expected_users_ids.size
+        expect(json_response['data'].size).to eq expected_users_ids.size
       end
     end
   end

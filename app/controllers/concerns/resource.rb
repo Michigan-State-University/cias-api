@@ -9,7 +9,7 @@ module Resource
 
   def serialized_response(collection, from_model = controller_name.classify, params = {})
     "V1::#{from_model}Serializer".safe_constantize.
-      new(collection, params: params).serialized_json
+     new(collection, params).serializable_hash.to_json
   end
 
   def serialized_hash(collection, from_model = controller_name.classify)

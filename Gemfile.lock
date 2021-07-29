@@ -205,8 +205,6 @@ GEM
     faraday-excon (1.1.0)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.1.0)
-    fast_jsonapi (1.5)
-      activesupport (>= 4.2)
     fasterer (0.9.0)
       colorize (~> 0.7)
       ruby_parser (>= 3.14.1)
@@ -289,6 +287,8 @@ GEM
     jmespath (1.4.0)
     json-schema (2.8.1)
       addressable (>= 2.4)
+    jsonapi-serializer (2.2.0)
+      activesupport (>= 4.2)
     jwt (2.2.3)
     launchy (2.5.0)
       addressable (~> 2.7)
@@ -564,13 +564,13 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
-  fast_jsonapi
   fasterer
   google-cloud-text_to_speech
   google-cloud-translate-v2
   guard-rake
   guard-rspec
   hiredis
+  jsonapi-serializer
   letter_opener_web
   license_finder
   lockbox

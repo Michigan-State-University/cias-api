@@ -123,7 +123,7 @@ RSpec.describe 'GET /v1/organizations', type: :request do
       end
 
       it 'returns proper included data' do
-        expect(json_response['included'][0]).to include(
+        expect(json_response['included']).to include(
           {
             'id' => health_clinic.id,
             'type' => 'health_clinic',
@@ -134,22 +134,22 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             },
             'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
-        )
-        expect(json_response['included'][1]).to include(
+        ).and include(
           {
             'id' => health_system.id,
             'type' => 'health_system',
             'attributes' =>
-                  {
-                    'name' => health_system.name,
-                    'organization_id' => health_system.organization_id,
-                    'deleted' => false
-                  },
+              {
+                'name' => health_system.name,
+                'organization_id' => health_system.organization_id,
+                'deleted' => false
+              },
             'relationships' =>
-                  {
-                    'health_system_admins' => { 'data' => [] },
-                    'health_clinics' => { 'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }] }
-                  }
+              {
+                'health_system_admins' => { 'data' => [] },
+                'health_clinics' => { 'data' => [{ 'id' => health_clinic.id,
+                                                   'type' => 'health_clinic' }] }
+              }
           }
         )
       end
@@ -264,14 +264,14 @@ RSpec.describe 'GET /v1/organizations', type: :request do
       expect(json_response['data']).to include(
         {
           'id' => organization1.id.to_s,
-          'type' => 'simple_organization',
+          'type' => 'organization',
           'attributes' => {
             'name' => organization1.name
           }
         }
       ).and not_include({
                           'id' => other_organization.id.to_s,
-                          'type' => 'simple_organization',
+                          'type' => 'organization',
                           'attributes' => {
                             'name' => other_organization.name
                           }

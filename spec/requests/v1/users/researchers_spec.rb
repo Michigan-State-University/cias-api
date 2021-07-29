@@ -35,11 +35,11 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
       end
 
       it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq researchers.size
+        expect(json_response['data'].size).to eq researchers.size
       end
     end
 
@@ -53,11 +53,11 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
       end
 
       it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq researchers.size
+        expect(json_response['data'].size).to eq researchers.size
       end
     end
   end
@@ -72,11 +72,11 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     end
 
     it 'returns correct user ids' do
-      expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+      expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
     end
 
     it 'returns correct users list size' do
-      expect(json_response['users'].size).to eq researchers.size
+      expect(json_response['data'].size).to eq researchers.size
     end
   end
 
@@ -107,11 +107,11 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     end
 
     it 'returns users only from his team' do
-      expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+      expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
     end
 
     it 'returns correct users list size' do
-      expect(json_response['users'].size).to eq researchers.size
+      expect(json_response['data'].size).to eq researchers.size
     end
   end
 end

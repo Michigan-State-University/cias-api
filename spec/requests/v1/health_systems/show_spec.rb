@@ -101,12 +101,12 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             'id' => health_system_admin.id,
             'type' => 'user',
             'attributes' =>
-                include(
-                  'email' => health_system_admin.email,
-                  'roles' => ['health_system_admin'],
-                  'first_name' => health_system_admin.first_name,
-                  'last_name' => health_system_admin.last_name
-                )
+              include(
+                'email' => health_system_admin.email,
+                'roles' => ['health_system_admin'],
+                'first_name' => health_system_admin.first_name,
+                'last_name' => health_system_admin.last_name
+              )
           }
         )
       end

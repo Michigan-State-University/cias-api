@@ -30,9 +30,7 @@ class Organization < ApplicationRecord
       organization_admins.delete(organization_admin)
     end
 
-    e_intervention_admins.each do |intervention_admin|
-      e_intervention_admins.delete(intervention_admin)
-    end
+    e_intervention_admins.delete_all
   end
 
   def update_interventions_from_deleted_organization
