@@ -10,16 +10,38 @@ RSpec.describe 'GET /v1/organizations/:organization_id/interventions', type: :re
   let!(:interventions_with_organization) { create_list(:intervention, 2, organization_id: organization1.id) }
   let!(:intervention_with_other_organization) { create(:intervention, organization_id: organization2.id) }
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_organization_interventions_path(organization_id: organization1.id), headers: headers }
+  let(:request) { get v1_organization_interventions_path(organization_id: organization1.id), params: params, headers: headers }
+  let!(:params) { {} }
 
-  before { request }
+  shared_examples 'organization invitations' do |interventions_size|
+    it { expect(response).to have_http_status(:ok) }
 
-  it { expect(response).to have_http_status(:ok) }
+    it 'returns proper size of interventions of organization' do
+      expect(json_response['data'].size).to eq interventions_size
+    end
+  end
 
-  it 'returns interventions of organization' do
-    data = json_response['data']
-    expect(data.size).to eq 2
-    expect(data[0]['id']).to eq interventions_with_organization.first.id
-    expect(data[1]['id']).to eq interventions_with_organization.last.id
+  context 'when params are given' do
+    let!(:params) { { page: 1, per_page: 1 } }
+
+    before { request }
+
+    it_behaves_like 'organization invitations', 1
+
+    it 'returns one intervention of organization' do
+      expect(json_response['data'][0]['id']).to eq interventions_with_organization.first.id
+    end
+  end
+
+  context 'when params are not given' do
+    before { request }
+
+    it_behaves_like 'organization invitations', 2
+
+    it 'returns all interventions of organization' do
+      data = json_response['data']
+      expect(data[0]['id']).to eq interventions_with_organization.first.id
+      expect(data[1]['id']).to eq interventions_with_organization.last.id
+    end
   end
 end

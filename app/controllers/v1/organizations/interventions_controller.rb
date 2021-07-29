@@ -4,7 +4,10 @@ class V1::Organizations::InterventionsController < V1Controller
   def index
     authorize! :read, Intervention
 
-    render json: serialized_response(interventions_scope)
+    collection = interventions_scope
+    paginated_collection = paginate(collection, params)
+
+    render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json
   end
 
   private

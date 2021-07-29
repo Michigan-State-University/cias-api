@@ -72,6 +72,11 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
                              ] })
   end
+  let!(:last_third_party_report_template) { session.report_templates.third_party.last }
+  let!(:question7) do
+    create(:question_third_party, question_group: question_group2, subtitle: 'Question Subtitle 7', position: 4,
+                                  body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }] })
+  end
 
   let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
   let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
@@ -172,7 +177,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
         expect(cloned_questions_collection.where(type: 'Question::Finish').size).to eq(1)
       end
 
-      it 'correctly clone questions' do
+      it 'correctly clone questions (question group 1)' do
         expect(cloned_questions_collection.map(&:attributes)).to include(
           include(
             'subtitle' => 'Question Subtitle',
@@ -217,7 +222,12 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                  'type' => 'Question::Single', 'probability' => '100' }] }
               ]
             }
-          ),
+          )
+        )
+      end
+
+      it 'correctly clone questions (question group 2)' do
+        expect(cloned_questions_collection.map(&:attributes)).to include(
           include(
             'subtitle' => 'Question Subtitle 4',
             'position' => 1,
@@ -265,7 +275,28 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                   'target' => [{ 'id' => '', 'type' => 'Question::Single', 'probability' => '100' }] }
               ]
             }
-          ),
+          )
+        )
+      end
+
+      it 'correctly clone third-party question and assign cloned report template id' do
+        expect(cloned_questions_collection.map(&:attributes)).to include(
+          include(
+            'subtitle' => 'Question Subtitle 7',
+            'position' => 4,
+            'body' => {
+              'data' => [{
+                'payload' => '',
+                'value' => '',
+                'report_template_ids' => [outcome_report_templates.where(name: last_third_party_report_template.name).last.id]
+              }]
+            }
+          )
+        )
+      end
+
+      it 'correctly clone questions (finish group)' do
+        expect(cloned_questions_collection.map(&:attributes)).to include(
           include(
             'position' => 999_999,
             'type' => 'Question::Finish'

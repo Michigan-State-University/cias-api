@@ -22,11 +22,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let(:organization) { create(:organization) }
   let!(:intervention_for_organization) { create(:intervention, organization_id: organization.id) }
 
-  shared_examples 'proper interventions' do
-    it 'returns proper interventions' do
-      expect(json_response['data'].pluck('id')).to match_array interventions_scope.map(&:id)
-    end
-  end
+  let!(:params) { {} }
 
   shared_examples 'proper error message' do
     it 'returns proper error message' do
@@ -34,39 +30,89 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     end
   end
 
-  context 'when user is' do
-    before { get v1_interventions_path, headers: user.create_new_auth_token }
+  shared_examples 'chosen users' do |interventions_size_admin, interventions_size_researcher|
+    context 'when user is' do
+      before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 
-    %w[admin user_with_admin_role].each do |role|
-      let(:user) { users[role] }
-      context role do
-        let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests }
+      %w[admin user_with_admin_role].each do |role|
+        let(:user) { users[role] }
+        context role do
+          let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests }
 
-        it_behaves_like 'proper interventions'
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'returns proper interventions' do
+            expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
+                                                                                  .take(interventions_size_admin).map(&:id)
+          end
+
+          it 'returns correct invitations list size' do
+            expect(json_response['data'].size).to eq interventions_size_admin
+          end
+        end
+      end
+
+      context 'participant' do
+        let(:user) { participant }
+        let(:interventions_scope) { admin_interventions + interventions_for_guests }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it_behaves_like 'proper error message'
+
+        it 'returns correct invitations list size' do
+          expect(json_response['data'].size).to eq 0
+        end
+      end
+
+      context 'researcher' do
+        let(:user) { researcher }
+        let(:interventions_scope) { researcher_interventions }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns proper interventions' do
+          expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
+                                                                                .take(interventions_size_researcher).map(&:id)
+        end
+
+        it 'returns correct invitations list size' do
+          expect(json_response['data'].size).to eq interventions_size_researcher
+        end
+      end
+
+      context 'guest' do
+        let(:user) { guest }
+        let(:interventions_scope) { interventions_for_guests }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns proper interventions' do
+          expect(json_response['data'].pluck('id')).to match_array []
+        end
+
+        it 'returns correct invitations list size' do
+          expect(json_response['data'].size).to eq 0
+        end
       end
     end
+  end
 
-    context 'has role participant' do
-      let(:user) { participant }
-      let(:interventions_scope) { admin_interventions + interventions_for_guests }
+  context 'when params are given' do
+    let!(:params) { { page: 1, per_page: 2 } }
 
-      it_behaves_like 'proper error message'
-    end
+    it_behaves_like 'chosen users', 2, 2
+  end
 
-    context 'has role researcher' do
-      let(:user) { researcher }
-      let(:interventions_scope) { researcher_interventions }
-
-      it_behaves_like 'proper interventions'
-    end
-
-    context 'has role guest' do
-      let(:user) { guest }
-      let(:interventions_scope) { interventions_for_guests }
-
-      it 'returns proper interventions' do
-        expect(json_response['data'].pluck('id')).to match_array []
-      end
-    end
+  context 'when params are not given' do
+    it_behaves_like 'chosen users', 8, 3
   end
 end
