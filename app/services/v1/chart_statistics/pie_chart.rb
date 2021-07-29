@@ -13,14 +13,13 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
   end
 
   def data_for_chart(label, value, patterns, default_pattern)
-    data = {}
-    data['label'] = label
-
-    data['value'] = value
     current_pattern = patterns.find { |pattern| pattern['label'] == label }
-    data['color'] = current_pattern.present? ? current_pattern['color'] : default_pattern['color']
 
-    data
+    {
+      'label' => label,
+      'value' => value,
+      'color' => current_pattern.present? ? current_pattern['color'] : default_pattern['color']
+    }
   end
 
   def current_chart_type_collection

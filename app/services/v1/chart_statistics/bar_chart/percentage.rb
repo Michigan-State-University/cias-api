@@ -4,18 +4,20 @@ class V1::ChartStatistics::BarChart::Percentage < V1::ChartStatistics::BarChart
   private
 
   def data_for_chart(month, value, patterns, default_pattern)
-    monthly_data = {}
     pattern = patterns.first
-    monthly_data['label'] = month
 
-    monthly_data['value'] = value[pattern['label']]
-    monthly_data['color'] = pattern['color']
+    monthly_data_value = value[pattern['label']]
 
     other_label = default_pattern['label']
-    monthly_data['population'] = value[other_label] + monthly_data['value']
-    monthly_data['value'] = (monthly_data['population']).zero? ? 0 : (monthly_data['value'].to_f / monthly_data['population'] * 100).round(2)
+    population = value[other_label] + monthly_data_value
+    monthly_data_value = population.zero? ? 0 : (monthly_data_value.to_f / population * 100).round(2)
 
-    monthly_data
+    {
+      'label' => month,
+      'color' => pattern['color'],
+      'population' => population,
+      'value' => monthly_data_value
+    }
   end
 
   def current_chart_type_collection
