@@ -69,7 +69,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           'status' => 'draft',
           'shared_to' => 'anyone',
           'organization_id' => organization.id,
-          'google_language_id' => 22
+          'google_language_id' => 1 # same as with google/index_spec.rb, after removing a default 22 it will default to 1
         )
       end
     end

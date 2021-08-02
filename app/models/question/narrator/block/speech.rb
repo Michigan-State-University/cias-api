@@ -10,6 +10,8 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
   private
 
   def replace_urls
+    return unless question.session.google_tts_voice
+
     block['audio_urls'] = block['text'].map.with_index(0) do |text, index_block|
       audio = V1::AudioService.new(text,
                                    language_code: question.session.google_tts_voice.language_code,

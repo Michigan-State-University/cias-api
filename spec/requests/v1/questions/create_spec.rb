@@ -8,6 +8,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   let(:user) { admin }
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
+  let!(:google_tts_voice) { create(:google_tts_voice, language_code: 'en-US') }
   let(:blocks) { [] }
   let(:params) do
     {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_28_063431) do
+ActiveRecord::Schema.define(version: 2021_07_29_102541) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -203,7 +203,7 @@ ActiveRecord::Schema.define(version: 2021_07_28_063431) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "organization_id"
-    t.bigint "google_language_id", default: 22, null: false
+    t.bigint "google_language_id", null: false
     t.boolean "from_deleted_organization", default: false, null: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -360,7 +360,7 @@ ActiveRecord::Schema.define(version: 2021_07_28_063431) do
     t.integer "last_report_template_number", default: 0
     t.string "variable"
     t.string "days_after_date_variable_name"
-    t.bigint "google_tts_voice_id", default: 43
+    t.bigint "google_tts_voice_id"
     t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"

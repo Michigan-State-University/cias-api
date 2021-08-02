@@ -9,7 +9,7 @@ class Session < ApplicationRecord
   include Translate
 
   belongs_to :intervention, inverse_of: :sessions, touch: true
-  belongs_to :google_tts_voice
+  belongs_to :google_tts_voice, optional: true
 
   has_many :question_groups, dependent: :destroy, inverse_of: :session
   has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
@@ -55,6 +55,7 @@ class Session < ApplicationRecord
   validate :unique_variable, on: %i[create update]
 
   before_validation :set_default_variable
+  after_create :assign_default_tts_voice
   after_commit :create_core_children, on: :create
 
   after_update_commit do
@@ -170,6 +171,11 @@ class Session < ApplicationRecord
   end
 
   private
+
+  def assign_default_tts_voice
+    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
+    save!
+  end
 
   def create_core_children
     return if question_group_finish

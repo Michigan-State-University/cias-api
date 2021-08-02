@@ -33,7 +33,12 @@ class Intervention < ApplicationRecord
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
 
+  before_validation :assign_default_google_language
   after_update_commit :status_change
+
+  def assign_default_google_language
+    self.google_language = GoogleLanguage.find_by(language_code: 'en') if google_language.nil?
+  end
 
   def status_change
     return unless saved_change_to_attribute?(:status)

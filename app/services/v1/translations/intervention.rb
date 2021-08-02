@@ -39,9 +39,7 @@ class V1::Translations::Intervention
   end
 
   def change_tts_in_sessions(intervention)
-    intervention.sessions.each do |session|
-      session.update!(google_tts_voice_id: destination_tts_voice_id)
-    end
+    intervention.sessions.each { |session| session.update!(google_tts_voice_id: destination_tts_voice_id) }
   end
 
   def clear_speech_blocks(intervention)
