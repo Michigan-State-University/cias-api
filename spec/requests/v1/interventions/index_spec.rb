@@ -20,7 +20,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let!(:researcher_interventions) { create_list(:intervention, 3, :published, user: researcher, shared_to: :invited) }
   let!(:interventions_for_guests) { create_list(:intervention, 2, :published) }
   let(:organization) { create(:organization) }
-  let!(:intervention_for_organization) { create(:intervention, organization_id: organization.id) }
+  let!(:intervention_for_organization) { [create(:intervention, organization_id: organization.id)] }
 
   let!(:params) { {} }
 
@@ -31,7 +31,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       %w[admin user_with_admin_role].each do |role|
         let(:user) { users[role] }
         context role do
-          let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests }
+          let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests + intervention_for_organization }
 
           it 'returns correct http status' do
             expect(response).to have_http_status(:ok)
@@ -109,6 +109,6 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   context 'when params are not given' do
-    it_behaves_like 'chosen users', 8, 3
+    it_behaves_like 'chosen users', 9, 3
   end
 end

@@ -28,11 +28,12 @@ class Intervention < ApplicationRecord
     left_joins(:invitations).published.not_shared_to_invited
       .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
-  scope :without_organization, -> { where(organization_id: nil, from_deleted_organization: false) }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
+
+  before_save :set_prefix_for_intervention_name
 
   def broadcast
     return unless draft?
@@ -72,5 +73,15 @@ class Intervention < ApplicationRecord
 
   def newest_report
     reports.attachments.order(created_at: :desc).first
+  end
+
+  private
+
+  def set_prefix_for_intervention_name
+    if organization.present?
+      self.name = "[Reporting] #{name}" if name.exclude?('[Reporting]')
+    elsif name.include?('[Reporting] ')
+      name.slice!('[Reporting] ')
+    end
   end
 end
