@@ -39,4 +39,12 @@ class Ability::Base
   def logged_user_sessions(user)
     Session.where(intervention_id: user.interventions.select(:id)).pluck(:id)
   end
+
+  def accepted_health_clinic_ids
+    return unless user.role?('health_clinic_admin')
+
+    health_clinic_ids = user.health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
+    health_clinic_ids.append(user.organizable.id) if user.organizable
+    health_clinic_ids
+  end
 end

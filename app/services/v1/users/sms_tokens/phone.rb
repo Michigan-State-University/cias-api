@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class V1::Users::PhoneService
-  def initialize(user, phone_params)
+class V1::Users::SmsTokens::Phone
+  def initialize(user, phone_number, iso, prefix)
     @user = user
-    @phone_number = phone_params[:phone_number]
-    @iso = phone_params[:iso]
-    @prefix = phone_params[:prefix]
+    @phone_number = phone_number
+    @iso = iso
+    @prefix = prefix
   end
 
   attr_reader :user, :phone_number, :iso, :prefix

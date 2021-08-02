@@ -4,17 +4,19 @@ class V1::Users::AvatarsController < V1Controller
   def create
     authorize_user
 
-    user_load.update!(avatar: avatar_params[:file])
-    invalidate_cache(user_load)
-    render json: serialized_response(user_load, 'User'), status: :created
+    user = V1::Users::Avatars::Create.call(user_load, avatar_params[:file])
+    invalidate_cache(user)
+
+    render json: serialized_response(user, 'User'), status: :created
   end
 
   def destroy
     authorize_user
 
-    user_load.avatar.purge
-    invalidate_cache(user_load)
-    render json: serialized_response(user_load, 'User')
+    user = V1::Users::Avatars::Destroy.call(user_load)
+    invalidate_cache(user)
+
+    render json: serialized_response(user, 'User')
   end
 
   private

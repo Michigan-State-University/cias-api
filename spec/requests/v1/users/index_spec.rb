@@ -47,6 +47,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     end
   end
 
+  # ADMIN
   context 'when current_user is admin' do
     let(:current_user) { user }
 
@@ -119,6 +120,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     end
   end
 
+  # RESEARCHER
   context 'when current_user is researcher' do
     let(:current_user) { researcher }
     let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
@@ -196,18 +198,6 @@ RSpec.describe 'GET /v1/users', type: :request do
     end
   end
 
-  context 'when current_user is participant' do
-    let(:current_user) { participant }
-    let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
-
-    context 'without params' do
-      let(:params) { {} }
-      let(:users) { [participant] }
-
-      it_behaves_like 'correct users response'
-    end
-  end
-
   context 'when current_user is team_admin' do
     let!(:team1) { create(:team) }
     let(:current_user) { team1.team_admin }
@@ -244,6 +234,22 @@ RSpec.describe 'GET /v1/users', type: :request do
 
       it 'returns correct users list size' do
         expect(json_response['data'].size).to eq expected_users_ids.size
+      end
+    end
+  end
+
+  %w[guest participant organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+    context "when current_user is #{role}" do
+      let(:current_user) { create(:user, :confirmed, role) }
+      let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
+
+      context 'without params' do
+        let(:params) { {} }
+        let(:users) { [current_user] }
+
+        before { request }
+
+        it_behaves_like 'correct users response'
       end
     end
   end

@@ -64,7 +64,7 @@ class V1::GeneratedReports::ShareToThirdParty
           next if report_ids.empty?
 
           user = User.find_by(email: email)
-          next if user.present? && user.roles.exclude?('third_party')
+          next if user.present? && user.not_a_third_party?
 
           user ||= User.invite!(email: email, roles: ['third_party'])
           users << user

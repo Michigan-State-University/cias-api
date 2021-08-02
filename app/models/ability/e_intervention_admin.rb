@@ -35,16 +35,16 @@ class Ability::EInterventionAdmin < Ability::Base
     can :read, GoogleTtsLanguage
     can :read, GoogleTtsVoice
     can :read, GoogleLanguage
-    can %i[read update], Organization, id: user.accepted_organizable_id
-    can :invite_organization_admin, Organization, id: user.accepted_organizable_id
-    can :manage, HealthSystem, organization: { id: user.accepted_organizable_id }
-    can :invite_health_system_admin, HealthSystem, organization: { id: user.accepted_organizable_id }
-    can :manage, HealthClinic, health_system: { organization: { id: user.accepted_organizable_id } }
-    can :invite_health_clinic_admin, HealthClinic, health_system: { organization: { id: user.accepted_organizable_id } }
-    can :manage, ReportingDashboard, organization: { id: user.accepted_organizable_id }
-    can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.accepted_organizable_id } }
-    can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organizable_id } } }
-    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organizable_id } } } }
+    can %i[read update], Organization, id: user.organizable_id
+    can :invite_organization_admin, Organization, id: user.organizable_id
+    can :manage, HealthSystem, organization: { id: user.organizable_id }
+    can :invite_health_system_admin, HealthSystem, organization: { id: user.organizable_id }
+    can :manage, HealthClinic, health_system: { organization: { id: user.organizable_id } }
+    can :invite_health_clinic_admin, HealthClinic, health_system: { organization: { id: user.organizable_id } }
+    can :manage, ReportingDashboard, organization: { id: user.organizable_id }
+    can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.organizable_id } }
+    can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.organizable_id } } }
+    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { id: user.organizable_id } } } }
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
   end
 end

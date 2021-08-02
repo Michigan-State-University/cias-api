@@ -20,19 +20,33 @@ RSpec.describe 'DELETE /v1/users/:id', type: :request do
     end
   end
 
-  context 'when response' do
-    context 'is success' do
-      before { request }
+  context 'when user is admin' do
+    context 'when response' do
+      context 'is success' do
+        before { request }
 
-      it { expect(response).to have_http_status(:no_content) }
+        it { expect(response).to have_http_status(:no_content) }
+      end
+
+      context 'not found' do
+        before do
+          delete v1_user_path(id: 'invalid'), headers: headers
+        end
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
     end
   end
 
-  context 'not found' do
-    before do
-      delete v1_user_path(id: 'invalid'), headers: headers
-    end
+  %w[guest participant researcher e_intervention_admin team_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+    context "when user is #{role}" do
+      let(:user) { create(:user, :confirmed, role) }
 
-    it { expect(response).to have_http_status(:not_found) }
+      context 'when response is not_found' do
+        before { request }
+
+        it { expect(response).to have_http_status(:not_found) }
+      end
+    end
   end
 end

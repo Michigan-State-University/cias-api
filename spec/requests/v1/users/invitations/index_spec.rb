@@ -18,37 +18,22 @@ describe 'GET /v1/users/invitations', type: :request do
                                invitation_accepted_at: Time.current)
   end
 
-  context 'when authenticated as guest user' do
-    let(:guest_user) { create(:user, :guest) }
-    let(:headers)    { guest_user.create_new_auth_token }
+  %w[guest participant researcher e_intervention_admin team_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+    context "when authenticated as #{role}" do
+      let(:current_user) { create(:user, role) }
+      let(:headers) { current_user.create_new_auth_token }
 
-    before do
-      request
-    end
+      before do
+        request
+      end
 
-    it 'returns correct http status' do
-      expect(response).to have_http_status(:ok)
-    end
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
 
-    it 'returns correct pending invitations size' do
-      expect(json_response['data'].size).to eq 0
-    end
-  end
-
-  context 'when authenticated as researcher user' do
-    let(:researcher_user) { create(:user, :researcher) }
-    let(:headers)         { researcher_user.create_new_auth_token }
-
-    before do
-      request
-    end
-
-    it 'returns correct http status' do
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns correct pending invitations size' do
-      expect(json_response['data'].size).to eq 0
+      it 'returns correct pending invitations size' do
+        expect(json_response['data'].size).to eq 0
+      end
     end
   end
 

@@ -12,7 +12,7 @@ class V1::UsersController < V1Controller
   end
 
   def show
-    render json: serialized_response(user_service.user_load(user_id))
+    render json: serialized_response(user_load)
   end
 
   def researchers
@@ -26,44 +26,33 @@ class V1::UsersController < V1Controller
   def update
     authorize_update_abilities
 
-    user = user_service.user_load(user_id)
-    user.update!(user_params)
+    user = V1::Users::Update.call(user_load, user_params)
 
     render json: serialized_response(user)
   end
 
   def destroy
-    user_service.user_load(user_id).deactivate!
+    user_load.deactivate!
+
     head :no_content
   end
 
   def send_sms_token
     authorize! :update, current_v1_user
 
-    phone = phone_service.phone
-    head :expectation_failed and return unless phone
+    send_service = V1::Users::SmsTokens::Send.call(current_v1_user, phone_params)
 
-    phone.refresh_confirmation_code
-    number = phone.prefix + phone.number
-    sms = Message.create(
-      phone: number,
-      body: "Your CIAS verification code is: #{phone.confirmation_code}"
-    )
-    service = Communication::Sms.new(sms.id)
-    service.send_message
-    head service.errors.empty? ? :accepted : :expectation_failed
+    head send_service&.errors&.empty? ? :accepted : :expectation_failed
   end
 
   def verify_sms_token
-    phone = current_v1_user.phone
-    head :expectation_failed and return unless phone&.token_correct?(params[:sms_token])
+    phone = V1::Users::SmsTokens::Verify.call(current_v1_user, params[:sms_token])
 
-    phone.confirm!
-    head :ok
+    head phone ? :ok : :expectation_failed
   end
 
   def confirm_logging_code
-    result = V1::Users::Verifications::Confirm.call(code, email)
+    result = V1::Users::Verifications::Confirm.call(verification_code_params, email_params)
     if result.present?
       render json: { verification_code: result }, status: :ok
     else
@@ -73,27 +62,23 @@ class V1::UsersController < V1Controller
 
   private
 
-  def user_service
-    @user_service ||= V1::UserService.new(current_v1_user)
-  end
-
-  def phone_service
-    @phone_service ||= V1::Users::PhoneService.new(current_v1_user, phone_params)
-  end
-
   def users_scope
-    user_service.users_scope.includes(:team, :phone, :avatar_attachment)
+    User.accessible_by(current_v1_user.ability).includes(:team, :phone, :avatar_attachment)
+  end
+
+  def user_load
+    users_scope.find(params[:id])
   end
 
   def user_id
     params[:id]
   end
 
-  def code
+  def verification_code_params
     params[:verification_code]
   end
 
-  def email
+  def email_params
     params[:email]
   end
 
@@ -124,12 +109,8 @@ class V1::UsersController < V1Controller
     end
   end
 
-  def query_string_digest
-    Digest::SHA1.hexdigest("#{params[:page]}#{params[:per_page]}#{params[:name]}#{params[:roles]&.join}#{params[:active]}")
-  end
-
   def authorize_update_abilities
-    user = user_service.user_load(user_id)
+    user = user_load
     authorize! :update, user
     %i[active roles].each do |attr|
       authorize! attr, user unless user_params[attr].nil?

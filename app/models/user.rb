@@ -4,8 +4,6 @@ class User < ApplicationRecord
   has_paper_trail skip: %i[
     first_name last_name email uid migrated_first_name migrated_last_name migrated_email migrated_uid
   ]
-  before_save :invalidate_token_after_changes
-  after_create_commit :set_terms_confirmed_date
 
   devise :confirmable,
          :database_authenticatable,
@@ -32,39 +30,53 @@ class User < ApplicationRecord
                 multiple: true,
                 allow_blank: true
 
+  # VALIDATIONS
   validates :time_zone, inclusion: { in: TIME_ZONES }
   validate :team_is_present?, if: :team_admin?, on: :update
   validates :terms, acceptance: { on: :create, accept: true }
 
+  # PHONE NUMBER
   has_one :phone, dependent: :destroy
   accepts_nested_attributes_for :phone, update_only: true
+
+  # AVATAR
   has_one_attached :avatar
 
+  # INTERVENTIONS
   has_many :interventions, dependent: :restrict_with_exception, inverse_of: :user
   has_many :user_sessions, dependent: :restrict_with_exception, inverse_of: :user
   has_many :sessions, through: :user_sessions, dependent: :restrict_with_exception
   has_many :user_log_requests, dependent: :destroy
-  belongs_to :team, optional: true
-  belongs_to :organizable, polymorphic: true, optional: true
-  has_many :user_health_clinics, dependent: :destroy
-  has_many :admins_teams, class_name: 'Team', dependent: :nullify,
-                          foreign_key: :team_admin_id, inverse_of: :team_admin
 
+  # TEAMS
+  belongs_to :team, optional: true # for members of team
+  has_many :admins_teams, class_name: 'Team', dependent: :nullify,
+                          foreign_key: :team_admin_id, inverse_of: :team_admin # for team admin
+  delegate :name, to: :team, prefix: true, allow_nil: true
+
+  # ORGANIZATIONS
+  belongs_to :organizable, polymorphic: true, optional: true # for members of organization/health system
+  has_many :user_health_clinics, dependent: :destroy # for members of health clinics
+
+  # INVITATIONS
   has_many :team_invitations, dependent: :destroy
   has_many :organization_invitations, dependent: :destroy
   has_many :health_system_invitations, dependent: :destroy
   has_many :health_clinic_invitations, dependent: :destroy
 
+  # REPORTS AVAILABLE FOR THIRD PARTY USER
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
                                                  dependent: :destroy
-  has_many :user_verification_codes, dependent: :destroy
-  has_many :chart_statistics, dependent: :nullify
 
+  # CHARTS
+  has_many :chart_statistics, dependent: :nullify # statistics of user answers
+
+  # USER IN GENERAL
+  has_many :user_verification_codes, dependent: :destroy
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
 
-  delegate :name, to: :team, prefix: true, allow_nil: true
-
+  # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
   scope :third_parties, -> { limit_to_roles('third_party') }
@@ -80,14 +92,25 @@ class User < ApplicationRecord
     end
   }
 
+  # BEFORE/AFTER ACTIONS
+  before_save :invalidate_token_after_changes
+  after_create_commit :set_terms_confirmed_date
+
+  # ENCRYPTION
   encrypts :email, :first_name, :last_name, :uid
   blind_index :email, :uid
 
+  # METHODS
   def self.detailed_search(params)
     scope = all
-    scope = params[:user_roles].include?('researcher') ? users_for_researcher(params, scope) : scope.limit_to_roles(params[:roles])
+    scope = if params[:user_roles].include?('researcher')
+              users_for_researcher(params, all)
+            else
+              temp_scope = scope.limit_to_roles(params[:roles])
+              params.key?(:team_id) ? temp_scope.from_team(params[:team_id]) : temp_scope
+            end
+
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && params[:user_roles].exclude?('researcher')
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
     scope
   end
@@ -112,14 +135,6 @@ class User < ApplicationRecord
     update!(active: true) unless active
   end
 
-  def active_for_authentication?
-    super && active
-  end
-
-  def send_devise_notification(notification, *args)
-    devise_mailer.send(notification, self, *args).deliver_later
-  end
-
   def deactivated?
     !active?
   end
@@ -132,20 +147,8 @@ class User < ApplicationRecord
     roles.include?('guest') || roles.include?('preview_session')
   end
 
-  def accepted_health_clinic_ids
-    return unless role?('health_clinic_admin')
-
-    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
-    health_clinic_ids.append(organizable.id) if organizable
-    health_clinic_ids
-  end
-
   def cache_key
     "user/#{id}-#{updated_at&.to_s(:number)}"
-  end
-
-  def accepted_organizable_id
-    organizable_id
   end
 
   def set_terms_confirmed_date
@@ -153,14 +156,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def self.users_for_researcher(params, scope)
-    if params[:roles]&.include?('researcher')
-      scope.researchers.from_team(params[:team_id])
-    else
-      scope.participants
-    end
-  end
 
   def team_admin?
     roles.include?('team_admin')
@@ -179,5 +174,23 @@ class User < ApplicationRecord
     self.tokens = {}
   end
 
-  private_class_method :users_for_researcher
+  def active_for_authentication?
+    super && active
+  end
+
+  def send_devise_notification(notification, *args)
+    devise_mailer.send(notification, self, *args).deliver_later
+  end
+
+  class << self
+    private
+
+    def users_for_researcher(params, scope)
+      if params[:roles]&.include?('researcher')
+        scope.researchers.from_team(params[:team_id])
+      else
+        scope.participants
+      end
+    end
+  end
 end

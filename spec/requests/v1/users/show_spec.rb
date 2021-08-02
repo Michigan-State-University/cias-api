@@ -44,6 +44,18 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
     end
   end
 
+  %w[guest participant researcher organization_admin health_system_admin health_clinic_admin third_party e_intervention_admin team_admin].each do |role|
+    context "when user is #{role}" do
+      let(:user) { create(:user, :confirmed, role) }
+
+      before { request }
+
+      it 'returns not found' do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   context 'invalid id' do
     before do
       get v1_user_path(id: 'invalid'), headers: headers
