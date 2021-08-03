@@ -347,7 +347,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:researcher_1) { create(:user, :confirmed, :researcher, first_name: 'Oliver', last_name: 'Wood', email: 'oliver.Wood@test.com', created_at: 4.days.ago, team_id: team.id) }
       let!(:add_current_user_to_team) { current_user.team_id = team.id }
       let!(:params) { { roles: %w[researcher], team_id: team.id } }
-      let!(:users) { [researcher_1, current_user] }
+      let!(:users) { [researcher_1] }
 
       before { request }
 
@@ -364,7 +364,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       end
 
       context 'and want to see other e-intervention admins from organization' do
-        let!(:e_intervention_admin) { create(:user, :e_intervention_admin, organizable: organization) }
+        let!(:e_intervention_admin) { create(:user, :e_intervention_admin, organizable: organization, team_id: team.id) }
         let!(:params) { { roles: %w[researcher e_intervention_admin], team_id: team.id } }
         let!(:users) { [e_intervention_admin, researcher_1, current_user] }
 

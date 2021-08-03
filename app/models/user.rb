@@ -89,7 +89,7 @@ class User < ApplicationRecord
     user_roles = params[:user_roles]
 
     scope = all
-    scope = include_researcher_or_e_intervention_admin?(user_roles) ? users_for_researcher(params, scope) : scope.limit_to_roles(params[:roles])
+    scope = include_researcher_or_e_intervention_admin?(user_roles) ? users_for_researcher_or_e_intervention_admin(params, scope) : scope.limit_to_roles(params[:roles])
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
     scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && params[:user_roles].exclude?('researcher') && params[:user_roles].exclude?('e_intervention_admin')
     scope.name_contains(params[:name])
@@ -149,16 +149,13 @@ class User < ApplicationRecord
 
   private
 
-  def self.users_for_researcher(params, scope)
+  def self.users_for_researcher_or_e_intervention_admin(params, scope)
     if params[:roles]&.include?('researcher') && params[:roles]&.include?('e_intervention_admin')
-      researcher_ids = scope.researchers_and_e_intervention_admins.from_team(params[:team_id]).pluck(:id)
-      e_intervention_admin_ids = scope.e_intervention_admins.from_organization(params[:organization_id]).pluck(:id)
-
-      scope.where(id: (researcher_ids + e_intervention_admin_ids).uniq)
-    elsif params[:roles]&.include?('researcher')
       scope.researchers_and_e_intervention_admins.from_team(params[:team_id])
+    elsif params[:roles]&.include?('researcher')
+      scope.researchers.from_team(params[:team_id])
     elsif params[:roles]&.include?('e_intervention_admin')
-      scope.e_intervention_admins.from_organization(params[:organization_id])
+      scope.e_intervention_admins.from_team(params[:team_id])
     else
       scope.participants
     end
