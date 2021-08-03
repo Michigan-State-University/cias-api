@@ -72,6 +72,4 @@ class Intervention < ApplicationRecord
   def newest_report
     reports.attachments.order(created_at: :desc).first
   end
-
-  private
 end
