@@ -35,7 +35,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
       context 'when intervention does not contain any report' do
         it 'contains proper attributes' do
           expect(attrs).to include(
-            'name' => '[Reporting] Some intervention',
+            'name' => 'Some intervention',
             'shared_to' => shared_to,
             'csv_link' => nil,
             'csv_generated_at' => nil,
@@ -50,7 +50,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
         it 'contains proper attributes' do
           expect(attrs).to include(
-            'name' => '[Reporting] Some intervention',
+            'name' => 'Some intervention',
             'shared_to' => shared_to,
             'csv_link' => include('test_empty.csv'),
             'csv_generated_at' => be_present
@@ -142,7 +142,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
         context 'when intervention does not contain any report' do
           it 'contains proper attributes' do
             expect(attrs).to include(
-              'name' => '[Reporting] Some intervention',
+              'name' => 'Some intervention',
               'shared_to' => shared_to,
               'csv_link' => nil,
               'csv_generated_at' => nil
@@ -155,7 +155,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
           it 'contains proper attributes' do
             expect(attrs).to include(
-              'name' => '[Reporting] Some intervention',
+              'name' => 'Some intervention',
               'shared_to' => shared_to,
               'csv_link' => include('test_empty.csv'),
               'csv_generated_at' => be_present

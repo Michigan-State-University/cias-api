@@ -4,7 +4,7 @@ class Clone::Intervention < Clone::Base
   def execute
     outcome.status = :draft
     outcome.name = "Copy of #{outcome.name}"
-    delete_organization!
+    clear_organization!
     outcome.save!
     create_sessions
     reassign_branching
@@ -79,7 +79,7 @@ class Clone::Intervention < Clone::Base
     nil
   end
 
-  def delete_organization!
+  def clear_organization!
     return if outcome.organization.blank?
 
     outcome.organization = nil

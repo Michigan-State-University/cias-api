@@ -54,7 +54,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
 
       it 'response contains proper attributes' do
         expect(json_response['data']['attributes']).to include(
-          'name' => '[Reporting] New Intervention',
+          'name' => 'New Intervention',
           'status' => 'draft',
           'shared_to' => 'anyone',
           'language_name' => 'English',
@@ -64,7 +64,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
 
       it 'creates a intervention object' do
         expect(Intervention.last.attributes).to include(
-          'name' => '[Reporting] New Intervention',
+          'name' => 'New Intervention',
           'user_id' => admin.id,
           'status' => 'draft',
           'shared_to' => 'anyone',
@@ -158,7 +158,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
 
         it 'response contains proper attributes' do
           expect(json_response['data']['attributes']).to include(
-            'name' => '[Reporting] New Intervention',
+            'name' => 'New Intervention',
             'status' => 'draft',
             'shared_to' => 'anyone'
           )
@@ -166,7 +166,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
 
         it 'creates a intervention object' do
           expect(Intervention.last.attributes).to include(
-            'name' => '[Reporting] New Intervention',
+            'name' => 'New Intervention',
             'user_id' => user.id,
             'status' => 'draft',
             'shared_to' => 'anyone'

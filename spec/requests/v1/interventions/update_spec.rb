@@ -108,7 +108,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
 
         it 'have correct prefix' do
           expect(json_response['data']['attributes']).to include(
-            'name' => '[Reporting] Intervention in organization'
+            'name' => 'Intervention in organization'
           )
         end
       end

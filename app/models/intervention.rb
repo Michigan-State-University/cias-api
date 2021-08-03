@@ -33,8 +33,6 @@ class Intervention < ApplicationRecord
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
 
-  before_save :set_prefix_for_intervention_name
-
   def broadcast
     return unless draft?
 
@@ -76,12 +74,4 @@ class Intervention < ApplicationRecord
   end
 
   private
-
-  def set_prefix_for_intervention_name
-    if organization.present?
-      self.name = "[Reporting] #{name}" if name.exclude?('[Reporting]')
-    elsif name.include?('[Reporting] ')
-      name.slice!('[Reporting] ')
-    end
-  end
 end
