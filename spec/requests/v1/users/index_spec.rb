@@ -27,7 +27,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     end
 
     it 'returns correct user ids' do
-      expect(json_response['data'].pluck('id')).to eq users.pluck(:id)
+      expect(json_response['data'].pluck('id')).to match_array users.pluck(:id)
     end
 
     it 'returns correct users list size' do
@@ -200,41 +200,68 @@ RSpec.describe 'GET /v1/users', type: :request do
 
   context 'when current_user is team_admin' do
     let!(:team1) { create(:team) }
-    let(:current_user) { team1.team_admin }
-    let(:team_participant) { create(:user, :participant, :confirmed) }
-    let(:other_team_participant) { create(:user, :participant, :confirmed, team_id: team1.id) }
-    let(:team_researcher) { create(:user, :researcher, :confirmed, team_id: team1.id) }
-    let!(:session) { create(:session, intervention: create(:intervention, user: team_researcher)) }
-    let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
-    let!(:question) { create(:question_slider, question_group: question_group) }
-    let!(:answer) do
-      create(:answer_slider, question: question,
-                             user_session: create(:user_session, user: team_participant, session: session))
+    let!(:current_user) { team1.team_admin }
+
+    let!(:team_participant) { create(:user, :participant, :confirmed) }
+    let!(:team_participant2) { create(:user, :participant, :confirmed) }
+    let!(:other_team_participant) { create(:user, :participant, first_name: 'John', team_id: team1.id) }
+
+    let!(:team_researcher) { create(:user, :researcher, :confirmed, team_id: team1.id) }
+    let!(:team_intervention_admin) { create(:user, :e_intervention_admin, :confirmed, team_id: team1.id) }
+
+    let!(:answer1) do
+      session = create(:session, intervention: create(:intervention, user: team_researcher))
+      question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
+      question = create(:question_slider, question_group: question_group)
+      create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant, session: session))
     end
+
+    let!(:answer2) do
+      session = create(:session, intervention: create(:intervention, user: team_intervention_admin))
+      question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
+      question = create(:question_slider, question_group: question_group)
+      create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant2, session: session))
+    end
+
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
-    let(:expected_users_ids) { [*team1.users.pluck(:id), current_user.id, team_participant.id] }
+    let(:users) { [*team1.users, current_user, team_participant, team_participant2] }
+
+    let!(:team2) { create(:team) }
+    let!(:other_researchers) do
+      create(:user, :researcher, team_id: team1.id)
+      create(:user, :researcher, team_id: team2.id)
+    end
 
     context 'without params' do
-      let!(:team2) { create(:team) }
       let(:params) { {} }
 
       before do
-        create(:user, :researcher, team_id: team1.id)
-        create(:user, :researcher, team_id: team2.id)
         request
       end
 
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
+      it_behaves_like 'correct users response'
+    end
+
+    context 'with filters params' do
+      let!(:params) { { name: 'John', roles: %w[participant] } }
+      let!(:users) { [other_team_participant] }
+
+      before do
+        request
       end
 
-      it 'returns users only from his team' do
-        expect(json_response['data'].pluck('id')).to match_array(expected_users_ids)
+      it_behaves_like 'correct users response'
+    end
+
+    context 'with team_id params' do
+      let!(:params) { { team_id: team1.id } }
+      let!(:users) { [*team1.users, team_participant, team_participant2] }
+
+      before do
+        request
       end
 
-      it 'returns correct users list size' do
-        expect(json_response['data'].size).to eq expected_users_ids.size
-      end
+      it_behaves_like 'correct users response'
     end
   end
 
