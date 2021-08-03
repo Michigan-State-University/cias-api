@@ -28,7 +28,6 @@ class Intervention < ApplicationRecord
     left_joins(:invitations).published.not_shared_to_invited
       .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
-  scope :without_organization, -> { where(organization_id: nil, from_deleted_organization: false) }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to

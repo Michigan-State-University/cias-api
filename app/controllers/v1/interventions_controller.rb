@@ -6,6 +6,7 @@ class V1::InterventionsController < V1Controller
   def index
     collection = interventions_scope
     paginated_collection = paginate(collection, params)
+
     render_json interventions: paginated_collection, interventions_size: collection.size
   end
 
@@ -32,7 +33,7 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.without_organization.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
+    Intervention.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
   end
 
   def intervention_load

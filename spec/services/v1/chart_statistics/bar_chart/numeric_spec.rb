@@ -68,7 +68,7 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
     context 'with data offset' do
       subject { described_class.new(data_collection, chart, data_offset).generate }
 
-      let(:data_offset) { ((Time.current - 1.month.ago) / 1.day).to_i }
+      let(:data_offset) { ((Time.current - 1.month.ago) / 1.day).to_i + 1 }
 
       it 'return correct data' do
         expect(subject).to include(
