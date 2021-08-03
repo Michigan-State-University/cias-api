@@ -89,10 +89,15 @@ class User < ApplicationRecord
     user_roles = params[:user_roles]
 
     scope = all
-    scope = include_researcher_or_e_intervention_admin?(user_roles) ? users_for_researcher_or_e_intervention_admin(params, scope) : scope.limit_to_roles(params[:roles])
+    scope = if include_researcher_or_e_intervention_admin?(user_roles)
+              users_for_researcher_or_e_intervention_admin(params, scope)
+            else
+              scope = users_for_team(params, scope) if params.key?(:team_id)
+              scope.limit_to_roles(params[:roles])
+            end
+
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && params[:user_roles].exclude?('researcher') && params[:user_roles].exclude?('e_intervention_admin')
-    scope.name_contains(params[:name])
+    scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
   end
 
   def ability
@@ -145,6 +150,7 @@ class User < ApplicationRecord
 
   def set_terms_confirmed_date
     self.terms_confirmed_at = Time.current
+    save!
   end
 
   private
@@ -180,5 +186,33 @@ class User < ApplicationRecord
     return if !roles_changed? && (!active_changed? || active)
 
     self.tokens = {}
+  end
+
+  class << self
+    private
+
+    def users_for_researcher(params, scope)
+      if params[:roles]&.include?('researcher')
+        scope.researchers.from_team(params[:team_id])
+      else
+        scope.participants
+      end
+    end
+
+    def participants_with_answers_ids(user)
+      result = Session.where(intervention_id: user.interventions.select(:id)).pluck(:id)
+      return User.none if result.blank?
+
+      User.participants.select { |participant| Answer.user_answers(participant.id, result).any? }.pluck(:id)
+    end
+
+    def participants_with_answers(scope)
+      User.participants.where(id: scope.researchers_and_e_intervention_admins.flat_map { |user| participants_with_answers_ids(user) })
+    end
+
+    def users_for_team(params, scope)
+      scope = scope.from_team(params[:team_id])
+      scope.or(participants_with_answers(scope)) # participants of researchers and e_intervention admins of team
+    end
   end
 end
