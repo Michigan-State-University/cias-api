@@ -14,7 +14,7 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def create
-    answer = V1::AnswerService.new(current_v1_user).create(user_session_id, question_id, answer_params)
+    answer = V1::AnswerService.call(current_v1_user, user_session_id, question_id, answer_params)
     render json: serialized_response(answer), status: :created
   end
 
