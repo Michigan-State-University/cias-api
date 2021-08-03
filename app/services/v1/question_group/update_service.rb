@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-# to delete
+
 class V1::QuestionGroup::UpdateService
   attr_accessor :question_group
   attr_reader :question_group_params

@@ -35,7 +35,7 @@ class V1::QuestionGroup::CreateService
       Question.create!(question_group_id: question_group.id,
                        position: question_group.questions.last&.position.to_i + 1,
                        **question_params.permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {},
-                                                formula: {}, body: {}))
+                                                                                      formula: {}, body: {}))
     end
   end
 end
