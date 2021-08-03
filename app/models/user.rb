@@ -66,6 +66,7 @@ class User < ApplicationRecord
 
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
+  scope :researchers_and_e_intervention_admins, -> { limit_to_roles(%w[e_intervention_admin researcher]) }
   scope :third_parties, -> { limit_to_roles('third_party') }
   scope :from_team, ->(team_id) { where(team_id: team_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
@@ -84,9 +85,14 @@ class User < ApplicationRecord
 
   def self.detailed_search(params)
     scope = all
-    scope = params[:user_roles].include?('researcher') ? users_for_researcher(params, scope) : scope.limit_to_roles(params[:roles])
+    scope = if params[:user_roles].include?('researcher')
+              users_for_researcher(params, scope)
+            else
+              scope = users_for_team(params, scope) if params.key?(:team_id)
+              scope.limit_to_roles(params[:roles])
+            end
+
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope = scope.from_team(params[:team_id]) if params.key?(:team_id) && params[:user_roles].exclude?('researcher')
     scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
     scope
   end
@@ -146,14 +152,6 @@ class User < ApplicationRecord
 
   private
 
-  def self.users_for_researcher(params, scope)
-    if params[:roles]&.include?('researcher')
-      scope.researchers.from_team(params[:team_id])
-    else
-      scope.participants
-    end
-  end
-
   def team_admin?
     roles.include?('team_admin')
   end
@@ -169,5 +167,33 @@ class User < ApplicationRecord
     return if !roles_changed? && (!active_changed? || active)
 
     self.tokens = {}
+  end
+
+  class << self
+    private
+
+    def users_for_researcher(params, scope)
+      if params[:roles]&.include?('researcher')
+        scope.researchers.from_team(params[:team_id])
+      else
+        scope.participants
+      end
+    end
+
+    def participants_with_answers_ids(user)
+      result = Session.where(intervention_id: user.interventions.select(:id)).pluck(:id)
+      return User.none if result.blank?
+
+      User.participants.select { |participant| Answer.user_answers(participant.id, result).any? }.pluck(:id)
+    end
+
+    def participants_with_answers(scope)
+      User.participants.where(id: scope.researchers_and_e_intervention_admins.flat_map { |user| participants_with_answers_ids(user) })
+    end
+
+    def users_for_team(params, scope)
+      scope = scope.from_team(params[:team_id])
+      scope.or(participants_with_answers(scope)) # participants of researchers and e_intervention admins of team
+    end
   end
 end

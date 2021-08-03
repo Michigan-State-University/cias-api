@@ -16,7 +16,7 @@ class Answer < ApplicationRecord
 
   scope :user_answers, lambda { |user_id, session_ids|
     relation = joins(:user_session, question: :question_group).where(user_sessions: { user_id: user_id })
-    relation.where('question_groups.session_id IN(?)', session_ids.join(',')) if session_ids.any?
+    relation = relation.where('question_groups.session_id IN(?)', session_ids) if session_ids.any?
     relation
   }
 
