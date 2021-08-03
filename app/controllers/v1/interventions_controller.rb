@@ -7,7 +7,7 @@ class V1::InterventionsController < V1Controller
     collection = interventions_scope
     paginated_collection = paginate(collection, params)
 
-    render json: serialized_hash(paginated_collection).merge(interventions_size: collection.size)
+    render_json interventions: paginated_collection, interventions_size: collection.size
   end
 
   def show

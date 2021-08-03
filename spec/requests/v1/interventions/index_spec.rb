@@ -38,12 +38,12 @@ RSpec.describe 'GET /v1/interventions', type: :request do
           end
 
           it 'returns proper interventions' do
-            expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
+            expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
                                                                                   .take(interventions_size_admin).map(&:id)
           end
 
           it 'returns correct invitations list size' do
-            expect(json_response['data'].size).to eq interventions_size_admin
+            expect(json_response['interventions'].size).to eq interventions_size_admin
           end
         end
       end
@@ -57,11 +57,11 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper error message' do
-          expect(json_response['data'].pluck('id')).to match_array []
+          expect(json_response['interventions'].pluck('id')).to match_array []
         end
 
         it 'returns correct invitations list size' do
-          expect(json_response['data'].size).to eq 0
+          expect(json_response['interventions'].size).to eq 0
         end
       end
 
@@ -74,12 +74,12 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper interventions' do
-          expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
+          expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
                                                                                 .take(interventions_size_researcher).map(&:id)
         end
 
         it 'returns correct invitations list size' do
-          expect(json_response['data'].size).to eq interventions_size_researcher
+          expect(json_response['interventions'].size).to eq interventions_size_researcher
         end
       end
 
@@ -92,11 +92,11 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper interventions' do
-          expect(json_response['data'].pluck('id')).to match_array []
+          expect(json_response['interventions'].pluck('id')).to match_array []
         end
 
         it 'returns correct invitations list size' do
-          expect(json_response['data'].size).to eq 0
+          expect(json_response['interventions'].size).to eq 0
         end
       end
     end
