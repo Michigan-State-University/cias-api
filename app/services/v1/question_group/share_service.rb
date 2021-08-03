@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::ShareService
-  def initialize(user, session_id)
+  def initialize(user, session)
     @user = user
-    @session = Session.accessible_by(user.ability).find(session_id)
-    @intervention = Intervention.accessible_by(user.ability).find(session.intervention_id)
+    @session = session
+    @intervention = session.intervention
     @all_user_questions = Question.accessible_by(user.ability)
     @question_groups = QuestionGroup.includes(:session,
-                                              :questions).accessible_by(user.ability).where(session_id: session_id).order(:position)
+                                              :questions).accessible_by(user.ability).where(session_id: session.id).order(:position)
   end
 
   attr_reader :user, :intervention, :session, :all_user_questions
@@ -69,13 +69,9 @@ class V1::QuestionGroup::ShareService
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty,
                    ::Question::Phone].member? question.class
 
-    if question_type_exist_in_session(
-      question, question_group
-    )
-      raise ActiveRecord::RecordNotUnique,
-            (I18n.t 'activerecord.errors.models.question_group.question',
-                    question_type: question.type)
-    end
+    return unless question_type_exist_in_session(question, question_group)
+
+    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type)
   end
 
   def question_type_exist_in_session(question, question_group)
