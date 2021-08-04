@@ -5,7 +5,17 @@ class V1::InterventionsController < V1Controller
 
   def index
     collection = interventions_scope
-    paginated_collection = paginate(collection, params)
+    paginated_collection = if start_index.present? && end_index.present?
+                             end_index_or_last_index = if end_index >= collection.size
+                                                         collection.size - 1
+                                                       else
+                                                         end_index
+                                                       end
+                             paginated_collection_ids = collection[start_index..end_index_or_last_index].pluck('id')
+                             interventions_scope.indexing(paginated_collection_ids)
+                           else
+                             collection
+                           end
 
     render_json interventions: paginated_collection, interventions_size: collection.size
   end
@@ -42,5 +52,13 @@ class V1::InterventionsController < V1Controller
 
   def intervention_params
     params.require(:intervention).permit(:name, :status_event, :shared_to, :organization_id, :google_language_id)
+  end
+
+  def start_index
+    params.permit(:startIndex)[:startIndex].to_i
+  end
+
+  def end_index
+    params.permit(:endIndex)[:endIndex].to_i
   end
 end

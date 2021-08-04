@@ -103,7 +103,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   context 'when params are given' do
-    let!(:params) { { page: 1, per_page: 2 } }
+    let!(:params) { { startIndex: 0, endIndex: 1 } }
 
     it_behaves_like 'chosen users', 2, 2
   end

@@ -29,6 +29,7 @@ class Intervention < ApplicationRecord
       .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
+  scope :indexing, ->(ids) { where(id: ids) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
