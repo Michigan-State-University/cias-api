@@ -12,4 +12,12 @@ class Question::ThirdParty < Question
   def csv_header_names
     []
   end
+
+  def translate_body(translator, source_language_name_short, destination_language_name_short)
+    body['data'].each do |row|
+      row['original_text'] = row['payload']
+
+      row['payload']= translator.translate(row['payload'], source_language_name_short, destination_language_name_short)
+    end
+  end
 end
