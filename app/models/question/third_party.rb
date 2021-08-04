@@ -17,7 +17,7 @@ class Question::ThirdParty < Question
     body['data'].each do |row|
       row['original_text'] = row['payload']
 
-      row['payload']= translator.translate(row['payload'], source_language_name_short, destination_language_name_short)
+      row['payload'] = translator.translate(row['payload'], source_language_name_short, destination_language_name_short)
     end
   end
 end
