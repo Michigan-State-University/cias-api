@@ -78,10 +78,10 @@ class V1::GeneratedReports::ShareToThirdParty
     # rubocop:disable Style/MultilineBlockChain
     @third_party_emails_report_template_ids ||= Answer::ThirdParty.where(user_session_id: user_session.id)
                                                     .map do |answer|
-                                                  [answer.body_data&.first&.dig('value')&.delete(' ')&.split(',').to_a,
+                                                  [answer.body_data&.first&.dig('value')&.delete(' ')&.split(','),
                                                    answer.body_data&.first&.dig('report_template_ids')]
                                                 end
-                                                    .each_with_object({}) { |(k, v), h| h[k] = (h[k] || []) + v } # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
+                                                    .each_with_object(Hash.new([])) { |(email, rep_id), hash| hash[email] += rep_id } # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
     # rubocop:enable Layout/LineLength
     # rubocop:enable Style/MultilineBlockChain
   end
