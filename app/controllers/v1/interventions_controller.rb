@@ -4,7 +4,7 @@ class V1::InterventionsController < V1Controller
   include Resource::Clone
 
   def index
-    collection = interventions_scope.limit_to_statuses(statuses)
+    collection = interventions_scope.detailed_search(params)
     paginated_collection = if start_index.present? && end_index.present?
                              end_index_or_last_index = if end_index >= collection.size
                                                          collection.size - 1
@@ -60,9 +60,5 @@ class V1::InterventionsController < V1Controller
 
   def end_index
     params.permit(:end_index)[:end_index]&.to_i
-  end
-
-  def statuses
-    params.permit(statuses: [])[:statuses]
   end
 end

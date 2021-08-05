@@ -127,4 +127,20 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       expect(json_response['interventions'].pluck('id')).to include(archived_intervention.id, closed_intervention.id)
     end
   end
+
+  context 'filtering by name' do
+    let!(:params) { { name: 'New' } }
+    let!(:new_intervention) { create(:intervention, :archived, user: admin, shared_to: :registered, name: 'New Intervention') }
+    let!(:old_intervention) { create(:intervention, :closed, user: admin, shared_to: :registered, name: 'Old Intervention') }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct size' do
+      expect(json_response['interventions'].size).to be(1)
+    end
+
+    it 'return correct intervention' do
+      expect(json_response['interventions'].first['id']).to include(new_intervention.id)
+    end
+  end
 end

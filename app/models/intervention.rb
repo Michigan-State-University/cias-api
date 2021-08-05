@@ -31,6 +31,7 @@ class Intervention < ApplicationRecord
   scope :with_any_organization, -> { where.not(organization_id: nil) }
   scope :indexing, ->(ids) { where(id: ids) }
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
+  scope :filter_by_starts_with, ->(name) { where('interventions.name like ?', "#{name}%") if name.present?}
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -73,5 +74,11 @@ class Intervention < ApplicationRecord
 
   def newest_report
     reports.attachments.order(created_at: :desc).first
+  end
+
+  def self.detailed_search(params)
+    scope = all
+    scope = scope.limit_to_statuses(params[:statuses])
+    scope.filter_by_starts_with(params[:name])
   end
 end
