@@ -30,6 +30,7 @@ class Intervention < ApplicationRecord
   }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
   scope :indexing, ->(ids) { where(id: ids) }
+  scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }

@@ -111,4 +111,20 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   context 'when params are not given' do
     it_behaves_like 'chosen users', 9, 3
   end
+
+  context 'filtering by statuses' do
+    let!(:params) { { statuses: %w[closed archived] } }
+    let!(:archived_intervention) { create(:intervention, :archived, user: admin, shared_to: :registered) }
+    let!(:closed_intervention) { create(:intervention, :closed, user: admin, shared_to: :registered) }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct size' do
+      expect(json_response['interventions'].size).to be(2)
+    end
+
+    it 'return correct intervention' do
+      expect(json_response['interventions'].pluck('id')).to include(archived_intervention.id, closed_intervention.id)
+    end
+  end
 end
