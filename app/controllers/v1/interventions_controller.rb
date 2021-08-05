@@ -59,6 +59,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def end_index
-    params.permit(:end_index)[:end_index].to_i
+    params.permit(:end_index)[:end_index]&.to_i
   end
 end
