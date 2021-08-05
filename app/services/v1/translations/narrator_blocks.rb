@@ -28,7 +28,7 @@ class V1::Translations::NarratorBlocks
   private
 
   def translate_text(texts, translator)
-    texts.map do |text|
+    texts&.map do |text|
       variable?(text) ? text : translator.translate(text, source_language_name_short, destination_language_name_short)
     end
   end
