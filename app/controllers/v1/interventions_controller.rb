@@ -11,7 +11,7 @@ class V1::InterventionsController < V1Controller
                                                        else
                                                          end_index
                                                        end
-                             paginated_collection_ids = collection[start_index..end_index_or_last_index].pluck('id')
+                             paginated_collection_ids = collection[start_index..end_index_or_last_index]&.pluck('id')
                              interventions_scope.indexing(paginated_collection_ids)
                            else
                              collection
