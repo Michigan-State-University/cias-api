@@ -43,11 +43,11 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
+    Intervention.accessible_by(current_ability).order(created_at: :desc)
   end
 
-  def intervention_load
-    Intervention.accessible_by(current_ability).find(params[:id])
+  def intervention_loadć
+    interventions_scope.find(params[:id])
   end
 
   def intervention_params
