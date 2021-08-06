@@ -54,6 +54,6 @@ class V1Controller < ApplicationController
     action = params[:action].presence || action_name
     serializer = "#{path}/#{action}".classify.constantize
 
-    render json: serializer.new(params.except(:path, :action, :status)).cached_render, status: params[:status]
+    render json: serializer.new(params.except(:path, :action, :status)).render, status: params[:status]
   end
 end
