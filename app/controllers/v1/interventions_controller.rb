@@ -12,7 +12,7 @@ class V1::InterventionsController < V1Controller
                                                          end_index
                                                        end
                              paginated_collection_ids = collection[start_index..end_index_or_last_index]&.pluck('id')
-                             interventions_scope.indexing(paginated_collection_ids)
+                             collection.indexing(paginated_collection_ids)
                            else
                              collection
                            end
@@ -46,7 +46,7 @@ class V1::InterventionsController < V1Controller
     Intervention.accessible_by(current_ability).order(created_at: :desc)
   end
 
-  def intervention_loadć
+  def intervention_load
     interventions_scope.find(params[:id])
   end
 
