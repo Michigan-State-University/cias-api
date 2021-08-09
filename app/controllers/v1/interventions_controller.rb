@@ -5,17 +5,7 @@ class V1::InterventionsController < V1Controller
 
   def index
     collection = interventions_scope.detailed_search(params)
-    paginated_collection = if start_index.present? && end_index.present?
-                             end_index_or_last_index = if end_index >= collection.size
-                                                         collection.size - 1
-                                                       else
-                                                         end_index
-                                                       end
-                             paginated_collection_ids = collection[start_index..end_index_or_last_index]&.pluck('id')
-                             collection.indexing(paginated_collection_ids)
-                           else
-                             collection
-                           end
+    paginated_collection = V1::Intervention::Paginate.call(collection, start_index, end_index)
 
     render_json interventions: paginated_collection, interventions_size: collection.size
   end
@@ -55,7 +45,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def start_index
-    params.permit(:start_index)[:start_index].to_i
+    params.permit(:start_index)[:start_index]&.to_i
   end
 
   def end_index
