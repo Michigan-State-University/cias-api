@@ -63,10 +63,6 @@ class UserSession < ApplicationRecord
 
   private
 
-  def session_next
-    @session_next ||= session.position_greater_than.first
-  end
-
   def decrement_audio_usage
     return if name_audio.nil?
 
