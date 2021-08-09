@@ -117,7 +117,7 @@ class Session < ApplicationRecord
     question_group_finish.questions.first
   end
 
-  def available_now(participant_date = nil)
+  def available_now?(participant_date = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
     return true if schedule == 'days_after_date' && participant_date&.noon&.past?

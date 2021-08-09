@@ -29,7 +29,7 @@ RSpec.describe Session, type: :model do
         end
       end
 
-      describe '#available_now' do
+      describe '#available_now?' do
         let(:session) do
           create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload)
         end
@@ -39,7 +39,7 @@ RSpec.describe Session, type: :model do
 
         context 'session schedule is after fill' do
           it 'returns true' do
-            expect(session.available_now).to be(true)
+            expect(session.available_now?).to be(true)
           end
         end
 
@@ -47,7 +47,7 @@ RSpec.describe Session, type: :model do
           let(:schedule) { 'days_after_fill' }
 
           it 'returns false' do
-            expect(session.available_now).to be(false)
+            expect(session.available_now?).to be(false)
           end
         end
 
@@ -67,7 +67,7 @@ RSpec.describe Session, type: :model do
           let(:schedule) { 'days_after_date' }
 
           it 'returns false' do
-            expect(session.available_now(calculated_date)).to be(false)
+            expect(session.available_now?(calculated_date)).to be(false)
           end
         end
 
@@ -76,7 +76,7 @@ RSpec.describe Session, type: :model do
 
           context 'session is in the feature' do
             it 'returns false ' do
-              expect(session.available_now).to be(false)
+              expect(session.available_now?).to be(false)
             end
           end
 
@@ -84,7 +84,7 @@ RSpec.describe Session, type: :model do
             let(:schedule_at) { DateTime.now - 1.day }
 
             it 'returns true' do
-              expect(session.available_now).to be(true)
+              expect(session.available_now?).to be(true)
             end
           end
         end

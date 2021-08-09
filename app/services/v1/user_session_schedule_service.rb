@@ -45,7 +45,7 @@ class V1::UserSessionScheduleService
     session = user_session.session
     if session.settings['formula']
       formula_result = session.exploit_formula(all_var_values)
-      target = V1::RandomizationService.new(formula_result['target']).execute unless formula_result.nil?
+      target = V1::RandomizationService.call(formula_result['target']) unless formula_result.nil?
       next_session = Session.find(target['id']) if target.is_a?(Hash) && !target['id'].nil?
     end
     next_session
