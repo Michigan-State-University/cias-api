@@ -7,6 +7,12 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
     block
   end
 
+  def self.swap_name(block, mp3url, name_text)
+    return block unless block['text'].include?(':name:.')
+
+    swap_name_into_block(block, mp3url, name_text)
+  end
+
   private
 
   def replace_urls

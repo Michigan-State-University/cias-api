@@ -68,6 +68,20 @@ class Question < ApplicationRecord
     @position_equal_or_higher ||= questionnaire.drop(current_position)
   end
 
+  def swap_name_mp3(name_audio, name_answer)
+    blocks = narrator['blocks']
+    blocks.map do |block|
+      next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
+
+      name_audio_url = name_audio&.url.to_s
+
+      name_text = name_answer.nil? ? 'name' : name_answer['name']
+
+      "Question::Narrator::Block::#{block['type'].classify}".safe_constantize&.swap_name(block, name_audio_url, name_text)
+    end
+    self
+  end
+
   def another_or_feedback(next_obj, answers_var_values)
     return next_obj unless next_obj.is_a?(::Question::Feedback)
 

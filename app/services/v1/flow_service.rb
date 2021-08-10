@@ -27,6 +27,8 @@ class V1::FlowService
     { question: question, warning: warning, next_user_session_id: next_user_session_id }
   end
 
+  private
+
   def question_to_display(preview_question_id)
     return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
 
@@ -44,7 +46,7 @@ class V1::FlowService
 
       obj_src = last_question.exploit_formula(all_var_values)
       self.warning = obj_src if obj_src.is_a?(String)
-      branching_question = nil
+
       branching_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
       next_question = branching_question unless branching_question.nil?
     end
@@ -53,7 +55,7 @@ class V1::FlowService
   end
 
   def branching_source_to_question(source)
-    source = V1::RandomizationService.new(source['target']).execute
+    source = V1::RandomizationService.call(source['target'])
 
     if source.is_a?(Array)
       self.warning = RANDOMIZATION_MISS_MATCH
@@ -69,7 +71,7 @@ class V1::FlowService
     end
     return question_or_session if branching_type.include? 'Question'
 
-    session_available_now = question_or_session.available_now(prepare_participant_date_with_schedule_payload(question_or_session))
+    session_available_now = question_or_session.available_now?(prepare_participant_date_with_schedule_payload(question_or_session))
 
     user_session.finish(send_email: !session_available_now)
 
@@ -83,25 +85,8 @@ class V1::FlowService
     user_session.session.finish_screen
   end
 
-  def swap_name_mp3(question)
-    blocks = question.narrator['blocks']
-    blocks.map do |block|
-      next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
-
-      name_audio_url = ''
-      name_audio_url = user_session.name_audio.url unless user_session.name_audio.nil?
-
-      name_answer = user_session.search_var('.:name:.')
-      name_text = name_answer.nil? ? 'name' : name_answer['name']
-
-      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, name_audio_url, name_text)
-      block
-    end
-    question
-  end
-
   def perform_narrator_reflections(question)
-    question = swap_name_mp3(question)
+    question = question.swap_name_mp3(name_audio, name_answer)
     question.narrator['blocks']&.each_with_index do |block, index|
       next unless %w[Reflection ReflectionFormula].include?(block['type'])
 
@@ -136,11 +121,17 @@ class V1::FlowService
     (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
   end
 
-  private
-
   def all_var_values
     @all_var_values ||= V1::UserInterventionService.new(
       user.id, user_session.session.intervention_id, user_session.id
     ).var_values
+  end
+
+  def name_audio
+    user_session.name_audio
+  end
+
+  def name_answer
+    user_session.search_var('.:name:.')
   end
 end

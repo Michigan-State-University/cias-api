@@ -12,10 +12,10 @@ RSpec.describe V1::RandomizationService do
       ]
     end
 
-    it 'return question approximately correct the times' do
+    it 'return question approximately correct time' do
       target_array.each do |target|
         counter = 0
-        1_000_000.times { counter += 1 if subject.execute == target }
+        1_000_000.times { counter += 1 if subject.call == target }
         counter /= 10_000
         expect(counter).to be >= (target['probability'].to_i - 1)
         expect(counter).to be <= (target['probability'].to_i + 1)
@@ -23,7 +23,7 @@ RSpec.describe V1::RandomizationService do
     end
   end
 
-  describe 'target array have an one records whitout probability' do
+  describe 'target array have an one records without probability' do
     let(:target_array) do
       [
         { 'id' => 'question_1', type: 'Question::Single' }
@@ -31,7 +31,7 @@ RSpec.describe V1::RandomizationService do
     end
 
     it 'return first question' do
-      expect(subject.execute).to eq(target_array[0])
+      expect(subject.call).to eq(target_array[0])
     end
   end
 end
