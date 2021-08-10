@@ -103,12 +103,44 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   context 'when params are given' do
-    let!(:params) { { page: 1, per_page: 2 } }
+    let!(:params) { { start_index: 0, end_index: 1 } }
 
     it_behaves_like 'chosen users', 2, 2
   end
 
   context 'when params are not given' do
     it_behaves_like 'chosen users', 9, 3
+  end
+
+  context 'filtering by statuses' do
+    let!(:params) { { statuses: %w[closed archived] } }
+    let!(:archived_intervention) { create(:intervention, :archived, user: admin, shared_to: :registered) }
+    let!(:closed_intervention) { create(:intervention, :closed, user: admin, shared_to: :registered) }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct size' do
+      expect(json_response['interventions'].size).to be(2)
+    end
+
+    it 'return correct intervention' do
+      expect(json_response['interventions'].pluck('id')).to include(archived_intervention.id, closed_intervention.id)
+    end
+  end
+
+  context 'filtering by name' do
+    let!(:params) { { name: 'New' } }
+    let!(:new_intervention) { create(:intervention, :archived, user: admin, shared_to: :registered, name: 'New Intervention') }
+    let!(:old_intervention) { create(:intervention, :closed, user: admin, shared_to: :registered, name: 'Old Intervention') }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct size' do
+      expect(json_response['interventions'].size).to be(1)
+    end
+
+    it 'return correct intervention' do
+      expect(json_response['interventions'].first['id']).to include(new_intervention.id)
+    end
   end
 end
