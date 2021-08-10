@@ -86,13 +86,21 @@ class V1::FlowService
   end
 
   def perform_narrator_reflections(question)
-    question = question.swap_name_mp3(user_session)
+    question = question.swap_name_mp3(name_audio, name_answer)
     question.narrator['blocks']&.each_with_index do |block, index|
       next unless %w[Reflection ReflectionFormula].include?(block['type'])
 
       question.narrator['blocks'][index]['target_value'] = prepare_block_target_value(question, block)
     end
     question
+  end
+
+  def name_audio
+    user_session.name_audio
+  end
+
+  def name_answer
+    user_session.search_var('.:name:.')
   end
 
   def prepare_block_target_value(question, block)
