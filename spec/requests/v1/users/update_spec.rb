@@ -225,7 +225,6 @@ describe 'PATCH /v1/users/:id', type: :request do
               it { expect(response).to have_http_status(:ok) }
 
               it 'JSON response contains proper attributes' do
-                p current_user
                 expect(json_response['data']['attributes']).to include(
                   'roles' => %w[participant],
                   'active' => true

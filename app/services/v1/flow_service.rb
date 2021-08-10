@@ -95,14 +95,6 @@ class V1::FlowService
     question
   end
 
-  def name_audio
-    user_session.name_audio
-  end
-
-  def name_answer
-    user_session.search_var('.:name:.')
-  end
-
   def prepare_block_target_value(question, block)
     return question.exploit_formula(all_var_values, block['payload'], block['reflections']) if block['type'].eql?('ReflectionFormula')
 
@@ -133,5 +125,13 @@ class V1::FlowService
     @all_var_values ||= V1::UserInterventionService.new(
       user.id, user_session.session.intervention_id, user_session.id
     ).var_values
+  end
+
+  def name_audio
+    user_session.name_audio
+  end
+
+  def name_answer
+    user_session.search_var('.:name:.')
   end
 end

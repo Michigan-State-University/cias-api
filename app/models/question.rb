@@ -73,7 +73,7 @@ class Question < ApplicationRecord
     blocks.map do |block|
       next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
 
-      name_audio_url = name_audio.url.to_s
+      name_audio_url = name_audio&.url.to_s
 
       name_text = name_answer.nil? ? 'name' : name_answer['name']
 
