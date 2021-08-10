@@ -9,12 +9,12 @@ class V1::GoogleTts::VoicesController < V1Controller
 
   private
 
-  def google_tts_languages_voices_service
-    @google_tts_languages_voices_service ||= V1::GoogleTtsLanguagesVoicesService.new
+  def google_tts_language_scope
+    GoogleTtsLanguage.includes(:google_tts_voices)
   end
 
   def google_tts_voices_scope
-    google_tts_languages_voices_service.google_tts_voices(language_id)
+    google_tts_language_scope.find(language_id).google_tts_voices
   end
 
   def language_id
