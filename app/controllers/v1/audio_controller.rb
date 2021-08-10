@@ -9,6 +9,18 @@ class V1::AudioController < V1Controller
 
   private
 
+  def current_language_code
+    return UserSession.find(user_session_id)&.session&.google_tts_voice&.language_code if user_session_id.present?
+
+    GoogleTtsVoice.find(google_tts_voice_id)&.language_code if google_tts_voice_id.present?
+  end
+
+  def current_voice_type
+    return UserSession.find(user_session_id)&.session&.google_tts_voice&.voice_type if user_session_id.present?
+
+    GoogleTtsVoice.find(google_tts_voice_id)&.voice_type if google_tts_voice_id.present?
+  end
+
   def audio_params
     params.require(:audio).permit(:text, :user_session_id, :google_tts_voice_id)
   end
@@ -23,17 +35,5 @@ class V1::AudioController < V1Controller
 
   def google_tts_voice_id
     audio_params[:google_tts_voice_id]
-  end
-
-  def current_language_code
-    return UserSession.find(user_session_id)&.session&.google_tts_voice&.language_code if user_session_id.present?
-
-    GoogleTtsVoice.find(google_tts_voice_id)&.language_code if google_tts_voice_id.present?
-  end
-
-  def current_voice_type
-    return UserSession.find(user_session_id)&.session&.google_tts_voice&.voice_type if user_session_id.present?
-
-    GoogleTtsVoice.find(google_tts_voice_id)&.voice_type if google_tts_voice_id.present?
   end
 end
