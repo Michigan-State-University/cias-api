@@ -67,7 +67,7 @@ class Question < ApplicationRecord
     current_position = questionnaire.map(&:id).find_index id
     @position_equal_or_higher ||= questionnaire.drop(current_position)
   end
-  
+
   def swap_name_mp3(name_audio, name_answer)
     blocks = narrator['blocks']
     blocks.map do |block|

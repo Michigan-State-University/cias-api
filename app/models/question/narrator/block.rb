@@ -26,5 +26,7 @@ class Question::Narrator::Block < SimpleDelegator
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
 
-  def swap_name(_block, _mp3url, _name_text); end
+  def swap_name(_block, _mp3url, _name_text)
+    raise NotImplementedError, "subclass did not define #{__method__}"
+  end
 end
