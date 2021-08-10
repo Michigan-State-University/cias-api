@@ -6,11 +6,15 @@ class Intervention::Csv
   attr_reader :questions_scope
   attr_accessor :data
 
+  def self.call(intervention)
+    new(intervention).call
+  end
+
   def initialize(intervention)
     @questions_scope = data_scope(intervention)
   end
 
-  def execute
+  def call
     collect_data
     generate
   end

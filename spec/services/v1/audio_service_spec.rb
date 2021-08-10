@@ -11,7 +11,7 @@ RSpec.describe V1::AudioService do
   end
 
   context 'execution' do
-    let(:audio) { described_class.new(text, preview: preview).execute }
+    let(:audio) { described_class.call(text, preview: preview) }
     let(:text) { 'Example' }
     let(:preview) { false }
 
