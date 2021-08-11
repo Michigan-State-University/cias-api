@@ -6,7 +6,7 @@ class V1::GeneratedReports::ShareToThirdParty
   end
 
   def initialize(user_session)
-    @user_session        = user_session
+    @user_session = user_session
     @third_party_reports = user_session.generated_reports.third_party
   end
 
