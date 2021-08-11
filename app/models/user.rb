@@ -154,7 +154,7 @@ class User < ApplicationRecord
   def cache_key
     "user/#{id}-#{updated_at&.to_s(:number)}"
   end
-  
+
   def accepted_health_clinic_ids
     return unless role?('health_clinic_admin')
 
@@ -167,8 +167,6 @@ class User < ApplicationRecord
     self.terms_confirmed_at = Time.current
     save!
   end
-
-  private
 
   def self.users_for_researcher_or_e_intervention_admin(params, scope)
     if params[:roles]&.include?('researcher') && params[:roles]&.include?('e_intervention_admin')
@@ -185,6 +183,8 @@ class User < ApplicationRecord
   def self.include_researcher_or_e_intervention_admin?(user_roles)
     user_roles.include?('researcher') || user_roles.include?('e_intervention_admin')
   end
+
+  private
 
   def team_admin?
     roles.include?('team_admin')
