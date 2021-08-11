@@ -128,7 +128,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:question) { create(:question_slider, question_group: question_group) }
     let!(:answer) do
       create(:answer_slider, question: question,
-                             user_session: create(:user_session, user: participant1, session: session))
+             user_session: create(:user_session, user: participant1, session: session))
     end
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
 
@@ -160,7 +160,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:question) { create(:question_slider, question_group: question_group) }
       let!(:answer) do
         create(:answer_slider, question: question,
-                               user_session: create(:user_session, user: participant1, session: session))
+               user_session: create(:user_session, user: participant1, session: session))
       end
 
       before { request }
@@ -188,7 +188,7 @@ RSpec.describe 'GET /v1/users', type: :request do
       let!(:team) { create(:team) }
       let!(:researcher1) do
         create(:user, :confirmed, :researcher, first_name: 'Oliver', last_name: 'Wood', email: 'oliver.Wood@test.com',
-                                               created_at: 4.days.ago, team_id: team.id)
+               created_at: 4.days.ago, team_id: team.id)
       end
       let!(:add_current_user_to_team) { researcher.team_id = team.id }
       let!(:params) { { roles: %w[researcher], team_id: team.id } }

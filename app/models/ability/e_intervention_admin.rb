@@ -10,7 +10,7 @@ class Ability::EInterventionAdmin < Ability::Base
 
   def e_intervention_admin
     can %i[update active], User, id: participants_with_answers(user)
-    can %i[read list_researchers], User, id: participants_and_researchers(user)
+    can %i[read list_researchers], User, id: participants_researchers_and_e_intervention_admins(user)
     can :create, :preview_session_user
     can :manage, Intervention, user_id: user.id
     can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.organizable_id)
