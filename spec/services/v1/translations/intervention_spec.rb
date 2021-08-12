@@ -23,6 +23,11 @@ RSpec.describe V1::Translations::Intervention do
       it 'set correct voice' do
         expect(subject.sessions.first.google_tts_voice_id).to eq(voice.id)
       end
+
+      it 'translates session name' do
+        session = subject.sessions.first
+        expect(session.name).to eq("from=>#{intervention.google_language.language_code} to=>#{language.language_code} text=>#{session.original_text['name']}")
+      end
     end
 
     context 'wrong language id' do

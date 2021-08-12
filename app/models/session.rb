@@ -26,6 +26,7 @@ class Session < ApplicationRecord
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 1
   attribute :formula, :json, default: assign_default_values('formula')
+  attribute :original_text, :json, default: { name: '' }
 
   enum schedule: { days_after: 'days_after',
                    days_after_fill: 'days_after_fill',
@@ -144,6 +145,13 @@ class Session < ApplicationRecord
         end
       end
     end
+  end
+
+  def translate_name(translator, source_language_name_short, destination_language_name_short)
+    original_text['name'] = name
+    new_name = translator.translate(name, source_language_name_short, destination_language_name_short)
+
+    update!(name: new_name)
   end
 
   def translate_questions(translator, source_language_name_short, destination_language_name_short)
