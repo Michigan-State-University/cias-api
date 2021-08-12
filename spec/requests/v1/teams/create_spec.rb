@@ -16,7 +16,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
   end
 
   shared_examples 'new team created properly' do
-    let(:new_team) { Team.order(:created_at).last }
+    let(:new_team) { Team.order(:created_at).first }
 
     it 'returns :created status' do
       request
@@ -25,7 +25,6 @@ RSpec.describe 'POST /v1/teams', type: :request do
 
     it 'creates new team with proper name, sets user as team admin' do
       expect { request }.to change(Team, :count).by(1)
-
       expect(new_team).to have_attributes(
         name: 'Best Team',
         team_admin_id: new_team_admin.id
@@ -67,7 +66,16 @@ RSpec.describe 'POST /v1/teams', type: :request do
   end
 
   context 'when params are valid, new team admin is team_admin' do
-    let!(:new_team_admin) { create(:user, :confirmed, roles: %w[participant team_admin guest]) }
+    let!(:new_team_admin) { create(:user, :confirmed, :team_admin) }
+    let(:params) do
+      {
+        team: {
+          name: 'Best Team',
+          user_id: new_team_admin.id
+        }
+      }
+    end
+    let(:new_team) { Team.order(:created_at).last }
 
     it_behaves_like 'new team created properly'
   end

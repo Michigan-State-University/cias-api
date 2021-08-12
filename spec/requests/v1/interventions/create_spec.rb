@@ -95,8 +95,15 @@ RSpec.describe 'POST /v1/interventions', type: :request do
     end
   end
 
-  context 'when user has role researcher' do
+  context 'when user has role researcher and wan\'t assign intervention to organization' do
     let(:user) { researcher }
+    let(:params) do
+      {
+        intervention: {
+          name: 'New Intervention'
+        }
+      }
+    end
 
     before { request }
 

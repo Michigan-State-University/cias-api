@@ -25,6 +25,10 @@ class Ability::Base
     team_id ? User.researchers.from_team(team_id).pluck(:id) : User.none
   end
 
+  def e_intervention_admins_from_organization(organization_id)
+    organization_id ? User.e_intervention_admins.where(organizable_id: organization_id).pluck(:id) : User.none
+  end
+
   def participants_with_answers(user)
     result = logged_user_sessions(user)
     return User.none if result.blank?
@@ -34,6 +38,10 @@ class Ability::Base
 
   def participants_and_researchers(user)
     participants_with_answers(user) + researchers_from_team(user.team_id)
+  end
+
+  def participants_researchers_and_e_intervention_admins(user)
+    participants_and_researchers(user) + e_intervention_admins_from_organization(user.organizable_id)
   end
 
   def logged_user_sessions(user)

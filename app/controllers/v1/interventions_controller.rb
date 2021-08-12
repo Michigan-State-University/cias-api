@@ -4,8 +4,8 @@ class V1::InterventionsController < V1Controller
   include Resource::Clone
 
   def index
-    collection = interventions_scope
-    paginated_collection = paginate(collection, params)
+    collection = interventions_scope.detailed_search(params)
+    paginated_collection = V1::Intervention::Paginate.call(collection, start_index, end_index)
 
     render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json
   end
@@ -33,14 +33,22 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.without_organization.includes(:sessions).accessible_by(current_ability).order(created_at: :desc)
+    Intervention.accessible_by(current_ability).order(created_at: :desc)
   end
 
   def intervention_load
-    Intervention.accessible_by(current_ability).find(params[:id])
+    interventions_scope.find(params[:id])
   end
 
   def intervention_params
     params.require(:intervention).permit(:name, :status, :shared_to, :organization_id, :google_language_id)
+  end
+
+  def start_index
+    params.permit(:start_index)[:start_index]&.to_i
+  end
+
+  def end_index
+    params.permit(:end_index)[:end_index]&.to_i
   end
 end

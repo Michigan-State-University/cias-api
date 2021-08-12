@@ -80,8 +80,10 @@ class User < ApplicationRecord
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
   scope :researchers_and_e_intervention_admins, -> { limit_to_roles(%w[e_intervention_admin researcher]) }
+  scope :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }
   scope :third_parties, -> { limit_to_roles('third_party') }
-  scope :from_team, ->(team_id) { where(team_id: team_id) } # only researchers
+  scope :from_team, ->(team_id) { where(team_id: team_id) }
+  scope :from_organization, ->(organization_id) { where(organizable_id: organization_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
   scope :participants, -> { limit_to_roles('participant') }
   scope :limit_to_active, -> { where(active: true) }
@@ -103,17 +105,18 @@ class User < ApplicationRecord
 
   # METHODS
   def self.detailed_search(params)
+    user_roles = params[:user_roles]
+
     scope = all
-    scope = if params[:user_roles].include?('researcher')
-              users_for_researcher(params, scope)
+    scope = if include_researcher_or_e_intervention_admin?(user_roles)
+              users_for_researcher_or_e_intervention_admin(params, scope)
             else
               scope = users_for_team(params, scope) if params.key?(:team_id)
               scope.limit_to_roles(params[:roles])
             end
 
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope = scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
-    scope
+    scope.name_contains(params[:name])
   end
 
   def ability
@@ -152,8 +155,33 @@ class User < ApplicationRecord
     "user/#{id}-#{updated_at&.to_s(:number)}"
   end
 
+  def accepted_health_clinic_ids
+    return unless role?('health_clinic_admin')
+
+    health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
+    health_clinic_ids.append(organizable.id) if organizable
+    health_clinic_ids
+  end
+
   def set_terms_confirmed_date
     self.terms_confirmed_at = Time.current
+    save!
+  end
+
+  def self.users_for_researcher_or_e_intervention_admin(params, scope)
+    if params[:roles]&.include?('researcher') && params[:roles]&.include?('e_intervention_admin')
+      scope.researchers_and_e_intervention_admins.from_team(params[:team_id])
+    elsif params[:roles]&.include?('researcher')
+      scope.researchers.from_team(params[:team_id])
+    elsif params[:roles]&.include?('e_intervention_admin')
+      scope.e_intervention_admins.from_team(params[:team_id])
+    else
+      scope.participants
+    end
+  end
+
+  def self.include_researcher_or_e_intervention_admin?(user_roles)
+    user_roles.include?('researcher') || user_roles.include?('e_intervention_admin')
   end
 
   private

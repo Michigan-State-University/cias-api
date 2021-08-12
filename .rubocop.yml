@@ -139,6 +139,7 @@ Metrics/ClassLength:
   Max: 150
   Exclude:
     - 'app/models/session.rb'
+    - 'app/models/user.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

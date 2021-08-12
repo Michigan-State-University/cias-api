@@ -20,15 +20,9 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let!(:researcher_interventions) { create_list(:intervention, 3, :published, user: researcher, shared_to: :invited) }
   let!(:interventions_for_guests) { create_list(:intervention, 2, :published) }
   let(:organization) { create(:organization) }
-  let!(:intervention_for_organization) { create(:intervention, organization_id: organization.id) }
+  let!(:intervention_for_organization) { [create(:intervention, organization_id: organization.id)] }
 
   let!(:params) { {} }
-
-  shared_examples 'proper error message' do
-    it 'returns proper error message' do
-      expect(json_response['data'].pluck('id')).to match_array []
-    end
-  end
 
   shared_examples 'chosen users' do |interventions_size_admin, interventions_size_researcher|
     context 'when user is' do
@@ -37,7 +31,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       %w[admin user_with_admin_role].each do |role|
         let(:user) { users[role] }
         context role do
-          let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests }
+          let(:interventions_scope) { admin_interventions + researcher_interventions + interventions_for_guests + intervention_for_organization }
 
           it 'returns correct http status' do
             expect(response).to have_http_status(:ok)
@@ -45,7 +39,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
           it 'returns proper interventions' do
             expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
-                                                                                  .take(interventions_size_admin).map(&:id)
+                                                                                                 .take(interventions_size_admin).map(&:id)
           end
 
           it 'returns correct invitations list size' do
@@ -62,7 +56,9 @@ RSpec.describe 'GET /v1/interventions', type: :request do
           expect(response).to have_http_status(:ok)
         end
 
-        it_behaves_like 'proper error message'
+        it 'returns proper error message' do
+          expect(json_response['data'].pluck('id')).to match_array []
+        end
 
         it 'returns correct invitations list size' do
           expect(json_response['data'].size).to eq 0
@@ -79,7 +75,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
         it 'returns proper interventions' do
           expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
-                                                                                .take(interventions_size_researcher).map(&:id)
+                                                                                               .take(interventions_size_researcher).map(&:id)
         end
 
         it 'returns correct invitations list size' do
@@ -107,12 +103,44 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   context 'when params are given' do
-    let!(:params) { { page: 1, per_page: 2 } }
+    let!(:params) { { start_index: 0, end_index: 1 } }
 
     it_behaves_like 'chosen users', 2, 2
   end
 
   context 'when params are not given' do
-    it_behaves_like 'chosen users', 8, 3
+    it_behaves_like 'chosen users', 9, 3
+  end
+
+  context 'filtering by statuses' do
+    let!(:params) { { statuses: %w[closed archived] } }
+    let!(:archived_intervention) { create(:intervention, :archived, user: admin, shared_to: :registered) }
+    let!(:closed_intervention) { create(:intervention, :closed, user: admin, shared_to: :registered) }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct size' do
+      expect(json_response['data'].size).to be(2)
+    end
+
+    it 'return correct intervention' do
+      expect(json_response['data'].pluck('id')).to include(archived_intervention.id, closed_intervention.id)
+    end
+  end
+
+  context 'filtering by name' do
+    let!(:params) { { name: 'New' } }
+    let!(:new_intervention) { create(:intervention, :archived, user: admin, shared_to: :registered, name: 'New Intervention') }
+    let!(:old_intervention) { create(:intervention, :closed, user: admin, shared_to: :registered, name: 'Old Intervention') }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct size' do
+      expect(json_response['data'].size).to be(1)
+    end
+
+    it 'return correct intervention' do
+      expect(json_response['data'].first['id']).to include(new_intervention.id)
+    end
   end
 end
