@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_29_102541) do
+ActiveRecord::Schema.define(version: 2021_08_11_164937) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -352,10 +352,9 @@ ActiveRecord::Schema.define(version: 2021_07_29_102541) do
     t.integer "schedule_payload"
     t.date "schedule_at"
     t.jsonb "formula"
-    t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "report_templates_count"
+    t.integer "report_templates_count", default: 0, null: false
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
     t.string "variable"

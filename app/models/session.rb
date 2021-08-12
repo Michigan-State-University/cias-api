@@ -3,7 +3,6 @@
 class Session < ApplicationRecord
   has_paper_trail
   extend DefaultValues
-  include BodyInterface
   include Clone
   include FormulaInterface
   include Translate
@@ -27,7 +26,6 @@ class Session < ApplicationRecord
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 1
   attribute :formula, :json, default: assign_default_values('formula')
-  attribute :body, :json, default: assign_default_values('body')
 
   enum schedule: { days_after: 'days_after',
                    days_after_fill: 'days_after_fill',
