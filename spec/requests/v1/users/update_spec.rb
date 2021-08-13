@@ -26,7 +26,8 @@ describe 'PATCH /v1/users/:id', type: :request do
         first_name: 'John',
         last_name: 'Kowalski',
         sms_notification: false,
-        description: 'Some details about user'
+        description: 'Some details about user',
+        ability_to_create_cat_mh: true
       }
     }
   end
@@ -100,14 +101,16 @@ describe 'PATCH /v1/users/:id', type: :request do
             'first_name' => 'John',
             'last_name' => 'Kowalski',
             'email' => other_user.email,
-            'avatar_url' => nil
+            'avatar_url' => nil,
+            'ability_to_create_cat_mh' => true
           )
         end
 
         it 'updates user attributes' do
           expect(other_user.reload.attributes).to include(
             'first_name' => 'John',
-            'last_name' => 'Kowalski'
+            'last_name' => 'Kowalski',
+            'ability_to_create_cat_mh' => true
           )
         end
 
@@ -394,6 +397,22 @@ describe 'PATCH /v1/users/:id', type: :request do
             it { expect(response).to have_http_status(:ok) }
           end
         end
+      end
+    end
+
+    context 'when user wants to update researcher belongs to him team' do
+      let!(:user_id) { team_participant.id }
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it 'JSON response contains proper attributes' do
+        expect(json_response['data']['attributes']).to include(
+          'first_name' => team_participant.first_name,
+          'last_name' => team_participant.last_name,
+          'email' => team_participant.email,
+          'avatar_url' => nil,
+          'ability_to_create_cat_mh' => true
+        )
       end
     end
   end

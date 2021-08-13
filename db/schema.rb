@@ -561,6 +561,7 @@ ActiveRecord::Schema.define(version: 2021_08_12_094612) do
     t.string "organizable_type"
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
+    t.boolean "ability_to_create_cat_mh", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

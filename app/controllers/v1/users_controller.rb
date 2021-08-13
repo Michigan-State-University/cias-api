@@ -87,9 +87,30 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    if (current_v1_user.roles & %w[team_admin researcher]).present? && current_v1_user.id != user_id
+    if (current_v1_user.roles & %w[researcher]).present? && current_v1_user.id != user_id
       params.require(:user).permit(
         :active
+      )
+    elsif (current_v1_user.roles & %w[team_admin]).present? && current_v1_user.id != user_id
+      params.require(:user).permit(
+        :active,
+        :ability_to_create_cat_mh
+      )
+    elsif (current_v1_user.roles & %w[admin]).present? && current_v1_user.id != user_id
+      params.require(:user).permit(
+        :ability_to_create_cat_mh,
+        :first_name,
+        :last_name,
+        :email,
+        :sms_notification,
+        :email_notification,
+        :time_zone,
+        :active,
+        :feedback_completed,
+        :description,
+        :organizable_id,
+        roles: [],
+        phone_attributes: %i[iso prefix number]
       )
     else
       params.require(:user).permit(
