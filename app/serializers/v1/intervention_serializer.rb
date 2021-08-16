@@ -27,6 +27,10 @@ class V1::InterventionSerializer < V1Serializer
     object.logo_blob.description if object.logo_blob.present?
   end
 
+  attribute :sessions_size do |object|
+    object.sessions.size
+  end
+
   def self.newest_csv_link(object)
     ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end
