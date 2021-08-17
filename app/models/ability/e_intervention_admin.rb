@@ -16,6 +16,7 @@ class Ability::EInterventionAdmin < Ability::Base
     can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.organizable_id)
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }
+    can :read_cat_resources, User, ability_to_create_cat_mh: true
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability)
     can :manage, Invitation, invitable_type: 'Intervention', invitable_id: Intervention.accessible_by(ability)
     can :manage, QuestionGroup, session: { intervention: { user_id: user.id } }

@@ -192,6 +192,13 @@ Rails.application.routes.draw do
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
 
     get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
+
+    namespace :cat_mh do
+      resources :languages, controller: :languages, only: :index
+      resources :time_frames, controller: :time_frames, only: :index
+      resources :test_types, controller: :test_types, only: :index
+      resources :populations, controller: :populations, only: :index
+    end
   end
 
   if Rails.env.development?

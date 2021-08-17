@@ -75,23 +75,15 @@ ActiveRecord::Schema.define(version: 2021_08_12_094612) do
   create_table "cat_mh_test_type_languages", force: :cascade do |t|
     t.integer "cat_mh_language_id"
     t.integer "cat_mh_test_type_id"
-    t.bigint "cat_mh_languages_id"
-    t.bigint "cat_mh_test_types_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["cat_mh_languages_id"], name: "index_cat_mh_test_type_languages_on_cat_mh_languages_id"
-    t.index ["cat_mh_test_types_id"], name: "index_cat_mh_test_type_languages_on_cat_mh_test_types_id"
   end
 
   create_table "cat_mh_test_type_time_frames", force: :cascade do |t|
     t.integer "cat_mh_time_frame_id"
     t.integer "cat_mh_test_type_id"
-    t.bigint "cat_mh_time_frames_id"
-    t.bigint "cat_mh_test_types_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["cat_mh_test_types_id"], name: "index_cat_mh_test_type_time_frames_on_cat_mh_test_types_id"
-    t.index ["cat_mh_time_frames_id"], name: "index_cat_mh_test_type_time_frames_on_cat_mh_time_frames_id"
   end
 
   create_table "cat_mh_test_types", force: :cascade do |t|
@@ -406,7 +398,7 @@ ActiveRecord::Schema.define(version: 2021_08_12_094612) do
     t.jsonb "formula"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "report_templates_count", default: 0, null: false
+    t.integer "report_templates_count", default: 0
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
     t.string "variable"
@@ -589,10 +581,10 @@ ActiveRecord::Schema.define(version: 2021_08_12_094612) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
-  add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages", column: "cat_mh_languages_id"
-  add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types", column: "cat_mh_test_types_id"
-  add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types", column: "cat_mh_test_types_id"
-  add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames", column: "cat_mh_time_frames_id"
+  add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages"
+  add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
+  add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
+  add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
