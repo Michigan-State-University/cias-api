@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_12_094612) do
+ActiveRecord::Schema.define(version: 2021_08_13_131745) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -404,7 +404,14 @@ ActiveRecord::Schema.define(version: 2021_08_12_094612) do
     t.string "variable"
     t.string "days_after_date_variable_name"
     t.bigint "google_tts_voice_id"
+    t.string "type", default: "Session::Classic", null: false
     t.jsonb "original_text"
+    t.bigint "cat_mh_language_id"
+    t.bigint "cat_mh_time_frame_id"
+    t.bigint "cat_mh_population_id"
+    t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
+    t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
+    t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
     t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
@@ -591,6 +598,9 @@ ActiveRecord::Schema.define(version: 2021_08_12_094612) do
   add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
+  add_foreign_key "sessions", "cat_mh_languages"
+  add_foreign_key "sessions", "cat_mh_populations"
+  add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"

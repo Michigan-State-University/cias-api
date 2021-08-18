@@ -10,13 +10,8 @@ class Session < ApplicationRecord
   belongs_to :intervention, inverse_of: :sessions, touch: true
   belongs_to :google_tts_voice, optional: true
 
-  has_many :question_groups, dependent: :destroy, inverse_of: :session
-  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
-  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
   has_many :sms_plans, dependent: :destroy
 
-  has_many :questions, dependent: :destroy, through: :question_groups
-  has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :report_templates, dependent: :destroy
 
@@ -55,11 +50,6 @@ class Session < ApplicationRecord
 
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
-  after_commit :create_core_children, on: :create
-
-  after_update_commit do
-    SessionJobs::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
-  end
 
   def position_greater_than
     @position_greater_than ||= intervention.sessions.where('position > ?', position).order(:position)
@@ -67,17 +57,6 @@ class Session < ApplicationRecord
 
   def next_session
     intervention.sessions.find_by(position: position + 1)
-  end
-
-  def propagate_settings
-    return unless settings_changed?
-
-    narrator = (settings['narrator'].to_a - settings_was['narrator'].to_a).to_h
-    questions.each do |question|
-      question.narrator['settings'].merge!(narrator)
-      question.execute_narrator
-      question.save!
-    end
   end
 
   def integral_update
@@ -108,14 +87,6 @@ class Session < ApplicationRecord
     SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
   end
 
-  def first_question
-    question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
-  end
-
-  def finish_screen
-    question_group_finish.questions.first
-  end
-
   def available_now?(participant_date = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
@@ -135,29 +106,11 @@ class Session < ApplicationRecord
     settings['formula'] = false
   end
 
-  def session_variables
-    [].tap do |array|
-      question_groups.each do |question_group|
-        question_group.questions.each do |question|
-          question.csv_header_names.each do |variable|
-            array << variable
-          end
-        end
-      end
-    end
-  end
-
   def translate_name(translator, source_language_name_short, destination_language_name_short)
     original_text['name'] = name
     new_name = translator.translate(name, source_language_name_short, destination_language_name_short)
 
     update!(name: new_name)
-  end
-
-  def translate_questions(translator, source_language_name_short, destination_language_name_short)
-    questions.each do |question|
-      question.translate(translator, source_language_name_short, destination_language_name_short)
-    end
   end
 
   def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
@@ -172,23 +125,11 @@ class Session < ApplicationRecord
     end
   end
 
-  def clear_speech_blocks
-    questions.each(&:clear_audio)
-  end
-
   private
 
   def assign_default_tts_voice
     self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
     save!
-  end
-
-  def create_core_children
-    return if question_group_finish
-
-    qg_finish = ::QuestionGroup::Finish.new(session_id: id)
-    qg_finish.save!
-    ::Question::Finish.create!(question_group_id: qg_finish.id)
   end
 
   def json_schema_path
