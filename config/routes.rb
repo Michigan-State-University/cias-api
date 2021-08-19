@@ -198,6 +198,7 @@ Rails.application.routes.draw do
       resources :time_frames, controller: :time_frames, only: :index
       resources :test_types, controller: :test_types, only: :index
       resources :populations, controller: :populations, only: :index
+      get 'available_test_types', to: 'test_types#available_tests'
     end
   end
 
