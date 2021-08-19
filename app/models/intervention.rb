@@ -22,6 +22,7 @@ class Intervention < ApplicationRecord
   attribute :shared_to, :string, default: 'anyone'
 
   validates :name, :shared_to, presence: true
+  validate :cat_sessions_validation, if: :published?
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:invitations).published.not_shared_to_invited
@@ -91,5 +92,15 @@ class Intervention < ApplicationRecord
     scope = all
     scope = scope.limit_to_statuses(params[:statuses])
     scope.filter_by_starts_with(params[:name])
+  end
+
+  def cat_sessions_validation
+    sessions.where(type: 'Session::CatMh').find_each do |session|
+      errors[:base] << "Session with id=#{session.id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id." unless valid_cat_session?(session) # rubocop:disable Layout/LineLength
+    end
+  end
+
+  def valid_cat_session?(session)
+    session.cat_mh_language_id.present? && session.cat_mh_population_id.present? && session.cat_mh_time_frame_id.present?
   end
 end
