@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_13_131745) do
+ActiveRecord::Schema.define(version: 2021_08_20_083928) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -57,6 +57,13 @@ ActiveRecord::Schema.define(version: 2021_08_13_131745) do
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
+  end
+
+  create_table "cat_mh_google_tts_voices", force: :cascade do |t|
+    t.integer "google_tts_voice_id"
+    t.integer "cat_mh_language_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "cat_mh_languages", force: :cascade do |t|
@@ -588,6 +595,8 @@ ActiveRecord::Schema.define(version: 2021_08_13_131745) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "cat_mh_google_tts_voices", "cat_mh_languages"
+  add_foreign_key "cat_mh_google_tts_voices", "google_tts_voices"
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages"
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"

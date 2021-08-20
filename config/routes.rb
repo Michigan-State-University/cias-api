@@ -194,7 +194,9 @@ Rails.application.routes.draw do
     get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
 
     namespace :cat_mh do
-      resources :languages, controller: :languages, only: :index
+      resources :languages, controller: :languages, only: :index do
+        resources :voices, controller: :voices, only: :index
+      end
       resources :time_frames, controller: :time_frames, only: :index
       resources :test_types, controller: :test_types, only: :index
       resources :populations, controller: :populations, only: :index
