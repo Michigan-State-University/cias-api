@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+class Api::CatMh::TerminateSession < Api::CatMh::Base
+  ENDPOINT = ENV['TERMINATE_ENDPOINT']
+
+  def call
+    result = request(:post, ENDPOINT)
+    {
+      'status' => result.status
+    }
+  end
+
+  private
+
+  def client
+    @client ||= Faraday.new(ENDPOINT) do |client|
+      client.request :url_encoded
+      client.adapter Faraday.default_adapter
+      client.headers['Cookie'] = cookie
+      client.headers['Content-Type'] = 'application/json'
+    end
+  end
+end

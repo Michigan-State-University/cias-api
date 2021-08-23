@@ -87,6 +87,43 @@ RSpec.configure do |config|
 
     google_translator = Google::Cloud::Translate::V2::Translation::Fake.new
     allow(Google::Cloud::Translate::V2).to receive(:new).and_return(google_translator)
+
+    allow_any_instance_of(Api::CatMh::CreateInterview).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'interviews' => [
+            {
+              'organizationID' => -1,
+              'interviewID' => -1,
+              'identifier' => 'identifier',
+              'signature' => 'signature'
+            }
+          ]
+        }
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::CheckStatus).to receive(:call).and_return(
+      {
+        'interviewValid' => true,
+        'credentialsValid' => true,
+        'startTime' => 1_628_245_694_220,
+        'endTime' => nil,
+        'inProgress' => true
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::Authentication).to receive(:call).and_return(
+      {
+        'status' => 302,
+        'cookies' =>
+          {
+            'JSESSIONID' => 'JSESSIONID',
+            'AWSELB' => 'AWSELB'
+          }
+      }
+    )
   end
 
   config.before :suite do
