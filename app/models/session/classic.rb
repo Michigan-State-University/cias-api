@@ -14,6 +14,13 @@ class Session::Classic < Session
     SessionJobs::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
   end
 
+  def integral_update
+    return if published?
+
+    propagate_settings
+    save!
+  end
+
   def first_question
     question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
   end

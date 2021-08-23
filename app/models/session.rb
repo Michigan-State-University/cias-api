@@ -62,7 +62,6 @@ class Session < ApplicationRecord
   def integral_update
     return if published?
 
-    propagate_settings
     save!
   end
 
