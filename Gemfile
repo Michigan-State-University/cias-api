@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.0.3.7'
+gem 'rails', '~> 6.0.4.1'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.0'
 
@@ -53,7 +53,7 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 
 group :development, :test do
   gem 'bundler-audit'
-  gem 'brakeman', require: false
+  gem 'brakeman', '~> 5.0.2', require: false
   gem 'bullet'
   gem 'dotenv-rails'
   gem 'fasterer', require: false
