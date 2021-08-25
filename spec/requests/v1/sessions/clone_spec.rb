@@ -132,7 +132,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
       let(:session_cloned) do
         json_response['data']['attributes'].except('id', 'generated_report_count', 'created_at', 'updated_at', 'position',
                                                    'sms_plans_count', 'logo_url', 'formula', 'settings', 'days_after_date_variable_name',
-                                                   'google_tts_voice_id', 'language_name', 'google_tts_voice', 'original_text', 'type')
+                                                   'google_tts_voice_id', 'language_name', 'google_tts_voice', 'original_text', 'type',
+                                                   'cat_mh_language_id', 'cat_mh_time_frame_id', 'cat_mh_population_id')
       end
 
       let(:session_cloned_position) { intervention.sessions.order(:position).last.position + 1 }

@@ -86,8 +86,8 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
         it { expect(response).to have_http_status(:created) }
 
         it 'returns proper cloned question attributes' do
-          expect(json_response['data'][0]['attributes']['title']).to eq('Question Id Title')
-          expect(json_response['data'][1]['attributes']['title']).to eq('Question 2 Id Title')
+          result = [json_response['data'][0]['attributes']['title'], json_response['data'][1]['attributes']['title']]
+          expect(result).to include('Question Id Title', 'Question 2 Id Title')
         end
 
         it 'returned cloned questions have proper position' do
@@ -95,12 +95,8 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
           expect(json_response['data'][1]['attributes']['position']).to eq(2)
         end
 
-        it 'first element has proper title' do
-          expect(session.reload.question_groups.last(2).first.questions.first.title).to eq('Question Id Title')
-        end
-
-        it 'last element has proper title' do
-          expect(session.reload.question_groups.last(2).first.questions.last.title).to eq('Question 2 Id Title')
+        it 'first and last element has proper title' do
+          expect(session.reload.question_groups.last(2).first.questions.pluck(:title)).to include('Question Id Title', 'Question 2 Id Title')
         end
 
         it 'first element has proper position' do
