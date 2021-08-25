@@ -47,15 +47,14 @@ RSpec.describe 'GET /v1/cat_mh/test_types', type: :request do
         expect(language_ids).to all(match_array(languages.pluck(:id)))
       end
 
-      it 'returns correct time frame data' do
-        # same as with languages
-        time_frame_ids = time_frame_relationship_data.map { |frames| frames.map { |h| h['id'].to_i } }
-        expect(time_frame_ids).to all(match_array(time_frames.pluck(:id)))
-      end
-
-      it 'returns correct population data' do
-        # test type can only have 1 population, so it easily maps to a 1-dimensional list
-        expect(population_relationship_data.map { |h| h['id'].to_i }).to match_array(populations.pluck(:id))
+      context 'return property variables assigned to the test' do
+        it 'return correct data' do
+          expect(json_response['data'].first['relationships']).to include(
+            'cat_mh_test_attributes' => {
+              'data' => []
+            }
+          )
+        end
       end
     end
   end

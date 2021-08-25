@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_20_083928) do
+ActiveRecord::Schema.define(version: 2021_08_23_072703) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -79,6 +79,14 @@ ActiveRecord::Schema.define(version: 2021_08_20_083928) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "cat_mh_test_attributes", force: :cascade do |t|
+    t.string "name"
+    t.string "variable_type"
+    t.string "range"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "cat_mh_test_type_languages", force: :cascade do |t|
     t.integer "cat_mh_language_id"
     t.integer "cat_mh_test_type_id"
@@ -108,6 +116,15 @@ ActiveRecord::Schema.define(version: 2021_08_20_083928) do
     t.string "short_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_variables", force: :cascade do |t|
+    t.bigint "cat_mh_test_attribute_id"
+    t.bigint "cat_mh_test_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["cat_mh_test_attribute_id"], name: "index_cat_mh_variables_on_cat_mh_test_attribute_id"
+    t.index ["cat_mh_test_type_id"], name: "index_cat_mh_variables_on_cat_mh_test_type_id"
   end
 
   create_table "chart_statistics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
