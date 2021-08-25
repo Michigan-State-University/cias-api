@@ -15,6 +15,7 @@ test:
 non_production:
   <<: *default
   database: cias_non_production
+  host: <%= ENV['CIAS_NONPROD_DATABASE_HOST'] %>
   username: <%= ENV['CIAS_NONPROD_DATABASE_USER'] %>
   password: <%= ENV['CIAS_NONPROD_DATABASE_PASSWORD'] %>
 
