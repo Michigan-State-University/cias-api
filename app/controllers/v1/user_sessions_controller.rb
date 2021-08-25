@@ -7,7 +7,8 @@ class V1::UserSessionsController < V1Controller
     user_session = UserSession.find_or_initialize_by(
       session_id: session_id,
       user_id: user_id,
-      health_clinic_id: health_clinic_id
+      health_clinic_id: health_clinic_id,
+      type: type
     )
     authorize! :create, user_session
     user_session.save!
@@ -28,6 +29,14 @@ class V1::UserSessionsController < V1Controller
     user = V1::Users::CreateGuest.call
     response.headers.merge!(user.create_new_auth_token)
     user
+  end
+
+  def type
+    session_load.user_session_type
+  end
+
+  def session_load
+    Session.find(session_id)
   end
 
   def user_session_params

@@ -46,4 +46,11 @@ FactoryBot.define do
       schedule_payload { 7 }
     end
   end
+
+  factory :cat_mh_session, class: Session::CatMh do
+    sequence(:name) { |s| "session_#{s}" }
+    sequence(:variable) { |s| "session_#{s}" }
+    sequence(:position) { |s| s }
+    association :intervention
+  end
 end

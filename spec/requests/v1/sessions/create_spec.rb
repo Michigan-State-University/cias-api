@@ -54,6 +54,33 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
               expect(Session.last.variable).to eq 's1234'
             end
           end
+
+          context 'and include type' do
+            let(:params) do
+              {
+                session: {
+                  name: 'research_assistant test1',
+                  intervention_id: intervention.id,
+                  body: {
+                    data: [
+                      {
+                        payload: 1,
+                        target: '',
+                        variable: '1'
+                      }
+                    ]
+                  },
+                  type: 'Session::CatMh'
+                }
+              }
+            end
+
+            it { expect(response).to have_http_status(:success) }
+
+            it 'session have correct type' do
+              expect(Session.last.type).to eql('Session::CatMh')
+            end
+          end
         end
 
         context 'when first session have default voice settings' do

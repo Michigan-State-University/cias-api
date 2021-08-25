@@ -124,6 +124,10 @@ class Session < ApplicationRecord
     end
   end
 
+  def user_session_type
+    raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
+  end
+
   private
 
   def assign_default_tts_voice

@@ -80,6 +80,20 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
       it 'creates user session' do
         expect { request }.to change(UserSession, :count).by(1)
       end
+
+      it 'user session have correct type' do
+        request
+        expect(json_response['data']['attributes']['type']).to eql('UserSession::Classic')
+      end
+
+      context 'create UserSession::CatMh' do
+        let(:session) { create(:cat_mh_session, intervention: intervention) }
+
+        it 'user session have correct type' do
+          request
+          expect(json_response['data']['attributes']['type']).to eql('UserSession::CatMh')
+        end
+      end
     end
 
     context 'exists' do

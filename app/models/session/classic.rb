@@ -62,6 +62,10 @@ class Session::Classic < Session
     end
   end
 
+  def user_session_type
+    UserSession::Classic.name
+  end
+
   private
 
   def create_core_children

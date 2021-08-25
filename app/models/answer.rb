@@ -4,7 +4,7 @@ class Answer < ApplicationRecord
   has_paper_trail
   include BodyInterface
 
-  belongs_to :question, inverse_of: :answers
+  belongs_to :question, inverse_of: :answers, optional: true
   belongs_to :user_session, optional: true
 
   attribute :decrypted_body, :json, default: { data: [] }

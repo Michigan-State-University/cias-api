@@ -7,7 +7,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_slider) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -23,7 +23,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject(:answer_bar_graph) { create(:answer_bar_graph) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -39,7 +39,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_feedback) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -55,7 +55,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_follow_up_contact) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -71,7 +71,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_grid) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -87,7 +87,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_information) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -103,7 +103,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_multiple) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -125,7 +125,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_number) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -141,7 +141,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_single) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -163,7 +163,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_free_response) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -185,7 +185,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_date) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -207,7 +207,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_external_link) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -223,7 +223,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_phone) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -239,7 +239,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_currency) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -255,7 +255,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_name) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -271,7 +271,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_participant_report) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end
@@ -287,7 +287,7 @@ RSpec.describe Answer, type: :model do
     describe 'expected behaviour' do
       subject { create(:answer_third_party) }
 
-      it { should belong_to(:question) }
+      it { should belong_to(:question).optional(true) }
       it { should belong_to(:user_session).optional(true) }
       it { should be_valid }
     end

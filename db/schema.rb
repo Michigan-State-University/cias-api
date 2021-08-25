@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 2021_08_23_072703) do
 
   create_table "answers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "type"
-    t.uuid "question_id", null: false
+    t.uuid "question_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "user_session_id"
@@ -522,6 +522,12 @@ ActiveRecord::Schema.define(version: 2021_08_23_072703) do
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
     t.uuid "health_clinic_id"
+    t.string "type", default: "UserSession::Classic", null: false
+    t.integer "cat_interview_id"
+    t.string "identifier"
+    t.string "signature"
+    t.string "jsession_id"
+    t.string "awselb"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
