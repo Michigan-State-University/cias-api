@@ -124,6 +124,53 @@ RSpec.configure do |config|
           }
       }
     )
+
+    allow_any_instance_of(Api::CatMh::Question).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'questionID' => 14,
+          'questionNumber' => 1,
+          'questionDescription' => 'How much of the time did you feel depressed?',
+          'questionAnswers' => [
+            {
+              'answerOrdinal' => 1,
+              'answerDescription' => 'None of the time',
+              'answerWeight' => 1
+            },
+            {
+              'answerOrdinal' => 2,
+              'answerDescription' => 'A little of the time',
+              'answerWeight' => 2
+            },
+            {
+              'answerOrdinal' => 3,
+              'answerDescription' => 'Some of the time',
+              'answerWeight' => 3
+            },
+            {
+              'answerOrdinal' => 4,
+              'answerDescription' => 'Most of the time',
+              'answerWeight' => 4
+            },
+            {
+              'answerOrdinal' => 5,
+              'answerDescription' => 'All of the time',
+              'answerWeight' => 5
+            }
+          ],
+          'questionAudioID' => 14,
+          'questionSymptom' => nil,
+          'questionSymptomFlag' => 0,
+          'audioExtension' => '',
+          'timeframeID' => 5,
+          'questionNoteID' => 5,
+          'questionNote' => 'Answer the following questions based on how you felt over <strong>the past 30 days</strong> unless otherwise specified.',
+          'answerType' => 1,
+          'questionFooter' => nil
+        }
+      }
+    )
   end
 
   config.before :suite do
