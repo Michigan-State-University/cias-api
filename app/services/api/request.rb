@@ -6,9 +6,18 @@ module Api::Request
   end
 
   def response(result)
+    return bad_request(result) if result.headers['location'].present?
+
     {
       'status' => result.status,
       'body' => JSON.parse(result.body)
+    }
+  end
+
+  def bad_request(result)
+    {
+      'status' => 400,
+      'error' => result.headers['location']
     }
   end
 end

@@ -5,7 +5,7 @@ class Api::CatMh::Answer < Api::CatMh::Base
 
   attr_reader :question_id, :response, :duration
 
-  ENDPOINT = ENV['ANSWER_ENDPOINT']
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/rest/interview/test/question"
 
   def self.call(jsession_id, awselb, question_id, response, duration)
     new(jsession_id, awselb, question_id, response, duration).call
@@ -21,6 +21,9 @@ class Api::CatMh::Answer < Api::CatMh::Base
 
   def call
     result = request(http_method, ENDPOINT, params)
+
+    return bad_request(result) if result.headers['location'].present?
+
     {
       'status' => result.status
     }

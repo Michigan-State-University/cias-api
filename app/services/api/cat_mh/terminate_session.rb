@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 class Api::CatMh::TerminateSession < Api::CatMh::Base
-  ENDPOINT = ENV['TERMINATE_ENDPOINT']
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/signout"
 
   def call
-    result = request(:post, ENDPOINT)
+    result = request(:post, ENDPOINT, params)
     {
       'status' => result.status
     }
@@ -19,5 +19,9 @@ class Api::CatMh::TerminateSession < Api::CatMh::Base
       client.headers['Cookie'] = cookie
       client.headers['Content-Type'] = 'application/json'
     end
+  end
+
+  def params
+    {}.to_json
   end
 end

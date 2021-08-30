@@ -3,7 +3,7 @@
 class Api::CatMh::Authentication
   attr_reader :signature, :identifier
 
-  ENDPOINT = ENV['AUTHENTICATION_ENDPOINT']
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/signin"
 
   def self.call(identifier, signature)
     new(identifier, signature).call

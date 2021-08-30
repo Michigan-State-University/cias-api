@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::CatMh::Question < Api::CatMh::Base
-  ENDPOINT = ENV['QUESTION_ENDPOINT']
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/rest/interview/test/question"
 
   def call
     result = request(http_method, ENDPOINT, params)

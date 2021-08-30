@@ -5,7 +5,7 @@ class Api::CatMh::CheckStatus
 
   attr_reader :application_id, :organization_id, :interview_id, :identifier, :signature
 
-  ENDPOINT = ENV['STATUS_ENDPOINT']
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/status"
 
   def self.call(interview_id, identifier, signature)
     new(interview_id, identifier, signature).call

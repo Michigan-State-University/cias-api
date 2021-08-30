@@ -5,31 +5,101 @@ class Api::CatMh
     Api::CatMh::CreateInterview.call(subject_id, number_of_interventions, tests, language)
   end
 
-  def status(interview_id, identifier, signature)
+  def status(user_session)
+    interview_id = user_session.cat_interview_id
+    identifier = user_session.identifier
+    signature = user_session.signature
+
     Api::CatMh::CheckStatus.call(interview_id, identifier, signature)
   end
 
-  def authentication(identifier, signature)
+  def authentication(user_session)
+    identifier = user_session.identifier
+    signature = user_session.signature
+
     Api::CatMh::Authentication.call(identifier, signature)
   end
 
-  def initialize_interview(jsession_id, awselb)
-    Api::CatMh::InitializeInterview.call(jsession_id, awselb)
+  def initialize_interview(user_session)
+    response = Api::CatMh::InitializeInterview.call(jsession_id(user_session), awselb(user_session))
+
+    if error?(response)
+      fix_problem(response, user_session)
+      response = Api::CatMh::InitializeInterview.call(jsession_id(user_session), awselb(user_session))
+    end
+
+    response
   end
 
-  def question(jsession_id, awselb)
-    Api::CatMh::Question.call(jsession_id, awselb)
+  def get_next_question(user_session)
+    response = Api::CatMh::Question.call(jsession_id(user_session), awselb(user_session))
+
+    if error?(response)
+      fix_problem(response, user_session)
+      response = Api::CatMh::Question.call(jsession_id(user_session), awselb(user_session))
+    end
+
+    response
   end
 
-  def answer(jsession_id, awselb, question_id, response, duration)
-    Api::CatMh::Answer.call(jsession_id, awselb, question_id, response, duration)
+  def on_user_answer(user_session, question_id, response, duration)
+    response = Api::CatMh::Answer.call(jsession_id(user_session), awselb(user_session), question_id, response, duration)
+
+    if error?(response)
+      fix_problem(response, user_session)
+      response = Api::CatMh::Answer.call(jsession_id(user_session), awselb(user_session), question_id, response, duration)
+    end
+
+    response
   end
 
-  def result(jsession_id, awselb)
-    Api::CatMh::Result.call(jsession_id, awselb)
+  def get_result(user_session)
+    response = Api::CatMh::Result.call(jsession_id(user_session), awselb(user_session))
+
+    if error?(response)
+      fix_problem(response, user_session)
+      response = Api::CatMh::Result.call(jsession_id(user_session), awselb(user_session))
+    end
+
+    response
   end
 
   def terminate_intervention(jsession_id, awselb)
     Api::CatMh::TerminateSession.call(jsession_id, awselb)
+  end
+
+  def reset_cookies(jsession_id, awselb)
+    Api::CatMh::BreakLock.call(jsession_id, awselb)
+  end
+
+  def jsession_id(user_session)
+    user_session.jsession_id
+  end
+
+  def awselb(user_session)
+    user_session.awselb
+  end
+
+  def fix_problem(response, user_session)
+    if blocked_cookies?(response)
+      reset_cookies(jsession_id(user_session), awselb(user_session))
+    elsif session_time_out?(response)
+      new_cookies = authentication(user_session)
+      new_jsession_id = new_cookies['cookies']['JSESSIONID']
+      new_awselb = new_cookies['cookies']['AWSELB']
+      user_session.update!(jsession_id: new_jsession_id, awselb: new_awselb)
+    end
+  end
+
+  def blocked_cookies?(response)
+    response['error'].eql?("#{ENV['BASE_CAT_URL']}/interview/secure/errorInProgress.html")
+  end
+
+  def session_time_out?(response)
+    response['error'].eql?("#{ENV['BASE_CAT_URL']}/interview/secure/errorInProgress.html")
+  end
+
+  def error?(response)
+    response['status'] == 400
   end
 end

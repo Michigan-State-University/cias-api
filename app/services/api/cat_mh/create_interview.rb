@@ -5,7 +5,7 @@ class Api::CatMh::CreateInterview
 
   attr_reader :application_id, :organization_id, :subject_id, :number_of_interventions, :tests, :language
 
-  ENDPOINT = ENV['CREATE_INTERVENTION_ENDPOINT']
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/createInterview"
 
   def self.call(subject_id, number_of_interventions, tests, language)
     new(subject_id, number_of_interventions, tests, language).call
