@@ -19,7 +19,8 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
     {
       session: {
         name: 'test1 params',
-        days_after_date_variable_name: 'var1'
+        days_after_date_variable_name: 'var1',
+        cat_tests: %w[mdd ss]
       }
     }
   end
@@ -52,6 +53,39 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             end
 
             it { expect(response).to have_http_status(:bad_request) }
+          end
+        end
+
+        context 'Session::CatMh' do
+          before { request }
+
+          let(:session) { Session.create(name: 'CatSession', intervention: intervention, type: 'Session::CatMh') }
+          let(:cat_mh_test_type) { create(:cat_mh_test_type) }
+          let(:cat_mh_test_type_id) { cat_mh_test_type.id }
+          let(:params) do
+            {
+              session: {
+                name: 'Cat-Mh',
+                days_after_date_variable_name: 'var1',
+                cat_tests: [cat_mh_test_type_id]
+              }
+            }
+          end
+
+          it 'updated values are proper' do
+            expect(json_response['data']['attributes']).to include('name' => 'Cat-Mh',
+                                                                   'days_after_date_variable_name' => 'var1')
+          end
+
+          it 'added test to session' do
+            expect(json_response['data']['relationships']).to include('cat_mh_test_types' => {
+                                                                        'data' => [
+                                                                          {
+                                                                            'id' => cat_mh_test_type_id.to_s,
+                                                                            'type' => 'test_type'
+                                                                          }
+                                                                        ]
+                                                                      })
           end
         end
       end

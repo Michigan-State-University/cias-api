@@ -6,6 +6,8 @@ class V1::SessionSerializer < V1Serializer
              :days_after_date_variable_name, :google_tts_voice, :type, :cat_mh_language_id, :cat_mh_time_frame_id,
              :cat_mh_population_id
 
+  has_many :cat_mh_test_types, serializer: V1::CatMh::TestTypeSerializer, if: proc { |record| record.type.eql?('Session::CatMh') }
+
   attribute :generated_report_count do |object|
     GeneratedReport.joins(:user_session).where(user_sessions: { session_id: object.id }).size
   end
