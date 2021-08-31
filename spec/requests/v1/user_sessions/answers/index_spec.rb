@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-RSpec.describe 'GET /v1/user_sessions/:user_session_id/user_answers', type: :request do
+RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request do
   let(:answers_response) { json_response['data'].all? { |hash| answers.any? { |a| a.id == hash['id'] } } }
 
   let(:request) do
-    get v1_user_session_user_answers_path(user_session.id), headers: headers
+    get v1_user_session_answers_path(user_session.id), headers: headers
   end
 
   context 'authorized access' do

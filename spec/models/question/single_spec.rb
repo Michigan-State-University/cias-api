@@ -43,7 +43,7 @@ RSpec.describe Question::Single, type: :model do
           expect(question_single.body['data']).to include(
             {
               'payload' => '',
-              'value' => '',
+              'value' => '1',
               'original_text' => ''
             },
             {

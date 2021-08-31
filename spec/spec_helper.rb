@@ -125,6 +125,12 @@ RSpec.configure do |config|
       }
     )
 
+    allow_any_instance_of(Api::CatMh::Answer).to receive(:call).and_return(
+      {
+        'status' => 200
+      }
+    )
+
     allow_any_instance_of(Api::CatMh::Question).to receive(:call).and_return(
       {
         'status' => 200,

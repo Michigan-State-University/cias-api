@@ -1,0 +1,79 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request do
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:intervention) { create(:intervention, user_id: researcher.id) }
+  let(:participant) { create(:user, :confirmed, :participant) }
+  let(:user) { participant }
+  let(:status) { 'draft' }
+  let(:params) do
+    {
+      'answer' => {
+        'type' => 'Answer::Single',
+        'body' => {
+          'data' => [
+            {
+              'var' => 'single_var',
+              'value' => '1'
+            }
+          ]
+        }
+      },
+      'question_id' => question_id
+    }
+  end
+
+  let(:request) { post v1_user_session_answers_path(user_session.id), headers: user.create_new_auth_token, params: params }
+
+  context 'UserSession::Classic' do
+    let(:session) { create(:session, intervention_id: intervention.id) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:question) { create(:question_single, question_group: question_group) }
+    let(:user_session) { create(:user_session, user: user, session: session) }
+    let(:question_id) { question.id }
+
+    it 'return correct status' do
+      request
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'return correct data' do
+      request
+      expect(json_response['data']).to include(
+        'type' => 'answer',
+        'attributes' => {
+          'type' => 'Answer::Single',
+          'body' => {
+            'data' => [
+              {
+                'var' => 'single_var',
+                'value' => '1'
+              }
+            ]
+          }
+        }
+      )
+    end
+
+    it 'create answer' do
+      expect { request }.to change(Answer, :count).by(1)
+    end
+  end
+
+  context 'UserSession::CatMh' do
+    let(:session) { Session.create(name: 'CatSession', intervention: intervention, type: 'Session::CatMh') }
+    let(:user_session) { UserSession.create(session: session, user: participant, type: 'UserSession::CatMh', last_answer_at: DateTime.current) }
+    let(:question_id) { '1' }
+
+    it 'return correct status' do
+      request
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'not add an answer to db' do
+      expect { request }.to change(Answer, :count).by(0)
+    end
+  end
+end

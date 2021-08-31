@@ -256,7 +256,7 @@ FactoryBot.define do
         data: [
           {
             payload: '',
-            value: ''
+            value: '1'
           },
           {
             payload: 'example2',
