@@ -11,11 +11,10 @@ namespace :cat_mh do
 
     english_voices = GoogleTtsVoice.joins(:google_tts_language).where('language_name LIKE ?', "#{english_language.name}%")
     spanish_voices = GoogleTtsVoice.joins(:google_tts_language).where('language_name LIKE ?', "#{spanish_language.name}%")
-    chinese_simplified_voices = GoogleTtsVoice.joins(:google_tts_language).where('language_name LIKE ?', "#{chinese_simplified_language.name}%")
-    chinese_traditional_voices = GoogleTtsVoice.joins(:google_tts_language).where('language_name LIKE ?', "#{chinese_traditional_language.name}%")
+    chinese_voices = GoogleTtsVoice.joins(:google_tts_language).where('language_name LIKE ?', 'Chinese%')
     english_language.update!(google_tts_voices: english_voices)
     spanish_language.update!(google_tts_voices: spanish_voices)
-    chinese_traditional_language.update!(google_tts_voices: chinese_simplified_voices)
-    chinese_simplified_language.update!(google_tts_voices: chinese_traditional_voices)
+    chinese_traditional_language.update!(google_tts_voices: chinese_voices)
+    chinese_simplified_language.update!(google_tts_voices: chinese_voices)
   end
 end
