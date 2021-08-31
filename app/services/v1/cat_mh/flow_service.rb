@@ -18,6 +18,9 @@ class V1::CatMh::FlowService
     audio = V1::AudioService.call(text(question),
                                   language_code: user_session.session.google_tts_voice.language_code,
                                   voice_type: user_session.session.google_tts_voice.voice_type)
+
+    user_session.finish if question['body']['questionID'] == -1
+
     map_cat_question(question['body'], audio)
   end
 

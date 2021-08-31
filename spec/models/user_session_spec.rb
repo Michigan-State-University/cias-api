@@ -43,6 +43,23 @@ RSpec.describe UserSession, type: :model do
             user_session.finish
           end
         end
+
+        context 'user session has type CatMh' do
+          let(:session) { create(:cat_mh_session, :with_test_type_and_variables) }
+          let(:user_session) { create(:user_session_cat_mh, session: session, finished_at: finished_at) }
+
+          it 'create answers' do
+            expect(user_session_schedule_service).not_to receive(:schedule)
+            user_session.finish(send_email: false)
+            answers = Answer.where(user_session_id: user_session.id)
+            expect(answers.size).to be(2)
+            variables = [answers.first.decrypted_body, answers.last.decrypted_body]
+            expect(variables).to include(
+              { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
+              { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
+            )
+          end
+        end
       end
 
       context 'user session on answer' do

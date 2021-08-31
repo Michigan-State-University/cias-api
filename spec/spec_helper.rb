@@ -177,6 +177,34 @@ RSpec.configure do |config|
         }
       }
     )
+
+    allow_any_instance_of(Api::CatMh::Result).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'interviewId' => 9088,
+          'subjectId' => 'test_subject',
+          'startTime' => 1_629_968_223_557,
+          'endTime' => 1_629_968_480_570,
+          'timeframeId' => 5,
+          'tests' => [
+            {
+              'type' => 'DEP',
+              'label' => 'Depression',
+              'timeframeId' => 5,
+              'diagnosis' => nil,
+              'confidence' => nil,
+              'severity' => 43.9,
+              'category' => 'mild',
+              'precision' => 5.0,
+              'prob' => 0.575,
+              'percentile' => 8.6,
+              'items' => nil
+            }
+          ]
+        }
+      }
+    )
   end
 
   config.before :suite do

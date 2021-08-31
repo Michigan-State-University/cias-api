@@ -5,4 +5,10 @@ FactoryBot.define do
     association :user
     association :session
   end
+
+  factory :user_session_cat_mh, class: UserSession::CatMh do
+    type { UserSession::CatMh }
+    association :user
+    association :session
+  end
 end

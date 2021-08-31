@@ -41,7 +41,7 @@ class Answer < ApplicationRecord
   private
 
   def type_integrity_validator
-    return if type.demodulize.eql? subclass_name
+    return if type.demodulize.eql?(subclass_name) || type.eql?('Answer::CatMh')
 
     errors.add(:type, 'broken type integrity')
   end

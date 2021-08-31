@@ -20,6 +20,20 @@ class UserSession::Classic < UserSession
     answers.order(:created_at).last
   end
 
+  def finish(send_email: true)
+    return if finished_at
+
+    cancel_timeout_job
+    update(finished_at: DateTime.current)
+
+    GenerateUserSessionReportsJob.perform_later(id)
+
+    decrement_audio_usage
+    V1::SmsPlans::ScheduleSmsForUserSession.call(self)
+    V1::UserSessionScheduleService.new(self).schedule if send_email
+    V1::ChartStatistics::CreateForUserSession.call(self)
+  end
+
   private
 
   def decrement_audio_usage

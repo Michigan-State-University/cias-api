@@ -52,5 +52,14 @@ FactoryBot.define do
     sequence(:variable) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
     association :intervention
+
+    trait :with_test_type_and_variables do
+      after(:build) do |session|
+        test_type = create(:cat_mh_test_type, name: 'Depression', short_name: 'dep')
+        test_type.cat_mh_test_attributes << CatMhTestAttribute.create(name: 'severity', variable_type: 'number', range: '0-100')
+        test_type.cat_mh_test_attributes << CatMhTestAttribute.create(name: 'precision', variable_type: 'number', range: '0-100')
+        session.cat_mh_test_types << test_type
+      end
+    end
   end
 end
