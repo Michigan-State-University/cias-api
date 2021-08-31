@@ -88,25 +88,23 @@ class V1::CatMh::FlowService
   def map_cat_answers_for_question(answers, answer_type)
     raise ArgumentError, 'Answer type can only be 1 (Single) or 2 (Multi)' unless [1, 2].include?(answer_type)
 
-    {
-      data: answers.map.with_index(1) do |answer, index|
-        case answer_type
-        when 1
-          {
-            payload: answer['answerDescription'],
+    answers.map.with_index(1) do |answer, index|
+      case answer_type
+      when 1
+        {
+          payload: answer['answerDescription'],
+          value: answer['answerOrdinal']
+        }
+      when 2
+        {
+          payload: answer['answerDescription'],
+          variable: {
+            name: "answer_ordinal_#{index}",
             value: answer['answerOrdinal']
           }
-        when 2
-          {
-            payload: answer['answerDescription'],
-            variable: {
-              name: "answer_ordinal_#{index}",
-              value: answer['answerOrdinal']
-            }
-          }
-        end
+        }
       end
-    }
+    end
   end
 
   def question_type(cat_mh_question_hash)

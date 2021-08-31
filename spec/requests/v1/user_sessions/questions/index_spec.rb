@@ -904,30 +904,28 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
     it 'have correct body' do
       expect(json_response['data']['attributes']['body']).to include(
-        'data' => {
-          'data' => [
-            {
-              'payload' => 'None of the time',
-              'value' => 1
-            },
-            {
-              'payload' => 'A little of the time',
-              'value' => 2
-            },
-            {
-              'payload' => 'Some of the time',
-              'value' => 3
-            },
-            {
-              'payload' => 'Most of the time',
-              'value' => 4
-            },
-            {
-              'payload' => 'All of the time',
-              'value' => 5
-            }
-          ]
-        },
+        'data' => [
+          {
+            'payload' => 'None of the time',
+            'value' => 1
+          },
+          {
+            'payload' => 'A little of the time',
+            'value' => 2
+          },
+          {
+            'payload' => 'Some of the time',
+            'value' => 3
+          },
+          {
+            'payload' => 'Most of the time',
+            'value' => 4
+          },
+          {
+            'payload' => 'All of the time',
+            'value' => 5
+          }
+        ],
         'variable' => {
           'name' => 'variable'
         }
