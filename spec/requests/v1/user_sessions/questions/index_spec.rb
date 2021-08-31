@@ -855,7 +855,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
   context 'UserSession::CatMh' do
     let(:researcher) { create(:user, :confirmed, :researcher) }
     let!(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
-    let!(:session) { Session.create(name: 'CatSession', intervention: intervention, type: 'Session::CatMh') }
+    let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
     let!(:user_session) { UserSession.create(session: session, user: participant, type: 'UserSession::CatMh') }
     let(:participant) { create(:user, :confirmed, :participant) }
     let(:user) { participant }

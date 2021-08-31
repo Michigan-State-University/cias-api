@@ -88,6 +88,8 @@ class V1::CatMh::FlowService
   def map_cat_answers_for_question(answers, answer_type)
     raise ArgumentError, 'Answer type can only be 1 (Single) or 2 (Multi)' unless [1, 2].include?(answer_type)
 
+    return [] if answers.blank?
+
     answers.map.with_index(1) do |answer, index|
       case answer_type
       when 1

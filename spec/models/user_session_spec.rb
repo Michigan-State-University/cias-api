@@ -45,7 +45,7 @@ RSpec.describe UserSession, type: :model do
         end
 
         context 'user session has type CatMh' do
-          let(:session) { create(:cat_mh_session, :with_test_type_and_variables) }
+          let(:session) { create(:cat_mh_session, :with_test_type_and_variables, :with_cat_mh_info) }
           let(:user_session) { create(:user_session_cat_mh, session: session, finished_at: finished_at) }
 
           it 'create answers' do
@@ -88,6 +88,18 @@ RSpec.describe UserSession, type: :model do
             user_session.on_answer
           end
         end
+      end
+    end
+
+    context 'UserSession::CatMh' do
+      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, :with_cat_mh_info) }
+      let(:user_session) { create(:user_session_cat_mh, session: session) }
+
+      it 'have assign needed information' do
+        expect(user_session.identifier).not_to be_nil
+        expect(user_session.signature).not_to be_nil
+        expect(user_session.jsession_id).not_to be_nil
+        expect(user_session.awselb).not_to be_nil
       end
     end
   end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Api::CatMh
-  def create_interview(subject_id, number_of_interventions, tests, language)
-    Api::CatMh::CreateInterview.call(subject_id, number_of_interventions, tests, language)
+  def create_interview(tests, language, timeframe_id, subject_id = 'test_subject', number_of_interventions = 1)
+    Api::CatMh::CreateInterview.call(subject_id, number_of_interventions, tests, language, timeframe_id)
   end
 
   def status(user_session)

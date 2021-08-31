@@ -8,8 +8,6 @@ class UserSession < ApplicationRecord
   has_many :generated_reports, dependent: :destroy
   belongs_to :health_clinic, optional: true
 
-  before_destroy :decrement_audio_usage
-
   def finish(_send_email: true)
     raise NotImplementedError, "subclass did not define #{__method__}"
   end

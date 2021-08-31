@@ -70,6 +70,8 @@ class V1::SessionService
   def assign_cat_tests_to_session(session, session_params)
     return if session.type != 'Session::CatMh'
 
+    session.cat_mh_test_types.destroy_all
+
     session_params['cat_tests'].each do |test_id|
       test = CatMhTestType.find(test_id)
       session.cat_mh_test_types << test

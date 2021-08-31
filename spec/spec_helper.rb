@@ -125,6 +125,29 @@ RSpec.configure do |config|
       }
     )
 
+    allow_any_instance_of(Api::CatMh::InitializeInterview).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'id' => 9106,
+          'startTime' => nil,
+          'endTime' => nil,
+          'iter' => 0,
+          'languageID' => 1,
+          'timeframeID' => 4,
+          'populationID' => 1,
+          'interviewTests' => [
+            1
+          ],
+          'conditionalTests' => nil,
+          'subjectID' => nil,
+          'displayResults' => 0,
+          'introFormat' => 0,
+          'interviewTemplateId' => -1
+        }
+      }
+    )
+
     allow_any_instance_of(Api::CatMh::Answer).to receive(:call).and_return(
       {
         'status' => 200

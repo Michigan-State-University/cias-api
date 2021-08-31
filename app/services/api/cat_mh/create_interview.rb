@@ -3,19 +3,20 @@
 class Api::CatMh::CreateInterview
   include Api::Request
 
-  attr_reader :application_id, :organization_id, :subject_id, :number_of_interventions, :tests, :language
+  attr_reader :application_id, :organization_id, :subject_id, :number_of_interventions, :tests, :language, :timeframe_id
 
   ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/createInterview"
 
-  def self.call(subject_id, number_of_interventions, tests, language)
-    new(subject_id, number_of_interventions, tests, language).call
+  def self.call(subject_id, number_of_interventions, tests, language, timeframe_id)
+    new(subject_id, number_of_interventions, tests, language, timeframe_id).call
   end
 
-  def initialize(subject_id, number_of_interventions, tests, language)
+  def initialize(subject_id, number_of_interventions, tests, language, timeframe_id)
     @subject_id = subject_id
     @number_of_interventions = number_of_interventions
     @tests = tests
     @language = language
+    @timeframe_id = timeframe_id
     @application_id = ENV['APPLICATION_ID']
     @organization_id = ENV['ORGANIZATION_ID']
   end
@@ -44,6 +45,7 @@ class Api::CatMh::CreateInterview
       'subjectID' => subject_id,
       'numberOfInterviews' => number_of_interventions,
       'language' => language,
+      'timeframeID' => timeframe_id,
       'tests' => tests
     }.to_json
   end

@@ -3,6 +3,8 @@
 class UserSession::Classic < UserSession
   belongs_to :name_audio, class_name: 'Audio', optional: true
 
+  before_destroy :decrement_audio_usage
+
   def on_answer
     timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
     cancel_timeout_job

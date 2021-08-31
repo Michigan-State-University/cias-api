@@ -61,5 +61,15 @@ FactoryBot.define do
         session.cat_mh_test_types << test_type
       end
     end
+
+    trait :with_cat_mh_info do
+      after(:build) do |session|
+        language = CatMhLanguage.create(language_id: 1, name: 'English')
+        time_frame = CatMhTimeFrame.create(timeframe_id: 1, description: 'Past hour', short_name: '1h')
+        population = CatMhPopulation.create(name: 'General')
+
+        session.update(cat_mh_language: language, cat_mh_time_frame: time_frame, cat_mh_population: population)
+      end
+    end
   end
 end

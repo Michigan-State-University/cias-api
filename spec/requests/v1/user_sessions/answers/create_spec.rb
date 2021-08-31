@@ -63,7 +63,7 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
   end
 
   context 'UserSession::CatMh' do
-    let(:session) { Session.create(name: 'CatSession', intervention: intervention, type: 'Session::CatMh') }
+    let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
     let(:user_session) { UserSession.create(session: session, user: participant, type: 'UserSession::CatMh', last_answer_at: DateTime.current) }
     let(:question_id) { '1' }
 

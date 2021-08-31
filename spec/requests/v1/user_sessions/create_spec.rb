@@ -2,10 +2,21 @@
 
 require 'rails_helper'
 
-RSpec.describe 'UserSession', type: :request do
-  let!(:intervention) { create(:intervention, :published) }
-  let!(:session) { create(:session, intervention_id: intervention.id) }
-  let!(:params) do
+RSpec.describe 'POST /v1/user_sessions', type: :request do
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:researcher) { create(:user, :confirmed, :researcher) }
+  let(:participant) { create(:user, :confirmed, :participant) }
+  let(:guest) { create(:user, :confirmed, :guest) }
+  let(:preview_session) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+  let(:user) { admin }
+  let(:intervention_user) { admin }
+  let(:shared_to) { :anyone }
+  let(:status) { :draft }
+  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations) }
+  let(:session) { create(:session, intervention: intervention) }
+  let(:invitations) { [] }
+  let(:headers) { user.create_new_auth_token }
+  let(:params) do
     {
       user_session: {
         session_id: session.id
@@ -13,26 +24,235 @@ RSpec.describe 'UserSession', type: :request do
     }
   end
 
-  let(:request) { post v1_user_sessions_path, params: params, headers: headers }
+  context 'when auth' do
+    context 'is invalid' do
+      before { post v1_user_sessions_path, params: params }
 
-  describe 'POST /v1/user_sessions' do
-    context 'when user is logged' do
-      let!(:user) { create(:user, :confirmed, :admin) }
-      let!(:headers) { user.create_new_auth_token }
-
-      it 'does not create new user' do
-        expect { request }.to change(User, :count).by(0)
-        expect(response).to have_http_status(:ok)
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'Uid' => include('@guest.true')
+        )
       end
     end
 
-    context 'when user is not logged' do
-      let(:guest) { User.limit_to_roles('guest').last }
+    context 'is valid' do
+      before { post v1_user_sessions_path, params: params, headers: headers }
 
-      it 'create new guest user' do
-        expect { request }.to change(User, :count).by(1)
-        expect(guest).not_to be(nil)
+      it 'response contains generated uid token' do
+        expect(response.headers.to_h).to include(
+          'Uid' => user.email
+        )
+      end
+    end
+  end
+
+  context 'when params' do
+    context 'valid' do
+      before do
+        post v1_user_sessions_path, params: params, headers: headers
+      end
+
+      it { expect(response).to have_http_status(:success) }
+    end
+
+    context 'invalid' do
+      context 'params' do
+        before do
+          invalid_params = { session: {} }
+          post v1_user_sessions_path, params: invalid_params, headers: headers
+        end
+
+        it { expect(response).to have_http_status(:bad_request) }
+      end
+    end
+  end
+
+  context 'user session' do
+    let(:request) { post v1_user_sessions_path, params: params, headers: headers }
+
+    context 'does not exist' do
+      it 'returns correct status' do
+        request
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'creates user session' do
+        expect { request }.to change(UserSession, :count).by(1)
+      end
+
+      it 'user session have correct type' do
+        request
+        expect(json_response['data']['attributes']['type']).to eql('UserSession::Classic')
+      end
+
+      context 'create UserSession::CatMh' do
+        let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
+
+        it 'user session have correct type' do
+          request
+          expect(json_response['data']['attributes']['type']).to eql('UserSession::CatMh')
+        end
+      end
+    end
+
+    context 'exists' do
+      let!(:user_session) { create(:user_session, user: user, session: session) }
+
+      it 'returns correct status' do
+        request
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'does not create user session' do
+        request
+        expect { request }.to change(UserSession, :count).by(0)
+      end
+
+      it 'returns correct user_session_id' do
+        request
+        expect(json_response['data']['id']).to eq(user_session.id)
+      end
+    end
+  end
+
+  context 'session access' do
+    before { post v1_user_sessions_path, params: params, headers: headers }
+
+    context 'user is admin' do
+      it 'returns correct http status' do
         expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns correct data' do
+        expect(json_response['data']['type']).to eq('user_session')
+      end
+    end
+
+    context 'user is researcher' do
+      let(:user) { researcher }
+
+      context 'access admin session' do
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'access his session' do
+        let(:intervention_user) { researcher }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns correct data' do
+          expect(json_response['data']['type']).to eq('user_session')
+        end
+      end
+    end
+
+    context 'user is participant' do
+      let(:user) { participant }
+      let(:status) { :published }
+
+      context 'access admin session shared to anyone with the link' do
+        %w[draft closed archived].each do |status|
+          context "intervention status is #{status}" do
+            let(:status) { status }
+
+            it 'returns correct http status' do
+              expect(response).to have_http_status(:forbidden)
+            end
+          end
+        end
+        context 'intervention status is published' do
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+
+      context 'shared to only registered participants' do
+        let(:shared_to) { :registered }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'shared to only invited registered participants' do
+        let(:shared_to) { :invited }
+
+        context 'participant was not invited' do
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+
+        context 'participant was invited' do
+          let(:invitations) { [build(:intervention_invitation, email: participant.email)] }
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:ok)
+          end
+        end
+      end
+    end
+
+    context 'user is guest' do
+      let(:user) { guest }
+      let(:status) { :published }
+
+      context 'shared to anyone' do
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'shared to only registered participants' do
+        let(:shared_to) { :registered }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'shared to only invited registered participants' do
+        let(:shared_to) { :invited }
+
+        context 'participant was not invited' do
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+
+        context 'participant was invited' do
+          let(:invitations) { [build(:intervention_invitation, email: guest.email)] }
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+      end
+    end
+
+    context 'user is preview session' do
+      let(:user) { preview_session }
+
+      %w[published closed archived].each do |status|
+        context "intervention status is #{status}" do
+          let(:status) { status }
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+      end
+      context 'intervention status is draft' do
+        let(:status) { :draft }
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:ok)
+        end
       end
     end
   end
