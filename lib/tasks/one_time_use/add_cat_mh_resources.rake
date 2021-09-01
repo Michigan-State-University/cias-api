@@ -47,7 +47,6 @@ namespace :cat_mh do
       ['anx', 'Anxiety Disorder', general, languages, time_frames],
       ['m/hm', 'Mania/Hypomania', general, languages, time_frames],
       ['sud', 'Substance Use Disorder', general, languages, frames_filtered],
-      ['sa', 'Substance Abuse', general, languages, frames_filtered],
       ['ptsd', 'Post-Traumatic Stress Disorder', general, languages, time_frames],
       ['psy-c', 'Psychosis - Clinician', general, languages_filtered, time_frames],
       ['psy-s', 'Psychosis - Self-Report', general, languages_filtered, time_frames],

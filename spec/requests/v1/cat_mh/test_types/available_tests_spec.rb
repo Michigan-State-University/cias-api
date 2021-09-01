@@ -12,20 +12,32 @@ RSpec.describe 'GET /v1/cat_mh/available_test_types', type: :request do
   let_it_be(:target_time_frame2) { CatMhTimeFrame.create!(timeframe_id: 2, short_name: '1h', description: 'Past Hour') }
   let_it_be(:test_types) do
     CatMhTestType.create!([
-                            { cat_mh_population: target_population1, cat_mh_languages: [target_language1], cat_mh_time_frames: [target_time_frame1] },
-                            { cat_mh_population: target_population1, cat_mh_languages: [target_language1, target_language2],
+                            { name: 'Major Depressive Disorder', cat_mh_population: target_population1, cat_mh_languages: [target_language1],
+                              cat_mh_time_frames: [target_time_frame1] },
+                            { name: 'Mania/Hypomania', cat_mh_population: target_population1, cat_mh_languages: [target_language1, target_language2],
                               cat_mh_time_frames: [target_time_frame1, target_time_frame2] },
-                            { cat_mh_population: target_population3, cat_mh_languages: [target_language2], cat_mh_time_frames: [target_time_frame2] }
+                            { name: 'Major Depressive Disorder (Crim. Justice)', cat_mh_population: target_population3, cat_mh_languages: [target_language2],
+                              cat_mh_time_frames: [target_time_frame2] },
+                            { name: 'Mania/Hypomania (Perinatal)', cat_mh_population: target_population2,
+                              cat_mh_languages: [target_language1, target_language2], cat_mh_time_frames: [target_time_frame1, target_time_frame2] },
+                            { name: 'Adult ADHD', cat_mh_population: target_population1, cat_mh_languages: [target_language1, target_language2],
+                              cat_mh_time_frames: [target_time_frame1] },
+                            { name: 'Post-Traumatic Stress Disorder', cat_mh_population: target_population1,
+                              cat_mh_languages: [target_language1, target_language2], cat_mh_time_frames: [target_time_frame1, target_time_frame2] }
                           ])
   end
 
-  shared_examples 'correct response' do
+  shared_examples 'correct response' do |target_size, array_indices| # we pass array of indices because you cannot use let_it_be constructs inside context
     it 'returns correct HTTP status code (OK)' do
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns correct amount of test types' do
-      expect(json_response['data'].size).to eq(1)
+      expect(json_response['data'].size).to eq(target_size)
+    end
+
+    it 'returns correct data' do
+      expect(json_response['data'].map { |h| h['id'].to_i }).to match_array(array_indices.map { |i| test_types[i].id })
     end
   end
 
@@ -43,7 +55,7 @@ RSpec.describe 'GET /v1/cat_mh/available_test_types', type: :request do
 
     before { request }
 
-    it_behaves_like 'correct response'
+    it_behaves_like 'correct response', 3, [1, 4, 5]
   end
 
   describe 'other populations' do
@@ -60,7 +72,7 @@ RSpec.describe 'GET /v1/cat_mh/available_test_types', type: :request do
 
     before { request }
 
-    it_behaves_like 'correct response'
+    it_behaves_like 'correct response', 3, [1, 2, 5]
   end
 
   describe 'missing params' do
@@ -78,11 +90,7 @@ RSpec.describe 'GET /v1/cat_mh/available_test_types', type: :request do
         }
       end
 
-      it_behaves_like 'correct response'
-
-      it 'returns correct data' do
-        expect(json_response['data'].map { |h| h['id'].to_i }).to match_array([test_types[2].id])
-      end
+      it_behaves_like 'correct response', 4, [1, 2, 4, 5]
     end
 
     context 'missing required parameters' do
