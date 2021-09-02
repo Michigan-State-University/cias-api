@@ -60,6 +60,10 @@ class V1::UsersController < V1Controller
     end
   end
 
+  def me
+    render json: serialized_response(current_v1_user)
+  end
+
   private
 
   def users_scope

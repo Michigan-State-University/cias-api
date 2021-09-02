@@ -201,6 +201,8 @@ Rails.application.routes.draw do
       resources :populations, controller: :populations, only: :index
       get 'available_test_types', to: 'test_types#available_tests'
     end
+
+    get 'me', to: 'users#me', as: :get_user_details
   end
 
   if Rails.env.development?
