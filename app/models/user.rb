@@ -97,7 +97,7 @@ class User < ApplicationRecord
             end
 
     scope = params.key?(:active) ? scope.where(active: params[:active]) : scope.limit_to_active
-    scope.name_contains(params[:name]) # rubocop:disable Style/RedundantAssignment
+    scope.name_contains(params[:name])
   end
 
   def ability

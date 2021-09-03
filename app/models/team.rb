@@ -7,4 +7,12 @@ class Team < ApplicationRecord
   has_many :team_invitations, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
+  
+  scope :name_contains, ->(name) { where('name ilike ?', "%#{name}%") if name.present? }
+
+  def self.detailed_search(params)
+    scope = all
+
+    scope.name_contains(params[:name])
+  end
 end
