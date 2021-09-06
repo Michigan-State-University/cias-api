@@ -19,6 +19,7 @@ class V1::UsersController < V1Controller
     authorize! :list_researchers, User
 
     collection = UserFinder.available_researchers(current_v1_user)
+    collection = collection.where(ability_to_create_cat_mh: params[:with_cat_ability]) if params.key?(:with_cat_ability)
     paginated_collection = paginate(collection, params)
     render json: serialized_hash(paginated_collection).merge({ users_size: collection.size }).to_json
   end

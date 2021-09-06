@@ -39,6 +39,10 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions.size
   end
 
+  attribute :has_cat_sessions do |object|
+    object.sessions.exists?(type: 'Session::CatMh')
+  end
+
   def self.newest_csv_link(object)
     ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end
