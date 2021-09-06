@@ -2,7 +2,6 @@
 
 class Organization < ApplicationRecord
   has_paper_trail
-  has_many :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }, class_name: 'User', as: :organizable
   has_many :organization_admins, -> { limit_to_roles('organization_admin') }, class_name: 'User', as: :organizable
   has_many :health_systems, -> { with_deleted }, dependent: :destroy
   has_many :health_clinics, -> { with_deleted }, through: :health_systems
@@ -10,6 +9,8 @@ class Organization < ApplicationRecord
   has_one :reporting_dashboard, dependent: :destroy
   has_many :charts, through: :reporting_dashboard
   has_many :chart_statistics, through: :health_systems
+  has_many :e_intervention_admin_organizations, dependent: :destroy
+  has_many :e_intervention_admins, through: :e_intervention_admin_organizations, source: :user
 
   validates :name, presence: true, uniqueness: true
 

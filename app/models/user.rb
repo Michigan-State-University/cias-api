@@ -46,6 +46,8 @@ class User < ApplicationRecord
   belongs_to :team, optional: true
   belongs_to :organizable, polymorphic: true, optional: true
   has_many :user_health_clinics, dependent: :destroy
+  has_many :e_intervention_admin_organizations, dependent: :destroy
+  has_many :organizations, through: :e_intervention_admin_organizations
   has_many :admins_teams, class_name: 'Team', dependent: :nullify,
                           foreign_key: :team_admin_id, inverse_of: :team_admin
 
@@ -146,6 +148,14 @@ class User < ApplicationRecord
     health_clinic_ids = health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
     health_clinic_ids.append(organizable.id) if organizable
     health_clinic_ids
+  end
+
+  def accepted_organization_ids
+    return unless role?('e_intervention_admin')
+
+    organization_ids = organization_invitations.where.not(accepted_at: nil).map(&:organization_id)
+    organization_ids.append(organizable.id) if organizable
+    organization_ids
   end
 
   def set_terms_confirmed_date
