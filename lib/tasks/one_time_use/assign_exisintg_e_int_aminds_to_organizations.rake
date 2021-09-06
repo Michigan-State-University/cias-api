@@ -5,7 +5,7 @@ namespace :one_time_use do
   task assign_e_int_admins: :environment do
     e_int_admins = User.e_intervention_admins
     e_int_admins.each do |user|
-      organization = Organization.find(user.organizable_id)
+      organization = Organization.find(user.organizable_id) if user.organizable_id.present?
       organization.e_intervention_admins << user if organization.present?
     end
   end
