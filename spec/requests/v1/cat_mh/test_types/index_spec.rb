@@ -61,9 +61,9 @@ RSpec.describe 'GET /v1/cat_mh/test_types', type: :request do
 
   context 'unauthorized user' do
     context 'users with different roles' do
-      %i[participant researcher].each do |role|
+      %i[participant].each do |role|
         context "with role #{role}" do
-          let(:user) { create(:user, :confirmed, role, ability_to_create_cat_mh: false) }
+          let(:user) { create(:user, :confirmed, role) }
           let(:headers) { user.create_new_auth_token }
           let(:request) do
             get v1_cat_mh_test_types_path, headers: headers
@@ -81,7 +81,7 @@ RSpec.describe 'GET /v1/cat_mh/test_types', type: :request do
     context 'CAT-MH permitted users' do
       %i[researcher e_intervention_admin].each do |role|
         context "user with role #{role}" do
-          let(:user) { create(:user, :confirmed, role, ability_to_create_cat_mh: true) }
+          let(:user) { create(:user, :confirmed, role) }
           let(:headers) { user.create_new_auth_token }
           let(:request) do
             get v1_cat_mh_test_types_path, headers: headers

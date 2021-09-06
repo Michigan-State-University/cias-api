@@ -15,7 +15,7 @@ class Ability::Researcher < Ability::Base
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }
-    can :read_cat_resources, User, ability_to_create_cat_mh: true
+    can :read_cat_resources, User
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability)
     can :manage, Invitation, invitable_type: 'Intervention', invitable_id: Intervention.accessible_by(ability)
     can :manage, QuestionGroup, session: { intervention: { user_id: user.id } }

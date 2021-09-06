@@ -25,7 +25,7 @@ RSpec.describe 'GET /v1/cat_mh/languages/:language_id/voices', type: :request do
   end
 
   context 'unauthorized user' do
-    %i[researcher participant].each do |role|
+    %i[participant].each do |role|
       describe "when user has role #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
