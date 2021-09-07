@@ -12,13 +12,6 @@ class UserSession < ApplicationRecord
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
 
-  def cancel_timeout_job
-    return if timeout_job_id.nil?
-
-    UserSessionTimeoutJob.cancel(timeout_job_id)
-    update(timeout_job_id: nil)
-  end
-
   def all_var_values(include_session_var: true)
     answers.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|

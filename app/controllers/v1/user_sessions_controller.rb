@@ -12,6 +12,7 @@ class V1::UserSessionsController < V1Controller
     )
     authorize! :create, user_session
     user_session.save!
+
     render json: serialized_response(user_session), status: :ok
   end
 
