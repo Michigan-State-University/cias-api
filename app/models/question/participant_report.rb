@@ -12,4 +12,8 @@ class Question::ParticipantReport < Question
   def csv_header_names
     []
   end
+
+  def question_variables
+    [body['variable']['name']]
+  end
 end

@@ -36,6 +36,12 @@ RSpec.describe Question::Finish, type: :model do
           expect(question_finish.subtitle).to include('from=>en to=>pl text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>') # rubocop:disable Layout/LineLength
         end
       end
+
+      describe '#question_variables' do
+        it 'returns empty variables list' do
+          expect(question_finish.question_variables).to match_array []
+        end
+      end
     end
   end
 end

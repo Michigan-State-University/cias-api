@@ -21,6 +21,16 @@ RSpec.describe Question::Single, type: :model do
                                                             clone1_single_var])).to eq('clone2_single_var')
           end
         end
+
+        describe '#question_variables' do
+          it 'returns correct amount of variables' do
+            expect(question_single.question_variables.size).to eq 1
+          end
+
+          it 'returns correct variable names' do
+            expect(question_single.question_variables).to match_array ['single_var']
+          end
+        end
       end
 
       describe 'translation' do

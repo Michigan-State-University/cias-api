@@ -74,6 +74,18 @@ RSpec.describe Question::Multiple, type: :model do
           )
         end
       end
+
+      describe '#question_variables' do
+        let(:expected) { (1..4).map { |i| "answer_#{i}" } }
+
+        it 'returns correct variables' do
+          expect(question_multiple.question_variables).to match_array expected
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_multiple.question_variables.size).to eq expected.size
+        end
+      end
     end
   end
 end

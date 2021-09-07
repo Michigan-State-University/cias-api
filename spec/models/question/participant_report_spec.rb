@@ -36,6 +36,18 @@ RSpec.describe Question::ParticipantReport, type: :model do
           expect(question_participant_report.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        let(:question_participant_report) { create(:question_participant_report, body: { variable: { name: 'htd' }, data: [{ payload: '' }] }) }
+
+        it 'returns correct variables' do
+          expect(question_participant_report.question_variables).to match_array ['htd']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_participant_report.question_variables.size).to eq 1
+        end
+      end
     end
   end
 end

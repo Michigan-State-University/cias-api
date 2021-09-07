@@ -35,4 +35,8 @@ class Question::Grid < Question
       record['payload'] = translated_text
     end
   end
+
+  def question_variables
+    body['data'].flat_map { |data| data['payload']['rows'].map { |row| row['variable']['name'] } }
+  end
 end

@@ -36,6 +36,16 @@ RSpec.describe Question::Number, type: :model do
           expect(question_number.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        it 'returns correct variables' do
+          expect(question_number.question_variables).to match_array ['number_var']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_number.question_variables.size).to eq 1
+        end
+      end
     end
   end
 end

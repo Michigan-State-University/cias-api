@@ -53,7 +53,20 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(cloned_resource), status: :created
   end
 
+  def session_variables
+    authorize! :read, Session
+
+    session = Session.find(session_id)
+    variable_names = session.fetch_variables(variable_filter_options)
+
+    render json: { session_variable: session.variable, variable_names: variable_names }
+  end
+
   private
+
+  def variable_filter_options
+    params.permit(:only_digit_variables, :question_id, allow_list: [])
+  end
 
   def session_service
     @session_service ||= V1::SessionService.new(current_v1_user, intervention_id)

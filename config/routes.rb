@@ -54,6 +54,7 @@ Rails.application.routes.draw do
     end
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
+    get 'sessions/:id/variables/(:question_id)', to: 'sessions#session_variables', as: :fetch_variables
     scope 'sessions/:session_id', as: 'session' do
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question

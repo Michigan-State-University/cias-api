@@ -36,6 +36,12 @@ RSpec.describe Question::Feedback, type: :model do
           expect(question_feedback.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        it 'returns empty variables list' do
+          expect(question_feedback.question_variables).to match_array []
+        end
+      end
     end
   end
 end

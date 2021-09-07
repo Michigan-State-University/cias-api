@@ -36,6 +36,16 @@ RSpec.describe Question::Date, type: :model do
             expect(question_date.subtitle).to equal(nil)
           end
         end
+
+        describe '#question_variables' do
+          it 'returns correct variables' do
+            expect(question_date.question_variables).to match_array ['date_var']
+          end
+
+          it 'returns correct amount of variables' do
+            expect(question_date.question_variables.size).to eq 1
+          end
+        end
       end
     end
 

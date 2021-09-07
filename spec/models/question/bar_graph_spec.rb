@@ -36,6 +36,18 @@ RSpec.describe Question::BarGraph, type: :model do
           expect(question_bar_graph.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        let(:question_bar_graph) { create(:question_bar_graph, body: { variable: { name: 'htd' }, data: [{ payload: '', value: '' }] }) }
+
+        it 'returns correct variables' do
+          expect(question_bar_graph.question_variables).to match_array ['htd']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_bar_graph.question_variables.size).to eq 1
+        end
+      end
     end
   end
 end

@@ -36,6 +36,16 @@ RSpec.describe Question::Slider, type: :model do
           expect(question_slider.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        it 'returns correct variable names list' do
+          expect(question_slider.question_variables).to match_array ['question_slider_var']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_slider.question_variables.size).to eq 1
+        end
+      end
     end
   end
 end

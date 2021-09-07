@@ -36,6 +36,16 @@ RSpec.describe Question::FollowUpContact, type: :model do
           expect(question_follow_up_contact.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        it 'returns correct variables' do
+          expect(question_follow_up_contact.question_variables).to match_array ['follow_up_contact_var']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_follow_up_contact.question_variables.size).to eq 1
+        end
+      end
     end
   end
 end

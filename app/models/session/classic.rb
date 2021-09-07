@@ -66,7 +66,19 @@ class Session::Classic < Session
     UserSession::Classic.name
   end
 
+  def fetch_variables(filter_options = {})
+    filtered = filter_options[:allow_list].present? ? questions.where(type: filter_options[:allow_list]) : questions
+    target_question = questions.find_by(id: filter_options[:question_id])
+    filtered = filtered.where(question_group: target_question.question_group).where('questions.position <= ?', target_question.position) if target_question
+    filtered = filtered.where(type: digit_variable_questions) if filter_options[:only_digit_variables]
+    filtered.flat_map(&:question_variables)
+  end
+
   private
+
+  def digit_variable_questions
+    %w[Question::Single Question::Slider Question::Grid Question::Multiple]
+  end
 
   def create_core_children
     return if question_group_finish

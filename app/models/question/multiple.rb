@@ -31,4 +31,8 @@ class Question::Multiple < Question
       row['payload'] = translated_text
     end
   end
+
+  def question_variables
+    body['data'].map { |data| data['variable']['name'] }
+  end
 end

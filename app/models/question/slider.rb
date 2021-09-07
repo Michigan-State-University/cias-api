@@ -26,6 +26,10 @@ class Question::Slider < Question
     end
   end
 
+  def question_variables
+    [body['variable']['name']]
+  end
+
   private
 
   def original_payload(row)

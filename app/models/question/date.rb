@@ -19,4 +19,8 @@ class Question::Date < Question
     end
     body['variable']['name'] = new_variable
   end
+
+  def question_variables
+    [body['variable']['name']]
+  end
 end

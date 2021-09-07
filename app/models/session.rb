@@ -128,6 +128,10 @@ class Session < ApplicationRecord
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 
+  def fetch_variables(_filter_options = {})
+    raise NotImplementedError, "Subclass of Session did not define #{__method__}"
+  end
+
   private
 
   def assign_default_tts_voice

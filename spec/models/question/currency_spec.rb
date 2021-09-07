@@ -37,6 +37,16 @@ RSpec.describe Question::Currency, type: :model do
             expect(question_currency.subtitle).to equal(nil)
           end
         end
+
+        describe '#question_variables' do
+          it 'returns correct variables' do
+            expect(question_currency.question_variables).to match_array ['currency_var']
+          end
+
+          it 'returns correct amount of variables' do
+            expect(question_currency.question_variables.size).to eq 1
+          end
+        end
       end
     end
 

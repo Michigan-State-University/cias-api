@@ -151,6 +151,11 @@ class Question < ApplicationRecord
     save!
   end
 
+  # default implementation, returning no variables
+  def question_variables
+    []
+  end
+
   private
 
   def initialize_narrator

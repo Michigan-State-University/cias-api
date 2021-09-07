@@ -71,6 +71,16 @@ RSpec.describe Question::Grid, type: :model do
           )
         end
       end
+
+      describe '#question_variables' do
+        it 'returns correct variables' do
+          expect(question_grid.question_variables).to match_array ['row1']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_grid.question_variables.size).to eq 1
+        end
+      end
     end
   end
 end

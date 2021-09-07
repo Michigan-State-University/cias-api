@@ -35,6 +35,18 @@ RSpec.describe Question::Phone, type: :model do
           expect(question_phone.subtitle).to equal(nil)
         end
       end
+
+      describe '#question_variables' do
+        let(:question_phone) { create(:question_phone, body: { variable: { name: 'htd' }, data: [{ payload: '' }] }) }
+
+        it 'returns correct amount of variables' do
+          expect(question_phone.question_variables.size).to eq 1
+        end
+
+        it 'returns correct variable names' do
+          expect(question_phone.question_variables).to match_array ['htd']
+        end
+      end
     end
   end
 end

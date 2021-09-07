@@ -25,4 +25,8 @@ class Question::Single < Question
       row['payload'] = translated_text
     end
   end
+
+  def question_variables
+    [body['variable']['name']]
+  end
 end
