@@ -19,7 +19,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   end
 
   def create
-    authorize! :create, ReportTemplate.new(session_id: @session.id)
+    authorize! :create, ReportTemplate
 
     new_report_template = V1::ReportTemplates::Create.call(
       report_template_params,
