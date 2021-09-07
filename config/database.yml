@@ -22,5 +22,6 @@ non_production:
 production:
   <<: *default
   database: cias_production
+  host: <%= ENV['CIAS_DATABASE_HOST'] %>
   username: <%= ENV['CIAS_DATABASE_USER'] %>
   password: <%= ENV['CIAS_DATABASE_PASSWORD'] %>
