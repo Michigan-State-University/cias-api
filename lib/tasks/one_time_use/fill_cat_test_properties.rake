@@ -20,7 +20,7 @@ namespace :cat_mh do
       test.cat_mh_test_attributes << percentile
     end
 
-    %w[m/hm p-m/hm sud ptsd ss cj-m/hm cj-sud cj-ss dep anx p-dep p-anx cj-dep cj-anx].each do |type|
+    %w[m/hm p-m/hm ptsd ss cj-m/hm cj-sud cj-ss dep anx p-dep p-anx cj-dep cj-anx].each do |type|
       test = CatMhTestType.find_by(short_name: type)
 
       test.cat_mh_test_attributes << severity

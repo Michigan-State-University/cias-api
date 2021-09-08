@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_31_063410) do
+ActiveRecord::Schema.define(version: 2021_08_24_123536) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -168,15 +168,6 @@ ActiveRecord::Schema.define(version: 2021_08_31_063410) do
     t.integer "position", default: 1, null: false
     t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
-  end
-
-  create_table "e_intervention_admin_organizations", force: :cascade do |t|
-    t.uuid "user_id"
-    t.uuid "organization_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["organization_id"], name: "index_e_intervention_admin_organizations_on_organization_id"
-    t.index ["user_id"], name: "index_e_intervention_admin_organizations_on_user_id"
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

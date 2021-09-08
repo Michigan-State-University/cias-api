@@ -3,7 +3,7 @@
 require 'csv'
 
 class Intervention::Csv
-  attr_reader :questions_scope
+  attr_reader :sessions_scope
   attr_accessor :data
 
   def self.call(intervention)
@@ -11,7 +11,7 @@ class Intervention::Csv
   end
 
   def initialize(intervention)
-    @questions_scope = data_scope(intervention)
+    @sessions_scope = data_scope(intervention)
   end
 
   def call
@@ -22,23 +22,11 @@ class Intervention::Csv
   private
 
   def data_scope(intervention)
-    Question.joins(question_group: :session)
-            .where(sessions: { intervention_id: intervention.id })
-            .where.not(type: %w[Question::Feedback Question::Finish Question::Information Question::ThirdParty])
-            .group(
-              'sessions.position, sessions.updated_at, questions.position, questions.updated_at, questions.id',
-              'question_groups.session_id'
-            )
-            .order(
-              'sessions.position' => :asc,
-              'sessions.updated_at' => :asc,
-              'questions.position' => :asc,
-              'questions.updated_at' => :asc
-            )
+    intervention.sessions.order(:position)
   end
 
   def collect_data
-    self.data = Harvester.new(questions_scope).collect
+    self.data = Harvester.new(sessions_scope).collect
   end
 
   def generate

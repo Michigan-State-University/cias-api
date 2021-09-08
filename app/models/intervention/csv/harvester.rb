@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 class Intervention::Csv::Harvester
-  attr_reader :questions
+  attr_reader :sessions
   attr_accessor :header, :rows, :users, :user_column
 
-  def initialize(questions)
-    @questions = questions
+  def initialize(sessions)
+    @sessions = sessions
     @header = []
     @rows = []
     @users = {}
@@ -21,23 +21,26 @@ class Intervention::Csv::Harvester
   private
 
   def set_headers
-    questions.each_with_index do |question, index|
-      header.insert(index, add_session_variable_to_question_variables(question))
+    sessions.each do |session|
+      session.fetch_variables.each do |variable|
+        header << add_session_variable_to_question_variable(session, variable)
+      end
     end
+
     header.flatten!
     header.unshift(:email)
     header.unshift(:user_id)
   end
 
-  def add_session_variable_to_question_variables(question)
-    session_variable = question.question_group.session.variable
-    question.csv_header_names.map { |question_variable| "#{session_variable}.#{question_variable}" }
+  def add_session_variable_to_question_variable(session, variable)
+    variable = 'phoneticName' if variable.eql?('.:name:.')
+
+    "#{session.variable}.#{variable}"
   end
 
   def set_rows
     users.each_with_index do |user, row_index|
       initialize_row
-
       user.user_sessions.where(session_id: session_ids).each_with_index do |user_session, index|
         set_user_data(row_index, user_session) if index.zero?
         user_session.answers.each do |answer|
@@ -59,7 +62,7 @@ class Intervention::Csv::Harvester
   end
 
   def session_ids
-    questions.select('question_groups.session_id')
+    sessions.pluck(:id)
   end
 
   def initialize_row

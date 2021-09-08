@@ -88,5 +88,8 @@ FactoryBot.define do
       type { Answer::ThirdParty }
       association :question, factory: :question_third_party
     end
+    factory :answer_cat_mh, class: Answer::CatMh do
+      type { Answer::CatMh }
+    end
   end
 end
