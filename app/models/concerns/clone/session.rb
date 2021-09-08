@@ -13,6 +13,7 @@ class Clone::Session < Clone::Base
       reassign_branching
       reassign_reflections
       reassign_report_templates_to_third_party_screens
+      reassign_tests
     end
     outcome
   end
@@ -20,6 +21,9 @@ class Clone::Session < Clone::Base
   private
 
   def create_question_groups
+    # CAT-MH sessions won't have question groups so it will throw an error if we try to access them
+    return unless source.respond_to?(:question_groups)
+
     destroy_default_finish_question_group
 
     source.question_groups.order(:position).each do |question_group|
@@ -155,6 +159,14 @@ class Clone::Session < Clone::Base
         third_party_question_body_data_element['report_template_ids'] = new_report_template_ids
       end
       third_party_question.save!
+    end
+  end
+
+  def reassign_tests
+    return if source.instance_of? Session::Classic
+
+    source.cat_mh_test_types.each do |test_type|
+      outcome.cat_mh_test_types << test_type
     end
   end
 end

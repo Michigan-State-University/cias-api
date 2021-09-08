@@ -71,5 +71,13 @@ FactoryBot.define do
         session.update(cat_mh_language: language, cat_mh_time_frame: time_frame, cat_mh_population: population)
       end
     end
+
+    trait :with_report_templates do
+      report_templates { create_list(:report_template, 2, :with_logo, :with_sections) }
+    end
+
+    trait :with_sms_plans do
+      sms_plans { create_list(:sms_plan, 2) }
+    end
   end
 end
