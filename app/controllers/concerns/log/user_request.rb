@@ -8,7 +8,7 @@ module Log::UserRequest
   end
 
   def leave_footprint
-    LogJobs::UserRequest.perform_later(request_scope)
+    LogJobs::UserRequest.perform_later(request_scope) unless ENV['LOG_OFF'] == 'true'
   end
 
   private
