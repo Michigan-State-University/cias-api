@@ -69,7 +69,7 @@ class V1::SessionService
 
   def assign_cat_tests_to_session(session, session_params)
     return if session.type != 'Session::CatMh'
-    return unless session_params.key?('cat_tests') && !session_params['cat_tests'].empty?
+    return unless session_params.key?('cat_tests')
 
     session.cat_mh_test_types.destroy_all
 
