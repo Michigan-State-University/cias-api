@@ -13,6 +13,10 @@ class Session::CatMh < Session
     UserSession::CatMh.name
   end
 
+  def contains_necessary_resources?
+    cat_mh_language_id.present? && cat_mh_population_id.present? && cat_mh_time_frame_id.present? && cat_mh_test_types.size.positive?
+  end
+
   def fetch_variables(filter_options = {})
     cat_mh_test_types.flat_map do |type|
       target_attrs = filter_options[:only_digit_variables] ? type.cat_mh_test_attributes.where(variable_type: 'number') : type.cat_mh_test_attributes

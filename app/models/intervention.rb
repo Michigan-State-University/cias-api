@@ -96,11 +96,7 @@ class Intervention < ApplicationRecord
 
   def cat_sessions_validation
     sessions.where(type: 'Session::CatMh').find_each do |session|
-      errors[:base] << "Session with id=#{session.id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id." unless valid_cat_session?(session) # rubocop:disable Layout/LineLength
+      errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_resources', session_id: session.id) unless session.contains_necessary_resources? # rubocop:disable Layout/LineLength
     end
-  end
-
-  def valid_cat_session?(session)
-    session.cat_mh_language_id.present? && session.cat_mh_population_id.present? && session.cat_mh_time_frame_id.present?
   end
 end
