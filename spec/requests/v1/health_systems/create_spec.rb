@@ -86,7 +86,8 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
     end
 
     context 'when user is e_intervention admin' do
-      let(:user) { create(:user, :confirmed, :e_intervention_admin) }
+      let(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
+      let(:user) { organization.e_intervention_admins.first }
 
       it_behaves_like 'permitted user'
     end
