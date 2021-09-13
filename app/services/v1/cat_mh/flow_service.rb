@@ -15,9 +15,12 @@ class V1::CatMh::FlowService
 
   def user_session_question
     question = cat_mh_api.get_next_question(user_session)
-    audio = V1::AudioService.call(text(question),
-                                  language_code: user_session.session.google_tts_voice.language_code,
-                                  voice_type: user_session.session.google_tts_voice.voice_type)
+    audio_enabled = user_session.session.settings['narrator']['voice']
+    audio = if audio_enabled
+              V1::AudioService.call(text(question),
+                                    language_code: user_session.session.google_tts_voice.language_code,
+                                    voice_type: user_session.session.google_tts_voice.voice_type)
+            end
 
     user_session.finish if question['body']['questionID'] == -1
 
@@ -57,11 +60,11 @@ class V1::CatMh::FlowService
                 'type' => 'ReadQuestion',
                 'action' => 'NO_ACTION',
                 'sha256' => [
-                  audio['sha256']
+                  audio.nil? ? '' : audio['sha256']
                 ],
                 'animation' => 'rest',
                 'audio_urls' => [
-                  audio.url
+                  audio&.url || ''
                 ],
                 endPosition: {
                   x: 600,
@@ -69,10 +72,7 @@ class V1::CatMh::FlowService
                 }
               }
             ],
-            settings: {
-              voice: true,
-              animation: true
-            }
+            settings: user_session.session.settings['narrator']
           },
           'body' => {
             'data' => map_cat_answers_for_question(cat_mh_question_hash['questionAnswers'], cat_mh_question_hash['answerType']),
