@@ -79,7 +79,7 @@ RSpec.describe 'GET /v1/cat_mh/test_types', type: :request do
 
   context 'authorized user' do
     context 'CAT-MH permitted users' do
-      %i[researcher e_intervention_admin].each do |role|
+      %i[researcher e_intervention_admin team_admin].each do |role|
         context "user with role #{role}" do
           let(:user) { create(:user, :confirmed, role) }
           let(:headers) { user.create_new_auth_token }
