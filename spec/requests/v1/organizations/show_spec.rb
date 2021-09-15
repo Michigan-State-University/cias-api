@@ -27,7 +27,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
     user = create(:user, :confirmed, :health_clinic_admin)
     user.organizable = health_clinic unless user.organizable
     UserHealthClinic.create!(user: user, health_clinic: health_clinic)
-    HealthClinicInvitation.create!(user: user, health_clinic: health_clinic, accepted_at: Time.now)
+    HealthClinicInvitation.create!(user: user, health_clinic: health_clinic, accepted_at: Time.zone.now)
     user
   end
 
@@ -94,7 +94,10 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                           { 'id' => health_clinic.id, 'type' => 'health_clinic' },
                           { 'id' => deleted_health_clinic.id, 'type' => 'health_clinic' }
                         )
-                      }
+                      },
+                  'organization_invitations' => {
+                    'data' => []
+                  }
                 }
           }
         )

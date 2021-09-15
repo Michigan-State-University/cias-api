@@ -82,6 +82,38 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         end
       end
 
+      context 'intervention_admin belongs to other organization' do
+        let_it_be(:organization2) { create(:organization, :with_e_intervention_admin) }
+        let(:e_intervention_admin_2) { organization2.e_intervention_admins.first }
+        let(:token) { SecureRandom.hex }
+        let(:params) { { email: e_intervention_admin_2.email } }
+        let(:organization_invitation) { OrganizationInvitation.order(created_at: :desc).first }
+
+        before do
+          allow_any_instance_of(OrganizationInvitation).to receive(:invitation_token).and_return(token)
+        end
+
+        it 'creates invitation for the existing e-intervention admin' do
+          expect(OrganizableMailer).to receive(:invite_user).with(
+            email: e_intervention_admin_2.email,
+            organizable: organization,
+            invitation_token: token,
+            organizable_type: 'Organization'
+          ).and_return(double(deliver_later: nil))
+
+          expect { request }.to change(OrganizationInvitation, :count).by(1).and \
+            avoid_changing(User, :count).and \
+              change { organization.reload.e_intervention_admins.count }.by(1)
+
+          expect(organization_invitation).to have_attributes(
+            user_id: e_intervention_admin_2.id,
+            organization_id: organization.id
+          )
+
+          expect(e_intervention_admin_2.organizations.size).to be(2)
+        end
+      end
+
       context 'intervention_admin account is not confirmed' do
         let!(:not_confirmed_intervention_admin) { create(:user, :e_intervention_admin) }
         let(:params) { { email: not_confirmed_intervention_admin.email } }

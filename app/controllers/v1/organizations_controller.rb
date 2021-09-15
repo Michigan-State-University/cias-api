@@ -59,7 +59,7 @@ class V1::OrganizationsController < V1Controller
   def organization_response(organization)
     V1::OrganizationSerializer.new(
       organization,
-      { include: %i[health_systems health_clinics e_intervention_admins organization_admins] }
+      { include: %i[health_systems health_clinics e_intervention_admins organization_admins organization_invitations] }
     )
   end
 

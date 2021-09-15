@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Intervention::Csv::Harvester
+  DEFAULT_VALUE = 888
   attr_reader :questions
   attr_accessor :header, :rows, :users, :user_column
 
@@ -46,7 +47,7 @@ class Intervention::Csv::Harvester
             next if var_index.blank?
 
             var_value = answer.csv_row_value(data)
-            rows[row_index][var_index] = var_value
+            rows[row_index][var_index] = answer.skipped ? DEFAULT_VALUE : var_value
           end
         end
       end

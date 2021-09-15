@@ -7,6 +7,7 @@ class V1::Interventions::Index < BaseSerializer
 
   def to_json
     {
+      interventions_size: @interventions_size,
       interventions: collect_interventions
     }
   end

@@ -64,7 +64,8 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
             'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
                                  'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id, 'type' => 'user' }] },
                                  'health_clinics' => { 'data' => [] },
-                                 'health_systems' => { 'data' => [] } }
+                                 'health_systems' => { 'data' => [] },
+                                 'organization_invitations' => { 'data' => [] } }
           }
         )
       end
