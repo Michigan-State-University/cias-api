@@ -69,7 +69,8 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
                                                                          'type' => 'user' }] },
                                  'health_clinics' => { 'data' => [] },
                                  'health_systems' => { 'data' => [] },
-                                 'organization_invitations' => { 'data' => [{ 'id' => organization.organization_invitations.first.id, 'type' => 'organization_invitation' }] } }
+                                 'organization_invitations' => { 'data' => [{ 'id' => organization.organization_invitations.first.id,
+                                                                              'type' => 'organization_invitation' }] } }
           }
         )
       end
