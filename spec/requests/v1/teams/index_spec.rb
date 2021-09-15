@@ -13,106 +13,56 @@ RSpec.describe 'GET /v1/teams', type: :request do
     }
   end
   let(:headers) { user.create_new_auth_token }
+  let(:params) { {} }
 
   context 'when there are teams' do
-    let!(:team_1) { create(:team, name: 'Super team') }
+    let!(:team1) { create(:team, name: 'Super team') }
     let!(:team_1_researcher) { create(:user, :researcher) }
-    let!(:team_2) { create(:team, name: 'Other') }
+    let!(:team2) { create(:team, name: 'Other') }
     let!(:team_2_researcher) { create(:user, :researcher) }
     let(:team_1_admin) { team1.team_admin }
     let(:team_2_admin) { team2.team_admin }
 
     before do
-      team_1.users << team_1_researcher
-      team_2.users << team_2_researcher
+      team1.users << team_1_researcher
+      team2.users << team_2_researcher
+      get v1_teams_path, headers: headers, params: params
     end
 
     shared_examples 'permitted user' do
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
       context 'without params' do
-        before do
-          get v1_teams_path, headers: headers
-        end
-
-      it 'returns list of teams' do
-        expect(json_response['data']).to include(
-          {
-            'id' => team1.id.to_s,
-            'type' => 'team',
-            'attributes' => include('name' => team1.name, 'team_admin_id' => team_1_admin.id),
-            'relationships' => {
-              'team_admin' => {
-                # if this stops working and for some reason returns team_admin then change it back to team_admin
-                'data' => include('id' => team_1_admin.id, 'type' => 'user')
-              }
-            }
-          }
-        ).and include(
-          {
-            'id' => team2.id.to_s,
-            'type' => 'team',
-            'attributes' => include('name' => team2.name, 'team_admin_id' => team_2_admin.id),
-            'relationships' => {
-              'team_admin' => {
-                'data' => include('id' => team_2_admin.id, 'type' => 'user') # ditto
-              }
-            }
-          }
-        )
-      end
-
-      it 'returns team admins details' do
-        expect(json_response['included']).to include(
-          'id' => team_2_admin.id,
-          'type' => 'user',
-          'attributes' => include(
-            'email' => team_2_admin.email,
-            'full_name' => team_2_admin.full_name,
-            'roles' => ['team_admin'],
-            'team_id' => nil,
-            'admins_team_ids' => [team2.id]
-          )
-        ).and include(
-          'id' => team_1_admin.id,
-          'type' => 'user',
-          'attributes' => include(
-            'email' => team_1_admin.email,
-            'full_name' => team_1_admin.full_name,
-            'roles' => ['team_admin'],
-            'team_id' => nil,
-            'admins_team_ids' => [team1.id]
-          )
-        )
-      end
-
-      it 'returns proper size of collection' do
-        expect(json_response['meta']).to include(
-          'teams_size' => 2
-        )
-        it 'has correct http code :ok' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'returns list of teams with team admins details' do
+        it 'returns list of teams' do
           expect(json_response['data']).to include(
-            'id' => team_1.id.to_s,
-            'type' => 'team',
-            'attributes' => include('name' => team_1.name, 'team_admin_id' => team_1_admin.id),
-            'relationships' => {
-              'team_admin' => {
-                'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
+            {
+              'id' => team1.id.to_s,
+              'type' => 'team',
+              'attributes' => include('name' => team1.name, 'team_admin_id' => team_1_admin.id),
+              'relationships' => {
+                'team_admin' => {
+                  # if this stops working and for some reason returns team_admin then change it back to team_admin
+                  'data' => include('id' => team_1_admin.id, 'type' => 'user')
+                }
               }
             }
           ).and include(
-            'id' => team_2.id.to_s,
-            'type' => 'team',
-            'attributes' => include('name' => team_2.name, 'team_admin_id' => team_2_admin.id),
-            'relationships' => {
-              'team_admin' => {
-                'data' => include('id' => team_2_admin.id, 'type' => 'team_admin')
+            {
+              'id' => team2.id.to_s,
+              'type' => 'team',
+              'attributes' => include('name' => team2.name, 'team_admin_id' => team_2_admin.id),
+              'relationships' => {
+                'team_admin' => {
+                  'data' => include('id' => team_2_admin.id, 'type' => 'user') # ditto
+                }
               }
             }
           )
+        end
 
+        it 'returns team admins details' do
           expect(json_response['included']).to include(
             'id' => team_2_admin.id,
             'type' => 'user',
@@ -121,7 +71,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
               'full_name' => team_2_admin.full_name,
               'roles' => ['team_admin'],
               'team_id' => nil,
-              'admins_team_ids' => [team_2.id]
+              'admins_team_ids' => [team2.id]
             )
           ).and include(
             'id' => team_1_admin.id,
@@ -131,10 +81,12 @@ RSpec.describe 'GET /v1/teams', type: :request do
               'full_name' => team_1_admin.full_name,
               'roles' => ['team_admin'],
               'team_id' => nil,
-              'admins_team_ids' => [team_1.id]
+              'admins_team_ids' => [team1.id]
             )
           )
+        end
 
+        it 'returns proper size of collection' do
           expect(json_response['meta']).to include(
             'teams_size' => 2
           )
@@ -144,18 +96,20 @@ RSpec.describe 'GET /v1/teams', type: :request do
       context 'with params' do
         let(:params) { { name: 'Super' } }
 
-        before do
-          get v1_teams_path, headers: headers, params: params
-        end
-
         it 'returns correct team' do
           expect(json_response['data']).to include(
-            'id' => team_1.id.to_s,
+            'id' => team1.id.to_s,
             'type' => 'team',
-            'attributes' => include('name' => team_1.name, 'team_admin_id' => team_1_admin.id),
+            'attributes' => include(
+              'name' => team1.name,
+              'team_admin_id' => team_1_admin.id
+            ),
             'relationships' => {
               'team_admin' => {
-                'data' => include('id' => team_1_admin.id, 'type' => 'team_admin')
+                'data' => include(
+                  'id' => team_1_admin.id,
+                  'type' => 'user'
+                )
               }
             }
           )
