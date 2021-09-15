@@ -14,7 +14,6 @@ class V1::Organizations::Invitations::Confirm
   end
 
   def call
-    user.update!(organizable: organization)
     user.activate! if user.role?('organization_admin')
 
     organization_invitation.update!(

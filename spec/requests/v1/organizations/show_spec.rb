@@ -74,21 +74,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
             'id' => organization.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization.name,
-              'e_intervention_admin_invitations' => include(
-                {
-                  'data' => [{
-                    'id' => e_intervention_admin_invitation.id,
-                    'type' => 'organizable_invitation',
-                    'attributes' =>
-                                       include(
-                                         'user_id' => e_intervention_admin_invitation.user_id,
-                                         'organizable_id' => e_intervention_admin_invitation.organization_id,
-                                         'is_accepted' => true
-                                       )
-                  }]
-                }
-              )
+              'name' => organization.name
             },
             'relationships' =>
                 {
@@ -115,7 +101,8 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                         )
                       },
                   'organization_invitations' => {
-                    'data' => []
+                    'data' => [{ 'id' => organization.organization_invitations.first.id,
+                                 'type' => 'organization_invitation' }]
                   }
                 }
           }
