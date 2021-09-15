@@ -63,8 +63,7 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'id' => organization1.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization1.name,
-              'e_intervention_admin_invitations' => { 'data' => [] }
+              'name' => organization1.name
             },
             'relationships' => {
               'e_intervention_admins' => { 'data' => [] },
@@ -78,44 +77,29 @@ RSpec.describe 'GET /v1/organizations', type: :request do
             'id' => organization2.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization2.name,
-              'e_intervention_admin_invitations' => include(
-                {
-                  'data' => [{
-                    'id' => e_intervention_admin_invitation.id,
-                    'type' => 'organizable_invitation',
-                    'attributes' =>
-                                       include(
-                                         'user_id' => e_intervention_admin_invitation.user_id,
-                                         'organizable_id' => e_intervention_admin_invitation.organization_id,
-                                         'is_accepted' => true
-                                       )
-                  }]
-                }
-              )
+              'name' => organization2.name
             },
             'relationships' => {
               'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
               'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'user' }] },
               'health_clinics' => { 'data' => [] },
               'health_systems' => { 'data' => [] },
-              'organization_invitations' => { 'data' => [] }
+              'organization_invitations' => { 'data' => [{ 'id' => organization2.organization_invitations.first.id, 'type' => 'organization_invitation' }] }
             }
           },
           {
             'id' => organization3.id.to_s,
             'type' => 'organization',
             'attributes' => {
-              'name' => organization3.name,
-              'e_intervention_admin_invitations' => { 'data' => [] }
+              'name' => organization3.name
             },
-            'relationships' => {
+            'relationships' => include(
               'e_intervention_admins' => { 'data' => [] },
               'organization_admins' => { 'data' => [] },
               'health_clinics' => { 'data' => [] },
               'health_systems' => { 'data' => [] },
               'organization_invitations' => { 'data' => [] }
-            }
+            )
           }
         )
       end
@@ -186,28 +170,14 @@ RSpec.describe 'GET /v1/organizations', type: :request do
                 'id' => organization2.id.to_s,
                 'type' => 'organization',
                 'attributes' => {
-                  'name' => organization2.name,
-                  'e_intervention_admin_invitations' => include(
-                    {
-                      'data' => [{
-                        'id' => e_intervention_admin_invitation.id,
-                        'type' => 'organizable_invitation',
-                        'attributes' =>
-                                           include(
-                                             'user_id' => e_intervention_admin_invitation.user_id,
-                                             'organizable_id' => e_intervention_admin_invitation.organization_id,
-                                             'is_accepted' => true
-                                           )
-                      }]
-                    }
-                  )
+                  'name' => organization2.name
                 },
                 'relationships' => {
                   'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
                   'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'user' }] },
                   'health_clinics' => { 'data' => [] },
                   'health_systems' => { 'data' => [] },
-                  'organization_invitations' => { 'data' => [] }
+                  'organization_invitations' => { 'data' => [{ 'id' => organization2.organization_invitations.first.id, 'type' => 'organization_invitation' }] }
                 }
               }
             )

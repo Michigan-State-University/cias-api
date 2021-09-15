@@ -62,26 +62,14 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
             'id' => organization.id,
             'type' => 'organization',
             'attributes' => {
-              'name' => 'Oregano Public Health',
-              'e_intervention_admin_invitations' => {
-                'data' => [{
-                  'id' => e_intervention_admin_invitation.id,
-                  'type' => 'organizable_invitation',
-                  'attributes' =>
-                                  include(
-                                    'user_id' => e_intervention_admin_invitation.user_id,
-                                    'organizable_id' => e_intervention_admin_invitation.organization_id,
-                                    'is_accepted' => true
-                                  )
-                }]
-              }
+              'name' => 'Oregano Public Health'
             },
             'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
                                  'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id,
                                                                          'type' => 'user' }] },
                                  'health_clinics' => { 'data' => [] },
                                  'health_systems' => { 'data' => [] },
-                                 'organization_invitations' => { 'data' => [] } }
+                                 'organization_invitations' => { 'data' => [{ 'id' => organization.organization_invitations.first.id, 'type' => 'organization_invitation' }] } }
           }
         )
       end
