@@ -66,7 +66,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
               'e_intervention_admins' => { 'data' => [] },
               'organization_admins' => { 'data' => [] },
               'health_clinics' => { 'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }] },
-              'health_systems' => { 'data' => [{ 'id' => health_system.id, 'type' => 'health_system' }] }
+              'health_systems' => { 'data' => [{ 'id' => health_system.id, 'type' => 'health_system' }] },
+              'organization_invitations' => { 'data' => [] }
             }
           },
           {
@@ -79,7 +80,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
               'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
               'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'user' }] },
               'health_clinics' => { 'data' => [] },
-              'health_systems' => { 'data' => [] }
+              'health_systems' => { 'data' => [] },
+              'organization_invitations' => { 'data' => [] }
             }
           },
           {
@@ -92,7 +94,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
               'e_intervention_admins' => { 'data' => [] },
               'organization_admins' => { 'data' => [] },
               'health_clinics' => { 'data' => [] },
-              'health_systems' => { 'data' => [] }
+              'health_systems' => { 'data' => [] },
+              'organization_invitations' => { 'data' => [] }
             }
           }
         )
@@ -113,7 +116,10 @@ RSpec.describe 'GET /v1/organizations', type: :request do
               'name' => health_clinic.name,
               'deleted' => false
             },
-            'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
+            'relationships' => {
+              'health_clinic_admins' => { 'data' => [] },
+              'health_clinic_invitations' => { 'data' => [] }
+            }
           }
         )
         expect(json_response['included'][1]).to include(
@@ -167,7 +173,8 @@ RSpec.describe 'GET /v1/organizations', type: :request do
                   'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
                   'organization_admins' => { 'data' => [{ 'id' => organization_admin.id, 'type' => 'user' }] },
                   'health_clinics' => { 'data' => [] },
-                  'health_systems' => { 'data' => [] }
+                  'health_systems' => { 'data' => [] },
+                  'organization_invitations' => { 'data' => [] }
                 }
               }
             )

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_07_27_063054) do
+ActiveRecord::Schema.define(version: 2021_09_10_122840) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "user_session_id"
     t.text "body_ciphertext"
+    t.boolean "skipped", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
@@ -99,6 +100,15 @@ ActiveRecord::Schema.define(version: 2021_07_27_063054) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position", default: 1, null: false
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
+  end
+
+  create_table "e_intervention_admin_organizations", force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "organization_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["organization_id"], name: "index_e_intervention_admin_organizations_on_organization_id"
+    t.index ["user_id"], name: "index_e_intervention_admin_organizations_on_user_id"
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

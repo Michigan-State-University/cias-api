@@ -94,6 +94,24 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
           )
         end
       end
+
+      context 'add to organization' do
+        let!(:organization) { create(:organization) }
+        let(:params) do
+          {
+            intervention: {
+              name: 'Intervention in organization',
+              organization_id: organization.id
+            }
+          }
+        end
+
+        it 'have correct prefix' do
+          expect(json_response['data']['attributes']).to include(
+            'name' => 'Intervention in organization'
+          )
+        end
+      end
     end
 
     context 'when params are INVALID' do

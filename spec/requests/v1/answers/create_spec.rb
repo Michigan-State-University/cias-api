@@ -42,6 +42,34 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
         it 'returns correct question type' do
           expect(json_response['data']['attributes']['type']).to eq 'Answer::Single'
         end
+
+        it 'skipped is false' do
+          expect(Answer.last.skipped).to be(false)
+        end
+
+        context 'when skipped is set as true' do
+          let(:params) do
+            {
+              answer: {
+                type: 'Answer::Single',
+                body: {
+                  data: [
+                    {
+                      var: 'a1',
+                      value: '1'
+                    }
+                  ]
+                },
+                skipped: true
+              },
+              question_id: question.id
+            }
+          end
+
+          it 'have correct value' do
+            expect(Answer.last.skipped).to be(true)
+          end
+        end
       end
     end
   end
