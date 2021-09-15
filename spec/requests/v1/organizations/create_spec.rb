@@ -43,14 +43,14 @@ RSpec.describe 'POST /v1/organizations', type: :request do
           {
             'type' => 'organization',
             'attributes' => {
-              'name' => 'New Organization',
-              'e_intervention_admin_invitations' => { 'data' => [] }
+              'name' => 'New Organization'
             },
             'relationships' => { 'e_intervention_admins' => { 'data' => [] },
                                  'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id,
                                                                          'type' => 'user' }] },
                                  'health_clinics' => { 'data' => [] },
-                                 'health_systems' => { 'data' => [] } }
+                                 'health_systems' => { 'data' => [] },
+                                 'organization_invitations' => { 'data' => [] } }
           }
         )
       end

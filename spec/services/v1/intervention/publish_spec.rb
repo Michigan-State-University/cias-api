@@ -64,6 +64,15 @@ RSpec.describe V1::Intervention::Publish do
         described_class.new(intervention).execute
         expect(third_session.reload.schedule_at).to eq(Date.current + days_after_payload.days)
       end
+
+      context 'number of days equal nil' do
+        let(:days_after_payload) { nil }
+
+        it 'set default value' do
+          described_class.new(intervention).execute
+          expect(third_session.reload.schedule_at).to eq(Date.current)
+        end
+      end
     end
 
     context 'previous session has exact_date schedule' do

@@ -4,11 +4,13 @@ class V1::TeamsController < V1Controller
   def index
     authorize! :index, Team
 
-    paginated_teams_scope = paginate(teams_scope, params)
+    collection = teams_scope.detailed_search(params)
+
+    paginated_teams_scope = paginate(collection, params)
 
     render json: V1::TeamSerializer.new(
       paginated_teams_scope,
-      { meta: { teams_size: teams_scope.count }, include: [:team_admin] }
+      { meta: { teams_size: collection.size }, include: [:team_admin] }
     )
   end
 

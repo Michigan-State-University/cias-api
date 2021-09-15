@@ -32,7 +32,7 @@ class V1::Intervention::Publish
         next
       end
 
-      schedule_time += session.schedule_payload.days
+      schedule_time += selected_number_of_days(session)
       next if %w[days_after_fill days_after_date].include?(session.schedule)
 
       if session.schedule == 'days_after'
@@ -56,5 +56,11 @@ class V1::Intervention::Publish
     UserLogRequest.where(user_id: preview_user_ids).delete_all
     Phone.where(user_id: preview_user_ids).delete_all
     preview_users.delete_all
+  end
+
+  def selected_number_of_days(session)
+    return 0 if session.schedule_payload.blank?
+
+    session.schedule_payload.days
   end
 end
