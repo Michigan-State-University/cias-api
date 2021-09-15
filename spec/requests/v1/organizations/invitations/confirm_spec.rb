@@ -35,9 +35,8 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
       let(:invitation_token) { organization_invitation.invitation_token }
 
       it 'confirms organization invitation and assign user to the organization' do
-
         expect { request }.to change { organization_invitation.reload.accepted_at }.and \
-            change(organization_invitation, :invitation_token).to(nil)
+          change(organization_invitation, :invitation_token).to(nil)
       end
 
       it 'redirects to the web app with success message' do
@@ -56,7 +55,7 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
 
       it 'confirms organization invitation and assign user to the organization' do
         expect { request }.to change { organization_invitation.reload.accepted_at }.and \
-            change(organization_invitation, :invitation_token).to(nil)
+          change(organization_invitation, :invitation_token).to(nil)
       end
 
       it 'redirects to the web app with success message' do

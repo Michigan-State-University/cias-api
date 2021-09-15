@@ -18,8 +18,6 @@ RSpec.describe 'POST /v1/health_systems', type: :request do
     }
   end
 
-  let!(:organization) { create(:organization, :with_e_intervention_admin) }
-
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {

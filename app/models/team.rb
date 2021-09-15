@@ -9,7 +9,7 @@ class Team < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   default_scope { order(created_at: :desc) }
-  
+
   scope :name_contains, ->(name) { where('name ilike ?', "%#{name}%") if name.present? }
 
   def self.detailed_search(params)

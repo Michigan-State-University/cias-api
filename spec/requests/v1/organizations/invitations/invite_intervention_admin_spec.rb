@@ -85,9 +85,9 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
 
       context 'intervention_admin belongs to other organization' do
         let_it_be(:organization2) { create(:organization, :with_e_intervention_admin) }
-        let(:e_intervention_admin_2) { organization2.e_intervention_admins.first }
+        let(:e_intervention_admin2) { organization2.e_intervention_admins.first }
         let(:token) { SecureRandom.hex }
-        let(:params) { { email: e_intervention_admin_2.email } }
+        let(:params) { { email: e_intervention_admin2.email } }
         let(:organization_invitation) { OrganizationInvitation.order(created_at: :desc).first }
 
         before do
@@ -95,8 +95,9 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
         end
 
         it 'creates invitation for the existing e-intervention admin' do
+          # rubocop:disable RSpec/StubbedMock
           expect(OrganizableMailer).to receive(:invite_user).with(
-            email: e_intervention_admin_2.email,
+            email: e_intervention_admin2.email,
             organizable: organization,
             invitation_token: token,
             organizable_type: 'Organization'
@@ -107,11 +108,12 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
               change { organization.reload.e_intervention_admins.count }.by(1)
 
           expect(organization_invitation).to have_attributes(
-            user_id: e_intervention_admin_2.id,
+            user_id: e_intervention_admin2.id,
             organization_id: organization.id
           )
 
-          expect(e_intervention_admin_2.organizations.size).to be(2)
+          expect(e_intervention_admin2.organizations.size).to be(2)
+          # rubocop:enable RSpec/StubbedMock
         end
       end
 

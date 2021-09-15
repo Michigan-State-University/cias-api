@@ -58,7 +58,8 @@ class Ability::EInterventionAdmin < Ability::Base
     health_clinic_ids = organizations.pluck('health_clinics.id')
     health_system_ids = organizations.pluck('health_systems.id')
 
-    organization_and_health_system_admin_ids(health_system_ids, organization_ids) + health_clinic_admin_ids(health_clinic_ids) + e_intervention_admin_ids(organization_ids)
+    organization_and_health_system_admin_ids(health_system_ids,
+                                             organization_ids) + health_clinic_admin_ids(health_clinic_ids) + e_intervention_admin_ids(organization_ids)
   end
 
   def organization_and_health_system_admin_ids(health_system_ids, organization_ids)
