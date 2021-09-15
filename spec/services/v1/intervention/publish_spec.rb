@@ -75,7 +75,6 @@ RSpec.describe V1::Intervention::Publish do
       end
     end
 
-
     context 'previous session has exact_date schedule' do
       let(:schedule) { 'exact_date' }
 
