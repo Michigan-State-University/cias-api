@@ -3,14 +3,24 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/google/languages', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:user) { admin }
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:guest) { create(:user, :confirmed, :guest) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
-  let(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
+  let(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
+  let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let!(:language) { create(:google_language) }
+  let(:roles) do
+    {
+      'admin' => admin,
+      'e_intervention_admin' => e_intervention_admin,
+      'team_admin' => team_admin,
+      'researcher' => researcher
+    }
+  end
 
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_google_languages_path, headers: headers }
@@ -61,9 +71,9 @@ RSpec.describe 'GET /v1/google/languages', type: :request do
       it_behaves_like 'permitted user'
     end
 
-    %i[team_admin researcher e_intervention_admin admin].each do |role|
+    %w[team_admin researcher e_intervention_admin admin].each do |role|
       context "user is #{role}" do
-        let(:user) { create(:user, :confirmed, role) }
+        let(:user) { roles[role] }
         let(:headers) { user.create_new_auth_token }
 
         it_behaves_like 'permitted user'

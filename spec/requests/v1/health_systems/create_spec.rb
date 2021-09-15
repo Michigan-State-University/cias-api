@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/health_systems', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
-  let(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
+  let(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
+  let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
   let(:user) { admin }
 

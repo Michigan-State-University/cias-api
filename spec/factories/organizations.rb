@@ -13,10 +13,8 @@ FactoryBot.define do
     end
 
     trait :with_e_intervention_admin do
-      after(:build) do |organization|
-        e_intervention_admin = create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id)
-        organization.e_intervention_admins << e_intervention_admin
-        OrganizationInvitation.create!(user: e_intervention_admin, organization: organization, accepted_at: Time.zone.now)
+      after(:create) do |organization|
+        organization.e_intervention_admins << create(:user, :confirmed, :e_intervention_admin, organizable: organization)
       end
     end
 

@@ -113,7 +113,10 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                           { 'id' => health_clinic.id, 'type' => 'health_clinic' },
                           { 'id' => deleted_health_clinic.id, 'type' => 'health_clinic' }
                         )
-                      }
+                      },
+                  'organization_invitations' => {
+                    'data' => []
+                  }
                 }
           }
         )

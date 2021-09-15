@@ -8,3 +8,7 @@ COPY Gemfile /api/Gemfile
 COPY Gemfile.lock /api/Gemfile.lock
 RUN gem install rake && gem install bundler -v "2.1.4" && bundle install -j4
 COPY . /api
+# Configure the main process to run when running the image
+ADD startup.sh /
+RUN chmod +x /startup.sh
+CMD ["/startup.sh"]

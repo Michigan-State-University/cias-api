@@ -496,5 +496,35 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
     end
+
+    context 'when question is skipped' do
+      let!(:question_body) do
+        {
+          'data' => [
+            { 'value' => '1', 'payload' => '' },
+            { 'value' => '2', 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'test' }
+        }
+      end
+      let!(:answer_body) do
+        {
+          'data' => [
+            {
+              'var' => 'test',
+              'value' => nil
+            }
+          ]
+        }
+      end
+      let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
+      let!(:answer) { create(:answer_single, question: question, body: answer_body, skipped: true, user_session: user_session) }
+
+      it 'save every variables and scores to csv' do
+        subject.collect
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test"]
+        expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 888]]
+      end
+    end
   end
 end

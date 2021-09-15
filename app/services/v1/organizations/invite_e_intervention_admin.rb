@@ -19,7 +19,7 @@ class V1::Organizations::InviteEInterventionAdmin
       organization.e_intervention_admins << new_user
     else
       set_researcher_as_e_intervention_admin
-      organization.e_intervention_admins << user
+      organization.e_intervention_admin_organizations << EInterventionAdminOrganization.new(user: user, organization: organization)
       V1::Organizations::Invitations::Create.call(organization, user)
     end
   end

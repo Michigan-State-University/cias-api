@@ -80,7 +80,8 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
                                  'organization_admins' => { 'data' => [{ 'id' => new_organization_admin.id,
                                                                          'type' => 'user' }] },
                                  'health_clinics' => { 'data' => [] },
-                                 'health_systems' => { 'data' => [] } }
+                                 'health_systems' => { 'data' => [] },
+                                 'organization_invitations' => { 'data' => [] } }
           }
         )
       end
