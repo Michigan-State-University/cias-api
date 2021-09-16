@@ -25,7 +25,10 @@ class V1::CatMh::TestTypesController < V1Controller
   end
 
   def test_types_response(tests)
-    V1::CatMh::TestTypeSerializer.new(tests).serializable_hash.to_json
+    V1::CatMh::TestTypeSerializer.new(
+      tests,
+      { include: %i[cat_mh_test_attributes] }
+    ).serializable_hash.to_json
   end
 
   def language_id
