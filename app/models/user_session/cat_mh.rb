@@ -31,7 +31,6 @@ class UserSession::CatMh < UserSession
     result = cat_mp_service.authentication(self)
     assign_cookies(result)
     cat_mp_service.initialize_interview(self)
-    on_answer
   end
 
   def tests

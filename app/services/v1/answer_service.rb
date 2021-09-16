@@ -37,7 +37,9 @@ class V1::AnswerService
   private
 
   def duration(user_session)
-    (Time.current - user_session.last_answer_at).to_i
+    last_answer_at = user_session.last_answer_at
+    last_answer_at = user_session.created_at if last_answer_at.blank?
+    (Time.current - last_answer_at).to_i
   end
 
   def response(answer_params)

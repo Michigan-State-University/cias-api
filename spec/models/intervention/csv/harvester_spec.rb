@@ -440,7 +440,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       context 'when we have the two sessions of the same intervention' do
         let!(:question) { create(:question_single, question_group: question_group, body: question_body, position: 1) }
         let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
-        let!(:question2) { create(:question_single, question_group: question_group2, position: 2, body: question_body2) }
+        let!(:question2) { create(:question_single, question_group: question_group2, body: question_body2, position: 2) }
         let!(:answer2) do
           create(:answer_single, question: question2, body: answer_body2, user_session: user_session2)
         end
