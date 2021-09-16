@@ -69,12 +69,19 @@ class Session::Classic < Session
   def fetch_variables(filter_options = {})
     filtered = filter_options[:allow_list].present? ? questions.where(type: filter_options[:allow_list]) : questions
     target_question = questions.find_by(id: filter_options[:question_id])
-    filtered = filtered.where(question_group: target_question.question_group).where('questions.position <= ?', target_question.position) if target_question
+    if target_question
+      comparator = to_boolean(filter_options[:include_current_question]) ? '<=' : '<'
+      filtered = filtered.where(question_group: target_question.question_group).where("questions.position #{comparator} ?", target_question.position)
+    end
     filtered = filtered.where(type: digit_variable_questions) if filter_options[:only_digit_variables]
-    filtered.flat_map(&:question_variables)
+    filtered.map { |question| { subtitle: question.subtitle, variables: question.question_variables } }
   end
 
   private
+
+  def to_boolean(value)
+    ActiveRecord::Type::Boolean.new.cast(value)
+  end
 
   def digit_variable_questions
     %w[Question::Single Question::Slider Question::Grid Question::Multiple]

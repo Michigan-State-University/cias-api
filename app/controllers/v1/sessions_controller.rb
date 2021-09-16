@@ -65,7 +65,7 @@ class V1::SessionsController < V1Controller
   private
 
   def variable_filter_options
-    params.permit(:only_digit_variables, :question_id, allow_list: [])
+    params.permit(:only_digit_variables, :question_id, :include_current_question, allow_list: [])
   end
 
   def session_service

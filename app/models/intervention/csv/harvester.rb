@@ -23,8 +23,8 @@ class Intervention::Csv::Harvester
 
   def set_headers
     sessions.each do |session|
-      session.fetch_variables.each do |variable|
-        header << add_session_variable_to_question_variable(session, variable)
+      session.fetch_variables.each do |question_hash|
+        question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var) }
       end
     end
 
