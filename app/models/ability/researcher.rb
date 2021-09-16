@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class Ability::Researcher < Ability::Base
+  include Ability::Generic::GoogleAccess
+  include Ability::Generic::ReportTemplateAccess
+  include Ability::Generic::SmsPlanAccess
+  include Ability::Generic::QuestionAccess
+  include Ability::Generic::CatMhAccess
+
   def definition
     super
     researcher if role?(class_name)
@@ -15,26 +21,17 @@ class Ability::Researcher < Ability::Base
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, Session, intervention: { user_id: user.id }
-    can :read_cat_resources, User
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability)
     can :manage, Invitation, invitable_type: 'Intervention', invitable_id: Intervention.accessible_by(ability)
-    can :manage, QuestionGroup, session: { intervention: { user_id: user.id } }
-    can :manage, Question, question_group: { session: { intervention: { user_id: user.id } } }
-    can :manage, Answer, question: { question_group: { session: { intervention: { user_id: user.id } } } }
-    can :manage, ReportTemplate, session: { intervention: { user_id: user.id } }
-    can :manage, ReportTemplate::Section,
-        report_template: { session: { intervention: { user_id: user.id } } }
-    can :manage, ReportTemplate::Section::Variant,
-        report_template_section: {
-          report_template: { session: { intervention: { user_id: user.id } } }
-        }
-    can :manage, SmsPlan, session_id: logged_user_sessions(user)
-    can :manage, SmsPlan::Variant, sms_plan: { session_id: logged_user_sessions(user) }
+
+    enable_questions_access(user.id)
+    enable_report_template_access(user.id)
+    enable_sms_plan_access(logged_user_sessions(user))
+    enable_cat_mh_access
+
     can %i[read get_protected_attachment], GeneratedReport,
         user_session: { session: { intervention: { user_id: user.id } } }
-    can :read, GoogleTtsLanguage
-    can :read, GoogleTtsVoice
-    can :read, GoogleLanguage
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
+    enable_google_access
   end
 end

@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class Ability::TeamAdmin < Ability::Base
+  include Ability::Generic::GoogleAccess
+  include Ability::Generic::ReportTemplateAccess
+  include Ability::Generic::SmsPlanAccess
+  include Ability::Generic::QuestionAccess
+  include Ability::Generic::CatMhAccess
+
   def definition
     super
     team_admin if role?(class_name)
@@ -22,26 +28,16 @@ class Ability::TeamAdmin < Ability::Base
     can %i[read update destroy], Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability).ids
     can %i[read update destroy], Invitation, invitable_type: 'Intervention',
                                              invitable_id: Intervention.accessible_by(ability).ids
-    can :manage, QuestionGroup, session: { intervention: { user_id: team_members_ids } }
-    can :manage, Question, question_group: { session: { intervention: { user_id: team_members_ids } } }
-    can :manage, Answer, question: { question_group: { session: { intervention: { user_id: team_members_ids } } } }
-    can :manage, ReportTemplate, session: { intervention: { user_id: team_members_ids } }
-    can :manage, ReportTemplate::Section,
-        report_template: { session: { intervention: { user_id: team_members_ids } } }
-    can :manage, ReportTemplate::Section::Variant,
-        report_template_section: {
-          report_template: { session: { intervention: { user_id: team_members_ids } } }
-        }
-    can :manage, SmsPlan, session: { intervention: { user_id: team_members_ids } }
-    can :manage, SmsPlan::Variant, sms_plan: {
-      session: { intervention: { user_id: team_members_ids } }
-    }
+
+    enable_questions_access(team_members_ids)
+    enable_report_template_access(team_members_ids)
+    enable_sms_plan_access({ intervention: { user_id: team_members_ids } })
+    enable_cat_mh_access
+
     can :read, GeneratedReport,
         user_session: { session: { intervention: { user_id: team_members_ids } } }
-    can :read, GoogleTtsLanguage
-    can :read, GoogleTtsVoice
-    can :read, GoogleLanguage
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: team_members_ids } } }
+    enable_google_access
   end
 
   def team_members_ids
