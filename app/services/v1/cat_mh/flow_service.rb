@@ -15,8 +15,7 @@ class V1::CatMh::FlowService
 
   def user_session_question
     question = cat_mh_api.get_next_question(user_session)
-    audio_enabled = user_session.session.settings['narrator']['voice']
-    audio = if audio_enabled
+    audio = if with_audio?
               V1::AudioService.call(text(question),
                                     language_code: user_session.session.google_tts_voice.language_code,
                                     voice_type: user_session.session.google_tts_voice.voice_type)
@@ -113,5 +112,11 @@ class V1::CatMh::FlowService
     return 'Question::Finish' if cat_mh_question_hash['questionID'] == -1
 
     ANSWER_TYPE_TO_QUESTION_TYPES[cat_mh_question_hash['answerType']]
+  end
+
+  def with_audio?
+    audio_enabled = user_session.session.settings['narrator']['voice']
+
+    user_session.session.google_tts_voice.present? && audio_enabled
   end
 end
