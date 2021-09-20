@@ -20,7 +20,7 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
-    session.google_tts_voice_id = first_session_voice_id if first_session_voice_id.present?
+    apply_narrator_settings(session)
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
@@ -52,8 +52,19 @@ class V1::SessionService
 
   private
 
-  def first_session_voice_id
-    intervention.sessions.order(:position)&.first&.google_tts_voice_id
+  def first_session_voice
+    first_session&.google_tts_voice
+  end
+
+  def first_session
+    intervention.sessions.order(:position)&.first
+  end
+
+  def same_as_intervention_language(session_voice)
+    voice_name = session_voice.google_tts_language.language_name
+    google_lang_name = intervention.google_language.language_name
+    # chinese languages are the only ones not following the convention so this check is needed...
+    voice_name.include?('Chinese') ? google_lang_name.include?('Chinese') : voice_name.include?(google_lang_name)
   end
 
   def clear_branching(object, session_id)
@@ -77,5 +88,13 @@ class V1::SessionService
       test = CatMhTestType.find(test_id)
       session.cat_mh_test_types << test
     end
+  end
+
+  def apply_narrator_settings(session)
+    first_session_voice_settings = first_session_voice
+    return unless first_session_voice_settings.present? && same_as_intervention_language(first_session_voice_settings)
+
+    session.google_tts_voice = first_session_voice_settings
+    session.cat_mh_language = CatMhLanguage.find_by(name: intervention.google_language.language_name) if session.type.eql? 'Session::CatMh'
   end
 end
