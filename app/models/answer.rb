@@ -22,6 +22,8 @@ class Answer < ApplicationRecord
 
   encrypts :body, type: :json, migrating: true
 
+  default_scope { order(:created_at) }
+
   def on_answer; end
 
   def csv_header_name(data)

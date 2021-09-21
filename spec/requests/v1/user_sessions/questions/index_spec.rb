@@ -319,6 +319,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           it { expect(json_response['next_user_session_id']).not_to eq user_session.id }
         end
 
+        context 'last answer in user_session has set next_session_id' do
+          it { expect(user_session.answers.last.next_session_id).to eql other_session.id }
+        end
+
         context 'session that is branched to and has schedule exact date with schedule in the past' do
           let!(:schedule) { 'exact_date' }
           let(:schedule_at) { DateTime.now - 1.day }

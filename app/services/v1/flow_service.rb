@@ -78,6 +78,7 @@ class V1::FlowService
     if session_available_now
       next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id)
       next_user_session.save!
+      user_session.answers.last.update!(next_session_id: question_or_session.id)
       self.next_user_session_id = next_user_session.id
       return question_or_session.first_question
     end

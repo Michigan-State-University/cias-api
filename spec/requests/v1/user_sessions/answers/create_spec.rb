@@ -45,14 +45,16 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
         'type' => 'answer',
         'attributes' => {
           'type' => 'Answer::Single',
-          'body' => {
+          'decrypted_body' => {
             'data' => [
               {
                 'var' => 'single_var',
                 'value' => '1'
               }
             ]
-          }
+          },
+          'question_id' => question.id,
+          'next_session_id' => nil
         }
       )
     end
