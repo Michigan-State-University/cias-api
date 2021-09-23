@@ -91,7 +91,13 @@ class V1::SessionService
   end
 
   def apply_narrator_settings(session)
-    first_session_voice_settings = first_session_voice
+    first = first_session
+    if first.nil? && session.type.eql?('Session::CatMh')
+      session.cat_mh_language = CatMhLanguage.find_by(name: intervention.google_language.language_name) || CatMhLanguage.find_by(name: 'English')
+      session.google_tts_voice = session.cat_mh_language.google_tts_voices.first
+      return
+    end
+    first_session_voice_settings = first&.google_tts_voice
     return unless first_session_voice_settings.present? && same_as_intervention_language(first_session_voice_settings)
 
     session.google_tts_voice = first_session_voice_settings

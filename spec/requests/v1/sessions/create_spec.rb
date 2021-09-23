@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :request do
+  let!(:cat_mh_language) { CatMhLanguage.create!(name: 'English', language_id: 1) }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
