@@ -1,38 +1,27 @@
 # frozen_string_literal: true
 
-class V1::CatMh::FlowService
-  attr_reader :user_session, :cat_mh_api
-
+module CatMh::QuestionMapping
   ANSWER_TYPE_TO_QUESTION_TYPES = {
     1 => 'Question::Single',
     2 => 'Question::Multiple'
   }.freeze
 
-  def initialize(user_session)
-    @user_session = user_session
-    @cat_mh_api = Api::CatMh.new
-  end
-
-  def user_session_question
-    question = cat_mh_api.get_next_question(user_session)
-    audio = if with_audio?
+  def prepare_question(user_session, question)
+    audio = if with_audio?(user_session)
               V1::AudioService.call(text(question),
                                     language_code: user_session.session.google_tts_voice.language_code,
                                     voice_type: user_session.session.google_tts_voice.voice_type)
             end
-
-    user_session.finish if question['body']['questionID'] == -1
-
-    map_cat_question(question['body'], audio)
+    map_cat_question(user_session, question, audio)
   end
 
   private
 
   def text(question)
-    question['body']['questionDescription']
+    question['questionDescription']
   end
 
-  def map_cat_question(cat_mh_question_hash, audio)
+  def map_cat_question(user_session, cat_mh_question_hash, audio)
     {
       'data' => {
         'id' => cat_mh_question_hash['questionID'],
@@ -114,7 +103,7 @@ class V1::CatMh::FlowService
     ANSWER_TYPE_TO_QUESTION_TYPES[cat_mh_question_hash['answerType']]
   end
 
-  def with_audio?
+  def with_audio?(user_session)
     audio_enabled = user_session.session.settings['narrator']['voice']
 
     user_session.session.google_tts_voice.present? && audio_enabled

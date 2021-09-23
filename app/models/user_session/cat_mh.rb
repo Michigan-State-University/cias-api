@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UserSession::CatMh < UserSession
+  include ::CatMh::QuestionMapping
+
   after_create_commit :initialize_user_session
 
   def on_answer
@@ -20,6 +22,12 @@ class UserSession::CatMh < UserSession
     V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
     V1::ChartStatistics::CreateForUserSession.call(self)
+  end
+
+  def first_question
+    question = Api::CatMh.new.get_next_question(self)
+
+    prepare_question(self, question['body'])
   end
 
   private

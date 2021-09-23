@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class V1::FlowService
+  include CatMh::QuestionMapping
+
   REFLECTION_MISS_MATCH = 'ReflectionMissMatch'
   NO_BRANCHING_TARGET = 'NoBranchingTarget'
   RANDOMIZATION_MISS_MATCH = 'RandomizationMissMatch'
+  FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION = 'ForbiddenBranchingToCatMhSession'
 
   def initialize(user_session)
     @user_session = user_session
@@ -11,18 +14,25 @@ class V1::FlowService
     @warning = ''
     @next_user_session_id = ''
     @health_clinic_id = user_session.health_clinic_id
+    @cat_mh_api = Api::CatMh.new
   end
 
   attr_reader :user
   attr_accessor :user_session, :warning, :next_user_session_id, :health_clinic_id
 
   def user_session_question(preview_question_id)
-    question = question_to_display(preview_question_id)
-    question = perform_narrator_reflections(question)
-    question = prepare_questions_with_answer_values(question)
-    question.another_or_feedback(question, all_var_values)
+    if user_session.type == 'UserSession::CatMh'
+      cat_mh_question = @cat_mh_api.get_next_question(user_session)
+      user_session.finish if cat_mh_question['body']['questionID'] == -1
+      question = prepare_question(user_session, cat_mh_question['body'])
+    else
+      question = question_to_display(preview_question_id)
+      question = perform_narrator_reflections(question)
+      question = prepare_questions_with_answer_values(question)
+      question.another_or_feedback(question, all_var_values) unless question.is_a?(Hash)
 
-    user_session.finish if question.type == 'Question::Finish'
+      user_session.finish if !question.is_a?(Hash) && question.type == 'Question::Finish'
+    end
 
     { question: question, warning: warning, next_user_session_id: next_user_session_id }
   end
@@ -33,7 +43,8 @@ class V1::FlowService
     return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
 
     last_answered_question = user_session.last_answer&.question
-    return user_session.session.first_question if last_answered_question.nil?
+
+    return user_session.first_question if last_answered_question.nil?
 
     perform_branching_to_next_question(last_answered_question)
   end
@@ -69,6 +80,12 @@ class V1::FlowService
       self.warning = NO_BRANCHING_TARGET
       return nil
     end
+
+    if preview? && question_or_session.type.eql?('Session::CatMh')
+      self.warning = FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION
+      return nil
+    end
+
     return question_or_session if branching_type.include? 'Question'
 
     session_available_now = question_or_session.available_now?(prepare_participant_date_with_schedule_payload(question_or_session))
@@ -76,17 +93,21 @@ class V1::FlowService
     user_session.finish(send_email: !session_available_now)
 
     if session_available_now
-      next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id)
+      next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id,
+                                                            type: question_or_session.user_session_type)
       next_user_session.save!
       user_session.answers.last.update!(next_session_id: question_or_session.id)
       self.next_user_session_id = next_user_session.id
-      return question_or_session.first_question
+
+      return next_user_session.first_question
     end
 
     user_session.session.finish_screen
   end
 
   def perform_narrator_reflections(question)
+    return question if question.is_a?(Hash)
+
     question = question.swap_name_mp3(name_audio, name_answer)
     question.narrator['blocks']&.each_with_index do |block, index|
       next unless %w[Reflection ReflectionFormula].include?(block['type'])
@@ -112,6 +133,8 @@ class V1::FlowService
   end
 
   def prepare_questions_with_answer_values(question)
+    return question if question.is_a?(Hash)
+
     question.another_or_feedback(question, all_var_values)
   end
 
@@ -134,5 +157,9 @@ class V1::FlowService
 
   def name_answer
     user_session.search_var('.:name:.')
+  end
+
+  def preview?
+    user_session.session.intervention.draft?
   end
 end

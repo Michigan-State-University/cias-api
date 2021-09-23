@@ -72,6 +72,33 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
       end
 
+      context 'formula branching to CatMh::Session' do
+        let!(:cat_session) { create(:cat_mh_session, intervention_id: intervention.id) }
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => [
+                                     { 'id' => cat_session.id, 'probability' => '100', 'type' => 'Session' }
+                                   ]
+                                 }
+                               ] }
+          question.save
+          question
+        end
+
+        it 'returns next question' do
+          expect(json_response['data']['id']).to eq questions[1].id
+        end
+
+        it 'have error message' do
+          expect(json_response['warning']).to eq 'ForbiddenBranchingToCatMhSession'
+        end
+      end
+
       context 'intervention is published' do
         let(:status) { 'published' }
 
@@ -120,6 +147,29 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
           it 'returns correct warning' do
             expect(json_response['warning']).to eq nil
+          end
+        end
+
+        context 'formula branching to CatMh::Session' do
+          let!(:cat_session) { create(:cat_mh_session, :with_cat_mh_info, intervention_id: intervention.id) }
+          let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+          let!(:question) do
+            question = questions.first
+            question.formula = { 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [
+                                       { 'id' => cat_session.id, 'probability' => '100', 'type' => 'Session' }
+                                     ]
+                                   }
+                                 ] }
+            question.save
+            question
+          end
+
+          it 'returns next question' do
+            expect(json_response['data']['id']).to eq 14
           end
         end
 

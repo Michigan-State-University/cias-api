@@ -5,6 +5,8 @@ class UserSession::Classic < UserSession
 
   before_destroy :decrement_audio_usage
 
+  delegate :first_question, to: :session
+
   def on_answer
     timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
     cancel_timeout_job
