@@ -33,7 +33,7 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def answer_params
-    params.require(:answer).permit(:type, :skipped, body: {})
+    params.require(:answer).permit(:type, body: {}).merge(params.permit(:skipped))
   end
 
   def question_id

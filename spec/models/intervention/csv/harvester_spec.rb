@@ -481,7 +481,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         }
       end
       let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
-      let!(:answer) { create(:answer_single, question: question, body: answer_body, skipped: true, user_session: user_session) }
+      let!(:answer) { create(:answer_single, question: question, skipped: true, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
