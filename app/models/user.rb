@@ -194,6 +194,10 @@ class User < ApplicationRecord
     user_roles.include?('researcher') || user_roles.include?('e_intervention_admin')
   end
 
+  def active_for_authentication?
+    super && active
+  end
+
   private
 
   def team_admin?
@@ -211,10 +215,6 @@ class User < ApplicationRecord
     return if !roles_changed? && (!active_changed? || active)
 
     self.tokens = {}
-  end
-
-  def active_for_authentication?
-    super && active
   end
 
   def send_devise_notification(notification, *args)
