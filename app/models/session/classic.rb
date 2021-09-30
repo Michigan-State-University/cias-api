@@ -77,6 +77,17 @@ class Session::Classic < Session
     filtered.map { |question| { subtitle: question.subtitle, variables: question.question_variables } }
   end
 
+  def assign_google_tts_voice(first_session)
+    intervention_language = intervention.google_language
+
+    session_voice = first_session&.google_tts_voice
+    if first_session.blank? || (first_session.present? && first_session.type.eql?('Session::CatMh') && !same_as_intervention_language(session_voice))
+      self.google_tts_voice = intervention_language.default_google_tts_voice
+    elsif first_session.present?
+      self.google_tts_voice = first_session&.google_tts_voice
+    end
+  end
+
   private
 
   def to_boolean(value)

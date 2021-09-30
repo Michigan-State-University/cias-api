@@ -20,7 +20,7 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
-    apply_narrator_settings(session)
+    session.assign_google_tts_voice(first_session)
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
@@ -88,19 +88,5 @@ class V1::SessionService
       test = CatMhTestType.find(test_id)
       session.cat_mh_test_types << test
     end
-  end
-
-  def apply_narrator_settings(session)
-    first = first_session
-    if first.nil? && session.type.eql?('Session::CatMh')
-      session.cat_mh_language = CatMhLanguage.find_by(name: intervention.google_language.language_name) || CatMhLanguage.find_by(name: 'English')
-      session.google_tts_voice = session.cat_mh_language.google_tts_voices.first
-      return
-    end
-    first_session_voice_settings = first&.google_tts_voice
-    return unless first_session_voice_settings.present? && same_as_intervention_language(first_session_voice_settings)
-
-    session.google_tts_voice = first_session_voice_settings
-    session.cat_mh_language = CatMhLanguage.find_by(name: intervention.google_language.language_name) if session.type.eql? 'Session::CatMh'
   end
 end

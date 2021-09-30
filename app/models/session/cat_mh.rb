@@ -27,4 +27,16 @@ class Session::CatMh < Session
       }
     end
   end
+
+  def assign_google_tts_voice(first_session)
+    session_voice = first_session&.google_tts_voice
+
+    if first_session.blank?
+      self.cat_mh_language = CatMhLanguage.find_by(name: intervention.google_language.language_name)
+      self.google_tts_voice = cat_mh_language&.google_tts_voices&.first
+    else
+      self.cat_mh_language = CatMhLanguage.find_by(name: first_session.google_tts_voice&.google_tts_language&.language_name&.split&.first)
+      self.google_tts_voice = cat_mh_language&.google_tts_voices&.find_by(id: session_voice.id)
+    end
+  end
 end

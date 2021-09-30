@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_20_065530) do
+ActiveRecord::Schema.define(version: 2021_09_28_113537) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -209,6 +209,8 @@ ActiveRecord::Schema.define(version: 2021_09_20_065530) do
     t.string "language_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "google_tts_language_id"
+    t.index ["google_tts_language_id"], name: "index_google_languages_on_google_tts_language_id"
   end
 
   create_table "google_tts_languages", force: :cascade do |t|
@@ -644,6 +646,7 @@ ActiveRecord::Schema.define(version: 2021_09_20_065530) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"

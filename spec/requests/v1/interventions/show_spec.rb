@@ -33,6 +33,12 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
         expect(response_sessions.size).to eq sessions.size and expect(attrs['sessions_size']).to eq sessions.size
       end
 
+      it 'conteins information about first session language' do
+        expect(attrs).to include(
+          'first_session_language' => 'English (United States)'
+        )
+      end
+
       context 'when intervention does not contain any report' do
         it 'contains proper attributes' do
           expect(attrs).to include(

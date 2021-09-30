@@ -132,10 +132,17 @@ class Session < ApplicationRecord
     raise NotImplementedError, "Subclass of Session did not define #{__method__}"
   end
 
+  def same_as_intervention_language(session_voice)
+    voice_name = session_voice&.google_tts_language&.language_name
+    google_lang_name = intervention.google_language.language_name
+    # chinese languages are the only ones not following the convention so this check is needed...
+    voice_name&.include?('Chinese') ? google_lang_name.include?('Chinese') : voice_name&.include?(google_lang_name)
+  end
+
   private
 
   def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
+    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
     save!
   end
 

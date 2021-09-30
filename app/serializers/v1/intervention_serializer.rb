@@ -7,6 +7,10 @@ class V1::InterventionSerializer < V1Serializer
 
   cache_options(store: Rails.cache, namespace: 'v1-intervention-serializer', expires_in: 24.hours)  # temporary length, might be a subject to change
 
+  attribute :first_session_language do |object|
+    object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
+  end
+
   attribute :csv_link do |object|
     newest_csv_link(object) if object.reports.attached?
   end
