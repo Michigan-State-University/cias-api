@@ -83,7 +83,7 @@ class V1::FlowService
 
     if preview? && question_or_session.type.eql?('Session::CatMh')
       self.warning = FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION
-      return nil
+      return user_session.session.questions.last
     end
 
     return question_or_session if branching_type.include? 'Question'

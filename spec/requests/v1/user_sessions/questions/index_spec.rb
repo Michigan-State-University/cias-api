@@ -90,8 +90,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           question
         end
 
-        it 'returns next question' do
-          expect(json_response['data']['id']).to eq questions[1].id
+        it 'returns last question' do
+          expect(json_response['data']['id']).to eq session.questions.last.id
         end
 
         it 'have error message' do
