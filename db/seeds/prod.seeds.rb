@@ -11,11 +11,15 @@ class CreateProdUsers
     private
 
     def create_users
-      if User.find_by_email('michal.sniec@htdevelopers.com')
-        p 'Users exists'
-        return
-      end
-      %w[michal.sniec@htdevelopers.com natalia.kolinska@htdevelopers.com arkadiusz.tubicz@htdevelopers.com onders12@msu.edu].each_with_index do |email, _index|
+
+      ENV['SEED_PROD_ACCOUTS_EMAILS'].split().each_with_index do |email, _index|
+        p "Creating user with #{email}"
+
+        if User.find_by_email(email)
+          p 'Users exists'
+          next
+        end
+
         u = User.new(
           first_name: 'Admin',
           last_name: 'Account',
