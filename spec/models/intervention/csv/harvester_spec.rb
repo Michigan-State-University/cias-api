@@ -44,7 +44,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
     context 'when session is Session::Classic' do
       let!(:questions) { Question.where(id: question.id).joins(:question_group) }
       let(:intervention) { create(:intervention) }
-      let!(:session) { create(:session, intervention: intervention) }
+      let!(:session) { build(:session, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
       let!(:question_group) { create(:question_group_plain, session: session) }
 
@@ -444,7 +444,9 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         let!(:answer2) do
           create(:answer_single, question: question2, body: answer_body2, user_session: user_session2)
         end
-        let!(:session2) { create(:session, intervention: intervention) }
+        let(:session) { build(:session, position: 1) }
+        let(:session2) { build(:session, position: 2) }
+        let!(:intervention) { create(:intervention, sessions: [session, session2]) }
         let!(:user_session2) { create(:user_session, user: user, session: session2) }
         let!(:question_group2) { create(:question_group_plain, session: session2) }
         let(:question_body) do
