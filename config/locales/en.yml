@@ -54,6 +54,8 @@ en:
   users:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
+    preview:
+      cat_mh: "User preview is unavailable for CAT-MH sessions"
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."
