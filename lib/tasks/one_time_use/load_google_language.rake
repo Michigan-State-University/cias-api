@@ -10,11 +10,16 @@ namespace :google_languages do
     translate = Google::Cloud::Translate::V2.new(credentials: credentials)
     languages = translate.languages 'en'
 
+    p 'Starting to fetch google languages...'
+
     ActiveRecord::Base.transaction do
       languages.each do |language|
         GoogleLanguage.create!(language_name: language.name, language_code: language.code)
+        p "Created #{language.name}"
       end
     end
+
+    p 'Finished fetch google languages successfully!'
   end
 
   def credentials

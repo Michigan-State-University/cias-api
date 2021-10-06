@@ -14,6 +14,9 @@ namespace :google_tts_languages do
       hash[voice.language_codes[0]] = hash[voice.language_codes[0]] ? hash[voice.language_codes[0]] << voice : [voice]
     end
     languages_hash = prepare_languages_hash
+
+    p 'Starting to fetch google tts languages ang google tts voices...'
+
     ActiveRecord::Base.transaction do
       hash.each do |language, voices|
         language_name = prepare_language_name(language, languages_hash)
@@ -39,8 +42,12 @@ namespace :google_tts_languages do
             google_tts_language: tts_language
           )
         end
+
+        p "Created #{language_name} with #{tts_language.google_tts_voices.count} voices"
       end
     end
+
+    p 'Finished fetch google tts languages ang google tts voices successfully!'
   end
 
   def credentials
