@@ -45,7 +45,6 @@ class Intervention::Csv::Harvester
       user.user_sessions.where(session_id: session_ids).each_with_index do |user_session, index|
         set_user_data(row_index, user_session) if index.zero?
         user_session.answers.each do |answer|
-
           set_default_value(user_session, answer, row_index)
           next if answer.skipped
 
