@@ -10,7 +10,6 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::RecordInvalid do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
 
@@ -20,12 +19,10 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::RecordNotUnique do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ActiveRecord::RecordNotSaved do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :not_found
     end
 

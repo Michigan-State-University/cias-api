@@ -494,6 +494,18 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', '3']]
         end
       end
+      let!(:answer_body) do
+        {
+          'data' => [
+            {
+              'var' => 'test',
+              'value' => nil
+            }
+          ]
+        }
+      end
+      let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
+      let!(:answer) { create(:answer_single, question: question, skipped: true, user_session: user_session) }
 
       context 'when question is skipped' do
         let!(:question_body) do
