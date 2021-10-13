@@ -6,9 +6,9 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:team) { create(:team) }
   let(:team_admin) { team.team_admin }
-  let!(:researcher) { create(:user, :confirmed, :researcher, team_id: team.id, ability_to_create_cat_mh: true) }
+  let!(:researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
   let!(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
-  let!(:other_researcher) { create(:user, :confirmed, :researcher, team_id: team.id, ability_to_create_cat_mh: false) }
+  let!(:other_researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
   let(:participant) { create(:user, :confirmed, :participant, team_id: team.id) }
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_researchers_path, headers: headers, params: {} }
@@ -59,27 +59,6 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
 
       it 'returns correct users list size' do
         expect(json_response['data'].size).to eq researchers.size
-      end
-    end
-
-    context 'with cat-mh ability' do
-      let(:params) { { with_cat_ability: true } }
-      let(:request) do
-        get v1_researchers_path, headers: headers, params: params
-      end
-
-      before { request }
-
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'returns correct users list size' do
-        expect(json_response['data'].size).to eq 1
-      end
-
-      it 'returns correct user ids' do
-        expect(json_response['data'][0]['id']).to eq researcher.id
       end
     end
   end

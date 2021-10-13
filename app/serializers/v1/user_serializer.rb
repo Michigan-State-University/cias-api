@@ -2,7 +2,7 @@
 
 class V1::UserSerializer < V1Serializer
   attributes :id, :email, :full_name, :first_name, :last_name, :description, :sms_notification, :time_zone, :active, :roles,
-             :avatar_url, :phone, :team_id, :admins_team_ids, :feedback_completed, :email_notification, :organizable_id, :ability_to_create_cat_mh
+             :avatar_url, :phone, :team_id, :admins_team_ids, :feedback_completed, :email_notification, :organizable_id
 
   cache_options store: Rails.cache, namespace: 'v1-user-serializer', expires_in: 24.hours
 
