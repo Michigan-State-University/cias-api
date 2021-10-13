@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_05_172942) do
+ActiveRecord::Schema.define(version: 2021_10_12_060812) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -613,7 +613,6 @@ ActiveRecord::Schema.define(version: 2021_10_05_172942) do
     t.string "organizable_type"
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
-    t.boolean "ability_to_create_cat_mh", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

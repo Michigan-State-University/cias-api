@@ -26,8 +26,7 @@ describe 'PATCH /v1/users/:id', type: :request do
         first_name: 'John',
         last_name: 'Kowalski',
         sms_notification: false,
-        description: 'Some details about user',
-        ability_to_create_cat_mh: true
+        description: 'Some details about user'
       }
     }
   end
@@ -101,16 +100,14 @@ describe 'PATCH /v1/users/:id', type: :request do
             'first_name' => 'John',
             'last_name' => 'Kowalski',
             'email' => other_user.email,
-            'avatar_url' => nil,
-            'ability_to_create_cat_mh' => true
+            'avatar_url' => nil
           )
         end
 
         it 'updates user attributes' do
           expect(other_user.reload.attributes).to include(
             'first_name' => 'John',
-            'last_name' => 'Kowalski',
-            'ability_to_create_cat_mh' => true
+            'last_name' => 'Kowalski'
           )
         end
 
@@ -410,8 +407,7 @@ describe 'PATCH /v1/users/:id', type: :request do
           'first_name' => team_participant.first_name,
           'last_name' => team_participant.last_name,
           'email' => team_participant.email,
-          'avatar_url' => nil,
-          'ability_to_create_cat_mh' => true
+          'avatar_url' => nil
         )
       end
     end
