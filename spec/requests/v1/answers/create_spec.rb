@@ -59,10 +59,10 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
                       value: '1'
                     }
                   ]
-                },
-                skipped: true
+                }
               },
-              question_id: question.id
+              question_id: question.id,
+              skipped: true
             }
           end
 
