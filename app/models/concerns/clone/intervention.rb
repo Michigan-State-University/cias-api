@@ -5,6 +5,7 @@ class Clone::Intervention < Clone::Base
     outcome.status = :draft
     outcome.name = "Copy of #{outcome.name}"
     clear_organization!
+    clear_cat_mh_settings!
     outcome.save!
     create_sessions
     reassign_branching
@@ -85,5 +86,12 @@ class Clone::Intervention < Clone::Base
     return if outcome.organization.blank?
 
     outcome.organization = nil
+  end
+
+  def clear_cat_mh_settings!
+    outcome.cat_mh_application_id = nil
+    outcome.cat_mh_organization_id = nil
+    outcome.cat_mh_pool = nil
+    outcome.created_cat_mh_session_count = 0
   end
 end

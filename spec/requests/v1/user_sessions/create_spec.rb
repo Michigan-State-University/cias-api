@@ -12,7 +12,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   let(:intervention_user) { admin }
   let(:shared_to) { :anyone }
   let(:status) { :draft }
-  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations) }
+  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, cat_mh_pool: 10) }
   let(:session) { create(:session, intervention: intervention) }
   let(:invitations) { [] }
   let(:headers) { user.create_new_auth_token }
@@ -91,6 +91,29 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
         it 'user session have correct type' do
           request
           expect(json_response['data']['attributes']['type']).to eql('UserSession::CatMh')
+        end
+
+        it 'created_cat_mh_session_counter in intervention should be incremented' do
+          request
+          expect(intervention.reload.created_cat_mh_session_count).to be(1)
+        end
+
+        context 'when intervention did\'t have permission' do
+          let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, cat_mh_pool: 0) }
+
+          it 'return forbidden status' do
+            request
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+
+        context 'when intervention has not set cat_mh_pool' do
+          let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations) }
+
+          it 'return forbidden status' do
+            request
+            expect(response).to have_http_status(:forbidden)
+          end
         end
       end
     end

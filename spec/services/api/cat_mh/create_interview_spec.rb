@@ -7,6 +7,8 @@ describe Api::CatMh::CreateInterview do
   let(:language) { 1 }
   let(:number_of_interviews) { 1 }
   let(:timeframe_id) { 1 }
+  let(:application_id) { 'application_id' }
+  let(:organization_id) { 'organization_id' }
   let(:tests) do
     [
       {
@@ -17,7 +19,7 @@ describe Api::CatMh::CreateInterview do
   end
 
   context 'return correct data' do
-    subject { described_class.call(subject_id, number_of_interviews, tests, language, timeframe_id) }
+    subject { described_class.call(subject_id, number_of_interviews, application_id, organization_id, tests, language, timeframe_id) }
 
     it 'return correct response' do
       expect(subject).to include(

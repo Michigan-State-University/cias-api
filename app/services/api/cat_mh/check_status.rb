@@ -7,13 +7,13 @@ class Api::CatMh::CheckStatus
 
   ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/status"
 
-  def self.call(interview_id, identifier, signature)
-    new(interview_id, identifier, signature).call
+  def self.call(interview_id, identifier, signature, application_id, organization_id)
+    new(interview_id, identifier, signature, application_id, organization_id).call
   end
 
-  def initialize(interview_id, identifier, signature)
-    @application_id = ENV['APPLICATION_ID']
-    @organization_id = ENV['ORGANIZATION_ID']
+  def initialize(interview_id, identifier, signature, application_id, organization_id)
+    @application_id = application_id
+    @organization_id = organization_id
     @identifier = identifier
     @interview_id = interview_id
     @signature = signature

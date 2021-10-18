@@ -1,16 +1,19 @@
 # frozen_string_literal: true
 
 class Api::CatMh
-  def create_interview(tests, language, timeframe_id, subject_id = 'test_subject', number_of_interventions = 1)
-    Api::CatMh::CreateInterview.call(subject_id, number_of_interventions, tests, language, timeframe_id)
+  def create_interview(tests, language, timeframe_id, application_id, organization_id, subject_id = 'test_subject', number_of_interventions = 1) # rubocop:disable Metrics/ParameterLists
+    Api::CatMh::CreateInterview.call(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id)
   end
 
   def status(user_session)
     interview_id = user_session.cat_interview_id
     identifier = user_session.identifier
     signature = user_session.signature
+    intervention = user_session.session.intervention
+    organization_id = intervention.cat_mh_organization_id
+    application_id = intervention.cat_mh_application_id
 
-    Api::CatMh::CheckStatus.call(interview_id, identifier, signature)
+    Api::CatMh::CheckStatus.call(interview_id, identifier, signature, application_id, organization_id)
   end
 
   def authentication(user_session)

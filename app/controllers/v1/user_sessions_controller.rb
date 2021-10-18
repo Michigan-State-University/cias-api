@@ -4,6 +4,8 @@ class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
+    return head :forbidden if pool_is_overflow?
+
     user_session = UserSession.find_or_initialize_by(
       session_id: session_id,
       user_id: user_id,
@@ -17,6 +19,14 @@ class V1::UserSessionsController < V1Controller
   end
 
   private
+
+  def pool_is_overflow?
+    intervention = session_load.intervention
+
+    return true if cat_sessions_in_intervention.any? && (intervention.cat_mh_pool.blank? || intervention.cat_mh_pool <= intervention.created_cat_mh_session_count) # rubocop:disable Layout/LineLength
+
+    false
+  end
 
   def current_v1_user_or_guest_user
     @current_v1_user_or_guest_user ||= current_v1_user || create_guest_user
@@ -38,6 +48,10 @@ class V1::UserSessionsController < V1Controller
 
   def session_load
     Session.find(session_id)
+  end
+
+  def cat_sessions_in_intervention
+    session_load.intervention.sessions.where(type: 'Session::CatMh')
   end
 
   def user_session_params

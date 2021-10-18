@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
-  let(:intervention) { create(:intervention) }
+  let(:intervention) { create(:intervention, cat_mh_application_id: 'application_id', cat_mh_organization_id: 'organization_id', cat_mh_pool: 100) }
   let!(:session) { create(:session, intervention: intervention, position: 1) }
   let!(:other_session) do
     create(:session, intervention: intervention, position: 2,
@@ -137,6 +137,13 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           },
           'variable' => third_session.variable.to_s
         )
+      end
+
+      it 'clear cat mh settings' do
+        expect(intervention_cloned['cat_mh_application_id']).to be nil
+        expect(intervention_cloned['cat_mh_organization_id']).to be nil
+        expect(intervention_cloned['cat_mh_pool']).to be nil
+        expect(intervention_cloned['created_cat_mh_session_count']).to be 0
       end
     end
 

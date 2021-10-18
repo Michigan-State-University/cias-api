@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class V1::InterventionSerializer < V1Serializer
-  attributes :id, :user_id, :name, :status, :shared_to, :organization_id, :google_language_id, :created_at, :updated_at, :published_at
+  attributes :id, :user_id, :name, :status, :shared_to, :organization_id, :google_language_id, :created_at, :updated_at, :published_at,
+             :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count
 
   has_many :sessions, serializer: V1::SessionSerializer
 

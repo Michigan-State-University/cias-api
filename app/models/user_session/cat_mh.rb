@@ -34,7 +34,14 @@ class UserSession::CatMh < UserSession
 
   def initialize_user_session
     cat_mp_service = Api::CatMh.new
-    result = cat_mp_service.create_interview(tests, language, timeframe_id)
+    intervention = session.intervention
+
+    cat_mh_organization_id = intervention.cat_mh_organization_id
+    cat_mh_application_id = intervention.cat_mh_application_id
+    result = cat_mp_service.create_interview(tests, language, timeframe_id, cat_mh_organization_id, cat_mh_application_id)
+
+    intervention.increment!(:created_cat_mh_session_count) # rubocop:disable Rails/SkipsModelValidations
+
     assign_identifier_and_signature(result)
     result = cat_mp_service.authentication(self)
     assign_cookies(result)

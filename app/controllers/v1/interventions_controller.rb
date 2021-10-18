@@ -41,7 +41,12 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(:name, :status, :shared_to, :organization_id, :google_language_id)
+    if params[:id].present? && intervention_load.published?
+      params.require(:intervention).permit(:status, :cat_mh_pool)
+    else
+      params.require(:intervention).permit(:name, :status, :shared_to, :organization_id, :google_language_id, :cat_mh_application_id, :cat_mh_organization_id,
+                                           :cat_mh_pool)
+    end
   end
 
   def start_index

@@ -23,6 +23,7 @@ class Intervention < ApplicationRecord
 
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
+  validate :cat_settings_validation, if: :published?
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:invitations).published.not_shared_to_invited
@@ -98,5 +99,15 @@ class Intervention < ApplicationRecord
     sessions.where(type: 'Session::CatMh').find_each do |session|
       errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_resources', session_id: session.id) unless session.contains_necessary_resources? # rubocop:disable Layout/LineLength
     end
+  end
+
+  def cat_settings_validation
+    return if !intervention_have_cat_mh_sessions? || (cat_mh_application_id.present? && cat_mh_organization_id.present? && cat_mh_pool.positive?)
+
+    errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting')
+  end
+
+  def intervention_have_cat_mh_sessions?
+    sessions.where(type: 'Session::CatMh').any?
   end
 end

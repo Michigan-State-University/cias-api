@@ -21,7 +21,10 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   end
 
   let(:intervention_user) { admin }
-  let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
+  let!(:intervention) do
+    create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft', cat_mh_application_id: 'application_id',
+                          cat_mh_organization_id: 'organization_id', cat_mh_pool: 10)
+  end
   let(:intervention_id) { intervention.id }
   let(:request) { patch v1_intervention_path(intervention_id), params: params, headers: headers }
   let(:participant) { create(:user, :confirmed, :participant) }
@@ -136,6 +139,53 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
           'shared_to' => 'anyone'
         )
       end
+    end
+  end
+
+  context 'when intervention is incorrect' do
+    let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
+    let!(:session) { create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, intervention: intervention) }
+
+    before { request }
+
+    it 'return correct status' do
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'return correct error message' do
+      expect(json_response['message']).to eql('Validation failed: Intervention should have all cat mh settings before publishing. ERROR_FLAG:CatMhWrongSettings') # rubocop:disable Layout/LineLength
+    end
+  end
+
+  context 'when intervention is published' do
+    let!(:intervention) do
+      create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'published', cat_mh_application_id: 'application_id',
+                            cat_mh_organization_id: 'organization_id', cat_mh_pool: 10)
+    end
+
+    let(:params) do
+      {
+        intervention: {
+          name: 'New name',
+          cat_mh_pool: 100
+        }
+      }
+    end
+
+    before { request }
+
+    it 'response contains proper attributes' do
+      expect(json_response['data']['attributes']).to include(
+        'name' => 'Old Intervention',
+        'cat_mh_pool' => 100
+      )
+    end
+
+    it 'updates a intervention object' do
+      expect(intervention.reload.attributes).to include(
+        'name' => 'Old Intervention',
+        'cat_mh_pool' => 100
+      )
     end
   end
 

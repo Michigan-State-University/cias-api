@@ -7,18 +7,18 @@ class Api::CatMh::CreateInterview
 
   ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/createInterview"
 
-  def self.call(subject_id, number_of_interventions, tests, language, timeframe_id)
-    new(subject_id, number_of_interventions, tests, language, timeframe_id).call
+  def self.call(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id) # rubocop:disable Metrics/ParameterLists
+    new(subject_id, number_of_interventions, tests, application_id, organization_id, language, timeframe_id).call
   end
 
-  def initialize(subject_id, number_of_interventions, tests, language, timeframe_id)
+  def initialize(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id) # rubocop:disable Metrics/ParameterLists
     @subject_id = subject_id
     @number_of_interventions = number_of_interventions
     @tests = tests
     @language = language
     @timeframe_id = timeframe_id
-    @application_id = ENV['APPLICATION_ID']
-    @organization_id = ENV['ORGANIZATION_ID']
+    @application_id = application_id
+    @organization_id = organization_id
   end
 
   def call
