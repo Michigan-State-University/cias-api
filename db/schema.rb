@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_13_064950) do
+ActiveRecord::Schema.define(version: 2021_10_19_061546) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -291,6 +291,8 @@ ActiveRecord::Schema.define(version: 2021_10_13_064950) do
     t.string "cat_mh_organization_id"
     t.integer "cat_mh_pool"
     t.integer "created_cat_mh_session_count", default: 0
+    t.boolean "is_access_revoked", default: false
+    t.string "license_type", default: "limited"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
