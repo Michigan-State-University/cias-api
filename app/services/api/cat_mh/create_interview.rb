@@ -8,7 +8,7 @@ class Api::CatMh::CreateInterview
   ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/createInterview"
 
   def self.call(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id) # rubocop:disable Metrics/ParameterLists
-    new(subject_id, number_of_interventions, tests, application_id, organization_id, language, timeframe_id).call
+    new(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id).call
   end
 
   def initialize(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id) # rubocop:disable Metrics/ParameterLists
@@ -29,7 +29,7 @@ class Api::CatMh::CreateInterview
   private
 
   def client
-    @client ||= Faraday.new(ENDPOINT) do |client|
+    @client = Faraday.new(ENDPOINT) do |client|
       client.request :url_encoded
       client.adapter Faraday.default_adapter
       client.headers['applicationid'] = application_id

@@ -14,8 +14,11 @@ class UserSession::CatMh < UserSession
 
     update(finished_at: DateTime.current)
 
-    result = Api::CatMh.new.get_result(self)
+    cat_mh_api = Api::CatMh.new
+
+    result = cat_mh_api.get_result(self)
     result_to_answers(result['body']) if result['status'] == 200
+    cat_mh_api.terminate_intervention(self)
 
     GenerateUserSessionReportsJob.perform_later(id)
 
@@ -38,11 +41,11 @@ class UserSession::CatMh < UserSession
 
     cat_mh_organization_id = intervention.cat_mh_organization_id
     cat_mh_application_id = intervention.cat_mh_application_id
-    result = cat_mp_service.create_interview(tests, language, timeframe_id, cat_mh_organization_id, cat_mh_application_id)
+    result = cat_mp_service.create_interview(tests, language, timeframe_id, cat_mh_application_id, cat_mh_organization_id, user.id.delete('-'))
 
     intervention.increment!(:created_cat_mh_session_count) # rubocop:disable Rails/SkipsModelValidations
 
-    assign_identifier_and_signature(result)
+    assign_basic_information(result)
     result = cat_mp_service.authentication(self)
     assign_cookies(result)
     cat_mp_service.initialize_interview(self)
@@ -62,12 +65,13 @@ class UserSession::CatMh < UserSession
     session.cat_mh_language.language_id
   end
 
-  def assign_identifier_and_signature(result)
+  def assign_basic_information(result)
     return if result['status'] != 200
 
     signature = result['body']['interviews'].first['signature']
     identifier = result['body']['interviews'].first['identifier']
-    update!(signature: signature, identifier: identifier)
+    interview_id = result['body']['interviews'].first['interviewID']
+    update!(signature: signature, identifier: identifier, cat_interview_id: interview_id)
   end
 
   def assign_cookies(result)

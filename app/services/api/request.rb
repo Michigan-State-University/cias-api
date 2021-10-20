@@ -6,7 +6,7 @@ module Api::Request
   end
 
   def response(result)
-    return bad_request(result) if result.headers['location'].present?
+    return bad_request(result) if result.headers['location'].present? || result.reason_phrase.eql?('Request Time-out')
 
     {
       'status' => result.status,
@@ -17,7 +17,7 @@ module Api::Request
   def bad_request(result)
     {
       'status' => 400,
-      'error' => result.headers['location']
+      'error' => result.headers['location'].presence || 'Request Time-out'
     }
   end
 end

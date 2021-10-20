@@ -40,6 +40,10 @@ class Api::CatMh
     if error?(response)
       fix_problem(response, user_session)
       response = Api::CatMh::Question.call(jsession_id(user_session), awselb(user_session))
+      if blocked_cookies?(response)
+        reset_cookies(jsession_id(user_session), awselb(user_session))
+        response = Api::CatMh::Question.call(jsession_id(user_session), awselb(user_session))
+      end
     end
 
     response
@@ -67,8 +71,8 @@ class Api::CatMh
     response
   end
 
-  def terminate_intervention(jsession_id, awselb)
-    Api::CatMh::TerminateSession.call(jsession_id, awselb)
+  def terminate_intervention(user_session)
+    Api::CatMh::TerminateSession.call(jsession_id(user_session), awselb(user_session))
   end
 
   def reset_cookies(jsession_id, awselb)
@@ -99,7 +103,7 @@ class Api::CatMh
   end
 
   def session_time_out?(response)
-    response['error'].eql?("#{ENV['BASE_CAT_URL']}/interview/secure/errorInProgress.html")
+    response['error'].eql?('Request Time-out')
   end
 
   def error?(response)

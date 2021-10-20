@@ -27,7 +27,7 @@ class Api::CatMh::CheckStatus
   private
 
   def client
-    @client ||= Faraday.new(ENDPOINT) do |client|
+    @client = Faraday.new(ENDPOINT) do |client|
       client.request :url_encoded
       client.adapter Faraday.default_adapter
       client.headers['applicationid'] = application_id

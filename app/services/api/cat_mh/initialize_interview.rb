@@ -11,7 +11,7 @@ class Api::CatMh::InitializeInterview < Api::CatMh::Base
   private
 
   def client
-    @client ||= Faraday.new(ENDPOINT) do |client|
+    @client = Faraday.new(ENDPOINT) do |client|
       client.request :url_encoded
       client.adapter Faraday.default_adapter
       client.headers['Cookie'] = cookie
