@@ -11,9 +11,8 @@ rails db:migrate
 rake db:seed:prod
 
 # Run sidekiq
-bundle exec sidekiq &
-# Wait for sidekiq to start
-sleep 5
+bundle exec good_job
+
 # Run rails server
 rails s -e production
 

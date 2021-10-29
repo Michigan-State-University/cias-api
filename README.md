@@ -17,8 +17,6 @@
 * `$ cd cias-api`
 * `$ cp .env.template .env`
 * Install `ruby 2.7.2`
-* Install `redis-server`
-* Install `ruby-sidekiq`
 * Install `PostgreSQL`
 * Install `bundler`
 * Create database user
@@ -33,8 +31,6 @@
 
 ## PRODUCTION SETUP
 * Install `ruby 2.7.2`
-* Install `redis-server`
-* Install `ruby-sidekiq`
 * Install `PostgreSQL`
 * Install `bundler`
 * Create database user
@@ -47,4 +43,4 @@
 
 * `localhost:3000/rails/browse_emails`
 * `localhost:3000/rails/info/routes`
-* `localhost:3000/rails/workers - if SIDEKIQ_WEB_INTERFACE=1`
+* `localhost:3000/good_job - if GOOD_JOB_WEB_INTERFACE=1`

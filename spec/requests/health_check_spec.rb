@@ -16,6 +16,6 @@ describe 'GET /health_check' do
   end
 
   it 'return system details in json response' do
-    expect(JSON.parse(last_response.body)).to eq({ 'database' => true, 'redis' => true })
+    expect(JSON.parse(last_response.body)).to eq({ 'database' => true })
   end
 end
