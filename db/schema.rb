@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_28_200937) do
+ActiveRecord::Schema.define(version: 2021_11_09_124945) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -388,7 +388,7 @@ ActiveRecord::Schema.define(version: 2021_10_28_200937) do
     t.integer "last_report_template_number", default: 0
     t.string "variable"
     t.string "days_after_date_variable_name"
-    t.bigint "google_tts_voice_id", default: 43
+    t.bigint "google_tts_voice_id"
     t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
