@@ -122,6 +122,7 @@ Rails.application.routes.draw do
     end
     get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
     post :phonetic_preview, to: 'audio#create'
+    post :recreate_audio, to: 'audio#recreate'
     resources :sms_plans do
       post 'clone', on: :member
     end
