@@ -23,6 +23,19 @@ class V1::Users::InvitationsController < V1Controller
     end
   end
 
+  def resend
+    authorize! :create, User
+
+    user = user_load
+    user = User.invite!(email: user.email, roles: user.roles)
+
+    if user.valid?
+      render json: serialized_response(user, controller_name.classify, { only_email: true })
+    else
+      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
+    end
+  end
+
   # This endpoint will be hit from mailer link, thus it needs to be public
   def edit
     user = User.where.not(invitation_token: nil).find_by_invitation_token(params[:invitation_token], true) # rubocop:disable Rails/DynamicFindBy

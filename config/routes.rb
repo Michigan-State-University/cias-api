@@ -25,6 +25,7 @@ Rails.application.routes.draw do
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]
+        post 'invitations/resend', to: 'invitations#resend', as: 'resend_invitation'
       end
     end
     resources :users, only: %i[index show update destroy] do
