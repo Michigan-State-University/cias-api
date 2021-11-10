@@ -146,11 +146,6 @@ class Session < ApplicationRecord
     save!
   end
 
-  def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
-    save!
-  end
-
   def json_schema_path
     @json_schema_path ||= 'db/schema/session'
   end

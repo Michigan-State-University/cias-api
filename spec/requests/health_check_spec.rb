@@ -16,7 +16,8 @@ RSpec.describe 'HealthCheck', type: :request do
       expect(last_response.status).to eq 200
     end
 
-  it 'return system details in json response' do
-    expect(JSON.parse(last_response.body)).to eq({ 'database' => true })
+    it 'return system details in json response' do
+      expect(JSON.parse(last_response.body)).to eq({ 'database' => true })
+    end
   end
 end
