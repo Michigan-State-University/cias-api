@@ -89,7 +89,7 @@ jobs:
       - name: Build
         env:
           BUNDLER_VERSION: 2.2.22
-          DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@database:5432/cias_test
+          DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@localhost:5432/cias_test
           GIT_AUTHOR_EMAIL: ci@ci.ci
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
