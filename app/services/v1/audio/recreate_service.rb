@@ -6,7 +6,7 @@ class V1::Audio::RecreateService
   end
 
   def call
-    UserSession.where.not(name_audio: [nil]).update(name_audio_id: nil)
+    UserSession.where.not(name_audio_id: nil).update(name_audio_id: nil)
     Audio.delete_all
 
     Question.find_each do |question|
