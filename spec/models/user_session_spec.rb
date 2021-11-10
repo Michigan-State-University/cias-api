@@ -90,7 +90,7 @@ RSpec.describe UserSession, type: :model do
           end
 
           it 'updates job finished_at' do
-            expect(good_job.finished_at).to_not be_blank
+            expect(good_job.finished_at).not_to be_blank
           end
 
           it 'adds information about cancellation to serialized_params' do

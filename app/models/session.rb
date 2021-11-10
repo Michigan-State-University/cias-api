@@ -48,7 +48,6 @@ class Session < ApplicationRecord
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
 
-  after_create :assign_default_tts_voice
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
 

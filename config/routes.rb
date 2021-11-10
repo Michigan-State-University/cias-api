@@ -2,9 +2,7 @@
 
 Rails.application.routes.draw do
   # Mount the GoodJob engine.
-  if ENV['GOOD_JOB_WEB_INTERFACE'] == '1'
-    mount GoodJob::Engine => 'good_job'
-  end
+  mount GoodJob::Engine => 'good_job' if ENV['GOOD_JOB_WEB_INTERFACE'] == '1'
 
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Keeps job records in your database even after jobs are completed.
 GoodJob.preserve_job_records = true
 

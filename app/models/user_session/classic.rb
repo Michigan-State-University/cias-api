@@ -42,7 +42,6 @@ class UserSession::Classic < UserSession
     V1::ChartStatistics::CreateForUserSession.call(self)
   end
 
-
   private
 
   def decrement_audio_usage
