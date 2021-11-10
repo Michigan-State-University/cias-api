@@ -6,7 +6,7 @@ ruby '2.7.2'
 
 gem 'rails', '~> 6.0.4.1'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 5.0'
+gem 'puma', '>= 5.5.1'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
@@ -23,16 +23,14 @@ gem 'faker', require: false
 gem 'fast_jsonapi'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
-gem 'hiredis'
 gem 'metainspector', '~> 1.15'
+gem 'nokogiri', '>= 1.12.5'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
 gem 'postgresql_cursor'
 gem 'pry-rails'
 gem 'rack-cors'
-gem 'redis'
-gem 'sidekiq'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
@@ -50,6 +48,9 @@ gem 'countries'
 gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
+
+# Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
+gem 'good_job'
 
 group :development, :test do
   gem 'bundler-audit'

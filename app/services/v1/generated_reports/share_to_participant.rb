@@ -36,7 +36,7 @@ class V1::GeneratedReports::ShareToParticipant
   def participant_should_not_receive_report?
     return true if participant_report_answer.blank?
 
-    participant_report_answer.body_data.first&.dig('value', 'receive_report').blank?
+    participant_report_answer.body_data.first['value']['receive_report'].blank?
   end
 
   def participant_email

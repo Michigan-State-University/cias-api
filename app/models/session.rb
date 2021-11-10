@@ -8,7 +8,7 @@ class Session < ApplicationRecord
   include FormulaInterface
 
   belongs_to :intervention, inverse_of: :sessions, touch: true
-  belongs_to :google_tts_voice
+  belongs_to :google_tts_voice, optional: true
 
   has_many :question_groups, dependent: :destroy, inverse_of: :session
   has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
@@ -40,6 +40,7 @@ class Session < ApplicationRecord
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
 
+  after_create :assign_default_tts_voice
   before_validation :set_default_variable
   after_commit :create_core_childs, on: :create
 
@@ -145,6 +146,11 @@ class Session < ApplicationRecord
     qg_finish = ::QuestionGroup::Finish.new(session_id: id)
     qg_finish.save!
     ::Question::Finish.create!(question_group_id: qg_finish.id)
+  end
+
+  def assign_default_tts_voice
+    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
+    save!
   end
 
   def json_schema_path

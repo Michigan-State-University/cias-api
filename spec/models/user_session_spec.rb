@@ -64,11 +64,20 @@ RSpec.describe UserSession, type: :model do
         end
 
         context 'when timeout_job_id is set' do
-          let(:timeout_job_id) { 'test_timeout_job' }
+          let(:timeout_job_id)  { SecureRandom.uuid }
+          let!(:good_job)       { GoodJob::Job.create(id: timeout_job_id, serialized_params: {}) }
 
-          it 'triggers #cancel on UserSessionTimeoutJob with timeout_job_id' do
-            expect(UserSessionTimeoutJob).to receive(:cancel).with(timeout_job_id)
+          before do
             user_session.on_answer
+            good_job.reload
+          end
+
+          it 'updates job finished_at' do
+            expect(good_job.finished_at).to_not be_blank
+          end
+
+          it 'adds information about cancellation to serialized_params' do
+            expect(good_job.serialized_params['cancelled']).to eq true
           end
         end
       end

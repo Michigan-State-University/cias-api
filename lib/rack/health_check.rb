@@ -8,7 +8,7 @@ class HealthCheck
   # @example Check system details:
   #   Rack::HealthCheck.new.call({})  #=> [200, {}, ["{\"database\":true}"]]
   def call(_env)
-    status = { database: postgresql, redis: redis }
+    status = { database: postgresql }
 
     [200, {}, [status.to_json]]
   end
@@ -21,13 +21,6 @@ class HealthCheck
   def postgresql
     ActiveRecord::Base.connection.execute 'SELECT 1'
     ApplicationRecord.connected?
-  rescue StandardError
-    false
-  end
-
-  def redis
-    Sidekiq.redis { |conn| conn.ping }
-    true
   rescue StandardError
     false
   end

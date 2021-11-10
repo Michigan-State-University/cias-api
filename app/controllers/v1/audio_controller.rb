@@ -10,6 +10,14 @@ class V1::AudioController < V1Controller
     render json: { url: audio_url }
   end
 
+  def recreate
+    authorize! :recreate_audio, Audio
+
+    V1::Audio::RecreateService.call
+
+    render status: :ok
+  end
+
   private
 
   def audio_params

@@ -44,7 +44,7 @@ Rails.application.configure do
   config.log_tags = [:request_id]
 
   # Use a different cache store in production.
-  config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'], driver: :ruby, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
+  config.cache_store = :memory_store
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
@@ -113,4 +113,13 @@ Rails.application.configure do
   # config.active_record.database_selector = { delay: 2.seconds }
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
+
+  config.good_job.execution_mode = :async
+
+  # Or with more configuration
+  config.good_job = {
+    execution_mode: :async,
+    max_threads: 4,
+    poll_interval: 30
+  }
 end
