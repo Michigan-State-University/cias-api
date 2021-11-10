@@ -583,6 +583,7 @@ DEPENDENCIES
   google-cloud-translate-v2
   guard-rake
   guard-rspec
+  jsonapi-serializer
   letter_opener_web
   license_finder
   lockbox

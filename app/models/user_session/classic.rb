@@ -10,13 +10,17 @@ class UserSession::Classic < UserSession
   def on_answer
     timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
     cancel_timeout_job
-    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.job_id)
+    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.provider_job_id)
   end
 
   def cancel_timeout_job
     return if timeout_job_id.nil?
 
-    UserSessionTimeoutJob.cancel(timeout_job_id)
+    timeout_job = GoodJob::Job.find(timeout_job_id)
+    timeout_job.serialized_params['cancelled'] = true
+    timeout_job.finished_at = Time.current
+    timeout_job.save
+
     update(timeout_job_id: nil)
   end
 
@@ -37,6 +41,7 @@ class UserSession::Classic < UserSession
     V1::UserSessionScheduleService.new(self).schedule if send_email
     V1::ChartStatistics::CreateForUserSession.call(self)
   end
+
 
   private
 
