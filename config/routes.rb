@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
-  require 'sidekiq/web'
-  Sidekiq::Web.use ActionDispatch::Cookies
-  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session'
-end
-
 Rails.application.routes.draw do
+  # Mount the GoodJob engine.
+  if ENV['GOOD_JOB_WEB_INTERFACE'] == '1'
+    mount GoodJob::Engine => 'good_job'
+  end
+
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
   namespace :v1 do
@@ -26,6 +25,7 @@ Rails.application.routes.draw do
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
         resources :invitations, only: %i[index create destroy]
+        post 'invitations/resend', to: 'invitations#resend', as: 'resend_invitation'
       end
     end
     resources :users, only: %i[index show update destroy] do
@@ -126,6 +126,7 @@ Rails.application.routes.draw do
     get 'team_invitations/confirm', to: 'teams/invitations#confirm', as: :team_invitations_confirm
 
     post :phonetic_preview, to: 'audio#create'
+    post :recreate_audio, to: 'audio#recreate'
     resources :sms_plans do
       post 'clone', on: :member
     end
@@ -211,18 +212,5 @@ Rails.application.routes.draw do
       mount LetterOpenerWeb::Engine, at: '/browse_emails'
     end
   end
-
-  if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
-    scope 'rails' do
-      Sidekiq::Web.use Rack::Auth::Basic do |username, password|
-        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username),
-                                                    ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
-          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password),
-                                                      ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
-      end
-      mount Sidekiq::Web => '/workers'
-    end
-  end
-
   mount ActionCable.server => '/cable'
 end

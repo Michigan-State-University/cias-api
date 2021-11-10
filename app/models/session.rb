@@ -48,6 +48,7 @@ class Session < ApplicationRecord
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
 
+  after_create :assign_default_tts_voice
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
 
@@ -143,6 +144,11 @@ class Session < ApplicationRecord
 
   def assign_default_tts_voice
     self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
+    save!
+  end
+
+  def assign_default_tts_voice
+    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
     save!
   end
 
