@@ -57,7 +57,7 @@ jobs:
         image: postgres:13.0-alpine
         env:
           POSTGRES_PASSWORD: 7AU0lHRd5OglmKO
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -88,12 +88,13 @@ jobs:
             ${{ runner.os }}-gems-
       - name: Build
         env:
+          BUNDLER_VERSION: 2.2.22
           DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@localhost:5432/cias_test
           GIT_AUTHOR_EMAIL: ci@ci.ci
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
         run: |
-          gem install bundler
+          gem install bundler -v "2.2.22"
           bundle config set path 'vendor/bundle'
           bundle install
           bundle exec rails db:create db:schema:load --trace
@@ -106,5 +107,5 @@ jobs:
         run: bundle exec brakeman --skip-files app/controllers/concerns/exception_handler.rb,app/controllers/v1/users/invitations_controller.rb
       - name: Analyze with bundler audit
         run: |
-            gem install bundler-audit
-            bundle-audit check --update
+          gem install bundler-audit
+          bundle-audit check --update

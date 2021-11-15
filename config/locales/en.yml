@@ -117,8 +117,8 @@ en:
       invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
   user_mailer:
     send_verification_login_code:
-      subject: Verifiy your identify in CIAS
-      header: Verifiy your identify in CIAS
-      body_first_paragraph: You recently logged in to CIAS from a browser or app that we don't recognize or your last verification took place was over 30 days ago.
-      body_second_paragraph: To ensure your account's security, we need to verify your identify. Enter the following code where prompted by CIAS.
+      subject: Verify your Identity in CIAS
+      header: Verify your Identity in CIAS
+      body_first_paragraph: You recently logged in to CIAS from a browser or app that we don't recognize or your last verification was over 30 days ago.
+      body_second_paragraph: To ensure your account's security, we need to verify your identity. Enter the following code where prompted by CIAS.
       verification_code: 'Verification code: %{verification_code}'
