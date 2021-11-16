@@ -57,5 +57,23 @@ namespace :db do
     end
 
     p 'Database is clean!'
+    p '=============================================='
+    p 'Sessions witch include images:'
+
+    Intervention.all.each do |intervention|
+      intervention.sessions.each do |session|
+        session.questions.each do |question|
+          if question.image.attached?
+            p '----------------------------------'
+            p "path = '/interventions/#{intervention.id}/sessions/#{session.id}/edit'"
+            p "question group = '#{question.question_group.title}'"
+            p "question subtitle = '#{question.subtitle}'"
+            p "question position = #{question.position}"
+            p '----------------------------------'
+          end
+        end
+      end
+    end
+    p 'end'
   end
 end
