@@ -40,6 +40,7 @@ class UserSession::Classic < UserSession
     V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
     V1::ChartStatistics::CreateForUserSession.call(self)
+    update_user_intervention(session_is_finished: true)
   end
 
   private

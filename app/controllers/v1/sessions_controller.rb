@@ -95,8 +95,8 @@ class V1::SessionsController < V1Controller
   def session_params
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
                                     :intervention_id, :days_after_date_variable_name, :google_tts_voice_id,
-                                    :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, narrator: {}, settings: {},
-                                                                                                       formula: {}, cat_tests: [])
+                                    :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, narrator: {}, settings: {},
+                                                                                                                        formula: {}, cat_tests: [])
   end
 
   def session_params_for_create

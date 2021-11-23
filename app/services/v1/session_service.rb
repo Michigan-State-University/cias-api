@@ -27,6 +27,7 @@ class V1::SessionService
   end
 
   def update(session_id, session_params)
+    sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
     session.assign_attributes(session_params.except(:cat_tests))
     assign_cat_tests_to_session(session, session_params)
@@ -88,5 +89,9 @@ class V1::SessionService
       test = CatMhTestType.find(test_id)
       session.cat_mh_test_types << test
     end
+  end
+
+  def sanitize_estimated_time_param(params)
+    params[:estimated_time] = params[:estimated_time].to_i if params[:estimated_time].present?
   end
 end

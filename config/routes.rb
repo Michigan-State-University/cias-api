@@ -38,6 +38,8 @@ Rails.application.routes.draw do
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
+        resources :accesses, only: %i[index create destroy]
+        resources :files, only: %i[create destroy]
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
@@ -80,6 +82,9 @@ Rails.application.routes.draw do
     scope module: 'sms_plans' do
       scope 'sms_plans/:sms_plan_id', as: :sms_plan do
         resources :variants
+        scope module: 'alert_phones' do
+          resources :phones, only: %i[create update destroy], path: '/alert_phones/'
+        end
       end
     end
 
@@ -109,6 +114,8 @@ Rails.application.routes.draw do
         resource :images, only: %i[create destroy update]
       end
     end
+
+    resources :user_interventions, only: %i[index show create]
 
     resources :user_sessions, only: %i[create] do
       resources :questions, only: %i[index], module: 'user_sessions'

@@ -118,6 +118,10 @@ class Clone::Session < Clone::Base
       plan.variants.each do |variant|
         new_sms_plan.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
       end
+
+      plan.alert_phones.each do |alert_phone|
+        new_sms_plan.alert_phones << AlertPhone.new(sms_plan: new_sms_plan, phone: alert_phone.phone)
+      end
     end
   end
 

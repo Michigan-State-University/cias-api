@@ -19,6 +19,7 @@ class V1::AnswerService
 
   def call
     user_session = UserSession.find(user_session_id)
+
     if user_session.type == 'UserSession::CatMh'
       answer = cat_mh_api.on_user_answer(user_session, question_id, response(answer_params), duration(user_session))
     else
@@ -31,6 +32,7 @@ class V1::AnswerService
     end
 
     user_session.on_answer
+    user_session.update_user_intervention
     answer
   end
 

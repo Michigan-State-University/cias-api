@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::Intervention::Paginate
+class V1::Paginate
   attr_reader :collection, :start_index, :end_index
 
   def self.call(collection, start_index, end_index)

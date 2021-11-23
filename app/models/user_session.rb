@@ -3,6 +3,7 @@
 class UserSession < ApplicationRecord
   has_paper_trail
   belongs_to :user, inverse_of: :user_sessions
+  belongs_to :user_intervention, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
   has_many :generated_reports, dependent: :destroy
@@ -29,5 +30,26 @@ class UserSession < ApplicationRecord
       end
     end
     nil
+  end
+
+  def update_user_intervention(session_is_finished: false)
+    user_intervention.completed_sessions += 1 if session_is_finished
+
+    if user_intervention_finished?
+      user_intervention.status = 'completed'
+      user_intervention.finished_at = DateTime.current
+    else
+      user_intervention.status = 'in_progress'
+    end
+
+    user_intervention.save!
+  end
+
+  private
+
+  def user_intervention_finished?
+    return user_intervention.completed_sessions == user_intervention.user_sessions.size unless user_intervention.intervention.module_intervention?
+
+    user_intervention.completed_sessions == user_intervention.sessions.size
   end
 end

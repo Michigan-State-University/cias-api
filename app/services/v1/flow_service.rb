@@ -15,10 +15,11 @@ class V1::FlowService
     @next_user_session_id = ''
     @health_clinic_id = user_session.health_clinic_id
     @cat_mh_api = Api::CatMh.new
+    @next_session_id = ''
   end
 
   attr_reader :user
-  attr_accessor :user_session, :warning, :next_user_session_id, :health_clinic_id
+  attr_accessor :user_session, :warning, :next_user_session_id, :health_clinic_id, :next_session_id
 
   def user_session_question(preview_question_id)
     if user_session.type == 'UserSession::CatMh'
@@ -31,13 +32,29 @@ class V1::FlowService
       question = prepare_questions_with_answer_values(question)
       question.another_or_feedback(question, all_var_values) unless question.is_a?(Hash)
 
-      user_session.finish if !question.is_a?(Hash) && question.type == 'Question::Finish'
+      if !question.is_a?(Hash) && question.type == 'Question::Finish'
+        assign_next_session_id(user_session.session.intervention)
+        user_session.finish
+      end
     end
 
-    { question: question, warning: warning, next_user_session_id: next_user_session_id }
+    { question: question, warning: warning, next_user_session_id: next_user_session_id, next_session_id: next_session_id }
   end
 
   private
+
+  def assign_next_session_id(intervention)
+    return unless intervention.module_intervention?
+
+    next_session = user_session.session.next_session
+
+    next_session = reassign_next_session_for_flexible_intervention(next_session, intervention) if intervention.type == 'Intervention::FlexibleOrder'
+
+    return if next_session.nil?
+    return if intervention.type == 'Intervention::FixedOrder' && !next_session.available_now?(prepare_participant_date_with_schedule_payload(next_session))
+
+    self.next_session_id = next_session.id
+  end
 
   def question_to_display(preview_question_id)
     return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
@@ -81,16 +98,24 @@ class V1::FlowService
       return nil
     end
 
+    return nil if branching_type.eql?('Session') && user_session.session.intervention.module_intervention?
+
     if preview? && question_or_session.type.eql?('Session::CatMh')
       self.warning = FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION
       return user_session.session.questions.last
     end
-
     return question_or_session if branching_type.include? 'Question'
 
-    session_available_now = question_or_session.available_now?(prepare_participant_date_with_schedule_payload(question_or_session))
+    perform_session_branching(question_or_session)
+  end
+
+  def perform_session_branching(session)
+    session_available_now = session.available_now?(prepare_participant_date_with_schedule_payload(session))
 
     user_session.finish(send_email: !session_available_now)
+
+    is_module_intervention = user_session.session.intervention.module_intervention?
+    return first_question_in_next_session(session) if session_available_now && !is_module_intervention
 
     if session_available_now
       next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id,
@@ -103,6 +128,16 @@ class V1::FlowService
     end
 
     user_session.session.finish_screen
+  end
+
+  def first_question_in_next_session(session)
+    next_user_session = UserSession.find_or_initialize_by(session_id: session.id, user_id: user.id, health_clinic_id: health_clinic_id,
+                                                          type: session.user_session_type, user_intervention: user_session.user_intervention)
+    next_user_session.save!
+    user_session.answers.last.update!(next_session_id: session.id)
+    self.next_user_session_id = next_user_session.id
+
+    next_user_session.first_question
   end
 
   def perform_narrator_reflections(question)
@@ -130,6 +165,16 @@ class V1::FlowService
       matched_reflections.push(reflection) if all_var_values.key?(reflection['variable']) && all_var_values[reflection['variable']].eql?(reflection['value'])
     end
     matched_reflections
+  end
+
+  def reassign_next_session_for_flexible_intervention(session, intervention)
+    return session unless session.nil? || UserSession.exists?(user_id: user.id, session_id: session.id)
+
+    intervention.sessions.each do |intervention_session|
+      return intervention_session unless UserSession.exists?(user_id: user.id, session_id: intervention_session.id)
+    end
+
+    nil
   end
 
   def prepare_questions_with_answer_values(question)

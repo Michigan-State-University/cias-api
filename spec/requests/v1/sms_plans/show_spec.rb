@@ -47,6 +47,24 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
         )
       )
     end
+
+    context 'when given sms plan is an alert' do
+      let!(:user) { create(:user, :confirmed, :admin) }
+      let!(:intervention) { create(:intervention, user: user) }
+      let!(:session) { create(:session, intervention: intervention) }
+      let!(:sms_plan) { create(:sms_alert, session: session, phones: [phone]) }
+      let!(:phone) { create(:phone, :confirmed) }
+      let!(:sms_plan_id) { sms_plan.id }
+
+      it 'returns sms alert plan with phone data' do
+        request
+        expect(json_response['included']).to include(
+          'id' => phone.id.to_s, # id is an integer, returned id is a string...
+          'type' => 'phone',
+          'attributes' => include('iso' => phone.iso, 'number' => phone.number, 'prefix' => phone.prefix)
+        )
+      end
+    end
   end
 
   context 'when there is no sms plan with given id' do

@@ -20,7 +20,8 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       session: {
         name: 'test1 params',
         days_after_date_variable_name: 'var1',
-        cat_tests: %w[mdd ss]
+        cat_tests: %w[mdd ss],
+        estimated_time: 10
       }
     }
   end
@@ -39,7 +40,8 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
           it 'updated values are proper' do
             expect(json_response['data']['attributes']).to include('name' => 'test1 params',
-                                                                   'days_after_date_variable_name' => 'var1')
+                                                                   'days_after_date_variable_name' => 'var1',
+                                                                   'estimated_time' => 10)
           end
         end
 

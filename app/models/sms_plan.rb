@@ -6,6 +6,8 @@ class SmsPlan < ApplicationRecord
   include Translate
   extend DefaultValues
 
+  has_many :alert_phones, dependent: :destroy
+  has_many :phones, through: :alert_phones
   belongs_to :session, counter_cache: true
   has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
 
@@ -13,8 +15,11 @@ class SmsPlan < ApplicationRecord
 
   validates :name, :schedule, :frequency, presence: true
 
+  scope :limit_to_types, ->(types) { where(type: types) if types.present? }
+
   ATTR_NAMES_TO_COPY = %w[
     name schedule schedule_payload frequency end_at formula no_formula_text is_used_formula
+    include_first_name include_last_name include_email include_phone_number type
   ].freeze
 
   enum schedule: {
@@ -38,5 +43,22 @@ class SmsPlan < ApplicationRecord
 
   def translate_variants(translator, src_language_name_short, dest_language_name_short)
     variants.each { |variant| variant.translate(translator, src_language_name_short, dest_language_name_short) }
+  end
+
+  def include_full_name?
+    include_first_name && include_last_name
+  end
+
+  def no_data_included?
+    !include_last_name && !include_first_name && !include_email && !include_phone_number
+  end
+
+  def alert?
+    type.eql? 'SmsPlan::Alert'
+  end
+
+  def self.detailed_search(params)
+    scope = all
+    scope.limit_to_types(params[:types])
   end
 end

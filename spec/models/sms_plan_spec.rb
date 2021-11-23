@@ -5,6 +5,8 @@ require 'rails_helper'
 RSpec.describe SmsPlan, type: :model do
   it { should belong_to(:session) }
   it { should have_many(:variants) }
+  it { should have_many(:alert_phones) }
+  it { should have_many(:phones) }
 
   context 'validations' do
     context 'when are params are valid' do

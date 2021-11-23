@@ -66,7 +66,10 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
 
   context 'UserSession::CatMh' do
     let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
-    let(:user_session) { UserSession.create(session: session, user: participant, type: 'UserSession::CatMh', last_answer_at: DateTime.current) }
+    let(:user_int) { create(:user_intervention, intervention: intervention, user: user) }
+    let(:user_session) do
+      UserSession.create(session: session, user: participant, type: 'UserSession::CatMh', last_answer_at: DateTime.current, user_intervention: user_int)
+    end
     let(:question_id) { '1' }
 
     it 'return correct status' do

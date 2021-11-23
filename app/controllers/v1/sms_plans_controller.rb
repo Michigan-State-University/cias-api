@@ -6,13 +6,15 @@ class V1::SmsPlansController < V1Controller
   def index
     authorize! :read, SmsPlan
 
-    render json: serialized_response(sms_plans_scope)
+    collection = sms_plans_scope.detailed_search(params)
+
+    render json: serialized_response(collection)
   end
 
   def show
     authorize! :read, sms_plan
 
-    render json: V1::SmsPlanSerializer.new(sms_plan, { include: [:variants] })
+    render json: V1::SmsPlanSerializer.new(sms_plan, { include: %i[variants phones] })
   end
 
   def create
@@ -65,7 +67,8 @@ class V1::SmsPlansController < V1Controller
   def sms_plan_params
     params.require(:sms_plan).permit(
       :name, :schedule, :schedule_payload, :frequency, :session_id, :end_at, :formula, :no_formula_text,
-      :is_used_formula
+      :is_used_formula, :type, :include_first_name, :include_last_name, :include_email,
+      :include_phone_number
     )
   end
 end

@@ -2,8 +2,13 @@
 
 class Phone < ApplicationRecord
   has_paper_trail skip: %i[number migrated_number]
-  belongs_to :user
-  validates :iso, :prefix, :number, presence: true
+  has_many :alert_phones, dependent: :destroy
+  has_many :sms_plans, through: :alert_phones
+  belongs_to :user, optional: true
+  validates :iso, :prefix, presence: true
+  # validate number only if its not an alert phone, because we need to allow blank values for updating when its an alert phone number
+  # we disable validation on create to enable edition of alert phone numbers
+  validates :number, presence: true, unless: :alert_phone_exists?, on: %i[save update]
   before_update :remove_confirmation, if: :number_changed?
 
   encrypts :number
@@ -24,7 +29,15 @@ class Phone < ApplicationRecord
     update(confirmed: true, confirmed_at: DateTime.current)
   end
 
+  def full_number
+    prefix + number
+  end
+
   private
+
+  def alert_phone_exists?
+    alert_phones.size&.positive?
+  end
 
   def remove_confirmation
     self.confirmed = false

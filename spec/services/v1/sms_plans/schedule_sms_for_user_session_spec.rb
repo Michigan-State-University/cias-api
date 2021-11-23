@@ -352,4 +352,107 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
       end
     end
   end
+
+  context 'sms alerts' do
+    let!(:user) { create(:user, :confirmed, :researcher, first_name: 'Randy', last_name: 'Rhoads', email: 'not.black.sabbath@gmail.com') }
+    let!(:phone) { create(:phone, :confirmed, user: user) }
+    let!(:intervention) { create(:intervention, :published) }
+    let!(:session) { create(:session, intervention: intervention) }
+    let!(:user_session) { create(:user_session, user: user, session: session) }
+    let!(:sms_plan) { create(:alert_with_personal_data, session: session) }
+    let!(:sms_phone_number) { AlertPhone.create!(sms_plan: sms_plan, phone: phone) }
+    let!(:content) { "#{user.first_name} #{user.last_name}\n#{user.email}\n#{phone.prefix}#{phone.number}\n#{sms_plan.no_formula_text}" }
+    let!(:number) { phone.prefix + phone.number }
+
+    shared_examples 'correct sms job queue' do
+      it do
+        subject
+        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(number, content, user.id, true)
+      end
+    end
+
+    context 'correctly applies personal data' do
+      context 'when all are selected' do
+        it_behaves_like 'correct sms job queue'
+      end
+
+      context 'when 3 are selected' do
+        let!(:sms_plan) { create(:sms_alert, session: session, include_email: true, include_first_name: true, include_last_name: true) }
+        let!(:content) { "#{user.first_name} #{user.last_name}\n#{user.email}\n#{sms_plan.no_formula_text}" }
+
+        it_behaves_like 'correct sms job queue'
+      end
+
+      context 'when 2 are selected' do
+        let!(:sms_plan) { create(:sms_alert, session: session, include_email: true, include_first_name: true) }
+        let!(:content) { "#{user.first_name}\n#{user.email}\n#{sms_plan.no_formula_text}" }
+
+        it_behaves_like 'correct sms job queue'
+      end
+
+      context 'when a single one is selected' do
+        let!(:sms_plan) { create(:sms_alert, session: session, include_email: true) }
+        let!(:content) { "#{user.email}\n#{sms_plan.no_formula_text}" }
+
+        it_behaves_like 'correct sms job queue'
+      end
+
+      context 'when no data is selected' do
+        let!(:sms_plan) { create(:sms_alert, session: session) }
+        let!(:content) { "No personal data provided\n#{sms_plan.no_formula_text}" }
+
+        it_behaves_like 'correct sms job queue'
+      end
+
+      context 'when data is included but missing from user' do
+        let!(:user) { create(:user, :confirmed, :researcher, first_name: 'Randy', last_name: 'Rhoads', email: 'not.black.sabbath@gmail.com') }
+        let!(:phone) { create(:phone, :confirmed, user: user) }
+        let!(:intervention) { create(:intervention, :published) }
+        let!(:session) { create(:session, intervention: intervention) }
+        let!(:sms_plan) { create(:alert_with_personal_data, session: session) }
+        let!(:sms_phone_number) { AlertPhone.create!(sms_plan: sms_plan, phone: phone) }
+
+        context 'when last name is missing' do
+          let!(:participant) { create(:user, :participant, :confirmed, first_name: 'Randall', last_name: nil, email: 'not.black.sabbath1@gmail.com') }
+          let!(:participant_phone) { create(:phone, :confirmed, user: participant) }
+          let!(:user_session) { create(:user_session, user: participant, session: session) }
+          let!(:content) do
+            "#{participant.first_name}\nLast name not provided\n#{participant.email}\n#{participant_phone.full_number}\n#{sms_plan.no_formula_text}"
+          end
+
+          it_behaves_like 'correct sms job queue'
+        end
+
+        context 'when first_name is missing' do
+          let!(:participant) { create(:user, :participant, :confirmed, first_name: nil, last_name: 'Pitt', email: 'not.black.sabbath1@gmail.com') }
+          let!(:participant_phone) { create(:phone, :confirmed, user: participant) }
+          let!(:user_session) { create(:user_session, user: participant, session: session) }
+          let!(:content) do
+            "First name not provided\n#{participant.last_name}\n#{participant.email}\n#{participant_phone.full_number}\n#{sms_plan.no_formula_text}"
+          end
+
+          it_behaves_like 'correct sms job queue'
+        end
+
+        context 'when both last and first name are missing' do
+          let!(:participant) { create(:user, :participant, :confirmed, last_name: nil, first_name: nil, email: 'not.black.sabbath1@gmail.com') }
+          let!(:participant_phone) { create(:phone, :confirmed, user: participant) }
+          let!(:user_session) { create(:user_session, user: participant, session: session) }
+          let!(:content) do
+            "First name not provided\nLast name not provided\n#{participant.email}\n#{participant_phone.full_number}\n#{sms_plan.no_formula_text}"
+          end
+
+          it_behaves_like 'correct sms job queue'
+        end
+
+        context 'when phone number is missing' do
+          let!(:participant) { create(:user, :participant, :confirmed, first_name: 'Randall', last_name: 'Pitt', email: 'not.black.sabbath1@gmail.com') }
+          let!(:user_session) { create(:user_session, user: participant, session: session) }
+          let!(:content) { "#{participant.full_name}\n#{participant.email}\nPhone number not provided\n#{sms_plan.no_formula_text}" }
+
+          it_behaves_like 'correct sms job queue'
+        end
+      end
+    end
+  end
 end

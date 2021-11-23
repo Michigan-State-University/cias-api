@@ -22,12 +22,14 @@ class Ability::TeamAdmin < Ability::Base
 
     can :manage, Intervention, user_id: team_members_ids
     can :manage, UserSession, session: { intervention: { user_id: team_members_ids } }
+    can :read, UserIntervention, intervention: { user_id: team_members_ids }
     can :manage, Session, intervention: { user_id: team_members_ids }
     can :create, Invitation
     can :read_cat_resources, User
     can %i[read update destroy], Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability).ids
     can %i[read update destroy], Invitation, invitable_type: 'Intervention',
                                              invitable_id: Intervention.accessible_by(ability).ids
+    can :manage, InterventionAccess, intervention: { user_id: user.id }
 
     enable_questions_access(team_members_ids)
     enable_report_template_access(team_members_ids)

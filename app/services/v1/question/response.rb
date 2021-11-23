@@ -16,6 +16,7 @@ class V1::Question::Response
       response = next_question[:question]
       response[:warning] = next_question[:warning] if next_question[:warning].present?
       response[:next_user_session_id] = next_question[:next_user_session_id]
+      response[:next_session_id] = next_question[:next_session_id] if next_question.key?(:next_session_id)
       response
     else
       response = serialized_hash(
@@ -23,7 +24,8 @@ class V1::Question::Response
         next_question[:question]&.de_constantize_modulize_name || NilClass
       )
       response = add_information(response, :warning, next_question) if next_question[:question].session.intervention.draft?
-      add_information(response, :next_user_session_id, next_question)
+      response = add_information(response, :next_user_session_id, next_question)
+      add_information(response, :next_session_id, next_question)
     end
   end
 

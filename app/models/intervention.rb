@@ -9,25 +9,29 @@ class Intervention < ApplicationRecord
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
   belongs_to :google_language
+  has_many :user_interventions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :sessions, dependent: :restrict_with_exception, inverse_of: :intervention
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
+  has_many :intervention_accesses, dependent: :destroy
 
   has_many_attached :reports
+  has_many_attached :files
   has_one_attached :logo, dependent: :purge_later
 
   has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
 
   attribute :shared_to, :string, default: 'anyone'
+  attribute :original_text, :json, default: { additional_text: '' }
 
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
   validate :cat_settings_validation, if: :published?
 
   scope :available_for_participant, lambda { |participant_email|
-    left_joins(:invitations).published.not_shared_to_invited
-      .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
+    left_joins(:intervention_accesses).published.not_shared_to_invited
+      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
   }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
   scope :indexing, ->(ids) { where(id: ids) }
@@ -62,13 +66,26 @@ class Intervention < ApplicationRecord
     save!
   end
 
+  def invite_by_email(emails, health_clinic_id = nil)
+    users_exists = ::User.where(email: emails)
+    (emails - users_exists.map(&:email)).each do |email|
+      User.invite!(email: email)
+    end
+
+    Invitation.transaction do
+      User.where(email: emails).find_each do |user|
+        invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
+      end
+    end
+
+    Interventions::InvitationJob.perform_later(id, emails, health_clinic_id)
+  end
+
   def give_user_access(emails)
     return if emails.empty?
 
-    Invitation.transaction do
-      emails.each do |email|
-        invitations.create!(email: email)
-      end
+    InterventionAccess.transaction do
+      emails.each { |email| InterventionAccess.create!(intervention_id: id, email: email) }
     end
   end
 
@@ -78,6 +95,13 @@ class Intervention < ApplicationRecord
 
   def translation_prefix(destination_language_name_short)
     update!(name: "(#{destination_language_name_short.upcase}) #{name}")
+  end
+
+  def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
+    original_text['additional_text'] = additional_text
+    new_additional_text = translator.translate(additional_text, source_language_name_short, destination_language_name_short)
+
+    update!(additional_text: new_additional_text)
   end
 
   def translate_sessions(translator, source_language_name_short, destination_language_name_short)
@@ -100,6 +124,14 @@ class Intervention < ApplicationRecord
     sessions.where(type: 'Session::CatMh').find_each do |session|
       errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_resources', session_id: session.id) unless session.contains_necessary_resources? # rubocop:disable Layout/LineLength
     end
+  end
+
+  def can_have_files?
+    false
+  end
+
+  def module_intervention?
+    false
   end
 
   def cat_settings_validation

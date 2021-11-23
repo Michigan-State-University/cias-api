@@ -5,7 +5,7 @@ class V1::InterventionsController < V1Controller
 
   def index
     collection = interventions_scope.detailed_search(params)
-    paginated_collection = V1::Intervention::Paginate.call(collection, start_index, end_index)
+    paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
     render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json
   end
@@ -44,8 +44,8 @@ class V1::InterventionsController < V1Controller
     if params[:id].present? && intervention_load.published?
       params.require(:intervention).permit(:status, :cat_mh_pool, :is_access_revoked)
     else
-      params.require(:intervention).permit(:name, :status, :shared_to, :organization_id, :google_language_id, :cat_mh_application_id, :cat_mh_organization_id,
-                                           :cat_mh_pool, :is_access_revoked, :license_type)
+      params.require(:intervention).permit(:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id, :cat_mh_application_id,
+                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type)
     end
   end
 

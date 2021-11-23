@@ -11,7 +11,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let!(:question_group) { create(:question_group, session: session) }
     let!(:question) { create(:question_single, question_group: question_group) }
     let(:audio_id) { nil }
-    let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id) }
+    let(:user_int) { create(:user_intervention, intervention: intervention, user: user) }
+    let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int) }
     let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
     let(:status) { 'draft' }
     let(:user) { participant }
@@ -398,6 +399,25 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
       end
 
+      context 'response when finishing a session in fixed order intervention' do
+        let(:session) { build(:session, position: 1) }
+        let(:target_session) { build(:session, position: 2) }
+        let!(:intervention) { create(:fixed_order_intervention, user: researcher, sessions: [session, target_session]) }
+        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
+        let!(:user_session) { create(:user_session, session: session, user_id: user.id, user_intervention: user_intervention) }
+
+        context 'returns next module id' do
+          it { expect(json_response['next_session_id']).to eq(target_session.id) }
+        end
+
+        context 'returns nil or empty string when finishing last module' do
+          let(:session) { build(:session, position: 1) }
+          let!(:intervention) { create(:fixed_order_intervention, user: researcher, sessions: [session]) }
+
+          it { expect(json_response['next_session_id']).to be_falsey }
+        end
+      end
+
       context 'response with question with calculated target_value' do
         let!(:question_with_reflection_formula) do
           question_single = build(:question_single, question_group: question_group, position: 2)
@@ -634,6 +654,32 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           it 'swaps name correctly' do
             expect(json_response['data']['attributes']['narrator']['blocks'].first['reflections'].first['text'].first).to eq('Michał')
           end
+        end
+      end
+
+      context 'modules intervention' do
+        let!(:intervention) { create(:fixed_order_intervention, user_id: researcher.id, status: status) }
+        let!(:session) { create(:session, intervention_id: intervention.id) }
+        let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int) }
+        let!(:next_session) { create(:session, intervention_id: intervention.id) }
+        let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+        let!(:question) do
+          question = questions.first
+          question.formula = { 'payload' => 'test',
+                               'patterns' => [
+                                 {
+                                   'match' => '=1',
+                                   'target' => [
+                                     { 'id' => next_session.id, 'probability' => '100', 'type' => 'Session' }
+                                   ]
+                                 }
+                               ] }
+          question.save
+          question
+        end
+
+        it 'returns next question' do
+          expect(json_response['data']['id']).to eq questions[1].id
         end
       end
     end
@@ -910,7 +956,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let(:researcher) { create(:user, :confirmed, :researcher) }
     let!(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
     let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
-    let!(:user_session) { UserSession.create(session: session, user: participant, type: 'UserSession::CatMh') }
+    let(:user_int) { create(:user_intervention, intervention: intervention, user: user) }
+    let!(:user_session) { UserSession.create(session: session, user: participant, type: 'UserSession::CatMh', user_intervention: user_int) }
     let(:participant) { create(:user, :confirmed, :participant) }
     let(:user) { participant }
     let(:status) { 'draft' }

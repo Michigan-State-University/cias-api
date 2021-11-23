@@ -140,6 +140,7 @@ Metrics/ClassLength:
   Exclude:
     - 'app/models/session.rb'
     - 'app/models/user.rb'
+    - 'app/services/v1/flow_service.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

@@ -12,9 +12,13 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   let(:intervention_user) { admin }
   let(:shared_to) { :anyone }
   let(:status) { :draft }
-  let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, cat_mh_pool: 10) }
-  let(:session) { create(:session, intervention: intervention) }
   let(:invitations) { [] }
+  let(:intervention) do
+    create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, intervention_accesses: accesses,
+                          cat_mh_pool: 10)
+  end
+  let(:session) { create(:session, intervention: intervention) }
+  let(:accesses) { [] }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
@@ -119,7 +123,8 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
     end
 
     context 'exists' do
-      let!(:user_session) { create(:user_session, user: user, session: session) }
+      let!(:user_int) { create(:user_intervention, intervention: intervention, user: user, status: 'in_progress') }
+      let!(:user_session) { create(:user_session, user: user, session: session, user_intervention: user_int) }
 
       it 'returns correct status' do
         request
@@ -212,7 +217,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
         end
 
         context 'participant was invited' do
-          let(:invitations) { [build(:intervention_invitation, email: participant.email)] }
+          let(:accesses) { [build(:intervention_access, email: participant.email)] }
 
           it 'returns correct http status' do
             expect(response).to have_http_status(:ok)

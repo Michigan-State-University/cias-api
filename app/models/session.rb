@@ -71,9 +71,20 @@ class Session < ApplicationRecord
       User.invite!(email: email)
     end
 
-    Invitation.transaction do
+    ActiveRecord::Base.transaction do
       User.where(email: emails).find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
+
+        user_intervention = UserIntervention.find_or_create_by(user_id: user.id, intervention_id: intervention.id, health_clinic_id: health_clinic_id)
+        user_session = UserSession.find_or_create_by(
+          session_id: id,
+          user_id: user.id,
+          health_clinic_id: health_clinic_id,
+          type: user_session_type,
+          user_intervention_id: user_intervention.id,
+          scheduled_at: DateTime.now
+        )
+        user_intervention.update!(status: 'in_progress') if user_session.finished_at.blank?
       end
     end
 
@@ -86,10 +97,10 @@ class Session < ApplicationRecord
     SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
   end
 
-  def available_now?(participant_date = nil)
+  def available_now?(participant_date_with_payload = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
-    return true if schedule == 'days_after_date' && participant_date&.noon&.past?
+    return true if schedule == 'days_after_date' && participant_date_with_payload&.noon&.past?
 
     false
   end

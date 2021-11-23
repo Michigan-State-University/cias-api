@@ -20,9 +20,11 @@ class Ability::Researcher < Ability::Base
     can :create, :preview_session_user
     can :manage, Intervention, user_id: user.id
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
+    can :read, UserIntervention, intervention: { user_id: user.id }
     can :manage, Session, intervention: { user_id: user.id }
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability)
     can :manage, Invitation, invitable_type: 'Intervention', invitable_id: Intervention.accessible_by(ability)
+    can :manage, InterventionAccess, intervention: { user_id: user.id }
 
     enable_questions_access(user.id)
     enable_report_template_access(user.id)
