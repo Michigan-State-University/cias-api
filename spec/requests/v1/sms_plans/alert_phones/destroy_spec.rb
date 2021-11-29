@@ -9,7 +9,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :requ
   let(:headers) { user.create_new_auth_token }
 
   let(:request) do
-    delete v1_sms_plan_phone_path(sms_plan_id: sms_alert.id, id: sms_alert.alert_phones.first.id), headers: headers
+    delete v1_sms_plan_phone_path(sms_plan_id: sms_alert.id, id: sms_alert.alert_phones.first.phone.id), headers: headers
   end
 
   context 'correctly deletes the alert phone associated record' do
@@ -21,11 +21,6 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :requ
 
     it 'deletes alert phone record' do
       expect(AlertPhone.count).to be 0
-    end
-
-    it 'does not delete actual phone and sms plan records' do
-      expect(SmsPlan::Alert.count).to be 1
-      expect(Phone.count).to be 1
     end
   end
 end

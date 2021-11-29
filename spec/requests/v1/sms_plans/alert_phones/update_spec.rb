@@ -4,9 +4,8 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :reque
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention, user: user) }
   let(:session) { create(:session, intervention: intervention) }
-  let(:sms_alert) { create(:sms_plan, type: 'SmsPlan::Alert', session: session) }
-  let(:phone) { create(:phone, :confirmed) }
-  let(:alert_phone) { AlertPhone.create!(phone: phone, sms_plan: sms_alert) }
+  let!(:sms_alert) { create(:sms_plan, type: 'SmsPlan::Alert', session: session) }
+  let!(:phone) { create(:phone, :confirmed, sms_plans: [sms_alert]) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
@@ -19,7 +18,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :reque
   end
 
   let(:request) do
-    patch v1_sms_plan_phone_path(sms_plan_id: sms_alert.id, id: alert_phone.id), headers: headers, params: params
+    patch v1_sms_plan_phone_path(sms_plan_id: sms_alert.id, id: phone.id), headers: headers, params: params
   end
 
   context 'correctly updates alert phone data' do

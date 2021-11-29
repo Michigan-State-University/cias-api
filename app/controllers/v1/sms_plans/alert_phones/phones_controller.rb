@@ -10,7 +10,7 @@ class V1::SmsPlans::AlertPhones::PhonesController < V1Controller
   end
 
   def destroy
-    alert_phone_load.destroy!
+    phone_load.destroy!
     head :no_content
   end
 
@@ -42,11 +42,7 @@ class V1::SmsPlans::AlertPhones::PhonesController < V1Controller
     SmsPlan::Alert.accessible_by(current_ability).find(sms_alert_id)
   end
 
-  def alert_phone_load
-    alert_load.alert_phones.find(alert_phone_id)
-  end
-
   def phone_load
-    alert_phone_load.phone
+    alert_load.alert_phones.find_by(phone_id: alert_phone_id).phone
   end
 end
