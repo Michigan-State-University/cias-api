@@ -64,4 +64,18 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/files', type: :request d
       it_behaves_like 'unpermitted user'
     end
   end
+
+  context 'file is too big' do
+    let(:user) { create(:user, :confirmed, :admin) }
+    let(:headers) { user.create_new_auth_token }
+    let(:intervention) { create(:flexible_order_intervention, user: user) }
+    let(:sample_file) do
+      FactoryHelpers.upload_file('spec/factories/text/big_file.txt', 'text/plain', false)
+    end
+
+    it 'returns correct HTTP status code (Payload Too Large)' do
+      request
+      expect(response).to have_http_status(:payload_too_large)
+    end
+  end
 end

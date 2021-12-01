@@ -137,7 +137,7 @@ class Intervention < ApplicationRecord
   def cat_settings_validation
     return if !intervention_have_cat_mh_sessions? || (cat_mh_application_id.present? && cat_mh_organization_id.present?)
 
-    errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting') if license_type_limited? && (cat_mh_pool.blank? || cat_mh_pool.negative?)  # rubocop:disable Layout/LineLength
+    errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting') if license_type_limited? && (cat_mh_pool.blank? || cat_mh_pool.negative?) # rubocop:disable Layout/LineLength
   end
 
   def intervention_have_cat_mh_sessions?
