@@ -101,24 +101,6 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
           request
           expect(intervention.reload.created_cat_mh_session_count).to be(1)
         end
-
-        context 'when intervention did\'t have permission' do
-          let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, cat_mh_pool: 0) }
-
-          it 'return forbidden status' do
-            request
-            expect(response).to have_http_status(:forbidden)
-          end
-        end
-
-        context 'when intervention has not set cat_mh_pool' do
-          let(:intervention) { create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations) }
-
-          it 'return forbidden status' do
-            request
-            expect(response).to have_http_status(:forbidden)
-          end
-        end
       end
     end
 

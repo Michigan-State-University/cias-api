@@ -4,8 +4,6 @@ class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
-    return head :forbidden unless can_create_another_user_session?
-
     user_intervention = UserIntervention.find_or_create_by(
       user_id: user_id,
       intervention_id: intervention_id,
@@ -26,14 +24,6 @@ class V1::UserSessionsController < V1Controller
   end
 
   private
-
-  def can_create_another_user_session?
-    intervention = session_load.intervention
-
-    return false if cat_sessions_in_intervention.any? && intervention.license_type_limited? && (intervention.cat_mh_pool.blank? || intervention.cat_mh_pool <= intervention.created_cat_mh_session_count) # rubocop:disable Layout/LineLength
-
-    true
-  end
 
   def current_v1_user_or_guest_user
     @current_v1_user_or_guest_user ||= current_v1_user || create_guest_user
