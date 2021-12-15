@@ -195,6 +195,17 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
     end
   end
 
+  context 'user is researcher' do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+    let(:user) { create(:user, :confirmed, :admin) }
+    let(:params) { { email: researcher.email } }
+
+    it 'changes researcher role to e-intervention admin' do
+      request
+      expect(researcher.reload.roles).to include 'e_intervention_admin'
+    end
+  end
+
   context 'when params are invalid' do
     let!(:user) { create(:user, :confirmed, :admin) }
 
