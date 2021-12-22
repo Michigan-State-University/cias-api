@@ -44,7 +44,7 @@ class UserSession::CatMh < UserSession
     cat_mh_application_id = intervention.cat_mh_application_id
     result = cat_mp_service.create_interview(tests, language, timeframe_id, cat_mh_application_id, cat_mh_organization_id, user.id.delete('-'))
 
-    intervention.increment!(:created_cat_mh_session_count) # rubocop:disable Rails/SkipsModelValidations
+    intervention.update!(created_cat_mh_session_count: (intervention.created_cat_mh_session_count + 1))
 
     assign_basic_information(result)
     result = cat_mp_service.authentication(self)
