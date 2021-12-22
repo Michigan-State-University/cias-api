@@ -37,7 +37,7 @@ class V1::Organizations::InviteEInterventionAdmin
   end
 
   def set_researcher_as_e_intervention_admin
-    user.roles = ['e_intervention_admin'] if user.roles.include?('researcher')
+    user.update!(roles: ['e_intervention_admin']) if user.roles.include?('researcher')
   end
 
   def user
