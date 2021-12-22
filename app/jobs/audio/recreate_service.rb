@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-class V1::Audio::RecreateService
-  def self.call
-    new.call
-  end
+class Audio::RecreateService < ApplicationJob
+  queue_as :default
 
-  def call
+  def perform
     UserSession.where.not(name_audio: [nil]).update_all(name_audio_id: nil)
     Audio.delete_all
 

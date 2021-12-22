@@ -13,7 +13,7 @@ class V1::AudioController < V1Controller
   def recreate
     authorize! :recreate_audio, Audio
 
-    V1::Audio::RecreateService.call
+    Audio::RecreateService.perform_later
 
     render status: :ok
   end
