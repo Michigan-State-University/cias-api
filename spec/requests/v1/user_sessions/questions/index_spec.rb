@@ -6,7 +6,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
   context 'UserSession::Classic' do
     let(:participant) { create(:user, :confirmed, :participant) }
     let(:researcher) { create(:user, :confirmed, :researcher) }
-    let!(:intervention) { create(:intervention, user_id: researcher.id, status: status) }
+    let!(:intervention) { create(:intervention, user_id: researcher.id, status: status, license_type: 'unlimited') }
     let!(:session) { create(:session, intervention_id: intervention.id) }
     let!(:question_group) { create(:question_group, session: session) }
     let!(:question) { create(:question_single, question_group: question_group) }
@@ -152,8 +152,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
 
         context 'formula branching to CatMh::Session' do
-          let!(:cat_session) { create(:cat_mh_session, :with_cat_mh_info, intervention_id: intervention.id) }
-          let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+          let!(:cat_session) { create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, intervention_id: intervention.id) }
+          let!(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
             question.formula = { 'payload' => 'test',

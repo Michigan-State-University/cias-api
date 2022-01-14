@@ -23,6 +23,7 @@ gem 'faker', require: false
 gem 'jsonapi-serializer'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
+gem 'google-protobuf', '>= 3.19.2'
 gem 'metainspector', '~> 1.15'
 gem 'nokogiri', '>= 1.12.5'
 gem 'oj'

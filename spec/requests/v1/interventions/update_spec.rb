@@ -143,7 +143,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   end
 
   context 'when intervention is incorrect' do
-    let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft') }
+    let!(:intervention) { create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft', license_type: 'limited') }
     let!(:session) { create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, intervention: intervention) }
 
     before { request }
