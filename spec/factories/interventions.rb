@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :intervention do
     user
     name { 'Intervention' }
+    license_type { 'unlimited' }
     trait :published do
       status { 'published' }
     end

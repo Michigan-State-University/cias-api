@@ -202,7 +202,6 @@ class Fake
       end
     end
 
-    # rubocop:disable Lint/DuplicateBranch
     def body_data_by_type(type)
       case type
       in 'Slider'
@@ -324,7 +323,6 @@ class Fake
         body_data_base
       end
     end
-    # rubocop:enable Lint/DuplicateBranch
 
     def body_data_base
       {
