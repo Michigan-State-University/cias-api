@@ -8,10 +8,4 @@ class Question::TlfbConfig < Question::Tlfb
     },
     'blocks' => []
   }
-
-  protected
-
-  def tlfb_body_validation
-    errors[:base].add(I18n.t('activerecord.errors.models.question.tlfb.config.narrator_enabled')) if narrator['settings']['voice'] || narrator['settings']['animation'] # rubocop:disable Layout/LineLength
-  end
 end
