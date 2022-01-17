@@ -34,10 +34,6 @@ en:
               already_exists: already exists
         question_group:
           question: '%{question_type} can appear only once per session'
-        question:
-          tlfb:
-            config:
-              narrator_enabled: Narrator is not supported for TLFB Config question.
         organization_invitation:
           attributes:
             user_id:
