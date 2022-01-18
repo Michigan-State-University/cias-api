@@ -107,7 +107,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_params
-    params.require(:question_group).permit(:title, :session_id)
+    params.require(:question_group).permit(:title, :session_id, :type)
   end
 
   def question_group_id

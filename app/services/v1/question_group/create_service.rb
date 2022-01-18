@@ -16,8 +16,8 @@ class V1::QuestionGroup::CreateService
   end
 
   def call
-    qg_plain = QuestionGroup::Plain.new(session_id: session.id, **question_group_params)
-    qg_plain.position = session.question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
+    qg_plain = QuestionGroup.new(session_id: session.id, **question_group_params)
+    qg_plain.position = session.question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
     qg_plain.save!
 
     questions.update_all(question_group_id: qg_plain.id) # rubocop:disable Rails/SkipsModelValidations
