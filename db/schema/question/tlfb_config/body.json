@@ -4,9 +4,22 @@
   "properties": {
     "data": {
       "type": "array",
-      "minItems": 0,
-      "maxItems": 0,
-      "items": {}
+      "minItems": 1,
+      "maxItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "required": [
