@@ -11,7 +11,16 @@
           "type": "object",
           "properties": {
             "payload": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "days_count": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "days_count"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
