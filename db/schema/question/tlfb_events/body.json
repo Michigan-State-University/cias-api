@@ -10,16 +10,24 @@
         {
           "type": "object",
           "properties": {
-            "screen_title ": {
-              "type": "string"
-            },
-            "screen_question ": {
-              "type": "string"
+            "payload": {
+              "properties": {
+                "screen_title ": {
+                  "type": "string"
+                },
+                "screen_question ": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "screen_title",
+                "screen_question"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
-            "screen_title",
-            "screen_question"
+            "payload"
           ],
           "additionalProperties": false
         }
