@@ -11,11 +11,12 @@
           "type": "object",
           "properties": {
             "payload": {
+              "type": "object",
               "properties": {
-                "screen_title ": {
+                "screen_title": {
                   "type": "string"
                 },
-                "screen_question ": {
+                "screen_question": {
                   "type": "string"
                 }
               },
