@@ -4,9 +4,31 @@
   "properties": {
     "data": {
       "type": "array",
-      "minItems": 0,
-      "maxItems": 0,
-      "items": {}
+      "minItems": 1,
+      "maxItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "object",
+              "properties": {
+                "days_count": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "days_count"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "required": [
