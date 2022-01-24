@@ -29,8 +29,7 @@ class V1::FlowService
     else
       question = question_to_display(preview_question_id)
       question = perform_narrator_reflections(question)
-      question = prepare_questions_with_answer_values(question)
-      question.another_or_feedback(question, all_var_values) unless question.is_a?(Hash)
+      question = question.prepare_to_display(all_var_values) unless question.is_a?(Hash)
 
       if !question.is_a?(Hash) && question.type == 'Question::Finish'
         assign_next_session_id(user_session.session.intervention)
@@ -57,11 +56,11 @@ class V1::FlowService
   end
 
   def question_to_display(preview_question_id)
-    return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
+    return user_session.session.questions.find(preview_question_id).prepare_to_display if preview_question_id.present? && user_session.session.draft?
 
     last_answered_question = user_session.last_answer&.question
 
-    return user_session.first_question if last_answered_question.nil?
+    return user_session.first_question.prepare_to_display if last_answered_question.nil?
 
     perform_branching_to_next_question(last_answered_question)
   end
@@ -79,7 +78,9 @@ class V1::FlowService
       next_question = branching_question unless branching_question.nil?
     end
 
-    next_question
+    return next_question if next_question.is_a?(Hash)
+
+    next_question.prepare_to_display(all_var_values)
   end
 
   def branching_source_to_question(source)
@@ -175,12 +176,6 @@ class V1::FlowService
     end
 
     nil
-  end
-
-  def prepare_questions_with_answer_values(question)
-    return question if question.is_a?(Hash)
-
-    question.another_or_feedback(question, all_var_values)
   end
 
   def prepare_participant_date_with_schedule_payload(next_session)

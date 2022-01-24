@@ -21,6 +21,18 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
     end
 
+    context 'tlfb logic' do
+      let!(:tlfb_question_group) { create(:tlfb_group, session: session) }
+
+      before do
+        get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+      end
+
+      it 'skip tlfbConfig and return tlfbEvent' do
+        expect(json_response['data']['attributes']['type']).to eq('Question::TlfbEvents')
+      end
+    end
+
     context 'branching logic' do
       context 'returns finish screen if only question' do
         it { expect(json_response['data']['attributes']['type']).to eq 'Question::Finish' }

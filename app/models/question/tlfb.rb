@@ -11,4 +11,13 @@ class Question::Tlfb < Question
       }
     )
   end
+
+  def prepare_to_display(_answers_var_values = nil)
+    apply_config(question_group.questions.first.body)
+    self
+  end
+
+  def apply_config(body)
+    body[:config] = body
+  end
 end

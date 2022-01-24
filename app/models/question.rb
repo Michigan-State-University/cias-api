@@ -82,11 +82,8 @@ class Question < ApplicationRecord
     self
   end
 
-  def another_or_feedback(next_obj, answers_var_values)
-    return next_obj unless next_obj.is_a?(::Question::Feedback)
-
-    next_obj.apply_formula(answers_var_values)
-    next_obj
+  def prepare_to_display(_answers_var_values = nil)
+    self
   end
 
   def variable_clone_prefix(_taken_variables) end

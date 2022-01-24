@@ -662,4 +662,28 @@ FactoryBot.define do
       body { { data: [] } }
     end
   end
+
+  factory :question_tlfb_config, class: Question::TlfbConfig do
+    title { 'Third party' }
+    type { Question::TlfbConfig }
+    body { { data: [] } }
+    sequence(:position) { |s| s }
+    association :question_group
+  end
+
+  factory :question_tlfb_event, class: Question::TlfbEvents do
+    title { 'Third party' }
+    type { Question::TlfbEvents }
+    body { { data: [] } }
+    sequence(:position) { |s| s }
+    association :question_group
+  end
+
+  factory :question_tlfb_question, class: Question::TlfbQuestion do
+    title { 'Third party' }
+    type { Question::TlfbQuestion }
+    body { { data: [] } }
+    sequence(:position) { |s| s }
+    association :question_group
+  end
 end
