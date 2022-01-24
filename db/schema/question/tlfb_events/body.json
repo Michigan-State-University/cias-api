@@ -4,9 +4,35 @@
   "properties": {
     "data": {
       "type": "array",
-      "minItems": 0,
-      "maxItems": 0,
-      "items": {}
+      "minItems": 1,
+      "maxItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "object",
+              "properties": {
+                "screen_title": {
+                  "type": "string"
+                },
+                "screen_question": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "screen_title",
+                "screen_question"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "required": [
