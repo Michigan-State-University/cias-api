@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_22_092720) do
+ActiveRecord::Schema.define(version: 2022_01_20_092500) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -186,6 +186,16 @@ ActiveRecord::Schema.define(version: 2021_12_22_092720) do
     t.integer "position", default: 1, null: false
     t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
+  end
+
+  create_table "days", force: :cascade do |t|
+    t.date "exact_date", null: false
+    t.uuid "user_session_id", null: false
+    t.uuid "question_group_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_group_id"], name: "index_days_on_question_group_id"
+    t.index ["user_session_id"], name: "index_days_on_user_session_id"
   end
 
   create_table "e_intervention_admin_organizations", force: :cascade do |t|
@@ -727,6 +737,8 @@ ActiveRecord::Schema.define(version: 2021_12_22_092720) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "days", "question_groups"
+  add_foreign_key "days", "user_sessions"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
