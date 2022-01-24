@@ -664,23 +664,43 @@ FactoryBot.define do
   end
 
   factory :question_tlfb_config, class: Question::TlfbConfig do
-    title { 'Third party' }
+    title { 'TlfbConfig' }
     type { Question::TlfbConfig }
-    body { { data: [] } }
+    body do
+      {
+        data: [
+          {
+            payload: { days_count: '0' }
+          }
+        ]
+      }
+    end
     sequence(:position) { |s| s }
     association :question_group
   end
 
   factory :question_tlfb_event, class: Question::TlfbEvents do
-    title { 'Third party' }
+    title { 'TlfbEvents' }
     type { Question::TlfbEvents }
-    body { { data: [] } }
+    body do
+      {
+        data: [
+          {
+            payload:
+              {
+                screen_title: '',
+                screen_question: ''
+              }
+          }
+        ]
+      }
+    end
     sequence(:position) { |s| s }
     association :question_group
   end
 
   factory :question_tlfb_question, class: Question::TlfbQuestion do
-    title { 'Third party' }
+    title { 'TlfbQuestion' }
     type { Question::TlfbQuestion }
     body { { data: [] } }
     sequence(:position) { |s| s }
