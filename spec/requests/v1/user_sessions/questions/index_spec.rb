@@ -18,10 +18,14 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let(:user) { participant }
 
     context 'tlfb logic' do
-      let!(:tlfb_question_group) { create(:tlfb_group, session: session) }
+      let!(:tlfb_session) { create(:session, intervention_id: intervention.id) }
+      let!(:tlfb_question_group) { create(:tlfb_group, session: tlfb_session) }
+      let!(:tlfb_user_session) do
+        create(:user_session, user_id: participant.id, session_id: tlfb_session.id, name_audio_id: audio_id, user_intervention: user_int)
+      end
 
       before do
-        get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+        get v1_user_session_questions_url(tlfb_user_session.id), headers: user.create_new_auth_token
       end
 
       it 'skip tlfbConfig and return tlfbEvent' do

@@ -17,7 +17,7 @@ class Question::Tlfb < Question
     self
   end
 
-  def apply_config(body)
-    body[:config] = body
+  def apply_config(config_body)
+    body['config'] = config_body
   end
 end
