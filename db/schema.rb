@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_01_20_092500) do
+ActiveRecord::Schema.define(version: 2022_01_20_101308) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -205,6 +205,14 @@ ActiveRecord::Schema.define(version: 2022_01_20_092500) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["organization_id"], name: "index_e_intervention_admin_organizations_on_organization_id"
     t.index ["user_id"], name: "index_e_intervention_admin_organizations_on_user_id"
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.string "name", default: ""
+    t.bigint "day_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["day_id"], name: "index_events_on_day_id"
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -739,6 +747,7 @@ ActiveRecord::Schema.define(version: 2022_01_20_092500) do
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
   add_foreign_key "days", "question_groups"
   add_foreign_key "days", "user_sessions"
+  add_foreign_key "events", "days"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
