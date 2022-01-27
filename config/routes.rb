@@ -122,6 +122,10 @@ Rails.application.routes.draw do
       resources :answers, only: %i[index show create], module: 'user_sessions'
     end
 
+    namespace :tlfb do
+      resources :events, only: %i[destroy create update]
+    end
+
     resources :teams, only: %i[index show create update destroy] do
       delete :remove_researcher
       scope module: 'teams' do
