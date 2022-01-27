@@ -23,6 +23,7 @@ gem 'faker', require: false
 gem 'fast_jsonapi'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
+gem 'google-protobuf', '>= 3.19.2'
 gem 'metainspector', '~> 1.15'
 gem 'nokogiri', '>= 1.12.5'
 gem 'oj'
@@ -37,6 +38,7 @@ gem 'wicked_pdf'
 gem 'rack-attack'
 gem 'secure_headers'
 gem 'airbrake'
+gem 'google-protobuf', '>= 3.19.2'
 # for encrypt data
 gem 'lockbox'
 # for search on encrypted data
