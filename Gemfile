@@ -77,7 +77,6 @@ group :development do
   gem 'letter_opener_web'
   gem 'license_finder'
   gem 'pgsync'
-  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
@@ -93,5 +92,9 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
-  gem 'wkhtmltopdf-heroku'
+end
+
+group :development, :production do
+  # only version that is working on AWS
+  gem 'wkhtmltopdf-binary', '~> 0.12.5.4'
 end
