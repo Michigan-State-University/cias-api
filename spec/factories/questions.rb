@@ -702,7 +702,20 @@ FactoryBot.define do
   factory :question_tlfb_question, class: Question::TlfbQuestion do
     title { 'TlfbQuestion' }
     type { Question::TlfbQuestion }
-    body { { data: [] } }
+    body do
+      {
+        data: [
+          {
+            payload:
+              {
+                question_title: '',
+                head_question: '',
+                substance_question: ''
+              }
+          }
+        ]
+      }
+    end
     sequence(:position) { |s| s }
     association :question_group
   end

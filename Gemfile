@@ -82,7 +82,6 @@ end
 group :test do
   gem 'factory_bot_rails'
   gem 'rspec-rails'
-  gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'test-prof'

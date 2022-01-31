@@ -4,9 +4,39 @@
   "properties": {
     "data": {
       "type": "array",
-      "minItems": 0,
-      "maxItems": 0,
-      "items": {}
+      "minItems": 1,
+      "maxItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "object",
+              "properties": {
+                "question_title": {
+                  "type": "string"
+                },
+                "head_question": {
+                  "type": "string"
+                },
+                "substance_question": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "question_title",
+                "head_question",
+                "substance_question"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
     }
   },
   "required": [
