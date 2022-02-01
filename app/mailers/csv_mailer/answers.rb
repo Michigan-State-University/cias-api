@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class CsvMailer::Answers < CsvMailer
-  def csv_answers(user, intervention, csv_content, requested_at)
+  def csv_answers(user, intervention, requested_at)
     @user = user
     @intervention = intervention
     @requested_at = requested_at
-    attachments['answers.csv'] = { mime_type: 'text/csv', content: csv_content }
     mail(to: @user.email, subject: I18n.t('csv_mailer.answers.subject', intervention_name: @intervention.name))
   end
 
