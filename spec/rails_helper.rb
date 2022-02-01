@@ -99,10 +99,6 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
-RSpec::Sidekiq.configure do |config|
-  config.warn_when_jobs_not_processed_by_sidekiq = false
-end
-
 RSpec::Matchers.define_negated_matcher :avoid_changing, :change
 RSpec::Matchers.define_negated_matcher :not_include, :include
 RSpec::Matchers.define :be_removed do
