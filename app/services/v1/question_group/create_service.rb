@@ -16,6 +16,8 @@ class V1::QuestionGroup::CreateService
   end
 
   def call
+    raise ActiveRecord::ActiveRecordError if questions.where("type like ?", "%Tlfb%").any?
+
     qg_plain = QuestionGroup.new(session_id: session.id, **question_group_params)
     qg_plain.position = session.question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
     qg_plain.save!

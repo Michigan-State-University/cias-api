@@ -143,4 +143,9 @@ class Intervention < ApplicationRecord
   def intervention_have_cat_mh_sessions?
     sessions.where(type: 'Session::CatMh').any?
   end
+
+  def ability_to_clone?
+    true
+  end
+
 end

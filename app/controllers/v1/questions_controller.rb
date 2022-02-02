@@ -18,7 +18,7 @@ class V1::QuestionsController < V1Controller
   def create
     authorize! :create, Question
 
-    question = V1::Question::Create.call(questions_scope, question_params)
+    question = V1::Question::Create.call(question_group_load, question_params)
 
     render json: serialized_response(question), status: :created
   end
@@ -52,6 +52,7 @@ class V1::QuestionsController < V1Controller
 
   def share
     authorize! :create, Question
+    require 'pry'; binding.pry
 
     V1::Question::ShareService.call(current_v1_user, question_ids, chosen_questions, researcher_ids)
 

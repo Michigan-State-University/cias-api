@@ -11,13 +11,15 @@ class V1::Question::ShareService
     @researchers = chosen_researchers(prepare_researchers(user), researcher_ids)
     @question_ids = question_ids
     @researcher_ids = researcher_ids
+    @tlfb_type = questions.where('type like ?', '%Tlfb%').any?
   end
 
-  attr_accessor :questions, :researchers
+  attr_accessor :questions, :researchers, :tlfb_type
   attr_reader :question_ids, :researcher_ids, :user
 
   def call
-    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids) && proper_researchers?(researchers, researcher_ids) # here
+    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids) && proper_researchers?(researchers, researcher_ids)
+    raise ActiveRecord::ActiveRecordError if inconsistent_question_group?
 
     researchers.each do |researcher|
       question_group = prepare_question_group(researcher, questions.first.question_group)
@@ -41,6 +43,19 @@ class V1::Question::ShareService
 
   private
 
+  def inconsistent_question_group?
+    question_groups_contains_tlfb_and_others_questions? || inconsistent_tlfb_group?
+  end
+
+  def question_groups_contains_tlfb_and_others_questions?
+    questions.where('type not like ?', '%Tlfb%').any? && questions.where('type like ?', '%Tlfb%').any?
+  end
+
+  def inconsistent_tlfb_group?
+    tlfb_questions = questions.where('type like ?', '%Tlfb%')
+    tlfb_questions.any? && ( tlfb_questions.count != 3 || tlfb_questions.pluck(:question_group_id).uniq.count != 1)
+  end
+
   def prepare_question_group(researcher, question_group)
     intervention = question_group_intervention(question_group)
     create_new_question_group(researcher, intervention)
@@ -63,6 +78,7 @@ class V1::Question::ShareService
       )
       QuestionGroup.create!(
         title: 'Copied Slides',
+        type: tlfb_type ? 'QuestionGroup::Tlfb' : 'QuestionGroup::Plain',
         session: new_session
       )
     end

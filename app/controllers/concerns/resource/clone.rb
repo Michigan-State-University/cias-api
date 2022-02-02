@@ -5,8 +5,14 @@ module Resource::Clone
   included do
     def clone
       authorize! :update, model_constant
-      cloned_resource = model_constant.
-        find(params[:id]).
+
+      # head :forbidden if
+      require 'pry'; binding.pry
+      resource = model_constant.find(params[:id])
+
+      return head :forbidden unless resource.ability_to_clone?
+
+      cloned_resource = resource.
         clone(params: clone_params)
       render json: serialized_response(cloned_resource), status: :created
     end

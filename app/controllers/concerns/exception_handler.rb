@@ -45,6 +45,10 @@ module ExceptionHandler
       notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
+
+    rescue_from ActiveRecord::ActiveRecordError do |exc|
+      render json: msg(exc), status: :forbidden
+    end
   end
 
   private

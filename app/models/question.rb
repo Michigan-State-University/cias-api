@@ -82,6 +82,10 @@ class Question < ApplicationRecord
     self
   end
 
+  def ability_to_clone?
+    true
+  end
+
   def prepare_to_display(_answers_var_values = nil)
     self
   end
