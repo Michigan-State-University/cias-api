@@ -56,6 +56,8 @@ class Question < ApplicationRecord
   after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
 
+  scope :tlfb, -> { where('type like ?', '%Tlfb%') }
+  scope :without_tlfb, -> { where('type not like ?', '%Tlfb%') }
   default_scope { order(:position) }
 
   def subclass_name

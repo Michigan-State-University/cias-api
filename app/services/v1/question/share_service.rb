@@ -11,7 +11,7 @@ class V1::Question::ShareService
     @researchers = chosen_researchers(prepare_researchers(user), researcher_ids)
     @question_ids = question_ids
     @researcher_ids = researcher_ids
-    @tlfb_type = questions.where('type like ?', '%Tlfb%').any?
+    @tlfb_type = questions.tlfb.any?
   end
 
   attr_accessor :questions, :researchers, :tlfb_type
@@ -48,11 +48,11 @@ class V1::Question::ShareService
   end
 
   def question_groups_contains_tlfb_and_others_questions?
-    questions.where('type not like ?', '%Tlfb%').any? && questions.where('type like ?', '%Tlfb%').any?
+    questions.without_tlfb.any? && questions.tlfb.any?
   end
 
   def inconsistent_tlfb_group?
-    tlfb_questions = questions.where('type like ?', '%Tlfb%')
+    tlfb_questions = questions.tlfb
     tlfb_questions.any? && (tlfb_questions.count != 3 || tlfb_questions.pluck(:question_group_id).uniq.count != 1)
   end
 

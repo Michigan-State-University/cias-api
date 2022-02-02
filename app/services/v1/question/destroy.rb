@@ -29,7 +29,7 @@ class V1::Question::Destroy
   def not_all_tlfb_group?
     return false unless chosen_questions.pluck(:type).any? { |type| type.include?('Tlfb') }
 
-    tlfb_questions = chosen_questions.where('type like ?', '%Tlfb%')
+    tlfb_questions = chosen_questions.tlfb
 
     return true if (tlfb_questions.pluck(:question_group_id).uniq.count * 3) != tlfb_questions.count
 
