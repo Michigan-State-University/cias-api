@@ -125,5 +125,15 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
         )
       end
     end
+
+    context 'when user wants clone tlfb_question' do
+      let!(:question) { create(:question_tlfb_question, question_group: question_group, subtitle: 'Question Subtitle', position: 1) }
+      let!(:question_group) { create(:tlfb_group, session: session) }
+
+      it 'return correct status' do
+        request
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 end

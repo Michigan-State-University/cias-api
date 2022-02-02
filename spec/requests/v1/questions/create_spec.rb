@@ -177,4 +177,13 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       it_behaves_like 'permitted user'
     end
   end
+
+  context 'when user wants to add a question to exist tlfb group' do
+    let(:question_group) { create(:tlfb_group) }
+
+    it 'the system did\'t allow to add a question and return correct status' do
+      request
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end

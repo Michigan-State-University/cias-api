@@ -12,7 +12,7 @@ class V1::Question::Create
   end
 
   def call
-    raise raise ActiveRecord::ActiveRecordError if question_group.type.eql?('QuestionGroup::Tlfb')
+    raise ActiveRecord::ActiveRecordError if question_group.type.eql?('QuestionGroup::Tlfb')
 
     question = questions_scope.new(question_params)
     question.position = questions_scope.last&.position.to_i + 1

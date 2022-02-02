@@ -12,7 +12,7 @@ class V1::Question::Destroy
 
   def call
     raise ActiveRecord::RecordNotFound unless proper_questions?
-    raise ActiveRecord::ActiveRecordError if delete_not_all_tlfb_group?
+    raise ActiveRecord::ActiveRecordError if not_all_tlfb_group?
 
     Question.transaction do
       chosen_questions.each do |question|
@@ -26,7 +26,7 @@ class V1::Question::Destroy
 
   private
 
-  def delete_not_all_tlfb_group?
+  def not_all_tlfb_group?
     return false unless chosen_questions.pluck(:type).any? {|type| type.include?('Tlfb')}
 
     tlfb_questions = chosen_questions.where("type like ?", "%Tlfb%")

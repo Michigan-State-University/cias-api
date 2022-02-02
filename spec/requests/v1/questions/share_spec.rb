@@ -234,6 +234,38 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
           end
         end
       end
+
+      context 'tlfb behavior' do
+        let(:tlfb_group) { create(:tlfb_group, session: session) }
+
+        context 'when user wants to share questions from tlfb group and others' do
+          let(:params) do
+            {
+              ids: questions.pluck(:id)[1, 2] << tlfb_group.questions.pluck(:id),
+              researcher_ids: [researcher1.id, researcher2.id]
+            }
+          end
+
+          it 'return correct status' do
+            request
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+
+        context 'when user wants to share only tlfb group' do
+          let(:params) do
+            {
+              ids: tlfb_group.questions.pluck(:id),
+              researcher_ids: [researcher1.id]
+            }
+          end
+
+          it 'return correct status' do
+            request
+            expect(response).to have_http_status(:created)
+          end
+        end
+      end
     end
   end
 end

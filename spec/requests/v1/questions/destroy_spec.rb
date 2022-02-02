@@ -93,4 +93,47 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
     it { expect(questions.first).not_to be(nil) }
     it { expect(other_questions.size).to be(3) }
   end
+
+  context 'delete tlfb questions' do
+    context 'when user wants to delete only part of tlfb group' do
+      let!(:tlfb_group) { create(:tlfb_group, session: session) }
+      let!(:params) do
+        {
+          ids: [tlfb_group.questions.first.id]
+        }
+      end
+
+      it 'return correct status' do
+        request
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'did\'t delete questions' do
+        request
+        expect(question_group.reload.questions.count).to be(3)
+      end
+    end
+
+    context 'when user wants delete all group' do
+      let!(:tlfb_group) { create(:tlfb_group, session: session) }
+      let!(:params) do
+        {
+          ids: tlfb_group.questions.pluck(:id)
+        }
+      end
+
+      it 'return correct status' do
+        request
+        expect(response).to have_http_status(:no_content)
+      end
+
+      it 'delete questions' do
+        expect { request }.to change(Question, :count).by(-3)
+      end
+
+      it 'delete group' do
+        expect { request }.to change(QuestionGroup, :count).by(-1)
+      end
+    end
+  end
 end
