@@ -53,7 +53,7 @@ class V1::Question::ShareService
 
   def inconsistent_tlfb_group?
     tlfb_questions = questions.where('type like ?', '%Tlfb%')
-    tlfb_questions.any? && ( tlfb_questions.count != 3 || tlfb_questions.pluck(:question_group_id).uniq.count != 1)
+    tlfb_questions.any? && (tlfb_questions.count != 3 || tlfb_questions.pluck(:question_group_id).uniq.count != 1)
   end
 
   def prepare_question_group(researcher, question_group)

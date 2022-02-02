@@ -147,5 +147,4 @@ class Intervention < ApplicationRecord
   def ability_to_clone?
     true
   end
-
 end
