@@ -52,7 +52,6 @@ class V1::QuestionsController < V1Controller
 
   def share
     authorize! :create, Question
-    require 'pry'; binding.pry
 
     V1::Question::ShareService.call(current_v1_user, question_ids, chosen_questions, researcher_ids)
 

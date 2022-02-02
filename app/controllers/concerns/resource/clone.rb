@@ -6,8 +6,6 @@ module Resource::Clone
     def clone
       authorize! :update, model_constant
 
-      # head :forbidden if
-      require 'pry'; binding.pry
       resource = model_constant.find(params[:id])
 
       return head :forbidden unless resource.ability_to_clone?
