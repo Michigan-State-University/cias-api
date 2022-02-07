@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_02_115406) do
+ActiveRecord::Schema.define(version: 2022_02_04_093542) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -564,13 +564,11 @@ ActiveRecord::Schema.define(version: 2022_02_02_115406) do
   end
 
   create_table "substances", force: :cascade do |t|
-    t.string "name", default: "", null: false
-    t.string "unit", default: "", null: false
-    t.uuid "user_session_id", null: false
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["user_session_id"], name: "index_substances_on_user_session_id"
+    t.bigint "day_id", null: false
+    t.index ["day_id"], name: "index_substances_on_day_id"
   end
 
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -771,7 +769,7 @@ ActiveRecord::Schema.define(version: 2022_02_02_115406) do
   add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
-  add_foreign_key "substances", "user_sessions"
+  add_foreign_key "substances", "days"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"

@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class Tlfb::Substance < ApplicationRecord
-  belongs_to :user_session
+  belongs_to :day, class_name: 'Tlfb::Day'
+
+  delegate :user_session, to: :day
+  delegate :question_group, to: :day
 
   attribute :body, :json, default: {}
   validates :body, json: {
