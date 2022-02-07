@@ -7,6 +7,7 @@ module Ability::Generic::FillInterventionAccess
     can :read, UserSession, user_id: user_id
     can :create, Answer, user_session: { user_id: user_id }
     can %i[create read], UserIntervention, user_id: user_id
+    can :manage, Tlfb::Day, user_session: { user_id: user_id }
     can :manage, Tlfb::Event, day: { user_session: { user_id: user_id } }
     can :manage, Tlfb::Substance, day: { user_session: { user_id: user_id } }
   end

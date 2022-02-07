@@ -4,6 +4,7 @@ class Tlfb::Day < ApplicationRecord
   belongs_to :user_session
   belongs_to :question_group
   has_many :events, class_name: 'Tlfb::Event', dependent: :destroy
+  has_many :substances, class_name: 'Tlfb::Substance', dependent: :destroy
   delegate :month, to: :exact_date
   delegate :year, to: :exact_date
   validates :exact_date, presence: true

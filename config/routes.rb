@@ -115,6 +115,8 @@ Rails.application.routes.draw do
       end
     end
 
+    get 'calendar_data', to: 'tlfb/days#index', as: :calendar_data
+
     resources :user_interventions, only: %i[index show create]
 
     resources :user_sessions, only: %i[create] do

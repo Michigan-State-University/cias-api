@@ -16,6 +16,7 @@ class Ability::PreviewSession < Ability::Base
     can :create, Answer, user_session: { user_id: user.id }
     can :manage, Tlfb::Event, day: { user_session: { user_id: user.id } }
     can :manage, Tlfb::Substance, day: { user_session: { user_id: user.id } }
+    can :manage, Tlfb::Day, user_session: { user_id: user.id }
   end
 
   def intervention_id
