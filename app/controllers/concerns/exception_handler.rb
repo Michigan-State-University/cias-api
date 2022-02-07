@@ -5,7 +5,7 @@ module ExceptionHandler
 
   included do
     rescue_from ActiveRecord::ActiveRecordError do |exc|
-      render json: msg(exc), status: :forbidden
+      render json: msg(exc), status: :bad_request
     end
 
     rescue_from ActionController::ParameterMissing do |exc|

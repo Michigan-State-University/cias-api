@@ -105,7 +105,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
 
       it 'return correct status' do
         request
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:bad_request)
       end
 
       it 'did\'t delete questions' do

@@ -248,7 +248,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
 
           it 'return correct status' do
             request
-            expect(response).to have_http_status(:forbidden)
+            expect(response).to have_http_status(:bad_request)
           end
         end
 

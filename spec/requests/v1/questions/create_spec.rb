@@ -183,7 +183,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
 
     it 'the system did\'t allow to add a question and return correct status' do
       request
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:bad_request)
     end
   end
 end

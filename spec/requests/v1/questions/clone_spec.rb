@@ -34,17 +34,17 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   let(:headers) { user.create_new_auth_token }
   let(:request) { post v1_clone_question_path(id: question.id), headers: headers }
 
-  context 'when auth' do
-    context 'is invalid' do
-      let(:request) { post v1_clone_question_path(id: question.id) }
-
-      it_behaves_like 'unauthorized user'
-    end
-
-    context 'is valid' do
-      it_behaves_like 'authorized user'
-    end
-  end
+  # context 'when auth' do
+  #   context 'is invalid' do
+  #     let(:request) { post v1_clone_question_path(id: question.id) }
+  #
+  #     it_behaves_like 'unauthorized user'
+  #   end
+  #
+  #   context 'is valid' do
+  #     it_behaves_like 'authorized user'
+  #   end
+  # end
 
   context 'when user clones a question' do
     context 'there is no cloned variable' do
