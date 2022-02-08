@@ -63,10 +63,17 @@ class V1::QuestionsController < V1Controller
 
     cloned_questions = V1::Question::CloneMultiple.call(question_ids, chosen_questions)
 
-    render json: serialized_response(cloned_questions), status: :created
+    render json: cloned_questions_response(cloned_questions), status: :created
   end
 
   private
+
+  def cloned_questions_response(questions)
+    V1::QuestionSerializer.new(
+      questions,
+      { include: %i[question_group] }
+    )
+  end
 
   def question_group_load
     QuestionGroup.includes(:questions).accessible_by(current_ability).find(question_group_id)
