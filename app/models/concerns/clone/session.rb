@@ -13,6 +13,9 @@ class Clone::Session < Clone::Base
       reassign_branching
       reassign_reflections
       reassign_report_templates_to_third_party_screens
+    rescue => e
+      p "CLONE DEBUG ERROR #{e.class}"
+      p "CLONE DEBUG ERROR #{e.message}"
     end
     p "CLONE DEBUG FINISH COPY SESSION #{position}"
     outcome
@@ -91,10 +94,11 @@ class Clone::Session < Clone::Base
 
   def reassign_reflections
     outcome_questions.each do |question|
-      p "CLONE DEBUG reassign_reflections #{question.id}"
+      p "CLONE DEBUG reassign_reflections #{question.narrator}"
       question.narrator['blocks'].each do |block|
         next block unless block['type'] == 'Reflection'
 
+        p "CLONE DEBUG reassign_reflections #{block}"
         reflection_question_id = block['question_id']
 
         next block if reflection_question_id.nil?
@@ -102,9 +106,9 @@ class Clone::Session < Clone::Base
         matched_reflection_question_id = matching_question_id(reflection_question_id)
         block['question_id'] = matched_reflection_question_id
       end
-      p "CLONE DEBUG FINISH REASSIGN REFLECTIONS"
       question.save!
     end
+    p "CLONE DEBUG FINISH REASSIGN REFLECTIONS"
   end
 
   def destroy_default_finish_question_group
