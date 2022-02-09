@@ -11,5 +11,5 @@ class V1::Question::ExtendedSerializer < V1Serializer
     object.image_blob.description if object.image_blob.present?
   end
 
-  belongs_to :question_group, serializer: V1::QuestionGroup::SimpleSerializer
+  belongs_to :question_group, serializer: V1::SimpleQuestionGroupSerializer
 end

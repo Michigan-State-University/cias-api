@@ -142,7 +142,7 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
         end
 
         it 'included created question group' do
-          expect(json_response['included'][0]['type']).to eq('question_group')
+          expect(json_response['included'][0]['type']).to eq('simple_question_group')
           expect(json_response['included'][0]['attributes']).to include({ 'title' => 'Copied Questions', 'position' => 4 })
         end
 
