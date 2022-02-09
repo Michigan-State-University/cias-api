@@ -69,7 +69,7 @@ class V1::QuestionsController < V1Controller
   private
 
   def cloned_questions_response(questions)
-    V1::QuestionSerializer.new(
+    V1::Question::ExtendedSerializer.new(
       questions,
       { include: %i[question_group] }
     )
