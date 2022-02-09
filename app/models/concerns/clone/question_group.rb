@@ -5,6 +5,7 @@ class Clone::QuestionGroup < Clone::Base
     outcome.position = position || outcome.session.question_groups.size
     clone_questions
     outcome.save!
+    p "CLONE DEBUG FINISH COPY QUESTION GROUP #{position}"
     outcome
   end
 

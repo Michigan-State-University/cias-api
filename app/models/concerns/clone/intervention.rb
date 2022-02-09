@@ -8,6 +8,7 @@ class Clone::Intervention < Clone::Base
     outcome.save!
     create_sessions
     reassign_branching
+    p "CLONE DEBUG FINISH COPY INTERVENTION"
     outcome
   end
 

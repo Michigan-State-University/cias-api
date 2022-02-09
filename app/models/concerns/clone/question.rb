@@ -6,6 +6,7 @@ class Clone::Question < Clone::Base
     clean_outcome_formulas if clean_formulas
     outcome.position = position || outcome.question_group.questions.size
     outcome.save!
+    p "CLONE DEBUG FINISH COPY QUESTION #{position}"
     outcome
   end
 
