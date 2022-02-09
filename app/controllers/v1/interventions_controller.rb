@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class V1::InterventionsController < V1Controller
-  include Resource::Clone
-
   def index
     collection = interventions_scope.detailed_search(params)
     paginated_collection = V1::Intervention::Paginate.call(collection, start_index, end_index)
@@ -30,6 +28,14 @@ class V1::InterventionsController < V1Controller
     render json: serialized_response(intervention)
   end
 
+  def clone
+    authorize! :update, Intervention
+
+    CloneJobs::Intervention.perform_later(current_v1_user, params[:id], clone_params)
+
+    render status: :ok
+  end
+
   private
 
   def interventions_scope
@@ -50,5 +56,19 @@ class V1::InterventionsController < V1Controller
 
   def end_index
     params.permit(:end_index)[:end_index]&.to_i
+  end
+
+  def clone_params
+    key = controller_name.singularize.to_sym
+    params.fetch(key, {}).permit(*to_permit[key])
+  end
+
+  def to_permit
+    @to_permit ||= {
+      intervention: [{ user_ids: [] }],
+      session: [],
+      question: [],
+      sms_plan: []
+    }
   end
 end
