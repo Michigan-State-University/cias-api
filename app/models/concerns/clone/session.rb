@@ -41,6 +41,7 @@ class Clone::Session < Clone::Base
 
   def reassign_branching
     outcome_questions.find_each do |question|
+      p "CLONE DEBUG reassign_branching #{question.id}"
       question.formula['patterns'] = question.formula['patterns'].map do |pattern|
         index = 0
         pattern['target'].each do |current_target|
@@ -49,6 +50,7 @@ class Clone::Session < Clone::Base
         end
         pattern
       end
+      p "CLONE DEBUG  reassign_branching FINISH"
       question.save!
     end
   end
@@ -88,6 +90,7 @@ class Clone::Session < Clone::Base
 
   def reassign_reflections
     outcome_questions.each do |question|
+      p "CLONE DEBUG reassign_reflections #{question.id}"
       question.narrator['blocks'].each do |block|
         next block unless block['type'] == 'Reflection'
 
@@ -98,6 +101,7 @@ class Clone::Session < Clone::Base
         matched_reflection_question_id = matching_question_id(reflection_question_id)
         block['question_id'] = matched_reflection_question_id
       end
+      p "CLONE DEBUG FINISH REASSIGN REFLECTIONS"
       question.save!
     end
   end
