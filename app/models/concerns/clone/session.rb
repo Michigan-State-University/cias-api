@@ -41,7 +41,8 @@ class Clone::Session < Clone::Base
 
   def reassign_branching
     outcome_questions.find_each do |question|
-      p "CLONE DEBUG reassign_branching #{question.id}"
+      p "CLONE DEBUG #{question.subtitle}"
+      p "CLONE DEBUG #{question.formula['patterns']}"
       question.formula['patterns'] = question.formula['patterns'].map do |pattern|
         index = 0
         pattern['target'].each do |current_target|
@@ -50,9 +51,9 @@ class Clone::Session < Clone::Base
         end
         pattern
       end
-      p "CLONE DEBUG  reassign_branching FINISH"
       question.save!
     end
+    p "CLONE DEBUG  reassign_branching FINISH"
   end
 
   def matching_outcome_target_id(pattern, index)
@@ -113,7 +114,6 @@ class Clone::Session < Clone::Base
   def create_sms_plans
     outcome.sms_plans_count = 0
     source.sms_plans.each do |plan|
-      p "CLONE DEBUG START sms PLAN  #{plan.id}"
       new_sms_plan = SmsPlan.new(plan.slice(*SmsPlan::ATTR_NAMES_TO_COPY))
       outcome.sms_plans << new_sms_plan
 
@@ -121,14 +121,12 @@ class Clone::Session < Clone::Base
         new_sms_plan.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
       end
     end
-    p "CLONE DEBUG FINISH COPY SMS_PLAN"
   end
 
   def create_report_templates
     outcome.report_templates_count = 0
     source.report_templates.each do |report_template|
       new_report_template = ReportTemplate.new(report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY))
-      p "CLONE DEBUG START RAPORT TEMPLATE #{report_template.id}"
       outcome.report_templates << new_report_template
 
       new_report_template.logo.attach(report_template.logo.blob) if report_template.logo.attachment
@@ -146,7 +144,6 @@ class Clone::Session < Clone::Base
         end
       end
     end
-    p "CLONE DEBUG FINISH COPY RAPORT TEMPLATES"
   end
 
   def reassign_report_templates_to_third_party_screens
@@ -165,6 +162,5 @@ class Clone::Session < Clone::Base
       end
       third_party_question.save!
     end
-    p "CLONE DEBUG FINISH reassign_report_templates_to_third_party_screens"
   end
 end
