@@ -39,8 +39,9 @@ class V1::SessionsController < V1Controller
   def duplicate
     authorize! :duplicate, Session
 
-    session = session_service.duplicate(session_id, new_intervention_id)
-    render json: serialized_response(session), status: :created
+    # session = session_service.duplicate(session_id, new_intervention_id)
+    DuplicateJobs::Session.perform_later(current_v1_user, session_id, new_intervention_id)
+    render status: :ok
   end
 
   def clone

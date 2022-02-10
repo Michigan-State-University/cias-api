@@ -13,18 +13,11 @@ class DuplicateJobs::Session < DuplicateJob
                        position: new_position).execute
 
     return unless user.email_notification
-  #   intervention = session.intervention
-  #   position = intervention.sessions.order(:position).last.position + 1
-  #   params = { variable: "cloned_#{session.variable}_#{position}" }
-  #   cloned_session = session.clone(params: params)
-  #
-  #   return unless user.email_notification
-  #
-  #   CloneMailer.cloned_session(user, session.name, cloned_session).deliver_now
-  # rescue StandardError
-  #
-  #   return unless user.email_notification
-  #
-  #   CloneMailer.error(user).deliver_now
+
+    DuplicateMailer.confirmation(user, old_session, new_intervention).deliver_now
+  rescue StandardError
+    return unless user.email_notification
+
+    CloneMailer.error(user).deliver_now
   end
 end
