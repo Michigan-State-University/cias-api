@@ -8,7 +8,7 @@ RSpec.describe V1::Question::CloneMultiple do
   let!(:question_group) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: session) }
   let!(:questions) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group) }
   let(:question_ids) { questions.pluck(:id) }
-  let(:chosen_questions) { questions }
+  let(:chosen_questions) { Question.where(id: question_ids) }
 
   context 'when params are valid' do
     it 'clone questions to the same group as original' do
@@ -37,7 +37,7 @@ RSpec.describe V1::Question::CloneMultiple do
       end
       let!(:questions2) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group2) }
       let(:question_ids) { questions.pluck(:id) + questions2.pluck(:id) }
-      let(:chosen_questions) { questions + questions2 }
+      let(:chosen_questions) { Question.where(id: question_ids) }
 
       it 'create new group' do
         expect { subject }.to change(session.question_groups, :count).by(1)

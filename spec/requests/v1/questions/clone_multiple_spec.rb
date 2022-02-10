@@ -120,6 +120,50 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
           expect(json_response['data'][1]['attributes']['question_group_id']).to eq(session.reload.question_groups.last(2).first.id)
         end
       end
+
+      context 'when questions are from tlfb group' do
+        let!(:tlfb_group) { create(:tlfb_group, title: 'TLFB Group', position: 3, session: session) }
+        let(:question_ids) { tlfb_group.questions.pluck(:id) }
+
+        before { request }
+
+        it { expect(response).to have_http_status(:created) }
+
+        it 'returns proper cloned question attributes' do
+          result = [json_response['data'][0]['attributes']['title'], json_response['data'][1]['attributes']['title'],
+                    json_response['data'][2]['attributes']['title']]
+          expect(result).to include('TlfbConfig', 'TlfbEvents', 'TlfbQuestion')
+        end
+
+        it 'returned cloned questions have proper position' do
+          expect(json_response['data'][0]['attributes']['position']).to eq(1)
+          expect(json_response['data'][1]['attributes']['position']).to eq(2)
+          expect(json_response['data'][2]['attributes']['position']).to eq(3)
+        end
+
+        it 'included created question group' do
+          expect(json_response['included'][0]['type']).to eq('simple_question_group')
+          expect(json_response['included'][0]['attributes']).to include({ 'title' => 'Copied Questions', 'position' => 4 })
+        end
+
+        it 'first and last element has proper title' do
+          expect(session.reload.question_groups.last(2).first.questions.pluck(:title)).to include('TlfbConfig', 'TlfbEvents', 'TlfbQuestion')
+        end
+
+        it 'returns proper number of questions from question_group' do
+          expect(session.reload.question_groups.last(2).first.questions.size).to eq(question_ids.size)
+        end
+
+        it 'returns proper number of cloned questions' do
+          expect(json_response['data'].size).to eq(question_ids.size)
+        end
+
+        it 'cloned questions belong to  new question_group' do
+          expect(json_response['data'][0]['attributes']['question_group_id']).to eq(session.reload.question_groups.last(2).first.id)
+          expect(json_response['data'][1]['attributes']['question_group_id']).to eq(session.reload.question_groups.last(2).first.id)
+          expect(json_response['data'][2]['attributes']['question_group_id']).to eq(session.reload.question_groups.last(2).first.id)
+        end
+      end
     end
 
     context 'when params are invalid' do
@@ -149,6 +193,24 @@ RSpec.describe 'POST /v1/questions/clone_multiple', type: :request do
         before { request }
 
         it { expect(response).to have_http_status(:not_found) }
+      end
+
+      context 'when tlfb group is not complete' do
+        let!(:tlfb_group) { create(:tlfb_group, title: 'TLFB Group', position: 3, session: session) }
+        let(:question_ids) { [tlfb_group.questions[0].id, tlfb_group.questions[1].id] }
+
+        before { request }
+
+        it { expect(response).to have_http_status(:bad_request) }
+      end
+
+      context 'when questions from tlfb group and plain' do
+        let!(:tlfb_group) { create(:tlfb_group, title: 'TLFB Group', position: 3, session: session) }
+        let(:question_ids) { tlfb_group.questions.pluck(:id) << questions.first.id }
+
+        before { request }
+
+        it { expect(response).to have_http_status(:bad_request) }
       end
     end
   end

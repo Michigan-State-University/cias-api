@@ -24,4 +24,8 @@ class Question::Tlfb < Question
   def csv_header_names
     []
   end
+
+  def ability_to_clone?
+    false
+  end
 end

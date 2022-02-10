@@ -56,6 +56,8 @@ class Question < ApplicationRecord
   after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
 
+  scope :tlfb, -> { where('type like ?', '%Tlfb%') }
+  scope :without_tlfb, -> { where('type not like ?', '%Tlfb%') }
   default_scope { order(:position) }
 
   def subclass_name
@@ -80,6 +82,10 @@ class Question < ApplicationRecord
       "Question::Narrator::Block::#{block['type'].classify}".safe_constantize&.swap_name(block, name_audio_url, name_text)
     end
     self
+  end
+
+  def ability_to_clone?
+    true
   end
 
   def prepare_to_display(_answers_var_values = nil)
