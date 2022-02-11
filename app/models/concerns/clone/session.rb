@@ -53,7 +53,7 @@ class Clone::Session < Clone::Base
 
   def reassign_branching_question(question)
     p 'CLONE DEBUG REASSIGN BRANCHING'
-    p "CLONE DEBUG #{question.formula['patterns']}" 
+    p "CLONE DEBUG #{question.formula['patterns']}"
     question.formula['patterns'] = question.formula['patterns'].map do |pattern|
       index = 0
       pattern['target'].each do |current_target|
