@@ -33,7 +33,7 @@ class Clone::Intervention < Clone::Base
     outcome_session.formula['patterns'] = update_object_pattern(outcome_session)
     outcome_session.save!
 
-    outcome_session.questions.find_each do |question|
+    outcome_session.questions.each do |question|
       question.formula['patterns'] = update_object_pattern(question)
       question.save!
     end

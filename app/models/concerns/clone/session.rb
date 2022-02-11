@@ -31,19 +31,19 @@ class Clone::Session < Clone::Base
                                                           session_id: outcome.id,
                                                           questions_count: 0,
                                                           clean_formulas: false,
-                                                          position: question_group.position).execute
+                                                          position: question_group.position, session_variables: session_variables).execute
     end
   end
 
   def outcome_questions
-    Question.unscoped
+    @outcome_questions ||= Question.unscoped
             .includes(:question_group)
             .where(question_groups: { session_id: outcome.id })
             .order('question_groups.position ASC', 'questions.position ASC')
   end
 
   def reassign_branching
-    outcome_questions.find_each do |question|
+    outcome_questions.each do |question|
       p "CLONE DEBUG #{question.subtitle}"
       p "CLONE DEBUG #{question.formula['patterns']}"
       question.formula['patterns'] = question.formula['patterns'].map do |pattern|
@@ -154,7 +154,7 @@ class Clone::Session < Clone::Base
     source_third_party_report_templates = source.report_templates.third_party
     outcome_third_party_report_templates = outcome.report_templates.third_party
 
-    Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
+    Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).each do |third_party_question|
       third_party_question.body_data.each do |third_party_question_body_data_element|
         report_template_ids = third_party_question_body_data_element.dig('report_template_ids')
         new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids|
