@@ -10,8 +10,7 @@ class Clone::Session < Clone::Base
       outcome.save!
       create_sms_plans
       create_report_templates
-      reassign_branching
-      reassign_reflections
+      outcome_questions_reassignment
       reassign_report_templates_to_third_party_screens
     rescue => e
       p "CLONE DEBUG ERROR #{e.class}"
@@ -42,21 +41,28 @@ class Clone::Session < Clone::Base
             .order('question_groups.position ASC', 'questions.position ASC')
   end
 
-  def reassign_branching
+  def outcome_questions_reassignment
     outcome_questions.each do |question|
       p "CLONE DEBUG #{question.subtitle}"
-      p "CLONE DEBUG #{question.formula['patterns']}"
-      question.formula['patterns'] = question.formula['patterns'].map do |pattern|
-        index = 0
-        pattern['target'].each do |current_target|
-          current_target['id'] = matching_outcome_target_id(pattern, index)
-          index += 1
-        end
-        pattern
-      end
+      p "CLONE DEBUG #{question.id}"
+      question = reassign_branching_question(question)
+      question = reassign_question_reflections(question)
       question.save!
     end
-    p "CLONE DEBUG  reassign_branching FINISH"
+  end
+
+  def reassign_branching_question(question)
+    p 'CLONE DEBUG REASSIGN BRANCHING'
+    p "CLONE DEBUG #{question.formula['patterns']}" 
+    question.formula['patterns'] = question.formula['patterns'].map do |pattern|
+      index = 0
+      pattern['target'].each do |current_target|
+        current_target['id'] = matching_outcome_target_id(pattern, index)
+        index += 1
+      end
+      pattern
+    end
+    question
   end
 
   def matching_outcome_target_id(pattern, index)
@@ -92,23 +98,20 @@ class Clone::Session < Clone::Base
     nil
   end
 
-  def reassign_reflections
-    outcome_questions.each do |question|
-      p "CLONE DEBUG reassign_reflections #{question.narrator}"
-      question.narrator['blocks'].each do |block|
-        next block unless block['type'] == 'Reflection'
+  def reassign_question_reflections(question)
+    p "CLONE DEBUG REASSIGN QUESTION"
+    question.narrator['blocks'].each do |block|
+      next block unless block['type'] == 'Reflection'
 
-        p "CLONE DEBUG reassign_reflections #{block}"
-        reflection_question_id = block['question_id']
+      p "CLONE DEBUG reassign_reflections #{block}"
+      reflection_question_id = block['question_id']
 
-        next block if reflection_question_id.nil?
+      next block if reflection_question_id.nil?
 
-        matched_reflection_question_id = matching_question_id(reflection_question_id)
-        block['question_id'] = matched_reflection_question_id
-      end
-      question.save!
+      matched_reflection_question_id = matching_question_id(reflection_question_id)
+      block['question_id'] = matched_reflection_question_id
     end
-    p "CLONE DEBUG FINISH REASSIGN REFLECTIONS"
+    question
   end
 
   def destroy_default_finish_question_group
