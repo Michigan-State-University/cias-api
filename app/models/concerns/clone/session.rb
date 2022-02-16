@@ -13,9 +13,6 @@ class Clone::Session < Clone::Base
       reassign_branching
       reassign_reflections
       reassign_report_templates_to_third_party_screens
-    rescue => e
-      p "CLONE DEBUG ERROR #{e.class}"
-      p "CLONE DEBUG ERROR #{e.message}"
     end
     outcome
   end
