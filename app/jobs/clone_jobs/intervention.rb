@@ -2,7 +2,6 @@
 
 class CloneJobs::Intervention < CloneJob
   def perform(user, intervention_id, clone_params)
-    require 'pry'; binding.pry
     intervention = Intervention.find(intervention_id)
     cloned_intervention = intervention.clone(params: clone_params)
 
