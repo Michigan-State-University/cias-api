@@ -24,8 +24,9 @@ class CloneMailer < ApplicationMailer
     mail(to: @user.email, subject: I18n.t('clone_mailer.session.subject', session_name: @session_name))
   end
 
-  def error(user)
+  def error(user, error_msg)
     @user = user
+    @error_msg = error_msg
 
     mail(to: @user.email, subject: I18n.t('clone_mailer.error.subject'))
   end

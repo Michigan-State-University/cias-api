@@ -132,7 +132,7 @@ en:
     error:
       subject: 'Error during coping'
       header: 'An error has occurred during copying.'
-      body: 'Copying finished with an error. Please try again.'
+      body: 'Copying finished with an error. Please try again. Msg: ${error_msg}'
   duplicate_mailer:
     session:
       subject: 'Duplicate of %{session_name}'

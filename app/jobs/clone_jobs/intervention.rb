@@ -8,10 +8,10 @@ class CloneJobs::Intervention < CloneJob
     return unless user.email_notification
 
     CloneMailer.cloned_intervention(user, intervention.name, cloned_intervention.id).deliver_now
-  rescue StandardError
+  rescue StandardError => e
 
     return unless user.email_notification
 
-    CloneMailer.error(user).deliver_now
+    CloneMailer.error(user, e.message).deliver_now
   end
 end
