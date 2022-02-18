@@ -12,11 +12,7 @@ class Clone::Session < Clone::Base
       create_report_templates
       outcome_questions_reassignment
       reassign_report_templates_to_third_party_screens
-    rescue => e
-      p "CLONE DEBUG ERROR #{e.class}"
-      p "CLONE DEBUG ERROR #{e.message}"
     end
-    p "CLONE DEBUG FINISH COPY SESSION #{position}"
     outcome
   end
 
@@ -43,8 +39,6 @@ class Clone::Session < Clone::Base
 
   def outcome_questions_reassignment
     outcome_questions.each do |question|
-      p "CLONE DEBUG #{question.subtitle}"
-      p "CLONE DEBUG #{question.id}"
       question = reassign_branching_question(question)
       question = reassign_question_reflections(question)
       question.save!
@@ -52,8 +46,6 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_branching_question(question)
-    p 'CLONE DEBUG REASSIGN BRANCHING'
-    p "CLONE DEBUG #{question.formula['patterns']}"
     question.formula['patterns'] = question.formula['patterns'].map do |pattern|
       index = 0
       pattern['target'].each do |current_target|
@@ -99,11 +91,9 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_question_reflections(question)
-    p "CLONE DEBUG REASSIGN QUESTION"
     question.narrator['blocks'].each do |block|
       next block unless block['type'] == 'Reflection'
 
-      p "CLONE DEBUG reassign_reflections #{block}"
       reflection_question_id = block['question_id']
 
       next block if reflection_question_id.nil?
@@ -157,7 +147,7 @@ class Clone::Session < Clone::Base
     source_third_party_report_templates = source.report_templates.third_party
     outcome_third_party_report_templates = outcome.report_templates.third_party
 
-    Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).each do |third_party_question|
+    Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
       third_party_question.body_data.each do |third_party_question_body_data_element|
         report_template_ids = third_party_question_body_data_element.dig('report_template_ids')
         new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids|

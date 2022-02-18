@@ -4,8 +4,6 @@ class Clone::Base
   attr_accessor :source, :outcome, :options, :clean_formulas, :position, :session_variables
 
   def initialize(source, **options)
-    p "CLONE DEBUG #{source.class.name}"
-    p "CLONE DEBUG #{source.id}"
     @source = source
     @outcome = @source.dup
     @session_variables = options.delete(:session_variables)
