@@ -38,7 +38,7 @@ class Clone::Session < Clone::Base
   end
 
   def outcome_questions_reassignment
-    outcome_questions.each do |question|
+    outcome_questions.find_each do |question|
       question = reassign_branching_question(question)
       question = reassign_question_reflections(question)
       question.save!
