@@ -58,7 +58,7 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
 
   config.after_initialize do
-    Bullet.enable = true
-    Bullet.rails_logger = true
+    Bullet.enable        = true
+    Bullet.rails_logger  = true
   end
 end

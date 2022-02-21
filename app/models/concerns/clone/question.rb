@@ -16,8 +16,8 @@ class Clone::Question < Clone::Base
   end
 
   def clean_outcome_formulas
-    taken_variables = outcome.question_group.session.session_variables.uniq
-    outcome.variable_clone_prefix(taken_variables)
+    @session_variables ||= outcome.question_group.session.session_variables.uniq
+    outcome.variable_clone_prefix(@session_variables)
     outcome.formula = Question.assign_default_values('formula')
   end
 end
