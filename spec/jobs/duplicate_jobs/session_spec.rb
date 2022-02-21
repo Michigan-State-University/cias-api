@@ -69,10 +69,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     subject { described_class.perform_now(user, session.id, 'wrong_id') }
 
     it 'did\'t create a new session' do
-      expect do
-        subject
-        perform_enqueued_jobs
-      end.to avoid_changing(Session, :count)
+      expect { subject }.to avoid_changing(Session, :count)
     end
   end
 
@@ -80,10 +77,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     subject { described_class.perform_now(user, 'wrong_id', new_intervention.id) }
 
     it 'did\'t create a new session' do
-      expect do
-        subject
-        perform_enqueued_jobs
-      end.to avoid_changing(Session, :count)
+      expect { subject }.to avoid_changing(Session, :count)
     end
   end
 end
