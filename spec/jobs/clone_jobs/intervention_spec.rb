@@ -29,4 +29,19 @@ RSpec.describe CloneJobs::Intervention, type: :job do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
     end
   end
+
+  context 'share intervention' do
+    let(:researcher1) { create(:user, :confirmed, :researcher) }
+    let(:researcher2) { create(:user, :confirmed, :researcher) }
+    let!(:clone_params) do
+      { user_ids: [
+        researcher1.id,
+        researcher2.id
+      ] }
+    end
+
+    it 'send email' do
+      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(2)
+    end
+  end
 end
