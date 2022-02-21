@@ -7,6 +7,7 @@ class CloneJobs::Intervention < CloneJob
 
     return unless user.email_notification
 
+
     send_emails(user, intervention, cloned_intervention)
   rescue StandardError
     return unless user.email_notification
