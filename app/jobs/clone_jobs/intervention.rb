@@ -7,10 +7,26 @@ class CloneJobs::Intervention < CloneJob
 
     return unless user.email_notification
 
-    CloneMailer.cloned_intervention(user, intervention.name, cloned_intervention.id).deliver_now
-  rescue StandardError
+
+    send_emails(user, intervention, cloned_intervention)
+  rescue StandardError => e
+    logger.error 'ERROR-LOG'
+    logger.error e
+    logger.error e.message
+    logger.error 'ERROR-LOG-END'
+
     return unless user.email_notification
 
     CloneMailer.error(user).deliver_now
+  end
+
+  private
+
+  def send_emails(user, intervention, cloned_interventions)
+    return CloneMailer.cloned_intervention(user, intervention.name, cloned_interventions.id).deliver_now unless cloned_interventions.is_a?(Array)
+
+    cloned_interventions.each do |cloned_intervention|
+      CloneMailer.cloned_intervention(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
+    end
   end
 end
