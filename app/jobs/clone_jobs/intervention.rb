@@ -9,7 +9,12 @@ class CloneJobs::Intervention < CloneJob
 
 
     send_emails(user, intervention, cloned_intervention)
-  rescue StandardError
+  rescue StandardError => e
+    logger.error 'ERROR-LOG'
+    logger.error e
+    logger.error e.message
+    logger.error 'ERROR-LOG-END'
+
     return unless user.email_notification
 
     CloneMailer.error(user).deliver_now
