@@ -27,7 +27,6 @@
                 },
                 "substances": {
                   "type": "array",
-                  "minItems": 0,
                   "items": {}
                 }
               },
