@@ -3,13 +3,18 @@
 class CloneJobs::Intervention < CloneJob
   def perform(user, intervention_id, clone_params)
     intervention = Intervention.find(intervention_id)
+
     cloned_intervention = intervention.clone(params: clone_params)
+    cloned_intervention.update!(is_cloning: false)
 
     return unless user.email_notification
 
-
     send_emails(user, intervention, cloned_intervention)
   rescue StandardError => e
+    if cloned_intervention
+      cloned_intervention.sessions.destroy_all
+      cloned_intervention.destroy
+    end
     logger.error 'ERROR-LOG'
     logger.error e
     logger.error e.message

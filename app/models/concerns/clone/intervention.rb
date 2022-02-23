@@ -4,6 +4,7 @@ class Clone::Intervention < Clone::Base
   def execute
     outcome.status = :draft
     outcome.name = "Copy of #{outcome.name}"
+    outcome.is_cloning = true
     clear_organization!
     outcome.save!
     create_sessions
