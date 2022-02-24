@@ -10,11 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_22_092720) do
+ActiveRecord::Schema.define(version: 2022_02_22_125157) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
-  enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
   enable_extension "uuid-ossp"
@@ -68,6 +67,7 @@ ActiveRecord::Schema.define(version: 2021_12_22_092720) do
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
+    t.index ["sha256"], name: "index_audios_on_sha256", unique: true
   end
 
   create_table "chart_statistics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -109,7 +109,6 @@ ActiveRecord::Schema.define(version: 2021_12_22_092720) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position", default: 1, null: false
-    t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
@@ -145,7 +144,7 @@ ActiveRecord::Schema.define(version: 2021_12_22_092720) do
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
 
-  create_table "good_jobs", id: :uuid, default: -> { "public.gen_random_uuid()" }, force: :cascade do |t|
+  create_table "good_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "queue_name"
     t.integer "priority"
     t.jsonb "serialized_params"
@@ -211,7 +210,6 @@ ActiveRecord::Schema.define(version: 2021_12_22_092720) do
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
-    t.index ["name", "health_system_id"], name: "index_health_clinics_on_name_and_health_system_id", unique: true
   end
 
   create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
