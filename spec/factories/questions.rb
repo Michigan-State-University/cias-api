@@ -710,7 +710,9 @@ FactoryBot.define do
               {
                 question_title: '',
                 head_question: '',
-                substance_question: ''
+                substance_question: '',
+                substances_with_group: true,
+                substances: []
               }
           }
         ]
