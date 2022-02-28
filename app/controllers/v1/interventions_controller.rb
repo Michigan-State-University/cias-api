@@ -39,7 +39,7 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.accessible_by(current_ability).order(created_at: :desc)
+    Intervention.accessible_by(current_ability).order(created_at: :desc).without_cloning
   end
 
   def intervention_load

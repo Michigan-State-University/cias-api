@@ -143,4 +143,14 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       expect(json_response['interventions'].first['id']).to include(new_intervention.id)
     end
   end
+
+  context 'returns only interventions that are not being cloned' do
+    let!(:intervention_being_cloned) { create(:intervention, user: admin, is_cloning: true) }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct intervention' do
+      expect(json_response['interventions'].pluck('id')).to not_include(intervention_being_cloned.id)
+    end
+  end
 end

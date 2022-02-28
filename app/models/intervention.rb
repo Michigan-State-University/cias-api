@@ -28,6 +28,8 @@ class Intervention < ApplicationRecord
     left_joins(:invitations).published.not_shared_to_invited
       .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
+
+  scope :without_cloning, -> { where(is_cloning: false) }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
   scope :indexing, ->(ids) { where(id: ids) }
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
