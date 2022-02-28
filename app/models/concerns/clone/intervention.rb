@@ -9,6 +9,7 @@ class Clone::Intervention < Clone::Base
     outcome.save!
     create_sessions
     reassign_branching
+    outcome.update!(is_cloning: false)
     outcome
   end
 

@@ -25,7 +25,6 @@ class CloneJobs::Intervention < CloneJob
 
   def after_clone(intervention, cloned_interventions)
     cloned_interventions.each do |cloned_intervention|
-      cloned_intervention.update!(is_cloning: false)
       return unless cloned_intervention.user.email_notification
 
       CloneMailer.cloned_intervention(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
