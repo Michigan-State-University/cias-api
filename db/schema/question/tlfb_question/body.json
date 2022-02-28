@@ -21,12 +21,20 @@
                 },
                 "substance_question": {
                   "type": "string"
+                },
+                "substances_with_group": {
+                  "type": "boolean"
+                },
+                "substances": {
+                  "type": "array",
+                  "items": {}
                 }
               },
               "required": [
                 "question_title",
                 "head_question",
-                "substance_question"
+                "substance_question",
+                "substances_with_group"
               ],
               "additionalProperties": false
             }
