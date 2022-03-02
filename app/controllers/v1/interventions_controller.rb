@@ -39,11 +39,17 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.accessible_by(current_ability).order(created_at: :desc).without_cloning
+    Intervention.accessible_by(current_ability)
+                .order(created_at: :desc)
+                .includes(%i[user reports_attachments logo_attachment])
+                .without_cloning
   end
 
   def intervention_load
-    interventions_scope.find(params[:id])
+    Intervention.accessible_by(current_ability)
+                .order(created_at: :desc)
+                .includes(%i[reports_attachments logo_attachment])
+                .find(params[:id])
   end
 
   def intervention_params

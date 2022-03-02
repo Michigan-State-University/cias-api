@@ -38,7 +38,6 @@ gem 'wicked_pdf'
 gem 'rack-attack'
 gem 'secure_headers'
 gem 'airbrake'
-gem 'google-protobuf', '>= 3.19.2'
 # for encrypt data
 gem 'lockbox'
 # for search on encrypted data
