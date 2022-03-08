@@ -22,6 +22,10 @@
                 "substance_question": {
                   "type": "string"
                 },
+                "substance_groups": {
+                  "type": "array",
+                  "items": {}
+                },
                 "substances_with_group": {
                   "type": "boolean"
                 },
