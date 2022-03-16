@@ -28,10 +28,13 @@ class Intervention < ApplicationRecord
     left_joins(:invitations).published.not_shared_to_invited
       .or(left_joins(:invitations).published.where(invitations: { email: participant_email }))
   }
+
+  scope :without_cloning, -> { where(is_cloning: false) }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
   scope :indexing, ->(ids) { where(id: ids) }
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
   scope :filter_by_name, ->(name) { where('lower(name) like ?', "%#{name.downcase}%") if name.present? }
+  scope :filter_by_organization, ->(organization_id) { where(organization_id: organization_id) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -79,6 +82,7 @@ class Intervention < ApplicationRecord
   def self.detailed_search(params)
     scope = all
     scope = scope.limit_to_statuses(params[:statuses])
+    scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
     scope.filter_by_name(params[:name])
   end
 end

@@ -4,7 +4,7 @@ class V1::SessionService
   def initialize(user, intervention_id)
     @user = user
     @intervention_id = intervention_id
-    @intervention = Intervention.includes(:sessions).accessible_by(user.ability).find(intervention_id)
+    @intervention = Intervention.accessible_by(user.ability).find(intervention_id)
   end
 
   attr_reader :user, :intervention_id

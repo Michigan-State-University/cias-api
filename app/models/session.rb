@@ -7,7 +7,7 @@ class Session < ApplicationRecord
   include Clone
   include FormulaInterface
 
-  belongs_to :intervention, inverse_of: :sessions, touch: true
+  belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
 
   has_many :question_groups, dependent: :destroy, inverse_of: :session
@@ -100,7 +100,7 @@ class Session < ApplicationRecord
   end
 
   def first_question
-    question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
+    question_groups.where('questions_count > 0').order(:position).first.questions.includes(%i[image_blob image_attachment]).order(:position).first
   end
 
   def finish_screen

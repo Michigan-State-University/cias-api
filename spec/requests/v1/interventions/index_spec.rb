@@ -20,7 +20,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   let!(:researcher_interventions) { create_list(:intervention, 3, :published, user: researcher, shared_to: :invited) }
   let!(:interventions_for_guests) { create_list(:intervention, 2, :published) }
   let(:organization) { create(:organization) }
-  let!(:intervention_for_organization) { [create(:intervention, organization_id: organization.id)] }
+  let!(:intervention_for_organization) { create_list(:intervention, 3, organization_id: organization.id, user: researcher) }
 
   let!(:params) { {} }
 
@@ -67,7 +67,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
       context 'researcher' do
         let(:user) { researcher }
-        let(:interventions_scope) { researcher_interventions }
+        let(:interventions_scope) { researcher_interventions + intervention_for_organization }
 
         it 'returns correct http status' do
           expect(response).to have_http_status(:ok)
@@ -80,6 +80,19 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
         it 'returns correct invitations list size' do
           expect(json_response['interventions'].size).to eq interventions_size_researcher
+        end
+
+        context 'filtering by organization' do
+          let!(:params) { { organization_id: organization.id } }
+
+          it 'return correct status' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'return correct data' do
+            expect(json_response['interventions'].size).to eq intervention_for_organization.size
+            expect(json_response['interventions'].pluck('id')).to match_array intervention_for_organization.map(&:id)
+          end
         end
       end
 
@@ -109,7 +122,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   context 'when params are not given' do
-    it_behaves_like 'chosen users', 9, 3
+    it_behaves_like 'chosen users', 11, 6
   end
 
   context 'filtering by statuses' do
@@ -141,6 +154,16 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
     it 'return correct intervention' do
       expect(json_response['interventions'].first['id']).to include(new_intervention.id)
+    end
+  end
+
+  context 'returns only interventions that are not being cloned' do
+    let!(:intervention_being_cloned) { create(:intervention, user: admin, is_cloning: true) }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct intervention' do
+      expect(json_response['interventions'].pluck('id')).to not_include(intervention_being_cloned.id)
     end
   end
 end

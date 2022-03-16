@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.4.6'
+gem 'rails', '~> 6.1.4.7'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.2'
 
@@ -38,7 +38,6 @@ gem 'wicked_pdf'
 gem 'rack-attack'
 gem 'secure_headers'
 gem 'airbrake'
-gem 'google-protobuf', '>= 3.19.2'
 # for encrypt data
 gem 'lockbox'
 # for search on encrypted data
@@ -50,7 +49,9 @@ gem 'countries'
 gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
-
+# for logging errors
+gem "sentry-ruby"
+gem "sentry-rails"
 # Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 gem 'good_job'
 

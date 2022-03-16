@@ -28,7 +28,7 @@ class V1::FlowService
   end
 
   def question_to_display(preview_question_id)
-    return user_session.session.questions.find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
+    return user_session.session.questions.includes(%i[image_blob image_attachment]).find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
 
     last_answered_question = user_session.last_answer&.question
     return user_session.session.first_question if last_answered_question.nil?

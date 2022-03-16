@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_22_125157) do
+ActiveRecord::Schema.define(version: 2022_03_09_142828) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -245,6 +245,8 @@ ActiveRecord::Schema.define(version: 2022_02_22_125157) do
     t.uuid "organization_id"
     t.bigint "google_language_id", default: 22, null: false
     t.boolean "from_deleted_organization", default: false, null: false
+    t.boolean "is_cloning", default: false
+    t.integer "sessions_count"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
