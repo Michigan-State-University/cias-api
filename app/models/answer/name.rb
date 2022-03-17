@@ -8,6 +8,6 @@ class Answer::Name < Answer
   end
 
   def csv_header_name(_data)
-    'phoneticName'
+    'metadata.phonetic_name'
   end
 end

@@ -383,19 +383,19 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       end
       let!(:answer_2) do
         create(:answer_name, user_session: user_session, question: question_3, body: { data: [
-                 { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
+                 { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phonetic_name' => 'John' } }
                ] })
       end
 
       it 'save nil values for each variable unanswered questions' do
         subject.collect
         expect(subject.header).to eq [:user_id, :email, "#{session.variable}.var_1", "#{session.variable}.var_2", "#{session.variable}.var_3",
-                                      "#{session.variable}.phoneticName", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+                                      "#{session.variable}.metadata.phonetic_name", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
         expect(subject.rows).to eq [
           [
             answer_1.user_session.user_id.to_s,
             answer_1.user_session.user.email.to_s,
-            '1', nil, nil, { 'name' => 'John', 'phoneticName' => 'John' },
+            '1', nil, nil, { 'name' => 'John', 'phonetic_name' => 'John' },
             answer_1.user_session.created_at, nil, nil
           ]
         ]
