@@ -7,7 +7,7 @@ class Session < ApplicationRecord
   include FormulaInterface
   include Translate
 
-  belongs_to :intervention, inverse_of: :sessions, touch: true
+  belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
 
   has_many :sms_plans, dependent: :destroy
@@ -95,6 +95,14 @@ class Session < ApplicationRecord
     return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
     SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
+  end
+
+  def first_question
+    question_groups.where('questions_count > 0').order(:position).first.questions.includes(%i[image_blob image_attachment]).order(:position).first
+  end
+
+  def finish_screen
+    question_group_finish.questions.first
   end
 
   def available_now?(participant_date_with_payload = nil)

@@ -10,6 +10,7 @@ class Question::Narrator
   end
 
   def execute(destroy: false)
+    return if question.duplicated
     return if question.changed? && question.narrator == question.narrator_was && !question.duplicated
 
     self.outdated_files = Blobs.call(question.narrator_was, question.duplicated)

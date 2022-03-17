@@ -39,18 +39,16 @@ class V1::SessionsController < V1Controller
   def duplicate
     authorize! :duplicate, Session
 
-    session = session_service.duplicate(session_id, new_intervention_id)
-    render json: serialized_response(session), status: :created
+    DuplicateJobs::Session.perform_later(current_v1_user, session_id, new_intervention_id)
+    render status: :ok
   end
 
   def clone
     authorize! :clone, Session
 
-    intervention = session_obj.intervention
-    position = intervention.sessions.order(:position).last.position + 1
-    params = { variable: "cloned_#{session_obj.variable}_#{position}" }
-    cloned_resource = Session.find(session_id).clone(params: params)
-    render json: serialized_response(cloned_resource), status: :created
+    CloneJobs::Session.perform_later(current_v1_user, session_obj)
+
+    render status: :ok
   end
 
   def session_variables

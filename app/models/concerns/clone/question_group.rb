@@ -16,7 +16,7 @@ class Clone::QuestionGroup < Clone::Base
         outcome.questions << Clone::Question.new(question,
                                                  question_group_id: outcome.id,
                                                  clean_formulas: clean_formulas,
-                                                 position: question.position).execute
+                                                 position: question.position, session_variables: session_variables).execute
       end
     end
   end

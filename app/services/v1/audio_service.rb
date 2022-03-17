@@ -17,10 +17,11 @@ class V1::AudioService
   def call
     digest = prepare_audio_digest
     audio = Audio.find_by(sha256: digest)
-    audio&.increment!(:usage_counter) unless preview_audio
+    # audio&.increment!(:usage_counter) unless preview_audio
     audio = create_audio(digest) if audio.nil?
-    audio.save
-    audio.reload
+    # audio.save
+    # audio.reload
+    audio
   end
 
   def prepare_audio_digest
@@ -36,7 +37,8 @@ class V1::AudioService
       language: language_code,
       voice_type: voice_type
     ).execute
-    audio
+    audio.save
+    audio.reload
   end
 
   def unify_text(text)

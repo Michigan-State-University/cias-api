@@ -4,12 +4,13 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.4.2'
+gem 'rails', '~> 6.1.4.7'
 gem 'pg', '~> 1.2'
-gem 'puma', '>= 5.5.1'
+gem 'puma', '>= 5.6.2'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
+gem 'activestorage', '>= 6.1.4.7'
 gem 'active_storage_validations'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
@@ -25,7 +26,7 @@ gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '>= 3.19.2'
 gem 'metainspector', '~> 1.15'
-gem 'nokogiri', '>= 1.12.5'
+gem 'nokogiri', '>= 1.13.2'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
@@ -49,7 +50,9 @@ gem 'countries'
 gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
-
+# for logging errors
+gem "sentry-ruby"
+gem "sentry-rails"
 # Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 gem 'good_job'
 
@@ -76,13 +79,11 @@ group :development do
   gem 'letter_opener_web'
   gem 'license_finder'
   gem 'pgsync'
-  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
   gem 'factory_bot_rails'
   gem 'rspec-rails'
-  gem 'rspec-sidekiq'
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'test-prof'
@@ -93,5 +94,9 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
-  gem 'wkhtmltopdf-heroku'
+end
+
+group :development, :production do
+  # only version that is working on AWS
+  gem 'wkhtmltopdf-binary', '~> 0.12.5.4'
 end

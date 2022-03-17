@@ -73,8 +73,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test"]
-          expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1, #{answer.user_session.created_at}, nil, nil]]
         end
       end
 
@@ -112,8 +112,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2"]
-          expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1 2]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', '2', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -143,8 +143,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1"]
-          expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -172,8 +172,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1, answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -215,8 +215,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2"]
-          expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1 2]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email, '1', '2', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -247,8 +247,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1, answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -278,8 +278,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save variable and the clicking on the link to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.site"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, true]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.site", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, true, answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -307,8 +307,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save variable and the clicking on the link to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.date"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12']]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.date", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -336,8 +336,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save variable and the value to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.phone"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123']]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.phone", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -365,8 +365,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save variable and the value to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.currency"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD']]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.currency", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -426,12 +426,13 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         it 'save nil values for each variable unanswered questions' do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.var_1", "#{session.variable}.var_2", "#{session.variable}.var_3",
-                                        "#{session.variable}.phoneticName"]
+                                        "#{session.variable}.metadata.phonetic_name", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
           expect(subject.rows).to eq [
             [
-              answer1.user_session.user_id.to_s,
-              answer1.user_session.user.email.to_s,
-              '1', nil, nil, { 'name' => 'John', 'phoneticName' => 'John' }
+              answer_1.user_session.user_id.to_s,
+              answer_1.user_session.user.email.to_s,
+              '1', nil, nil, { 'name' => 'John', 'phonetic_name' => 'John' },
+              answer_1.user_session.created_at, nil, nil
             ]
           ]
         end
@@ -491,7 +492,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         it 'save the values into the one row' do
           subject.collect
           expect(subject.rows.size).to eq 1
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', '3']]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil, '3', answer_2.user_session.created_at, nil, nil]]
         end
       end
 
@@ -520,8 +521,85 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 888]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 888, answer.user_session.created_at, nil, nil]]
+        end
+      end
+
+      context 'when session is finished' do
+        let!(:question_body) do
+          {
+            'data' => [
+              { 'value' => '1', 'payload' => '' },
+              { 'value' => '2', 'payload' => '' }
+            ],
+            'variable' => { 'name' => 'test' }
+          }
+        end
+        let!(:user_session) { create(:user_session, session: session, user: user) }
+        let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
+        let!(:answer) { create(:answer_single, question: question, skipped: true, user_session: user_session) }
+  
+        before do
+          user_session.update!(finished_at: user_session.created_at + 5.hours)
+        end
+  
+        it 'correctly shows an end date & session duration' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user_session.user.id, user_session.user.email, 888, user_session.created_at, user_session.finished_at, '05:00:00']]
+        end
+  
+        context 'when more than 1 session is finished' do
+          let!(:question_body) do
+            {
+              'data' => [
+                { 'value' => '1', 'payload' => '' },
+                { 'value' => '2', 'payload' => '' }
+              ],
+              'variable' => { 'name' => 'test' }
+            }
+          end
+          let!(:session1) { create(:session, intervention: intervention, position: 1) }
+          let!(:user_session1) { create(:user_session, session: session1, user: user) }
+          let!(:question_group1) { create(:question_group_plain, session: session1) }
+          let!(:question1) { create(:question_single, question_group: question_group1, body: question_body) }
+          let!(:answer1) { create(:answer_single, question: question1, skipped: true, user_session: user_session1) }
+          let!(:session2) { create(:session, intervention: intervention, position: 2) }
+          let!(:question_group2) { create(:question_group_plain, session: session2) }
+          let!(:user_session2) { create(:user_session, session: session2, user: user) }
+          let!(:question2) { create(:question_single, question_group: question_group2, body: question_body) }
+          let!(:answer2) { create(:answer_single, question: question2, skipped: true, user_session: user_session2) }
+          let(:sessions) { Session.where(id: [session1.id, session2.id]).order(:position) }
+          let(:expected_header) do
+            [:user_id, :email, "#{session1.variable}.test", "#{session1.variable}.metadata.session_start", "#{session1.variable}.metadata.session_end", "#{session1.variable}.metadata.session_duration", "#{session2.variable}.test", "#{session2.variable}.metadata.session_start", "#{session2.variable}.metadata.session_end", "#{session2.variable}.metadata.session_duration"]
+          end
+          let(:expected_row) do
+            [user.id, user.email, 888, user_session1.created_at, user_session1.finished_at, '05:00:00', 888, user_session2.created_at, user_session2.finished_at, '06:50:40']
+          end
+  
+          before do
+            user_session1.update!(finished_at: user_session1.created_at + 5.hours)
+            user_session2.update!(finished_at: user_session2.created_at + 6.hours + 50.minutes + 40.seconds)
+          end
+  
+          it 'correctly shows end dates & durations' do
+            subject.collect
+            expect(subject.header).to eq(expected_header)
+            expect(subject.rows).to eq([expected_row])
+          end
+        end
+      end
+  
+      context 'when no questions in session' do
+        let(:sessions) { [session] }
+        let(:intervention) { create(:intervention, user: user) }
+        let(:session) { create(:session, intervention: intervention) }
+  
+        it 'shows start, end and duration columns in csv' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user.id, user.email, user_session.created_at, nil, nil]]
         end
       end
     end
