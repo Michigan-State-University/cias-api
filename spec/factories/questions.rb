@@ -670,7 +670,7 @@ FactoryBot.define do
       {
         data: [
           {
-            payload: { days_count: '0' }
+            payload: { days_count: '1' }
           }
         ]
       }
