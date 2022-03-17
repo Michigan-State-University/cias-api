@@ -556,6 +556,7 @@ DEPENDENCIES
   active_storage_validations
   activejob-cancel
   activerecord_json_validator
+  activestorage (>= 6.1.4.7)
   airbrake
   aws-sdk-s3
   blind_index
