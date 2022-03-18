@@ -6,10 +6,6 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: user) }
 
-  let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
-  let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
-  let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
-
   context 'Session::Classic' do
     let(:session) do
       create(:session, :with_report_templates,
@@ -43,40 +39,106 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                  { 'match' => '=4', 'target' => [{ 'id' => question4.id, 'probability' => '100', type: 'Question::Single' }] }
                                ] })
     end
-  end
+    let!(:question4) do
+      create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 4', position: 1,
+                               formula: { 'payload' => 'var + 7', 'patterns' => [
+                                 { 'match' => '=11', 'target' => [{ 'id' => question1.id, 'probability' => '100', type: 'Question::Single' }] }
+                               ] })
+    end
 
-  shared_examples 'permitted user' do
-    context 'when user clones a session' do
-      before { request }
+    let!(:question5) do
+      create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 5', position: 2,
+                               narrator: {
+                                 blocks: [
+                                   {
+                                     action: 'NO_ACTION',
+                                     question_id: question3.id,
+                                     reflections: [],
+                                     animation: 'pointUp',
+                                     type: 'Reflection',
+                                     endPosition: {
+                                       x: 0,
+                                       y: 600
+                                     }
+                                   }
+                                 ],
+                                 settings: {
+                                   voice: true,
+                                   animation: true
+                                 }
+                               })
+    end
+    let!(:question6) do
+      create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 6', position: 3,
+                               formula: { 'payload' => '', 'patterns' => [
+                                 { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
+                               ] })
+    end
+    let!(:last_third_party_report_template) { session.report_templates.third_party.last }
+    let!(:question7) do
+      create(:question_third_party, question_group: question_group2, subtitle: 'Question Subtitle 7', position: 4,
+                                    body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }] })
+    end
 
-      it 'has correct http code' do
-        expect(response).to have_http_status(:ok)
+    let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
+    let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
+    let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
+
+    context 'when auth' do
+      context 'is invalid' do
+        let(:request) { post v1_clone_session_path(id: session.id) }
+
+        it_behaves_like 'unauthorized user'
+      end
+
+      context 'is valid' do
+        it_behaves_like 'authorized user'
       end
     end
 
-    it 'correctly clone tests' do
-      expect(outcome_cat_mh_test_types.size).to eq(session.cat_mh_test_types.size)
-      expect(outcome_cat_mh_test_types).to eq(session.cat_mh_test_types)
+    context 'not found' do
+      let(:invalid_session_id) { '1' }
+
+      before do
+        post v1_clone_session_path(id: invalid_session_id), headers: user.create_new_auth_token
+      end
+
+      it 'has correct failure http status' do
+        expect(response).to have_http_status(:not_found)
+      end
     end
 
-    it 'correctly clones report templates' do
-      expect(outcome_report_templates.size).to eq 2
+    shared_examples 'permitted user' do
+      context 'when user clones a session' do
+        before { request }
 
-      outcome_report_template = outcome_report_templates.order(:created_at).last
-      report_template = session.report_templates.order(:created_at).last
+        it 'has correct http code' do
+          expect(response).to have_http_status(:ok)
+        end
+      end
+    end
 
-      expect(outcome_report_template.variants.size).to eq 1
-      expect(outcome_report_template.sections.size).to eq 1
+    context 'when user is researcher' do
+      it_behaves_like 'permitted user'
+    end
 
-      expect(outcome_report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY)).to eq report_template.slice(
-        *ReportTemplate::ATTR_NAMES_TO_COPY
-      )
-      expect(outcome_report_template.sections.last.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY)).to eq report_template.sections.last.slice(
-        *ReportTemplate::Section::ATTR_NAMES_TO_COPY
-      )
-      expect(outcome_report_template.variants.last.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY)).to eq report_template.variants.last.slice(
-        *ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY
-      )
+    context 'when user is researcher and have multiple roles' do
+      let(:user) { create(:user, :confirmed, roles: %w[guest researcher participant]) }
+
+      it_behaves_like 'permitted user'
+    end
+  end
+
+  context 'Session::CatMh' do
+    let!(:session) do
+      create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, :with_sms_plans, :with_report_templates, intervention: intervention)
+    end
+    let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token  }
+
+    before { request }
+
+    it 'has correct http code' do
+      expect(response).to have_http_status(:ok)
     end
   end
 end

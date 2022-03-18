@@ -206,6 +206,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
           )
         )
       end
+
       it { expect(response).to have_http_status(:ok) }
     end
   end

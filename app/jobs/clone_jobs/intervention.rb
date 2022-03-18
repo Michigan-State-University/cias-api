@@ -7,7 +7,6 @@ class CloneJobs::Intervention < CloneJob
     cloned_intervention = intervention.clone(params: clone_params)
     cloned_intervention = Array(cloned_intervention) unless cloned_intervention.is_a?(Array)
 
-
     after_clone(intervention, cloned_intervention)
   rescue StandardError => e
     logger.error 'ERROR-LOG'
@@ -22,11 +21,10 @@ class CloneJobs::Intervention < CloneJob
 
   private
 
-
   def after_clone(intervention, cloned_interventions)
     cloned_interventions.each do |cloned_intervention|
       Intervention.reset_counters(cloned_intervention.id, :sessions)
-      return unless cloned_intervention.user.email_notification
+      next unless cloned_intervention.user.email_notification
 
       CloneMailer.cloned_intervention(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
     end

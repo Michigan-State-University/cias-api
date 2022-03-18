@@ -129,7 +129,8 @@ RSpec.describe Intervention, type: :model do
     it 'return correct data' do
       cloned_intervention = intervention.clone
 
-      expect(intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
+      expect(intervention.attributes.except('id', 'created_at', 'updated_at', 'status',
+                                            'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
     end

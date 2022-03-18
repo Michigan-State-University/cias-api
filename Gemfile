@@ -51,8 +51,8 @@ gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
-gem "sentry-ruby"
-gem "sentry-rails"
+gem 'sentry-ruby'
+gem 'sentry-rails'
 # Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 gem 'good_job'
 

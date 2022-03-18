@@ -4,7 +4,9 @@ class V1::QuestionGroupService
   def initialize(user, session_id)
     @user = user
     @session_id = session_id
-    @question_groups = QuestionGroup.includes(:questions, questions: %i[image_attachment image_blob]).accessible_by(user.ability).where(session_id: session_id).order(:position)
+    @question_groups = QuestionGroup.includes(:questions,
+                                              questions: %i[image_attachment
+                                                            image_blob]).accessible_by(user.ability).where(session_id: session_id).order(:position)
   end
 
   attr_reader :user, :session_id

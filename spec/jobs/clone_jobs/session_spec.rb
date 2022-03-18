@@ -16,40 +16,40 @@ RSpec.describe CloneJobs::Session, type: :job do
   let!(:other_session) { create(:session, intervention: intervention, position: 2) }
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
-  let!(:question_group_1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
-  let!(:question_group_2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
-  let!(:question_1) do
-    create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle', position: 1,
+  let!(:question_group1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
+  let!(:question_group2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
+  let!(:question1) do
+    create(:question_single, question_group: question_group1, subtitle: 'Question Subtitle', position: 1,
                              formula: { 'payload' => 'var + 3', 'patterns' => [
-                               { 'match' => '=7', 'target' => [{ 'id' => question_2.id, 'probability' => '100', type: 'Question::Single' }] }
+                               { 'match' => '=7', 'target' => [{ 'id' => question2.id, 'probability' => '100', type: 'Question::Single' }] }
                              ] })
   end
-  let!(:question_2) do
-    create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle 2', position: 2,
+  let!(:question2) do
+    create(:question_single, question_group: question_group1, subtitle: 'Question Subtitle 2', position: 2,
                              formula: { 'payload' => 'var + 4', 'patterns' => [
                                { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
                              ] })
   end
-  let!(:question_3) do
-    create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle 3', position: 3,
+  let!(:question3) do
+    create(:question_single, question_group: question_group1, subtitle: 'Question Subtitle 3', position: 3,
                              formula: { 'payload' => 'var + 2', 'patterns' => [
-                               { 'match' => '=4', 'target' => [{ 'id' => question_4.id, 'probability' => '100', type: 'Question::Single' }] }
+                               { 'match' => '=4', 'target' => [{ 'id' => question4.id, 'probability' => '100', type: 'Question::Single' }] }
                              ] })
   end
-  let!(:question_4) do
-    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 4', position: 1,
+  let!(:question4) do
+    create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 4', position: 1,
                              formula: { 'payload' => 'var + 7', 'patterns' => [
-                               { 'match' => '=11', 'target' => [{ 'id' => question_1.id, 'probability' => '100', type: 'Question::Single' }] }
+                               { 'match' => '=11', 'target' => [{ 'id' => question1.id, 'probability' => '100', type: 'Question::Single' }] }
                              ] })
   end
 
-  let!(:question_5) do
-    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 5', position: 2,
+  let!(:question5) do
+    create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 5', position: 2,
                              narrator: {
                                blocks: [
                                  {
                                    action: 'NO_ACTION',
-                                   question_id: question_3.id,
+                                   question_id: question3.id,
                                    reflections: [],
                                    animation: 'pointUp',
                                    type: 'Reflection',
@@ -65,15 +65,15 @@ RSpec.describe CloneJobs::Session, type: :job do
                                }
                              })
   end
-  let!(:question_6) do
-    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 6', position: 3,
+  let!(:question6) do
+    create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 6', position: 3,
                              formula: { 'payload' => '', 'patterns' => [
                                { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
                              ] })
   end
   let!(:last_third_party_report_template) { session.report_templates.third_party.last }
-  let!(:question_7) do
-    create(:question_third_party, question_group: question_group_2, subtitle: 'Question Subtitle 7', position: 4,
+  let!(:question7) do
+    create(:question_third_party, question_group: question_group2, subtitle: 'Question Subtitle 7', position: 4,
                                   body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }] })
   end
 
@@ -130,8 +130,10 @@ RSpec.describe CloneJobs::Session, type: :job do
 
     it 'origin and outcome same except variable' do
       expect(session_was.except('variable')).to eq(cloned_session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position',
-                                                                                    'sms_plans_count', 'logo_url', 'formula', 'settings', 'days_after_date_variable_name',
-                                                                                    'google_tts_voice_id', 'language_name', 'google_tts_voice', 'variable', 'last_report_template_number', 'name'))
+                                                                                    'sms_plans_count', 'logo_url', 'formula', 'settings',
+                                                                                    'days_after_date_variable_name', 'google_tts_voice_id',
+                                                                                    'language_name', 'google_tts_voice', 'variable',
+                                                                                    'last_report_template_number', 'name'))
       expect(cloned_session.attributes['variable']).to eq "cloned_#{session.variable}_#{intervention.sessions.count}"
     end
 

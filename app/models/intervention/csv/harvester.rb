@@ -81,7 +81,10 @@ class Intervention::Csv::Harvester
     duration = ActiveSupport::Duration.build(seconds_diff.abs)
     parts = duration.parts
     total_hours = (parts[:hours] || 0) + (parts[:days] || 0) * 24
-    format('%02d:%02d:%02d', total_hours, parts[:minutes] || 0, parts[:seconds] || 0)
+    format('%<hours>02d:%<minutes>02d:%<seconds>02d',
+           hours: total_hours,
+           minutes: parts[:minutes] || 0,
+           seconds: parts[:seconds] || 0)
   end
 
   def users
