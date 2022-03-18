@@ -6,7 +6,6 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
-  let(:user) { researcher }
   let(:users) do
     {
       'researcher' => researcher,
@@ -14,10 +13,10 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     }
   end
   let!(:intervention) { create(:intervention, user: user) }
-  let!(:intervention_2) { create(:intervention, user: user) }
+  let!(:intervention2) { create(:intervention, user: user) }
   let!(:params) do
     {
-      new_intervention_id: intervention_2.id
+      new_intervention_id: intervention2.id
     }
   end
   let!(:headers) { user.create_new_auth_token }

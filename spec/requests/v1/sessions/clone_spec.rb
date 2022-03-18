@@ -133,7 +133,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let!(:session) do
       create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, :with_sms_plans, :with_report_templates, intervention: intervention)
     end
-    let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token  }
+    let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
 
     before { request }
 
