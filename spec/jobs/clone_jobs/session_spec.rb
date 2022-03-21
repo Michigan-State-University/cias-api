@@ -314,7 +314,6 @@ RSpec.describe CloneJobs::Session, type: :job do
     end
     let(:outcome_cat_mh_test_types) { Session.order(:created_at).last.cat_mh_test_types }
     let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
-    let(:outcome_cat_mh_test_types) { Session.order(:created_at).last.cat_mh_test_types }
     let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
 
     before { subject }
