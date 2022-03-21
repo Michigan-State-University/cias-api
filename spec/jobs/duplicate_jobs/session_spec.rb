@@ -41,7 +41,6 @@ RSpec.describe DuplicateJobs::Session, type: :job do
   context 'assign a new session to the intervention' do
     before do
       subject
-      perform_enqueued_jobs
     end
 
     it 'add new session to intervention' do
