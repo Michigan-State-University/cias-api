@@ -17,10 +17,7 @@ class V1::AudioService
   def call
     digest = prepare_audio_digest
     audio = Audio.find_by(sha256: digest)
-    # audio&.increment!(:usage_counter) unless preview_audio
     audio = create_audio(digest) if audio.nil?
-    # audio.save
-    # audio.reload
     audio
   end
 

@@ -74,10 +74,6 @@ class V1::QuestionGroupsController < V1Controller
 
   private
 
-  def question_group_service
-    @question_group_service ||= V1::QuestionGroupService.new(current_v1_user, session_id)
-  end
-
   def question_group_share_service
     @question_group_share_service ||= V1::QuestionGroup::ShareService.new(current_v1_user, session_load)
   end

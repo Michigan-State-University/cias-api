@@ -97,14 +97,6 @@ class Session < ApplicationRecord
     SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
   end
 
-  def first_question
-    question_groups.where('questions_count > 0').order(:position).first.questions.includes(%i[image_blob image_attachment]).order(:position).first
-  end
-
-  def finish_screen
-    question_group_finish.questions.first
-  end
-
   def available_now?(participant_date_with_payload = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
