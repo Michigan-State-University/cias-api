@@ -9,7 +9,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
   describe '#collect_data' do
     context 'when session is Session::CatMh' do
       let!(:intervention) { create(:intervention) }
-      let!(:session) { create(:cat_mh_session, :with_test_type_and_variables, intervention: intervention) }
+      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
       let!(:answer_body1) do
         {
@@ -44,7 +44,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
     context 'when session is Session::Classic' do
       let!(:questions) { Question.where(id: question.id).joins(:question_group) }
       let(:intervention) { create(:intervention) }
-      let!(:session) { build(:session, intervention: intervention) }
+      let(:session) { build(:session, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
       let!(:question_group) { create(:question_group_plain, session: session) }
 
@@ -396,7 +396,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             'variable' => { 'name' => 'var_1' }
           }
         end
-        let!(:answer_1_body) do
+        let!(:answer1_body) do
           {
             'data' => [
               {
@@ -431,7 +431,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           Question.joins(:question_group).where(id: [question1.id, question2.id, question3.id]).order(:position)
         end
         let!(:answer1) do
-          create(:answer_single, question: question1, body: answer_1_body, user_session: user_session)
+          create(:answer_single, question: question1, body: answer1_body, user_session: user_session)
         end
         let!(:answer2) do
           create(:answer_name, user_session: user_session, question: question3, body: { data: [
@@ -446,10 +446,10 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
           expect(subject.rows).to eq [
             [
-              answer_1.user_session.user_id.to_s,
-              answer_1.user_session.user.email.to_s,
-              '1', nil, nil, { 'name' => 'John', 'phonetic_name' => 'John' },
-              answer_1.user_session.created_at, nil, nil
+              answer1.user_session.user_id.to_s,
+              answer1.user_session.user.email.to_s,
+              '1', nil, nil, { 'name' => 'John', 'phoneticName' => 'John' },
+              answer1.user_session.created_at, nil, nil
             ]
           ]
         end
@@ -510,7 +510,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.rows.size).to eq 1
           expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil,
-                                       '3', answer_2.user_session.created_at, nil, nil]]
+                                       '3', answer2.user_session.created_at, nil, nil]]
         end
       end
 
