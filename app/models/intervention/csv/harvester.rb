@@ -22,9 +22,10 @@ class Intervention::Csv::Harvester
   private
 
   def set_headers
-    sessions.each do |session|
-      session.questions.where.not(type: ignored_types).order(:position).each do |question|
-        header << add_session_variable_to_question_variables(question, session)
+    sessions.order(:position).each do |session|
+
+      session.fetch_variables.each do |question_hash|
+        question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var) }
       end
 
       header.concat(session_times_metadata(session))
@@ -43,8 +44,10 @@ class Intervention::Csv::Harvester
     %w[Question::Feedback Question::Information Question::Finish Question::ThirdParty]
   end
 
-  def add_session_variable_to_question_variables(question, session)
-    question.csv_header_names.map { |question_variable| "#{session.variable}.#{question_variable}" }
+  def add_session_variable_to_question_variable(session, variable)
+    variable = 'metadata.phonetic_name' if variable.eql?('.:name:.')
+
+    "#{session.variable}.#{variable}"
   end
 
   def set_rows
@@ -52,28 +55,34 @@ class Intervention::Csv::Harvester
       initialize_row
       user.user_sessions.where(session_id: session_ids).each_with_index do |user_session, index|
         set_user_data(row_index, user_session) if index.zero?
+        session_variable = user_session.session.variable
         user_session.answers.each do |answer|
           set_default_value(user_session, answer, row_index)
           next if answer.skipped
 
           answer.body_data&.each do |data|
-            var_index = header.index("#{user_session.session.variable}.#{answer.csv_header_name(data)}")
+            var_index = header.index("#{session_variable}.#{answer.csv_header_name(data)}")
             next if var_index.blank?
 
             var_value = answer.csv_row_value(data)
             rows[row_index][var_index] = var_value
           end
         end
-        session_headers_index = header.index("#{user_session.session.variable}.metadata.session_start")
-        session_start = user_session.created_at
-        session_end = user_session.finished_at
-        unless session_end.nil?
-          rows[row_index][session_headers_index + 2] = time_diff(session_start, session_end) # session duration
-          rows[row_index][session_headers_index + 1] = session_end
-        end
-        rows[row_index][session_headers_index] = session_start
+
+        metadata(session_variable, user_session, row_index)
       end
     end
+  end
+
+  def metadata(session_variable, user_session, row_index)
+    session_headers_index = header.index("#{session_variable}.metadata.session_start")
+    session_start = user_session.created_at
+    session_end = user_session.finished_at
+    unless session_end.nil?
+      rows[row_index][session_headers_index + 2] = time_diff(session_start, session_end) # session duration
+      rows[row_index][session_headers_index + 1] = session_end
+    end
+    rows[row_index][session_headers_index] = session_start
   end
 
   def time_diff(start_time, end_time)

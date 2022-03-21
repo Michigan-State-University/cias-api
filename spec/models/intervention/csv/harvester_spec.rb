@@ -36,13 +36,14 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
       it 'save every variables and scores to csv' do
         subject.collect
-        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.dep_severity", "#{session.variable}.dep_precision"]
-        expect(subject.rows).to eq [%W[#{user_session.user_id} #{user_session.user.email} 1 2]]
+        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.dep_severity", "#{session.variable}.dep_precision", "#{session.variable}.metadata.session_start",
+                                      "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+        expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', '2', user_session.created_at, nil, nil]]
       end
     end
 
     context 'when session is Session::Classic' do
-      let!(:questions) { Question.where(id: question.id).joins(:question_group) }
+      let(:questions) { Question.where(id: question.id).joins(:question_group) }
       let(:intervention) { create(:intervention) }
       let(:session) { build(:session, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
@@ -75,7 +76,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [%W[#{answer.user_session.user_id} #{answer.user_session.user.email} 1 #{answer.user_session.created_at} nil nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
         end
       end
 
@@ -580,12 +581,13 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
               'variable' => { 'name' => 'test' }
             }
           end
-          let!(:session1) { create(:session, intervention: intervention, position: 1) }
+          let!(:intervention1) { create(:intervention) }
+          let!(:session1) { create(:session, intervention: intervention1, position: 1) }
           let!(:user_session1) { create(:user_session, session: session1, user: user) }
           let!(:question_group1) { create(:question_group_plain, session: session1) }
           let!(:question1) { create(:question_single, question_group: question_group1, body: question_body) }
           let!(:answer1) { create(:answer_single, question: question1, skipped: true, user_session: user_session1) }
-          let!(:session2) { create(:session, intervention: intervention, position: 2) }
+          let!(:session2) { create(:session, intervention: intervention1, position: 2) }
           let!(:question_group2) { create(:question_group_plain, session: session2) }
           let!(:user_session2) { create(:user_session, session: session2, user: user) }
           let!(:question2) { create(:question_single, question_group: question_group2, body: question_body) }
@@ -605,6 +607,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             user_session1.update!(finished_at: user_session1.created_at + 5.hours)
             user_session2.update!(finished_at: user_session2.created_at + 6.hours + 50.minutes + 40.seconds)
           end
+
+          let(:subject) { described_class.new(intervention1.sessions) }
 
           it 'correctly shows end dates & durations' do
             subject.collect
