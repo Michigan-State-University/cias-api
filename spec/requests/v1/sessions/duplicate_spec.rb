@@ -23,6 +23,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   let(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
 
   context 'when auth' do
+    let!(:session) { create(:session, intervention: intervention) }
     context 'is invalid' do
       let!(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params }
 
