@@ -46,5 +46,6 @@ module CiasApi
     routes.default_url_options = { host: ENV['APP_HOSTNAME'] }
     config.eager_load_paths += %W[#{config.root}/lib/rack]
     config.middleware.use ActionDispatch::Flash
+    config.filter_parameters << %i[password password_confirmation email first_name last_name]
   end
 end

@@ -4,11 +4,13 @@ class Clone::Intervention < Clone::Base
   def execute
     outcome.status = :draft
     outcome.name = "Copy of #{outcome.name}"
+    outcome.is_cloning = true
     clear_organization!
     clear_cat_mh_settings!
     outcome.save!
     create_sessions
     reassign_branching
+    outcome.update!(is_cloning: false)
     outcome
   end
 

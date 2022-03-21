@@ -22,7 +22,7 @@ class Session::Classic < Session
   end
 
   def first_question
-    question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
+    question_groups.where('questions_count > 0').order(:position).first.questions.includes(%i[image_blob image_attachment]).order(:position).first
   end
 
   def finish_screen
