@@ -60,7 +60,10 @@ RSpec.describe CloneJobs::Intervention, type: :job do
       expect(Intervention.order(:created_at).last.attributes.slice('cat_mh_application_id', 'cat_mh_organization_id', 'cat_mh_pool',
                                                                    'created_cat_mh_session_count')).to eq(
                                                                      {
-                                                                       'cat_mh_application_id' => nil, 'cat_mh_organization_id' => nil, 'cat_mh_pool' => nil, 'created_cat_mh_session_count' => 0
+                                                                       'cat_mh_application_id' => nil,
+                                                                       'cat_mh_organization_id' => nil,
+                                                                       'cat_mh_pool' => nil,
+                                                                       'created_cat_mh_session_count' => 0
                                                                      }
                                                                    )
     end
