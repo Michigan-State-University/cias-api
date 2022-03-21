@@ -90,8 +90,8 @@ RSpec.describe 'GET /v1/interventions', type: :request do
           end
 
           it 'return correct data' do
-            expect(json_response['interventions'].size).to eq intervention_for_organization.size
-            expect(json_response['interventions'].pluck('id')).to match_array intervention_for_organization.map(&:id)
+            expect(json_response['data'].size).to eq intervention_for_organization.size
+            expect(json_response['data'].pluck('id')).to match_array intervention_for_organization.map(&:id)
           end
         end
       end
@@ -163,7 +163,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 
     it 'return correct intervention' do
-      expect(json_response['interventions'].pluck('id')).to not_include(intervention_being_cloned.id)
+      expect(json_response['data'].pluck('id')).to not_include(intervention_being_cloned.id)
     end
   end
 end
