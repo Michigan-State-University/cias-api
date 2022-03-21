@@ -44,4 +44,25 @@ RSpec.describe CloneJobs::Intervention, type: :job do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(2)
     end
   end
+
+  context 'Session::CatMh' do
+    let(:intervention) do
+      create(:intervention, name: 'CAT-MH', cat_mh_application_id: 'application_id', cat_mh_organization_id: 'organization_id', cat_mh_pool: 100)
+    end
+    let!(:session) { create(:session, intervention: intervention, position: 1) }
+
+    it 'create a new cloned' do
+      expect { subject }.to change(Intervention, :count).by(1)
+    end
+
+    it 'clear cat mh settings' do
+      subject
+      expect(Intervention.order(:created_at).last.attributes.slice('cat_mh_application_id', 'cat_mh_organization_id', 'cat_mh_pool',
+                                                                   'created_cat_mh_session_count')).to eq(
+                                                                     {
+                                                                       'cat_mh_application_id' => nil, 'cat_mh_organization_id' => nil, 'cat_mh_pool' => nil, 'created_cat_mh_session_count' => 0
+                                                                     }
+                                                                   )
+    end
+  end
 end
