@@ -18,7 +18,7 @@ class CsvJob::Answers < CsvJob
     if intervention.draft?
       CsvMailer::Answers.csv_answers_preview(user, intervention, csv_content, requested_at).deliver_now
     else
-      CsvMailer::Answers.csv_answers(user, intervention, csv_content, requested_at).deliver_now
+      CsvMailer::Answers.csv_answers(user, intervention, requested_at).deliver_now
     end
   end
 end

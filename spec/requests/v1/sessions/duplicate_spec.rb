@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', type: :request do
+  let(:user) { create(:user, :confirmed, :researcher) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
-  let(:user) { researcher }
   let(:users) do
     {
       'researcher' => researcher,
@@ -14,19 +14,42 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   end
   let!(:intervention) { create(:intervention, user: user) }
   let!(:intervention2) { create(:intervention, user: user) }
-  let(:other_session) { create(:session, intervention: intervention) }
   let!(:params) do
     {
       new_intervention_id: intervention2.id
     }
   end
   let!(:headers) { user.create_new_auth_token }
-  let(:request) do
-    post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params,
-                                                                                                   headers: headers
+  let(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
+
+  context 'when auth' do
+    let!(:session) { create(:session, intervention: intervention) }
+
+    context 'is invalid' do
+      let!(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params }
+
+      it_behaves_like 'unauthorized user'
+    end
+
+    context 'when there are sms plans' do
+      shared_examples 'permitted user' do
+        context 'is valid' do
+          before { request }
+
+          it_behaves_like 'authorized user'
+        end
+      end
+
+      %w[researcher researcher_with_multiple_roles].each do |role|
+        let(:user) { users[role] }
+
+        it_behaves_like 'permitted user'
+      end
+    end
   end
 
   context 'Session::Classic' do
+    let(:other_session) { create(:session, intervention: intervention) }
     let!(:session) do
       create(:session, intervention: intervention,
                        formula: { 'payload' => 'var + 5', 'patterns' => [
@@ -37,78 +60,23 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
     let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
 
-    context 'when auth' do
-      context 'is invalid' do
-        let!(:request) do
-          post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params
-        end
-
-        it_behaves_like 'unauthorized user'
-      end
-
-      context 'when there are sms plans' do
-        shared_examples 'permitted user' do
-          context 'is valid' do
-            before { request }
-
-            it_behaves_like 'authorized user'
-
-            it 'session is duplicated' do
-              expect(json_response['data']['attributes']).to include(
-                'intervention_id' => intervention2.id,
-                'position' => intervention2.sessions.size,
-                'name' => session.name,
-                'schedule' => session.schedule,
-                'schedule_payload' => session.schedule_payload,
-                'variable' => "duplicated_#{session.variable}_#{intervention2.sessions.last&.position.to_i}"
-              )
-            end
-
-            it 'question_group is duplicated' do
-              expect(Session.find(json_response['data']['id']).question_groups.first).not_to eq(nil)
-            end
-
-            it 'question_group duplicated has diffrent id from original' do
-              expect(Session.find(json_response['data']['id']).question_groups.first.title).to eq(question_group.title)
-            end
-
-            it 'questions are duplicated' do
-              expect(Session.find(json_response['data']['id']).question_groups.first.questions.size).to eq(3)
-            end
-
-            it 'question duplicated has diffrent id from original' do
-              expect(Session.find(json_response['data']['id']).question_groups.first.questions.first.title).to eq(questions.first.title)
-            end
-          end
-        end
-
-        %w[researcher researcher_with_multiple_roles].each do |role|
-          let(:user) { users[role] }
-
-          it_behaves_like 'permitted user'
-        end
-      end
-    end
-
     context 'when intervention_id is invalid' do
       before do
-        post v1_intervention_duplicate_session_path(intervention_id: 9000, id: session.id), params: params,
-                                                                                            headers: headers
+        post v1_intervention_duplicate_session_path(intervention_id: 9000, id: session.id), params: params, headers: headers
       end
 
       it 'error message is expected' do
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
       end
     end
 
     context 'when session_id is invalid' do
       before do
-        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: 9000), params: params,
-                                                                                                 headers: headers
+        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: 9000), params: params, headers: headers
       end
 
       it 'error message is expected' do
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -120,57 +88,21 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
       end
 
       before do
-        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params,
-                                                                                                       headers: headers
+        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
       end
 
       it 'error message is expected' do
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:ok)
       end
     end
 
     context 'when all params are valid and response' do
       context 'is success' do
         before do
-          post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params,
-                                                                                                         headers: headers
+          post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
         end
 
-        it { expect(response).to have_http_status(:created) }
-
-        it 'session is duplicated' do
-          expect(json_response['data']['attributes']).to include(
-            'intervention_id' => intervention2.id,
-            'position' => intervention2.sessions.size,
-            'name' => session.name,
-            'schedule' => session.schedule,
-            'schedule_payload' => session.schedule_payload
-          )
-        end
-
-        it 'has cleared formula' do
-          expect(json_response['data']['attributes']['formula']).to include(
-            'payload' => '',
-            'patterns' => []
-          )
-          expect(json_response['data']['attributes']['settings']['formula']).to eq(false)
-        end
-
-        it 'question_group is duplicated' do
-          expect(Session.find(json_response['data']['id']).question_groups.first).not_to eq(nil)
-        end
-
-        it 'question_group duplicated has diffrent id from original' do
-          expect(Session.find(json_response['data']['id']).question_groups.first.title).to eq(question_group.title)
-        end
-
-        it 'questions are duplicated' do
-          expect(Session.find(json_response['data']['id']).question_groups.first.questions.size).to eq(3)
-        end
-
-        it 'question duplicated has diffrent id from original' do
-          expect(Session.find(json_response['data']['id']).question_groups.first.questions.first.title).to eq(questions.first.title)
-        end
+        it { expect(response).to have_http_status(:ok) }
       end
     end
   end
@@ -180,25 +112,8 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
 
     before { request }
 
-    it { expect(response).to have_http_status(:created) }
-
-    it 'session is duplicated' do
-      expect(json_response['data']['attributes']).to include(
-        'intervention_id' => intervention2.id,
-        'position' => intervention2.sessions.size,
-        'name' => session.name,
-        'schedule' => session.schedule,
-        'schedule_payload' => session.schedule_payload,
-        'variable' => "duplicated_#{session.variable}_#{intervention2.sessions.last&.position.to_i}",
-        'cat_mh_language_id' => session.cat_mh_language_id,
-        'cat_mh_time_frame_id' => session.cat_mh_time_frame_id,
-        'cat_mh_population_id' => session.cat_mh_population_id
-      )
-    end
-
-    it 'tests is duplicated' do
-      expect(Session.find(json_response['data']['id']).cat_mh_test_types.size).to eq(session.cat_mh_test_types.size)
-      expect(Session.find(json_response['data']['id']).cat_mh_test_types).to eq(session.cat_mh_test_types)
+    it 'correct status code' do
+      expect(response).to have_http_status(:ok)
     end
   end
 end

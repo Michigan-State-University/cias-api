@@ -489,6 +489,14 @@ GEM
       sexp_processor (~> 4.9)
     rubyzip (2.3.0)
     secure_headers (6.3.2)
+    sentry-rails (5.1.1)
+      railties (>= 5.0)
+      sentry-ruby-core (~> 5.1.1)
+    sentry-ruby (5.1.1)
+      concurrent-ruby (~> 1.0, >= 1.0.2)
+      sentry-ruby-core (= 5.1.1)
+    sentry-ruby-core (5.1.1)
+      concurrent-ruby
     sexp_processor (4.15.2)
     shellany (0.0.1)
     shoulda-matchers (4.5.1)
@@ -539,8 +547,7 @@ GEM
     wicked_pdf (2.1.0)
       activesupport
     with_env (1.1.0)
-    wkhtmltopdf-binary (0.12.6.5)
-    wkhtmltopdf-heroku (2.12.6.0)
+    wkhtmltopdf-binary (0.12.5.4)
     xml-simple (1.1.8)
     zeitwerk (2.5.4)
 
@@ -552,6 +559,7 @@ DEPENDENCIES
   active_storage_validations
   activejob-cancel
   activerecord_json_validator
+  activestorage (>= 6.1.4.7)
   airbrake
   aws-sdk-s3
   blind_index
@@ -609,6 +617,8 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-thread_safety
   secure_headers
+  sentry-rails
+  sentry-ruby
   shoulda-matchers
   simplecov
   sql_query
@@ -616,8 +626,7 @@ DEPENDENCIES
   timecop
   twilio-ruby (~> 5.45.0)
   wicked_pdf
-  wkhtmltopdf-binary
-  wkhtmltopdf-heroku
+  wkhtmltopdf-binary (~> 0.12.5.4)
 
 RUBY VERSION
    ruby 2.7.2p137

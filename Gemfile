@@ -10,6 +10,7 @@ gem 'puma', '>= 5.6.2'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
+gem 'activestorage', '>= 6.1.4.7'
 gem 'active_storage_validations'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
@@ -49,7 +50,9 @@ gem 'countries'
 gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
-
+# for logging errors
+gem 'sentry-ruby'
+gem 'sentry-rails'
 # Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 gem 'good_job'
 
@@ -76,7 +79,6 @@ group :development do
   gem 'letter_opener_web'
   gem 'license_finder'
   gem 'pgsync'
-  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
@@ -92,5 +94,9 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
-  gem 'wkhtmltopdf-heroku'
+end
+
+group :development, :production do
+  # only version that is working on AWS
+  gem 'wkhtmltopdf-binary', '~> 0.12.5.4'
 end

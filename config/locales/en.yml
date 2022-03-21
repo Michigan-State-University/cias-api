@@ -146,3 +146,27 @@ en:
       body_first_paragraph: You recently logged in to CIAS from a browser or app that we don't recognize or your last verification was over 30 days ago.
       body_second_paragraph: To ensure your account's security, we need to verify your identity. Enter the following code where prompted by CIAS.
       verification_code: 'Verification code: %{verification_code}'
+  clone_mailer:
+    intervention:
+      subject: 'Copy of %{intervention_name}'
+      header: 'Your copy of %{intervention_name} is ready'
+      body: 'Your intervention has been copied successfully. Now you can use it in CIAS.'
+      button_text: Open the e-intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
+    session:
+      subject: 'Copy of %{session_name}'
+      header: 'Your copy of %{session_name} is ready'
+      body: 'Your session has been copied successfully. Now you can use it in CIAS.'
+      button_text: Open the session
+      link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
+    error:
+      subject: 'Error during coping'
+      header: 'An error has occurred during copying.'
+      body: 'Something goes wrong while copying your session/intervention. Please try again.'
+  duplicate_mailer:
+    session:
+      subject: 'Duplicate of %{session_name}'
+      header: 'Your duplicate of %{session_name} is ready'
+      body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> is ready that you requested'
+      button_text: Open the e-intervention
+      link: '%{web_url}/interventions/%{intervention_id}'

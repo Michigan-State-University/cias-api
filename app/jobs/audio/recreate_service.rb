@@ -4,7 +4,7 @@ class Audio::RecreateService < ApplicationJob
   queue_as :default
 
   def perform
-    UserSession.where.not(name_audio_id: nil).update(name_audio_id: nil)
+    UserSession.where.not(name_audio: [nil]).update_all(name_audio_id: nil) # rubocop:disable Rails/SkipsModelValidations
     Audio.delete_all
 
     Question.find_each do |question|

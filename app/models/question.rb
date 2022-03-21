@@ -65,7 +65,7 @@ class Question < ApplicationRecord
   end
 
   def position_equal_or_higher
-    questionnaire = session.question_groups.includes([:questions]).map(&:questions).flatten
+    questionnaire = session.question_groups.includes([:questions], questions: %i[image_blob image_attachment]).map(&:questions).flatten
     current_position = questionnaire.map(&:id).find_index id
     @position_equal_or_higher ||= questionnaire.drop(current_position)
   end
