@@ -660,8 +660,10 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save every variables and scores to csv' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.drug_d1", "#{session.variable}.tlfb.alcohol_d1"]
-          expect(subject.rows).to eq [[user.id, user.email, true, false]]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.drug_d1", "#{session.variable}.tlfb.alcohol_d1",
+                                        "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                        "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user.id, user.email, true, false, user_session.created_at, nil, nil]]
         end
       end
 
@@ -724,8 +726,9 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         it 'save every variables and scores to csv' do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.vodka_d1", "#{session.variable}.tlfb.wine_d1",
-                                        "#{session.variable}.tlfb.cacao_d1"]
-          expect(subject.rows).to eq [[user.id, user.email, 10, 3, 15]]
+                                        "#{session.variable}.tlfb.cacao_d1", "#{session.variable}.metadata.session_start",
+                                        "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user.id, user.email, 10, 3, 15, user_session.created_at, nil, nil]]
         end
       end
     end
