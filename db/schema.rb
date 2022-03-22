@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_02_164138) do
+ActiveRecord::Schema.define(version: 2022_03_09_142828) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 2022_03_02_164138) do
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
+    t.index ["sha256"], name: "index_audios_on_sha256", unique: true
   end
 
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
@@ -360,6 +361,8 @@ ActiveRecord::Schema.define(version: 2022_03_02_164138) do
     t.integer "created_cat_mh_session_count", default: 0
     t.boolean "is_access_revoked", default: true
     t.string "license_type", default: "limited"
+    t.boolean "is_cloning", default: false
+    t.integer "sessions_count"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"

@@ -58,8 +58,11 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
 
   config.after_initialize do
-    Bullet.enable = true
-    Bullet.rails_logger = true
+    Bullet.enable        = true
+    Bullet.rails_logger  = true
+    Bullet.alert = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
   end
 
   # Mount Action Cable outside main process or domain

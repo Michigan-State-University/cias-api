@@ -32,6 +32,6 @@ class Question::TlfbQuestion < Question::Tlfb
   end
 
   def number_of_days
-    question_group.questions.first.body_data.first.dig('payload', 'days_count').to_i
+    question_group.questions.find_by(type: 'Question::TlfbConfig').body_data.first.dig('payload', 'days_count').to_i
   end
 end
