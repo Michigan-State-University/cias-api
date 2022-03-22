@@ -656,7 +656,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
         let!(:question) { questions.last.update!(body: question_body) }
         let!(:day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }
-        let!(:substance) { create(:tlfb_substance, day: day, body: answer_body) }
+        let!(:consumption_result) { create(:tlfb_consumption_result, day: day, body: answer_body) }
 
         it 'save every variables and scores to csv' do
           subject.collect
@@ -721,7 +721,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
         let!(:question) { questions.last.update!(body: question_body) }
         let!(:day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }
-        let!(:substance) { create(:tlfb_substance, day: day, body: answer_body) }
+        let!(:consumption_result) { create(:tlfb_consumption_result, day: day, body: answer_body) }
 
         it 'save every variables and scores to csv' do
           subject.collect

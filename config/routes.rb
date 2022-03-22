@@ -126,7 +126,7 @@ Rails.application.routes.draw do
 
     namespace :tlfb do
       resources :events, only: %i[destroy create update]
-      resources :substances, only: %i[create update]
+      resources :consumption_results, only: %i[create update]
     end
 
     resources :teams, only: %i[index show create update destroy] do

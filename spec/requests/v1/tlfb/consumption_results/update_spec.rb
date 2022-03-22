@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'PATCH v1/tlfb/substances/:id', type: :request do
+RSpec.describe 'PATCH v1/tlfb/consumption_results/:id', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
@@ -9,11 +9,11 @@ RSpec.describe 'PATCH v1/tlfb/substances/:id', type: :request do
   let(:question_group) { create(:tlfb_group, session: session) }
   let(:user_session) { create(:user_session, session: session) }
   let(:day) { create(:tlfb_day, user_session: user_session, question_group: question_group) }
-  let(:substance) { create(:tlfb_substance, day: day) }
+  let(:consumption_result) { create(:tlfb_consumption_result, day: day) }
 
   let(:params) do
     {
-      substance: {
+      consumption_result: {
         body: {
           data: {
             name: 'Test name',
@@ -23,7 +23,7 @@ RSpec.describe 'PATCH v1/tlfb/substances/:id', type: :request do
       }
     }
   end
-  let(:request) { patch v1_tlfb_substance_path(substance.id), headers: headers, params: params }
+  let(:request) { patch v1_tlfb_consumption_result_path(consumption_result.id), headers: headers, params: params }
 
   before { request }
 
@@ -33,7 +33,7 @@ RSpec.describe 'PATCH v1/tlfb/substances/:id', type: :request do
     end
 
     it 'correctly updates substance data' do
-      expect(substance.reload.attributes).to include(
+      expect(consumption_result.reload.attributes).to include(
         'body' => {
           'data' => include(
             'unit' => 'Test unit',
@@ -54,7 +54,7 @@ RSpec.describe 'PATCH v1/tlfb/substances/:id', type: :request do
 
   context 'Unauthorized user' do
     let(:user) { create(:user, :participant, :confirmed) }
-    let(:request) { post v1_tlfb_substances_path, headers: {}, params: params }
+    let(:request) { patch v1_tlfb_consumption_result_path(consumption_result.id), headers: {}, params: params }
 
     it 'returns correct HTTP status code (Unauthorized)' do
       expect(response).to have_http_status(:unauthorized)

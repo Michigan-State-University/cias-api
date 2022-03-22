@@ -8,5 +8,5 @@ class V1::Tlfb::DaySerializer < V1Serializer
   end
 
   has_many :events, serializer: V1::Tlfb::EventSerializer
-  has_many :substances, serializer: V1::Tlfb::SubstanceSerializer
+  has_one :consumption_result, serializer: V1::Tlfb::ConsumptionResultSerializer
 end

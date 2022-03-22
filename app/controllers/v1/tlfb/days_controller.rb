@@ -24,7 +24,7 @@ class V1::Tlfb::DaysController < V1Controller
   def day_response(days)
     V1::Tlfb::DaySerializer.new(
       days,
-      { include: %i[events substances] }
+      { include: %i[events consumption_result] }
     )
   end
 end

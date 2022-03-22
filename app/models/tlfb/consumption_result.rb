@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Tlfb::Substance < ApplicationRecord
+class Tlfb::ConsumptionResult < ApplicationRecord
   belongs_to :day, class_name: 'Tlfb::Day'
 
   delegate :user_session, to: :day
@@ -15,6 +15,6 @@ class Tlfb::Substance < ApplicationRecord
   private
 
   def json_schema_path
-    'db/schema/tlfb/substance'
+    'db/schema/tlfb/consumption_result'
   end
 end

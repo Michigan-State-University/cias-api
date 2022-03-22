@@ -133,8 +133,8 @@ class Intervention::Csv::Harvester
     session.question_groups.where(type: 'QuestionGroup::Tlfb').find_each do |tlfb_question_group|
       days = Tlfb::Day.where(user_session_id: user_session.id, question_group_id: tlfb_question_group.id)
       days.each_with_index do |day, day_index|
-        substance = day.substances.first
-        substance.body['consumptions']&.each do |consumption|
+        consumption_result = day.consumption_result
+        consumption_result.body['consumptions']&.each do |consumption|
           var_index = header.index("#{session.variable}.tlfb.#{consumption['variable']}_d#{day_index + 1}")
           rows[row_index][var_index] = consumption['amount'] || consumption['consumed']
         end

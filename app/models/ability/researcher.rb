@@ -35,6 +35,6 @@ class Ability::Researcher < Ability::Base
         user_session: { session: { intervention: { user_id: user.id } } }
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
     enable_google_access
-    can :manage, Tlfb::Substance, user_session: { session: { intervention: { user_id: user.id } } }
+    can :manage, Tlfb::ConsumptionResult, user_session: { session: { intervention: { user_id: user.id } } }
   end
 end

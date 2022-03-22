@@ -19,9 +19,7 @@ RSpec.describe 'GET /v1/calendar_data', type: :request do
   let!(:events2) do
     create_list(:tlfb_event, 3, day: day1)
   end
-  let!(:substances) do
-    create_list(:tlfb_substance, 4, day: day1)
-  end
+  let!(:consumption_result) { create(:tlfb_consumption_result, day: day1) }
   let(:params) { { user_session_id: user_session.id, tlfb_group_id: question_group.id } }
 
   let(:request) do
@@ -40,8 +38,8 @@ RSpec.describe 'GET /v1/calendar_data', type: :request do
     it 'return correct data' do
       expect(json_response['data'].count).to be(2)
       expect(json_response['data'].pluck('id')).to include(day1.id.to_s, day2.id.to_s)
-      expect(json_response['included'].size).to eq 9
-      expect(json_response['included'].pluck('type').uniq).to include('event', 'substance')
+      expect(json_response['included'].size).to eq 6
+      expect(json_response['included'].pluck('type').uniq).to include('event', 'consumption_result')
     end
   end
 

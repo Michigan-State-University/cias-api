@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'POST v1/tlfb/events', type: :request do
+RSpec.describe 'POST v1/tlfb/consumption_results', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:user) { admin }
   let(:intervention) { create(:intervention, user: admin) }
@@ -12,7 +12,7 @@ RSpec.describe 'POST v1/tlfb/events', type: :request do
 
   let(:params) do
     {
-      substance: {
+      consumption_result: {
         body: {
           data: {
             name: '',
@@ -26,7 +26,7 @@ RSpec.describe 'POST v1/tlfb/events', type: :request do
     }
   end
 
-  let(:request) { post v1_tlfb_substances_path, headers: headers, params: params }
+  let(:request) { post v1_tlfb_consumption_results_path, headers: headers, params: params }
 
   before { request }
 
@@ -35,9 +35,9 @@ RSpec.describe 'POST v1/tlfb/events', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'returns correct substance data' do
+    it 'returns correct consumption data' do
       expect(json_response['data']).to include(
-        'type' => 'substance',
+        'type' => 'consumption_result',
         'attributes' => include(
           'body' => {
             'data' => include('name' => '',
@@ -58,7 +58,7 @@ RSpec.describe 'POST v1/tlfb/events', type: :request do
 
   context 'Unauthorized user' do
     let(:user) { create(:user, :participant, :confirmed) }
-    let(:request) { post v1_tlfb_substances_path, headers: {}, params: params }
+    let(:request) { post v1_tlfb_consumption_results_path, headers: {}, params: params }
 
     it 'returns correct HTTP status code (Unauthorized)' do
       expect(response).to have_http_status(:unauthorized)

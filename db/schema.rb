@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_09_142828) do
+ActiveRecord::Schema.define(version: 2022_03_17_094149) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -176,6 +176,14 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
+  end
+
+  create_table "consumption_results", force: :cascade do |t|
+    t.jsonb "body"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "day_id", null: false
+    t.index ["day_id"], name: "index_consumption_results_on_day_id"
   end
 
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -566,14 +574,6 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
-  create_table "substances", force: :cascade do |t|
-    t.jsonb "body"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.bigint "day_id", null: false
-    t.index ["day_id"], name: "index_substances_on_day_id"
-  end
-
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "team_id"
@@ -756,6 +756,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "consumption_results", "days"
   add_foreign_key "days", "question_groups"
   add_foreign_key "days", "user_sessions"
   add_foreign_key "events", "days"
@@ -772,7 +773,6 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
   add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
-  add_foreign_key "substances", "days"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
