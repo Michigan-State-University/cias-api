@@ -663,7 +663,26 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.drug_d1", "#{session.variable}.tlfb.alcohol_d1",
                                         "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                         "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[user.id, user.email, true, false, user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[user.id, user.email, 1, 0, user_session.created_at, nil, nil]]
+        end
+
+        context 'csv will be generated with default value' do
+          let!(:answer_body) do
+            {
+              'consumptions' => [
+                { 'amount' => nil, 'consumed' => true, 'variable' => 'drug' }
+              ],
+              'substances_consumed' => true
+            }
+          end
+
+          it 'save every variables and scores to csv' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.drug_d1", "#{session.variable}.tlfb.alcohol_d1",
+                                          "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                          "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[user.id, user.email, 1, 0, user_session.created_at, nil, nil]]
+          end
         end
       end
 
@@ -729,6 +748,26 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                         "#{session.variable}.tlfb.cacao_d1", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
           expect(subject.rows).to eq [[user.id, user.email, 10, 3, 15, user_session.created_at, nil, nil]]
+        end
+
+        context 'csv will be generated with default value' do
+          let!(:answer_body) do
+            {
+              'consumptions' => [
+                { 'amount' => 10, 'consumed' => nil, 'variable' => 'vodka' },
+                { 'amount' => 3, 'consumed' => nil, 'variable' => 'wine' }
+              ],
+              'substances_consumed' => true
+            }
+          end
+
+          it 'save every variables and scores to csv' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.vodka_d1", "#{session.variable}.tlfb.wine_d1",
+                                          "#{session.variable}.tlfb.cacao_d1", "#{session.variable}.metadata.session_start",
+                                          "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[user.id, user.email, 10, 3, 0, user_session.created_at, nil, nil]]
+          end
         end
       end
     end
