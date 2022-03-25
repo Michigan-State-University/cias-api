@@ -15,10 +15,20 @@
               "properties": {
                 "days_count": {
                   "type": "string"
+                },
+                "start_date": {
+                  "type": "string"
+                },
+                "end_date": {
+                  "type": "string"
+                },
+                "choose_date_range": {
+                  "type": "boolean"
                 }
               },
               "required": [
-                "days_count"
+                "days_count",
+                "choose_date_range"
               ],
               "additionalProperties": false
             }

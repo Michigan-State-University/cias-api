@@ -670,7 +670,12 @@ FactoryBot.define do
       {
         data: [
           {
-            payload: { days_count: '1' }
+            payload: {
+              days_count: '1',
+              start_date: (DateTime.now - 1.day).to_s,
+              end_date: DateTime.now,
+              choose_date_range: false
+            }
           }
         ]
       }
