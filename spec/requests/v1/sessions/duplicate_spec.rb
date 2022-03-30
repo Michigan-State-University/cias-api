@@ -18,9 +18,9 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   let(:other_session) { create(:session, intervention: intervention) }
   let!(:session) do
     create(:session, intervention: intervention,
-                     formula: { 'payload' => 'var + 5', 'patterns' => [
+                     formulas: [{ 'payload' => 'var + 5', 'patterns' => [
                        { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-                     ] },
+                     ] }],
                      settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
   end
   let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }

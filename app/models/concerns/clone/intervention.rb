@@ -31,17 +31,21 @@ class Clone::Intervention < Clone::Base
   end
 
   def reassign_branching_between_sessions(outcome_session)
-    outcome_session.formula['patterns'] = update_object_pattern(outcome_session)
+    outcome_session.formulas.each do |formula|
+      formula['patterns'] = update_object_pattern(outcome_session, formula)
+    end
     outcome_session.save!
 
     outcome_session.questions.find_each do |question|
-      question.formula['patterns'] = update_object_pattern(question)
+      question.formulas.each do |formula|
+        formula['patterns'] = update_object_pattern(question, formula)
+      end
       question.save!
     end
   end
 
-  def update_object_pattern(object)
-    object.formula['patterns'].map do |pattern|
+  def update_object_pattern(object, formula)
+    formula['patterns'].map do |pattern|
       index = 0
       pattern['target'].each do |current_target|
         current_target['id'] = matching_outcome_target_id(pattern, index, object)

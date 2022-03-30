@@ -13,7 +13,7 @@ class Question < ApplicationRecord
 
   attribute :narrator, :json, default: assign_default_values('narrator')
   attribute :position, :integer, default: 0
-  attribute :formula, :json, default: assign_default_values('formula')
+  attribute :formulas, :json, default: assign_default_values('formulas')
   attribute :body, :json, default: assign_default_values('body')
   attribute :duplicated, :boolean, default: false
 
@@ -28,7 +28,7 @@ class Question < ApplicationRecord
   validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
   validates :narrator, json: { schema: -> { Rails.root.join("#{json_schema_path}/narrator.json").to_s }, message: ->(err) { err } }
   validates :video_url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
-  validates :formula, presence: true, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
+  validates :formulas, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
   validates :body, presence: true, json: { schema: -> { Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s }, message: ->(err) { err } }
 
   delegate :session, to: :question_group

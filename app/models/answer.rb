@@ -10,7 +10,7 @@ class Answer < ApplicationRecord
   attribute :decrypted_body, :json, default: { data: [] }
   attribute :body, :json, default: { data: [] }
 
-  delegate :subclass_name, :settings, :position, :title, :subtitle, :formula, to: :question, allow_nil: true
+  delegate :subclass_name, :settings, :position, :title, :subtitle, :formulas, to: :question, allow_nil: true
 
   validate :type_integrity_validator
 

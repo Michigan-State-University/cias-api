@@ -7,9 +7,9 @@ RSpec.describe CloneJobs::Session, type: :job do
   let!(:user) { create(:user, :confirmed, :researcher) }
   let!(:intervention) { create(:intervention, user: user, status: 'published') }
   let!(:session) do
-    create(:session, :with_report_templates, intervention: intervention, position: 1, formula: { 'payload' => 'var + 5', 'patterns' => [
+    create(:session, :with_report_templates, intervention: intervention, position: 1, formulas: [{ 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-           ] },
+           ] }],
                                              settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
                                              days_after_date_variable_name: 'var1')
   end
@@ -20,27 +20,27 @@ RSpec.describe CloneJobs::Session, type: :job do
   let!(:question_group_2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
   let!(:question_1) do
     create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle', position: 1,
-                             formula: { 'payload' => 'var + 3', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 3', 'patterns' => [
                                { 'match' => '=7', 'target' => [{ 'id' => question_2.id, 'probability' => '100', type: 'Question::Single' }] }
-                             ] })
+                             ] }])
   end
   let!(:question_2) do
     create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle 2', position: 2,
-                             formula: { 'payload' => 'var + 4', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-                             ] })
+                             ] }])
   end
   let!(:question_3) do
     create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle 3', position: 3,
-                             formula: { 'payload' => 'var + 2', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 2', 'patterns' => [
                                { 'match' => '=4', 'target' => [{ 'id' => question_4.id, 'probability' => '100', type: 'Question::Single' }] }
-                             ] })
+                             ] }])
   end
   let!(:question_4) do
     create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 4', position: 1,
-                             formula: { 'payload' => 'var + 7', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 7', 'patterns' => [
                                { 'match' => '=11', 'target' => [{ 'id' => question_1.id, 'probability' => '100', type: 'Question::Single' }] }
-                             ] })
+                             ] }])
   end
 
   let!(:question_5) do
@@ -67,9 +67,9 @@ RSpec.describe CloneJobs::Session, type: :job do
   end
   let!(:question_6) do
     create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 6', position: 3,
-                             formula: { 'payload' => '', 'patterns' => [
+                             formulas: [{ 'payload' => '', 'patterns' => [
                                { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
-                             ] })
+                             ] }])
   end
   let!(:last_third_party_report_template) { session.report_templates.third_party.last }
   let!(:question_7) do
@@ -114,7 +114,7 @@ RSpec.describe CloneJobs::Session, type: :job do
     let(:cloned_session) { intervention.reload.sessions.order(:position).last }
     let(:session_was) do
       session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position', 'sms_plans_count',
-                                'last_report_template_number', 'formula', 'settings', 'days_after_date_variable_name',
+                                'last_report_template_number', 'formulas', 'settings', 'days_after_date_variable_name',
                                 'google_tts_voice_id', 'language_name', 'google_tts_voice', 'name')
     end
     let(:cloned_questions_collection) do
@@ -130,7 +130,7 @@ RSpec.describe CloneJobs::Session, type: :job do
 
     it 'origin and outcome same except variable' do
       expect(session_was.except('variable')).to eq(cloned_session.attributes.except('id', 'generated_report_count', 'created_at', 'updated_at', 'position',
-                                                                                    'sms_plans_count', 'logo_url', 'formula', 'settings', 'days_after_date_variable_name',
+                                                                                    'sms_plans_count', 'logo_url', 'formulas', 'settings', 'days_after_date_variable_name',
                                                                                     'google_tts_voice_id', 'language_name', 'google_tts_voice', 'variable', 'last_report_template_number', 'name'))
       expect(cloned_session.attributes['variable']).to eq "cloned_#{session.variable}_#{intervention.sessions.count}"
     end
@@ -140,7 +140,7 @@ RSpec.describe CloneJobs::Session, type: :job do
     end
 
     it 'has cleared formula' do
-      expect(cloned_session.attributes['formula']).to include(
+      expect(cloned_session.attributes['formulas']).to include(
         'payload' => '',
         'patterns' => []
       )
@@ -167,12 +167,12 @@ RSpec.describe CloneJobs::Session, type: :job do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 3',
             'patterns' => [
               { 'match' => '=7', 'target' => [{ 'id' => cloned_questions_collection.second.id, 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
-          }
+          }]
         ),
         include(
           'subtitle' => 'Question Subtitle 2',
@@ -180,12 +180,12 @@ RSpec.describe CloneJobs::Session, type: :job do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 4',
             'patterns' => [
               { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'type' => 'Session', 'probability' => '100' }] }
             ]
-          }
+          }]
         ),
         include(
           'subtitle' => 'Question Subtitle 3',
@@ -193,12 +193,12 @@ RSpec.describe CloneJobs::Session, type: :job do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 2',
             'patterns' => [
               { 'match' => '=4', 'target' => [{ 'id' => cloned_questions_collection.fourth.id, 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
-          }
+          }]
         )
       )
     end
@@ -211,12 +211,12 @@ RSpec.describe CloneJobs::Session, type: :job do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 7',
             'patterns' => [
               { 'match' => '=11', 'target' => [{ 'id' => cloned_questions_collection.first.id, 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
-          }
+          }]
         ),
         include(
           'subtitle' => 'Question Subtitle 5',
@@ -243,12 +243,12 @@ RSpec.describe CloneJobs::Session, type: :job do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => '',
             'patterns' => [
               { 'match' => '', 'target' => [{ 'id' => '', 'type' => 'Question::Single', 'probability' => '100' }] }
             ]
-          }
+          }]
         )
       )
     end

@@ -83,4 +83,36 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       it_behaves_like 'permitted user'
     end
   end
+
+  context 'empty formulas' do
+    let(:params) do
+      {
+        question: {
+          type: question.type,
+          position: 999,
+          title: 'Question Test 1',
+          subtitle: 'test 1',
+          body: {
+            data: [
+              {
+                payload: {
+                  start_value: 'test 1',
+                  end_value: 'test 1'
+                }
+              }
+            ],
+            variable: {
+              name: 'var test 1'
+            }
+          },
+          formulas: []
+        }
+      }
+    end
+
+    it 'lets users assign empty array of formulas' do
+      request
+      expect(json_response['data']['attributes']['formulas']).to eq []
+    end
+  end
 end

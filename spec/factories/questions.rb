@@ -288,20 +288,22 @@ FactoryBot.define do
     end
 
     trait :branching_to_question do
-      formula do
-        {
-          payload: 'a1',
-          patterns: [
-            {
-              match: '=1',
-              target: [{
-                id: '',
-                probability: '100',
-                type: 'Question::Single'
-              }]
-            }
-          ]
-        }
+      formulas do
+        [
+          {
+            payload: 'a1',
+            patterns: [
+              {
+                match: '=1',
+                target: [{
+                  id: '',
+                  probability: '100',
+                  type: 'Question::Single'
+                }]
+              }
+            ]
+          }
+        ]
       end
       body do
         {
@@ -323,17 +325,19 @@ FactoryBot.define do
     end
 
     trait :branching_to_session do
-      formula do
-        {
-          payload: 'a1',
-          patterns: [
-            { match: '=2',
-              target: [{
-                id: '',
-                type: 'Session'
-              }] }
-          ]
-        }
+      formulas do
+        [
+          {
+            payload: 'a1',
+            patterns: [
+              { match: '=2',
+                target: [{
+                  id: '',
+                  type: 'Session'
+                }] }
+            ]
+          }
+        ]
       end
       body do
         {

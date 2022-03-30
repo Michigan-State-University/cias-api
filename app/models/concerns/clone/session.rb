@@ -3,7 +3,7 @@
 class Clone::Session < Clone::Base
   def execute
     outcome.position = position || outcome.intervention.sessions.size
-    outcome.clear_formula if clean_formulas
+    outcome.clear_formulas if clean_formulas
     outcome.days_after_date_variable_name = nil
     ActiveRecord::Base.transaction do
       create_question_groups
@@ -46,13 +46,15 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_branching_question(question)
-    question.formula['patterns'] = question.formula['patterns'].map do |pattern|
-      index = 0
-      pattern['target'].each do |current_target|
-        current_target['id'] = matching_outcome_target_id(pattern, index)
-        index += 1
+    question.formulas.each do |formula|
+      formula['patterns'] = formula['patterns'].map do |pattern|
+        index = 0
+        pattern['target'].each do |current_target|
+          current_target['id'] = matching_outcome_target_id(pattern, index)
+          index += 1
+        end
+        pattern
       end
-      pattern
     end
     question
   end

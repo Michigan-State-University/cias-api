@@ -103,32 +103,32 @@ RSpec.describe Intervention, type: :model do
     let!(:session) { create(:session, intervention: intervention, position: 1) }
     let!(:other_session) do
       create(:session, intervention: intervention, position: 2,
-                       formula: { 'payload' => 'var + 2',
-                                  'patterns' =>
+                       formulas: [{ 'payload' => 'var + 2',
+                                    'patterns' =>
                           [{ 'match' => '=1',
                              'target' =>
-                               [{ 'id' => third_session.id, 'type' => 'Session' }] }] })
+                               [{ 'id' => third_session.id, 'type' => 'Session' }] }] }])
     end
     let!(:third_session) do
       create(:session, intervention: intervention, position: 3,
-                       formula: { 'payload' => '',
-                                  'patterns' =>
+                       formulas: [{ 'payload' => '',
+                                    'patterns' =>
                           [{ 'match' => '',
                              'target' =>
-                               [{ 'id' => '', 'type' => 'Session' }] }] })
+                               [{ 'id' => '', 'type' => 'Session' }] }] }])
     end
     let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
     let!(:question1) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
-                               formula: { 'payload' => 'var + 3', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 3', 'patterns' => [
                                  { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
-                               ] })
+                               ] }])
     end
     let!(:question2) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
-                               formula: { 'payload' => 'var + 4', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                  { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
-                               ] })
+                               ] }])
     end
 
     it 'return correct data' do
@@ -150,12 +150,12 @@ RSpec.describe Intervention, type: :model do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 3',
             'patterns' => [
               { 'match' => '=7', 'target' => [{ 'id' => cloned_questions.second.id, 'type' => 'Question::Single' }] }
             ]
-          }
+          }]
         ),
         include(
           'subtitle' => 'Question Subtitle 2',
@@ -163,12 +163,12 @@ RSpec.describe Intervention, type: :model do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 4',
             'patterns' => [
               { 'match' => '=3', 'target' => [{ 'id' => cloned_sessions.second.id, 'type' => 'Session' }] }
             ]
-          }
+          }]
         ),
         include(
           'position' => 999_999,
@@ -185,21 +185,21 @@ RSpec.describe Intervention, type: :model do
 
       expect(second_cloned_session.attributes).to include(
         'position' => 2,
-        'formula' => {
+        'formulas' => [{
           'payload' => 'var + 2',
           'patterns' => [
             { 'match' => '=1', 'target' => [{ 'id' => third_cloned_session.id, 'type' => 'Session' }] }
           ]
-        }
+        }]
       )
       expect(third_cloned_session.attributes).to include(
         'position' => 3,
-        'formula' => {
+        'formulas' => [{
           'payload' => '',
           'patterns' => [
             { 'match' => '', 'target' => [{ 'id' => '', 'type' => 'Session' }] }
           ]
-        },
+        }],
         'variable' => third_session.variable.to_s
       )
     end

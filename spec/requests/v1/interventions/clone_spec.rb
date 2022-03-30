@@ -8,32 +8,32 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let!(:session) { create(:session, intervention: intervention, position: 1) }
   let!(:other_session) do
     create(:session, intervention: intervention, position: 2,
-                     formula: { 'payload' => 'var + 2',
-                                'patterns' =>
+                     formulas: [{ 'payload' => 'var + 2',
+                                  'patterns' =>
                         [{ 'match' => '=1',
                            'target' =>
-                             [{ 'id' => third_session.id, 'type' => 'Session' }] }] })
+                             [{ 'id' => third_session.id, 'type' => 'Session' }] }] }])
   end
   let!(:third_session) do
     create(:session, intervention: intervention, position: 3,
-                     formula: { 'payload' => '',
-                                'patterns' =>
+                     formulas: [{ 'payload' => '',
+                                  'patterns' =>
                         [{ 'match' => '',
                            'target' =>
-                             [{ 'id' => '', 'type' => 'Session' }] }] })
+                             [{ 'id' => '', 'type' => 'Session' }] }] }])
   end
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
-                             formula: { 'payload' => 'var + 3', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 3', 'patterns' => [
                                { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
-                             ] })
+                             ] }])
   end
   let!(:question2) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
-                             formula: { 'payload' => 'var + 4', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
-                             ] })
+                             ] }])
   end
   let(:headers) { user.create_new_auth_token }
   let(:request) { post clone_v1_intervention_path(id: intervention.id), headers: headers }
