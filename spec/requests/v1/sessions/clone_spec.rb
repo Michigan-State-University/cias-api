@@ -10,9 +10,9 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let(:session) do
       create(:session, :with_report_templates,
              intervention: intervention,
-             formula: { 'payload' => 'var + 5', 'patterns' => [
+             formulas: [{ 'payload' => 'var + 5', 'patterns' => [
                { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-             ] },
+             ] }],
              settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
              days_after_date_variable_name: 'var1')
     end
@@ -23,27 +23,27 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let!(:question_group2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
     let!(:question1) do
       create(:question_single, question_group: question_group1, subtitle: 'Question Subtitle', position: 1,
-                               formula: { 'payload' => 'var + 3', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 3', 'patterns' => [
                                  { 'match' => '=7', 'target' => [{ 'id' => question2.id, 'probability' => '100', type: 'Question::Single' }] }
-                               ] })
+                               ] }])
     end
     let!(:question2) do
       create(:question_single, question_group: question_group1, subtitle: 'Question Subtitle 2', position: 2,
-                               formula: { 'payload' => 'var + 4', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                  { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-                               ] })
+                               ] }])
     end
     let!(:question3) do
       create(:question_single, question_group: question_group1, subtitle: 'Question Subtitle 3', position: 3,
-                               formula: { 'payload' => 'var + 2', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 2', 'patterns' => [
                                  { 'match' => '=4', 'target' => [{ 'id' => question4.id, 'probability' => '100', type: 'Question::Single' }] }
-                               ] })
+                               ] }])
     end
     let!(:question4) do
       create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 4', position: 1,
-                               formula: { 'payload' => 'var + 7', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 7', 'patterns' => [
                                  { 'match' => '=11', 'target' => [{ 'id' => question1.id, 'probability' => '100', type: 'Question::Single' }] }
-                               ] })
+                               ] }])
     end
 
     let!(:question5) do
@@ -70,9 +70,9 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
     let!(:question6) do
       create(:question_single, question_group: question_group2, subtitle: 'Question Subtitle 6', position: 3,
-                               formula: { 'payload' => '', 'patterns' => [
+                               formulas: [{ 'payload' => '', 'patterns' => [
                                  { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
-                               ] })
+                               ] }])
     end
     let!(:last_third_party_report_template) { session.report_templates.third_party.last }
     let!(:question7) do

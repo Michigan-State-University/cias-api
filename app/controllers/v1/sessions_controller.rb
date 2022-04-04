@@ -94,7 +94,11 @@ class V1::SessionsController < V1Controller
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
                                     :intervention_id, :days_after_date_variable_name, :google_tts_voice_id,
                                     :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, narrator: {}, settings: {},
-                                                                                                                        formula: {}, cat_tests: [])
+                                                                                                                        formulas: [
+                                                                                                                          :payload, { patterns: [:match, {
+                                                                                                                            target: %i[type probability id]
+                                                                                                                          }] }
+                                                                                                                        ], cat_tests: [])
   end
 
   def session_params_for_create

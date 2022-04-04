@@ -9,9 +9,9 @@ RSpec.describe DuplicateJobs::Session, type: :job do
   let!(:new_intervention) { create(:intervention, user: user, status: 'published') }
   let!(:other_session) { create(:session, intervention: intervention) }
   let!(:session) do
-    create(:session, intervention: intervention, name: 'Test', formula: { 'payload' => 'var + 5', 'patterns' => [
+    create(:session, intervention: intervention, name: 'Test', formulas: [{ 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-           ] })
+           ] }])
   end
   let!(:clone_params) { {} }
 
@@ -57,7 +57,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     end
 
     it 'clear formula' do
-      expect(new_intervention.reload.sessions.first.formula).to include(
+      expect(new_intervention.reload.sessions.first.formulas[0]).to include(
         'payload' => '',
         'patterns' => []
       )

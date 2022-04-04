@@ -13,7 +13,7 @@ RSpec.describe V1::Question::Create do
       position: 99,
       title: 'Question Test 1',
       subtitle: 'test 1',
-      formula: {
+      formulas: [{
         payload: 'test',
         patterns: [
           {
@@ -33,7 +33,7 @@ RSpec.describe V1::Question::Create do
             }]
           }
         ]
-      },
+      }],
       body: {
         data: [
           {

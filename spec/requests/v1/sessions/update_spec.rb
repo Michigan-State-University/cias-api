@@ -111,4 +111,26 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       it_behaves_like 'permitted user'
     end
   end
+
+  context 'empty formulas' do
+    let(:params) do
+      {
+        session: {
+          name: 'test1 params',
+          days_after_date_variable_name: 'var1',
+          body: {
+            payload: 1,
+            target: '',
+            variable: '1'
+          },
+          formulas: []
+        }
+      }
+    end
+
+    it 'lets users assign empty array of formulas' do
+      request
+      expect(json_response['data']['attributes']['formulas']).to eq []
+    end
+  end
 end

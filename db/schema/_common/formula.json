@@ -1,55 +1,61 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "properties": {
-    "payload": {
-      "type": "string"
-    },
-    "patterns": {
-      "type": "array",
-      "items": [
-        {
-          "type": "object",
-          "properties": {
-            "match": {
-              "type": "string"
-            },
-            "target": {
-              "type": "array",
-              "items": [
-                {
-                  "properties": {
-                    "type": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "string"
-                    },
-                    "probability": {
-                      "type": "string"
+  "type": "array",
+  "minItems": 0,
+  "items": [
+    {
+      "type": "object",
+      "properties": {
+        "payload": {
+          "type": "string"
+        },
+        "patterns": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "properties": {
+                "match": {
+                  "type": "string"
+                },
+                "target": {
+                  "type": "array",
+                  "items": [
+                    {
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "probability": {
+                          "type": "string"
+                        }
+                      }
                     }
-                  }
+                  ],
+                  "required": [
+                    "type",
+                    "id"
+                  ],
+                  "additionalProperties": false
                 }
-              ],
+              },
               "required": [
-                "type",
-                "id"
+                "match",
+                "target"
               ],
               "additionalProperties": false
             }
-          },
-          "required": [
-            "match",
-            "target"
-          ],
-          "additionalProperties": false
+          ]
         }
-      ]
+      },
+      "required": [
+        "payload",
+        "patterns"
+      ],
+      "additionalProperties": false
     }
-  },
-  "required": [
-    "payload",
-    "patterns"
-  ],
-  "additionalProperties": false
+  ]
 }

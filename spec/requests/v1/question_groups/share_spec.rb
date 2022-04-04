@@ -10,9 +10,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
   let!(:other_question_group) { create(:question_group_plain, session: session, position: 2) }
   let!(:question_ids) do
     create_list(:question_single, 3, :narrator_block_one, title: 'Question Id Title', question_group: question_group,
-                                                          formula: { 'payload' => 'var + 4', 'patterns' => [
+                                                          formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                                             { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
-                                                          ] })
+                                                          ] }])
   end
   let!(:other_question_ids) do
     create_list(:question_free_response, 2, title: 'Other question Id Title', question_group: other_question_group)
@@ -46,13 +46,13 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
         it 'returned questions have no branching,variables and cleared speech blocks' do
           expect(json_response['included'][2]['attributes']['narrator']['blocks']).to eq question_ids.third.narrator['blocks']
-          expect(json_response['included'][2]['attributes']['formula']).not_to eq question_ids.third.formula
+          expect(json_response['included'][2]['attributes']['formulas']).not_to eq question_ids.third.formulas
           expect(json_response['included'][2]['attributes']['body']['data']).to eq question_ids.third.body['data']
         end
 
         it 'shared_question_group questions have no branching,variables and cleared speech blocks' do
           expect(third_question.narrator['blocks']).to eq question_ids.third.narrator['blocks']
-          expect(third_question.formula).not_to eq question_ids.third.formula
+          expect(third_question.formulas).not_to eq question_ids.third.formulas
           expect(third_question.body['data']).to eq question_ids.third.body['data']
         end
       end
