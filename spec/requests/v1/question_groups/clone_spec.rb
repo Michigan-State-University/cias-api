@@ -3,24 +3,22 @@
 require 'rails_helper'
 
 describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :request do
-  let(:request) do
-    post clone_v1_session_question_group_path(session_id: session.id, id: question_group.id), headers: headers
-  end
+  let(:request) { post clone_v1_session_question_group_path(session_id: session.id, id: question_group.id), headers: headers }
 
   let!(:session) { create(:session, intervention: create(:intervention, :published)) }
   let!(:other_session) { create(:session) }
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
-                             formula: { 'payload' => 'var + 3', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 3', 'patterns' => [
                                { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
-                             ] })
+                             ] }])
   end
   let!(:question2) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
-                             formula: { 'payload' => 'var + 4', 'patterns' => [
+                             formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
-                             ] })
+                             ] }])
   end
 
   context 'when authenticated as guest user' do
@@ -64,10 +62,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
                 'body' => include(
                   'variable' => { 'name' => 'clone_single_var' }
                 ),
-                'formula' => {
+                'formulas' => [{
                   'payload' => '',
                   'patterns' => []
-                }
+                }]
               )
             ),
             include(
@@ -78,10 +76,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
                 'body' => include(
                   'variable' => { 'name' => 'clone1_single_var' }
                 ),
-                'formula' => {
+                'formulas' => [{
                   'payload' => '',
                   'patterns' => []
-                }
+                }]
               )
             )
           ]

@@ -14,7 +14,7 @@ class Question < ApplicationRecord
 
   attribute :narrator, :json, default: assign_default_values('narrator')
   attribute :position, :integer, default: 0
-  attribute :formula, :json, default: assign_default_values('formula')
+  attribute :formulas, :json, default: assign_default_values('formulas')
   attribute :body, :json, default: assign_default_values('body')
   attribute :original_text, :json, default: assign_default_values('original_text')
   attribute :duplicated, :boolean, default: false
@@ -40,11 +40,11 @@ class Question < ApplicationRecord
                                                      err
                                                    } }
   validates :video_url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
-  validates :formula, presence: true, json: { schema: lambda {
-                                                        Rails.root.join("#{json_schema_path}/formula.json").to_s
-                                                      }, message: lambda { |err|
-                                                                    err
-                                                                  } }
+  validates :formulas, json: { schema: lambda {
+                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
+                                       }, message: lambda { |err|
+                                                     err
+                                                   } }
   validates :body, presence: true, json: { schema: lambda {
                                                      Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s
                                                    }, message: lambda { |err|

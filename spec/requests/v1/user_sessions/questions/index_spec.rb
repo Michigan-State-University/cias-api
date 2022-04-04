@@ -30,16 +30,16 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         let(:questions) { create_list(:question_single, 4, question_group: question_group) }
         let!(:question) do
           question = questions.first
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [
-                                     { 'id' => questions[2].id, 'probability' => '50', 'type' => 'Question' },
-                                     { 'id' => questions[3].id, 'probability' => '50', 'type' => 'Question' }
-                                   ]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [
+                                       { 'id' => questions[2].id, 'probability' => '50', 'type' => 'Question' },
+                                       { 'id' => questions[3].id, 'probability' => '50', 'type' => 'Question' }
+                                     ]
+                                   }
+                                 ] }]
           question.save
           question
         end
@@ -53,13 +53,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         let(:questions) { create_list(:question_single, 4, question_group: question_group) }
         let!(:question) do
           question = questions.first
-          question.formula = { 'payload' => 'test + test2',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test + test2',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                   }
+                                 ] }]
           question.save
           question
         end
@@ -78,15 +78,15 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         let(:questions) { create_list(:question_single, 4, question_group: question_group) }
         let!(:question) do
           question = questions.first
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [
-                                     { 'id' => cat_session.id, 'probability' => '100', 'type' => 'Session' }
-                                   ]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [
+                                       { 'id' => cat_session.id, 'probability' => '100', 'type' => 'Session' }
+                                     ]
+                                   }
+                                 ] }]
           question.save
           question
         end
@@ -107,13 +107,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test/test2',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test/test2',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -131,13 +131,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test test2',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test test2',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -156,15 +156,15 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let!(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [
-                                       { 'id' => cat_session.id, 'probability' => '100', 'type' => 'Session' }
-                                     ]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [
+                                         { 'id' => cat_session.id, 'probability' => '100', 'type' => 'Session' }
+                                       ]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -178,13 +178,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [{ 'id' => 'INVALID ID', 'probability' => '100', 'type' => 'Question' }]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [{ 'id' => 'INVALID ID', 'probability' => '100', 'type' => 'Question' }]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -204,13 +204,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test/test2',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test/test2',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -228,13 +228,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test test2',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test test2',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -252,13 +252,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 4, question_group: question_group) }
           let!(:question) do
             question = questions.first
-            question.formula = { 'payload' => 'test',
-                                 'patterns' => [
-                                   {
-                                     'match' => '=1',
-                                     'target' => [{ 'id' => 'INVALID ID', 'probability' => '100', 'type' => 'Question' }]
-                                   }
-                                 ] }
+            question.formulas = [{ 'payload' => 'test',
+                                   'patterns' => [
+                                     {
+                                       'match' => '=1',
+                                       'target' => [{ 'id' => 'INVALID ID', 'probability' => '100', 'type' => 'Question' }]
+                                     }
+                                   ] }]
             question.save
             question
           end
@@ -277,13 +277,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         let(:questions) { create_list(:question_single, 4, question_group: question_group) }
         let!(:question) do
           question = questions.first
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=2',
-                                   'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=2',
+                                     'target' => [{ 'id' => questions[3].id, 'probability' => '100', 'type' => 'Question' }]
+                                   }
+                                 ] }]
           question
         end
 
@@ -319,14 +319,14 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
         let(:question) do
           question = build(:question_single, question_group: question_group, position: 1)
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [{ 'id' => question_feedback.id, 'probability' => '100',
-                                                  'type' => 'Question' }]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [{ 'id' => question_feedback.id, 'probability' => '100',
+                                                    'type' => 'Question' }]
+                                   }
+                                 ] }]
           question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
                             'variable' => { 'name' => 'test' } }
           question.save
@@ -349,13 +349,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
         let!(:question) do
           question = questions.first
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [{ 'id' => other_session.id, 'probability' => '100', 'type' => 'Session' }]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [{ 'id' => other_session.id, 'probability' => '100', 'type' => 'Session' }]
+                                   }
+                                 ] }]
           question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
                             'variable' => { 'name' => 'test' } }
           question.save
@@ -463,14 +463,14 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
         let!(:question) do
           question = build(:question_single, question_group: question_group, position: 1)
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100',
-                                                  'type' => 'Question' }]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [{ 'id' => question_with_reflection_formula.id, 'probability' => '100',
+                                                    'type' => 'Question' }]
+                                   }
+                                 ] }]
           question.body = { 'data' => [{ 'value' => '1', 'payload' => '' }, { 'value' => '2', 'payload' => '' }],
                             'variable' => { 'name' => 'test' } }
           question.save
@@ -665,15 +665,15 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         let(:questions) { create_list(:question_single, 4, question_group: question_group) }
         let!(:question) do
           question = questions.first
-          question.formula = { 'payload' => 'test',
-                               'patterns' => [
-                                 {
-                                   'match' => '=1',
-                                   'target' => [
-                                     { 'id' => next_session.id, 'probability' => '100', 'type' => 'Session' }
-                                   ]
-                                 }
-                               ] }
+          question.formulas = [{ 'payload' => 'test',
+                                 'patterns' => [
+                                   {
+                                     'match' => '=1',
+                                     'target' => [
+                                       { 'id' => next_session.id, 'probability' => '100', 'type' => 'Session' }
+                                     ]
+                                   }
+                                 ] }]
           question.save
           question
         end

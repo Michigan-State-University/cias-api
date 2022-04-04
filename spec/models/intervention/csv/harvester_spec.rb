@@ -398,7 +398,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             'variable' => { 'name' => 'var_1' }
           }
         end
-        let!(:answer1_body) do
+        let!(:answer_1_body) do
           {
             'data' => [
               {
@@ -433,11 +433,11 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           Question.joins(:question_group).where(id: [question1.id, question2.id, question3.id]).order(:position)
         end
         let!(:answer1) do
-          create(:answer_single, question: question1, body: answer1_body, user_session: user_session)
+          create(:answer_single, question: question1, body: answer_1_body, user_session: user_session)
         end
         let!(:answer2) do
           create(:answer_name, user_session: user_session, question: question3, body: { data: [
-                   { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
+                   { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phonetic_name' => 'John' } }
                  ] })
         end
 
@@ -450,7 +450,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             [
               answer1.user_session.user_id.to_s,
               answer1.user_session.user.email.to_s,
-              '1', nil, nil, { 'name' => 'John', 'phoneticName' => 'John' },
+              '1', nil, nil, { 'name' => 'John', 'phonetic_name' => 'John' },
               answer1.user_session.created_at, nil, nil
             ]
           ]

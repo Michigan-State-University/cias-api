@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_09_142828) do
+ActiveRecord::Schema.define(version: 2022_03_22_094121) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -430,7 +430,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "subtitle"
     t.jsonb "narrator"
     t.string "video_url"
-    t.jsonb "formula"
+    t.jsonb "formulas"
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -491,7 +491,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "schedule", default: "after_fill"
     t.integer "schedule_payload"
     t.date "schedule_at"
-    t.jsonb "formula"
+    t.jsonb "formulas"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "report_templates_count", default: 0
