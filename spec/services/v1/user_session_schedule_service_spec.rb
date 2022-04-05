@@ -4,7 +4,7 @@ RSpec.describe V1::UserSessionScheduleService do
   let!(:intervention) { create(:intervention, :published) }
   let!(:user) { create(:user, :participant) }
   let!(:preview_user) { create(:user, :preview_session) }
-  let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formula: formula) }
+  let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
   let!(:second_session) do
     create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at)
   end

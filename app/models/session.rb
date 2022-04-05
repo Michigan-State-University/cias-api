@@ -20,7 +20,7 @@ class Session < ApplicationRecord
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 1
-  attribute :formula, :json, default: assign_default_values('formula')
+  attribute :formulas, :json, default: assign_default_values('formulas')
   attribute :original_text, :json, default: { name: '' }
 
   enum schedule: { days_after: 'days_after',
@@ -40,11 +40,11 @@ class Session < ApplicationRecord
                                        }, message: lambda { |err|
                                                      err
                                                    } }
-  validates :formula, presence: true, json: { schema: lambda {
-                                                        Rails.root.join("#{json_schema_path}/formula.json").to_s
-                                                      }, message: lambda { |err|
-                                                                    err
-                                                                  } }
+  validates :formulas, json: { schema: lambda {
+                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
+                                       }, message: lambda { |err|
+                                                     err
+                                                   } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
 
@@ -111,8 +111,8 @@ class Session < ApplicationRecord
     self.last_report_template_number
   end
 
-  def clear_formula
-    self.formula = self.class.assign_default_values('formula')
+  def clear_formulas
+    self.formulas = self.class.assign_default_values('formulas')
     settings['formula'] = false
   end
 

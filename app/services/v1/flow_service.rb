@@ -72,13 +72,18 @@ class V1::FlowService
     return nil if last_question.id.eql?(last_question.position_equal_or_higher.last.id)
 
     next_question = last_question.position_equal_or_higher[1]
-    if last_question.formula['payload'].present?
-
-      obj_src = last_question.exploit_formula(all_var_values)
+    if last_question.formulas.present?
+      obj_src = nil
+      last_question.formulas.each do |formula|
+        obj_src = last_question.exploit_formula(all_var_values, formula['payload'], formula['patterns'])
+        break unless obj_src.nil?
+      end
       self.warning = obj_src if obj_src.is_a?(String)
-
-      branching_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
-      next_question = branching_question unless branching_question.nil?
+      unless obj_src.nil?
+        branching_question = nil
+        branching_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
+        next_question = branching_question unless branching_question.nil?
+      end
     end
 
     return next_question if next_question.is_a?(Hash)

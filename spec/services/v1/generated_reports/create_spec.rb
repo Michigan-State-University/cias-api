@@ -51,7 +51,7 @@ RSpec.describe V1::GeneratedReports::Create do
     let!(:answer_receive_report_true) do
       create(:answer_name, user_session: user_session,
                            body: { data: [
-                             { 'var' => '.:name:.', 'value' => { 'name' => '', 'phoneticName' => 'John' } }
+                             { 'var' => '.:name:.', 'value' => { 'name' => '', 'phonetic_name' => 'John' } }
                            ] })
     end
 
@@ -122,7 +122,7 @@ RSpec.describe V1::GeneratedReports::Create do
       let!(:answer_receive_report_true) do
         create(:answer_name, user_session: user_session,
                              body: { data: [
-                               { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
+                               { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phonetic_name' => 'John' } }
                              ] })
       end
 
