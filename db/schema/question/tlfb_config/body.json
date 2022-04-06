@@ -24,11 +24,15 @@
                 },
                 "choose_date_range": {
                   "type": "boolean"
+                },
+                "display_helping_materials": {
+                  "type": "boolean"
                 }
               },
               "required": [
                 "days_count",
-                "choose_date_range"
+                "choose_date_range",
+                "display_helping_materials"
               ],
               "additionalProperties": false
             }

@@ -678,7 +678,8 @@ FactoryBot.define do
               days_count: '1',
               start_date: (DateTime.now - 1.day).to_s,
               end_date: DateTime.now,
-              choose_date_range: false
+              choose_date_range: false,
+              display_helping_materials: false
             }
           }
         ]
