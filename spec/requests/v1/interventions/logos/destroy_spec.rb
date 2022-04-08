@@ -5,9 +5,14 @@ require 'rails_helper'
 RSpec.describe 'DELETE /v1/interventions/:interventions_id/logo', type: :request do
   let(:current_user) { create(:user, :confirmed, :admin) }
   let(:other_user) { create(:user, :confirmed, :participant) }
-  let(:intervention) { create(:intervention, user: current_user, logo: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:intervention) do
+    create(:intervention, user: current_user, logo: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+  end
   let(:intervention_id) { intervention.id }
-  let(:published_intervention) { create(:intervention, user: current_user, status: :published, logo: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)) }
+  let(:published_intervention) do
+    create(:intervention, user: current_user, status: :published,
+                          logo: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+  end
   let(:published_intervention_id) { published_intervention.id }
 
   context 'when current_user is admin' do

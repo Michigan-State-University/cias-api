@@ -28,6 +28,9 @@
                 "value"
               ],
               "additionalProperties": false
+            },
+            "original_text" : {
+              "type": "string"
             }
           },
           "required": [

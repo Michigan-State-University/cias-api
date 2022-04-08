@@ -22,4 +22,17 @@ class Question::Multiple < Question
       payload['variable']['name'] = new_variable
     end
   end
+
+  def translate_body(translator, source_language_name_short, destination_language_name_short)
+    body['data'].each do |row|
+      row['original_text'] = row['payload']
+
+      translated_text = translator.translate(row['payload'], source_language_name_short, destination_language_name_short)
+      row['payload'] = translated_text
+    end
+  end
+
+  def question_variables
+    body['data'].map { |data| data['variable']['name'] }
+  end
 end

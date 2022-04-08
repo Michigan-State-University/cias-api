@@ -5,8 +5,6 @@ class V1::Users::CreateGuest
     new.call
   end
 
-  def initialize; end
-
   def call
     User.new.tap do |user|
       user.roles = %w[guest]

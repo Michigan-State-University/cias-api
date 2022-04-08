@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Teams::Destroy
+  prepend Database::Transactional
+
   def self.call(team)
     new(team).call
   end
@@ -10,11 +12,9 @@ class V1::Teams::Destroy
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      team_admin&.update!(roles: ['researcher']) if last_team?
+    team_admin&.update!(roles: ['researcher']) if last_team?
 
-      team.destroy!
-    end
+    team.destroy!
   end
 
   private

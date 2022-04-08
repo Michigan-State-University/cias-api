@@ -19,7 +19,8 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
           schedule: SmsPlan.schedules[:after_session_end],
           frequency: SmsPlan.frequencies[:once_a_day],
           no_formula_text: 'test text',
-          is_used_formula: false
+          is_used_formula: false,
+          type: 'SmsPlan::Normal'
         }
       }
     end
@@ -71,6 +72,27 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
           is_used_formula: false,
           no_formula_text: 'test text'
         )
+      end
+    end
+
+    context 'for sms alerts' do
+      let(:params) do
+        {
+          sms_plan: {
+            name: 'sms plan 1',
+            session_id: session.id,
+            schedule: SmsPlan.schedules[:after_session_end],
+            frequency: SmsPlan.frequencies[:once_a_day],
+            no_formula_text: 'test text',
+            is_used_formula: false,
+            type: 'SmsPlan::Alert'
+          }
+        }
+      end
+
+      it 'correctly creates SMS Alert plan' do
+        request
+        expect(response).to have_http_status(:created)
       end
     end
   end

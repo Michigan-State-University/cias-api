@@ -8,7 +8,7 @@ module Log::UserRequest
   end
 
   def leave_footprint
-    LogJobs::UserRequest.perform_later(request_scope)
+    LogJobs::UserRequest.perform_later(request_scope) unless ENV['LOG_OFF'] == 'true'
   end
 
   private
@@ -26,6 +26,7 @@ module Log::UserRequest
     }
   end
 
+  # rubocop:disable all
   def erase_from_params
     params[:user]&.delete(:password)
     params[:user]&.delete(:password_confirmation)
@@ -33,6 +34,7 @@ module Log::UserRequest
     params[:avatar]&.delete(:file)
     params[:report_template]&.delete(:logo)
     params[:variant]&.delete(:image)
+    params[:intervention]&.delete(:files)
     params[:logo]&.delete(:file)
     params.delete(:password)
     params.delete(:password_confirmation)
@@ -50,4 +52,5 @@ module Log::UserRequest
     params[:invitation]&.delete(:email)
     params.delete(:current_password)
   end
+  # rubocop:enable all
 end

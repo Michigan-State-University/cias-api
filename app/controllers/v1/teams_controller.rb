@@ -42,7 +42,7 @@ class V1::TeamsController < V1Controller
   end
 
   def remove_researcher
-    authorize! :remove_researcher, team
+    authorize! :remove_researcher, Team
 
     team.users.researchers.find(params.require(:user_id)).update!(team_id: nil)
 

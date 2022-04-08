@@ -44,11 +44,26 @@ RSpec.describe 'GET /v1/users/:id', type: :request do
     end
   end
 
+  %w[guest participant researcher organization_admin health_system_admin health_clinic_admin third_party e_intervention_admin team_admin].each do |role|
+    context "when user is #{role}" do
+      let(:user) { create(:user, :confirmed, role) }
+
+      before { request }
+
+      it 'returns not found' do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
   context 'when user is e-intervention admin' do
     let_it_be(:organization) { create(:organization, name: 'Awesome Organization') }
     let_it_be(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
     let(:alter_user) { health_system.health_system_admins.first }
-    let(:current_user) { create(:user, :confirmed, :e_intervention_admin, first_name: 'John', last_name: 'E-intervention admin', email: 'john.e_intervention_admin@test.com', created_at: 5.days.ago, organizable: organization) }
+    let(:current_user) do
+      create(:user, :confirmed, :e_intervention_admin, first_name: 'John', last_name: 'E-intervention admin', email: 'john.e_intervention_admin@test.com',
+                                                       created_at: 5.days.ago, organizable: organization)
+    end
 
     before { request }
 

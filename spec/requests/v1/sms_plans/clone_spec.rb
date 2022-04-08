@@ -38,6 +38,10 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
           expect(cloned_sms_plan['name']).to eq 'Copy of Plan name'
         end
 
+        it 'has correct type' do
+          expect(cloned_sms_plan['type']).to eq 'SmsPlan::Normal'
+        end
+
         context 'copied variants' do
           it 'have correct size' do
             expect(SmsPlan.find(json_response['data']['id']).variants.size).to eq variants.size
@@ -49,6 +53,21 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
 
           it 'have correct formula_match' do
             expect(SmsPlan.find(json_response['data']['id']).variants.first.formula_match).to eq 'test'
+          end
+        end
+
+        context 'copied alert phones' do
+          let!(:sms_plan) { create(:sms_alert, name: 'Plan name', session: session) }
+          let!(:phone) { create(:phone, :confirmed, sms_plans: [sms_plan]) }
+
+          before { post clone_v1_sms_plan_path(id: sms_plan.id), headers: headers }
+
+          it 'has correct amount of alert phones' do
+            expect(SmsPlan.find(json_response['data']['id']).alert_phones.size).to eq 1
+          end
+
+          it 'has correct phone number in alert phone data' do
+            expect(SmsPlan.find(json_response['data']['id']).alert_phones.first.phone.id).to eq phone.id
           end
         end
       end

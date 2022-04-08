@@ -3,8 +3,9 @@
 class V1::Sessions::SmsPlansController < V1Controller
   def index
     authorize! :read, SmsPlan
+    collection = session_load.sms_plans.detailed_search(params)
 
-    render json: serialized_response(session_load.sms_plans)
+    render json: serialized_response(collection)
   end
 
   private

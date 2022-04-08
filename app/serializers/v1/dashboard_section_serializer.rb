@@ -12,8 +12,6 @@ class V1::DashboardSectionSerializer < V1Serializer
   end
 
   attribute :organization_id do |object|
-    ReportingDashboard.find(object.reporting_dashboard_id).organization_id
-  rescue ActiveRecord::RecordNotFound
-    nil
+    ReportingDashboard.find_by(id: object.reporting_dashboard_id)&.organization_id
   end
 end

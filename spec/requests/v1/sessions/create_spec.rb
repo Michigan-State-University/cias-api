@@ -3,6 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :request do
+  let!(:cat_mh_language) { CatMhLanguage.create!(name: 'English', language_id: 1) }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
@@ -34,7 +35,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
       }
     }
   end
-  let(:request) { post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers }
+  let(:request) do
+    post v1_intervention_sessions_path(intervention_id: intervention.id), params: params, headers: headers
+  end
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do
@@ -52,6 +55,33 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
               expect(Session.last.variable).to eq 's1234'
             end
           end
+
+          context 'and include type' do
+            let(:params) do
+              {
+                session: {
+                  name: 'research_assistant test1',
+                  intervention_id: intervention.id,
+                  body: {
+                    data: [
+                      {
+                        payload: 1,
+                        target: '',
+                        variable: '1'
+                      }
+                    ]
+                  },
+                  type: 'Session::CatMh'
+                }
+              }
+            end
+
+            it { expect(response).to have_http_status(:success) }
+
+            it 'session have correct type' do
+              expect(Session.last.type).to eql('Session::CatMh')
+            end
+          end
         end
 
         context 'when first session have default voice settings' do
@@ -66,7 +96,8 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
           context 'params' do
             before do
               invalid_params = { session: {} }
-              post v1_intervention_sessions_path(intervention_id: intervention.id), params: invalid_params, headers: headers
+              post v1_intervention_sessions_path(intervention_id: intervention.id), params: invalid_params,
+                                                                                    headers: headers
             end
 
             it { expect(response).to have_http_status(:bad_request) }

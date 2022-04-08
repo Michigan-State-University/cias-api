@@ -3,6 +3,6 @@
 class V1Serializer
   extend ActionDispatch::Routing::UrlFor
   extend Rails.application.routes.url_helpers
-  include FastJsonapi::ObjectSerializer
+  include JSONAPI::Serializer
   include Rails.application.routes.url_helpers
 end

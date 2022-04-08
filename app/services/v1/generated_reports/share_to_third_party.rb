@@ -6,7 +6,7 @@ class V1::GeneratedReports::ShareToThirdParty
   end
 
   def initialize(user_session)
-    @user_session        = user_session
+    @user_session = user_session
     @third_party_reports = user_session.generated_reports.third_party
   end
 
@@ -64,7 +64,7 @@ class V1::GeneratedReports::ShareToThirdParty
           next if report_ids.empty?
 
           user = User.find_by(email: email)
-          next if user.present? && user.roles.exclude?('third_party')
+          next if user.present? && user.not_a_third_party?
 
           user ||= User.invite!(email: email, roles: ['third_party'])
           users << user
@@ -74,11 +74,15 @@ class V1::GeneratedReports::ShareToThirdParty
   end
 
   def third_party_emails_report_template_ids
+    # rubocop:disable Layout/LineLength
+    # rubocop:disable Style/MultilineBlockChain
     @third_party_emails_report_template_ids ||= Answer::ThirdParty.where(user_session_id: user_session.id)
                                                     .map do |answer|
-                                                  [answer.body_data&.first&.dig('value')&.delete(' ')&.split(',').to_a,
+                                                  [answer.body_data&.first&.dig('value')&.delete(' ')&.split(','),
                                                    answer.body_data&.first&.dig('report_template_ids')]
                                                 end
-                                                    .each_with_object({}) { |(emails, report_templates), h| h[emails] = (h[emails] || []) + report_templates if report_templates.present? } # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
+                                                    .each_with_object(Hash.new([])) { |(email, rep_id), hash| hash[email] += rep_id } # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
+    # rubocop:enable Layout/LineLength
+    # rubocop:enable Style/MultilineBlockChain
   end
 end

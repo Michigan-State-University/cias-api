@@ -11,13 +11,12 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def call
     return unless session.intervention.published?
-    return unless phone.present? && phone.confirmed?
     return unless user.sms_notification
 
     session.sms_plans.each do |plan|
       next unless can_run_plan?(plan)
 
-      send("#{plan.schedule}_schedule", plan)
+      send("#{plan.schedule}_schedule", plan) if plan.alert? || (phone.present? && phone.confirmed?)
     end
   end
 
@@ -55,6 +54,12 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     content = insert_variables_into_variant(content)
     finish_date = plan.end_at
 
+    if plan.alert?
+      content = prepend_alert_content(content, plan)
+      plan.phones.each { |phone| send_alert(start_time, content, phone) }
+      return
+    end
+
     if frequency == SmsPlan.frequencies[:once]
       send_sms(start_time, content)
     else
@@ -64,6 +69,23 @@ class V1::SmsPlans::ScheduleSmsForUserSession
         date = date.next_day(number_days[frequency])
       end
     end
+  end
+
+  def prepend_alert_content(current_content, plan)
+    return "#{I18n.t('sessions.sms_alerts.no_data_provided')}\n#{current_content}" if plan.no_data_included?
+
+    user = user_session.user
+    result = +'' # mutable empty string
+    if plan.include_full_name? && (user.first_name.present? && user.last_name.present?)
+      result << "#{user.full_name}\n"
+    else
+      # only one of these should be valid because we handle both include checks as separate statements
+      result << ("#{user.first_name.presence || I18n.t('sessions.sms_alerts.no_first_name_provided')}\n") if plan.include_first_name
+      result << ("#{user.last_name.presence || I18n.t('sessions.sms_alerts.no_last_name_provided')}\n") if plan.include_last_name
+    end
+    result << ("#{user.email.presence || I18n.t('sessions.sms_alerts.no_email_provided')}\n") if plan.include_email
+    result << ("#{user.phone.present? ? user.phone.full_number : I18n.t('sessions.sms_alerts.no_phone_number_provided')}\n") if plan.include_phone_number
+    result + current_content
   end
 
   def sms_content(plan)
@@ -89,7 +111,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     insert_name_into_variant(content)
 
     user_intervention_answer_vars.each do |variable, value|
-      content.gsub!(".:#{variable}:.", value.to_s || 'Unknown')
+      content.gsub!(".:#{variable}:.", value.present? ? value.to_s : 'Unknown')
     end
     content
   end
@@ -111,7 +133,11 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def send_sms(start_time, content)
-    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone_number, content, user.id)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(user.phone.full_number, content, user.id)
+  end
+
+  def send_alert(start_time, content, phone)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, phone.user&.id, true)
   end
 
   def phone
@@ -125,12 +151,8 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   def now_in_timezone
     @now_in_timezone ||=
       begin
-        timezone = Phonelib.parse(phone_number).timezone
+        timezone = Phonelib.parse(phone.full_number).timezone
         Time.use_zone(timezone) { Time.current }
       end
-  end
-
-  def phone_number
-    phone.prefix + phone.number
   end
 end

@@ -51,8 +51,8 @@ RSpec.describe V1::ReportTemplates::GeneratePdfPreview do
             report_template: report_template
           }
         )
-        expect(wicked_pdf_instance).to receive(:pdf_from_string).and_return('PDF')
-        expect(ReportTemplateMailer).to receive(:template_preview).with(
+        allow(wicked_pdf_instance).to receive(:pdf_from_string).and_return('PDF')
+        allow(ReportTemplateMailer).to receive(:template_preview).with(
           email: current_v1_user.email,
           report_template: report_template,
           report_template_preview_pdf: 'PDF'

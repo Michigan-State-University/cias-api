@@ -17,10 +17,14 @@ en:
   activerecord:
     errors:
       models:
+        intervention:
+          attributes:
+            cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
+            cat_mh_setting: 'Intervention should have all cat mh settings before publishing. ERROR_FLAG:CatMhWrongSettings'
         user:
           attributes:
             roles:
-              team_id_is_required_for_team_admin: 'Team Admin must have a team'
+              team_admin_must_have_a_team: 'Team Admin must have a team'
               organization_id_is_required_for_organization_admin: 'Organization Admin must have an organization'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
@@ -45,12 +49,27 @@ en:
       messages:
         undestroyable: Forbidden operation
   interventions:
+    invitations:
+      wrong_intervention_type: "Users can only be invited to module interventions (fixed & flexible order)"
+    fixed_order:
+      wrong_sharing_target: "Fixed order interventions can only be shared to registered participants (Got %{shared_to})"
+    flexible_order:
+      wrong_sharing_target: "Flexible order interventions can only be shared to registered participants (Got %{shared_to})"
     answers:
       index:
         csv: The request to send the CSV file has been successfully created. We will soon send an email to you with the request status.
+  sessions:
+    sms_alerts:
+      no_data_provided: "No personal data provided"
+      no_first_name_provided: "First name not provided"
+      no_last_name_provided: "Last name not provided"
+      no_email_provided: "E-mail not provided"
+      no_phone_number_provided: "Phone number not provided"
   users:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
+    preview:
+      cat_mh: "User preview is unavailable for CAT-MH sessions"
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."
@@ -109,6 +128,15 @@ en:
       button_text: Start the session
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
       invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+  intervention_mailer:
+    inform_to_an_email:
+      subject: You have been invited to complete an intervention.
+      body: You have been invited to complete %{intervention_name}. Please click in the link to get more information.
+      header: Complete a new intervention
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span> intervention.<br /><br />Click the link below to start the intervention'
+      button_text: Start the intervention
+      invitation_link: "%{domain}/interventions/%{intervention_id}/invite"
+      invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
   user_mailer:
     send_verification_login_code:
       subject: Verify your Identity in CIAS

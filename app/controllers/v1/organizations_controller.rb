@@ -4,11 +4,8 @@ class V1::OrganizationsController < V1Controller
   def index
     authorize! :read, Organization
 
-    if current_v1_user.roles.include?('health_clinic_admin')
-      render json: simple_response(organization_scope)
-    else
-      render json: organizations_response(organization_scope)
-    end
+    is_health_clinic_admin = current_v1_user.roles.include?('health_clinic_admin')
+    render json: is_health_clinic_admin ? simple_response(organization_scope) : organizations_response(organization_scope)
   end
 
   def show
@@ -53,7 +50,9 @@ class V1::OrganizationsController < V1Controller
   end
 
   def simple_response(organization)
-    V1::SimpleOrganizationSerializer.new(organization)
+    response_hash = V1::OrganizationSerializer.new(organization, { fields: { organization: [:name] } }).serializable_hash
+    response_hash[:data].each { |item| item.except!(:relationships) }
+    response_hash.to_json
   end
 
   def organization_response(organization)

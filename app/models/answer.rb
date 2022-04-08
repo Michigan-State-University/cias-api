@@ -4,7 +4,7 @@ class Answer < ApplicationRecord
   has_paper_trail
   include BodyInterface
 
-  belongs_to :question, inverse_of: :answers
+  belongs_to :question, inverse_of: :answers, optional: true
   belongs_to :user_session, optional: true
 
   attribute :decrypted_body, :json, default: { data: [] }
@@ -15,12 +15,14 @@ class Answer < ApplicationRecord
   validate :type_integrity_validator
 
   scope :user_answers, lambda { |user_id, session_ids|
-    relation = joins(:user_session, question: :question_group).where(user_sessions: { user_id: user_id })
-    relation = relation.where('question_groups.session_id IN(?)', session_ids) if session_ids.any?
+    relation = joins(:user_session).where(user_sessions: { user_id: user_id })
+    relation = relation.where('user_sessions.session_id IN(?)', session_ids) if session_ids.any?
     relation
   }
 
   encrypts :body, type: :json, migrating: true
+
+  default_scope { order(:created_at) }
 
   def on_answer; end
 
@@ -41,7 +43,7 @@ class Answer < ApplicationRecord
   private
 
   def type_integrity_validator
-    return if type.demodulize.eql? subclass_name
+    return if type.demodulize.eql?(subclass_name) || type.eql?('Answer::CatMh')
 
     errors.add(:type, 'broken type integrity')
   end

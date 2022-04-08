@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class V1::FlowService
+  include CatMh::QuestionMapping
+
   REFLECTION_MISS_MATCH = 'ReflectionMissMatch'
   NO_BRANCHING_TARGET = 'NoBranchingTarget'
   RANDOMIZATION_MISS_MATCH = 'RandomizationMissMatch'
+  FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION = 'ForbiddenBranchingToCatMhSession'
 
   def initialize(user_session)
     @user_session = user_session
@@ -11,27 +14,57 @@ class V1::FlowService
     @warning = ''
     @next_user_session_id = ''
     @health_clinic_id = user_session.health_clinic_id
+    @cat_mh_api = Api::CatMh.new
+    @next_session_id = ''
   end
 
   attr_reader :user
-  attr_accessor :user_session, :warning, :next_user_session_id, :health_clinic_id
+  attr_accessor :user_session, :warning, :next_user_session_id, :health_clinic_id, :next_session_id
 
   def user_session_question(preview_question_id)
-    question = question_to_display(preview_question_id)
-    question = perform_narrator_reflections(question)
-    question = prepare_questions_with_answer_values(question)
-    question.another_or_feedback(question, all_var_values)
+    if user_session.type == 'UserSession::CatMh'
+      cat_mh_question = @cat_mh_api.get_next_question(user_session)
+      user_session.finish if cat_mh_question['body']['questionID'] == -1
+      question = prepare_question(user_session, cat_mh_question['body'])
+    else
+      question = question_to_display(preview_question_id)
+      question = perform_narrator_reflections(question)
+      question = prepare_questions_with_answer_values(question)
+      question.another_or_feedback(question, all_var_values) unless question.is_a?(Hash)
 
-    user_session.finish if question.type == 'Question::Finish'
+      if !question.is_a?(Hash) && question.type == 'Question::Finish'
+        assign_next_session_id(user_session.session.intervention)
+        user_session.finish
+      end
+    end
 
-    { question: question, warning: warning, next_user_session_id: next_user_session_id }
+    { question: question, warning: warning, next_user_session_id: next_user_session_id, next_session_id: next_session_id }
+  end
+
+  private
+
+  def assign_next_session_id(intervention)
+    return unless intervention.module_intervention?
+
+    next_session = user_session.session.next_session
+
+    next_session = reassign_next_session_for_flexible_intervention(next_session, intervention) if intervention.type == 'Intervention::FlexibleOrder'
+
+    return if next_session.nil?
+    return if intervention.type == 'Intervention::FixedOrder' && !next_session.available_now?(prepare_participant_date_with_schedule_payload(next_session))
+
+    self.next_session_id = next_session.id
   end
 
   def question_to_display(preview_question_id)
-    return user_session.session.questions.includes(%i[image_blob image_attachment]).find(preview_question_id) if preview_question_id.present? && user_session.session.draft?
+    if preview_question_id.present? && user_session.session.draft?
+      return user_session.session.questions.includes(%i[image_blob
+                                                        image_attachment]).find(preview_question_id)
+    end
 
     last_answered_question = user_session.last_answer&.question
-    return user_session.session.first_question if last_answered_question.nil?
+
+    return user_session.first_question if last_answered_question.nil?
 
     perform_branching_to_next_question(last_answered_question)
   end
@@ -58,7 +91,7 @@ class V1::FlowService
   end
 
   def branching_source_to_question(source)
-    source = V1::RandomizationService.new(source['target']).execute
+    source = V1::RandomizationService.call(source['target'])
 
     if source.is_a?(Array)
       self.warning = RANDOMIZATION_MISS_MATCH
@@ -72,41 +105,53 @@ class V1::FlowService
       self.warning = NO_BRANCHING_TARGET
       return nil
     end
+
+    return nil if branching_type.eql?('Session') && user_session.session.intervention.module_intervention?
+
+    if preview? && question_or_session.type.eql?('Session::CatMh')
+      self.warning = FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION
+      return user_session.session.questions.last
+    end
     return question_or_session if branching_type.include? 'Question'
 
-    session_available_now = question_or_session.available_now(prepare_participant_date_with_schedule_payload(question_or_session))
+    perform_session_branching(question_or_session)
+  end
+
+  def perform_session_branching(session)
+    session_available_now = session.available_now?(prepare_participant_date_with_schedule_payload(session))
 
     user_session.finish(send_email: !session_available_now)
 
+    is_module_intervention = user_session.session.intervention.module_intervention?
+    return first_question_in_next_session(session) if session_available_now && !is_module_intervention
+
     if session_available_now
-      next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id)
+      next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id,
+                                                            type: question_or_session.user_session_type)
       next_user_session.save!
+      user_session.answers.last.update!(next_session_id: question_or_session.id)
       self.next_user_session_id = next_user_session.id
-      return question_or_session.first_question
+
+      return next_user_session.first_question
     end
 
     user_session.session.finish_screen
   end
 
-  def swap_name_mp3(question)
-    blocks = question.narrator['blocks']
-    blocks.map do |block|
-      next block unless %w[Speech ReflectionFormula Reflection].include?(block['type'])
+  def first_question_in_next_session(session)
+    next_user_session = UserSession.find_or_initialize_by(session_id: session.id, user_id: user.id, health_clinic_id: health_clinic_id,
+                                                          type: session.user_session_type, user_intervention: user_session.user_intervention)
+    next_user_session.save!
+    user_session.answers.last.update!(next_session_id: session.id)
+    self.next_user_session_id = next_user_session.id
 
-      name_audio_url = ''
-      name_audio_url = user_session.name_audio.url unless user_session.name_audio.nil?
-
-      name_answer = user_session.search_var('.:name:.')
-      name_text = name_answer.nil? ? 'name' : name_answer['name']
-
-      block = question.send("swap_name_into_#{block['type'].downcase}_block", block, name_audio_url, name_text)
-      block
-    end
-    question
+    next_user_session.first_question
   end
 
   def perform_narrator_reflections(question)
-    question = swap_name_mp3(question)
+    return question if question.is_a?(Hash)
+
+    question = question.swap_name_mp3(name_audio, name_answer)
     question.narrator['blocks']&.each_with_index do |block, index|
       next unless %w[Reflection ReflectionFormula].include?(block['type'])
 
@@ -130,7 +175,19 @@ class V1::FlowService
     matched_reflections
   end
 
+  def reassign_next_session_for_flexible_intervention(session, intervention)
+    return session unless session.nil? || UserSession.exists?(user_id: user.id, session_id: session.id)
+
+    intervention.sessions.each do |intervention_session|
+      return intervention_session unless UserSession.exists?(user_id: user.id, session_id: intervention_session.id)
+    end
+
+    nil
+  end
+
   def prepare_questions_with_answer_values(question)
+    return question if question.is_a?(Hash)
+
     question.another_or_feedback(question, all_var_values)
   end
 
@@ -141,11 +198,21 @@ class V1::FlowService
     (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
   end
 
-  private
-
   def all_var_values
     @all_var_values ||= V1::UserInterventionService.new(
       user.id, user_session.session.intervention_id, user_session.id
     ).var_values
+  end
+
+  def name_audio
+    user_session.name_audio
+  end
+
+  def name_answer
+    user_session.search_var('.:name:.')
+  end
+
+  def preview?
+    user_session.session.intervention.draft?
   end
 end

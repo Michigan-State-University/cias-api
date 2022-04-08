@@ -6,9 +6,9 @@ FactoryBot.define do
 
     trait :with_organization_admin do
       after(:build) do |organization|
-        organization_admin = create(:user, :confirmed, :organization_admin)
-        organization_admin.organizable = organization
+        organization_admin = create(:user, :confirmed, :organization_admin, organizable_id: organization.id)
         organization.organization_admins << organization_admin
+        OrganizationInvitation.create!(user: organization_admin, organization: organization, accepted_at: Time.zone.now)
       end
     end
 

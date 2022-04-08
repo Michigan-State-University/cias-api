@@ -1,24 +1,50 @@
 # frozen_string_literal: true
 
 class V1::AnswerService
-  def initialize(user)
-    @user = user
+  prepend Database::Transactional
+
+  def self.call(user, user_session_id, question_id, answer_params)
+    new(user, user_session_id, question_id, answer_params).call
   end
 
-  attr_reader :user
+  def initialize(user, user_session_id, question_id, answer_params)
+    @user = user
+    @user_session_id = user_session_id
+    @question_id = question_id
+    @answer_params = answer_params
+    @cat_mh_api = Api::CatMh.new
+  end
 
-  def create(user_session_id, question_id, answer_params)
+  attr_reader :user, :user_session_id, :question_id, :answer_params, :cat_mh_api
+
+  def call
     user_session = UserSession.find(user_session_id)
 
-    ActiveRecord::Base.transaction do
-      answer = answer_params[:type].constantize.where(question_id: question_id, user_session_id: user_session.id)
+    if user_session.type == 'UserSession::CatMh'
+      answer = cat_mh_api.on_user_answer(user_session, question_id, response(answer_params), duration(user_session))
+    else
+      answer = answer_params[:type].constantize.where(question_id: question_id, user_session_id: user_session_id)
                                    .order(:created_at)
                                    .first_or_initialize(question_id: question_id, user_session_id: user_session_id)
       answer.assign_attributes(answer_params)
       answer.save!
-      user_session.on_answer
       answer.on_answer
-      answer
     end
+
+    user_session.on_answer
+    user_session.update_user_intervention
+    answer
+  end
+
+  private
+
+  def duration(user_session)
+    last_answer_at = user_session.last_answer_at
+    last_answer_at = user_session.created_at if last_answer_at.blank?
+    (Time.current - last_answer_at).to_i
+  end
+
+  def response(answer_params)
+    answer_params['body']['data'].first['value']
   end
 end

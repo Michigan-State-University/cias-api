@@ -7,6 +7,7 @@ describe 'PATCH /v1/users/:id', type: :request do
   let(:user_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:researcher) { create(:user, :confirmed, :researcher, first_name: 'Smith', last_name: 'Wazowski') }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
+  let(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
   let(:other_user) { create(:user, :confirmed) }
   let(:users) do
     {
@@ -14,7 +15,8 @@ describe 'PATCH /v1/users/:id', type: :request do
       'user_with_multiple_roles' => user_with_multiple_roles,
       'other_user' => other_user,
       'researcher' => researcher,
-      'researcher_with_multiple_roles' => researcher_with_multiple_roles
+      'researcher_with_multiple_roles' => researcher_with_multiple_roles,
+      'e_intervention_admin' => e_intervention_admin
     }
   end
   let(:current_user) { admin }
@@ -139,9 +141,11 @@ describe 'PATCH /v1/users/:id', type: :request do
     end
 
     %w[admin user_with_multiple_roles].each do |role|
-      let(:current_user) { users[role] }
+      context "when current user is #{role}" do
+        let(:current_user) { users[role] }
 
-      it_behaves_like 'admin'
+        it_behaves_like 'admin'
+      end
     end
   end
 
@@ -286,9 +290,11 @@ describe 'PATCH /v1/users/:id', type: :request do
     end
 
     %w[researcher researcher_with_multiple_roles].each do |role|
-      let!(:current_user) { users[role] }
+      context "when user is #{role}" do
+        let!(:current_user) { users[role] }
 
-      it_behaves_like 'researcher'
+        it_behaves_like 'researcher'
+      end
     end
   end
 
@@ -390,99 +396,69 @@ describe 'PATCH /v1/users/:id', type: :request do
         end
       end
     end
-  end
 
-  context 'when current_user is participant' do
-    let(:current_user) { create(:user, :confirmed, :participant, first_name: 'Smith', last_name: 'Wazowski') }
+    context 'when user wants to update researcher belongs to him team' do
+      let!(:user_id) { team_participant.id }
 
-    context 'when current_user updates itself' do
       it { expect(response).to have_http_status(:ok) }
 
       it 'JSON response contains proper attributes' do
         expect(json_response['data']['attributes']).to include(
-          'first_name' => 'John',
-          'last_name' => 'Kowalski',
-          'email' => current_user.email,
+          'first_name' => team_participant.first_name,
+          'last_name' => team_participant.last_name,
+          'email' => team_participant.email,
           'avatar_url' => nil
         )
       end
-
-      it 'updates user attributes' do
-        expect(current_user.reload.attributes).to include(
-          'first_name' => 'John',
-          'last_name' => 'Kowalski'
-        )
-      end
-
-      context 'when current_user tries to update deactivated and roles attributes' do
-        let(:params) do
-          {
-            user: {
-              roles: %w[admin guest],
-              deactivated: true
-            }
-          }
-        end
-
-        it { expect(response).to have_http_status(:forbidden) }
-
-        it 'response contains proper error message' do
-          expect(json_response['message']).to eq 'You are not authorized to access this page.'
-        end
-      end
-    end
-
-    context 'when current_user updates other user' do
-      let(:user_id) { other_user.id }
-
-      it { expect(response).to have_http_status(:not_found) }
     end
   end
 
-  context 'when current_user is guest' do
-    let(:current_user) { create(:user, :confirmed, :guest, first_name: 'Smith', last_name: 'Wazowski') }
+  %w[guest participant organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+    context "when current_user is #{role}" do
+      let(:current_user) { create(:user, :confirmed, role, first_name: 'Smith', last_name: 'Wazowski') }
 
-    context 'when current_user updates itself' do
-      it { expect(response).to have_http_status(:ok) }
+      context 'when current_user updates itself' do
+        it { expect(response).to have_http_status(:ok) }
 
-      it 'JSON response contains proper attributes' do
-        expect(json_response['data']['attributes']).to include(
-          'first_name' => 'John',
-          'last_name' => 'Kowalski',
-          'email' => current_user.email,
-          'avatar_url' => nil
-        )
-      end
+        it 'JSON response contains proper attributes' do
+          expect(json_response['data']['attributes']).to include(
+            'first_name' => 'John',
+            'last_name' => 'Kowalski',
+            'email' => current_user.email,
+            'avatar_url' => nil
+          )
+        end
 
-      it 'updates user attributes' do
-        expect(current_user.reload.attributes).to include(
-          'first_name' => 'John',
-          'last_name' => 'Kowalski'
-        )
-      end
+        it 'updates user attributes' do
+          expect(current_user.reload.attributes).to include(
+            'first_name' => 'John',
+            'last_name' => 'Kowalski'
+          )
+        end
 
-      context 'when current_user tries to update deactivated and roles attributes' do
-        let(:params) do
-          {
-            user: {
-              roles: %w[admin guest],
-              deactivated: true
+        context 'when current_user tries to update deactivated and roles attributes' do
+          let(:params) do
+            {
+              user: {
+                roles: %w[admin guest],
+                deactivated: true
+              }
             }
-          }
-        end
+          end
 
-        it { expect(response).to have_http_status(:forbidden) }
+          it { expect(response).to have_http_status(:forbidden) }
 
-        it 'response contains proper error message' do
-          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+          it 'response contains proper error message' do
+            expect(json_response['message']).to eq 'You are not authorized to access this page.'
+          end
         end
       end
-    end
 
-    context 'when current_user updates other user' do
-      let(:user_id) { other_user.id }
+      context 'when current_user updates other user' do
+        let(:user_id) { other_user.id }
 
-      it { expect(response).to have_http_status(:not_found) }
+        it { expect(response).to have_http_status(:not_found) }
+      end
     end
   end
 end

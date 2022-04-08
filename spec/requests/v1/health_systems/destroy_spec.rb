@@ -3,11 +3,24 @@
 require 'rails_helper'
 
 RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:e_intervention_admin) { organization.e_intervention_admins.first }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
+  let(:user) { admin }
+
+  let(:roles) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles,
+      'e_intervention_admin' => e_intervention_admin
+    }
+  end
 
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization) }
+  let!(:health_system) do
+    create(:health_system, :with_health_system_admin, name: 'Michigan Public Health System', organization: organization)
+  end
   let!(:health_system_admin_id) { health_system.health_system_admins.first.id }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, health_system: health_system) }
   let!(:health_clinic_admin_id) { health_clinic.health_clinic_admins.first.id }
@@ -64,10 +77,6 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       it 'does not change chart statistic count' do
         expect { request }.to avoid_changing(ChartStatistic, :count)
       end
-    end
-
-    context 'when user is admin' do
-      it_behaves_like 'permitted user'
 
       context 'when health system id is invalid' do
         before do
@@ -80,16 +89,12 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       end
     end
 
-    context 'when user has multiple roles' do
-      let(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+    %w[admin admin_with_multiple_roles].each do |role|
+      context "when user is #{role}" do
+        let(:user) { roles[role] }
 
-      it_behaves_like 'permitted user'
-    end
-
-    context 'when user is e-intervention admin' do
-      let(:user) { organization.e_intervention_admins.first }
-
-      it_behaves_like 'permitted user'
+        it_behaves_like 'permitted user'
+      end
     end
   end
 
@@ -102,7 +107,8 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       end
     end
 
-    %i[health_system_admin organization_admin team_admin researcher participant guest health_clinic_admin].each do |role|
+    %i[health_system_admin organization_admin team_admin researcher participant guest
+       health_clinic_admin third_party].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

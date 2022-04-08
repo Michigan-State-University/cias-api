@@ -97,7 +97,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
 
         context 'is failure' do
           before do
-            intervention.broadcast
+            intervention.published!
             request
           end
 

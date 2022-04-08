@@ -7,7 +7,9 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/invitations', type: :requ
   let!(:users) { create_list(:user, 4, :confirmed) }
   let!(:intervention) { create(:intervention, user_id: user.id, invitations: users_with_access) }
   let!(:users_with_access) { create_list(:intervention_invitation, 3) }
-  let(:request) { get v1_intervention_invitations_path(intervention_id: intervention.id), headers: user.create_new_auth_token }
+  let(:request) do
+    get v1_intervention_invitations_path(intervention_id: intervention.id), headers: user.create_new_auth_token
+  end
 
   context 'will retrieve all users that were added to the access list' do
     before do

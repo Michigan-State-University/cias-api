@@ -7,6 +7,7 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
   let(:team) { create(:team) }
   let(:team_admin) { team.team_admin }
   let!(:researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
+  let!(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin) }
   let!(:other_researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
   let(:participant) { create(:user, :confirmed, :participant, team_id: team.id) }
   let(:headers) { user.create_new_auth_token }
@@ -35,11 +36,11 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
       end
 
       it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq researchers.size
+        expect(json_response['data'].size).to eq researchers.size
       end
     end
 
@@ -53,40 +54,32 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
       end
 
       it 'returns correct user ids' do
-        expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
       end
 
       it 'returns correct users list size' do
-        expect(json_response['users'].size).to eq researchers.size
+        expect(json_response['data'].size).to eq researchers.size
       end
     end
   end
 
-  context 'when current_user is researcher' do
-    let!(:user) { researcher }
+  %w[researcher].each do |role|
+    context "when current_user is #{role}" do
+      let!(:user) { researcher }
 
-    before { request }
+      before { request }
 
-    it 'returns correct http status' do
-      expect(response).to have_http_status(:ok)
-    end
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
 
-    it 'returns correct user ids' do
-      expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
-    end
+      it 'returns correct user ids' do
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
+      end
 
-    it 'returns correct users list size' do
-      expect(json_response['users'].size).to eq researchers.size
-    end
-  end
-
-  context 'when current_user is participant' do
-    let!(:user) { participant }
-
-    before { request }
-
-    it 'returns correct http status' do
-      expect(response).to have_http_status(:forbidden)
+      it 'returns correct users list size' do
+        expect(json_response['data'].size).to eq researchers.size
+      end
     end
   end
 
@@ -97,6 +90,8 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     before do
       create(:user, :researcher, team_id: team2.id)
       create(:user, :researcher, team_id: team2.id)
+      create(:user, :participant, team_id: team2.id)
+      create(:user, :participant, team_id: team.id)
       request
     end
 
@@ -105,11 +100,23 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     end
 
     it 'returns users only from his team' do
-      expect(json_response['users'].pluck('id')).to match_array(researchers.pluck(:id))
+      expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
     end
 
     it 'returns correct users list size' do
-      expect(json_response['users'].size).to eq researchers.size
+      expect(json_response['data'].size).to eq researchers.size
+    end
+  end
+
+  %w[guest participant organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+    context "when current_user is #{role}" do
+      let!(:user) { create(:user, :confirmed, role) }
+
+      before { request }
+
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:forbidden)
+      end
     end
   end
 end

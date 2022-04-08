@@ -3,6 +3,10 @@
 class Question::Narrator::Blobs
   include BlockHelper
 
+  def self.call(narrator, cloned = false)
+    new(narrator, cloned).call
+  end
+
   attr_accessor :ids
   attr_reader :narrator, :cloned
 
@@ -12,7 +16,7 @@ class Question::Narrator::Blobs
     @ids = []
   end
 
-  def execute
+  def call
     blocks
     ids.compact!
     self
@@ -26,7 +30,7 @@ class Question::Narrator::Blobs
     digest_index.nil?
   end
 
-  def purification
+  def purge
     return if cloned
 
     counts = ids.tally

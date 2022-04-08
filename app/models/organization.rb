@@ -31,12 +31,10 @@ class Organization < ApplicationRecord
       organization_admins.delete(organization_admin)
     end
 
-    e_intervention_admins.each do |intervention_admin|
-      e_intervention_admins.delete(intervention_admin)
-    end
+    e_intervention_admins.delete_all
   end
 
   def update_interventions_from_deleted_organization
-    Intervention.where(organization_id: id).update_all(organization_id: nil, from_deleted_organization: true)
+    Intervention.where(organization_id: id).update_all(organization_id: nil, from_deleted_organization: true) # rubocop:disable Rails/SkipsModelValidations:
   end
 end

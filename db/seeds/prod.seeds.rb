@@ -11,12 +11,11 @@ class CreateProdUsers
     private
 
     def create_users
+      ENV['SEED_PROD_ACCOUTS_EMAILS'].split.each_with_index do |email, _index|
+        p "Creating user with #{email}" # rubocop:disable Rails/Output
 
-      ENV['SEED_PROD_ACCOUTS_EMAILS'].split().each_with_index do |email, _index|
-        p "Creating user with #{email}"
-
-        if User.find_by_email(email)
-          p 'Users exists'
+        if User.find_by(email: email)
+          p 'Users exists' # rubocop:disable Rails/Output
           next
         end
 
@@ -32,7 +31,6 @@ class CreateProdUsers
         u.user_verification_codes.create(code: SecureRandom.base64(6), confirmed: true)
       end
     end
-
   end
 end
 

@@ -46,10 +46,46 @@ RSpec.describe 'DELETE /v1/teams/:id', type: :request do
       end
     end
 
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
+    shared_examples 'non-permitted user' do
+      it 'returns :forbidden status' do
+        request
+        expect(response).to have_http_status(:forbidden)
+      end
 
-      it_behaves_like 'permitted user'
+      it 'not destroys a team' do
+        expect { request }.not_to change(Team, :count)
+      end
+    end
+
+    %w[admin admin_with_multiple_roles].each do |role|
+      describe '#permitted user' do
+        let(:user) { users[role] }
+
+        it_behaves_like 'permitted user'
+      end
+    end
+
+    %w[researcher participant e_intervention_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+      describe '#non-permitted user' do
+        let(:user) { create(:user, :confirmed, roles: [role]) }
+
+        it_behaves_like 'non-permitted user'
+      end
+    end
+
+    context 'when user is team admin' do
+      context 'wants to delete his team' do
+        let(:user) { team.team_admin }
+
+        it_behaves_like 'non-permitted user'
+      end
+
+      context 'wants to delete other team' do
+        let!(:other_team) { create :team }
+        let(:user) { other_team.team_admin }
+
+        it_behaves_like 'non-permitted user'
+      end
     end
   end
 

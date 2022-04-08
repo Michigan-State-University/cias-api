@@ -3,20 +3,15 @@
 class Session < ApplicationRecord
   has_paper_trail
   extend DefaultValues
-  include BodyInterface
   include Clone
   include FormulaInterface
+  include Translate
 
   belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
 
-  has_many :question_groups, dependent: :destroy, inverse_of: :session
-  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
-  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
   has_many :sms_plans, dependent: :destroy
 
-  has_many :questions, dependent: :destroy, through: :question_groups
-  has_many :answers, dependent: :destroy, through: :questions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :report_templates, dependent: :destroy
 
@@ -27,55 +22,48 @@ class Session < ApplicationRecord
   attribute :position, :integer, default: 1
   attribute :formulas, :json, default: assign_default_values('formulas')
   attribute :body, :json, default: assign_default_values('body')
+  attribute :original_text, :json, default: { name: '' }
 
-  enum schedule: { days_after: 'days_after', days_after_fill: 'days_after_fill', exact_date: 'exact_date', after_fill: 'after_fill', days_after_date: 'days_after_date' }, _prefix: :schedule
+  enum schedule: { days_after: 'days_after',
+                   days_after_fill: 'days_after_fill',
+                   exact_date: 'exact_date',
+                   after_fill: 'after_fill',
+                   days_after_date: 'days_after_date' },
+       _prefix: :schedule
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
 
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
-  validates :settings, json: { schema: -> { Rails.root.join("#{json_schema_path}/settings.json").to_s }, message: ->(err) { err } }
-  validates :formulas, json: { schema: -> { Rails.root.join("#{json_schema_path}/formula.json").to_s }, message: ->(err) { err } }
+  validates :settings, json: { schema: lambda {
+                                         Rails.root.join("#{json_schema_path}/settings.json").to_s
+                                       }, message: lambda { |err|
+                                                     err
+                                                   } }
+  validates :formulas, json: { schema: lambda {
+                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
+                                       }, message: lambda { |err|
+                                                     err
+                                                   } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
 
-  after_create :assign_default_tts_voice
   before_validation :set_default_variable
-  after_commit :create_core_childs, on: :create
+  after_create :assign_default_tts_voice
 
-  after_update_commit do
-    SessionJobs::ReloadAudio.perform_later(id) if saved_change_to_attribute?(:google_tts_voice_id)
-  end
-
-  def position_grather_than
-    @position_grather_than ||= intervention.sessions.where('position > ?', position).order(:position)
+  def position_greater_than
+    @position_greater_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end
 
   def next_session
     intervention.sessions.find_by(position: position + 1)
   end
 
-  def propagate_settings
-    return unless settings_changed?
-
-    narrator = (settings['narrator'].to_a - settings_was['narrator'].to_a).to_h
-    questions.each do |question|
-      question.narrator['settings'].merge!(narrator)
-      question.execute_narrator
-      question.save!
-    end
-  end
-
   def integral_update
     return if published?
 
-    propagate_settings
     save!
-  end
-
-  def perform_narrator_reflection(_placeholder)
-    nil
   end
 
   def invite_by_email(emails, health_clinic_id = nil)
@@ -84,9 +72,20 @@ class Session < ApplicationRecord
       User.invite!(email: email)
     end
 
-    Invitation.transaction do
+    ActiveRecord::Base.transaction do
       User.where(email: emails).find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
+
+        user_intervention = UserIntervention.find_or_create_by(user_id: user.id, intervention_id: intervention.id, health_clinic_id: health_clinic_id)
+        user_session = UserSession.find_or_create_by(
+          session_id: id,
+          user_id: user.id,
+          health_clinic_id: health_clinic_id,
+          type: user_session_type,
+          user_intervention_id: user_intervention.id,
+          scheduled_at: DateTime.now
+        )
+        user_intervention.update!(status: 'in_progress') if user_session.finished_at.blank?
       end
     end
 
@@ -99,18 +98,10 @@ class Session < ApplicationRecord
     SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
   end
 
-  def first_question
-    question_groups.where('questions_count > 0').order(:position).first.questions.includes(%i[image_blob image_attachment]).order(:position).first
-  end
-
-  def finish_screen
-    question_group_finish.questions.first
-  end
-
-  def available_now(participant_date = nil)
+  def available_now?(participant_date_with_payload = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
-    return true if schedule == 'days_after_date' && participant_date&.noon&.past?
+    return true if schedule == 'days_after_date' && participant_date_with_payload&.noon&.past?
 
     false
   end
@@ -126,30 +117,44 @@ class Session < ApplicationRecord
     settings['formula'] = false
   end
 
-  def session_variables
-    [].tap do |array|
-      question_groups.each do |question_group|
-        question_group.questions.each do |question|
-          question.csv_header_names.each do |variable|
-            array << variable
-          end
-        end
-      end
+  def translate_name(translator, source_language_name_short, destination_language_name_short)
+    original_text['name'] = name
+    new_name = translator.translate(name, source_language_name_short, destination_language_name_short)
+
+    update!(name: new_name)
+  end
+
+  def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)
+    sms_plans.each do |sms_plan|
+      sms_plan.translate(translator, source_language_name_short, destination_language_name_short)
     end
+  end
+
+  def translate_report_templates(translator, source_language_name_short, destination_language_name_short)
+    report_templates.each do |report_template|
+      report_template.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
+
+  def user_session_type
+    raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
+  end
+
+  def fetch_variables(_filter_options = {})
+    raise NotImplementedError, "Subclass of Session did not define #{__method__}"
+  end
+
+  def same_as_intervention_language(session_voice)
+    voice_name = session_voice&.google_tts_language&.language_name
+    google_lang_name = intervention.google_language.language_name
+    # chinese languages are the only ones not following the convention so this check is needed...
+    voice_name&.include?('Chinese') ? google_lang_name.include?('Chinese') : voice_name&.include?(google_lang_name)
   end
 
   private
 
-  def create_core_childs
-    return if question_group_finish
-
-    qg_finish = ::QuestionGroup::Finish.new(session_id: id)
-    qg_finish.save!
-    ::Question::Finish.create!(question_group_id: qg_finish.id)
-  end
-
   def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil?
+    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
     save!
   end
 

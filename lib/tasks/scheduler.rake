@@ -3,7 +3,8 @@
 desc 'This tasks are called by the Heroku scheduler add-on'
 task interventions_schedule: :environment do
   start_end_at = Date.current.beginning_of_day..Date.current.end_of_day
-  interventions = Intervention.joins(:user_interventions).where(schedule_at: start_end_at).or(Intervention.joins(:user_interventions).where(user_interventions: { schedule_at: start_end_at }))
+  interventions = Intervention.joins(:user_interventions).where(schedule_at: start_end_at)
+                              .or(Intervention.joins(:user_interventions).where(user_interventions: { schedule_at: start_end_at }))
 
   users = User.where(id: interventions.users)
   interventions.each do |intervention|

@@ -15,7 +15,9 @@ RSpec.describe 'GET /v1/question_groups/:question_group_id/questions/:id', type:
   let(:question) { create(:question_slider, question_group: question_group) }
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers }
+  let(:request) do
+    get v1_question_group_question_path(question_group_id: question_group.id, id: question.id), headers: headers
+  end
 
   context 'when auth' do
     context 'is invalid' do

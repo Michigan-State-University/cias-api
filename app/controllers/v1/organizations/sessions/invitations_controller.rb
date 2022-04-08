@@ -34,7 +34,7 @@ class V1::Organizations::Sessions::InvitationsController < V1Controller
   end
 
   def session_invitations_load
-    session_invitation_scope.find(params[:id])
+    session_invitations_scope.find(params[:id])
   end
 
   def session_invitations_params

@@ -14,11 +14,17 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def create
-    answer = V1::AnswerService.new(current_v1_user).create(user_session_id, question_id, answer_params)
+    answer = V1::AnswerService.call(current_v1_user, user_session_id, question_id, answer_params)
+    return head answer['status'] if user_session_load.type == 'UserSession::CatMh'
+
     render json: serialized_response(answer), status: :created
   end
 
   private
+
+  def user_session_load
+    UserSession.find(user_session_id)
+  end
 
   def answers_scope
     Answer.includes(:question, :user_session).accessible_by(current_ability).where(user_session_id: user_session_id)

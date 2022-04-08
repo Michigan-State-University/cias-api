@@ -23,6 +23,9 @@
                         "payload": {
                           "type": "string"
                         },
+                        "original_text" : {
+                          "type": "string"
+                        },
                         "variable": {
                           "type": "object",
                           "properties": {
@@ -54,6 +57,9 @@
                         "payload": {
                           "type": "string"
                         },
+                        "original_text" : {
+                          "type": "string"
+                        },
                         "variable": {
                           "type": "object",
                           "properties": {
@@ -77,6 +83,9 @@
                       "type": "object",
                       "properties": {
                         "payload": {
+                          "type": "string"
+                        },
+                        "original_text" : {
                           "type": "string"
                         },
                         "variable": {

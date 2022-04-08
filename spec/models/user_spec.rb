@@ -4,7 +4,23 @@ require 'rails_helper'
 
 describe User, type: :model do
   it { should have_many(:team_invitations).dependent(:destroy) }
-  it { should have_many(:chart_statistics) }
+  it { should have_many(:organization_invitations).dependent(:destroy) }
+  it { should have_many(:health_system_invitations).dependent(:destroy) }
+  it { should have_many(:health_clinic_invitations).dependent(:destroy) }
+  it { should have_many(:chart_statistics).dependent(:nullify) }
+  it { should have_many(:user_verification_codes).dependent(:destroy) }
+  it { should have_many(:user_health_clinics) }
+  it { should have_many(:admins_teams).dependent(:nullify) }
+  it { should have_many(:user_log_requests).dependent(:destroy) }
+  it { should have_many(:sessions).dependent(:restrict_with_exception) }
+  it { should have_many(:user_sessions).dependent(:restrict_with_exception) }
+  it { should have_many(:interventions).dependent(:restrict_with_exception) }
+  it { should have_one(:phone).dependent(:destroy) }
+  it { should have_one_attached(:avatar) }
+  it { should have_many(:generated_reports_third_party_users).dependent(:destroy) }
+
+  it { should belong_to(:team).optional(true) }
+  it { should belong_to(:organizable).optional(true) }
 
   describe 'participant' do
     subject { create(:user, :confirmed, :participant) }

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::ReportTemplates::Variants::Update
+  prepend Database::Transactional
+
   def self.call(variant, variant_params)
     new(variant, variant_params).call
   end
@@ -11,13 +13,11 @@ class V1::ReportTemplates::Variants::Update
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      variant.update!(
-        variant_params
-      )
+    variant.update!(
+      variant_params
+    )
 
-      other_variants.update_all(preview: false) if variant.preview
-    end
+    other_variants.update_all(preview: false) if variant.preview
   end
 
   private

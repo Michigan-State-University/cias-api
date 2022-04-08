@@ -37,6 +37,12 @@ RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
       end
     end
 
+    context 'UserIntervention' do
+      it 'create user_intervention after invite' do
+        expect { request }.to change(UserIntervention, :count).by(2)
+      end
+    end
+
     %w[draft closed archived].each do |status|
       context "when intervention is #{status}" do
         let!(:intervention_status) { status.to_sym }

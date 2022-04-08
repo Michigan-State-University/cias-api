@@ -12,4 +12,8 @@ class Question::Name < Question
   def csv_header_names
     ['metadata.phonetic_name']
   end
+
+  def question_variables
+    ['.:name:.']
+  end
 end

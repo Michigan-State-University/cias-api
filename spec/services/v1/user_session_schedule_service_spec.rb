@@ -5,7 +5,9 @@ RSpec.describe V1::UserSessionScheduleService do
   let!(:user) { create(:user, :participant) }
   let!(:preview_user) { create(:user, :preview_session) }
   let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
-  let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at) }
+  let!(:second_session) do
+    create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at)
+  end
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Health Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Heath System', organization: organization) }
@@ -58,7 +60,7 @@ RSpec.describe V1::UserSessionScheduleService do
           %w[exact_date days_after].each do |schedule_type|
             context "when session has schedule #{schedule_type}" do
               it 'does not schedule at all' do
-                expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionEmailScheduleJob)
+                expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionScheduleJob)
               end
             end
           end
@@ -94,9 +96,13 @@ RSpec.describe V1::UserSessionScheduleService do
             end
 
             it 'schedules on correct time' do
-              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                     .with(second_session.id, user.id, user_session.health_clinic)
-                                                     .at(a_value_within(1.second).of(expected_timestamp))
+              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .at(a_value_within(1.second).of(expected_timestamp))
+            end
+
+            it 'crate next user_session' do
+              expect { described_class.new(user_session).schedule }.to change(UserSession, :count).by(1)
             end
           end
 
@@ -109,9 +115,13 @@ RSpec.describe V1::UserSessionScheduleService do
             end
 
             it 'schedules on correct time' do
-              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
                                                                          .with(second_session.id, user.id, user_session.health_clinic)
                                                                          .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+            end
+
+            it 'crate next user_session' do
+              expect { described_class.new(user_session).schedule }.to change(UserSession, :count).by(1)
             end
           end
 
@@ -124,9 +134,13 @@ RSpec.describe V1::UserSessionScheduleService do
             end
 
             it 'schedules on correct time' do
-              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
+              expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
                                                                          .with(second_session.id, user.id, user_session.health_clinic)
                                                                          .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
+            end
+
+            it 'crate next user_session' do
+              expect { described_class.new(user_session).schedule }.to change(UserSession, :count).by(1)
             end
           end
 
@@ -147,9 +161,13 @@ RSpec.describe V1::UserSessionScheduleService do
               end
 
               it 'schedules on correct time' do
-                expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionEmailScheduleJob)
-                                                                             .with(second_session.id, user.id, user_session.health_clinic)
-                                                                             .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
+                expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
+                                                                           .with(second_session.id, user.id, user_session.health_clinic)
+                                                                           .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
+              end
+
+              it 'crate next user_session' do
+                expect { described_class.new(user_session).schedule }.to change(UserSession, :count).by(1)
               end
             end
 

@@ -11,17 +11,8 @@ class V1::HealthSystems::Update
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      health_system.update!(name: health_system_params[:name]) if name_changed?
-
-      V1::HealthSystems::ChangeHealthSystemAdmins.call(
-        health_system,
-        health_system_params[:health_system_admins_to_add],
-        health_system_params[:health_system_admins_to_remove]
-      )
-
-      health_system.reload
-    end
+    health_system.update!(name: health_system_params[:name]) if name_changed?
+    health_system.reload
   end
 
   private

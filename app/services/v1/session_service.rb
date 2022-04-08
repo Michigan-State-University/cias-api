@@ -20,15 +20,17 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
-    session.google_tts_voice_id = first_session_voice_id if first_session_voice_id.present?
+    session.assign_google_tts_voice(first_session)
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
   end
 
   def update(session_id, session_params)
+    sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
-    session.assign_attributes(session_params)
+    session.assign_attributes(session_params.except(:cat_tests))
+    assign_cat_tests_to_session(session, session_params)
     session.integral_update
     session
   end
@@ -51,8 +53,19 @@ class V1::SessionService
 
   private
 
-  def first_session_voice_id
-    intervention.sessions.order(:position)&.first&.google_tts_voice_id
+  def first_session_voice
+    first_session&.google_tts_voice
+  end
+
+  def first_session
+    intervention.sessions.order(:position)&.first
+  end
+
+  def same_as_intervention_language(session_voice)
+    voice_name = session_voice.google_tts_language.language_name
+    google_lang_name = intervention.google_language.language_name
+    # chinese languages are the only ones not following the convention so this check is needed...
+    voice_name.include?('Chinese') ? google_lang_name.include?('Chinese') : voice_name.include?(google_lang_name)
   end
 
   def clear_branching(object, session_id)
@@ -64,5 +77,21 @@ class V1::SessionService
         end
       end
     end
+  end
+
+  def assign_cat_tests_to_session(session, session_params)
+    return if session.type != 'Session::CatMh'
+    return unless session_params.key?('cat_tests')
+
+    session.cat_mh_test_types.destroy_all
+
+    session_params['cat_tests'].each do |test_id|
+      test = CatMhTestType.find(test_id)
+      session.cat_mh_test_types << test
+    end
+  end
+
+  def sanitize_estimated_time_param(params)
+    params[:estimated_time] = params[:estimated_time].to_i if params[:estimated_time].present?
   end
 end

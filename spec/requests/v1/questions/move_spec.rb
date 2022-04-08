@@ -6,34 +6,34 @@ describe 'PATCH /v1/sessions/:session_id/questions/move', type: :request do
   let(:request) { patch v1_session_move_question_path(session_id: session.id), params: params, headers: headers }
 
   let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
-  let!(:question_group_1) { create(:question_group, title: 'Question Group 1 Title', session: session, position: 1) }
-  let!(:question_group_2) { create(:question_group, title: 'Question Group 2 Title', session: session, position: 2) }
-  let!(:question_1)       { create(:question_free_response, question_group: question_group_1, position: 0) }
-  let!(:question_2)       { create(:question_free_response, question_group: question_group_1, position: 1) }
-  let!(:question_3)       { create(:question_free_response, question_group: question_group_1, position: 2) }
-  let!(:question_4)       { create(:question_free_response, question_group: question_group_2, position: 0) }
-  let!(:question_5)       { create(:question_free_response, question_group: question_group_2, position: 1) }
-  let!(:question_6)       { create(:question_free_response, question_group: question_group_2, position: 2) }
-  let!(:question_7)       { create(:question_free_response, question_group: question_group_2, position: 3) }
+  let!(:question_group1) { create(:question_group, title: 'Question Group 1 Title', session: session, position: 1) }
+  let!(:question_group2) { create(:question_group, title: 'Question Group 2 Title', session: session, position: 2) }
+  let!(:question1)       { create(:question_free_response, question_group: question_group1, position: 0) }
+  let!(:question2)       { create(:question_free_response, question_group: question_group1, position: 1) }
+  let!(:question3)       { create(:question_free_response, question_group: question_group1, position: 2) }
+  let!(:question4)       { create(:question_free_response, question_group: question_group2, position: 0) }
+  let!(:question5)       { create(:question_free_response, question_group: question_group2, position: 1) }
+  let!(:question6)       { create(:question_free_response, question_group: question_group2, position: 2) }
+  let!(:question7)       { create(:question_free_response, question_group: question_group2, position: 3) }
 
   let(:params) do
     {
       question: {
         position: [
           {
-            id: question_1.id,
+            id: question1.id,
             position: 11,
-            question_group_id: question_group_2.id
+            question_group_id: question_group2.id
           },
           {
-            id: question_2.id,
+            id: question2.id,
             position: 22,
-            question_group_id: question_group_2.id
+            question_group_id: question_group2.id
           },
           {
-            id: question_3.id,
+            id: question3.id,
             position: 33,
-            question_group_id: question_group_2.id
+            question_group_id: question_group2.id
           }
         ]
       }
@@ -62,9 +62,9 @@ describe 'PATCH /v1/sessions/:session_id/questions/move', type: :request do
         expect(response).to have_http_status(:ok)
         expect(response).to have_http_status(:ok)
         expect(json_response['data'].size).to eq 3
-        expect(question_1.reload.position).to eq 11
-        expect(question_2.reload.position).to eq 22
-        expect(question_3.reload.position).to eq 33
+        expect(question1.reload.position).to eq 11
+        expect(question2.reload.position).to eq 22
+        expect(question3.reload.position).to eq 33
       end
     end
   end

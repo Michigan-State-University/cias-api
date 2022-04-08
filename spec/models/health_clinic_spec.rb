@@ -20,7 +20,10 @@ RSpec.describe HealthClinic, type: :model do
 
     context 'name is not unique' do
       let!(:existing_health_clinic) { create(:health_clinic) }
-      let(:health_clinic) { build_stubbed(:health_clinic, name: existing_health_clinic.name, health_system: existing_health_clinic.health_system) }
+      let(:health_clinic) do
+        build_stubbed(:health_clinic, name: existing_health_clinic.name,
+                                      health_system: existing_health_clinic.health_system)
+      end
 
       it 'health clinic is invalid' do
         expect(health_clinic).not_to be_valid

@@ -6,6 +6,7 @@ class Clone::Intervention < Clone::Base
     outcome.name = "Copy of #{outcome.name}"
     outcome.is_cloning = true
     clear_organization!
+    clear_cat_mh_settings!
     outcome.save!
     create_sessions
     reassign_branching
@@ -35,6 +36,8 @@ class Clone::Intervention < Clone::Base
       formula['patterns'] = update_object_pattern(outcome_session, formula)
     end
     outcome_session.save!
+
+    return unless outcome_session.respond_to?(:questions)
 
     outcome_session.questions.find_each do |question|
       question.formulas.each do |formula|
@@ -89,5 +92,12 @@ class Clone::Intervention < Clone::Base
     return if outcome.organization.blank?
 
     outcome.organization = nil
+  end
+
+  def clear_cat_mh_settings!
+    outcome.cat_mh_application_id = nil
+    outcome.cat_mh_organization_id = nil
+    outcome.cat_mh_pool = nil
+    outcome.created_cat_mh_session_count = 0
   end
 end
