@@ -13,21 +13,7 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     }
   end
   let!(:intervention) { create(:intervention, user: user) }
-<<<<<<< HEAD
-  let!(:intervention_2) { create(:intervention, user: user) }
-  let(:other_session) { create(:session, intervention: intervention) }
-  let!(:session) do
-    create(:session, intervention: intervention,
-                     formulas: [{ 'payload' => 'var + 5', 'patterns' => [
-                       { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-                     ] }],
-                     settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
-  end
-  let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
-  let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
-=======
   let!(:intervention2) { create(:intervention, user: user) }
->>>>>>> post-mvp-2
   let!(:params) do
     {
       new_intervention_id: intervention2.id

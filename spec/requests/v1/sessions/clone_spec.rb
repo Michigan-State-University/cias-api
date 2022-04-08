@@ -5,47 +5,6 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: user) }
-<<<<<<< HEAD
-  let(:session) do
-    create(:session, :with_report_templates,
-           intervention: intervention,
-           formulas: [{ 'payload' => 'var + 5', 'patterns' => [
-             { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-           ] }],
-           settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
-           days_after_date_variable_name: 'var1')
-  end
-  let!(:sms_plan) { create(:sms_plan, session: session) }
-  let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
-  let!(:other_session) { create(:session, intervention: intervention) }
-  let!(:question_group_1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
-  let!(:question_group_2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
-  let!(:question_1) do
-    create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle', position: 1,
-                             formulas: [{ 'payload' => 'var + 3', 'patterns' => [
-                               { 'match' => '=7', 'target' => [{ 'id' => question_2.id, 'probability' => '100', type: 'Question::Single' }] }
-                             ] }])
-  end
-  let!(:question_2) do
-    create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle 2', position: 2,
-                             formulas: [{ 'payload' => 'var + 4', 'patterns' => [
-                               { 'match' => '=3', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-                             ] }])
-  end
-  let!(:question_3) do
-    create(:question_single, question_group: question_group_1, subtitle: 'Question Subtitle 3', position: 3,
-                             formulas: [{ 'payload' => 'var + 2', 'patterns' => [
-                               { 'match' => '=4', 'target' => [{ 'id' => question_4.id, 'probability' => '100', type: 'Question::Single' }] }
-                             ] }])
-  end
-  let!(:question_4) do
-    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 4', position: 1,
-                             formulas: [{ 'payload' => 'var + 7', 'patterns' => [
-                               { 'match' => '=11', 'target' => [{ 'id' => question_1.id, 'probability' => '100', type: 'Question::Single' }] }
-                             ] }])
-  end
-=======
->>>>>>> post-mvp-2
 
   context 'Session::Classic' do
     let(:session) do
@@ -107,26 +66,6 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                    voice: true,
                                    animation: true
                                  }
-<<<<<<< HEAD
-                               ],
-                               settings: {
-                                 voice: true,
-                                 animation: true
-                               }
-                             })
-  end
-  let!(:question_6) do
-    create(:question_single, question_group: question_group_2, subtitle: 'Question Subtitle 6', position: 3,
-                             formulas: [{ 'payload' => '', 'patterns' => [
-                               { 'match' => '', 'target' => [{ 'id' => 'invalid_id', 'probability' => '100', type: 'Question::Single' }] }
-                             ] }])
-  end
-  let!(:last_third_party_report_template) { session.report_templates.third_party.last }
-  let!(:question_7) do
-    create(:question_third_party, question_group: question_group_2, subtitle: 'Question Subtitle 7', position: 4,
-                                  body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }] })
-  end
-=======
                                })
     end
     let!(:question6) do
@@ -144,7 +83,6 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
     let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
     let(:request) { post v1_clone_session_path(id: session.id), headers: user.create_new_auth_token }
->>>>>>> post-mvp-2
 
     context 'when auth' do
       context 'is invalid' do

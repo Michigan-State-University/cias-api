@@ -326,73 +326,6 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
 
-<<<<<<< HEAD
-    context 'when exist questions without answers' do
-      let!(:question_1_body) do
-        {
-          'data' => [
-            { 'value' => '1', 'payload' => '' },
-            { 'value' => '2', 'payload' => '' }
-          ],
-          'variable' => { 'name' => 'var_1' }
-        }
-      end
-      let!(:answer_1_body) do
-        {
-          'data' => [
-            {
-              'var' => 'var_1',
-              'value' => '1'
-            }
-          ]
-        }
-      end
-      let!(:question_2_body) do
-        {
-          'data' => [
-            {
-              'payload' => '',
-              'variable' => { 'name' => 'var_2', value: '1' }
-            },
-            {
-              'payload' => '',
-              'variable' => { 'name' => 'var_3', value: '2' }
-            }
-          ]
-        }
-      end
-      let!(:question_1) do
-        create(:question_single, question_group: question_group, body: question_1_body, position: 1)
-      end
-      let!(:question_2) do
-        create(:question_multiple, question_group: question_group, body: question_2_body, position: 2)
-      end
-      let!(:question_3) { create(:question_name, question_group: question_group, position: 3) }
-      let!(:questions) do
-        Question.joins(:question_group).where(id: [question_1.id, question_2.id, question_3.id]).order(:position)
-      end
-      let!(:answer_1) do
-        create(:answer_single, question: question_1, body: answer_1_body, user_session: user_session)
-      end
-      let!(:answer_2) do
-        create(:answer_name, user_session: user_session, question: question_3, body: { data: [
-                 { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phonetic_name' => 'John' } }
-               ] })
-      end
-
-      it 'save nil values for each variable unanswered questions' do
-        subject.collect
-        expect(subject.header).to eq [:user_id, :email, "#{session.variable}.var_1", "#{session.variable}.var_2", "#{session.variable}.var_3",
-                                      "#{session.variable}.metadata.phonetic_name", "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-        expect(subject.rows).to eq [
-          [
-            answer_1.user_session.user_id.to_s,
-            answer_1.user_session.user.email.to_s,
-            '1', nil, nil, { 'name' => 'John', 'phonetic_name' => 'John' },
-            answer_1.user_session.created_at, nil, nil
-          ]
-        ]
-=======
       context 'when phone' do
         let!(:question_body) do
           {
@@ -422,7 +355,6 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123', answer.user_session.created_at,
                                        nil, nil]]
         end
->>>>>>> post-mvp-2
       end
 
       context 'when currency' do
