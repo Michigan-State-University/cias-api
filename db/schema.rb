@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_22_094121) do
+ActiveRecord::Schema.define(version: 2022_04_05_075514) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -359,6 +359,7 @@ ActiveRecord::Schema.define(version: 2022_03_22_094121) do
     t.uuid "report_template_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "position", default: 0, null: false
     t.index ["report_template_id"], name: "index_report_template_sections_on_report_template_id"
   end
 

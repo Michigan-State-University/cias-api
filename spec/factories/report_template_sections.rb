@@ -10,5 +10,7 @@ FactoryBot.define do
         section.variants << create(:report_template_section_variant, :with_image)
       end
     end
+
+    sequence(:position) { |s| s }
   end
 end

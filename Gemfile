@@ -6,7 +6,7 @@ ruby '2.7.2'
 
 gem 'rails', '~> 6.1.4.7'
 gem 'pg', '~> 1.2'
-gem 'puma', '>= 5.6.2'
+gem 'puma', '>= 5.6.4'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
