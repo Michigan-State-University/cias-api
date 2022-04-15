@@ -4,9 +4,8 @@ class V1::Translations::TranslationsController < V1Controller
   def translate_intervention
     authorize! :translate, Intervention
 
-    intervention = find_intervention(intervention_id)
-    translated_intervention = V1::Translations::Intervention.call(intervention, destination_language_id, destination_google_tts_voice_id)
-    render json: serialized_response(translated_intervention, 'Intervention'), status: :created
+    Translations::InterventionJob.perform_later(intervention_id, destination_language_id, destination_google_tts_voice_id, current_v1_user)
+    render status: :ok
   end
 
   private
@@ -21,9 +20,5 @@ class V1::Translations::TranslationsController < V1Controller
 
   def destination_google_tts_voice_id
     params.permit(:destination_google_tts_voice_id)[:destination_google_tts_voice_id]
-  end
-
-  def find_intervention(id)
-    Intervention.accessible_by(current_ability).find(id)
   end
 end
