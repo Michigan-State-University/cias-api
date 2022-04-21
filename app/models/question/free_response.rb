@@ -17,4 +17,8 @@ class Question::FreeResponse < Question
     new_variable = variable_with_clone_index(taken_variables, body['variable']['name']) if taken_variables.include?(new_variable)
     body['variable']['name'] = new_variable
   end
+
+  def question_variables
+    [body['variable']['name']]
+  end
 end

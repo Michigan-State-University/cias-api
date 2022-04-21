@@ -1,6 +1,6 @@
 default: &default
   adapter: postgresql
-  host: database
+  host: localhost
   pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 4 } %>
   encoding: unicode
   username: postgres

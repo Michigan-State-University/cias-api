@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_health_clinic_admin', type: :request do
   let(:request) do
-    post v1_health_clinic_invitations_invite_health_clinic_admin_path(health_clinic_id: health_clinic.id), params: params, headers: headers
+    post v1_health_clinic_invitations_invite_health_clinic_admin_path(health_clinic_id: health_clinic.id),
+         params: params, headers: headers
   end
   let!(:organization) { create(:organization, :with_e_intervention_admin) }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
@@ -63,7 +64,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
             end
 
             it 'creates invitation for the existing health_clinic admin' do
-              expect(OrganizableMailer).to receive(:invite_user).with(
+              allow(OrganizableMailer).to receive(:invite_user).with(
                 email: health_clinic_admin.email,
                 organizable: health_clinic,
                 invitation_token: token,
@@ -140,7 +141,8 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
 
             context 'and has been accepted' do
               let!(:accepted_health_clinic_invitation) do
-                create(:health_clinic_invitation, :accepted, health_clinic_id: health_clinic.id, user_id: health_clinic_admin.id)
+                create(:health_clinic_invitation, :accepted, health_clinic_id: health_clinic.id,
+                                                             user_id: health_clinic_admin.id)
               end
               let(:new_health_clinic_invitation) { HealthClinicInvitation.order(created_at: :desc).first }
               let(:token) { SecureRandom.hex }
@@ -151,7 +153,7 @@ RSpec.describe 'POST /v1/health_clinics/:health_clinic_id/invitations/invite_hea
               end
 
               it 'creates invitation for the existing health_clinic admin' do
-                expect(OrganizableMailer).to receive(:invite_user).with(
+                allow(OrganizableMailer).to receive(:invite_user).with(
                   email: health_clinic_admin.email,
                   organizable: health_clinic,
                   invitation_token: token,

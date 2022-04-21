@@ -1,33 +1,81 @@
 name: CI
 on: push
+
 jobs:
-  test:
+  setup_environment:
+    name: Prepare environment & split tests
     runs-on: ubuntu-latest
-    container:
-      image: ruby:2.7.2
+    outputs:
+      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7.2
+        env:
+          RUBYOPT: --jit
+
+      - uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle config set path 'vendor/bundle'
+          bundle install
+
+      - name: Analyze with Rubocop
+        run: bundle exec rubocop
+
+      - id: set-test-chunks
+        name: Set Chunks
+        #the test_setup.sh script returns a list of all spec files and passes that to jq, which groups them up in batches (amount of batches specified by GitHub secret TEST_BATCH_COUNT)
+        run: echo "::set-output name=test-chunks::$(./.github/workflows/test_setup.sh ./spec | jq -cM '[to_entries | group_by(.key % ${{ secrets.TEST_BATCH_COUNT }}) | .[] | map(.value)]')"
+
+      - id: set-test-chunk-ids
+        name: Set Chunk IDs
+        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        env:
+          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+
+  test:
+    name: Test batch no. ${{ matrix.chunk }}
+    needs: setup_environment
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        chunk: ${{ fromJson(needs.setup_environment.outputs['test-chunk-ids']) }}
     services:
       database:
         image: postgres:13.0-alpine
         env:
           POSTGRES_PASSWORD: 7AU0lHRd5OglmKO
-        ports: ['5432:5432']
+        ports: ["5432:5432"]
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
       cache:
-        image: redis:6.0.8-alpine
-        ports: ['6379:6379']
+        image: redis
         options: --entrypoint redis-server
+        ports:
+          - 6379:6379
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
-          ruby-version: 2.7.x
+          ruby-version: 2.7.2
         env:
           RUBYOPT: --jit
       - run: cp .env.template .env
@@ -41,21 +89,23 @@ jobs:
       - name: Build
         env:
           BUNDLER_VERSION: 2.2.22
-          DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@database:5432/cias_test
+          DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@localhost:5432/cias_test
           GIT_AUTHOR_EMAIL: ci@ci.ci
           RAILS_ENV: test
-          REDIS_URL: redis://localhost:6379/0
+          REDIS_URL: redis://localhost:6379/
         run: |
-          apt-get -yqq install libpq-dev
           gem install bundler -v "2.2.22"
           bundle config set path 'vendor/bundle'
           bundle install
           bundle exec rails db:create db:schema:load --trace
-      - name: Execute tests
-        run: bundle exec rspec
+      - name: Run test batch
+        env:
+          CHUNKS: ${{ needs.setup_environment.outputs['test-chunks'] }}
+          #sed is needed because rspec prepends './' to file paths which contain '"' character and this jq command returns them in such format
+        run: bundle exec rspec $(echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | sed 's/\"//g')
       - name: Analyze with Brakeman
         run: bundle exec brakeman --skip-files app/controllers/concerns/exception_handler.rb,app/controllers/v1/users/invitations_controller.rb
       - name: Analyze with bundler audit
         run: |
-            gem install bundler-audit
-            bundle-audit check --update
+          gem install bundler-audit
+          bundle-audit check --update

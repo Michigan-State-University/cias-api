@@ -7,13 +7,12 @@ FactoryBot.define do
 
     trait :with_health_system_admin do
       after(:build) do |health_system|
-        health_system_admin = create(:user, :confirmed, :health_system_admin)
-        health_system_admin.organizable = health_system
+        health_system_admin = create(:user, :confirmed, :health_system_admin, organizable: health_system)
         health_system.health_system_admins << health_system_admin
       end
     end
 
-    trait :with_clinics do
+    trait :with_health_clinic do
       after(:build) do |health_system|
         health_system.health_clinics << create(:health_clinic)
       end

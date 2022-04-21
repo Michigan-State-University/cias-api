@@ -48,7 +48,7 @@ RSpec.describe 'GET /v1/google/languages', type: :request do
       it 'returns proper collection data' do
         expect(json_response['data']).to include(
           {
-            'id' => '22',
+            'id' => '1', # after removing a default id 22 the id will be 1
             'type' => 'supported_language',
             'attributes' => {
               'language_code' => 'en',

@@ -4,13 +4,22 @@ class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
+    user_intervention = UserIntervention.find_or_create_by(
+      user_id: user_id,
+      intervention_id: intervention_id,
+      health_clinic_id: health_clinic_id
+    )
+
     user_session = UserSession.find_or_initialize_by(
       session_id: session_id,
       user_id: user_id,
-      health_clinic_id: health_clinic_id
+      health_clinic_id: health_clinic_id,
+      type: type,
+      user_intervention_id: user_intervention.id
     )
     authorize! :create, user_session
     user_session.save!
+
     render json: serialized_response(user_session), status: :ok
   end
 
@@ -30,12 +39,28 @@ class V1::UserSessionsController < V1Controller
     user
   end
 
+  def type
+    session_load.user_session_type
+  end
+
+  def session_load
+    Session.find(session_id)
+  end
+
+  def cat_sessions_in_intervention
+    session_load.intervention.sessions.where(type: 'Session::CatMh')
+  end
+
   def user_session_params
     params.require(:user_session).permit(:session_id, :health_clinic_id)
   end
 
   def session_id
     user_session_params[:session_id]
+  end
+
+  def intervention_id
+    Session.find(session_id).intervention.id
   end
 
   def health_clinic_id

@@ -7,7 +7,7 @@ class V1::Teams::ChangeTeamAdmin
 
   def initialize(team, team_admin_id, current_ability)
     @team            = team
-    @team_admin_id   = team_admin_id
+    @team_admin_id   = team_admin_id # new team_admin
     @current_ability = current_ability
   end
 
@@ -16,21 +16,18 @@ class V1::Teams::ChangeTeamAdmin
     return if admin_not_changed?
 
     ActiveRecord::Base.transaction do
-      if admin_for_one_team?
+      if current_admin_of_one_team?
         current_team_admin.update!(
           roles: ['researcher'],
           team_id: team.id
-        )
-      else
-        current_team_admin.update!(
-          team_id: nil
         )
       end
 
       team.update!(team_admin_id: team_admin_id)
 
       new_team_admin.update!(
-        roles: ['team_admin']
+        roles: ['team_admin'],
+        team_id: nil # to avoid problems when researcher of the team becomes team_admin for this team
       )
 
       V1::Teams::RemoveUsersActiveInvitations.call(new_team_admin)
@@ -62,7 +59,7 @@ class V1::Teams::ChangeTeamAdmin
     @current_team_admin ||= team.team_admin
   end
 
-  def admin_for_one_team?
+  def current_admin_of_one_team?
     current_team_admin.admins_teams.count == 1
   end
 end

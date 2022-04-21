@@ -1,13 +1,17 @@
 # frozen_string_literal: true
 
 class V1::RandomizationService
+  def self.call(target_array)
+    new(target_array).call
+  end
+
   def initialize(target_array)
     @target_array = target_array
   end
 
   attr_reader :target_array
 
-  def execute
+  def call
     return target_array.first if target_array.first['probability'].nil?
 
     probability = rand(100)

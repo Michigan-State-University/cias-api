@@ -16,7 +16,34 @@ RSpec.describe Question::Number, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_number.variable_clone_prefix(%w[clone_number_var clone1_number_var])).to eq('clone2_number_var')
+          expect(question_number.variable_clone_prefix(%w[clone_number_var
+                                                          clone1_number_var])).to eq('clone2_number_var')
+        end
+      end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_number.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_number.title).to include('from=>en to=>pl text=>Number')
+        end
+
+        it '#translate_subtitle' do
+          question_number.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_number.subtitle).to equal(nil)
+        end
+      end
+
+      describe '#question_variables' do
+        it 'returns correct variables' do
+          expect(question_number.question_variables).to match_array ['number_var']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_number.question_variables.size).to eq 1
         end
       end
     end

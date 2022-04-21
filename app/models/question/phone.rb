@@ -8,4 +8,8 @@ class Question::Phone < Question
       { 'required' => true }
     )
   end
+
+  def question_variables
+    [body['variable']['name']]
+  end
 end

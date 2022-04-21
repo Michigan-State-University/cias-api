@@ -114,6 +114,11 @@ Rails.application.configure do
   # config.active_record.database_resolver = ActiveRecord::Middleware::DatabaseSelector::Resolver
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
 
+  # Mount Action Cable outside main process or domain
+  # config.action_cable.mount_path = nil
+  # config.action_cable.url = 'wss://example.com/cable'
+  config.action_cable.allowed_request_origins = [%r{http://*}, %r{https://*}]
+  config.action_cable.disable_request_forgery_protection = true
   config.good_job.execution_mode = :async
 
   # Or with more configuration

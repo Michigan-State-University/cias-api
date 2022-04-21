@@ -14,8 +14,10 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
   end
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:health_system) { create(:health_system, :with_clinics, organization: organization) }
+  let!(:organization) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
+  end
+  let!(:health_system) { create(:health_system, :with_health_clinic, organization: organization) }
   let!(:deleted_health_system) { create(:health_system, organization: organization, deleted_at: Time.current, name: 'Deleted health system') }
   let!(:deleted_health_clinic) { create(:health_clinic, health_system: deleted_health_system, deleted_at: Time.current, name: 'Deleted healt clinic') }
   let!(:health_clinic) { health_system.health_clinics.first }
@@ -30,6 +32,9 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
     HealthClinicInvitation.create!(user: user, health_clinic: health_clinic, accepted_at: Time.zone.now)
     user
   end
+
+  let(:e_intervention_admin_invitation) { e_intervention_admin.organization_invitations.first }
+  let(:organization_admin_invitation) { organization_admin.organization_invitations.first }
 
   let(:roles_organization) do
     {
@@ -96,7 +101,8 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                         )
                       },
                   'organization_invitations' => {
-                    'data' => []
+                    'data' => [{ 'id' => organization.organization_invitations.first.id,
+                                 'type' => 'organization_invitation' }]
                   }
                 }
           }
@@ -104,20 +110,17 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
       end
 
       it 'returns proper include' do
-        expect(json_response['included'][0]).to include(
-          {
-            'id' => e_intervention_admin.id,
-            'type' => 'user',
-            'attributes' =>
-                include(
-                  'email' => e_intervention_admin.email,
-                  'first_name' => e_intervention_admin.first_name,
-                  'last_name' => e_intervention_admin.last_name,
-                  'roles' => ['e_intervention_admin']
-                )
-          }
-        )
-        expect(json_response['included'][1]).to include(
+        expect(json_response['included']).to include(
+          'id' => e_intervention_admin.id,
+          'type' => 'user',
+          'attributes' =>
+              include(
+                'email' => e_intervention_admin.email,
+                'first_name' => e_intervention_admin.first_name,
+                'last_name' => e_intervention_admin.last_name,
+                'roles' => ['e_intervention_admin']
+              )
+        ).and include(
           'id' => deleted_health_clinic.id,
           'type' => 'health_clinic',
           'attributes' => {
@@ -133,8 +136,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
               'data' => []
             }
           }
-        )
-        expect(json_response['included'][2]).to include(
+        ).and include(
           {
             'id' => health_clinic.id,
             'type' => 'health_clinic',
@@ -154,62 +156,61 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
               'health_clinic_invitations' => {
                 'data' => [{
                   'id' => health_clinic_admin.health_clinic_invitations.last.id,
-                  'type' => 'health_clinic_invitation'
+                  'type' => 'organizable_invitation'
                 }]
               }
             }
           }
-        )
-        expect(json_response['included'][3]).to include(
+        ).and include(
           {
             'id' => deleted_health_system.id,
             'type' => 'health_system',
             'attributes' =>
-              {
-                'name' => deleted_health_system.name,
-                'organization_id' => health_system.organization_id,
-                'deleted' => true
-              },
+                    {
+                      'name' => deleted_health_system.name,
+                      'organization_id' => health_system.organization_id,
+                      'deleted' => true
+                    },
             'relationships' =>
-              {
-                'health_system_admins' => { 'data' => [] },
-                'health_clinics' => { 'data' => [
-                  {
-                    'id' => deleted_health_clinic.id,
-                    'type' => 'health_clinic'
-                  }
-                ] }
-              }
+                    {
+                      'health_system_admins' => { 'data' => [] },
+                      'health_clinics' => { 'data' => [
+                        {
+                          'id' => deleted_health_clinic.id,
+                          'type' => 'health_clinic'
+                        }
+                      ] }
+                    }
           }
-        )
-        expect(json_response['included'][4]).to include(
+        ).and include(
           {
             'id' => health_system.id,
             'type' => 'health_system',
             'attributes' =>
-                  {
-                    'name' => health_system.name,
-                    'organization_id' => health_system.organization_id,
-                    'deleted' => false
-                  },
+                               {
+                                 'name' => health_system.name,
+                                 'organization_id' => health_system.organization_id,
+                                 'deleted' => false
+                               },
             'relationships' =>
-                  {
-                    'health_system_admins' => { 'data' => [] },
-                    'health_clinics' => { 'data' => [{ 'id' => health_clinic.id, 'type' => 'health_clinic' }] }
-                  }
+                               {
+                                 'health_system_admins' => { 'data' => [] },
+                                 'health_clinics' => { 'data' => [{
+                                   'id' => health_clinic.id, 'type' => 'health_clinic'
+                                 }] }
+                               }
           }
-        )
-        expect(json_response['included'][5]).to include(
+        ).and include(
           {
             'id' => organization_admin.id,
             'type' => 'user',
             'attributes' =>
-                  include(
-                    'email' => organization_admin.email,
-                    'first_name' => organization_admin.first_name,
-                    'last_name' => organization_admin.last_name,
-                    'roles' => ['organization_admin']
-                  )
+                     include(
+                       'email' => organization_admin.email,
+                       'first_name' => organization_admin.first_name,
+                       'last_name' => organization_admin.last_name,
+                       'roles' => ['organization_admin']
+                     )
           }
         )
       end

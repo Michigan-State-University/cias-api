@@ -11,11 +11,15 @@ RSpec.describe UserSession, type: :model do
     it { should have_many(:answers) }
     it { should have_many(:generated_reports) }
     it { should be_valid }
+    it { should belong_to(:user_intervention) }
   end
 
   context 'instance methods' do
     context 'user session finish behaviour' do
-      let(:user_session) { create(:user_session, finished_at: finished_at) }
+      let(:intervention) { create(:fixed_order_intervention) }
+      let!(:sessions) { create_list(:session, 2, intervention: intervention) }
+      let(:user_intervention) { create(:user_intervention, intervention: intervention, status: 'in_progress', completed_sessions: 1) }
+      let(:user_session) { create(:user_session, finished_at: finished_at, user_intervention: user_intervention) }
       let(:user_session_schedule_service) { instance_double(V1::UserSessionScheduleService) }
       let(:finished_at) { nil }
 
@@ -35,12 +39,36 @@ RSpec.describe UserSession, type: :model do
           user_session.finish(send_email: false)
         end
 
+        it 'update user_session' do
+          user_session.finish(send_email: false)
+          expect(user_intervention.status).to eq('completed')
+          expect(user_intervention.completed_sessions).to eq(2)
+          expect(user_intervention.finished_at).not_to eq(nil)
+        end
+
         context 'user has been finished before' do
           let(:finished_at) { DateTime.now }
 
           it 'does not call user schedule service ' do
             expect(user_session_schedule_service).not_to receive(:schedule)
             user_session.finish
+          end
+        end
+
+        context 'user session has type CatMh' do
+          let(:session) { create(:cat_mh_session, :with_test_type_and_variables, :with_cat_mh_info) }
+          let(:user_session) { create(:user_session_cat_mh, session: session, finished_at: finished_at) }
+
+          it 'create answers' do
+            expect(user_session_schedule_service).not_to receive(:schedule)
+            user_session.finish(send_email: false)
+            answers = Answer.where(user_session_id: user_session.id)
+            expect(answers.size).to be(2)
+            variables = [answers.first.decrypted_body, answers.last.decrypted_body]
+            expect(variables).to include(
+              { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
+              { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
+            )
           end
         end
       end
@@ -73,13 +101,34 @@ RSpec.describe UserSession, type: :model do
           end
 
           it 'updates job finished_at' do
-            expect(good_job.finished_at).to_not be_blank
+            expect(good_job.finished_at).not_to be_blank
           end
 
           it 'adds information about cancellation to serialized_params' do
             expect(good_job.serialized_params['cancelled']).to eq true
           end
         end
+      end
+    end
+
+    context 'UserSession::CatMh' do
+      let(:intervention) { create(:intervention) }
+      let(:user_intervention) { create(:user_intervention, intervention: intervention) }
+      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, :with_cat_mh_info, intervention: intervention) }
+      let(:user_session) { create(:user_session_cat_mh, session: session, user_intervention: user_intervention) }
+
+      it 'have assign needed information' do
+        expect(user_session.identifier).not_to be_nil
+        expect(user_session.signature).not_to be_nil
+        expect(user_session.jsession_id).not_to be_nil
+        expect(user_session.awselb).not_to be_nil
+      end
+
+      it 'update user_session' do
+        user_session.finish(send_email: false)
+        expect(user_intervention.status).to eq('completed')
+        expect(user_intervention.completed_sessions).to eq(1)
+        expect(user_intervention.finished_at).not_to eq(nil)
       end
     end
   end

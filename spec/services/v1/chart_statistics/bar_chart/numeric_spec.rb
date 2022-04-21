@@ -13,10 +13,22 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   let!(:other_chart) { create(:chart, name: 'pie_chart', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
   let(:chart) { bar_chart1 }
 
-  let!(:chart_matched_statistic1) { create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 2.months.ago) }
-  let!(:chart_not_matched_statistic1) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 2.months.ago) }
-  let!(:chart_matched_statistic2) { create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 1.month.ago) }
-  let!(:chart_not_matched_statistic2) { create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1, health_clinic: health_clinic, filled_at: 1.month.ago) }
+  let!(:chart_matched_statistic1) do
+    create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                      health_clinic: health_clinic, filled_at: 2.months.ago)
+  end
+  let!(:chart_not_matched_statistic1) do
+    create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                     health_clinic: health_clinic, filled_at: 2.months.ago)
+  end
+  let!(:chart_matched_statistic2) do
+    create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                     health_clinic: health_clinic, filled_at: 1.month.ago)
+  end
+  let!(:chart_not_matched_statistic2) do
+    create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                     health_clinic: health_clinic, filled_at: 1.month.ago)
+  end
 
   let(:data_collection) { ChartStatistic.all }
   let(:charts) { Chart.all }

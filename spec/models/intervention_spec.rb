@@ -10,88 +10,83 @@ RSpec.describe Intervention, type: :model do
 
     it { should belong_to(:user) }
     it { should have_many(:sessions) }
-    it { should belong_to(:google_language) }
+    it { should have_many(:user_interventions) }
+    it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { expect(initial_status.draft?).to be true }
   end
 
-  context 'change states' do
-    context 'from draft' do
-      let(:intervention) { create(:intervention) }
-      let!(:sessions) { create_list(:session, 4, intervention_id: intervention.id) }
+  describe 'instance methods' do
+    describe 'translation' do
+      let(:intervention) { create(:intervention_with_logo, name: 'New intervention') }
+      let(:translator) { V1::Google::TranslationService.new }
+      let(:source_language_name_short) { 'en' }
+      let(:destination_language_name_short) { 'pl' }
 
-      context 'to published' do
-        it 'success event' do
-          intervention.broadcast
-          expect(intervention.published?).to be true
-        end
+      before do
+        intervention.logo_blob.description = 'This is the description'
+        intervention.translate(translator, source_language_name_short, destination_language_name_short)
       end
 
-      context 'to closed' do
-        it 'no status change' do
-          intervention.close
-          expect(intervention.draft?).to be true
-        end
-      end
-
-      context 'to archived' do
-        it 'success event' do
-          intervention.to_archive
-          expect(intervention.archived?).to be true
+      describe '#translation_prefix' do
+        it 'add correct prefix' do
+          expect(intervention.reload.name).to include("(#{destination_language_name_short.upcase}) New intervention")
         end
       end
     end
 
-    context 'from published' do
-      let(:intervention) { create(:intervention, :published) }
+    describe '#invite_by_email' do
+      before do
+        allow(message_delivery).to receive(:deliver_later)
+        ActiveJob::Base.queue_adapter = :test
+      end
 
-      context 'to closed' do
-        it 'success event' do
-          intervention.close
-          expect(intervention.closed?).to be true
+      after { intervention.invite_by_email([user.email]) }
+
+      let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+      let(:intervention) { create(:intervention, status: status) }
+      let(:status) { :draft }
+      let(:user) { create(:user, :confirmed, :admin) }
+
+      context 'intervention is draft' do
+        it 'dose not schedule send email' do
+          expect(InterventionMailer).not_to receive(:inform_to_an_email)
         end
       end
 
-      context 'to archived' do
-        it 'no status change' do
-          intervention.to_archive
-          expect(intervention.published?).to be true
+      context 'intervention is published' do
+        let(:status) { :published }
+
+        %i[guest preview_session].each do |role|
+          context "user is #{role}" do
+            let(:user) { create(:user, :confirmed, role) }
+
+            it 'dose not schedule send email' do
+              expect(SessionMailer).not_to receive(:inform_to_an_email)
+            end
+          end
         end
-      end
-    end
 
-    context 'from closed' do
-      let(:intervention) { create(:intervention, :closed) }
+        %i[admin researcher participant].each do |role|
+          context "user is #{role}" do
+            let(:user) { create(:user, :confirmed, role) }
 
-      context 'to published' do
-        it 'no status change' do
-          intervention.broadcast
-          expect(intervention.closed?).to be true
-        end
-      end
+            context 'email notification enabled' do
+              it 'schedules send email' do
+                allow(InterventionMailer).to receive(:inform_to_an_email).with(intervention, user.email, nil).and_return(
+                  message_delivery
+                )
+              end
+            end
 
-      context 'to archived' do
-        it 'success event' do
-          intervention.to_archive
-          expect(intervention.archived?).to be true
-        end
-      end
-    end
+            context 'email notification disabled' do
+              let!(:disable_email_notification) { user.email_notification = false }
 
-    context 'from archived' do
-      let(:intervention) { create(:intervention, :archived) }
-
-      context 'to published' do
-        it 'no status change' do
-          intervention.broadcast
-          expect(intervention.archived?).to be true
-        end
-      end
-
-      context 'to closed' do
-        it 'no status change' do
-          intervention.close
-          expect(intervention.archived?).to be true
+              it "Don't schedule send email" do
+                expect(InterventionMailer).not_to receive(:inform_to_an_email)
+              end
+            end
+          end
         end
       end
     end
@@ -134,7 +129,8 @@ RSpec.describe Intervention, type: :model do
     it 'return correct data' do
       cloned_intervention = intervention.clone
 
-      expect(intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
+      expect(intervention.attributes.except('id', 'created_at', 'updated_at', 'status',
+                                            'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
     end

@@ -16,4 +16,22 @@ class Question::Feedback < Question
   def csv_header_names
     []
   end
+
+  def translate_body(translator, source_language_name_short, destination_language_name_short)
+    body['data'].each do |row|
+      original_payload(row['payload'])
+
+      row['payload']['end_value'] = translator.translate(row['payload']['end_value'], source_language_name_short, destination_language_name_short)
+      row['payload']['start_value'] = translator.translate(row['payload']['start_value'], source_language_name_short, destination_language_name_short)
+    end
+  end
+
+  private
+
+  def original_payload(row)
+    row['original_text'] = {
+      'end_value' => row['end_value'],
+      'start_value' => row['start_value']
+    }
+  end
 end

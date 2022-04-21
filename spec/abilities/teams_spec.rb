@@ -6,6 +6,15 @@ describe Team do
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }
 
+    shared_examples 'not authorized for any team' do
+      it 'can\'t read, create, update, destroy, invite_researcher, change_team_admin any team' do
+        expect(subject).to not_have_abilities(
+          %i[read create update destroy invite_researcher change_team_admin],
+          described_class
+        )
+      end
+    end
+
     context 'admin' do
       let(:user) { build_stubbed(:user, :confirmed, :admin) }
 
@@ -46,34 +55,19 @@ describe Team do
     context 'researcher' do
       let(:user) { build_stubbed(:user, :confirmed, :researcher) }
 
-      it do
-        expect(subject).to not_have_abilities(
-          %i[read create update destroy invite_researcher change_team_admin],
-          described_class
-        )
-      end
+      it_behaves_like 'not authorized for any team'
     end
 
     context 'participant' do
       let(:user) { build_stubbed(:user, :confirmed, :participant) }
 
-      it do
-        expect(subject).to not_have_abilities(
-          %i[read create update destroy invite_researcher change_team_admin],
-          described_class
-        )
-      end
+      it_behaves_like 'not authorized for any team'
     end
 
     context 'guest' do
       let(:user) { build_stubbed(:user, :confirmed, :guest) }
 
-      it do
-        expect(subject).to not_have_abilities(
-          %i[read create update destroy invite_researcher change_team_admin],
-          described_class
-        )
-      end
+      it_behaves_like 'not authorized for any team'
     end
   end
 
@@ -84,11 +78,17 @@ describe Team do
 
     context 'admin' do
       let!(:user) { create(:user, :confirmed, :admin) }
-      let!(:team1) { create(:team) }
-      let!(:team2) { create(:team) }
+      let!(:team1) { create(:team, created_at: Time.zone.now - 10) }
+      let!(:team2) { create(:team, created_at: Time.zone.now - 5) }
+      let!(:team3) { create(:team) }
+      let(:ordered_team_names) { [team3.name, team2.name, team1.name] }
 
       it 'return all teams' do
-        expect(subject).to include(team1, team2)
+        expect(subject).to include(team1, team2, team3)
+      end
+
+      it 'all teams are returned with proper order' do
+        expect(subject.pluck(:name)).to eq(ordered_team_names)
       end
     end
 

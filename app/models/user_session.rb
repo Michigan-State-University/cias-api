@@ -3,49 +3,14 @@
 class UserSession < ApplicationRecord
   has_paper_trail
   belongs_to :user, inverse_of: :user_sessions
+  belongs_to :user_intervention, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
-  belongs_to :name_audio, class_name: 'Audio', optional: true
   has_many :generated_reports, dependent: :destroy
   belongs_to :health_clinic, optional: true
 
-  before_destroy :decrement_audio_usage
-
-  def finish(send_email: true)
-    return if finished_at
-
-    cancel_timeout_job
-    update(finished_at: DateTime.current)
-
-    GenerateUserSessionReportsJob.perform_later(id)
-
-    decrement_audio_usage
-    V1::SmsPlans::ScheduleSmsForUserSession.call(self)
-    V1::UserSessionScheduleService.new(self).schedule if send_email
-    V1::ChartStatistics::CreateForUserSession.call(self)
-  end
-
-  def on_answer
-    timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
-    cancel_timeout_job
-    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.provider_job_id)
-  end
-
-  def cancel_timeout_job
-    return if timeout_job_id.nil?
-
-    timeout_job = GoodJob::Job.find_by(id: timeout_job_id)
-    return if timeout_job.nil?
-
-    timeout_job.serialized_params['cancelled'] = true
-    timeout_job.finished_at = Time.current
-    timeout_job.save
-
-    update(timeout_job_id: nil)
-  end
-
-  def last_answer
-    answers.order(:created_at).last
+  def finish(_send_email: true)
+    raise NotImplementedError, "subclass did not define #{__method__}"
   end
 
   def all_var_values(include_session_var: true)
@@ -67,16 +32,24 @@ class UserSession < ApplicationRecord
     nil
   end
 
-  private
+  def update_user_intervention(session_is_finished: false)
+    user_intervention.completed_sessions += 1 if session_is_finished
 
-  def session_next
-    @session_next ||= session.position_grather_than.first
+    if user_intervention_finished?
+      user_intervention.status = 'completed'
+      user_intervention.finished_at = DateTime.current
+    else
+      user_intervention.status = 'in_progress'
+    end
+
+    user_intervention.save!
   end
 
-  def decrement_audio_usage
-    return if name_audio.nil?
+  private
 
-    name_audio.decrement(:usage_counter)
-    name_audio.save!
+  def user_intervention_finished?
+    return user_intervention.completed_sessions == user_intervention.user_sessions.size unless user_intervention.intervention.module_intervention?
+
+    user_intervention.completed_sessions == user_intervention.sessions.size
   end
 end

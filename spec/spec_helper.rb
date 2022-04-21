@@ -28,6 +28,22 @@ class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   end
 end
 
+class Google::Cloud::Translate::V2::Translation::Fake
+  class Translator
+    attr_reader :text
+
+    def initialize(text)
+      @text = text
+    end
+  end
+
+  def translate(text, to: nil, from: nil, _format: nil, _model: nil)
+    raise Google::Cloud::InvalidArgumentError if to.nil?
+
+    Translator.new("from=>#{from} to=>#{to} text=>#{text}")
+  end
+end
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -68,17 +84,161 @@ RSpec.configure do |config|
 
     allow(Google::Cloud::TextToSpeech).to receive(:text_to_speech).and_return(tts_instance)
     allow(tts_instance).to receive(:synthesize_speech).and_return(speech_response_instance)
+
+    google_translator = Google::Cloud::Translate::V2::Translation::Fake.new
+    allow(Google::Cloud::Translate::V2).to receive(:new).and_return(google_translator)
+
+    allow_any_instance_of(Api::CatMh::CreateInterview).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'interviews' => [
+            {
+              'organizationID' => -1,
+              'interviewID' => -1,
+              'identifier' => 'identifier',
+              'signature' => 'signature'
+            }
+          ]
+        }
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::CheckStatus).to receive(:call).and_return(
+      {
+        'interviewValid' => true,
+        'credentialsValid' => true,
+        'startTime' => 1_628_245_694_220,
+        'endTime' => nil,
+        'inProgress' => true
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::Authentication).to receive(:call).and_return(
+      {
+        'status' => 302,
+        'cookies' =>
+          {
+            'JSESSIONID' => 'JSESSIONID',
+            'AWSELB' => 'AWSELB'
+          }
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::InitializeInterview).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'id' => 9106,
+          'startTime' => nil,
+          'endTime' => nil,
+          'iter' => 0,
+          'languageID' => 1,
+          'timeframeID' => 4,
+          'populationID' => 1,
+          'interviewTests' => [
+            1
+          ],
+          'conditionalTests' => nil,
+          'subjectID' => nil,
+          'displayResults' => 0,
+          'introFormat' => 0,
+          'interviewTemplateId' => -1
+        }
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::Answer).to receive(:call).and_return(
+      {
+        'status' => 200
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::Question).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'questionID' => 14,
+          'questionNumber' => 1,
+          'questionDescription' => 'How much of the time did you feel depressed?',
+          'questionAnswers' => [
+            {
+              'answerOrdinal' => 1,
+              'answerDescription' => 'None of the time',
+              'answerWeight' => 1
+            },
+            {
+              'answerOrdinal' => 2,
+              'answerDescription' => 'A little of the time',
+              'answerWeight' => 2
+            },
+            {
+              'answerOrdinal' => 3,
+              'answerDescription' => 'Some of the time',
+              'answerWeight' => 3
+            },
+            {
+              'answerOrdinal' => 4,
+              'answerDescription' => 'Most of the time',
+              'answerWeight' => 4
+            },
+            {
+              'answerOrdinal' => 5,
+              'answerDescription' => 'All of the time',
+              'answerWeight' => 5
+            }
+          ],
+          'questionAudioID' => 14,
+          'questionSymptom' => nil,
+          'questionSymptomFlag' => 0,
+          'audioExtension' => '',
+          'timeframeID' => 5,
+          'questionNoteID' => 5,
+          'questionNote' => 'Answer the following questions based on how you felt over <strong>the past 30 days</strong> unless otherwise specified.',
+          'answerType' => 1,
+          'questionFooter' => nil
+        }
+      }
+    )
+
+    allow_any_instance_of(Api::CatMh::Result).to receive(:call).and_return(
+      {
+        'status' => 200,
+        'body' => {
+          'interviewId' => 9088,
+          'subjectId' => 'test_subject',
+          'startTime' => 1_629_968_223_557,
+          'endTime' => 1_629_968_480_570,
+          'timeframeId' => 5,
+          'tests' => [
+            {
+              'type' => 'DEP',
+              'label' => 'Depression',
+              'timeframeId' => 5,
+              'diagnosis' => nil,
+              'confidence' => nil,
+              'severity' => 43.9,
+              'category' => 'mild',
+              'precision' => 5.0,
+              'prob' => 0.575,
+              'percentile' => 8.6,
+              'items' => nil
+            }
+          ]
+        }
+      }
+    )
   end
 
   config.before :suite do
-    DatabaseCleaner.strategy = :truncation, { except: %w[google_tts_voice google_tts_language google_language] }
+    DatabaseCleaner.strategy = :truncation
     DatabaseCleaner.clean_with :truncation
 
     language = GoogleTtsLanguage.create(language_name: 'English (United States)')
-    GoogleTtsVoice.create(id: 43, voice_label: 'Standard-female-1', voice_type: 'en-US-Standard-C', language_code: 'en-US', google_tts_language: language)
-    GoogleTtsVoice.create(id: 44, voice_label: 'Standard-female-2', voice_type: 'en-US-Standard-B', language_code: 'en-US', google_tts_language: language)
+    GoogleTtsVoice.create(voice_label: 'Standard-female-1', voice_type: 'en-US-Standard-C', language_code: 'en-US', google_tts_language: language)
+    GoogleTtsVoice.create(voice_label: 'Standard-female-2', voice_type: 'en-US-Standard-B', language_code: 'en-US', google_tts_language: language)
 
-    GoogleLanguage.create(id: 22, language_name: 'English', language_code: 'en')
+    GoogleLanguage.create(language_name: 'English', language_code: 'en')
   end
   # The settings below are suggested to provide a good initial experience
   # with RSpec, but feel free to customize to your heart's content.

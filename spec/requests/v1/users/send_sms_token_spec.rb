@@ -57,8 +57,8 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
     end
   end
 
-  context 'when phone non exist and' do
-    context 'user is logged in' do
+  context 'user is logged in' do
+    context 'when phone non exist and' do
       let(:message) { create(:message, :with_code) }
       let(:service) { Communication::Sms.new(message.id) }
 
@@ -72,113 +72,78 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
         it_behaves_like 'creates phone for user'
       end
 
-      context 'user is guest user' do
-        let!(:user) { create(:user, :confirmed, :guest) }
+      %w[guest participant organization_admin health_system_admin health_clinic_admin third_party admin team_admin researcher
+         e_intervention_admin].each do |role|
+        context 'user is guest user' do
+          let!(:user) { create(:user, :confirmed, role) }
 
-        before do
-          request_with_stubbed_service
+          before do
+            request_with_stubbed_service
+          end
+
+          it_behaves_like 'creates phone for user'
         end
-
-        it_behaves_like 'creates phone for user'
       end
 
-      context 'user is super admin' do
-        let!(:user) { create(:user, :confirmed, :admin) }
+      context 'user is logged in but phone number is not uniq' do
+        let!(:other_user) { create(:user, :confirmed, :participant) }
+        let!(:other_phone) { create(:phone, :confirmed, number: phone_number, prefix: prefix, iso: iso, user: other_user) }
+        let(:message) { create(:message, :with_code) }
+        let(:service) { Communication::Sms.new(message.id) }
 
         before do
           request_with_stubbed_service
         end
 
         it_behaves_like 'creates phone for user'
-      end
 
-      context 'user is team admin' do
-        let!(:user) { create(:user, :confirmed, :team_admin) }
-
-        before do
-          request_with_stubbed_service
+        it 'confirmations code of both users are diffrent' do
+          expect(user.phone.confirmation_code).not_to eq other_phone.confirmation_code
         end
 
-        it_behaves_like 'creates phone for user'
-      end
-
-      context 'user is researcher' do
-        let!(:user) { create(:user, :confirmed, :researcher) }
-
-        before do
-          request_with_stubbed_service
+        it 'statuses of both phones are diffrent' do
+          expect(user.phone.confirmed).to be false
+          expect(user.phone.confirmed).not_to be other_user.phone.confirmed
         end
-
-        it_behaves_like 'creates phone for user'
-      end
-
-      context 'user is participant' do
-        before do
-          request_with_stubbed_service
-        end
-
-        it_behaves_like 'creates phone for user'
       end
     end
 
-    context 'user is logged in but phone number is not uniq' do
-      let!(:other_user) { create(:user, :confirmed, :participant) }
-      let!(:other_phone) { create(:phone, :confirmed, number: phone_number, prefix: prefix, iso: iso, user: other_user) }
-      let(:message) { create(:message, :with_code) }
+    context 'when phone exist and' do
+      let!(:phone) { create(:phone, user_id: user.id) }
       let(:service) { Communication::Sms.new(message.id) }
 
-      before do
-        request_with_stubbed_service
+      context 'user doesn\'t change phone number' do
+        let!(:phone_number) { phone.number }
+        let(:prefix) { phone.prefix }
+        let(:iso) { phone.iso }
+
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
       end
 
-      it_behaves_like 'creates phone for user'
+      context 'user changes phone number' do
+        let!(:phone_number) { '123123123' }
+        let(:prefix) { '+48' }
+        let(:iso) { 'PL' }
 
-      it 'confirmations code of both users are diffrent' do
-        expect(user.phone.confirmation_code).not_to eq other_phone.confirmation_code
+        before do
+          request_with_stubbed_service
+        end
+
+        it_behaves_like 'creates phone for user'
       end
 
-      it 'statuses of both phones are diffrent' do
-        expect(user.phone.confirmed).to be false
-        expect(user.phone.confirmed).not_to be other_user.phone.confirmed
-      end
-    end
-  end
+      context 'sms service respond with error' do
+        before do
+          put v1_send_sms_token_path, headers: headers, params: params
+        end
 
-  context 'when phone exist and' do
-    let!(:phone) { create(:phone, user_id: user.id) }
-    let(:service) { Communication::Sms.new(message.id) }
-
-    context 'user doesn\'t change phone number' do
-      let!(:phone_number) { phone.number }
-      let(:prefix) { phone.prefix }
-      let(:iso) { phone.iso }
-
-      before do
-        request_with_stubbed_service
-      end
-
-      it_behaves_like 'creates phone for user'
-    end
-
-    context 'user changes phone number' do
-      let!(:phone_number) { '123123123' }
-      let(:prefix) { '+48' }
-      let(:iso) { 'PL' }
-
-      before do
-        request_with_stubbed_service
-      end
-
-      it_behaves_like 'creates phone for user'
-    end
-
-    context 'sms service respond with error' do
-      before do
-        put v1_send_sms_token_path, headers: headers, params: params
-      end
-
-      it 'response has status expectation_failed' do
-        expect(response.status).to eq 417
+        it 'response has status expectation_failed' do
+          expect(response.status).to eq 417
+        end
       end
     end
   end

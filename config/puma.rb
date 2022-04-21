@@ -16,7 +16,6 @@ preload_app!
 wait_for_less_busy_worker 0.001
 nakayoshi_fork
 
-
 before_fork do
   GoodJob.shutdown
 end

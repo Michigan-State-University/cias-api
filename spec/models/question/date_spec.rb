@@ -20,6 +20,32 @@ RSpec.describe Question::Date, type: :model do
             expect(question_date.variable_clone_prefix(%w[clone_date_var clone1_date_var])).to eq('clone2_date_var')
           end
         end
+
+        describe 'translation' do
+          let(:translator) { V1::Google::TranslationService.new }
+          let(:source_language_name_short) { 'en' }
+          let(:destination_language_name_short) { 'pl' }
+
+          it '#translate_title' do
+            question_date.translate_title(translator, source_language_name_short, destination_language_name_short)
+            expect(question_date.title).to include('from=>en to=>pl text=>date')
+          end
+
+          it '#translate_subtitle' do
+            question_date.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+            expect(question_date.subtitle).to equal(nil)
+          end
+        end
+
+        describe '#question_variables' do
+          it 'returns correct variables' do
+            expect(question_date.question_variables).to match_array ['date_var']
+          end
+
+          it 'returns correct amount of variables' do
+            expect(question_date.question_variables.size).to eq 1
+          end
+        end
       end
     end
 

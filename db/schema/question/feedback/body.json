@@ -16,6 +16,14 @@
             "type": "string"
           }
         },
+        "original_text": {
+          "end_value" : {
+            "type": "string"
+          },
+          "start_value": {
+            "type": "string"
+          }
+        },
         "required": [
           "start_value",
           "end_value",

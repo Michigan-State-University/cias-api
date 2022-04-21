@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request do
+RSpec.describe 'POST /v1/interventions/:intervention_id/access', type: :request do
   let!(:user) { create(:user, :confirmed, :admin) }
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:intervention) { create(:intervention, user_id: user.id, status: intervention_status) }
@@ -16,7 +16,10 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request d
     }
   end
 
-  let(:request) { post v1_intervention_invitations_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
+  let(:request) do
+    post v1_intervention_accesses_path(intervention_id: intervention.id), params: params,
+                                                                          headers: user.create_new_auth_token
+  end
 
   context 'create user access' do
     %w[draft published].each do |status|
@@ -45,7 +48,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/users', type: :request d
         end
 
         it 'set intervention invitation size correctly' do
-          expect(intervention.reload.invitations.size).to eq(2)
+          expect(intervention.reload.intervention_accesses.size).to eq(2)
         end
       end
     end

@@ -3,29 +3,43 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/health_systems/:id', type: :request do
-  let(:user) { create(:user, :confirmed, :admin) }
+  let(:admin) { create(:user, :confirmed, :admin) }
+  let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[admin participant]) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
+  let(:user) { admin }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:health_system) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization) }
+  let!(:organization) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
+  end
+  let!(:health_system) { create(:health_system, :with_health_system_admin, :with_health_clinic, organization: organization) }
   let!(:deleted_health_system) { create(:health_system, organization: organization, name: 'Deleted health system', deleted_at: Time.current) }
   let!(:health_clinic) { health_system.health_clinics.first }
 
   let!(:organization1) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Oregano Public Health') }
-  let!(:health_system1) { create(:health_system, :with_health_system_admin, :with_clinics, organization: organization1, name: 'Test') }
+  let!(:health_system1) { create(:health_system, :with_health_system_admin, :with_health_clinic, organization: organization1, name: 'Test') }
 
   let!(:health_system_admin) { health_system.health_system_admins.first }
+  let!(:health_system_admin1) { health_system1.health_system_admins.first }
+
+  let(:admins) do
+    {
+      'admin' => admin,
+      'admin_with_multiple_roles' => admin_with_multiple_roles
+    }
+  end
 
   let(:roles_organization) do
     {
       'organization_admin' => organization.organization_admins.first,
-      'e_intervention_admin' => organization.e_intervention_admins.first
+      'e_intervention_admin' => organization.e_intervention_admins.first,
+      'health_system_admin' => health_system_admin
     }
   end
   let(:roles_organization1) do
     {
       'organization_admin' => organization1.organization_admins.first,
-      'e_intervention_admin' => organization1.e_intervention_admins.first
+      'e_intervention_admin' => organization1.e_intervention_admins.first,
+      'health_system_admin' => health_system_admin1
     }
   end
 
@@ -71,7 +85,7 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       end
 
       it 'returns proper include' do
-        expect(json_response['included'][0]).to include(
+        expect(json_response['included']).to include(
           {
             'id' => health_clinic.id,
             'type' => 'health_clinic',
@@ -82,19 +96,17 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             },
             'relationships' => { 'health_clinic_admins' => { 'data' => [] }, 'health_clinic_invitations' => { 'data' => [] } }
           }
-        )
-
-        expect(json_response['included'][1]).to include(
+        ).and include(
           {
             'id' => health_system_admin.id,
             'type' => 'user',
             'attributes' =>
-                include(
-                  'email' => health_system_admin.email,
-                  'roles' => ['health_system_admin'],
-                  'first_name' => health_system_admin.first_name,
-                  'last_name' => health_system_admin.last_name
-                )
+              include(
+                'email' => health_system_admin.email,
+                'roles' => ['health_system_admin'],
+                'first_name' => health_system_admin.first_name,
+                'last_name' => health_system_admin.last_name
+              )
           }
         )
       end
@@ -142,33 +154,29 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       end
     end
 
-    context 'when user is admin' do
-      it_behaves_like 'permitted user'
+    %w[admin admin_with_multiple_roles].each do |role|
+      context "when user is #{role}" do
+        let(:user) { admins[role] }
+
+        it_behaves_like 'permitted user'
+      end
     end
 
-    context 'when admin has multiple roles' do
-      let(:user) { create(:user, :confirmed, roles: %w[admin participant]) }
+    %w[organization_admin e_intervention_admin health_system_admin].each do |role|
+      context "when user is #{role}" do
+        context 'refers to their health_system' do
+          let(:user) { roles_organization[role] }
 
-      it_behaves_like 'permitted user'
-    end
+          it_behaves_like 'permitted user'
+        end
 
-    context 'when user is' do
-      %w[organization_admin e_intervention_admin].each do |role|
-        context role.to_s do
-          context 'refers to their health_system' do
-            let(:user) { roles_organization[role] }
+        context 'doesn\'t refer to other health_system' do
+          let(:user) { roles_organization1[role] }
 
-            it_behaves_like 'permitted user'
-          end
+          before { request }
 
-          context 'doesn\'t refer to other health_system' do
-            let(:user) { roles_organization1[role] }
-
-            before { request }
-
-            it 'returns proper error message' do
-              expect(json_response['message']).to include('Couldn\'t find HealthSystem with')
-            end
+          it 'returns proper error message' do
+            expect(json_response['message']).to include('Couldn\'t find HealthSystem with')
           end
         end
       end
@@ -184,7 +192,7 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       end
     end
 
-    %i[health_clinic_admin team_admin researcher participant guest].each do |role|
+    %i[health_clinic_admin team_admin researcher participant guest third_party].each do |role|
       context "user is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }

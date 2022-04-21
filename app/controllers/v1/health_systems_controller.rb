@@ -39,9 +39,8 @@ class V1::HealthSystemsController < V1Controller
   private
 
   def health_system_scope
-    return HealthSystem.accessible_by(current_ability).with_deleted if with_deleted?
-
-    HealthSystem.accessible_by(current_ability)
+    @health_systems ||= HealthSystem.accessible_by(current_ability)
+    with_deleted? ? @health_systems.with_deleted : @health_systems
   end
 
   def health_system_load
@@ -49,7 +48,7 @@ class V1::HealthSystemsController < V1Controller
   end
 
   def health_system_params
-    params.require(:health_system).permit(:name, :organization_id, health_system_admins_to_add: [], health_system_admins_to_remove: [])
+    params.require(:health_system).permit(:name, :organization_id)
   end
 
   def with_deleted?
@@ -57,7 +56,8 @@ class V1::HealthSystemsController < V1Controller
   end
 
   def to_boolean(value)
-    ActiveRecord::Type::Boolean.new.cast(value)
+    @boolean ||= ActiveRecord::Type::Boolean.new
+    @boolean.cast(value)
   end
 
   def health_system_response(health_system)

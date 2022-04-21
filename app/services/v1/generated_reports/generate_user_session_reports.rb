@@ -15,22 +15,13 @@ class V1::GeneratedReports::GenerateUserSessionReports
     dentaku_service.store_and_transform_values
 
     report_templates.each do |report_template|
-      V1::GeneratedReports::Create.call(
-        report_template,
-        user_session,
-        dentaku_service
-      )
+      V1::GeneratedReports::Create.call(report_template, user_session, dentaku_service)
     end
 
     user_session.reload
 
-    V1::GeneratedReports::ShareToParticipant.call(
-      user_session
-    )
-
-    V1::GeneratedReports::ShareToThirdParty.call(
-      user_session
-    )
+    V1::GeneratedReports::ShareToParticipant.call(user_session)
+    V1::GeneratedReports::ShareToThirdParty.call(user_session)
   end
 
   private

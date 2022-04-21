@@ -18,32 +18,40 @@ RSpec.describe V1::Users::Verifications::Create do
     Timecop.return
   end
 
+  shared_examples 'generating codes' do
+    let_it_be(:code) { '456' }
+
+    it 'generate new code and send email' do
+      allow(UserMailer).to receive(:send_verification_login_code).with(verification_code: code,
+                                                                       email: user.email).and_return(message_delivery)
+      subject
+      user_verification_codes = user.reload.user_verification_codes
+      expect(user_verification_codes.count).to eq number_of_codes
+      expect(user_verification_codes.exists?(code: code)).to eq true if exist456 == true
+      expect(user_verification_codes.last.code).to eq last_code if last_code
+    end
+  end
+
   context 'when first login' do
     let(:verification_code_from_headers) { nil }
     let!(:remove_verification_code) do
       user.user_verification_codes.last.delete
     end
 
-    it 'generate new code and send email' do
-      expect(UserMailer).to receive(:send_verification_login_code).with(verification_code: '456', email: user.email).and_return(message_delivery)
-      subject
-      user_verification_codes = user.reload.user_verification_codes
-      expect(user_verification_codes.count).to eq 1
-      expect(user_verification_codes.last.code).to eq '456'
+    it_behaves_like 'generating codes' do
+      let(:number_of_codes) { 1 }
+      let(:last_code) { '456' }
+      let(:exist456) { true }
     end
   end
 
   context 'when log in on other browser than previous login' do
     let(:verification_code_from_headers) { nil }
 
-    it 'generate new code and send email' do
-      expect(UserMailer).to receive(:send_verification_login_code).with(
-        verification_code: '456', email: user.email
-      ).and_return(message_delivery)
-      subject
-      user_verification_codes = user.reload.user_verification_codes
-      expect(user_verification_codes.count).to eq 2
-      expect(user_verification_codes.exists?(code: '456')).to eq true
+    it_behaves_like 'generating codes' do
+      let(:number_of_codes) { 2 }
+      let(:last_code) { nil }
+      let(:exist456) { true }
     end
   end
 
@@ -53,26 +61,20 @@ RSpec.describe V1::Users::Verifications::Create do
       user.user_verification_codes.last.update!(created_at: time - 33.days)
     end
 
-    it 'generate new code and send email' do
-      expect(UserMailer).to receive(:send_verification_login_code).with(
-        verification_code: '456', email: user.email
-      ).and_return(message_delivery)
-      subject
-      user_verification_codes = user.reload.user_verification_codes
-      expect(user_verification_codes.count).to eq 1
-      expect(user_verification_codes.last.code).to eq '456'
+    it_behaves_like 'generating codes' do
+      let(:number_of_codes) { 1 }
+      let(:last_code) { '456' }
+      let(:exist456) { true }
     end
   end
 
   context 'when verification_code is present and is valid' do
     let(:verification_code_from_headers) { "verification_code_#{user.email}" }
 
-    it "don't send email and generate new code" do
-      expect(UserMailer).not_to receive(:send_verification_login_code)
-      subject
-      user_verification_codes = user.reload.user_verification_codes
-      expect(user_verification_codes.count).to eq 1
-      expect(user_verification_codes.last.code).to eq "verification_code_#{user.email}"
+    it_behaves_like 'generating codes' do
+      let(:number_of_codes) { 1 }
+      let(:last_code) { "verification_code_#{user.email}" }
+      let(:exist456) { false }
     end
   end
 
@@ -81,12 +83,10 @@ RSpec.describe V1::Users::Verifications::Create do
     let(:verification_code_from_headers) { "verification_code_#{another_user.email}" }
     let!(:user) { create(:user) }
 
-    it 'generate new code and send email' do
-      subject
-
-      user_verification_codes = user.reload.user_verification_codes
-      expect(user_verification_codes.count).to eq 2
-      expect(user_verification_codes.exists?(code: '456')).to eq true
+    it_behaves_like 'generating codes' do
+      let(:number_of_codes) { 2 }
+      let(:last_code) { nil }
+      let(:exist456) { true }
     end
   end
 end

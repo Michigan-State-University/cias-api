@@ -6,8 +6,12 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:preview_user) { create(:user, :confirmed, :preview_session) }
 
-  let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
-  let!(:organization_2) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization') }
+  let!(:organization) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health')
+  end
+  let!(:organization2) do
+    create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Other Organization')
+  end
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
   let!(:deleted_health_clinic) { create(:health_clinic, name: 'Deleted Health Clinic', health_system: health_system, deleted_at: Time.current) }
@@ -22,10 +26,10 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
     }
   end
 
-  let(:roles_organization_2) do
+  let(:roles_organization2) do
     {
-      'organization_admin' => organization_2.organization_admins.first,
-      'e_intervention_admin' => organization_2.e_intervention_admins.first
+      'organization_admin' => organization2.organization_admins.first,
+      'e_intervention_admin' => organization2.e_intervention_admins.first
     }
   end
 
@@ -84,7 +88,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       it 'returns proper include for health_clinic_invitation' do
         expect(json_response['included'][1]['attributes']).to include(
           {
-            'health_clinic_id' => health_clinic.id,
+            'organizable_id' => health_clinic.id,
             'user_id' => health_clinic_admin.id,
             'is_accepted' => true
           }
@@ -138,6 +142,8 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
 
     context 'when admin has multiple roles' do
       let(:user) { create(:user, :confirmed, :admin) }
+
+      it_behaves_like 'permitted user'
     end
 
     context 'when user is' do
@@ -184,7 +190,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
     context 'when user is ' do
       %w[organization_admin e_intervention_admin].each do |role|
         context role.to_s do
-          let(:user) { roles_organization_2[role] }
+          let(:user) { roles_organization2[role] }
 
           before { request }
 

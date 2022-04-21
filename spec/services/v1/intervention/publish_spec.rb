@@ -14,6 +14,7 @@ RSpec.describe V1::Intervention::Publish do
   let(:schedule_at) { Date.current + 10.days }
   let(:schedule_payload) { 7 }
   let(:days_after_payload) { 5 }
+  let(:instance) { instance_double(described_class) }
 
   before do
     Timecop.freeze
@@ -25,9 +26,9 @@ RSpec.describe V1::Intervention::Publish do
 
   context 'intervention status change publish' do
     it 'calls correct methods on execute' do
-      expect_any_instance_of(described_class).to receive(:timestamp_published_at)
-      expect_any_instance_of(described_class).to receive(:calculate_days_after_schedule)
-      expect_any_instance_of(described_class).to receive(:delete_draft_answers)
+      allow(instance).to receive(:calculate_days_after_schedule)
+      allow(instance).to receive(:delete_draft_answers)
+      allow(instance).to receive(:timestamp_published_at)
       described_class.new(intervention).execute
     end
 
@@ -73,7 +74,6 @@ RSpec.describe V1::Intervention::Publish do
         end
       end
     end
-
 
     context 'previous session has exact_date schedule' do
       let(:schedule) { 'exact_date' }

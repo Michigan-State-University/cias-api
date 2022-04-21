@@ -3,7 +3,10 @@
 require 'rails_helper'
 
 describe 'PATCH /v1/sessions/:session_id/question_groups/:id/questions_change', type: :request do
-  let(:request) { patch questions_change_v1_session_question_group_path(session_id: session.id, id: question_group.id), params: params, headers: headers }
+  let(:request) do
+    patch questions_change_v1_session_question_group_path(session_id: session.id, id: question_group.id),
+          params: params, headers: headers
+  end
   let(:params) do
     {
       question_group: {

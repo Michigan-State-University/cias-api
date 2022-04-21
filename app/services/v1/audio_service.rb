@@ -3,6 +3,10 @@
 class V1::AudioService
   attr_reader :text, :language_code, :voice_type, :preview_audio
 
+  def self.call(text, preview: false, language_code: nil, voice_type: nil)
+    new(text, preview: preview, language_code: language_code, voice_type: voice_type).call
+  end
+
   def initialize(text, preview: false, language_code: nil, voice_type: nil)
     @text = unify_text(text)
     @language_code = language_code || ENV.fetch('TEXT_TO_SPEECH_LANGUAGE', 'en-US')
@@ -10,13 +14,10 @@ class V1::AudioService
     @preview_audio = preview
   end
 
-  def execute
+  def call
     digest = prepare_audio_digest
     audio = Audio.find_by(sha256: digest)
-    # audio&.increment!(:usage_counter) unless preview_audio
     audio = create_audio(digest) if audio.nil?
-    # audio.save
-    # audio.reload
     audio
   end
 

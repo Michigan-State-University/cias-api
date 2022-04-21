@@ -21,12 +21,12 @@ gem 'devise-argon2'
 gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
-gem 'fast_jsonapi'
+gem 'jsonapi-serializer'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '>= 3.19.2'
 gem 'metainspector', '~> 1.15'
-gem 'nokogiri', '>= 1.13.2'
+gem 'nokogiri', '>= 1.13.4'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
@@ -51,8 +51,8 @@ gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
-gem "sentry-ruby"
-gem "sentry-rails"
+gem 'sentry-ruby'
+gem 'sentry-rails'
 # Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
 gem 'good_job'
 
@@ -89,6 +89,7 @@ group :test do
   gem 'test-prof'
   gem 'timecop'
   gem 'database_cleaner-active_record'
+  gem 'action-cable-testing', '~> 0.6.1'
 end
 
 group :production do

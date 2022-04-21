@@ -22,7 +22,7 @@ class Ability::Base
   end
 
   def researchers_from_team(team_id)
-    team_id ? User.researchers.where(team_id: team_id).pluck(:id) : User.none
+    team_id ? User.researchers.from_team(team_id).pluck(:id) : User.none
   end
 
   def e_intervention_admins_from_organization(organization_id)
@@ -30,7 +30,7 @@ class Ability::Base
   end
 
   def participants_with_answers(user)
-    result = logged_user_sessions(user)
+    result = logged_user_session_ids(user)
     return User.none if result.blank?
 
     User.participants.select { |participant| Answer.user_answers(participant.id, result).any? }.pluck(:id)
@@ -44,7 +44,19 @@ class Ability::Base
     participants_and_researchers(user) + e_intervention_admins_from_organization(user.organizable_id)
   end
 
+  def logged_user_session_ids(user)
+    logged_user_sessions(user).pluck(:id)
+  end
+
   def logged_user_sessions(user)
-    Session.where(intervention_id: user.interventions.select(:id)).pluck(:id)
+    Session.where(intervention_id: user.interventions.select(:id))
+  end
+
+  def accepted_health_clinic_ids
+    return unless user.role?('health_clinic_admin')
+
+    health_clinic_ids = user.health_clinic_invitations.where.not(accepted_at: nil).map(&:health_clinic_id)
+    health_clinic_ids.append(user.organizable.id) if user.organizable
+    health_clinic_ids
   end
 end
