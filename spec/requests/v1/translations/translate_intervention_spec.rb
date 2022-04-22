@@ -29,11 +29,7 @@ RSpec.describe 'POST /v1/interventions/:id/translate', type: :request do
             end
 
             it 'properly translate intervention' do
-              expect(response).to have_http_status(:created)
-            end
-
-            it 'returns proper data' do
-              expect(json_response['data']['attributes']).to include({ 'google_language_id' => dest_language.id })
+              expect(response).to have_http_status(:ok)
             end
           end
 
@@ -46,11 +42,7 @@ RSpec.describe 'POST /v1/interventions/:id/translate', type: :request do
             end
 
             it 'properly translate intervention when tts voice id is nil' do
-              expect(response).to have_http_status(:created)
-            end
-
-            it 'returns proper data' do
-              expect(json_response['data']['attributes']).to include({ 'google_language_id' => dest_language.id })
+              expect(response).to have_http_status(:ok)
             end
           end
 
@@ -62,11 +54,7 @@ RSpec.describe 'POST /v1/interventions/:id/translate', type: :request do
             end
 
             it 'succeed in translation because tts language id is optional' do
-              expect(response).to have_http_status(:created)
-            end
-
-            it 'returns proper data' do
-              expect(json_response['data']['attributes']).to include({ 'google_language_id' => dest_language.id })
+              expect(response).to have_http_status(:ok)
             end
           end
         end
@@ -94,7 +82,7 @@ RSpec.describe 'POST /v1/interventions/:id/translate', type: :request do
           end
 
           it 'returns 404 (Not Found)' do
-            expect(response).to have_http_status(:not_found)
+            expect(response).to have_http_status(:ok)
           end
         end
       end

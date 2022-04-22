@@ -91,6 +91,7 @@ Rails.application.routes.draw do
     scope module: :report_templates do
       scope 'report_templates/:report_template_id', as: :report_template do
         resources :sections, only: %i[index show create update destroy]
+        patch 'move_sections', to: 'sections#move', as: :move_sections
         resource :generate_pdf_preview, only: :create
       end
 
