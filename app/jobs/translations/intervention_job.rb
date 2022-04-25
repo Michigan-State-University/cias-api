@@ -8,7 +8,8 @@ class Translations::InterventionJob < ApplicationJob
     return unless current_user.email_notification
 
     TranslationMailer.confirmation(current_user, intervention, translated_intervention).deliver_now
-  rescue StandardError
+  rescue StandardError => e
+    logger.error "Translation error log #{e}"
     return unless current_user.email_notification
 
     TranslationMailer.error(current_user).deliver_now

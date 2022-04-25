@@ -1,0 +1,11 @@
+---
+:concurrency: <%= ENV.fetch('RAILS_MAX_THREADS') { 4 } %>
+:queues:
+  - [default,1]
+  - [reports,1]
+  - [sms_plans, 1]
+  - [mailers,2]
+  - [log,3]
+  - [active_storage_purge,4]
+  - [active_storage_analysis,5]
+  - [clone,3]

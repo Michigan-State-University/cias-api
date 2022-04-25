@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
-Rails.application.routes.draw do
-  # Mount the GoodJob engine.
-  mount GoodJob::Engine => 'good_job' if ENV['GOOD_JOB_WEB_INTERFACE'] == '1'
+if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+  require 'sidekiq/web'
+  Sidekiq::Web.use ActionDispatch::Cookies
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session'
+end
 
+Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
   namespace :v1 do
@@ -216,6 +219,16 @@ Rails.application.routes.draw do
   if Rails.env.development?
     scope 'rails' do
       mount LetterOpenerWeb::Engine, at: '/browse_emails'
+    end
+  end
+
+  if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+    scope 'rails' do
+      Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
+          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
+      end
+      mount Sidekiq::Web => '/workers'
     end
   end
   mount ActionCable.server => '/cable'

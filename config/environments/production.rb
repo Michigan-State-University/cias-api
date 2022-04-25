@@ -44,7 +44,7 @@ Rails.application.configure do
   config.log_tags = [:request_id]
 
   # Use a different cache store in production.
-  config.cache_store = :memory_store
+  config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'], driver: :ruby, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
@@ -119,12 +119,4 @@ Rails.application.configure do
   # config.action_cable.url = 'wss://example.com/cable'
   config.action_cable.allowed_request_origins = [%r{http://*}, %r{https://*}]
   config.action_cable.disable_request_forgery_protection = true
-  config.good_job.execution_mode = :async
-
-  # Or with more configuration
-  config.good_job = {
-    execution_mode: :async,
-    max_threads: 4,
-    poll_interval: 30
-  }
 end
