@@ -15,7 +15,7 @@ class Organization < ApplicationRecord
   validates :name, presence: true, uniqueness: true
 
   after_create :initialize_reporting_dashboard
-  before_destroy :deactivate_organization_and_intervention_admins, :update_interventions_from_deleted_organization
+  before_destroy :deactivate_organization_and_intervention_admins, :update_interventions_from_deleted_organization, :really_destroy_all_children
 
   default_scope { order(created_at: :desc) }
 
@@ -36,5 +36,9 @@ class Organization < ApplicationRecord
 
   def update_interventions_from_deleted_organization
     Intervention.where(organization_id: id).update_all(organization_id: nil, from_deleted_organization: true) # rubocop:disable Rails/SkipsModelValidations:
+  end
+
+  def really_destroy_all_children
+    health_systems.with_deleted.each(&:really_destroy!)
   end
 end
