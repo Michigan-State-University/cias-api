@@ -6,6 +6,7 @@ RSpec.describe Translations::InterventionJob, type: :job do
   let!(:user) { create(:user, :confirmed, :researcher) }
   let!(:intervention) { create(:intervention, user: user, status: 'published') }
   let!(:intervention_id) { intervention.id }
+  let!(:sessions) { create_list(:session, 10, intervention_id: intervention_id) }
 
   let_it_be(:destination_language_id) { GoogleLanguage.first.id }
   let_it_be(:destination_google_tts_voice_id) { GoogleTtsVoice.first.id }
@@ -29,6 +30,14 @@ RSpec.describe Translations::InterventionJob, type: :job do
 
     it "Don't send email" do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+    end
+  end
+
+  context 'creates correct number of session' do
+
+    it 'Has correct number of sessions' do
+      subject
+      expect(Intervention.order(:created_at).last.sessions_count).to eq(10)
     end
   end
 end
