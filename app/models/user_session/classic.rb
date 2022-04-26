@@ -16,10 +16,7 @@ class UserSession::Classic < UserSession
   def cancel_timeout_job
     return if timeout_job_id.nil?
 
-    timeout_job = GoodJob::Job.find(timeout_job_id)
-    timeout_job.serialized_params['cancelled'] = true
-    timeout_job.finished_at = Time.current
-    timeout_job.save
+    UserSessionTimeoutJob.cancel(timeout_job_id)
 
     update(timeout_job_id: nil)
   end

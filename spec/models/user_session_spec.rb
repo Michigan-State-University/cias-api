@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
 RSpec.describe UserSession, type: :model do
   context 'UserSession' do
     subject { create(:user_session) }
@@ -92,20 +91,11 @@ RSpec.describe UserSession, type: :model do
         end
 
         context 'when timeout_job_id is set' do
-          let(:timeout_job_id)  { SecureRandom.uuid }
-          let!(:good_job)       { GoodJob::Job.create(id: timeout_job_id, serialized_params: {}) }
+          let(:timeout_job_id) { 'test_timeout_job' }
 
-          before do
+          it 'triggers #cancel on UserSessionTimeoutJob with timeout_job_id' do
+            expect(UserSessionTimeoutJob).to receive(:cancel).with(timeout_job_id)
             user_session.on_answer
-            good_job.reload
-          end
-
-          it 'updates job finished_at' do
-            expect(good_job.finished_at).not_to be_blank
-          end
-
-          it 'adds information about cancellation to serialized_params' do
-            expect(good_job.serialized_params['cancelled']).to eq true
           end
         end
       end

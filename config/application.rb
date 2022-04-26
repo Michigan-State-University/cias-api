@@ -20,9 +20,6 @@ require 'action_cable/engine'
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 
-# Require the GoodJob Dashboard as a mountable Rails::Engine.
-require 'good_job/engine'
-
 Bundler.require(*Rails.groups)
 
 module CiasApi
@@ -40,7 +37,7 @@ module CiasApi
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
     config.i18n.default_locale = :en
-    config.active_job.queue_adapter = :good_job
+    config.active_job.queue_adapter = :sidekiq
     config.filter_parameters << :password_confirmation
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
     routes.default_url_options = { host: ENV['APP_HOSTNAME'] }

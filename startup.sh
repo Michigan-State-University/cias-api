@@ -11,7 +11,7 @@ rails db:migrate
 rake db:seed:prod
 
 # Run sidekiq
-bundle exec good_job &
+bundle exec sidekiq &
 
 sleep 5
 
