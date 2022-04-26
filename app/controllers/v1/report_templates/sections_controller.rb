@@ -44,6 +44,17 @@ class V1::ReportTemplates::SectionsController < V1Controller
     head :no_content
   end
 
+  def move
+    authorize! :update, @report_template
+
+    V1::ReportTemplates::SectionReorderService.call(@report_template.id, position_params[:position])
+
+    render json: V1::ReportTemplateSerializer.new(
+      @report_template,
+      { include: %i[sections variants] }
+    ), status: :ok
+  end
+
   private
 
   def serialized_section_response(sections)
@@ -60,5 +71,9 @@ class V1::ReportTemplates::SectionsController < V1Controller
 
   def section_params
     params.require(:section).permit(:formula)
+  end
+
+  def position_params
+    params.require(:section).permit(position: %i[id position])
   end
 end

@@ -170,3 +170,13 @@ en:
       body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> is ready that you requested'
       button_text: Open the e-intervention
       link: '%{web_url}/interventions/%{intervention_id}'
+  translation_mailer:
+    subject: 'Translation of %{intervention_name}'
+    header: 'Your translation of %{intervention_name} is ready'
+    body: 'You intervention has been translated successfully. Now you can use it in CIAS.'
+    button_text: Open the e-intervention
+    link: '%{web_url}/interventions/%{intervention_id}'
+    error:
+      subject: 'Error during translation'
+      header: 'An error has occurred during translation.'
+      body: 'Something goes wrong while translating your intervention. Please try again.'
