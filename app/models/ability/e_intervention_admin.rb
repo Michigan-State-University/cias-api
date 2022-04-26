@@ -10,11 +10,11 @@ class Ability::EInterventionAdmin < Ability::Researcher
 
   def e_intervention_admin
     can %i[read list_researchers], User, id: participants_researchers_and_e_intervention_admins(user)
-    can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.organizable_id)
+    can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.accepted_organization_ids)
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, UserIntervention, intervention: { user_id: user.id }
-    can %i[read update], Organization, id: user.organizable_id
-    can :invite_organization_admin, Organization, id: user.organizable_id
+    can %i[read update], Organization, id: user.accepted_organization_ids
+    can :invite_organization_admin, Organization, id: user.accepted_organization_ids
     can :manage, HealthSystem, organization: { id: user.organizable_id }
     can :invite_health_system_admin, HealthSystem, organization: { id: user.organizable_id }
     can :manage, HealthClinic, health_system: { organization: { id: user.organizable_id } }
