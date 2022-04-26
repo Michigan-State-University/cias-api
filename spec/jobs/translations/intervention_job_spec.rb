@@ -34,7 +34,6 @@ RSpec.describe Translations::InterventionJob, type: :job do
   end
 
   context 'creates correct number of session' do
-
     it 'Has correct number of sessions' do
       subject
       expect(Intervention.order(:created_at).last.sessions_count).to eq(10)
