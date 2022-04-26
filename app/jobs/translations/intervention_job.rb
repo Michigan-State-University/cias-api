@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Translations::InterventionJob < ApplicationJob
+  queue_as :translations
   def perform(intervention_id, destination_language_id, destination_google_tts_voice_id, current_user)
     intervention = find_intervention(intervention_id, current_user)
     translated_intervention = V1::Translations::Intervention.call(intervention, destination_language_id, destination_google_tts_voice_id)
