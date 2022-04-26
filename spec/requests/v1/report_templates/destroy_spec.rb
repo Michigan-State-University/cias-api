@@ -53,4 +53,28 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  context 'deletion of report template id from third party report question' do
+    let(:user) { create(:user, :confirmed, :admin) }
+    let(:intervention) { create(:intervention, user: user) }
+    let(:session) { create(:session, intervention: intervention) }
+    let(:report_template) { create(:report_template, session: session) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:third_party_questions) { create_list(:question_third_party, 2, question_group: question_group) }
+
+    before do
+      third_party_questions.each do |question|
+        question.body_data.each do |data|
+          data['report_template_ids'] << report_template.id
+        end
+        question.update!(body: question.body)
+      end
+    end
+
+    it 'correctly deletes report template id from third party questions' do
+      request
+      # expect all of them to be empty since the only id we add to them is the created template id
+      expect(third_party_questions.each(&:reload).flat_map { |q| q.body_data.map { |data| data['report_template_ids'] } }).to all(eq [])
+    end
+  end
 end

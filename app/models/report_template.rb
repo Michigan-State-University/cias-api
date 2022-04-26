@@ -18,6 +18,8 @@ class ReportTemplate < ApplicationRecord
   validates :name, :report_for, presence: true
   validates :name, uniqueness: { scope: :session_id }
 
+  after_destroy :remove_template_from_third_party_questions
+
   enum report_for: {
     third_party: 'third_party',
     participant: 'participant'
@@ -46,6 +48,17 @@ class ReportTemplate < ApplicationRecord
       section.variants.each do |variant|
         variant.translate(translator, source_language_name_short, destination_language_name_short)
       end
+    end
+  end
+
+  private
+
+  def remove_template_from_third_party_questions
+    session.questions.where(type: 'Question::ThirdParty').find_each do |question|
+      question.body_data.each do |data|
+        data['report_template_ids'].delete(id)
+      end
+      question.update!(body: question.body)
     end
   end
 end
