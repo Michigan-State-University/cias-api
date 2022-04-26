@@ -5,12 +5,15 @@ class Translations::InterventionJob < ApplicationJob
   def perform(intervention_id, destination_language_id, destination_google_tts_voice_id, current_user)
     intervention = find_intervention(intervention_id, current_user)
     translated_intervention = V1::Translations::Intervention.call(intervention, destination_language_id, destination_google_tts_voice_id)
+    Intervention.reset_counters(translated_intervention.id, :sessions)
 
     return unless current_user.email_notification
 
     TranslationMailer.confirmation(current_user, intervention, translated_intervention).deliver_now
   rescue StandardError => e
     logger.error "Translation error log #{e}"
+    translated_intervention&.sessions&.destroy_all
+    translated_intervention&.destroy
     return unless current_user.email_notification
 
     TranslationMailer.error(current_user).deliver_now
