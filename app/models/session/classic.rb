@@ -5,7 +5,7 @@ class Session::Classic < Session
   has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain', foreign_key: :session_id
   has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish', foreign_key: :session_id
 
-  has_many :questions, dependent: :destroy, through: :question_groups
+  has_many :questions, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
 
   after_commit :create_core_children, on: :create
