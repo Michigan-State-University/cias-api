@@ -12,7 +12,7 @@ class V1::Google::TranslationService
   private
 
   def client
-    logger.error "TRANSLATION ENV TEST #{ENV['WEB_URL']}"
+    p "TRANSLATION ENV TEST #{ENV['WEB_URL']}"
     @client ||= Google::Cloud::Translate::V2.new(credentials: credentials)
   end
 
