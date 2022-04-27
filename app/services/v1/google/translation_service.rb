@@ -12,7 +12,8 @@ class V1::Google::TranslationService
   private
 
   def client
-    p "TRANSLATION ENV TEST #{ENV['WEB_URL']}"
+    p "TRANSLATION ENV TEST #{credentials}"
+    p "TRANSLATION #{Google::Cloud::Translate::V2.new(credentials: credentials)}"
     @client ||= Google::Cloud::Translate::V2.new(credentials: credentials)
   end
 
