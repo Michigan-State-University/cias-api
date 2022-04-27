@@ -72,7 +72,41 @@ class V1::QuestionGroupsController < V1Controller
     render json: question_group_response(shared_question_group), action: :show, status: :ok
   end
 
+  def duplicate_here
+    authorize! :update, QuestionGroup
+
+    duplicated_groups = V1::QuestionGroup::DuplicateWithStructureService.call(load_session, duplicate_here_params[:question_groups])
+
+    render json: question_group_response(duplicated_groups)
+  end
+
+  def share_externally
+    authorize! :create, QuestionGroup
+
+    V1::QuestionGroup::ShareExternallyService.call(share_externally_params[:user_ids], session_id, share_externally_params[:question_groups], current_v1_user)
+    head :created
+  end
+
+  def duplicate_internally
+    authorize! :create, QuestionGroup
+
+    V1::QuestionGroup::ShareInternallyService.call([Session.find(session_id)], duplicate_internally_params[:question_groups])
+    head :created
+  end
+
   private
+
+  def share_externally_params
+    params.permit(user_ids: [], question_groups: [:id, { question_ids: [] }])
+  end
+
+  def duplicate_internally_params
+    params.permit(question_groups: [:id, { question_ids: [] }])
+  end
+
+  def question_group_service
+    @question_group_service ||= V1::QuestionGroupService.new(current_v1_user, session_id)
+  end
 
   def question_group_share_service
     @question_group_share_service ||= V1::QuestionGroup::ShareService.new(current_v1_user, session_load)
@@ -127,5 +161,13 @@ class V1::QuestionGroupsController < V1Controller
       question_groups,
       { include: %i[questions] }
     )
+  end
+
+  def load_session
+    Session.accessible_by(current_ability).find(session_id)
+  end
+
+  def duplicate_here_params
+    params.permit(question_groups: [:id, { question_ids: [] }])
   end
 end

@@ -59,6 +59,7 @@ Rails.application.routes.draw do
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     get 'sessions/:id/variables/(:question_id)', to: 'sessions#session_variables', as: :fetch_variables
     scope 'sessions/:session_id', as: 'session' do
+      post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
@@ -118,6 +119,9 @@ Rails.application.routes.draw do
         resource :images, only: %i[create destroy update]
       end
     end
+
+    post 'question_groups/share_externally', to: 'question_groups#share_externally'
+    post 'question_groups/duplicate_internally', to: 'question_groups#duplicate_internally'
 
     resources :user_interventions, only: %i[index show create]
 

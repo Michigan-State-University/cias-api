@@ -168,6 +168,13 @@ en:
       body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> is ready that you requested'
       button_text: Open the e-intervention
       link: '%{web_url}/interventions/%{intervention_id}'
+  duplication_with_structure:
+    intervention_name: 'Copy of %{source_intervention_name} from %{user_full_name}'
+    session_name: 'Copied Session'
+    question_group_title: 'Copy of %{source_group_title}'
+    wrong_argument: 'Wrong argument. This service should receive target_session and selected_groups with questions'
+    wrong_sessions: "Wrong argument. Can/'t found all passed sessions"
+    not_researcher: "Access denied. You pass user which can not have intervention"
   translation_mailer:
     subject: 'Translation of %{intervention_name}'
     header: 'Your translation of %{intervention_name} is ready'
