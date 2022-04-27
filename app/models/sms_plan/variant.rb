@@ -6,6 +6,8 @@ class SmsPlan::Variant < ApplicationRecord
 
   attribute :original_text, :json, default: { 'content' => '' }
 
+  default_scope { order(:created_at) }
+
   ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
 
   def translate(translator, src_language_name_short, dest_language_name_short)

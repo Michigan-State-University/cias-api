@@ -10,7 +10,8 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
   context 'when there is a sms plan with given id' do
     let!(:end_at) { Date.strptime('11/03/2021', '%d/%m/%Y') }
     let!(:sms_plan) { create(:sms_plan, end_at: end_at) }
-    let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
+    let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan, created_at: 2.days.ago) }
+    let!(:variant2) { create(:sms_plan_variant, sms_plan: sms_plan, created_at: 1.day.ago) }
     let!(:sms_plan_id) { sms_plan.id }
 
     before do
@@ -46,6 +47,19 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
           'content' => variant.content
         )
       )
+      expect(json_response['included']).to include(
+        'id' => variant2.id,
+        'type' => 'variant',
+        'attributes' => include(
+          'formula_match' => variant2.formula_match,
+          'content' => variant2.content
+        )
+      )
+    end
+
+    it 'return in correct order' do
+      expect(json_response['included'][0]['id']).to eq(variant.id)
+      expect(json_response['included'][1]['id']).to eq(variant2.id)
     end
 
     context 'when given sms plan is an alert' do
