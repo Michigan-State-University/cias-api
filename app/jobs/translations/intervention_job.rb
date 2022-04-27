@@ -12,7 +12,6 @@ class Translations::InterventionJob < ApplicationJob
     TranslationMailer.confirmation(current_user, intervention, translated_intervention).deliver_now
   rescue StandardError => e
     logger.error "TRANSLATION ERROR LOG #{e}"
-    logger.error "TRANSLATION ENV TEST #{ENV['WEB_URL']}"
     translated_intervention&.sessions&.destroy_all
     translated_intervention&.destroy
     return unless current_user.email_notification
