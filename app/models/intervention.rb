@@ -34,7 +34,7 @@ class Intervention < ApplicationRecord
       .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
   }
 
-  scope :without_hidden, -> { where(is_hidden: false) }
+  scope :only_visible, -> { where(is_hidden: false) }
   scope :with_any_organization, -> { where.not(organization_id: nil) }
   scope :indexing, ->(ids) { where(id: ids) }
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
