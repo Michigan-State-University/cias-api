@@ -158,7 +158,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   context 'returns only interventions that are not being cloned' do
-    let!(:intervention_being_cloned) { create(:intervention, user: admin, is_cloning: true) }
+    let!(:intervention_being_cloned) { create(:intervention, user: admin, is_hidden: true) }
 
     before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 

@@ -42,7 +42,7 @@ class V1::InterventionsController < V1Controller
     Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
                 .includes(%i[user reports_attachments logo_attachment])
-                .without_cloning
+                .only_visible
   end
 
   def intervention_load
