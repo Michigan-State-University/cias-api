@@ -22,6 +22,8 @@ class V1::Translations::Intervention
     change_language(cloned_resource)
     destination_tts_voice_id ? change_tts_in_sessions(cloned_resource) : clear_speech_blocks(cloned_resource)
     cloned_resource
+  rescue StandardError
+    cloned_resource
   end
 
   private
