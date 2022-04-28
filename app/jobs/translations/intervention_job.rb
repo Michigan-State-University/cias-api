@@ -6,6 +6,7 @@ class Translations::InterventionJob < ApplicationJob
     intervention = find_intervention(intervention_id, current_user)
     translated_intervention = V1::Translations::Intervention.call(intervention, destination_language_id, destination_google_tts_voice_id)
     Intervention.reset_counters(translated_intervention.id, :sessions)
+    translated_intervention.update!(is_hidden: false)
 
     return unless current_user.email_notification
 
