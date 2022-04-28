@@ -165,7 +165,7 @@ en:
     session:
       subject: 'Duplicate of %{session_name}'
       header: 'Your duplicate of %{session_name} is ready'
-      body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> is ready that you requested'
+      body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> that you requested is ready'
       button_text: Open the e-intervention
       link: '%{web_url}/interventions/%{intervention_id}'
   duplication_with_structure:
