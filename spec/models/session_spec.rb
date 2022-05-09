@@ -177,8 +177,8 @@ RSpec.describe Session, type: :model do
 
         it 'translate questions' do
           # rubocop:disable Layout/LineLength
-          expect(session.reload.questions.first.title).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=>Enter title here")
-          expect(session.reload.questions.first.subtitle).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=><h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>")
+          expect(session.reload.questions.first.title).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=><h2>Enter title here</h2>")
+          expect(session.reload.questions.first.subtitle).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=><p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>")
           expect(session.reload.questions.first.narrator['blocks'].first['text']).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=>Enter main text for screen here. This is the last screen participants will see in this session")
           # rubocop:enable Layout/LineLength
         end
