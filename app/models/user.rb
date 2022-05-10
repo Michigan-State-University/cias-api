@@ -82,15 +82,23 @@ class User < ApplicationRecord
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
-  scope :researchers_and_e_intervention_admins, -> { limit_to_roles(%w[e_intervention_admin researcher]) }
+  scope :with_intervention_creation_access, -> { limit_to_roles(%w[e_intervention_admin researcher]) }
   scope :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }
   scope :third_parties, -> { limit_to_roles('third_party') }
-  scope :from_team, ->(team_id) { where(team_id: team_id) }
+  scope :from_team, ->(team_id) { team_id.present? ? left_joins(:organization_invitations).where(users: { team_id: team_id }) : User.none }
   scope :from_organization, ->(organization_id) { where(organizable_id: organization_id) }
   scope :team_admins, -> { limit_to_roles('team_admin') }
   scope :participants, -> { limit_to_roles('participant') }
   scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
+
+  # rubocop:disable Layout/LineLength
+  scope :active_users_invited_to_organizations, ->(organization_ids) { left_joins(:organization_invitations).where('organization_invitations.organization_id IN (?) AND organization_invitations.accepted_at IS NOT NULL', organization_ids) }
+  scope :active_users_assigned_to_organizations, ->(organization_ids) { left_joins(:organization_invitations).where('users.organizable_id IN (?) AND users.confirmed_at IS NOT NULL', organization_ids) }
+  scope :active_e_intervention_admins_from_organizations, ->(organization_ids) { organization_ids.present? ? active_users_invited_to_organizations(organization_ids).or(active_users_assigned_to_organizations(organization_ids)) : User.none }
+  scope :from_team_or_organization, ->(team_id, organization_ids) { active_e_intervention_admins_from_organizations(organization_ids).or(from_team(team_id)) }
+  # rubocop:enable Layout/LineLength
+
   scope :name_contains, lambda { |substring|
     if substring.present?
       ids = select { |u| "#{u.first_name} #{u.last_name} #{u.email}" =~ /#{substring.downcase}/i }.map(&:id)
@@ -181,7 +189,7 @@ class User < ApplicationRecord
 
   def self.users_for_researcher_or_e_intervention_admin(params, scope)
     if params[:roles]&.include?('researcher') && params[:roles]&.include?('e_intervention_admin')
-      scope.researchers_and_e_intervention_admins.from_team(params[:team_id])
+      scope.with_intervention_creation_access.from_team(params[:team_id])
     elsif params[:roles]&.include?('researcher')
       scope.researchers.from_team(params[:team_id])
     elsif params[:roles]&.include?('e_intervention_admin')
@@ -197,6 +205,12 @@ class User < ApplicationRecord
 
   def active_for_authentication?
     super && active
+  end
+
+  def accepted_organization
+    organization_ids = organization_invitations.where.not(accepted_at: nil).map(&:organization_id)
+
+    Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
   private
@@ -241,7 +255,7 @@ class User < ApplicationRecord
     end
 
     def participants_with_answers(scope)
-      User.participants.where(id: scope.researchers_and_e_intervention_admins.flat_map { |user| participants_with_answers_ids(user) })
+      User.participants.where(id: scope.with_intervention_creation_access.flat_map { |user| participants_with_answers_ids(user) })
     end
 
     def users_for_team(params, scope)

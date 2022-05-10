@@ -28,6 +28,8 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
   end
 
   context 'when current_user is admin' do
+    let(:researchers) { [other_researcher, researcher, e_intervention_admin] }
+
     context 'without pagination params' do
       before { request }
 
@@ -46,6 +48,53 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
 
     context 'with pagination params' do
       let!(:params) { { page: 1, per_page: 1 } }
+
+      before { request }
+
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns correct user ids' do
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
+      end
+
+      it 'returns correct users list size' do
+        expect(json_response['data'].size).to eq researchers.size
+      end
+    end
+  end
+
+  context 'when current_user is e-intervention admin' do
+    let(:organization) { create(:organization) }
+    let!(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id, organizable_type: 'Organization') }
+    let!(:other_e_int_admin) { create(:user, :confirmed, :e_intervention_admin) }
+    let!(:organization_invitation) { OrganizationInvitation.create(user_id: other_e_int_admin.id, organization_id: organization.id, accepted_at: DateTime.now) }
+    let(:researchers) { [other_e_int_admin, e_intervention_admin] }
+    let(:headers) { e_intervention_admin.create_new_auth_token }
+
+    before { request }
+
+    context 'belongs only to organization' do
+      it 'returns correct http status' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns correct user ids' do
+        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
+      end
+
+      it 'returns correct users list size' do
+        expect(json_response['data'].size).to eq researchers.size
+      end
+    end
+
+    context 'when e_int admin belongs also to the team' do
+      let!(:e_intervention_admin) do
+        create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id, organizable_type: 'Organization', team_id: team.id)
+      end
+
+      let(:researchers) { [other_e_int_admin, e_intervention_admin, researcher, other_researcher] }
 
       before { request }
 

@@ -55,6 +55,6 @@ class Ability::TeamAdmin < Ability::Base
   end
 
   def team_members_and_researchers_participants
-    team_members_ids + team_members.researchers_and_e_intervention_admins.flat_map { |researcher| participants_with_answers(researcher) }
+    team_members_ids + team_members.with_intervention_creation_access.flat_map { |researcher| participants_with_answers(researcher) }
   end
 end
