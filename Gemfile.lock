@@ -539,7 +539,7 @@ GEM
     wicked_pdf (2.1.0)
       activesupport
     with_env (1.1.0)
-    wkhtmltopdf-binary (0.12.5.4)
+    wkhtmltopdf-heroku (2.12.6.0)
     xml-simple (1.1.8)
     zeitwerk (2.5.4)
 
@@ -620,7 +620,7 @@ DEPENDENCIES
   timecop
   twilio-ruby (~> 5.45.0)
   wicked_pdf
-  wkhtmltopdf-binary (~> 0.12.5.4)
+  wkhtmltopdf-heroku (= 2.12.6.0)
 
 RUBY VERSION
    ruby 2.7.2p137
