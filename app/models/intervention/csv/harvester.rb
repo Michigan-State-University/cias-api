@@ -139,13 +139,28 @@ class Intervention::Csv::Harvester
         next if consumption_result.blank?
 
         fill_by_default_value(tlfb_question_group, row_index, session_variable, day_index + 1)
+        if simple_yes_or_no?(tlfb_question_group)
+          fill_by_simple_question_yes_or_not(tlfb_question_group, row_index, session_variable, day_index + 1,
+                                             consumption_result)
+        end
 
         consumption_result.body['consumptions']&.each do |consumption|
           var_index = header.index("#{session_variable}.tlfb.#{consumption['variable']}_d#{day_index + 1}")
-          rows[row_index][var_index] = consumption['amount'] || boolean_to_int(consumption['consumed'])
+          rows[row_index][var_index] = consumption['amount'] || boolean_to_int(consumption['consumed']) if var_index.present?
         end
       end
     end
+  end
+
+  def fill_by_simple_question_yes_or_not(tlfb_question_group, row_index, session_variable, day_number, consumption_result)
+    var_index = header.index("#{session_variable}.tlfb.#{tlfb_question_group.title_as_variable}_d#{day_number}")
+    rows[row_index][var_index] = boolean_to_int(consumption_result.body['substances_consumed'])
+  end
+
+  def simple_yes_or_no?(tlfb_question_group)
+    question_body = tlfb_question_group.questions.find_by(type: 'Question::TlfbQuestion').body
+
+    question_body.dig('data', 0, 'payload', 'substance_groups').blank? && question_body.dig('data', 0, 'payload', 'substances').blank?
   end
 
   def boolean_to_int(value)
