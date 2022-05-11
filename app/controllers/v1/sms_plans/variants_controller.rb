@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::SmsPlans::VariantsController < V1Controller
+  include Reorder
+
   def create
     authorize! :create, SmsPlan::Variant
 
@@ -26,6 +28,16 @@ class V1::SmsPlans::VariantsController < V1Controller
 
     variant.destroy
     head :no_content
+  end
+
+  protected
+
+  def reorder_response
+    V1::SmsPlanSerializer.new(sms_plan, { include: %i[variants] })
+  end
+
+  def reorder_data_scope
+    sms_plan.variants
   end
 
   private

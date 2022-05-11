@@ -6,7 +6,9 @@ class SmsPlan::Variant < ApplicationRecord
 
   attribute :original_text, :json, default: { 'content' => '' }
 
-  default_scope { order(:created_at) }
+  before_create :assign_position
+
+  default_scope { order(:position) }
 
   ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
 
@@ -15,5 +17,11 @@ class SmsPlan::Variant < ApplicationRecord
     new_content = translator.translate(content, src_language_name_short, dest_language_name_short)
 
     update!(content: new_content)
+  end
+
+  private
+
+  def assign_position
+    self.position = sms_plan.variants.count
   end
 end

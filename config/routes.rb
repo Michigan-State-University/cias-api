@@ -86,6 +86,7 @@ Rails.application.routes.draw do
     scope module: 'sms_plans' do
       scope 'sms_plans/:sms_plan_id', as: :sms_plan do
         resources :variants
+        patch 'move_variants', to: 'variants#move'
         scope module: 'alert_phones' do
           resources :phones, only: %i[create update destroy], path: '/alert_phones/'
         end

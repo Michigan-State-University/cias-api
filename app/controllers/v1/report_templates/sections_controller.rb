@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::ReportTemplates::SectionsController < V1Controller
+  include Reorder
   load_and_authorize_resource :report_template
 
   def index
@@ -44,15 +45,17 @@ class V1::ReportTemplates::SectionsController < V1Controller
     head :no_content
   end
 
-  def move
-    authorize! :update, @report_template
+  protected
 
-    V1::ReportTemplates::SectionReorderService.call(@report_template.id, position_params[:position])
+  def reorder_data_scope
+    sections_scope
+  end
 
-    render json: V1::ReportTemplateSerializer.new(
+  def reorder_response
+    V1::ReportTemplateSerializer.new(
       @report_template,
       { include: %i[sections variants] }
-    ), status: :ok
+    )
   end
 
   private

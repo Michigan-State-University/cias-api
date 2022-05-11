@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_28_085503) do
+ActiveRecord::Schema.define(version: 2022_05_05_084200) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -525,6 +525,7 @@ ActiveRecord::Schema.define(version: 2022_04_28_085503) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.integer "position", default: 0, null: false
     t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
   end
 
