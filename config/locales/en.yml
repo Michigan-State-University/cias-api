@@ -158,9 +158,9 @@ en:
       button_text: Open the session
       link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
     error:
-      subject: 'Error during coping'
+      subject: 'Error during copying'
       header: 'An error has occurred during copying.'
-      body: 'Something goes wrong while copying your session/intervention. Please try again.'
+      body: 'Something went wrong while copying your session/intervention. Please try again.'
   duplicate_mailer:
     session:
       subject: 'Duplicate of %{session_name}'
