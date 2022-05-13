@@ -10,8 +10,12 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
   let!(:other_session) { create(:session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
   let!(:other_question_group) { create(:question_group_plain, session: other_session, position: 1) }
-  let!(:question_ids) { create_list(:question_free_response, 3, title: 'Question Id Title', question_group: question_group) }
-  let(:request) { post v1_session_question_groups_path(session_id: session.id), params: params, headers: user.create_new_auth_token }
+  let!(:question_ids) do
+    create_list(:question_free_response, 3, title: 'Question Id Title', question_group: question_group)
+  end
+  let(:request) do
+    post v1_session_question_groups_path(session_id: session.id), params: params, headers: user.create_new_auth_token
+  end
   let!(:question_array_json) do
     questions = []
     2.times do |i|
@@ -116,7 +120,7 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
       it_behaves_like 'permitted user'
     end
 
-    context 'user is researcher' do
+    context 'user is researcher and also have other roles' do
       let(:user) { researcher_with_multiple_roles }
 
       it_behaves_like 'permitted user'

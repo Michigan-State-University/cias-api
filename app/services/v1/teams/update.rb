@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Teams::Update
+  prepend Database::Transactional
+
   def self.call(team, team_params, current_ability)
     new(team, team_params, current_ability).call
   end
@@ -12,17 +14,15 @@ class V1::Teams::Update
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      team.update!(name: team_params[:name]) if name_changed?
+    team.update!(name: team_params[:name]) if name_changed?
 
-      V1::Teams::ChangeTeamAdmin.call(
-        team,
-        team_params[:user_id],
-        current_ability
-      )
+    V1::Teams::ChangeTeamAdmin.call(
+      team,
+      team_params[:user_id],
+      current_ability
+    )
 
-      team.reload
-    end
+    team.reload
   end
 
   private

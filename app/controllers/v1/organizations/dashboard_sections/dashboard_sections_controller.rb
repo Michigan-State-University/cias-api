@@ -29,7 +29,8 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
   def update
     authorize! :update, DashboardSection
 
-    dashboard_section = V1::Organizations::DashboardSections::Update.call(dashboard_section_load, dashboard_section_params)
+    dashboard_section = V1::Organizations::DashboardSections::Update.call(dashboard_section_load,
+                                                                          dashboard_section_params)
     render json: serialized_response(dashboard_section)
   end
 

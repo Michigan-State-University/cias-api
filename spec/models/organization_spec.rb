@@ -29,4 +29,14 @@ RSpec.describe Organization, type: :model do
       end
     end
   end
+
+  describe '#destroy' do
+    context 'destroy all health systems' do
+      let!(:organization) { create(:organization, :with_health_system) }
+
+      it 'destroy all children' do
+        expect { organization.destroy }.to change(described_class, :count).by(-1).and change(HealthSystem.with_deleted, :count).by(-1)
+      end
+    end
+  end
 end

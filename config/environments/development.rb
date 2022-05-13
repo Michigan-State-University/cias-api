@@ -21,7 +21,10 @@ Rails.application.configure do
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
   if Rails.root.join('tmp/caching-dev.txt').exist?
-   config.cache_store = :memory_store
+    config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'] }
+    config.public_file_server.headers = {
+      'Cache-Control' => "public, max-age=#{2.days.to_i}"
+    }
   else
     config.action_controller.perform_caching = false
 
@@ -64,4 +67,9 @@ Rails.application.configure do
     Bullet.bullet_logger = true
     Bullet.console = true
   end
+
+  # Mount Action Cable outside main process or domain
+  # config.action_cable.mount_path = nil
+  # config.action_cable.url = 'wss://example.com/cable'
+  config.action_cable.allowed_request_origins = [%r{http://*}, %r{https://*}]
 end

@@ -38,12 +38,12 @@ RSpec.describe 'GET /v1/interventions', type: :request do
           end
 
           it 'returns proper interventions' do
-            expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
-                                                                                  .take(interventions_size_admin).map(&:id)
+            expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
+                                                                                                 .take(interventions_size_admin).map(&:id)
           end
 
           it 'returns correct invitations list size' do
-            expect(json_response['interventions'].size).to eq interventions_size_admin
+            expect(json_response['data'].size).to eq interventions_size_admin
           end
         end
       end
@@ -57,11 +57,11 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper error message' do
-          expect(json_response['interventions'].pluck('id')).to match_array []
+          expect(json_response['data'].pluck('id')).to match_array []
         end
 
         it 'returns correct invitations list size' do
-          expect(json_response['interventions'].size).to eq 0
+          expect(json_response['data'].size).to eq 0
         end
       end
 
@@ -74,12 +74,12 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper interventions' do
-          expect(json_response['interventions'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
-                                                                                .take(interventions_size_researcher).map(&:id)
+          expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
+                                                                                               .take(interventions_size_researcher).map(&:id)
         end
 
         it 'returns correct invitations list size' do
-          expect(json_response['interventions'].size).to eq interventions_size_researcher
+          expect(json_response['data'].size).to eq interventions_size_researcher
         end
 
         context 'filtering by organization' do
@@ -90,8 +90,8 @@ RSpec.describe 'GET /v1/interventions', type: :request do
           end
 
           it 'return correct data' do
-            expect(json_response['interventions'].size).to eq intervention_for_organization.size
-            expect(json_response['interventions'].pluck('id')).to match_array intervention_for_organization.map(&:id)
+            expect(json_response['data'].size).to eq intervention_for_organization.size
+            expect(json_response['data'].pluck('id')).to match_array intervention_for_organization.map(&:id)
           end
         end
       end
@@ -105,11 +105,11 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper interventions' do
-          expect(json_response['interventions'].pluck('id')).to match_array []
+          expect(json_response['data'].pluck('id')).to match_array []
         end
 
         it 'returns correct invitations list size' do
-          expect(json_response['interventions'].size).to eq 0
+          expect(json_response['data'].size).to eq 0
         end
       end
     end
@@ -133,11 +133,11 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 
     it 'return correct size' do
-      expect(json_response['interventions'].size).to be(2)
+      expect(json_response['data'].size).to be(2)
     end
 
     it 'return correct intervention' do
-      expect(json_response['interventions'].pluck('id')).to include(archived_intervention.id, closed_intervention.id)
+      expect(json_response['data'].pluck('id')).to include(archived_intervention.id, closed_intervention.id)
     end
   end
 
@@ -149,21 +149,21 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 
     it 'return correct size' do
-      expect(json_response['interventions'].size).to be(1)
+      expect(json_response['data'].size).to be(1)
     end
 
     it 'return correct intervention' do
-      expect(json_response['interventions'].first['id']).to include(new_intervention.id)
+      expect(json_response['data'].first['id']).to include(new_intervention.id)
     end
   end
 
   context 'returns only interventions that are not being cloned' do
-    let!(:intervention_being_cloned) { create(:intervention, user: admin, is_cloning: true) }
+    let!(:intervention_being_cloned) { create(:intervention, user: admin, is_hidden: true) }
 
     before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 
     it 'return correct intervention' do
-      expect(json_response['interventions'].pluck('id')).to not_include(intervention_being_cloned.id)
+      expect(json_response['data'].pluck('id')).to not_include(intervention_being_cloned.id)
     end
   end
 end

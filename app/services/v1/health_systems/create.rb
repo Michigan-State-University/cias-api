@@ -10,20 +10,10 @@ class V1::HealthSystems::Create
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      health_system = HealthSystem.create!(
-        name: health_system_params[:name],
-        organization_id: health_system_params[:organization_id]
-      )
-
-      V1::HealthSystems::ChangeHealthSystemAdmins.call(
-        health_system,
-        health_system_params[:health_system_admins_to_add],
-        nil
-      )
-
-      health_system
-    end
+    HealthSystem.create!(
+      name: health_system_params[:name],
+      organization_id: health_system_params[:organization_id]
+    )
   end
 
   private

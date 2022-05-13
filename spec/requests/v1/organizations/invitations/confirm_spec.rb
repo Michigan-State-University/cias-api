@@ -13,7 +13,8 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
 
   let(:params) { { invitation_token: invitation_token } }
   let(:success_message) do
-    { success: Base64.encode64(I18n.t('organizables.invitations.accepted', organizable_type: 'Organization', organizable_name: organization.name)) }.to_query
+    { success: Base64.encode64(I18n.t('organizables.invitations.accepted', organizable_type: 'Organization',
+                                                                           organizable_name: organization.name)) }.to_query
   end
   let(:success_path) do
     "#{ENV['WEB_URL']}?#{success_message}"
@@ -28,13 +29,14 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
 
   context 'when user is intervention admin' do
     context 'when invitation_token is valid' do
-      let!(:organization_invitation) { create(:organization_invitation, user_id: intervention_admin.id, organization_id: organization.id) }
+      let!(:organization_invitation) do
+        create(:organization_invitation, user_id: intervention_admin.id, organization_id: organization.id)
+      end
       let(:invitation_token) { organization_invitation.invitation_token }
 
       it 'confirms organization invitation and assign user to the organization' do
-
         expect { request }.to change { organization_invitation.reload.accepted_at }.and \
-            change(organization_invitation, :invitation_token).to(nil)
+          change(organization_invitation, :invitation_token).to(nil)
       end
 
       it 'redirects to the web app with success message' do
@@ -46,12 +48,14 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
   context 'when user is organization admin' do
     context 'when invitation_token is valid' do
       let(:headers) { organization_admin.create_new_auth_token }
-      let!(:organization_invitation) { create(:organization_invitation, user_id: organization_admin.id, organization_id: organization.id) }
+      let!(:organization_invitation) do
+        create(:organization_invitation, user_id: organization_admin.id, organization_id: organization.id)
+      end
       let(:invitation_token) { organization_invitation.invitation_token }
 
       it 'confirms organization invitation and assign user to the organization' do
         expect { request }.to change { organization_invitation.reload.accepted_at }.and \
-            change(organization_invitation, :invitation_token).to(nil)
+          change(organization_invitation, :invitation_token).to(nil)
       end
 
       it 'redirects to the web app with success message' do

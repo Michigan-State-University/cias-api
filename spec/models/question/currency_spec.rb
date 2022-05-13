@@ -17,7 +17,34 @@ RSpec.describe Question::Currency, type: :model do
           end
 
           it 'sets correct variable with passed taken variables' do
-            expect(question_currency.variable_clone_prefix(%w[clone_currency_var clone1_currency_var])).to eq('clone2_currency_var')
+            expect(question_currency.variable_clone_prefix(%w[clone_currency_var
+                                                              clone1_currency_var])).to eq('clone2_currency_var')
+          end
+        end
+
+        describe 'translation' do
+          let(:translator) { V1::Google::TranslationService.new }
+          let(:source_language_name_short) { 'en' }
+          let(:destination_language_name_short) { 'pl' }
+
+          it '#translate_title' do
+            question_currency.translate_title(translator, source_language_name_short, destination_language_name_short)
+            expect(question_currency.reload.title).to eq('from=>en to=>pl text=>Currency')
+          end
+
+          it '#translate_subtitle' do
+            question_currency.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+            expect(question_currency.subtitle).to equal(nil)
+          end
+        end
+
+        describe '#question_variables' do
+          it 'returns correct variables' do
+            expect(question_currency.question_variables).to match_array ['currency_var']
+          end
+
+          it 'returns correct amount of variables' do
+            expect(question_currency.question_variables.size).to eq 1
           end
         end
       end

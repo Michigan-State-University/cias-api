@@ -4,22 +4,27 @@
 # if intervention is shared to only selected registered participant;
 class V1::Interventions::InvitationsController < V1Controller
   def index
-    render json: serialized_response(user_with_access_scope)
+    render json: serialized_response(intervention_invitation_scope)
   end
 
   def create
-    return head :not_acceptable if intervention_load.closed? || intervention_load.archived?
+    intervention = intervention_load
+    return head :not_acceptable unless intervention.published?
+
+    if intervention.type.eql? 'Intervention'
+      return render json: { message: I18n.t('interventions.invitations.wrong_intervention_type') }, status: :unprocessable_entity
+    end
 
     authorize! :create, Invitation
 
-    intervention_load.give_user_access(user_session_params[:emails])
-    render json: serialized_response(user_with_access_scope), status: :created
+    intervention.invite_by_email(intervention_invitation_params[:emails], intervention_invitation_params[:health_clinic_id])
+    render json: serialized_response(intervention_invitation_scope), status: :created
   end
 
   def destroy
     return head :not_acceptable if intervention_load.closed? || intervention_load.archived?
 
-    user_with_access_scope.find(params[:id]).destroy
+    intervention_invitation_scope.find(params[:id]).destroy
     head :no_content
   end
 
@@ -29,11 +34,15 @@ class V1::Interventions::InvitationsController < V1Controller
     Intervention.accessible_by(current_ability).find(params[:intervention_id])
   end
 
-  def user_with_access_scope
+  def intervention_invitation_scope
     intervention_load.invitations
   end
 
   def user_session_params
     params.require(:user_session).permit(emails: [])
+  end
+
+  def intervention_invitation_params
+    params.require(:intervention_invitation).permit(:health_clinic_id, emails: [])
   end
 end

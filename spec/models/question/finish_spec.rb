@@ -16,7 +16,30 @@ RSpec.describe Question::Finish, type: :model do
         end
 
         it 'returns nil with passed taken variables' do
-          expect(question_finish.variable_clone_prefix(%w[clone_question_slider_var clone1_question_slider_var])).to eq(nil)
+          expect(question_finish.variable_clone_prefix(%w[clone_question_slider_var
+                                                          clone1_question_slider_var])).to eq(nil)
+        end
+      end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_finish.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_finish.title).to include('from=>en to=>pl text=><h2>Enter title here</h2>')
+        end
+
+        it '#translate_subtitle' do
+          question_finish.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_finish.subtitle).to include('from=>en to=>pl text=><p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>') # rubocop:disable Layout/LineLength
+        end
+      end
+
+      describe '#question_variables' do
+        it 'returns empty variables list' do
+          expect(question_finish.question_variables).to match_array []
         end
       end
     end

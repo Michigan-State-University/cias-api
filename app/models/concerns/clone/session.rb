@@ -3,7 +3,7 @@
 class Clone::Session < Clone::Base
   def execute
     outcome.position = position || outcome.intervention.sessions.size
-    outcome.clear_formula if clean_formulas
+    outcome.clear_formulas if clean_formulas
     outcome.days_after_date_variable_name = nil
     ActiveRecord::Base.transaction do
       create_question_groups
@@ -12,6 +12,7 @@ class Clone::Session < Clone::Base
       create_report_templates
       outcome_questions_reassignment
       reassign_report_templates_to_third_party_screens
+      reassign_tests
     end
     outcome
   end
@@ -19,6 +20,9 @@ class Clone::Session < Clone::Base
   private
 
   def create_question_groups
+    # CAT-MH sessions won't have question groups so it will throw an error if we try to access them
+    return unless source.respond_to?(:question_groups)
+
     destroy_default_finish_question_group
 
     source.question_groups.order(:position).each do |question_group|
@@ -46,20 +50,22 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_branching_question(question)
-    question.formula['patterns'] = question.formula['patterns'].map do |pattern|
-      index = 0
-      pattern['target'].each do |current_target|
-        current_target['id'] = matching_outcome_target_id(pattern, index)
-        index += 1
+    question.formulas.each do |formula|
+      formula['patterns'] = formula['patterns'].map do |pattern|
+        index = 0
+        pattern['target'].each do |current_target|
+          current_target['id'] = matching_outcome_target_id(pattern, index)
+          index += 1
+        end
+        pattern
       end
-      pattern
     end
     question
   end
 
   def matching_outcome_target_id(pattern, index)
     target_id = pattern['target'][index]['id']
-    return check_if_session_exists(target_id) if pattern['target'][index]['type'] == 'Session' || target_id.empty?
+    return check_if_session_exists(target_id) if pattern['target'][index]['type'].include?('Session') || target_id.empty?
 
     matching_question_id(target_id)
   end
@@ -117,6 +123,10 @@ class Clone::Session < Clone::Base
       plan.variants.each do |variant|
         new_sms_plan.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
       end
+
+      plan.alert_phones.each do |alert_phone|
+        new_sms_plan.alert_phones << AlertPhone.new(sms_plan: new_sms_plan, phone: alert_phone.phone)
+      end
     end
   end
 
@@ -149,8 +159,8 @@ class Clone::Session < Clone::Base
 
     Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
       third_party_question.body_data.each do |third_party_question_body_data_element|
-        report_template_ids = third_party_question_body_data_element.dig('report_template_ids')
-        new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids|
+        report_template_ids = third_party_question_body_data_element['report_template_ids']
+        new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids| # rubocop:disable Lint/ShadowingOuterLocalVariable
           source_report_template = source_third_party_report_templates.find(report_template_id)
           outcome_report_template_id = outcome_third_party_report_templates.find_by(name: source_report_template.name)&.id
           new_report_template_ids << outcome_report_template_id
@@ -158,6 +168,14 @@ class Clone::Session < Clone::Base
         third_party_question_body_data_element['report_template_ids'] = new_report_template_ids
       end
       third_party_question.save!
+    end
+  end
+
+  def reassign_tests
+    return if source.instance_of? Session::Classic
+
+    source.cat_mh_test_types.each do |test_type|
+      outcome.cat_mh_test_types << test_type
     end
   end
 end

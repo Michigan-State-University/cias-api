@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Ability::Guest < Ability::Base
+  include Ability::Generic::FillInterventionAccess
+
   def definition
     super
     guest if role?(class_name)
@@ -9,8 +11,6 @@ class Ability::Guest < Ability::Base
   private
 
   def guest
-    can :create, UserSession, session: { intervention: { status: 'published', shared_to: 'anyone' } }
-    can :read, UserSession, user_id: user.id
-    can :create, Answer, user_session: { user_id: user.id }
+    enable_fill_in_access(user.id, { status: 'published', shared_to: 'anyone' })
   end
 end

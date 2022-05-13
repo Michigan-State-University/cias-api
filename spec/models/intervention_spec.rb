@@ -10,88 +10,83 @@ RSpec.describe Intervention, type: :model do
 
     it { should belong_to(:user) }
     it { should have_many(:sessions) }
-    it { should belong_to(:google_language) }
+    it { should have_many(:user_interventions) }
+    it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { expect(initial_status.draft?).to be true }
   end
 
-  context 'change states' do
-    context 'from draft' do
-      let(:intervention) { create(:intervention) }
-      let!(:sessions) { create_list(:session, 4, intervention_id: intervention.id) }
+  describe 'instance methods' do
+    describe 'translation' do
+      let(:intervention) { create(:intervention_with_logo, name: 'New intervention') }
+      let(:translator) { V1::Google::TranslationService.new }
+      let(:source_language_name_short) { 'en' }
+      let(:destination_language_name_short) { 'pl' }
 
-      context 'to published' do
-        it 'success event' do
-          intervention.broadcast
-          expect(intervention.published?).to be true
-        end
+      before do
+        intervention.logo_blob.description = 'This is the description'
+        intervention.translate(translator, source_language_name_short, destination_language_name_short)
       end
 
-      context 'to closed' do
-        it 'no status change' do
-          intervention.close
-          expect(intervention.draft?).to be true
-        end
-      end
-
-      context 'to archived' do
-        it 'success event' do
-          intervention.to_archive
-          expect(intervention.archived?).to be true
+      describe '#translation_prefix' do
+        it 'add correct prefix' do
+          expect(intervention.reload.name).to include("(#{destination_language_name_short.upcase}) New intervention")
         end
       end
     end
 
-    context 'from published' do
-      let(:intervention) { create(:intervention, :published) }
+    describe '#invite_by_email' do
+      before do
+        allow(message_delivery).to receive(:deliver_later)
+        ActiveJob::Base.queue_adapter = :test
+      end
 
-      context 'to closed' do
-        it 'success event' do
-          intervention.close
-          expect(intervention.closed?).to be true
+      after { intervention.invite_by_email([user.email]) }
+
+      let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+      let(:intervention) { create(:intervention, status: status) }
+      let(:status) { :draft }
+      let(:user) { create(:user, :confirmed, :admin) }
+
+      context 'intervention is draft' do
+        it 'dose not schedule send email' do
+          expect(InterventionMailer).not_to receive(:inform_to_an_email)
         end
       end
 
-      context 'to archived' do
-        it 'no status change' do
-          intervention.to_archive
-          expect(intervention.published?).to be true
+      context 'intervention is published' do
+        let(:status) { :published }
+
+        %i[guest preview_session].each do |role|
+          context "user is #{role}" do
+            let(:user) { create(:user, :confirmed, role) }
+
+            it 'dose not schedule send email' do
+              expect(SessionMailer).not_to receive(:inform_to_an_email)
+            end
+          end
         end
-      end
-    end
 
-    context 'from closed' do
-      let(:intervention) { create(:intervention, :closed) }
+        %i[admin researcher participant].each do |role|
+          context "user is #{role}" do
+            let(:user) { create(:user, :confirmed, role) }
 
-      context 'to published' do
-        it 'no status change' do
-          intervention.broadcast
-          expect(intervention.closed?).to be true
-        end
-      end
+            context 'email notification enabled' do
+              it 'schedules send email' do
+                allow(InterventionMailer).to receive(:inform_to_an_email).with(intervention, user.email, nil).and_return(
+                  message_delivery
+                )
+              end
+            end
 
-      context 'to archived' do
-        it 'success event' do
-          intervention.to_archive
-          expect(intervention.archived?).to be true
-        end
-      end
-    end
+            context 'email notification disabled' do
+              let!(:disable_email_notification) { user.email_notification = false }
 
-    context 'from archived' do
-      let(:intervention) { create(:intervention, :archived) }
-
-      context 'to published' do
-        it 'no status change' do
-          intervention.broadcast
-          expect(intervention.archived?).to be true
-        end
-      end
-
-      context 'to closed' do
-        it 'no status change' do
-          intervention.close
-          expect(intervention.archived?).to be true
+              it "Don't schedule send email" do
+                expect(InterventionMailer).not_to receive(:inform_to_an_email)
+              end
+            end
+          end
         end
       end
     end
@@ -103,38 +98,39 @@ RSpec.describe Intervention, type: :model do
     let!(:session) { create(:session, intervention: intervention, position: 1) }
     let!(:other_session) do
       create(:session, intervention: intervention, position: 2,
-                       formula: { 'payload' => 'var + 2',
-                                  'patterns' =>
+                       formulas: [{ 'payload' => 'var + 2',
+                                    'patterns' =>
                           [{ 'match' => '=1',
                              'target' =>
-                               [{ 'id' => third_session.id, 'type' => 'Session' }] }] })
+                               [{ 'id' => third_session.id, 'type' => 'Session' }] }] }])
     end
     let!(:third_session) do
       create(:session, intervention: intervention, position: 3,
-                       formula: { 'payload' => '',
-                                  'patterns' =>
+                       formulas: [{ 'payload' => '',
+                                    'patterns' =>
                           [{ 'match' => '',
                              'target' =>
-                               [{ 'id' => '', 'type' => 'Session' }] }] })
+                               [{ 'id' => '', 'type' => 'Session' }] }] }])
     end
     let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
     let!(:question1) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
-                               formula: { 'payload' => 'var + 3', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 3', 'patterns' => [
                                  { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
-                               ] })
+                               ] }])
     end
     let!(:question2) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
-                               formula: { 'payload' => 'var + 4', 'patterns' => [
+                               formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                  { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
-                               ] })
+                               ] }])
     end
 
     it 'return correct data' do
       cloned_intervention = intervention.clone
 
-      expect(intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
+      expect(intervention.attributes.except('id', 'created_at', 'updated_at', 'status',
+                                            'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
     end
@@ -150,12 +146,12 @@ RSpec.describe Intervention, type: :model do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 3',
             'patterns' => [
               { 'match' => '=7', 'target' => [{ 'id' => cloned_questions.second.id, 'type' => 'Question::Single' }] }
             ]
-          }
+          }]
         ),
         include(
           'subtitle' => 'Question Subtitle 2',
@@ -163,12 +159,12 @@ RSpec.describe Intervention, type: :model do
           'body' => include(
             'variable' => { 'name' => 'single_var' }
           ),
-          'formula' => {
+          'formulas' => [{
             'payload' => 'var + 4',
             'patterns' => [
               { 'match' => '=3', 'target' => [{ 'id' => cloned_sessions.second.id, 'type' => 'Session' }] }
             ]
-          }
+          }]
         ),
         include(
           'position' => 999_999,
@@ -185,21 +181,21 @@ RSpec.describe Intervention, type: :model do
 
       expect(second_cloned_session.attributes).to include(
         'position' => 2,
-        'formula' => {
+        'formulas' => [{
           'payload' => 'var + 2',
           'patterns' => [
             { 'match' => '=1', 'target' => [{ 'id' => third_cloned_session.id, 'type' => 'Session' }] }
           ]
-        }
+        }]
       )
       expect(third_cloned_session.attributes).to include(
         'position' => 3,
-        'formula' => {
+        'formulas' => [{
           'payload' => '',
           'patterns' => [
             { 'match' => '', 'target' => [{ 'id' => '', 'type' => 'Session' }] }
           ]
-        },
+        }],
         'variable' => third_session.variable.to_s
       )
     end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Teams::Create
+  prepend Database::Transactional
+
   def self.call(team_params)
     new(team_params).call
   end
@@ -10,20 +12,18 @@ class V1::Teams::Create
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      team = Team.create!(
-        name: team_params[:name],
-        team_admin_id: new_team_admin.id
-      )
+    team = Team.create!(
+      name: team_params[:name],
+      team_admin_id: new_team_admin.id
+    )
 
-      new_team_admin.update!(
-        roles: ['team_admin']
-      )
+    new_team_admin.update!(
+      roles: ['team_admin']
+    )
 
-      V1::Teams::RemoveUsersActiveInvitations.call(new_team_admin)
+    V1::Teams::RemoveUsersActiveInvitations.call(new_team_admin)
 
-      team
-    end
+    team
   end
 
   private

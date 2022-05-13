@@ -20,11 +20,8 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       session: {
         name: 'test1 params',
         days_after_date_variable_name: 'var1',
-        body: {
-          payload: 1,
-          target: '',
-          variable: '1'
-        }
+        cat_tests: %w[mdd ss],
+        estimated_time: 10
       }
     }
   end
@@ -44,11 +41,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
           it 'updated values are proper' do
             expect(json_response['data']['attributes']).to include('name' => 'test1 params',
                                                                    'days_after_date_variable_name' => 'var1',
-                                                                   'body' => {
-                                                                     'payload' => '1',
-                                                                     'target' => '',
-                                                                     'variable' => '1'
-                                                                   })
+                                                                   'estimated_time' => 10)
           end
         end
 
@@ -57,10 +50,44 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             before do
               invalid_params = { session: {} }
               session.reload
-              patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: invalid_params, headers: headers
+              patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id),
+                    params: invalid_params, headers: headers
             end
 
             it { expect(response).to have_http_status(:bad_request) }
+          end
+        end
+
+        context 'Session::CatMh' do
+          before { request }
+
+          let(:session) { Session.create(name: 'CatSession', intervention: intervention, type: 'Session::CatMh') }
+          let(:cat_mh_test_type) { create(:cat_mh_test_type) }
+          let(:cat_mh_test_type_id) { cat_mh_test_type.id }
+          let(:params) do
+            {
+              session: {
+                name: 'Cat-Mh',
+                days_after_date_variable_name: 'var1',
+                cat_tests: [cat_mh_test_type_id]
+              }
+            }
+          end
+
+          it 'updated values are proper' do
+            expect(json_response['data']['attributes']).to include('name' => 'Cat-Mh',
+                                                                   'days_after_date_variable_name' => 'var1')
+          end
+
+          it 'added test to session' do
+            expect(json_response['data']['relationships']).to include('cat_mh_test_types' => {
+                                                                        'data' => [
+                                                                          {
+                                                                            'id' => cat_mh_test_type_id.to_s,
+                                                                            'type' => 'test_type'
+                                                                          }
+                                                                        ]
+                                                                      })
           end
         end
       end
@@ -82,6 +109,28 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       end
 
       it_behaves_like 'permitted user'
+    end
+  end
+
+  context 'empty formulas' do
+    let(:params) do
+      {
+        session: {
+          name: 'test1 params',
+          days_after_date_variable_name: 'var1',
+          body: {
+            payload: 1,
+            target: '',
+            variable: '1'
+          },
+          formulas: []
+        }
+      }
+    end
+
+    it 'lets users assign empty array of formulas' do
+      request
+      expect(json_response['data']['attributes']['formulas']).to eq []
     end
   end
 end

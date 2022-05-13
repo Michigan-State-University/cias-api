@@ -16,8 +16,8 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
   let(:request) { get v1_sms_plans_path, headers: headers }
 
   context 'when there are sms plans' do
-    let!(:sms_plan_1) { create(:sms_plan) }
-    let!(:sms_plan_2) { create(:sms_plan) }
+    let!(:sms_plan1) { create(:sms_plan) }
+    let!(:sms_plan2) { create(:sms_plan) }
 
     before do
       request
@@ -31,7 +31,7 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
       it 'returns sms plans' do
         expect(
           json_response['data'].pluck('id')
-        ).to match_array [sms_plan_1.id, sms_plan_2.id]
+        ).to match_array [sms_plan1.id, sms_plan2.id]
       end
     end
 
@@ -53,6 +53,48 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
 
     it 'success to Hash' do
       expect(json_response['data']).to be_empty
+    end
+  end
+
+  context 'when filter params are present' do
+    let!(:sms_plan1) { create(:sms_plan) }
+    let!(:sms_alert1) { create(:sms_alert) }
+    let!(:sms_plan2) { create(:sms_plan) }
+    let!(:sms_alert2) { create(:sms_alert) }
+    let!(:params) { {} }
+
+    let(:request) { get v1_sms_plans_path, headers: headers, params: params }
+
+    before do
+      request
+    end
+
+    context 'filter only sms alerts' do
+      let!(:params) { { types: ['SmsPlan::Alert'] } }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns correct id's" do
+        expect(
+          json_response['data'].pluck('id')
+        ).to match_array [sms_alert1.id, sms_alert2.id]
+      end
+    end
+
+    context 'filter only sms plans' do
+      let!(:params) { { types: ['SmsPlan::Normal'] } }
+
+      it 'has correct http code :ok' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns correct id's" do
+        expect(
+          json_response['data'].pluck('id')
+        ).to match_array [sms_plan1.id, sms_plan2.id]
+      end
     end
   end
 end

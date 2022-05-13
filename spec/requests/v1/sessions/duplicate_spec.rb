@@ -6,7 +6,6 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
-  let(:user) { researcher }
   let(:users) do
     {
       'researcher' => researcher,
@@ -14,26 +13,18 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     }
   end
   let!(:intervention) { create(:intervention, user: user) }
-  let!(:intervention_2) { create(:intervention, user: user) }
-  let(:other_session) { create(:session, intervention: intervention) }
-  let!(:session) do
-    create(:session, intervention: intervention,
-                     formula: { 'payload' => 'var + 5', 'patterns' => [
-                       { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
-                     ] },
-                     settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
-  end
-  let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
-  let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
+  let!(:intervention2) { create(:intervention, user: user) }
   let!(:params) do
     {
-      new_intervention_id: intervention_2.id
+      new_intervention_id: intervention2.id
     }
   end
   let!(:headers) { user.create_new_auth_token }
   let(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers }
 
   context 'when auth' do
+    let!(:session) { create(:session, intervention: intervention) }
+
     context 'is invalid' do
       let!(:request) { post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params }
 
@@ -57,49 +48,72 @@ RSpec.describe 'POST /v1/intervention/:intervention_id/sessions/:id/duplicate', 
     end
   end
 
-  context 'when intervention_id is invalid' do
-    before do
-      post v1_intervention_duplicate_session_path(intervention_id: 9000, id: session.id), params: params, headers: headers
+  context 'Session::Classic' do
+    let(:other_session) { create(:session, intervention: intervention) }
+    let!(:session) do
+      create(:session, intervention: intervention,
+                       formulas: [{ 'payload' => 'var + 5', 'patterns' => [
+                         { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
+                       ] }],
+                       settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } })
+    end
+    let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
+    let!(:questions) { create_list(:question_single, 3, question_group: question_group) }
+
+    context 'when intervention_id is invalid' do
+      before do
+        post v1_intervention_duplicate_session_path(intervention_id: 9000, id: session.id), params: params, headers: headers
+      end
+
+      it 'error message is expected' do
+        expect(response).to have_http_status(:ok)
+      end
     end
 
-    it 'error message is expected' do
-      expect(response).to have_http_status(:ok)
-    end
-  end
+    context 'when session_id is invalid' do
+      before do
+        post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: 9000), params: params, headers: headers
+      end
 
-  context 'when session_id is invalid' do
-    before do
-      post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: 9000), params: params, headers: headers
-    end
-
-    it 'error message is expected' do
-      expect(response).to have_http_status(:ok)
-    end
-  end
-
-  context 'when params are invalid' do
-    let(:params) do
-      {
-        new_intervention_id: 9999
-      }
+      it 'error message is expected' do
+        expect(response).to have_http_status(:ok)
+      end
     end
 
-    before do
-      post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
-    end
+    context 'when params are invalid' do
+      let(:params) do
+        {
+          new_intervention_id: 9999
+        }
+      end
 
-    it 'error message is expected' do
-      expect(response).to have_http_status(:ok)
-    end
-  end
-
-  context 'when all params are valid and response' do
-    context 'is success' do
       before do
         post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
       end
 
-      it { expect(response).to have_http_status(:ok) }
+      it 'error message is expected' do
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when all params are valid and response' do
+      context 'is success' do
+        before do
+          post v1_intervention_duplicate_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers
+        end
+
+        it { expect(response).to have_http_status(:ok) }
+      end
+    end
+  end
+
+  context 'Session::CatMh' do
+    let!(:session) { create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, intervention: intervention) }
+
+    before { request }
+
+    it 'correct status code' do
+      expect(response).to have_http_status(:ok)
     end
   end
 end

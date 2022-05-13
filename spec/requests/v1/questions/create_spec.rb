@@ -8,6 +8,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   let(:user) { admin }
   let(:question_group) { create(:question_group) }
   let(:headers) { user.create_new_auth_token }
+  let!(:google_tts_voice) { create(:google_tts_voice, language_code: 'en-US') }
   let(:blocks) { [] }
   let(:params) do
     {
@@ -16,7 +17,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         position: 99,
         title: 'Question Test 1',
         subtitle: 'test 1',
-        formula: {
+        formulas: [{
           payload: 'test',
           patterns: [
             {
@@ -36,7 +37,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
               }]
             }
           ]
-        },
+        }],
         body: {
           data: [
             {
@@ -65,7 +66,9 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       }
     }
   end
-  let(:request) { post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json }
+  let(:request) do
+    post v1_question_group_questions_path(question_group.id), params: params, headers: headers, as: :json
+  end
 
   context 'one or multiple roles' do
     shared_examples 'permitted user' do
@@ -103,11 +106,13 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         before { request }
 
         it 'has correct formula size' do
-          expect(json_response['data']['attributes']['formula']['patterns'].size).to eq(2)
+          expect(json_response['data']['attributes']['formulas'][0]['patterns'].size).to eq(2)
         end
 
         it 'has correct patterns data' do
-          expect(json_response['data']['attributes']['formula']['patterns'][1]).to include('match' => '> 5', 'target' => [{ 'id' => '', 'type' => 'Question', 'probability' => '100' }])
+          expect(json_response['data']['attributes']['formulas'][0]['patterns'][1]).to include('match' => '> 5',
+                                                                                               'target' => [{ 'id' => '', 'type' => 'Question',
+                                                                                                              'probability' => '100' }])
         end
 
         it 'has correct body data size' do
@@ -115,7 +120,9 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         end
 
         it 'has correct body data attributes' do
-          expect(json_response['data']['attributes']['body']['data'][0]).to include('payload' => 'create1', 'variable' => { 'value' => '1', 'name' => 'test1' })
+          expect(json_response['data']['attributes']['body']['data'][0]).to include('payload' => 'create1',
+                                                                                    'variable' => { 'value' => '1',
+                                                                                                    'name' => 'test1' })
         end
       end
 

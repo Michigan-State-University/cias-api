@@ -10,6 +10,10 @@ class Question::Name < Question
   end
 
   def csv_header_names
-    ['phoneticName']
+    ['metadata.phonetic_name']
+  end
+
+  def question_variables
+    ['.:name:.']
   end
 end

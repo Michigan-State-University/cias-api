@@ -20,6 +20,9 @@
               "items": {
                 "type": "string"
               }
+            },
+            "original_text": {
+              "type": "string"
             }
           },
           "required": [

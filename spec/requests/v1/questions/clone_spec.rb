@@ -8,12 +8,14 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
-                             formula: {
+                             formulas: [{
                                'payload' => 'var + 3',
                                'patterns' => [
-                                 { 'match' => '=7', 'target' => [{ 'id' => question_2.id, 'probability' => '100', type: 'Question::Single' }] }
+                                 { 'match' => '=7',
+                                   'target' => [{ 'id' => question2.id, 'probability' => '100',
+                                                  type: 'Question::Single' }] }
                                ]
-                             },
+                             }],
                              body: {
                                data: [
                                  {
@@ -26,7 +28,9 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
                                }
                              })
   end
-  let!(:question_2) { create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2) }
+  let!(:question2) do
+    create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2)
+  end
   let(:headers) { user.create_new_auth_token }
   let(:request) { post v1_clone_question_path(id: question.id), headers: headers }
 
@@ -64,7 +68,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
               'name' => 'clone_variable'
             }
           },
-          'formula' => { 'payload' => '', 'patterns' => [] },
+          'formulas' => [{ 'payload' => '', 'patterns' => [] }],
           'position' => 3,
           'question_group_id' => question_group.id,
           'narrator' => question.narrator
@@ -75,12 +79,13 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
     context 'when there is question with same variables' do
       let!(:third_question) do
         create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 3,
-                                 formula: {
+                                 formulas: [{
                                    'payload' => 'var + 3',
                                    'patterns' => [
-                                     { 'match' => '=7', 'target' => [{ 'id' => question_2.id, type: 'Question::Single' }] }
+                                     { 'match' => '=7',
+                                       'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
                                    ]
-                                 },
+                                 }],
                                  body: {
                                    data: [
                                      {
@@ -113,7 +118,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
               'name' => 'clone1_variable'
             }
           },
-          'formula' => { 'payload' => '', 'patterns' => [] },
+          'formulas' => [{ 'payload' => '', 'patterns' => [] }],
           'position' => 4,
           'question_group_id' => question_group.id,
           'narrator' => question.narrator

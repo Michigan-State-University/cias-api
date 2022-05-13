@@ -51,7 +51,7 @@ RSpec.describe V1::GeneratedReports::Create do
     let!(:answer_receive_report_true) do
       create(:answer_name, user_session: user_session,
                            body: { data: [
-                             { 'var' => '.:name:.', 'value' => { 'name' => '', 'phoneticName' => 'John' } }
+                             { 'var' => '.:name:.', 'value' => { 'name' => '', 'phonetic_name' => 'John' } }
                            ] })
     end
 
@@ -61,7 +61,7 @@ RSpec.describe V1::GeneratedReports::Create do
     end
 
     it 'creates generated report with proper attributes and attachments' do
-      expect(V1::RenderPdfReport).to receive(:call).with(
+      allow(V1::RenderPdfReport).to receive(:call).with(
         report_template: report_template,
         variants_to_generate: [
           variant_with_content('Hello Participant,'),
@@ -90,7 +90,7 @@ RSpec.describe V1::GeneratedReports::Create do
       end
 
       it 'shares report to third party' do
-        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+        allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
         subject
       end
     end
@@ -101,7 +101,7 @@ RSpec.describe V1::GeneratedReports::Create do
       end
 
       it 'does not share report to third party' do
-        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+        allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
         subject
       end
     end
@@ -110,7 +110,7 @@ RSpec.describe V1::GeneratedReports::Create do
       let(:all_var_values) { { var1: 5, var2: 5 } }
 
       it 'creates generated report with proper attributes and attachments' do
-        expect(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+        allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
 
         expect { subject }.to change(GeneratedReport, :count).by(1)
 
@@ -122,7 +122,7 @@ RSpec.describe V1::GeneratedReports::Create do
       let!(:answer_receive_report_true) do
         create(:answer_name, user_session: user_session,
                              body: { data: [
-                               { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phoneticName' => 'John' } }
+                               { 'var' => '.:name:.', 'value' => { 'name' => 'John', 'phonetic_name' => 'John' } }
                              ] })
       end
 
@@ -132,7 +132,7 @@ RSpec.describe V1::GeneratedReports::Create do
       end
 
       it 'replace name variable with name variable value in variants contents' do
-        expect(V1::RenderPdfReport).to receive(:call).with(
+        allow(V1::RenderPdfReport).to receive(:call).with(
           report_template: report_template,
           variants_to_generate: [
             variant_with_content('Hello John,'),

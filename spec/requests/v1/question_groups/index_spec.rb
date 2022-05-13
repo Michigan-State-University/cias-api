@@ -9,7 +9,10 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
   let(:guest) { create(:user, :guest) }
   let(:user) { admin }
 
-  let!(:intervention) { create(:intervention, status: intervention_status, invitations: users_with_accesses, shared_to: shared_to, user: intervention_user) }
+  let!(:intervention) do
+    create(:intervention, status: intervention_status, invitations: users_with_accesses, shared_to: shared_to,
+                          user: intervention_user)
+  end
 
   let!(:session) { create(:session, intervention: intervention) }
   let(:shared_to) { :anyone }

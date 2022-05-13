@@ -10,7 +10,7 @@ class V1::Sessions::InvitationsController < V1Controller
 
     authorize! :create, Invitation
 
-    session_load.invite_by_email(session_invitation_params[:emails])
+    session_load.invite_by_email(session_invitation_params[:emails], session_invitation_params[:health_clinic_id])
     render json: serialized_response(session_invitations_scope), status: :created
   end
 
@@ -38,6 +38,6 @@ class V1::Sessions::InvitationsController < V1Controller
   end
 
   def session_invitation_params
-    params.require(:session_invitation).permit(emails: [])
+    params.require(:session_invitation).permit(:health_clinic_id, emails: [])
   end
 end

@@ -37,11 +37,11 @@ class V1::ChartStatistics::Base
   end
 
   def add_basic_information(chart, statistics)
-    chart_statistic = {}
-    chart_statistic['chart_id'] = chart.id
-    chart_statistic['data'] = statistics
-    chart_statistic['population'] = charts_data_collection.where(chart_id: chart.id).count
-    chart_statistic['dashboard_section_id'] = chart.dashboard_section_id
-    chart_statistic
+    {
+      'chart_id' => chart.id,
+      'data' => statistics,
+      'population' => charts_data_collection.where(chart_id: chart.id).count,
+      'dashboard_section_id' => chart.dashboard_section_id
+    }
   end
 end

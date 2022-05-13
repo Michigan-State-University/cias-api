@@ -157,32 +157,60 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
       end
     end
 
-    %w[admin admin_with_multiple_roles].each do |role|
-      let(:user) { users[role] }
-
-      it_behaves_like 'permitted user'
-    end
-  end
-
-  context 'when team admin of current team' do
-    let(:team_admin) { team.team_admin }
-    let(:user) { team_admin }
-    let(:researcher) { create(:user, :confirmed, :researcher) }
-
-    context 'when name and team admin changed' do
-      let(:params) do
-        {
-          team: {
-            user_id: researcher.id,
-            name: 'Best team'
-          }
-        }
+    shared_examples 'non-permitted user' do
+      it 'returns :forbidden status' do
+        request
+        expect(response).to have_http_status(:forbidden)
       end
+    end
 
-      it 'team name is changed but team admin did not' do
-        expect { request }.to change { team.reload.name }.and \
-          avoid_changing { team_admin.reload.roles }.and \
-            avoid_changing { researcher.reload.roles }
+    %w[admin admin_with_multiple_roles].each do |role|
+      describe '#permitted user' do
+        let(:user) { users[role] }
+
+        it_behaves_like 'permitted user'
+      end
+    end
+
+    %w[researcher participant e_intervention_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+      describe '#non-permitted user' do
+        let(:user) { create(:user, :confirmed, roles: [role]) }
+
+        it_behaves_like 'non-permitted user'
+      end
+    end
+
+    context 'when team admin of current team' do
+      let(:team_admin) { team.team_admin }
+      let(:user) { team_admin }
+      let(:researcher) { create(:user, :confirmed, :researcher) }
+
+      context 'when name and team admin changed' do
+        let(:params) do
+          {
+            team: {
+              user_id: researcher.id,
+              name: 'Best team'
+            }
+          }
+        end
+
+        it 'team name is changed but team admin did not' do
+          expect { request }.to change { team.reload.name }.and \
+            avoid_changing { team_admin.reload.roles }.and \
+              avoid_changing { researcher.reload.roles }
+        end
+      end
+    end
+
+    context 'when team admin of other team' do
+      let!(:other_team) { create(:team) }
+      let(:user) { other_team.team_admin }
+      let(:params) { {} }
+
+      it 'returns :not_found status' do
+        request
+        expect(response).to have_http_status(:not_found)
       end
     end
   end

@@ -4,29 +4,29 @@ class V1::QuestionGroupsController < V1Controller
   include Resource::Position
 
   def index
-    question_groups = question_groups_scope
-    raise ActiveRecord::RecordNotFound, 'Session not found' if question_groups.empty?
+    raise ActiveRecord::RecordNotFound, 'Session not found' if question_groups_scope.empty?
 
-    render json: question_group_response(question_groups)
+    render json: question_group_response(question_groups_scope)
   end
 
   def show
-    render json: question_group_response(question_group_service.question_group_load(question_group_id))
+    render json: question_group_response(question_group_load)
   end
 
   def create
     authorize! :create, QuestionGroup
 
-    qg_id = question_group_service.create(question_group_params, question_ids, new_questions_params)
+    question_group = V1::QuestionGroup::CreateService.call(question_group_params, questions_scope, new_questions_params, session_load)
     SqlQuery.new('question_group/question_group_pure_empty').execute
 
-    render json: question_group_response(question_group_service.question_group_load(qg_id).reload), action: :show, status: :created
+    render json: question_group_response(question_group.reload), action: :show,
+           status: :created
   end
 
   def update
     authorize! :update, QuestionGroup
 
-    question_group = question_group_service.update(question_group_id, question_group_params)
+    question_group = V1::QuestionGroup::UpdateService.call(question_group_load, question_group_params)
 
     render json: question_group_response(question_group), action: :show
   end
@@ -34,7 +34,8 @@ class V1::QuestionGroupsController < V1Controller
   def destroy
     authorize! :destroy, QuestionGroup
 
-    question_group_service.destroy(question_group_id)
+    question_group = question_group_load
+    question_group.destroy! unless question_group.finish?
 
     head :no_content
   end
@@ -42,15 +43,15 @@ class V1::QuestionGroupsController < V1Controller
   def questions_change
     authorize! :update, QuestionGroup
 
-    question_group = question_group_service.questions_change(question_group_id, question_ids)
+    question_group = V1::QuestionGroup::QuestionsChangeService.call(question_group_load, questions_scope)
 
-    render json: question_group_response(question_group.reload), action: :show
+    render json: question_group_response(question_group), action: :show
   end
 
   def remove_questions
     authorize! :update, QuestionGroup
 
-    question_group_service.questions_scope(question_ids).destroy_all
+    questions_scope.destroy_all
 
     head :no_content
   end
@@ -58,7 +59,7 @@ class V1::QuestionGroupsController < V1Controller
   def clone
     authorize! :create, QuestionGroup
 
-    cloned_question_group = question_group_service.question_group_load(question_group_id).clone(clean_formulas: true)
+    cloned_question_group = question_group_load.clone(clean_formulas: true)
 
     render json: question_group_response(cloned_question_group), action: :show, status: :ok
   end
@@ -71,18 +72,60 @@ class V1::QuestionGroupsController < V1Controller
     render json: question_group_response(shared_question_group), action: :show, status: :ok
   end
 
+  def duplicate_here
+    authorize! :update, QuestionGroup
+
+    duplicated_groups = V1::QuestionGroup::DuplicateWithStructureService.call(load_session, duplicate_here_params[:question_groups])
+
+    render json: question_group_response(duplicated_groups)
+  end
+
+  def share_externally
+    authorize! :create, QuestionGroup
+
+    V1::QuestionGroup::ShareExternallyService.call(share_externally_params[:user_ids], session_id, share_externally_params[:question_groups], current_v1_user)
+    head :created
+  end
+
+  def duplicate_internally
+    authorize! :create, QuestionGroup
+
+    V1::QuestionGroup::ShareInternallyService.call([Session.find(session_id)], duplicate_internally_params[:question_groups])
+    head :created
+  end
+
   private
+
+  def share_externally_params
+    params.permit(user_ids: [], question_groups: [:id, { question_ids: [] }])
+  end
+
+  def duplicate_internally_params
+    params.permit(question_groups: [:id, { question_ids: [] }])
+  end
 
   def question_group_service
     @question_group_service ||= V1::QuestionGroupService.new(current_v1_user, session_id)
   end
 
   def question_group_share_service
-    @question_group_share_service ||= V1::QuestionGroup::ShareService.new(current_v1_user, session_id)
+    @question_group_share_service ||= V1::QuestionGroup::ShareService.new(current_v1_user, session_load)
   end
 
   def question_groups_scope
-    question_group_service.question_groups
+    @question_groups_scope ||= QuestionGroup.includes(:session, :questions).accessible_by(current_ability).where(session_id: session_id).order(:position)
+  end
+
+  def question_group_load
+    question_groups_scope.find(question_group_id)
+  end
+
+  def questions_scope
+    Question.accessible_by(current_ability).where(id: question_ids)
+  end
+
+  def session_load
+    Session.accessible_by(current_ability).find(session_id)
   end
 
   def new_questions_params
@@ -118,5 +161,13 @@ class V1::QuestionGroupsController < V1Controller
       question_groups,
       { include: %i[questions] }
     )
+  end
+
+  def load_session
+    Session.accessible_by(current_ability).find(session_id)
+  end
+
+  def duplicate_here_params
+    params.permit(question_groups: [:id, { question_ids: [] }])
   end
 end

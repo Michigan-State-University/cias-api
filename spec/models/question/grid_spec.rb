@@ -16,7 +16,69 @@ RSpec.describe Question::Grid, type: :model do
         end
 
         it 'sets correct variable with passed taken variables' do
-          expect(question_grid.variable_clone_prefix(%w[clone_row1 clone1_row1])[0]['variable']['name']).to eq('clone2_row1')
+          expect(question_grid.variable_clone_prefix(%w[clone_row1
+                                                        clone1_row1])[0]['variable']['name']).to eq('clone2_row1')
+        end
+      end
+
+      describe 'translation' do
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+
+        it '#translate_title' do
+          question_grid.translate_title(translator, source_language_name_short, destination_language_name_short)
+          expect(question_grid.title).to include('from=>en to=>pl text=>Grid')
+        end
+
+        it '#translate_subtitle' do
+          question_grid.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
+          expect(question_grid.subtitle).to equal(nil)
+        end
+
+        it '#translate_body' do
+          question_grid.translate_body(translator, source_language_name_short, destination_language_name_short)
+          expect(question_grid.body['data']).to include(
+            {
+              'payload' => {
+                'columns' => [
+                  {
+                    'original_text' => '',
+                    'payload' => '',
+                    'variable' => {
+                      'value' => '1'
+                    }
+                  },
+                  {
+                    'original_text' => '',
+                    'payload' => '',
+                    'variable' => {
+                      'value' => '1'
+                    }
+                  }
+                ],
+                'rows' => [
+                  {
+                    'original_text' => '',
+                    'payload' => '',
+                    'variable' => {
+                      'name' => 'row1'
+                    }
+                  }
+                ]
+              }
+            }
+          )
+        end
+      end
+
+      describe '#question_variables' do
+        it 'returns correct variables' do
+          expect(question_grid.question_variables).to match_array ['row1']
+        end
+
+        it 'returns correct amount of variables' do
+          expect(question_grid.question_variables.size).to eq 1
         end
       end
     end

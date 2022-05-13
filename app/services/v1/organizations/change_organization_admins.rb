@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Organizations::ChangeOrganizationAdmins
+  prepend Database::Transactional
+
   def self.call(organization, organization_admins_to_add, organization_admins_to_remove)
     new(organization, organization_admins_to_add, organization_admins_to_remove).call
   end
@@ -12,10 +14,8 @@ class V1::Organizations::ChangeOrganizationAdmins
   end
 
   def call
-    ActiveRecord::Base.transaction do
-      add_organization_admins
-      remove_organization_admins
-    end
+    add_organization_admins
+    remove_organization_admins
   end
 
   private

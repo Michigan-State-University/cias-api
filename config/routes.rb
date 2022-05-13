@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
-Rails.application.routes.draw do
-  # Mount the GoodJob engine.
-  if ENV['GOOD_JOB_WEB_INTERFACE'] == '1'
-    mount GoodJob::Engine => 'good_job'
-  end
+if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+  require 'sidekiq/web'
+  Sidekiq::Web.use ActionDispatch::Cookies
+  Sidekiq::Web.use ActionDispatch::Session::CookieStore, key: '_interslice_session'
+end
 
+Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
   namespace :v1 do
@@ -40,9 +41,12 @@ Rails.application.routes.draw do
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
+        resources :accesses, only: %i[index create destroy]
+        resources :files, only: %i[create destroy]
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
+      post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy]
     end
 
@@ -53,7 +57,9 @@ Rails.application.routes.draw do
     end
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
+    get 'sessions/:id/variables/(:question_id)', to: 'sessions#session_variables', as: :fetch_variables
     scope 'sessions/:session_id', as: 'session' do
+      post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
@@ -80,12 +86,17 @@ Rails.application.routes.draw do
     scope module: 'sms_plans' do
       scope 'sms_plans/:sms_plan_id', as: :sms_plan do
         resources :variants
+        patch 'move_variants', to: 'variants#move'
+        scope module: 'alert_phones' do
+          resources :phones, only: %i[create update destroy], path: '/alert_phones/'
+        end
       end
     end
 
     scope module: :report_templates do
       scope 'report_templates/:report_template_id', as: :report_template do
         resources :sections, only: %i[index show create update destroy]
+        patch 'move_sections', to: 'sections#move', as: :move_sections
         resource :generate_pdf_preview, only: :create
       end
 
@@ -110,6 +121,11 @@ Rails.application.routes.draw do
       end
     end
 
+    post 'question_groups/share_externally', to: 'question_groups#share_externally'
+    post 'question_groups/duplicate_internally', to: 'question_groups#duplicate_internally'
+
+    resources :user_interventions, only: %i[index show create]
+
     resources :user_sessions, only: %i[create] do
       resources :questions, only: %i[index], module: 'user_sessions'
       resources :answers, only: %i[index show create], module: 'user_sessions'
@@ -121,7 +137,8 @@ Rails.application.routes.draw do
         resources :invitations, only: :create
       end
     end
-    get 'team_invitations/confirm', to: 'team_invitations#confirm', as: :team_invitations_confirm
+    get 'team_invitations/confirm', to: 'teams/invitations#confirm', as: :team_invitations_confirm
+
     post :phonetic_preview, to: 'audio#create'
     post :recreate_audio, to: 'audio#recreate'
     resources :sms_plans do
@@ -147,21 +164,24 @@ Rails.application.routes.draw do
         end
       end
     end
-    get 'organization_invitations/confirm', to: 'organizations/invitations#confirm', as: :organization_invitations_confirm
+    get 'organization_invitations/confirm', to: 'organizations/invitations#confirm',
+                                            as: :organization_invitations_confirm
 
     resources :health_systems, controller: :health_systems do
       scope module: 'health_systems' do
         post 'invitations/invite_health_system_admin', to: 'invitations#invite_health_system_admin'
       end
     end
-    get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm', as: :health_system_invitations_confirm
+    get 'health_system_invitations/confirm', to: 'health_systems/invitations#confirm',
+                                             as: :health_system_invitations_confirm
 
     resources :health_clinics, controller: :health_clinics do
       scope module: 'health_clinics' do
         post 'invitations/invite_health_clinic_admin', to: 'invitations#invite_health_clinic_admin'
       end
     end
-    get 'health_clinic_invitations/confirm', to: 'health_clinics/invitations#confirm', as: :health_clinic_invitations_confirm
+    get 'health_clinic_invitations/confirm', to: 'health_clinics/invitations#confirm',
+                                             as: :health_clinic_invitations_confirm
 
     resources :generated_reports, only: :index
 
@@ -172,7 +192,9 @@ Rails.application.routes.draw do
     end
 
     namespace :google do
-      resources :languages, only: :index
+      resources :languages, only: :index do
+        resources :voices, only: :index
+      end
     end
 
     resources :dashboard_sections, only: [], controller: :dashboard_sections do
@@ -185,6 +207,18 @@ Rails.application.routes.draw do
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
 
     get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
+
+    namespace :cat_mh do
+      resources :languages, controller: :languages, only: :index do
+        resources :voices, controller: :voices, only: :index
+      end
+      resources :time_frames, controller: :time_frames, only: :index
+      resources :test_types, controller: :test_types, only: :index
+      resources :populations, controller: :populations, only: :index
+      get 'available_test_types', to: 'test_types#available_tests'
+    end
+
+    get 'me', to: 'users#me', as: :get_user_details
   end
 
   if Rails.env.development?
@@ -192,4 +226,15 @@ Rails.application.routes.draw do
       mount LetterOpenerWeb::Engine, at: '/browse_emails'
     end
   end
+
+  if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
+    scope 'rails' do
+      Sidekiq::Web.use Rack::Auth::Basic do |username, password|
+        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
+          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
+      end
+      mount Sidekiq::Web => '/workers'
+    end
+  end
+  mount ActionCable.server => '/cable'
 end

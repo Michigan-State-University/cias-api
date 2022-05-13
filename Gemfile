@@ -4,12 +4,13 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.4.7'
+gem 'rails', '~> 6.1.5'
 gem 'pg', '~> 1.2'
-gem 'puma', '>= 5.6.2'
+gem 'puma', '>= 5.6.4'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
+gem 'activestorage', '>= 6.1.4.7'
 gem 'active_storage_validations'
 gem 'bootsnap', '>= 1.4', require: false
 gem 'cancancan'
@@ -20,18 +21,21 @@ gem 'devise-argon2'
 gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
-gem 'fast_jsonapi'
+gem 'jsonapi-serializer'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '>= 3.19.2'
+gem 'hiredis'
 gem 'metainspector', '~> 1.15'
-gem 'nokogiri', '>= 1.13.2'
+gem 'nokogiri', '>= 1.13.4'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
 gem 'postgresql_cursor'
 gem 'pry-rails'
 gem 'rack-cors'
+gem 'redis'
+gem 'sidekiq', '>= 6.4.0'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
@@ -50,10 +54,8 @@ gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
-gem "sentry-ruby"
-gem "sentry-rails"
-# Multithreaded, Postgres-based, ActiveJob backend for Ruby on Rails.
-gem 'good_job'
+gem 'sentry-ruby'
+gem 'sentry-rails'
 
 group :development, :test do
   gem 'bundler-audit'
@@ -88,6 +90,7 @@ group :test do
   gem 'test-prof'
   gem 'timecop'
   gem 'database_cleaner-active_record'
+  gem 'action-cable-testing', '~> 0.6.1'
 end
 
 group :production do
@@ -96,5 +99,5 @@ end
 
 group :development, :production do
   # only version that is working on AWS
-  gem 'wkhtmltopdf-binary', '~> 0.12.5.4'
+  gem 'wkhtmltopdf-heroku', '2.12.6.0'
 end

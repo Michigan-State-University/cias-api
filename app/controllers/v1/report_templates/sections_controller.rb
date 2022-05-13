@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::ReportTemplates::SectionsController < V1Controller
+  include Reorder
   load_and_authorize_resource :report_template
 
   def index
@@ -44,6 +45,19 @@ class V1::ReportTemplates::SectionsController < V1Controller
     head :no_content
   end
 
+  protected
+
+  def reorder_data_scope
+    sections_scope
+  end
+
+  def reorder_response
+    V1::ReportTemplateSerializer.new(
+      @report_template,
+      { include: %i[sections variants] }
+    )
+  end
+
   private
 
   def serialized_section_response(sections)
@@ -60,5 +74,9 @@ class V1::ReportTemplates::SectionsController < V1Controller
 
   def section_params
     params.require(:section).permit(:formula)
+  end
+
+  def position_params
+    params.require(:section).permit(position: %i[id position])
   end
 end

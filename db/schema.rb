@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_09_142828) do
+ActiveRecord::Schema.define(version: 2022_05_05_084200) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -46,14 +46,22 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "alert_phones", force: :cascade do |t|
+    t.uuid "sms_plan_id", null: false
+    t.bigint "phone_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "answers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "type"
-    t.uuid "question_id", null: false
+    t.uuid "question_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "user_session_id"
     t.text "body_ciphertext"
     t.boolean "skipped", default: false
+    t.uuid "next_session_id"
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
@@ -68,6 +76,74 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+  end
+
+  create_table "cat_mh_google_tts_voices", force: :cascade do |t|
+    t.integer "google_tts_voice_id"
+    t.integer "cat_mh_language_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_languages", force: :cascade do |t|
+    t.integer "language_id"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_populations", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_test_attributes", force: :cascade do |t|
+    t.string "name"
+    t.string "variable_type"
+    t.string "range"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_test_type_languages", force: :cascade do |t|
+    t.integer "cat_mh_language_id"
+    t.integer "cat_mh_test_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_test_type_time_frames", force: :cascade do |t|
+    t.integer "cat_mh_time_frame_id"
+    t.integer "cat_mh_test_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_test_types", force: :cascade do |t|
+    t.string "short_name"
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "cat_mh_population_id"
+    t.index ["cat_mh_population_id"], name: "index_cat_mh_test_types_on_cat_mh_population_id"
+  end
+
+  create_table "cat_mh_time_frames", force: :cascade do |t|
+    t.integer "timeframe_id"
+    t.string "description"
+    t.string "short_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "cat_mh_variables", force: :cascade do |t|
+    t.integer "cat_mh_test_attribute_id"
+    t.integer "cat_mh_test_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["cat_mh_test_attribute_id"], name: "index_cat_mh_variables_on_cat_mh_test_attribute_id"
+    t.index ["cat_mh_test_type_id"], name: "index_cat_mh_variables_on_cat_mh_test_type_id"
   end
 
   create_table "chart_statistics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -109,6 +185,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "position", default: 1, null: false
+    t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
@@ -172,6 +249,8 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "language_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "google_tts_language_id"
+    t.index ["google_tts_language_id"], name: "index_google_languages_on_google_tts_language_id"
   end
 
   create_table "google_tts_languages", force: :cascade do |t|
@@ -210,6 +289,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
+    t.index ["name", "health_system_id"], name: "index_health_clinics_on_name_and_health_system_id", unique: true
   end
 
   create_table "health_system_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -231,7 +311,16 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
+    t.index ["name", "organization_id"], name: "index_health_systems_on_name_and_organization_id", unique: true
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
+  end
+
+  create_table "intervention_accesses", force: :cascade do |t|
+    t.uuid "intervention_id", null: false
+    t.string "email", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["intervention_id"], name: "index_intervention_accesses_on_intervention_id"
   end
 
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -243,9 +332,18 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "organization_id"
-    t.bigint "google_language_id", default: 22, null: false
+    t.bigint "google_language_id", null: false
     t.boolean "from_deleted_organization", default: false, null: false
-    t.boolean "is_cloning", default: false
+    t.string "type", default: "Intervention", null: false
+    t.string "additional_text", default: ""
+    t.jsonb "original_text"
+    t.string "cat_mh_application_id"
+    t.string "cat_mh_organization_id"
+    t.integer "cat_mh_pool"
+    t.integer "created_cat_mh_session_count", default: 0
+    t.boolean "is_access_revoked", default: true
+    t.string "license_type", default: "limited"
+    t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -293,6 +391,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "name", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["name"], name: "index_organizations_on_name", unique: true
   end
 
   create_table "phones", force: :cascade do |t|
@@ -331,10 +430,11 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "subtitle"
     t.jsonb "narrator"
     t.string "video_url"
-    t.jsonb "formula"
+    t.jsonb "formulas"
     t.jsonb "body"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["question_group_id"], name: "index_questions_on_question_group_id"
     t.index ["title"], name: "index_questions_on_title"
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
@@ -350,6 +450,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
     t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end
@@ -359,6 +460,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.uuid "report_template_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "position", default: 0, null: false
     t.index ["report_template_id"], name: "index_report_template_sections_on_report_template_id"
   end
 
@@ -369,6 +471,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.text "summary"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"
@@ -389,16 +492,24 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "schedule", default: "after_fill"
     t.integer "schedule_payload"
     t.date "schedule_at"
-    t.jsonb "formula"
-    t.jsonb "body"
+    t.jsonb "formulas"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "report_templates_count"
+    t.integer "report_templates_count", default: 0
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
     t.string "variable"
     t.string "days_after_date_variable_name"
     t.bigint "google_tts_voice_id"
+    t.string "type", default: "Session::Classic", null: false
+    t.jsonb "original_text"
+    t.bigint "cat_mh_language_id"
+    t.bigint "cat_mh_time_frame_id"
+    t.bigint "cat_mh_population_id"
+    t.integer "estimated_time"
+    t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
+    t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
+    t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
     t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
@@ -413,6 +524,8 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.text "content"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
+    t.integer "position", default: 0, null: false
     t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
   end
 
@@ -428,6 +541,12 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.boolean "is_used_formula", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.jsonb "original_text"
+    t.string "type", default: "SmsPlan", null: false
+    t.boolean "include_first_name"
+    t.boolean "include_last_name"
+    t.boolean "include_phone_number"
+    t.boolean "include_email"
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
@@ -452,6 +571,15 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
   end
 
+  create_table "tests", force: :cascade do |t|
+    t.uuid "session_id"
+    t.integer "cat_mh_test_type_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["cat_mh_test_type_id"], name: "index_tests_on_cat_mh_test_type_id"
+    t.index ["session_id"], name: "index_tests_on_session_id"
+  end
+
   create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "health_clinic_id"
@@ -459,6 +587,20 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_health_clinics_on_health_clinic_id"
     t.index ["user_id"], name: "index_user_health_clinics_on_user_id"
+  end
+
+  create_table "user_interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "intervention_id"
+    t.uuid "health_clinic_id"
+    t.integer "completed_sessions", default: 0, null: false
+    t.string "status", default: "ready_to_start"
+    t.datetime "finished_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
+    t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
+    t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
 
   create_table "user_log_requests", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -483,11 +625,20 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
     t.uuid "health_clinic_id"
+    t.string "type", default: "UserSession::Classic", null: false
+    t.integer "cat_interview_id"
+    t.string "identifier"
+    t.string "signature"
+    t.string "jsession_id"
+    t.string "awselb"
+    t.uuid "user_intervention_id", null: false
+    t.datetime "scheduled_at"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
+    t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end
 
   create_table "user_verification_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -515,7 +666,7 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
     t.datetime "invitation_accepted_at"
     t.integer "invitation_limit"
     t.string "invited_by_type"
-    t.bigint "invited_by_id"
+    t.integer "invited_by_id"
     t.integer "invitations_count", default: 0
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -571,19 +722,33 @@ ActiveRecord::Schema.define(version: 2022_03_09_142828) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "alert_phones", "phones"
+  add_foreign_key "alert_phones", "sms_plans"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "cat_mh_google_tts_voices", "cat_mh_languages"
+  add_foreign_key "cat_mh_google_tts_voices", "google_tts_voices"
+  add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages"
+  add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
+  add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
+  add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "google_languages", "google_tts_languages"
+  add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
+  add_foreign_key "sessions", "cat_mh_languages"
+  add_foreign_key "sessions", "cat_mh_populations"
+  add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
   add_foreign_key "user_sessions", "sessions"
+  add_foreign_key "user_sessions", "user_interventions"
   add_foreign_key "user_sessions", "users"
 end

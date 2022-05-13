@@ -4,8 +4,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   attr_reader :data_offset
 
   def initialize(charts_data_collection, charts, data_offset = nil)
-    @charts_data_collection = charts_data_collection
-    @charts = charts
+    super(charts_data_collection, charts)
     @data_offset = data_offset
   end
 
@@ -16,6 +15,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
     monthly_statistics(aggregated_data, patterns, default_pattern, chart.id)
   end
 
+  # rubocop:disable Lint/ShadowingOuterLocalVariable
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       charts_data_collection.find_each do |data_statistic|
@@ -23,6 +23,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
       end
     end
   end
+  # rubocop:enable Lint/ShadowingOuterLocalVariable
 
   def monthly_statistics(aggregated_data, patterns, default_pattern, chart_id)
     statistics = []

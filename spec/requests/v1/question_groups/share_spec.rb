@@ -10,18 +10,25 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
   let!(:other_question_group) { create(:question_group_plain, session: session, position: 2) }
   let!(:question_ids) do
     create_list(:question_single, 3, :narrator_block_one, title: 'Question Id Title', question_group: question_group,
-                                                          formula: { 'payload' => 'var + 4', 'patterns' => [
+                                                          formulas: [{ 'payload' => 'var + 4', 'patterns' => [
                                                             { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
-                                                          ] })
+                                                          ] }])
   end
-  let!(:other_question_ids) { create_list(:question_free_response, 2, title: 'Other question Id Title', question_group: other_question_group) }
+  let!(:other_question_ids) do
+    create_list(:question_free_response, 2, title: 'Other question Id Title', question_group: other_question_group)
+  end
 
   let!(:other_intervention) { create(:intervention, user: user) }
   let!(:other_session) { create(:session, intervention: other_intervention) }
   let!(:shared_question_group) { create(:question_group_plain, session: other_session, position: 1) }
-  let!(:shared_questions) { create_list(:question_free_response, 2, title: 'Shared question Id Title', question_group: shared_question_group) }
+  let!(:shared_questions) do
+    create_list(:question_free_response, 2, title: 'Shared question Id Title', question_group: shared_question_group)
+  end
   let!(:first_question_position) { shared_questions.first.position }
-  let(:request) { post share_v1_session_question_group_path(session_id: other_session.id, id: shared_question_group.id), params: params, headers: user.create_new_auth_token }
+  let(:request) do
+    post share_v1_session_question_group_path(session_id: other_session.id, id: shared_question_group.id), params: params,
+                                                                                                           headers: user.create_new_auth_token
+  end
 
   let(:params) do
     {
@@ -39,13 +46,13 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
         it 'returned questions have no branching,variables and cleared speech blocks' do
           expect(json_response['included'][2]['attributes']['narrator']['blocks']).to eq question_ids.third.narrator['blocks']
-          expect(json_response['included'][2]['attributes']['formula']).not_to eq question_ids.third.formula
+          expect(json_response['included'][2]['attributes']['formulas']).not_to eq question_ids.third.formulas
           expect(json_response['included'][2]['attributes']['body']['data']).to eq question_ids.third.body['data']
         end
 
         it 'shared_question_group questions have no branching,variables and cleared speech blocks' do
           expect(third_question.narrator['blocks']).to eq question_ids.third.narrator['blocks']
-          expect(third_question.formula).not_to eq question_ids.third.formula
+          expect(third_question.formulas).not_to eq question_ids.third.formulas
           expect(third_question.body['data']).to eq question_ids.third.body['data']
         end
       end
@@ -97,7 +104,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       end
 
       context 'when user clones questions from current question_group' do
-        let(:request) { post share_v1_session_question_group_path(session_id: session.id, id: question_group.id), params: params, headers: user.create_new_auth_token }
+        let(:request) do
+          post share_v1_session_question_group_path(session_id: session.id, id: question_group.id), params: params,
+                                                                                                    headers: user.create_new_auth_token
+        end
         let!(:first_question_position) { question_ids.first.position }
 
         before { request }
@@ -229,7 +239,9 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
           let!(:other_intervention) { create(:intervention, user: other_user) }
           let!(:other_session) { create(:session, intervention: other_intervention) }
           let!(:shared_question_group) { create(:question_group_plain, session: other_session, position: 1) }
-          let!(:shared_questions) { create_list(:question_free_response, 2, title: 'Shared question Id Title', question_group: shared_question_group) }
+          let!(:shared_questions) do
+            create_list(:question_free_response, 2, title: 'Shared question Id Title', question_group: shared_question_group)
+          end
 
           before { request }
 
@@ -244,7 +256,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
           let!(:published_intervention) { create(:intervention, :published, user: user) }
           let!(:published_session) { create(:session, intervention: published_intervention) }
           let!(:published_question_group) { create(:question_group_plain, session: published_session, position: 1) }
-          let!(:request) { post share_v1_session_question_group_path(session_id: published_session.id, id: published_question_group.id), params: params, headers: user.create_new_auth_token }
+          let!(:request) do
+            post share_v1_session_question_group_path(session_id: published_session.id, id: published_question_group.id),
+                 params: params, headers: user.create_new_auth_token
+          end
 
           before { request }
 
@@ -303,21 +318,35 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       let!(:third_intervention) { create(:intervention, user: user) }
       let!(:session_with_name) { create(:session, intervention: third_intervention) }
       let!(:question_group_with_name) { create(:question_group_plain, session: session_with_name, position: 1) }
-      let!(:name_question) { create(:question_name, title: 'Name Question 1', question_group: question_group_with_name) }
-      let!(:simple_question_1) { create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name) }
-      let!(:simple_question_2) { create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name) }
+      let!(:name_question) do
+        create(:question_name, title: 'Name Question 1', question_group: question_group_with_name)
+      end
+      let!(:simple_question1) do
+        create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name)
+      end
+      let!(:simple_question2) do
+        create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name)
+      end
 
       let!(:other_session_with_name) { create(:session, intervention: third_intervention) }
-      let!(:other_question_group_with_name) { create(:question_group_plain, session: other_session_with_name, position: 1) }
-      let!(:other_question_name) { create(:question_name, title: 'Name Question 2', question_group: other_question_group_with_name) }
-      let!(:other_question_group_without_name_in_session_with_name) { create(:question_group_plain, session: other_session_with_name, position: 1) }
+      let!(:other_question_group_with_name) do
+        create(:question_group_plain, session: other_session_with_name, position: 1)
+      end
+      let!(:other_question_name) do
+        create(:question_name, title: 'Name Question 2', question_group: other_question_group_with_name)
+      end
+      let!(:other_question_group_without_name_in_session_with_name) do
+        create(:question_group_plain, session: other_session_with_name, position: 1)
+      end
 
-      let!(:request_1) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params, headers: user.create_new_auth_token }
-      let!(:request_2) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params, headers: user.create_new_auth_token }
-      let!(:request_3) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params, headers: user.create_new_auth_token }
-      let!(:request_4) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
-      let!(:request_5) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
-      let!(:request_6) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      # rubocop:disable Layout/LineLength
+      let!(:request1) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request2) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request3) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params, headers: user.create_new_auth_token }
+      let!(:request4) { post share_v1_session_question_group_path(session_id: session_with_name.id, id: question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      let!(:request5) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      let!(:request6) { post share_v1_session_question_group_path(session_id: other_session_with_name.id, id: other_question_group_without_name_in_session_with_name.id), params: params_with_questions, headers: user.create_new_auth_token }
+      # rubocop:enable Layout/LineLength
 
       let(:params) do
         {
@@ -330,44 +359,44 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       let(:params_with_questions) do
         {
           question_group: {
-            question_ids: [simple_question_1.id, simple_question_2.id, name_question.id]
+            question_ids: [simple_question1.id, simple_question2.id, name_question.id]
           }
         }
       end
 
       it 'when Question::Name exist in session return BadRequest' do
-        request_1
+        request1
         expect(response).to have_http_status(:unprocessable_entity)
         expect(question_group_with_name.reload.questions.size).to be(3)
       end
 
       it 'when Question::Name exit in other session and in a group' do
-        request_2
+        request2
         expect(response).to have_http_status(:unprocessable_entity)
         expect(other_question_group_with_name.reload.questions.size).to be(1)
       end
 
       it 'when Question::Name exit in other session but not in a group' do
-        request_3
+        request3
         expect(response).to have_http_status(:unprocessable_entity)
         expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
       end
 
       context 'testing rollback when in group is invalid question' do
         it 'when in group of shared questions is Question::Name and exit in group' do
-          request_4
+          request4
           expect(response).to have_http_status(:unprocessable_entity)
           expect(question_group_with_name.reload.questions.size).to be(3)
         end
 
         it 'when in group of shared questions is Question::Name and Question::Name exit in other session and in a group' do
-          request_5
+          request5
           expect(response).to have_http_status(:unprocessable_entity)
           expect(other_question_group_with_name.reload.questions.size).to be(1)
         end
 
         it 'when in group of shared questions is Question::Name and Question::Name exit in other session but not in a group' do
-          request_6
+          request6
           expect(response).to have_http_status(:unprocessable_entity)
           expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
         end

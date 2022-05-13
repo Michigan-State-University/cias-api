@@ -18,7 +18,7 @@ class V1::SessionsController < V1Controller
   def create
     authorize! :create, Session
 
-    session = session_service.create(session_params)
+    session = session_service.create(session_params_for_create)
     render json: serialized_response(session), status: :created
   end
 
@@ -51,7 +51,20 @@ class V1::SessionsController < V1Controller
     render status: :ok
   end
 
+  def session_variables
+    authorize! :read, Session
+
+    session = Session.find(session_id)
+    variable_names = session.fetch_variables(variable_filter_options)
+
+    render json: { session_variable: session.variable, variable_names: variable_names }
+  end
+
   private
+
+  def variable_filter_options
+    params.permit(:only_digit_variables, :question_id, :include_current_question, allow_list: [])
+  end
 
   def session_service
     @session_service ||= V1::SessionService.new(current_v1_user, intervention_id)
@@ -78,8 +91,17 @@ class V1::SessionsController < V1Controller
   end
 
   def session_params
-    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable,
-                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, narrator: {}, settings: {},
-                                                                                                            formula: {}, body: {})
+    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
+                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id,
+                                    :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, narrator: {}, settings: {},
+                                                                                                                        formulas: [
+                                                                                                                          :payload, { patterns: [:match, {
+                                                                                                                            target: %i[type probability id]
+                                                                                                                          }] }
+                                                                                                                        ], cat_tests: [])
+  end
+
+  def session_params_for_create
+    session_params.except(:cat_tests)
   end
 end

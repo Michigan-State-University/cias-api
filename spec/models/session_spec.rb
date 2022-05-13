@@ -29,15 +29,17 @@ RSpec.describe Session, type: :model do
         end
       end
 
-      describe '#available_now' do
-        let(:session) { create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
+      describe '#available_now?' do
+        let(:session) do
+          create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload)
+        end
         let(:schedule) { 'after_fill' }
         let(:schedule_at) { DateTime.now.tomorrow }
         let(:schedule_payload) { 2 }
 
         context 'session schedule is after fill' do
           it 'returns true' do
-            expect(session.available_now).to be(true)
+            expect(session.available_now?).to be(true)
           end
         end
 
@@ -45,7 +47,7 @@ RSpec.describe Session, type: :model do
           let(:schedule) { 'days_after_fill' }
 
           it 'returns false' do
-            expect(session.available_now).to be(false)
+            expect(session.available_now?).to be(false)
           end
         end
 
@@ -53,7 +55,10 @@ RSpec.describe Session, type: :model do
           let(:participant) { create(:user, :confirmed, :participant) }
           let!(:user_session) { create(:user_session, user: participant, session_id: session.id) }
           let!(:update_session) { session.days_after_date_variable_name = 'var1' }
-          let!(:answer) { create(:answer_date, user_session: user_session, body: { data: [{ var: 'var1', value: DateTime.now.tomorrow }] }) }
+          let!(:answer) do
+            create(:answer_date, user_session: user_session,
+                                 body: { data: [{ var: 'var1', value: DateTime.now.tomorrow }] })
+          end
           let!(:all_var_values) { user_session.all_var_values(include_session_var: false) }
           let!(:calculated_date) do
             all_var_values[session.days_after_date_variable_name].to_datetime + session.schedule_payload&.days
@@ -62,7 +67,7 @@ RSpec.describe Session, type: :model do
           let(:schedule) { 'days_after_date' }
 
           it 'returns false' do
-            expect(session.available_now(calculated_date)).to be(false)
+            expect(session.available_now?(calculated_date)).to be(false)
           end
         end
 
@@ -71,7 +76,7 @@ RSpec.describe Session, type: :model do
 
           context 'session is in the feature' do
             it 'returns false ' do
-              expect(session.available_now).to be(false)
+              expect(session.available_now?).to be(false)
             end
           end
 
@@ -79,7 +84,7 @@ RSpec.describe Session, type: :model do
             let(:schedule_at) { DateTime.now - 1.day }
 
             it 'returns true' do
-              expect(session.available_now).to be(true)
+              expect(session.available_now?).to be(true)
             end
           end
         end
@@ -128,7 +133,7 @@ RSpec.describe Session, type: :model do
 
                 context 'email notification enabled' do
                   it 'schedules send email' do
-                    expect(SessionMailer).to receive(:inform_to_an_email).with(session, user.email, nil).and_return(
+                    allow(SessionMailer).to receive(:inform_to_an_email).with(session, user.email, nil).and_return(
                       message_delivery
                     )
                   end
@@ -156,12 +161,45 @@ RSpec.describe Session, type: :model do
           expect(session.session_variables).to eq ['a1']
         end
       end
+
+      describe '#translate' do
+        let!(:session) { create(:session, :with_sms_plans_with_text, :with_report_templates) }
+        let(:translator) { V1::Google::TranslationService.new }
+        let(:source_language_name_short) { 'en' }
+        let(:destination_language_name_short) { 'pl' }
+        let(:first_report_template) { session.reload.report_templates.first }
+        let(:variant) { first_report_template.variants.first }
+        let(:first_sms_plan) { session.reload.sms_plans.first }
+
+        before do
+          session.translate(translator, source_language_name_short, destination_language_name_short)
+        end
+
+        it 'translate questions' do
+          # rubocop:disable Layout/LineLength
+          expect(session.reload.questions.first.title).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=><h2>Enter title here</h2>")
+          expect(session.reload.questions.first.subtitle).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=><p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>")
+          expect(session.reload.questions.first.narrator['blocks'].first['text']).to include("from=>#{source_language_name_short} to=>#{destination_language_name_short} text=>Enter main text for screen here. This is the last screen participants will see in this session")
+          # rubocop:enable Layout/LineLength
+        end
+
+        it 'translate reports' do
+          expect(first_report_template.summary).to include('from=>en to=>pl text=>Your session summary')
+          expect(first_report_template.name).to include('from=>en to=>pl')
+          expect(variant.title).to include('from=>en to=>pl')
+          expect(variant.content).to include('from=>en to=>pl')
+        end
+
+        it 'translate sms plans' do
+          expect(first_sms_plan.no_formula_text).to include('from=>en to=>pl')
+        end
+      end
     end
 
     context 'validations' do
       context 'unique_variable' do
         context 'when variable exists in other session of the same intervention' do
-          let!(:session_2) { create(:session, variable: variable, intervention: intervention) }
+          let!(:session2) { create(:session, variable: variable, intervention: intervention) }
 
           it 'invalidate' do
             expect(subject.validate).to eq false
@@ -169,7 +207,7 @@ RSpec.describe Session, type: :model do
         end
 
         context 'when variable exists in other session, but in other intervention' do
-          let!(:session_2) { create(:session, variable: variable) }
+          let!(:session2) { create(:session, variable: variable) }
 
           it 'validate' do
             expect(subject.validate).to eq true

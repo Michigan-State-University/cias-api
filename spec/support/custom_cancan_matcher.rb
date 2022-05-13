@@ -12,7 +12,7 @@
 #   should not_have_abilities([:update, :destroy], post)
 #
 # WARNING: never use "should_not have_abilities" or you may get false positives due to
-# whitelisting/blacklisting issues. Use "should not_have_abilities" instead.
+# allowlisting/denylisting issues. Use "should not_have_abilities" instead.
 RSpec::Matchers.define :have_abilities do |actions, obj|
   include HaveAbilitiesMixin
 

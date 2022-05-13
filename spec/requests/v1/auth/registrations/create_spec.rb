@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'POST /v1/auth' do
+RSpec.describe 'POST /v1/auth', type: :request do
   let(:params) do
     {
       email: 'test@test.com',
@@ -25,7 +25,7 @@ describe 'POST /v1/auth' do
     end
 
     it 'add new user' do
-      expect{ request }.to change(User, :count).by(1)
+      expect { request }.to change(User, :count).by(1)
     end
 
     it 'fill data' do

@@ -6,9 +6,9 @@ en:
       report_file: '%m_%d_%Y_%H_%M'
   question:
     finish:
-      subtitle: '<h2>Enter main text for screen here </h2><br><i>Note: this is the last screen participants will see in this session</i>'
+      subtitle: '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>'
       text_to_speech: 'Enter main text for screen here. This is the last screen participants will see in this session'
-      title: Enter title here
+      title: '<h2>Enter title here</h2>'
   question_group:
     finish:
       title: Finish Group
@@ -17,10 +17,14 @@ en:
   activerecord:
     errors:
       models:
+        intervention:
+          attributes:
+            cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
+            cat_mh_setting: 'Intervention should have all cat mh settings before publishing. ERROR_FLAG:CatMhWrongSettings'
         user:
           attributes:
             roles:
-              team_id_is_required_for_team_admin: 'Team Admin must have a team'
+              team_admin_must_have_a_team: 'Team Admin must have a team'
               organization_id_is_required_for_organization_admin: 'Organization Admin must have an organization'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
@@ -45,12 +49,27 @@ en:
       messages:
         undestroyable: Forbidden operation
   interventions:
+    invitations:
+      wrong_intervention_type: "Users can only be invited to module interventions (fixed & flexible order)"
+    fixed_order:
+      wrong_sharing_target: "Fixed order interventions can only be shared to registered participants (Got %{shared_to})"
+    flexible_order:
+      wrong_sharing_target: "Flexible order interventions can only be shared to registered participants (Got %{shared_to})"
     answers:
       index:
         csv: The request to send the CSV file has been successfully created. We will soon send an email to you with the request status.
+  sessions:
+    sms_alerts:
+      no_data_provided: "No personal data provided"
+      no_first_name_provided: "First name not provided"
+      no_last_name_provided: "Last name not provided"
+      no_email_provided: "E-mail not provided"
+      no_phone_number_provided: "Phone number not provided"
   users:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
+    preview:
+      cat_mh: "User preview is unavailable for CAT-MH sessions"
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."
@@ -109,6 +128,15 @@ en:
       button_text: Start the session
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
       invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+  intervention_mailer:
+    inform_to_an_email:
+      subject: You have been invited to complete an intervention.
+      body: You have been invited to complete %{intervention_name}. Please click in the link to get more information.
+      header: Complete a new intervention
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span> intervention.<br /><br />Click the link below to start the intervention'
+      button_text: Start the intervention
+      invitation_link: "%{domain}/interventions/%{intervention_id}/invite"
+      invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
   user_mailer:
     send_verification_login_code:
       subject: Verify your Identity in CIAS
@@ -130,13 +158,30 @@ en:
       button_text: Open the session
       link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
     error:
-      subject: 'Error during coping'
+      subject: 'Error during copying'
       header: 'An error has occurred during copying.'
-      body: 'Something goes wrong while copying your session/intervention. Please try again.'
+      body: 'Something went wrong while copying your session/intervention. Please try again.'
   duplicate_mailer:
     session:
       subject: 'Duplicate of %{session_name}'
       header: 'Your duplicate of %{session_name} is ready'
-      body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> is ready that you requested'
+      body: 'Duplicate of <span style="color: #c866ea;">%{session_name}</span> to <span style="color: #c866ea;">%{intervention_name}</span> that you requested is ready'
       button_text: Open the e-intervention
       link: '%{web_url}/interventions/%{intervention_id}'
+  duplication_with_structure:
+    intervention_name: 'Copy of %{source_intervention_name} from %{user_full_name}'
+    session_name: 'Copied Session'
+    question_group_title: 'Copy of %{source_group_title}'
+    wrong_argument: 'Wrong argument. This service should receive target_session and selected_groups with questions'
+    wrong_sessions: "Wrong argument. Can/'t found all passed sessions"
+    not_researcher: "Access denied. You pass user which can not have intervention"
+  translation_mailer:
+    subject: 'Translation of %{intervention_name}'
+    header: 'Your translation of %{intervention_name} is ready'
+    body: 'You intervention has been translated successfully. Now you can use it in CIAS.'
+    button_text: Open the e-intervention
+    link: '%{web_url}/interventions/%{intervention_id}'
+    error:
+      subject: 'Error during translation'
+      header: 'An error has occurred during translation.'
+      body: 'Something goes wrong while translating your intervention. Please try again.'
