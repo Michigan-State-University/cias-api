@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_05_084200) do
+ActiveRecord::Schema.define(version: 2022_05_16_102108) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -364,6 +364,26 @@ ActiveRecord::Schema.define(version: 2022_05_05_084200) do
     t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
+  end
+
+  create_table "live_chat_conversations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "live_chat_interlocutors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "conversation_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "live_chat_messages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text "content", default: "", null: false
+    t.uuid "conversation_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.uuid "live_chat_interlocutor_id", null: false
   end
 
   create_table "messages", force: :cascade do |t|
@@ -738,6 +758,10 @@ ActiveRecord::Schema.define(version: 2022_05_05_084200) do
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"
+  add_foreign_key "live_chat_interlocutors", "live_chat_conversations", column: "conversation_id"
+  add_foreign_key "live_chat_interlocutors", "users"
+  add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
+  add_foreign_key "live_chat_messages", "live_chat_interlocutors"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"
