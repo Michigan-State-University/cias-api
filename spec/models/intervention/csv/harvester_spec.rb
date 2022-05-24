@@ -630,6 +630,19 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.rows).to eq [[user.id, user.email, user_session.created_at, nil, nil]]
         end
       end
+
+      context 'with turn on quick_exit' do
+        let(:sessions) { [session] }
+        let(:intervention) { create(:intervention, user: user, quick_exit: true) }
+        let!(:user_session) { create(:user_session, user: user, session: session, quick_exit: true) }
+
+        it 'shows start, end and duration columns in csv' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                        "#{session.variable}.metadata.session_duration", "#{session.variable}.metadata.quick_exit"]
+          expect(subject.rows).to eq [[user.id, user.email, user_session.created_at, nil, nil, 1]]
+        end
+      end
     end
   end
 end

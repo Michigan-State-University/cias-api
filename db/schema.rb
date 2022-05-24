@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_05_084200) do
+ActiveRecord::Schema.define(version: 2022_05_16_154920) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -345,6 +345,7 @@ ActiveRecord::Schema.define(version: 2022_05_05_084200) do
     t.string "license_type", default: "limited"
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
+    t.boolean "quick_exit", default: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -633,6 +634,7 @@ ActiveRecord::Schema.define(version: 2022_05_05_084200) do
     t.string "awselb"
     t.uuid "user_intervention_id", null: false
     t.datetime "scheduled_at"
+    t.boolean "quick_exit", default: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
