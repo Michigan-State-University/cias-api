@@ -32,3 +32,6 @@ class SummonUsers
 end
 
 SummonUsers.onboarding
+
+# global live chat conversation if there already isn't one created
+LiveChat::Conversation.create! if LiveChat::Conversation.count < 1

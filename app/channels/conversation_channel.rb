@@ -2,7 +2,9 @@
 
 class ConversationChannel < ApplicationCable::Channel
   def subscribed
-    stream_from 'conversation_channel'
+    user_conversations.find_each do |conversation|
+      stream_from channel_id_for(conversation)
+    end
   end
 
   def unsubscribed
@@ -12,6 +14,20 @@ class ConversationChannel < ApplicationCable::Channel
 
   def on_message(data)
     # format will be for example: { 'action' => 'on_message', 'content' => 'this is the content of the message' }
-    ActionCable.server.broadcast('conversation_channel', data)  # let's leave it as a broadcast for now
+    conversation = LiveChat::Conversation.find(data['conversationId'])
+    sender = User.find(data['senderId'])
+    interlocutor = LiveChat::Interlocutor.find_by(user_id: sender.id, conversation_id: conversation.id)
+    message = LiveChat::Message.create!(conversation: conversation, content: data['content'], live_chat_interlocutor: interlocutor)
+    ActionCable.server.broadcast("conversation_channel_#{conversation.id}", V1::LiveChat::MessageSerializer.new(message).serializable_hash)
+  end
+
+  private
+
+  def channel_id_for(conversation)
+    "conversation_channel_#{conversation.id}"
+  end
+
+  def user_conversations
+    LiveChat::Conversation.includes(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: current_user.id })
   end
 end
