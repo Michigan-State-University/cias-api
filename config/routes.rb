@@ -218,6 +218,12 @@ Rails.application.routes.draw do
       get 'available_test_types', to: 'test_types#available_tests'
     end
 
+    namespace :live_chat do
+      resources :conversations do
+        resources :messages, only: %i[index], controller: 'conversations/messages'
+      end
+    end
+
     get 'me', to: 'users#me', as: :get_user_details
   end
 
