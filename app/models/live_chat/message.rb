@@ -7,5 +7,5 @@ class LiveChat::Message < ApplicationRecord
   belongs_to :live_chat_interlocutor, class_name: 'LiveChat::Interlocutor'
   delegate :user, to: :live_chat_interlocutor
 
-  default_scope { order(created_at: :desc) }
+  default_scope { order(created_at: :asc) }
 end
