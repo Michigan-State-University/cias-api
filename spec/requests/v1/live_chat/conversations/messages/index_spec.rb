@@ -41,7 +41,7 @@ RSpec.describe 'GET /v1/live_chat/conversations/:conversation_id/messages', type
     end
 
     it 'returns correct messages' do
-      expect(json_response['data'].pluck('id')).to match_array(messages.sort_by!(&:created_at).reverse!.pluck(:id).slice(0, 3))
+      expect(json_response['data'].pluck('id')).to match_array(messages.sort_by!(&:created_at).pluck(:id).slice(0, 3))
     end
   end
 end

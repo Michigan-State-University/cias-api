@@ -2,7 +2,7 @@
 
 class V1::LiveChat::Conversations::MessagesController < V1Controller
   def index
-    authorize! :read, LiveChat::Conversation
+    # authorize! :read, LiveChat::Conversation
     conversation = conversation_load
 
     collection = V1::Paginate.call(conversation.messages, start_index, end_index)

@@ -56,6 +56,7 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby'
 gem 'sentry-rails'
+gem 'rack', '>= 2.2.3.1'
 
 group :development, :test do
   gem 'bundler-audit'
