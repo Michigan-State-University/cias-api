@@ -48,7 +48,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       let(:intervention) { create(:intervention) }
       let(:session) { build(:session, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
-      let!(:question_group) { create(:question_group_plain, session: session) }
+      let!(:question_group) { create(:question_group_plain, session: session, position: 2) }
 
       context 'when single question' do
         let!(:question_body) do
@@ -70,7 +70,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             ]
           }
         end
-        let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
+        let!(:question) { create(:question_single, question_group: question_group, body: question_body, position: 1) }
         let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
 
         it 'save every variables and scores to csv' do
@@ -78,6 +78,39 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
           expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+        end
+
+        context 'set correct order based on question group position' do
+          let!(:second_question_group) { create(:question_group_plain, session: session, position: 1) }
+          let!(:second_question_body) do
+            {
+              'data' => [
+                { 'value' => '1', 'payload' => '' },
+                { 'value' => '2', 'payload' => '' }
+              ],
+              'variable' => { 'name' => 'test_2' }
+            }
+          end
+          let!(:second_answer_body) do
+            {
+              'data' => [
+                {
+                  'var' => 'test_2',
+                  'value' => '2'
+                }
+              ]
+            }
+          end
+          let!(:second_question) { create(:question_single, question_group: second_question_group, body: second_question_body, position: 2) }
+          let!(:second_answer) { create(:answer_single, question: second_question, body: second_answer_body, user_session: user_session) }
+
+          it 'save variables in correct order' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_2", "#{session.variable}.test",
+                                          "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                          "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '2', '1', answer.user_session.created_at, nil, nil]]
+          end
         end
       end
 
