@@ -22,12 +22,12 @@ namespace :google_tts_languages do
         language_name = prepare_language_name(language, languages_hash)
         tts_language = GoogleTtsLanguage.create!(language_name: language_name)
 
-        usage_hash = {
-          'standard-male' => 1,
-          'standard-female' => 1,
-          'wavenet-male' => 1,
-          'wavenet-female' => 1
-        }
+        usage_hash = Hash.new(0).merge({
+                                         'standard-male' => 1,
+                                         'standard-female' => 1,
+                                         'wavenet-male' => 1,
+                                         'wavenet-female' => 1
+                                       })
         voices.each do |voice_type|
           voice_standard = voice_type.name.split('-')[2].downcase
           voice_gender = voice_type.ssml_gender.to_s.downcase

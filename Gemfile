@@ -39,6 +39,7 @@ gem 'sidekiq', '>= 6.4.0'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
+gem 'rack', '>= 2.2.3.1'
 gem 'rack-attack'
 gem 'secure_headers'
 gem 'airbrake'
@@ -56,7 +57,6 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby'
 gem 'sentry-rails'
-gem 'rack', '>= 2.2.3.1'
 
 group :development, :test do
   gem 'bundler-audit'
