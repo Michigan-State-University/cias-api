@@ -22,6 +22,7 @@ gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
+gem 'jmespath', '>= 1.6.1'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '>= 3.19.2'
@@ -39,6 +40,7 @@ gem 'sidekiq', '>= 6.4.0'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
+gem 'rack', '>= 2.2.3.1'
 gem 'rack-attack'
 gem 'secure_headers'
 gem 'airbrake'
@@ -56,7 +58,6 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby'
 gem 'sentry-rails'
-gem 'rack', '~> 2.1.4', '>= 2.1.4.1'
 
 group :development, :test do
   gem 'bundler-audit'

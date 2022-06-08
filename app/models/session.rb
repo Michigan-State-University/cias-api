@@ -154,7 +154,7 @@ class Session < ApplicationRecord
   private
 
   def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
+    self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
     save!
   end
 
