@@ -33,4 +33,8 @@ class V1::UserSessionSerializer < V1Serializer
   attribute :intervention_type do |object|
     object.session.intervention.type
   end
+
+  attribute :live_chat_enabled do |object|
+    object.session.intervention.live_chat_enabled
+  end
 end

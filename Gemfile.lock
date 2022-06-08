@@ -288,7 +288,7 @@ GEM
       concurrent-ruby (~> 1.0)
     i18n_data (0.11.0)
     iniparse (1.5.0)
-    jmespath (1.4.0)
+    jmespath (1.6.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
     jsonapi-serializer (2.2.0)
@@ -579,6 +579,7 @@ DEPENDENCIES
   guard-rake
   guard-rspec
   hiredis
+  jmespath (>= 1.6.1)
   jsonapi-serializer
   letter_opener_web
   license_finder

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_16_102108) do
+ActiveRecord::Schema.define(version: 2022_06_07_083222) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -345,6 +345,7 @@ ActiveRecord::Schema.define(version: 2022_05_16_102108) do
     t.string "license_type", default: "limited"
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
+    t.boolean "live_chat_enabled", default: false, null: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"

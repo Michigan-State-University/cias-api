@@ -28,6 +28,7 @@ class Intervention < ApplicationRecord
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
   validate :cat_settings_validation, if: :published?
+  validate :live_chat_validation
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:intervention_accesses).published.not_shared_to_invited
@@ -142,6 +143,12 @@ class Intervention < ApplicationRecord
     return if !intervention_have_cat_mh_sessions? || (cat_mh_application_id.present? && cat_mh_organization_id.present?)
 
     errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting') if license_type_limited? && (cat_mh_pool.blank? || cat_mh_pool.negative?) # rubocop:disable Layout/LineLength
+  end
+
+  def live_chat_validation
+    return if status == 'published' || status == 'draft'
+
+    errors[:base] << I18n.t('activerecord.errors.models.intervention.attributes.live_chat_wrong_session_status') if live_chat_enabled
   end
 
   def intervention_have_cat_mh_sessions?
