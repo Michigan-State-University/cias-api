@@ -104,6 +104,22 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
       end
     end
 
+    context 'when quick exit is turn on' do
+      let(:intervention) do
+        create(:intervention, :published, user: intervention_user, quick_exit: true)
+      end
+
+      it 'returns correct status' do
+        request
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'update user object' do
+        request
+        expect(user.reload.quick_exit_enabled).to be true
+      end
+    end
+
     context 'exists' do
       let!(:user_int) { create(:user_intervention, intervention: intervention, user: user, status: 'in_progress') }
       let!(:user_session) { create(:user_session, user: user, session: session, user_intervention: user_int) }

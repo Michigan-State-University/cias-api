@@ -19,6 +19,7 @@ class V1::UserSessionsController < V1Controller
     )
     authorize! :create, user_session
     user_session.save!
+    @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
 
     render json: serialized_response(user_session), status: :ok
   end
@@ -77,8 +78,12 @@ class V1::UserSessionsController < V1Controller
     params[:user_session_id]
   end
 
+  def intervention
+    Session.find(session_id).intervention
+  end
+
   def intervention_id
-    Session.find(session_id).intervention.id
+    intervention.id
   end
 
   def health_clinic_id
