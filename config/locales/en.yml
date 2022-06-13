@@ -47,6 +47,12 @@ en:
           attributes:
             variable:
               already_exists: already exists
+        live_chat:
+          message:
+            attributes:
+              content:
+                too_long: 'length cannot exceed %{limit} characters.'
+                too_long_detailed: "Message is too long. Max length: %{max_len}, got: %{cur_len}"
       messages:
         undestroyable: Forbidden operation
   interventions:

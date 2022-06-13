@@ -7,5 +7,7 @@ class LiveChat::Message < ApplicationRecord
   belongs_to :live_chat_interlocutor, class_name: 'LiveChat::Interlocutor'
   delegate :user, to: :live_chat_interlocutor
 
+  validates :content, length: { maximum: 500, too_long: I18n.t('activerecord.errors.models.live_chat.message.attributes.content.too_long', limit: 500) }
+
   default_scope { order(created_at: :asc) }
 end
