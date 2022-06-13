@@ -4,7 +4,7 @@ class V1::LiveChat::ConversationSerializer < V1Serializer
   attributes :id
 
   attribute :last_message do |object|
-    V1::LiveChat::MessageSerializer.new(object.messages.first).serializable_hash
+    V1::LiveChat::MessageSerializer.new(object.messages.last).serializable_hash
   end
 
   attribute :interlocutors do |object|

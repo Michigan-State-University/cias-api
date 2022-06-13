@@ -219,7 +219,7 @@ Rails.application.routes.draw do
     end
 
     namespace :live_chat do
-      resources :conversations, only: %i[index] do
+      resources :conversations, only: %i[index create] do
         resources :messages, only: %i[index], controller: 'conversations/messages'
       end
     end
