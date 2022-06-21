@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_07_083222) do
+ActiveRecord::Schema.define(version: 2022_06_14_080855) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -387,6 +387,23 @@ ActiveRecord::Schema.define(version: 2022_06_07_083222) do
     t.uuid "live_chat_interlocutor_id", null: false
   end
 
+  create_table "live_chat_navigator_setups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "no_navigator_available_message", default: "", null: false
+    t.string "contact_email", default: "", null: false
+    t.string "notify_by"
+    t.uuid "intervention_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "live_chat_participant_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text "url", null: false
+    t.string "display_name", default: "", null: false
+    t.uuid "navigator_setup_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "messages", force: :cascade do |t|
     t.text "body", null: false
     t.string "status", default: "new", null: false
@@ -425,6 +442,7 @@ ActiveRecord::Schema.define(version: 2022_06_07_083222) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "number_ciphertext"
+    t.uuid "navigator_setup_id"
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
@@ -763,6 +781,9 @@ ActiveRecord::Schema.define(version: 2022_06_07_083222) do
   add_foreign_key "live_chat_interlocutors", "users"
   add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_messages", "live_chat_interlocutors"
+  add_foreign_key "live_chat_navigator_setups", "interventions"
+  add_foreign_key "live_chat_participant_links", "live_chat_navigator_setups", column: "navigator_setup_id"
+  add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"

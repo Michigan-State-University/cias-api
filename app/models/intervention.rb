@@ -14,6 +14,7 @@ class Intervention < ApplicationRecord
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :intervention_accesses, dependent: :destroy
+  has_one :navigator_setup, class_name: 'LiveChat::Intervention::NavigatorSetup', dependent: :destroy
 
   has_many_attached :reports
   has_many_attached :files
@@ -47,6 +48,7 @@ class Intervention < ApplicationRecord
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
 
   before_validation :assign_default_google_language
+  before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   after_update_commit :status_change
 
   def assign_default_google_language
@@ -137,6 +139,10 @@ class Intervention < ApplicationRecord
 
   def module_intervention?
     false
+  end
+
+  def create_navigator_setup
+    self.navigator_setup = LiveChat::Intervention::NavigatorSetup.new
   end
 
   def cat_settings_validation

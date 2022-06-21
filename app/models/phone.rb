@@ -5,6 +5,7 @@ class Phone < ApplicationRecord
   has_many :alert_phones, dependent: :destroy
   has_many :sms_plans, through: :alert_phones
   belongs_to :user, optional: true
+  belongs_to :navigator_setup, class_name: 'LiveChat::Intervention::NavigatorSetup', optional: true
   validates :iso, :prefix, presence: true
   # validate number only if its not an alert phone, because we need to allow blank values for updating when its an alert phone number
   # we disable validation on create to enable edition of alert phone numbers
