@@ -105,7 +105,7 @@ describe User, type: :model do
 
     context 'roles have not changed' do
       it 'does not remove user tokens' do
-        expect { user.update(roles: ['team_admin']) }.not_to change { user.reload.tokens }
+        expect { user.update(roles: %w[researcher team_admin]) }.not_to change { user.reload.tokens }
       end
     end
 

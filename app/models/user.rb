@@ -200,7 +200,7 @@ class User < ApplicationRecord
   end
 
   def self.include_researcher_or_e_intervention_admin?(user_roles)
-    user_roles.include?('researcher') || user_roles.include?('e_intervention_admin')
+    (user_roles.include?('researcher') && user_roles.size == 1) || user_roles.include?('e_intervention_admin')
   end
 
   def active_for_authentication?
@@ -213,11 +213,15 @@ class User < ApplicationRecord
     Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
-  private
-
   def team_admin?
     roles.include?('team_admin')
   end
+
+  def e_intervention_admin?
+    roles.include?('e_intervention_admin')
+  end
+
+  private
 
   def team_is_present?
     return if Team.exists?(team_admin_id: id)

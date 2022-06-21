@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ability::EInterventionAdmin < Ability::Researcher
+class Ability::EInterventionAdmin < Ability::Base
   def definition
     super
     e_intervention_admin if role?(class_name)
@@ -9,10 +9,8 @@ class Ability::EInterventionAdmin < Ability::Researcher
   private
 
   def e_intervention_admin
-    can %i[read list_researchers], User, id: participants_researchers_and_e_intervention_admins(user)
+    can %i[read list_researchers], User, id: researchers_and_e_intervention_admins(user)
     can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.accepted_organization_ids)
-    can :manage, UserSession, session: { intervention: { user_id: user.id } }
-    can :manage, UserIntervention, intervention: { user_id: user.id }
     can %i[read update], Organization, id: user.accepted_organization_ids
     can :invite_organization_admin, Organization, id: user.accepted_organization_ids
     can :manage, HealthSystem, organization: { id: user.organizable_id }

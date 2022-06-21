@@ -44,6 +44,10 @@ class Ability::Base
     participants_and_researchers(user) + e_intervention_admins_from_organization(user.organizable_id)
   end
 
+  def researchers_and_e_intervention_admins(user)
+    researchers_from_team(user.team_id) + e_intervention_admins_from_organization(user.accepted_organization_ids)
+  end
+
   def logged_user_session_ids(user)
     logged_user_sessions(user).pluck(:id)
   end

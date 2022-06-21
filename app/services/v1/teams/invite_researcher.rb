@@ -30,7 +30,7 @@ class V1::Teams::InviteResearcher
   end
 
   def user_is_not_researcher?
-    user&.roles&.exclude?('researcher') && user&.roles&.exclude?('e_intervention_admin')
+    user&.roles&.exclude?('researcher')
   end
 
   def user

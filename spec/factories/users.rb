@@ -44,7 +44,7 @@ FactoryBot.define do
     end
 
     trait :team_admin do
-      roles { %w[team_admin] }
+      roles { %w[researcher team_admin] }
       after(:build) do |team_admin|
         if team_admin.admins_teams.blank?
           new_team = build(:team, team_admin: team_admin)
@@ -97,7 +97,7 @@ FactoryBot.define do
     end
 
     trait :e_intervention_admin do
-      roles { %w[e_intervention_admin] }
+      roles { %w[researcher e_intervention_admin] }
     end
 
     trait :preview_session do

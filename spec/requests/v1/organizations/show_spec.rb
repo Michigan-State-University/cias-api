@@ -118,7 +118,7 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                 'email' => e_intervention_admin.email,
                 'first_name' => e_intervention_admin.first_name,
                 'last_name' => e_intervention_admin.last_name,
-                'roles' => ['e_intervention_admin']
+                'roles' => %w[researcher e_intervention_admin]
               )
         ).and include(
           'id' => deleted_health_clinic.id,

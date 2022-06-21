@@ -22,7 +22,6 @@ gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
-gem 'jmespath', '>= 1.6.1'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '>= 3.19.2'
@@ -58,6 +57,7 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby'
 gem 'sentry-rails'
+gem 'jmespath', '>= 1.6.1'
 
 group :development, :test do
   gem 'bundler-audit'
