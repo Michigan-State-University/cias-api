@@ -2,7 +2,10 @@
 
 class V1::LiveChat::ConversationsController < V1Controller
   def index
-    render json: V1::LiveChat::ConversationSerializer.new(user_conversations)
+    render json: V1::LiveChat::ConversationSerializer.new(
+      user_conversations,
+      { include: %i[live_chat_interlocutors] }
+    )
   end
 
   def create
@@ -22,6 +25,6 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def user_conversations
-    LiveChat::Conversation.includes(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: current_v1_user.id })
+    LiveChat::Conversation.joins(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: current_v1_user.id })
   end
 end

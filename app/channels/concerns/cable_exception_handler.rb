@@ -5,7 +5,7 @@ module CableExceptionHandler
 
   included do
     rescue_from LiveChat::MessageTooLongException do |exc|
-      ActionCable.server.broadcast(exc.conversation_channel_id, { data: { error: exc.message }, status: 422, topic: 'message-error' })
+      ActionCable.server.broadcast(exc.channel_id, { data: { error: exc.message, conversationId: exc.conversation_id }, status: 422, topic: 'message-error' })
     end
   end
 end

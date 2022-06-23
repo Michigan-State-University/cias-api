@@ -20,6 +20,6 @@ RSpec.describe 'POST /v1/live_chat/conversations', type: :request do
   end
 
   it 'returns correct conversation data (with 2 interlocutors)' do
-    expect(json_response['data']['attributes']['interlocutors']['data'].size).to eq 2
+    expect(json_response['data']['relationships']['live_chat_interlocutors']['data'].size).to eq 2
   end
 end

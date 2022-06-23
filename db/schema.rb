@@ -385,6 +385,7 @@ ActiveRecord::Schema.define(version: 2022_06_20_122537) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "live_chat_interlocutor_id", null: false
+    t.boolean "is_read", default: false, null: false
   end
 
   create_table "live_chat_navigator_setups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

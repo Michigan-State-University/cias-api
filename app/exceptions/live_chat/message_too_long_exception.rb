@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class LiveChat::MessageTooLongException < StandardError
-  def initialize(msg, conversation_channel_id)
+  def initialize(msg, channel_id, conversation_id)
     super(msg)
-    @conversation_channel_id = conversation_channel_id
+    @channel_id = channel_id
+    @conversation_id = conversation_id
   end
 
-  attr_reader :conversation_channel_id
+  attr_reader :channel_id, :conversation_id
 end
