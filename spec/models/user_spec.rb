@@ -181,4 +181,10 @@ describe User, type: :model do
 
     include_examples 'without team admin validations'
   end
+
+  describe 'navigator' do
+    subject { create(:user, :confirmed, :navigator) }
+
+    it { should be_valid }
+  end
 end

@@ -112,5 +112,9 @@ FactoryBot.define do
         user.update_attribute(:confirmation_sent_at, evaluator.allow_unconfirmed_period - 1.day)
       end
     end
+
+    trait :navigator do
+      roles { %w[navigator] }
+    end
   end
 end

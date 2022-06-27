@@ -21,7 +21,7 @@ class User < ApplicationRecord
 
   # Order of roles is important because final authorization is the sum of all roles
   APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
-                 organization_admin researcher e_intervention_admin team_admin admin].freeze
+                 organization_admin researcher e_intervention_admin team_admin admin navigator].freeze
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
