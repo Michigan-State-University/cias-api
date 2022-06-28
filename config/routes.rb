@@ -222,6 +222,13 @@ Rails.application.routes.draw do
       resources :conversations, only: %i[index create] do
         resources :messages, only: %i[index], controller: 'conversations/messages'
       end
+
+      scope '/intervention/:id', as: :intervention do
+        resource :navigator_setup, only: %i[show update], controller: 'intervention/navigator_setups'
+        namespace :navigator_setups do
+          resources :participant_links, only: %i[create update], param: :participant_link_id, controller: '/v1/live_chat/intervention/participant_links'
+        end
+      end
     end
 
     get 'me', to: 'users#me', as: :get_user_details

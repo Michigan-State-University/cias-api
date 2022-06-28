@@ -15,6 +15,12 @@ FactoryBot.define do
       status { 'archived' }
     end
     shared_to { 'anyone' }
+
+    trait :with_navigator_setup do
+      after(:build) do |intervention|
+        intervention.live_chat_enabled = true
+      end
+    end
   end
 
   factory :intervention_with_logo, class: Intervention do
