@@ -115,6 +115,11 @@ en:
         subject: 'Preview [CSV] Answers for: %{intervention_name}'
         header: Your preview CSV file is generated successfully
         html_body: 'CSV that you requested on %{requested_at} with preview data from <span style="color: #c866ea;">%{intervention_name}</span> is available as attachment to this email'
+  backup_mailer:
+    result:
+      subject: Your CIAS Intervention is ready to download!
+      body: Your Intervention is ready to download!
+      header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!

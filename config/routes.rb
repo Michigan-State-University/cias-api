@@ -38,6 +38,7 @@ Rails.application.routes.draw do
 
     resources :interventions, only: %i[index show create update] do
       post 'clone', on: :member
+      post 'export', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
