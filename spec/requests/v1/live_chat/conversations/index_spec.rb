@@ -55,4 +55,10 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
       expect(json_response['data'].map { |h| h['attributes'] }.pluck('last_message').map { |h| h.except('created_at') }).to eq expected
     end
   end
+
+  context 'when user don\'t have permission' do
+    let(:user) { create(:user, :health_clinic_admin, :confirmed) }
+
+    it { expect(response).to have_http_status(:forbidden) }
+  end
 end

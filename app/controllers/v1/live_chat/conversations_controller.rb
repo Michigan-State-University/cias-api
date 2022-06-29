@@ -2,6 +2,8 @@
 
 class V1::LiveChat::ConversationsController < V1Controller
   def index
+    authorize! :index, LiveChat::Conversation
+
     render json: V1::LiveChat::ConversationSerializer.new(
       user_conversations,
       { include: %i[live_chat_interlocutors] }
@@ -9,6 +11,8 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def create
+    authorize! :create, LiveChat::Conversation
+
     conversation = LiveChat::Conversation.create!
     create_new_interlocutors(conversation)
     render json: V1::LiveChat::ConversationSerializer.new(conversation)
