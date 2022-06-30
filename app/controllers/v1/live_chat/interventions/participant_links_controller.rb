@@ -17,6 +17,13 @@ class V1::LiveChat::Interventions::ParticipantLinksController < V1Controller
     render json: V1::LiveChat::Interventions::NavigatorSetupSerializer.new(navigator_setup), status: :created
   end
 
+  def destroy
+    authorize! :delete, LiveChat::Intervention::ParticipantLink
+
+    participant_link_load.destroy
+    head :ok
+  end
+
   private
 
   def participant_link_params
