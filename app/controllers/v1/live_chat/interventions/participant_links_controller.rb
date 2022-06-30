@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::LiveChat::Intervention::ParticipantLinksController < V1Controller
+class V1::LiveChat::Interventions::ParticipantLinksController < V1Controller
   def update
     authorize! :update, Intervention
 
@@ -13,8 +13,8 @@ class V1::LiveChat::Intervention::ParticipantLinksController < V1Controller
     authorize! :create, Intervention
 
     navigator_setup = setup_load
-    LiveChat::Intervention::ParticipantLink.create!(participant_link_params.merge(navigator_setup_id: navigator_setup.id))
-    render json: V1::LiveChat::Intervention::NavigatorSetupSerializer.new(navigator_setup), status: :created
+    LiveChat::Interventions::ParticipantLink.create!(participant_link_params.merge(navigator_setup_id: navigator_setup.id))
+    render json: V1::LiveChat::Interventions::NavigatorSetupSerializer.new(navigator_setup), status: :created
   end
 
   private

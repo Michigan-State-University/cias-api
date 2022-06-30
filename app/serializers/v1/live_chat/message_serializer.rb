@@ -6,4 +6,8 @@ class V1::LiveChat::MessageSerializer < V1Serializer
   attribute :interlocutor_id do |object|
     object.live_chat_interlocutor.id
   end
+
+  attribute :intervention_id do |object|
+    object.conversation.intervention_id
+  end
 end

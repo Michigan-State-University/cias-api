@@ -13,15 +13,23 @@ class V1::LiveChat::ConversationsController < V1Controller
   def create
     authorize! :create, LiveChat::Conversation
 
-    conversation = LiveChat::Conversation.create!
+    conversation = LiveChat::Conversation.create!(intervention_id: intervention_id)
     create_new_interlocutors(conversation)
     render json: V1::LiveChat::ConversationSerializer.new(conversation)
   end
 
   private
 
+  def conversation_params
+    params.require(:conversation).permit(:intervention_id, user_ids: [])
+  end
+
+  def intervention_id
+    conversation_params[:intervention_id]
+  end
+
   def interlocutor_ids
-    params.permit(user_ids: [])[:user_ids] || []
+    conversation_params[:user_ids] || []
   end
 
   def create_new_interlocutors(conversation)
@@ -29,6 +37,8 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def user_conversations
-    LiveChat::Conversation.joins(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: current_v1_user.id })
+    LiveChat::Conversation.
+      joins(:live_chat_interlocutors).
+      where(live_chat_interlocutors: { user_id: current_v1_user.id })
   end
 end

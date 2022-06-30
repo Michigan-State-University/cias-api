@@ -42,7 +42,7 @@ class ConversationChannel < ApplicationCable::Channel
 
   def on_conversation_created(data)
     interlocutors = [LiveChat::Interlocutor.new(user_id: data['userId']), LiveChat::Interlocutor.new(user_id: current_user.id)]
-    conversation = LiveChat::Conversation.create!(live_chat_interlocutors: interlocutors)
+    conversation = LiveChat::Conversation.create!(live_chat_interlocutors: interlocutors, intervention_id: data['interventionId'])
     response = generic_message(V1::LiveChat::ConversationSerializer.new(conversation, { include: %i[live_chat_interlocutors] }).serializable_hash,
                                'conversation_created')
     ActionCable.server.broadcast(current_channel_id, response)

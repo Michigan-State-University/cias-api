@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::ConversationSerializer < V1Serializer
-  attributes :id
+  attributes :id, :intervention_id
 
   has_many :live_chat_interlocutors, serializer: V1::LiveChat::InterlocutorSerializer
 
@@ -19,5 +19,9 @@ class V1::LiveChat::ConversationSerializer < V1Serializer
         is_read: last_message.is_read
       }
     end
+  end
+
+  attribute :intervention_name do |object|
+    object.intervention.name
   end
 end

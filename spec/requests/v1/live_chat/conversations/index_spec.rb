@@ -3,10 +3,11 @@
 RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
   let!(:user) { create(:user, :confirmed, :admin) }
   let!(:other_user) { create(:user, :confirmed, :admin) }
+  let(:intervention) { create(:intervention, user: user) }
   let!(:interlocutors) { conversations.map { |conv| create(:live_chat_interlocutor, user: user, conversation: conv) } }
   let!(:other_interlocutors) { conversations.map { |conv| create(:live_chat_interlocutor, user: other_user, conversation: conv) } }
-  let!(:conversation) { create(:live_chat_conversation) }
-  let!(:conversations) { create_list(:live_chat_conversation, 4) }
+  let!(:conversation) { create(:live_chat_conversation, intervention: intervention) }
+  let!(:conversations) { create_list(:live_chat_conversation, 4, intervention: intervention) }
   let!(:messages) do
     [
       create(:live_chat_message, conversation: conversations[0], live_chat_interlocutor: interlocutors[0]),

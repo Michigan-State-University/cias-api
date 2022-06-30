@@ -5,7 +5,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups/participan
   let!(:intervention) { create(:intervention, :with_navigator_setup, user: user) }
   let(:headers) { user.create_new_auth_token }
   let!(:participant_link) do
-    LiveChat::Intervention::ParticipantLink.create!(
+    LiveChat::Interventions::ParticipantLink.create!(
       navigator_setup: intervention.navigator_setup, url: 'https://google.com', display_name: 'This is my favourite website'
     )
   end

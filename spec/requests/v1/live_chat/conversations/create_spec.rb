@@ -3,9 +3,13 @@
 RSpec.describe 'POST /v1/live_chat/conversations', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:participant) { create(:user, :confirmed, :participant) }
+  let(:intervention) { create(:intervention, user: user) }
   let(:params) do
     {
-      user_ids: [user.id, participant.id]
+      conversation: {
+        user_ids: [user.id, participant.id],
+        intervention_id: intervention.id
+      }
     }
   end
 

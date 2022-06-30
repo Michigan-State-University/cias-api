@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::LiveChat::Intervention::NavigatorSetupsController < V1Controller
+class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
   def show
     authorize! :read, Intervention
 
@@ -30,7 +30,7 @@ class V1::LiveChat::Intervention::NavigatorSetupsController < V1Controller
   end
 
   def setup_response(data)
-    V1::LiveChat::Intervention::NavigatorSetupSerializer.new(data, { include: %i[participant_links phone] })
+    V1::LiveChat::Interventions::NavigatorSetupSerializer.new(data, { include: %i[participant_links phone] })
   end
 
   def navigator_setup_params

@@ -14,7 +14,8 @@ class Intervention < ApplicationRecord
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :intervention_accesses, dependent: :destroy
-  has_one :navigator_setup, class_name: 'LiveChat::Intervention::NavigatorSetup', dependent: :destroy
+  has_one :navigator_setup, class_name: 'LiveChat::Interventions::NavigatorSetup', dependent: :destroy
+  has_many :conversations, class_name: 'LiveChat::Conversation', dependent: :restrict_with_exception
 
   has_many_attached :reports
   has_many_attached :files
@@ -142,7 +143,7 @@ class Intervention < ApplicationRecord
   end
 
   def create_navigator_setup
-    self.navigator_setup = LiveChat::Intervention::NavigatorSetup.new
+    self.navigator_setup = LiveChat::Interventions::NavigatorSetup.new
   end
 
   def cat_settings_validation

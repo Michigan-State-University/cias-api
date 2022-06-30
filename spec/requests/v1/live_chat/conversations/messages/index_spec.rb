@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe 'GET /v1/live_chat/conversations/:conversation_id/messages', type: :request do
-  let!(:conversation) { create(:live_chat_conversation) }
+  let(:intervention) { create(:intervention, user: user) }
+  let!(:conversation) { create(:live_chat_conversation, intervention: intervention) }
   let(:interlocutor) { create(:live_chat_interlocutor, user: user, conversation: conversation) }
   let!(:messages) { create_list(:live_chat_message, 4, conversation: conversation, live_chat_interlocutor: interlocutor) }
   let!(:user) { create(:user, :admin, :confirmed) }
