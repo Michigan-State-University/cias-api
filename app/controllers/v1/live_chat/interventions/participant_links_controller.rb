@@ -18,7 +18,7 @@ class V1::LiveChat::Interventions::ParticipantLinksController < V1Controller
   end
 
   def destroy
-    authorize! :delete, LiveChat::Intervention::ParticipantLink
+    authorize! :delete, LiveChat::Interventions::ParticipantLink
 
     participant_link_load.destroy
     head :ok

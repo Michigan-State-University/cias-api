@@ -226,7 +226,8 @@ Rails.application.routes.draw do
       scope '/intervention/:id', as: :intervention do
         resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'
         namespace :navigator_setups do
-          resources :participant_links, only: %i[create update destroy], param: :participant_link_id, controller: '/v1/live_chat/interventions/participant_links'
+          resources :participant_links, only: %i[create update destroy], param: :participant_link_id,
+                                        controller: '/v1/live_chat/interventions/participant_links'
         end
       end
     end
