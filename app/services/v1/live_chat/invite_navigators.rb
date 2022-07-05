@@ -39,7 +39,7 @@ class V1::LiveChat::InviteNavigators < V1Controller
 
   def check_roles_of_existing_users(users)
     users.each do |user|
-      raise ActiveRecord::RecordInvalid, I18n.t('activerecord.errors.models.live_chat.navigator.not_researcher') unless @user.researcher?
+      raise ActiveRecord::RecordInvalid, I18n.t('activerecord.errors.models.live_chat.navigator.not_researcher') unless user.researcher?
     end
   end
 
