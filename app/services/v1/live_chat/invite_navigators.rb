@@ -30,7 +30,6 @@ class V1::LiveChat::InviteNavigators
 
       User.where(email: emails).find_each do |user|
         LiveChat::Interventions::NavigatorInvitations(email: user.email, intervention: @intervention)
-        # will be send an email
       end
     end
 
