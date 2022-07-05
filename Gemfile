@@ -42,6 +42,7 @@ gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
 gem 'rack', '>= 2.2.3.1'
 gem 'rack-attack'
+gem 'rails-html-sanitizer', '>= 1.4.3'
 gem 'secure_headers'
 gem 'airbrake'
 # for encrypt data
