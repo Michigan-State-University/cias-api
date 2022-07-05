@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::LiveChat::InviteNavigators < V1Controller
+class V1::LiveChat::InviteNavigators
   def self.call(emails, intervention)
     new(emails, intervention)
   end
@@ -14,7 +14,6 @@ class V1::LiveChat::InviteNavigators < V1Controller
     assign_role_or_invite_to_system(emails)
     LiveChat::Interventions::NavigatorInvitations.create(user: user, intervention: intervention, accepted_at: DateTime.now)
   end
-
 
   attr_reader :emails, :intervention
   attr_accessor :user, :users_exists
@@ -30,7 +29,6 @@ class V1::LiveChat::InviteNavigators < V1Controller
       invite_new_users_to_system(emails - users_exists.map(&:email))
 
       User.where(email: emails).find_each do |user|
-
         LiveChat::Interventions::NavigatorInvitations(email: user.email, intervention: @intervention)
         # will be send an email
       end
