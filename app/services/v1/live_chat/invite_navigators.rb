@@ -33,6 +33,8 @@ class V1::LiveChat::InviteNavigators
         # will be send an email
       end
     end
+
+    Navigators::InvitationJob.perform_later(emails, intervention.id)
   end
 
   def check_roles_of_existing_users(users)
