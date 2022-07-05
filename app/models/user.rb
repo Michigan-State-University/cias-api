@@ -221,6 +221,14 @@ class User < ApplicationRecord
     roles.include?('e_intervention_admin')
   end
 
+  def researcher?
+    roles.include('researcher')
+  end
+
+  def navigator?
+    roles.include?('navigator')
+  end
+
   private
 
   def team_is_present?

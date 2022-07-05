@@ -53,6 +53,8 @@ en:
               content:
                 too_long: 'length cannot exceed %{limit} characters.'
                 too_long_detailed: "Message is too long. Max length: %{max_len}, got: %{cur_len}"
+          navigator:
+            not_researcher: 'User cannot become a navigator'
       messages:
         undestroyable: Forbidden operation
   interventions:
