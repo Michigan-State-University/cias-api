@@ -75,6 +75,7 @@ class Session < ApplicationRecord
     ActiveRecord::Base.transaction do
       User.where(email: emails).find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
+        user.update!(quick_exit_enabled: intervention.quick_exit)
 
         user_intervention = UserIntervention.find_or_create_by(user_id: user.id, intervention_id: intervention.id, health_clinic_id: health_clinic_id)
         user_session = UserSession.find_or_create_by(
@@ -154,7 +155,7 @@ class Session < ApplicationRecord
   private
 
   def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
+    self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
     save!
   end
 

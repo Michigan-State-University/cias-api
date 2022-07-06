@@ -41,6 +41,24 @@ RSpec.describe 'POST /v1/user_interventions', type: :request do
     it 'save user intervention in db' do
       expect { request }.to change(UserIntervention, :count).by(1)
     end
+
+    context 'when quick_exit is turn on' do
+      let!(:intervention) { create(:flexible_order_intervention, user: user, shared_to: 'registered', quick_exit: true) }
+
+      it 'returns correct HTTP status code (OK)' do
+        request
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'save user intervention in db' do
+        expect { request }.to change(UserIntervention, :count).by(1)
+      end
+
+      it 'set correct flag in user object' do
+        request
+        expect(user.reload.quick_exit_enabled).to be true
+      end
+    end
   end
 
   context 'when user intervention exist in the system' do

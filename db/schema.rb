@@ -345,6 +345,7 @@ ActiveRecord::Schema.define(version: 2022_06_27_084751) do
     t.string "license_type", default: "limited"
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
+    t.boolean "quick_exit", default: false
     t.boolean "live_chat_enabled", default: false, null: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -675,6 +676,7 @@ ActiveRecord::Schema.define(version: 2022_06_27_084751) do
     t.string "awselb"
     t.uuid "user_intervention_id", null: false
     t.datetime "scheduled_at"
+    t.boolean "quick_exit", default: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
@@ -738,6 +740,7 @@ ActiveRecord::Schema.define(version: 2022_06_27_084751) do
     t.string "organizable_type"
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
+    t.boolean "quick_exit_enabled", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

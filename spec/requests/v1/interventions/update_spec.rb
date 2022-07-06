@@ -216,6 +216,21 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
               'shared_to' => 'anyone'
             )
           end
+
+          context 'quick_exit - researcher is able to set this option if wants to give an option to
+                    a participant to a quick exit from filling and clear the footprint from history' do
+            let(:params) do
+              {
+                intervention: {
+                  quick_exit: true
+                }
+              }
+            end
+
+            it 'updates a intervention object' do
+              expect(intervention.reload.attributes).to include('quick_exit' => true)
+            end
+          end
         end
 
         context 'when params are INVALID' do

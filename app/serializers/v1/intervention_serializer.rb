@@ -3,7 +3,7 @@
 class V1::InterventionSerializer < V1Serializer
   attributes :id, :user_id, :type, :name, :status, :shared_to, :organization_id, :google_language_id, :created_at, :updated_at, :published_at,
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
-             :additional_text, :original_text, :live_chat_enabled
+             :additional_text, :original_text, :quick_exit, :live_chat_enabled
 
   has_many :sessions, serializer: V1::SessionSerializer
 

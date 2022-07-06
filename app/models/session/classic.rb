@@ -67,7 +67,11 @@ class Session::Classic < Session
   end
 
   def fetch_variables(filter_options = {})
-    filtered = filter_options[:allow_list].present? ? questions.where(type: filter_options[:allow_list]) : questions
+    filtered = if filter_options[:allow_list].present?
+                 questions.where(type: filter_options[:allow_list])
+               else
+                 questions.reorder('"question_groups"."position" ASC, "questions"."position" ASC')
+               end
     target_question = questions.find_by(id: filter_options[:question_id])
     if target_question
       comparator = to_boolean(filter_options[:include_current_question]) ? '<=' : '<'

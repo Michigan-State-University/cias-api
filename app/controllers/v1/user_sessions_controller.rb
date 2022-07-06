@@ -19,8 +19,19 @@ class V1::UserSessionsController < V1Controller
     )
     authorize! :create, user_session
     user_session.save!
+    @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
 
     render json: serialized_response(user_session), status: :ok
+  end
+
+  def quick_exit
+    user_session = user_session_load
+
+    authorize! :update, user_session
+
+    user_session.update(quick_exit: true)
+
+    head :ok
   end
 
   private
@@ -47,6 +58,10 @@ class V1::UserSessionsController < V1Controller
     Session.find(session_id)
   end
 
+  def user_session_load
+    UserSession.find(user_session_id)
+  end
+
   def cat_sessions_in_intervention
     session_load.intervention.sessions.where(type: 'Session::CatMh')
   end
@@ -59,8 +74,16 @@ class V1::UserSessionsController < V1Controller
     user_session_params[:session_id]
   end
 
+  def user_session_id
+    params[:user_session_id]
+  end
+
+  def intervention
+    Session.find(session_id).intervention
+  end
+
   def intervention_id
-    Session.find(session_id).intervention.id
+    intervention.id
   end
 
   def health_clinic_id
