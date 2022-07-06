@@ -41,12 +41,14 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def on_conversation_created(data)
-    interlocutors = [LiveChat::Interlocutor.new(user_id: data['userId']), LiveChat::Interlocutor.new(user_id: current_user.id)]
+    navigator = fetch_available_navigator
+    interlocutors = [LiveChat::Interlocutor.new(user_id: navigator.id), LiveChat::Interlocutor.new(user_id: current_user.id)]
     conversation = LiveChat::Conversation.create!(live_chat_interlocutors: interlocutors, intervention_id: data['interventionId'])
+    conversation.messages << LiveChat::Message.new(content: data['firstMessageContent'], live_chat_interlocutor: interlocutors[1])
     response = generic_message(V1::LiveChat::ConversationSerializer.new(conversation, { include: %i[live_chat_interlocutors] }).serializable_hash,
                                'conversation_created')
     ActionCable.server.broadcast(current_channel_id, response)
-    ActionCable.server.broadcast("user_conversation_channel_#{data['userId']}", response)
+    ActionCable.server.broadcast(user_channel_id(navigator), response)
   end
 
   private
@@ -69,5 +71,11 @@ class ConversationChannel < ApplicationCable::Channel
 
   def current_channel_id
     @current_channel_id ||= user_channel_id(current_user)
+  end
+
+  def fetch_available_navigator
+    # TODO: implement fetching online navigator with least conversations present
+    # TODO: after implementing fetching navigator - if all navigators are offline/busy then raise a custom exception and add it to exc handler
+    User.where(roles: ['navigator']).first
   end
 end
