@@ -222,7 +222,7 @@ class User < ApplicationRecord
   end
 
   def researcher?
-    roles.include('researcher')
+    roles.include?('researcher')
   end
 
   def navigator?

@@ -2,7 +2,7 @@
 
 class V1::LiveChat::InviteNavigators
   def self.call(emails, intervention)
-    new(emails, intervention)
+    new(emails, intervention).call
   end
 
   def initialize(emails, intervention)
@@ -11,16 +11,6 @@ class V1::LiveChat::InviteNavigators
   end
 
   def call
-    assign_role_or_invite_to_system(emails)
-    LiveChat::Interventions::NavigatorInvitations.create(user: user, intervention: intervention, accepted_at: DateTime.now)
-  end
-
-  attr_reader :emails, :intervention
-  attr_accessor :user, :users_exists
-
-  private
-
-  def assign_role_or_invite_to_system(emails)
     users_exists = User.where(email: emails)
     check_roles_of_existing_users(users_exists)
 
@@ -29,12 +19,17 @@ class V1::LiveChat::InviteNavigators
       invite_new_users_to_system(emails - users_exists.map(&:email))
 
       User.where(email: emails).find_each do |user|
-        LiveChat::Interventions::NavigatorInvitations(email: user.email, intervention: @intervention)
+        LiveChat::Interventions::NavigatorInvitations.create(email: user.email, intervention: @intervention)
       end
     end
 
     Navigators::InvitationJob.perform_later(emails, intervention.id)
   end
+
+  attr_reader :emails, :intervention
+  attr_accessor :user, :users_exists
+
+  private
 
   def check_roles_of_existing_users(users)
     users.each do |user|
