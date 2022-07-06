@@ -8,5 +8,7 @@ class Ability::Navigator < Ability::Base
 
   private
 
-  def navigator; end
+  def navigator
+    can :index, LiveChat::Conversation
+  end
 end
