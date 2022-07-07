@@ -54,6 +54,33 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         expect(phone.prefix).to eq '+1'
       end
     end
+
+    context 'correctly updates phone object' do
+      let(:nav_setup) do
+        navigator_setup = intervention.navigator_setup
+        navigator_setup.update!(phone: Phone.new(iso: 'US', prefix: '+48', number: '111111111'))
+        navigator_setup
+      end
+
+      let(:params) do
+        {
+          navigator_setup: {
+            phone: {
+              number: 111_222_333,
+              iso: 'PL',
+              prefix: '+43'
+            }
+          }
+        }
+      end
+
+      it do
+        phone = intervention.navigator_setup.phone
+        expect(phone.number).to eq 111_222_333.to_s
+        expect(phone.iso).to eq 'PL'
+        expect(phone.prefix).to eq '+43'
+      end
+    end
   end
 
   context 'when params invalid' do
