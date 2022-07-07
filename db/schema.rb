@@ -428,7 +428,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_065308) do
   create_table "navigator_invitations", force: :cascade do |t|
     t.text "email_ciphertext"
     t.string "email_bidx"
-    t.bigint "intervention_id"
+    t.uuid "intervention_id"
     t.datetime "accepted_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
