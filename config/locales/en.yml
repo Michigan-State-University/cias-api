@@ -94,6 +94,10 @@ en:
     invitations:
       accepted: "You've successfully joined %{organizable_type} %{organizable_name}."
       not_found: "%{organizable_type} Invitation not found"
+  live_chat:
+    navigators:
+      invitations:
+        success: "You have successfully accepted the invitation to intervention %{intervention_name}"
   organizable_mailer:
     invite_user:
       subject:      You've been invited to the %{organizable_type}

@@ -230,6 +230,12 @@ Rails.application.routes.draw do
                                         controller: '/v1/live_chat/interventions/participant_links'
         end
       end
+
+      namespace :navigators do
+        scope :invitations do
+          get 'confirm', to: 'invitations#confirm'
+        end
+      end
     end
 
     get 'me', to: 'users#me', as: :get_user_details
