@@ -3,7 +3,6 @@
 class V1::LiveChat::Navigators::InvitationsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[confirm]
 
-
   def index
     authorize! :read, Intervention
 
