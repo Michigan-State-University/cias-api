@@ -3,14 +3,19 @@
 class V1::LiveChat::Navigators::InvitationsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[confirm]
 
-  def index; end
+
+  def index
+    authorize! :read, Intervention
+
+    render json: serialized_response(not_accepted_invitations, 'LiveChat::Interventions::NavigatorInvitation')
+  end
 
   def create; end
 
   def destroy; end
 
   def confirm
-    intervention = intervention_load
+    intervention = Intervention.find(intervention_id)
     intervention.navigators << User.find_by(email: email)
     intervention.live_chat_navigator_invitations.find_by!(email: email, intervention_id: intervention.id).update!(accepted_at: DateTime.now)
 
@@ -28,12 +33,16 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
   end
 
   def intervention_load
-    Intervention.find(intervention_id)
+    Intervention.accessible_by(current_ability).find(intervention_id)
   end
 
   def redirect_to_web_app(**message)
     message.transform_values! { |v| Base64.encode64(v) }
 
     redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
+  end
+
+  def not_accepted_invitations
+    intervention_load.live_chat_navigator_invitations.not_accepted(intervention_id)
   end
 end

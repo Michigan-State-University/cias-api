@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class LiveChat::Interventions::NavigatorInvitations < ApplicationRecord
+class LiveChat::Interventions::NavigatorInvitation < ApplicationRecord
   belongs_to :intervention
 
   encrypts :email

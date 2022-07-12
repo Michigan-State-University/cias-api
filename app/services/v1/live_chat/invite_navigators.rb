@@ -19,7 +19,7 @@ class V1::LiveChat::InviteNavigators
       invite_new_users_to_system(emails - users_exists.map(&:email))
 
       User.where(email: emails).find_each do |user|
-        LiveChat::Interventions::NavigatorInvitations.create(email: user.email, intervention: @intervention)
+        LiveChat::Interventions::NavigatorInvitation.create(email: user.email, intervention: @intervention)
       end
     end
 

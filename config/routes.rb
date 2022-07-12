@@ -48,6 +48,9 @@ Rails.application.routes.draw do
       patch 'sessions/position', to: 'sessions#position'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy]
+      namespace :navigators do
+        resources :invitations, only: %i[index], controller: '/v1/live_chat/navigators/invitations'
+      end
     end
 
     scope 'interventions/:interventions_id', as: 'intervention' do

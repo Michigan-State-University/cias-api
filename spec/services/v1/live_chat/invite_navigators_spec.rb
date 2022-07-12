@@ -14,7 +14,7 @@ RSpec.describe V1::LiveChat::InviteNavigators do
 
   context 'when user doesn\'t exist' do
     it {
-      expect { subject }.to change(User, :count).by(1).and change(LiveChat::Interventions::NavigatorInvitations, :count).by(1)
+      expect { subject }.to change(User, :count).by(1).and change(LiveChat::Interventions::NavigatorInvitation, :count).by(1)
       expect(User.find_by(email: emails.first).roles).to eq ['navigator']
     }
 
@@ -26,7 +26,7 @@ RSpec.describe V1::LiveChat::InviteNavigators do
     let!(:emails) { [researcher.email] }
 
     it {
-      expect { subject }.to change(User, :count).by(0).and change(LiveChat::Interventions::NavigatorInvitations, :count).by(1)
+      expect { subject }.to change(User, :count).by(0).and change(LiveChat::Interventions::NavigatorInvitation, :count).by(1)
       expect(researcher.reload.roles).to include('researcher', 'navigator')
     }
 
