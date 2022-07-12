@@ -7,4 +7,8 @@ class LiveChat::Conversation < ApplicationRecord
   has_many :messages, class_name: 'LiveChat::Message', dependent: :destroy
   has_many :live_chat_interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :destroy
   has_many :users, through: :live_chat_interlocutors
+
+  scope :active_user_conversations, lambda { |user|
+    LiveChat::Conversation.joins(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: user.id }, archived: false)
+  }
 end

@@ -55,6 +55,14 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
       end
       expect(json_response['data'].map { |h| h['attributes'] }.pluck('last_message').map { |h| h.except('created_at') }).to eq expected
     end
+
+    context 'returns only non-archived conversations' do
+      let!(:archived_conversations) { create_list(:live_chat_conversation, 3, intervention: intervention, archived: true) }
+
+      it do
+        expect(json_response['data'].length).to eq conversations.length
+      end
+    end
   end
 
   context 'when user don\'t have permission' do

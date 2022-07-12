@@ -21,9 +21,9 @@ class ConversationChannel < ApplicationCable::Channel
       conversation.live_chat_interlocutors.each do |interlocutor|
         ActionCable.server.broadcast(user_channel_id(interlocutor.user), format_chat_message(message))
       end
-    rescue ActiveRecord::RecordInvalid
-      raise LiveChat::MessageTooLongException.new(
-        I18n.t('activerecord.errors.models.live_chat.message.attributes.content.too_long_detailed', max_len: 500, cur_len: data['content'].length),
+    rescue ActiveRecord::RecordInvalid => e
+      raise LiveChat::OperationInvalidException.new(
+        e.record.errors.map(&:message),
         current_channel_id,
         conversation.id
       )
@@ -51,6 +51,16 @@ class ConversationChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(user_channel_id(navigator), response)
   end
 
+  def on_conversation_ended(data)
+    # this event should only fire when navigator ends the conversation; therefore, current user should always be a navigator
+    conversation = LiveChat::Conversation.find(data['conversationId'])
+    conversation.update!(archived: true)
+    response = generic_message({ conversationId: conversation.id }, 'conversation_ended')
+    conversation.users.each do |user|
+      ActionCable.server.broadcast(user_channel_id(user), response)
+    end
+  end
+
   private
 
   def format_chat_message(message)
@@ -76,6 +86,6 @@ class ConversationChannel < ApplicationCable::Channel
   def fetch_available_navigator
     # TODO: implement fetching online navigator with least conversations present
     # TODO: after implementing fetching navigator - if all navigators are offline/busy then raise a custom exception and add it to exc handler
-    User.where(roles: ['navigator']).first
+    User.limit_to_roles(['navigator']).first
   end
 end
