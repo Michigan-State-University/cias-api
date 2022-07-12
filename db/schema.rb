@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_05_065308) do
+ActiveRecord::Schema.define(version: 2022_07_11_074728) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -354,6 +354,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_065308) do
     t.string "license_type", default: "limited"
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
+    t.boolean "quick_exit", default: false
     t.boolean "live_chat_enabled", default: false, null: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -380,6 +381,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_065308) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "intervention_id", null: false
+    t.boolean "archived", default: false, null: false
   end
 
   create_table "live_chat_interlocutors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -695,6 +697,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_065308) do
     t.string "awselb"
     t.uuid "user_intervention_id", null: false
     t.datetime "scheduled_at"
+    t.boolean "quick_exit", default: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
@@ -758,6 +761,7 @@ ActiveRecord::Schema.define(version: 2022_07_05_065308) do
     t.string "organizable_type"
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
+    t.boolean "quick_exit_enabled", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

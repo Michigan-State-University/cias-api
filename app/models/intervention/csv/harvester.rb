@@ -28,6 +28,7 @@ class Intervention::Csv::Harvester
       end
 
       header.concat(session_times_metadata(session))
+      header.concat(quick_exit_header(session))
     end
 
     header.flatten!
@@ -37,6 +38,10 @@ class Intervention::Csv::Harvester
 
   def session_times_metadata(session)
     %W[#{session.variable}.metadata.session_start #{session.variable}.metadata.session_end #{session.variable}.metadata.session_duration]
+  end
+
+  def quick_exit_header(session)
+    session.intervention.quick_exit ? %W[#{session.variable}.metadata.quick_exit] : []
   end
 
   def ignored_types
@@ -69,6 +74,7 @@ class Intervention::Csv::Harvester
         end
 
         metadata(session_variable, user_session, row_index)
+        quick_exit(session_variable, row_index, user_session)
       end
     end
   end
@@ -82,6 +88,12 @@ class Intervention::Csv::Harvester
       rows[row_index][session_headers_index + 1] = session_end
     end
     rows[row_index][session_headers_index] = session_start
+  end
+
+  def quick_exit(session_variable, row_index, user_session)
+    session_header_index = header.index("#{session_variable}.metadata.quick_exit")
+
+    rows[row_index][session_header_index] = boolean_to_int(user_session.quick_exit) if session_header_index.present?
   end
 
   def time_diff(start_time, end_time)
@@ -122,5 +134,9 @@ class Intervention::Csv::Harvester
 
       rows[row_index][var_index] = DEFAULT_VALUE
     end
+  end
+
+  def boolean_to_int(value)
+    value ? 1 : 0
   end
 end

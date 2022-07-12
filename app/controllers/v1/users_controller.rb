@@ -83,7 +83,7 @@ class V1::UsersController < V1Controller
   end
 
   def email_params
-    params[:email]
+    params[:email].downcase
   end
 
   def phone_params

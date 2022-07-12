@@ -37,8 +37,6 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def user_conversations
-    LiveChat::Conversation.
-      joins(:live_chat_interlocutors).
-      where(live_chat_interlocutors: { user_id: current_v1_user.id })
+    LiveChat::Conversation.active_user_conversations(current_v1_user)
   end
 end

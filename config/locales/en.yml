@@ -49,6 +49,7 @@ en:
               already_exists: already exists
         live_chat:
           message:
+            sent_in_archived_conversation: "Cannot send messages in archived conversations!"
             attributes:
               content:
                 too_long: 'length cannot exceed %{limit} characters.'
@@ -128,6 +129,11 @@ en:
         subject: 'Preview [CSV] Answers for: %{intervention_name}'
         header: Your preview CSV file is generated successfully
         html_body: 'CSV that you requested on %{requested_at} with preview data from <span style="color: #c866ea;">%{intervention_name}</span> is available as attachment to this email'
+  backup_mailer:
+    result:
+      subject: Your CIAS Intervention is ready to download!
+      body: Your Intervention is ready to download!
+      header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
@@ -198,3 +204,7 @@ en:
       subject: 'Error during translation'
       header: 'An error has occurred during translation.'
       body: 'Something goes wrong while translating your intervention. Please try again.'
+  mailer:
+    footnote:
+      not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
+      ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href=\"mailto:cias@msu.edu\">cias@msu.edu</a>. Thank you!<br /><br />"

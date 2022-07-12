@@ -2,9 +2,12 @@
 
 namespace :google_tts_languages do
   desc 'Fetch google tts'
-  task fetch: :environment do
-    GoogleTtsLanguage.delete_all
-    GoogleTtsVoice.delete_all
+  task :fetch,  [:update] => :environment do |_, args|
+    args.with_defaults(update: false)
+    unless args.update
+      GoogleTtsLanguage.delete_all
+      GoogleTtsVoice.delete_all
+    end
     text_to_speech_client = Google::Cloud::TextToSpeech.text_to_speech do |tts|
       tts.credentials = credentials
     end
@@ -15,19 +18,17 @@ namespace :google_tts_languages do
     end
     languages_hash = prepare_languages_hash
 
+    p "Voices count before: #{GoogleTtsVoice.count}"
+
     p 'Starting to fetch google tts languages ang google tts voices...'
 
     ActiveRecord::Base.transaction do
       hash.each do |language, voices|
         language_name = prepare_language_name(language, languages_hash)
-        tts_language = GoogleTtsLanguage.create!(language_name: language_name)
+        tts_language = GoogleTtsLanguage.find_or_create_by!(language_name: language_name)
 
-        usage_hash = Hash.new(0).merge({
-                                         'standard-male' => 1,
-                                         'standard-female' => 1,
-                                         'wavenet-male' => 1,
-                                         'wavenet-female' => 1
-                                       })
+        usage_hash = Hash.new(1)
+
         voices.each do |voice_type|
           voice_standard = voice_type.name.split('-')[2].downcase
           voice_gender = voice_type.ssml_gender.to_s.downcase
@@ -35,7 +36,7 @@ namespace :google_tts_languages do
           voice_name = "#{voice_hash}-#{usage_hash[voice_hash]}"
           usage_hash[voice_hash] += 1
 
-          GoogleTtsVoice.create!(
+          GoogleTtsVoice.find_or_create_by!(
             voice_label: voice_name.capitalize,
             voice_type: voice_type.name,
             language_code: language,
@@ -47,6 +48,7 @@ namespace :google_tts_languages do
       end
     end
 
+    p "Voices count after: #{GoogleTtsVoice.count}"
     p 'Finished fetch google tts languages ang google tts voices successfully!'
   end
 

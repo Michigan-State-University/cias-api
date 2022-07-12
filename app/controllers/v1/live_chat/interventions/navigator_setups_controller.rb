@@ -11,7 +11,7 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
     authorize! :update, Intervention
 
     setup = navigator_setup_load
-    setup.update!(update_params_for(setup))
+    update_setup(setup)
     render json: setup_response(setup)
   end
 
@@ -38,11 +38,16 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
                                             phone: %i[iso number prefix])
   end
 
-  def update_params_for(setup)
-    setup.phone.nil? ? navigator_setup_params.merge(phone: phone) : navigator_setup_params
+  def update_setup(setup)
+    if setup.phone.nil?
+      setup.update!(navigator_setup_params.merge({ phone: new_phone }))
+    else
+      setup.update!(navigator_setup_params.except(:phone))
+      setup.phone.update(navigator_setup_params[:phone])
+    end
   end
 
-  def phone
+  def new_phone
     Phone.create!(navigator_setup_params[:phone]) if navigator_setup_params[:phone].present?
   end
 end
