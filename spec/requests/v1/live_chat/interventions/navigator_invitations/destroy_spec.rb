@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe 'DELETE /v1/interventions/:intervention_id/navigators/invitations/:id', type: :request do
+RSpec.describe 'DELETE /v1/interventions/:intervention_id/navigator_invitations/:id', type: :request do
   let(:user) { create(:user, :researcher, :confirmed) }
   let(:intervention) { create(:intervention, :with_navigator_setup, user: user) }
   let(:headers) { user.create_new_auth_token }
   let(:request) do
-    delete v1_intervention_navigators_invitation_path(intervention_id: intervention.id, id: invitation_id), headers: headers
+    delete v1_intervention_navigator_invitation_path(intervention_id: intervention.id, id: invitation_id), headers: headers
   end
   let!(:navigator_invitation) { create(:navigator_invitation, intervention: intervention) }
   let!(:accepted_invitation) { create(:navigator_invitation, :confirmed, intervention: intervention) }

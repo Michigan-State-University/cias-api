@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe 'GET /v1/interventions/:intervention_id/navigators/invitations', type: :request do
+RSpec.describe 'GET /v1/interventions/:intervention_id/navigator_invitations', type: :request do
   let(:user) { create(:user, :researcher, :confirmed) }
   let(:intervention) { create(:intervention, :with_navigator_setup, user: user) }
   let(:headers) { user.create_new_auth_token }
   let(:request) do
-    get v1_intervention_navigators_invitations_path(intervention_id: intervention.id), headers: headers
+    get v1_intervention_navigator_invitations_path(intervention_id: intervention.id), headers: headers
   end
   let!(:navigator_invitations) { create_list(:navigator_invitation, 4, intervention: intervention) }
   let!(:accepted_invitation) { create(:navigator_invitation, :confirmed, intervention: intervention) }

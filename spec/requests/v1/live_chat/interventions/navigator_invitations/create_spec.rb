@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'POST /v1/live_chat/navigators/invitations', type: :request do
+RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', type: :request do
   let(:admin) { create(:user, :admin, :confirmed) }
   let(:intervention) { create(:intervention, user: admin) }
 
@@ -9,7 +9,7 @@ RSpec.describe 'POST /v1/live_chat/navigators/invitations', type: :request do
   end
 
   let(:request) do
-    post v1_live_chat_navigators_invitations_path, headers: admin.create_new_auth_token, params: params
+    post v1_intervention_navigator_invitations_path(intervention.id), headers: admin.create_new_auth_token, params: params
   end
 
   context 'Correctly invites emails' do
