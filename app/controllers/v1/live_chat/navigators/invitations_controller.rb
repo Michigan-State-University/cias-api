@@ -10,7 +10,16 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
     render json: serialized_response(not_accepted_invitations, 'LiveChat::Interventions::NavigatorInvitation')
   end
 
-  def create; end
+  def create
+    authorize! :update, Intervention
+
+    created_invitations = V1::LiveChat::InviteNavigators.call(
+      navigator_invitation_params[:emails],
+      Intervention.find(navigator_invitation_params[:intervention_id])
+    )
+
+    render json: serialized_response(created_invitations, 'LiveChat::Interventions::NavigatorInvitation'), status: :created
+  end
 
   def destroy
     authorize! :update, Intervention
@@ -28,6 +37,10 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
   end
 
   private
+
+  def navigator_invitation_params
+    params.require(:navigator_invitation).permit(:intervention_id, emails: [])
+  end
 
   def email
     params[:email]
