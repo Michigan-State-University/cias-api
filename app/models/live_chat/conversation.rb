@@ -8,7 +8,8 @@ class LiveChat::Conversation < ApplicationRecord
   has_many :live_chat_interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :destroy
   has_many :users, through: :live_chat_interlocutors
 
+  # TODO: change this later to include 'archived: false' options in the where clause
   scope :active_user_conversations, lambda { |user|
-    LiveChat::Conversation.joins(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: user.id }, archived: false)
+    LiveChat::Conversation.joins(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: user.id })
   }
 end

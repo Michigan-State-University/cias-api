@@ -51,11 +51,11 @@ class ConversationChannel < ApplicationCable::Channel
     ActionCable.server.broadcast(user_channel_id(navigator), response)
   end
 
-  def on_conversation_ended(data)
+  def on_conversation_archived(data)
     # this event should only fire when navigator ends the conversation; therefore, current user should always be a navigator
     conversation = LiveChat::Conversation.find(data['conversationId'])
     conversation.update!(archived: true)
-    response = generic_message({ conversationId: conversation.id }, 'conversation_ended')
+    response = generic_message({ conversationId: conversation.id }, 'conversation_archived')
     conversation.users.each do |user|
       ActionCable.server.broadcast(user_channel_id(user), response)
     end

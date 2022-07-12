@@ -18,7 +18,7 @@ module CableExceptionHandler
         conversationId: exc.conversation_id
       },
       status: 422,
-      topic: 'message-error'
+      topic: 'message_error'
     }
   end
 end
