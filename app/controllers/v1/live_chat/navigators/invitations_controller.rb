@@ -12,7 +12,12 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
   def create; end
 
-  def destroy; end
+  def destroy
+    authorize! :update, Intervention
+
+    not_accepted_invitations.find(invitation_id).destroy
+    render status: :ok
+  end
 
   def confirm
     intervention = Intervention.find(intervention_id)
@@ -34,6 +39,10 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
   def intervention_load
     Intervention.accessible_by(current_ability).find(intervention_id)
+  end
+
+  def invitation_id
+    params[:id]
   end
 
   def redirect_to_web_app(**message)

@@ -49,7 +49,7 @@ Rails.application.routes.draw do
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy]
       namespace :navigators do
-        resources :invitations, only: %i[index], controller: '/v1/live_chat/navigators/invitations'
+        resources :invitations, only: %i[index destroy], controller: '/v1/live_chat/navigators/invitations'
       end
     end
 
