@@ -45,6 +45,24 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', 
     end
   end
 
+  context 'Existed user cannot become a navigator' do
+    let(:participant) { create(:user, :confirmed, :participant) }
+    let(:params) do
+      {
+        navigator_invitation: {
+          emails: [participant.email],
+          intervention_id: intervention.id
+        }
+      }
+    end
+
+    it 'returns correct status code (FORBIDDEN) and msg' do
+      request
+      expect(response).to have_http_status(:forbidden)
+      expect(json_response['message']).to eq 'User cannot become a navigator'
+    end
+  end
+
   context 'Incorrect params' do
     let(:params) do
       {}
