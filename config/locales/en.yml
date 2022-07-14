@@ -53,7 +53,6 @@ en:
             attributes:
               content:
                 too_long: 'length cannot exceed %{limit} characters.'
-                too_long_detailed: "Message is too long. Max length: %{max_len}, got: %{cur_len}"
           navigator:
             not_researcher: 'User cannot become a navigator'
       messages:
@@ -208,3 +207,9 @@ en:
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
       ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href=\"mailto:cias@msu.edu\">cias@msu.edu</a>. Thank you!<br /><br />"
+  navigator_mailer:
+    invitation:
+      subject: "Welcome to the navigator role in CIAS!"
+      click_the_link: "Click the link to accept invitation"
+      navigator_invite: "Navigator intervention invite"
+      accept: "Accept invitation"
