@@ -22,7 +22,7 @@ class Ability::EInterventionAdmin < Ability::Researcher
     can :manage, ReportingDashboard, organization: { id: user.accepted_organization_ids }
     can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.accepted_organization_ids } }
     can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } }
-    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } } }
+    can :read, ChartStatistic, organization_id: user.accepted_organization_ids
   end
 
   def users_in_organization(user)

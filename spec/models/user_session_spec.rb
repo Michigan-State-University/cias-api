@@ -40,7 +40,7 @@ RSpec.describe UserSession, type: :model do
 
         it 'update user_session' do
           user_session.finish(send_email: false)
-          expect(user_intervention.status).to eq('completed')
+          expect(user_intervention.reload.status).to eq('completed')
           expect(user_intervention.completed_sessions).to eq(2)
           expect(user_intervention.finished_at).not_to eq(nil)
         end
