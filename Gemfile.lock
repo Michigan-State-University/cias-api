@@ -284,7 +284,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashie (1.2.0)
     hiredis (0.6.3)
-    i18n (1.11.0)
+    i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     i18n_data (0.11.0)
     iniparse (1.5.0)

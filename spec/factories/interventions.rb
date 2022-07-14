@@ -21,6 +21,12 @@ FactoryBot.define do
         intervention.live_chat_enabled = true
       end
     end
+
+    trait :with_navigators do
+      after(:build) do |intervention|
+        intervention.navigators << create(:user, :confirmed, :navigator)
+      end
+    end
   end
 
   factory :intervention_with_logo, class: Intervention do
