@@ -32,4 +32,15 @@ RSpec.describe V1::LiveChat::InviteNavigators do
 
     it { expect { subject }.to have_enqueued_job(Navigators::InvitationJob) }
   end
+
+  context 'when inviting existing user' do
+    let!(:existing_user) { create(:user, :confirmed, :navigator) }
+    let!(:invitation) { create(:navigator_invitation, intervention: intervention, email: existing_user.email) }
+    let!(:emails) { [existing_user.email] }
+
+    it do
+      expect { subject }.not_to change(User, :count)
+      expect(LiveChat::Interventions::NavigatorInvitation.count).to eq 1
+    end
+  end
 end
