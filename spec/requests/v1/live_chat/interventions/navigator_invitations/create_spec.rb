@@ -16,8 +16,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', 
     let(:params) do
       {
         navigator_invitation: {
-          emails: emails,
-          intervention_id: intervention.id
+          emails: emails
         }
       }
     end
@@ -50,8 +49,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', 
     let(:params) do
       {
         navigator_invitation: {
-          emails: [participant.email],
-          intervention_id: intervention.id
+          emails: [participant.email]
         }
       }
     end

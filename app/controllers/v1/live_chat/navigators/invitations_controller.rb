@@ -14,7 +14,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
     created_invitations = V1::LiveChat::InviteNavigators.call(
       navigator_invitation_params[:emails],
-      Intervention.find(navigator_invitation_params[:intervention_id])
+      Intervention.find(intervention_id)
     )
 
     render json: serialized_response(created_invitations, 'LiveChat::Interventions::NavigatorInvitation'), status: :created
