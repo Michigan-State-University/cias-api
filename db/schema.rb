@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_11_074728) do
+ActiveRecord::Schema.define(version: 2022_07_13_082632) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -742,6 +742,7 @@ ActiveRecord::Schema.define(version: 2022_07_11_074728) do
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
     t.boolean "quick_exit_enabled", default: false, null: false
+    t.boolean "online", default: false, null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

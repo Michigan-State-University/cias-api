@@ -48,6 +48,8 @@ en:
             variable:
               already_exists: already exists
         live_chat:
+          conversation:
+            no_navigator_available: "No navigators are currently present."
           message:
             sent_in_archived_conversation: "Cannot send messages in archived conversations!"
             attributes:

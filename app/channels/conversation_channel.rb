@@ -84,8 +84,16 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def fetch_available_navigator
-    # TODO: implement fetching online navigator with least conversations present
-    # TODO: after implementing fetching navigator - if all navigators are offline/busy then raise a custom exception and add it to exc handler
-    User.limit_to_roles(['navigator']).first
+    active_navigators = User.limit_to_roles(['navigator']).
+      where(online: true).
+      includes(:conversations).
+      # I could not, for the life of me, do it using active record :/
+      sort_by { |user| user.conversations.where(archived: false).count }
+    if active_navigators.empty?
+      raise LiveChat::NavigatorUnavailableException.new(I18n.t('activerecord.errors.models.live_chat.conversation.no_navigator_available'),
+                                                        current_channel_id)
+    end
+
+    active_navigators.first
   end
 end

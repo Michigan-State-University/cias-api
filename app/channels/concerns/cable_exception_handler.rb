@@ -5,20 +5,24 @@ module CableExceptionHandler
 
   included do
     rescue_from LiveChat::OperationInvalidException do |exc|
-      ActionCable.server.broadcast(exc.channel_id, format_validation_error_message(exc))
+      ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 422, 'message_error', conversationId: exc.conversation_id))
+    end
+
+    rescue_from LiveChat::NavigatorUnavailableException do |exc|
+      ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 404, 'navigator_unavailable'))
     end
   end
 
   protected
 
-  def format_validation_error_message(exc)
+  def format_error_message(exc, status, topic, **additional_error_data)
     {
       data: {
         error: exc.message,
-        conversationId: exc.conversation_id
+        **additional_error_data
       },
-      status: 422,
-      topic: 'message_error'
+      status: status,
+      topic: topic
     }
   end
 end

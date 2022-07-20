@@ -74,6 +74,10 @@ class User < ApplicationRecord
   # CHARTS
   has_many :chart_statistics, dependent: :nullify # statistics of user answers
 
+  # LIVE CHAT
+  has_many :interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :restrict_with_exception
+  has_many :conversations, class_name: 'LiveChat::Conversation', through: :interlocutors
+
   # USER IN GENERAL
   has_many :user_verification_codes, dependent: :destroy
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
