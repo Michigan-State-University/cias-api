@@ -55,6 +55,8 @@ en:
             attributes:
               content:
                 too_long: 'length cannot exceed %{limit} characters.'
+          navigator:
+            not_researcher: 'User cannot become a navigator'
       messages:
         undestroyable: Forbidden operation
   interventions:
@@ -94,6 +96,10 @@ en:
     invitations:
       accepted: "You've successfully joined %{organizable_type} %{organizable_name}."
       not_found: "%{organizable_type} Invitation not found"
+  live_chat:
+    navigators:
+      invitations:
+        success: "You have successfully accepted the invitation to intervention %{intervention_name}"
   organizable_mailer:
     invite_user:
       subject:      You've been invited to the %{organizable_type}
@@ -203,3 +209,9 @@ en:
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
       ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href=\"mailto:cias@msu.edu\">cias@msu.edu</a>. Thank you!<br /><br />"
+  navigator_mailer:
+    invitation:
+      subject: "Welcome to the navigator role in CIAS!"
+      click_the_link: "Click the link to accept invitation"
+      navigator_invite: "Navigator intervention invite"
+      accept: "Accept invitation"

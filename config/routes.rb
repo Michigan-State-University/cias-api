@@ -49,6 +49,7 @@ Rails.application.routes.draw do
       patch 'sessions/position', to: 'sessions#position'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy]
+      resources :navigator_invitations, only: %i[index destroy create], controller: '/v1/live_chat/navigators/invitations'
     end
 
     scope 'interventions/:interventions_id', as: 'intervention' do
@@ -226,10 +227,17 @@ Rails.application.routes.draw do
       end
 
       scope '/intervention/:id', as: :intervention do
+        resources :navigators, controller: 'interventions/navigators', only: :index
         resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'
         namespace :navigator_setups do
           resources :participant_links, only: %i[create update destroy], param: :participant_link_id,
                                         controller: '/v1/live_chat/interventions/participant_links'
+        end
+      end
+
+      namespace :navigators do
+        scope :invitations do
+          get 'confirm', to: 'invitations#confirm'
         end
       end
     end

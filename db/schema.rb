@@ -323,6 +323,15 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
     t.index ["intervention_id"], name: "index_intervention_accesses_on_intervention_id"
   end
 
+  create_table "intervention_navigators", force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "intervention_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["intervention_id"], name: "index_intervention_navigators_on_intervention_id"
+    t.index ["user_id"], name: "index_intervention_navigators_on_user_id"
+  end
+
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "user_id", null: false
@@ -416,6 +425,17 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "phone_ciphertext"
+  end
+
+  create_table "navigator_invitations", force: :cascade do |t|
+    t.text "email_ciphertext"
+    t.string "email_bidx"
+    t.uuid "intervention_id"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["email_bidx"], name: "index_navigator_invitations_on_email_bidx"
+    t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
