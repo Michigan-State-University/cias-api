@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_08_082300) do
+ActiveRecord::Schema.define(version: 2022_07_19_115748) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -189,6 +189,17 @@ ActiveRecord::Schema.define(version: 2022_06_08_082300) do
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
   end
 
+  create_table "downloaded_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "generated_report_id", null: false
+    t.boolean "downloaded", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["generated_report_id"], name: "index_downloaded_reports_on_generated_report_id"
+    t.index ["user_id", "generated_report_id"], name: "index_downloaded_reports_on_user_id_and_generated_report_id"
+    t.index ["user_id"], name: "index_downloaded_reports_on_user_id"
+  end
+
   create_table "e_intervention_admin_organizations", force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "organization_id"
@@ -346,6 +357,7 @@ ActiveRecord::Schema.define(version: 2022_06_08_082300) do
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
+    t.boolean "live_chat_enabled", default: false, null: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -365,6 +377,46 @@ ActiveRecord::Schema.define(version: 2022_06_08_082300) do
     t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
+  end
+
+  create_table "live_chat_conversations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.uuid "intervention_id", null: false
+  end
+
+  create_table "live_chat_interlocutors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "conversation_id", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "live_chat_messages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text "content", default: "", null: false
+    t.uuid "conversation_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.uuid "live_chat_interlocutor_id", null: false
+    t.boolean "is_read", default: false, null: false
+  end
+
+  create_table "live_chat_navigator_setups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "no_navigator_available_message", default: "", null: false
+    t.string "contact_email", default: "", null: false
+    t.integer "notify_by", default: 0, null: false
+    t.uuid "intervention_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "is_navigator_notification_on", default: true
+  end
+
+  create_table "live_chat_participant_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text "url", null: false
+    t.string "display_name", default: "", null: false
+    t.uuid "navigator_setup_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "messages", force: :cascade do |t|
@@ -405,6 +457,7 @@ ActiveRecord::Schema.define(version: 2022_06_08_082300) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "number_ciphertext"
+    t.uuid "navigator_setup_id"
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
@@ -735,12 +788,22 @@ ActiveRecord::Schema.define(version: 2022_06_08_082300) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "downloaded_reports", "generated_reports"
+  add_foreign_key "downloaded_reports", "users"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"
+  add_foreign_key "live_chat_conversations", "interventions"
+  add_foreign_key "live_chat_interlocutors", "live_chat_conversations", column: "conversation_id"
+  add_foreign_key "live_chat_interlocutors", "users"
+  add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
+  add_foreign_key "live_chat_messages", "live_chat_interlocutors"
+  add_foreign_key "live_chat_navigator_setups", "interventions"
+  add_foreign_key "live_chat_participant_links", "live_chat_navigator_setups", column: "navigator_setup_id"
+  add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"
