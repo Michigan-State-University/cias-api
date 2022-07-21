@@ -11,7 +11,7 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
     authorize! :update, Intervention
 
     setup = navigator_setup_load
-    update_setup(setup)
+    V1::LiveChat::Interventions::UpdateNavigatorSetupService.call(setup, navigator_setup_params)
     render json: setup_response(setup)
   end
 
@@ -35,19 +35,6 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
 
   def navigator_setup_params
     params.require(:navigator_setup).permit(:contact_email, :notify_by, :no_navigator_available_message, :is_navigator_notification_on,
-                                            phone: %i[iso number prefix])
-  end
-
-  def update_setup(setup)
-    if setup.phone.nil?
-      setup.update!(navigator_setup_params.merge({ phone: new_phone }))
-    else
-      setup.update!(navigator_setup_params.except(:phone))
-      setup.phone.update(navigator_setup_params[:phone])
-    end
-  end
-
-  def new_phone
-    Phone.create!(navigator_setup_params[:phone]) if navigator_setup_params[:phone].present?
+                                            :phone, phone: %i[iso number prefix])
   end
 end

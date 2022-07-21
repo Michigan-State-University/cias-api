@@ -56,11 +56,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     end
 
     context 'correctly updates phone object' do
-      let(:nav_setup) do
-        navigator_setup = intervention.navigator_setup
-        navigator_setup.update!(phone: Phone.new(iso: 'US', prefix: '+48', number: '111111111'))
-        navigator_setup
-      end
+      let!(:intervention) { create(:intervention, :with_navigator_setup_and_phone, user: user) }
 
       let(:params) do
         {
@@ -75,11 +71,28 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       end
 
       it do
-        phone = intervention.navigator_setup.phone
+        phone = intervention.navigator_setup.reload.phone
         expect(phone.number).to eq 111_222_333.to_s
         expect(phone.iso).to eq 'PL'
         expect(phone.prefix).to eq '+43'
       end
+    end
+  end
+
+  context 'sets phone to nil when phone sent as nil and phone is present' do
+    let!(:intervention) { create(:intervention, :with_navigator_setup_and_phone, user: user) }
+
+    let(:params) do
+      {
+        navigator_setup: {
+          phone: nil
+        }
+      }
+    end
+
+    it do
+      expect(intervention.navigator_setup.reload.phone).to be nil
+      expect(Phone.count).to eq 0
     end
   end
 

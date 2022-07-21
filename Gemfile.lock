@@ -526,7 +526,7 @@ GEM
       faraday (>= 0.9, < 2.0)
       jwt (>= 1.5, <= 2.5)
       nokogiri (>= 1.6, < 2.0)
-    tzinfo (2.0.4)
+    tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.0.0)
     unicode_utils (1.4.0)
