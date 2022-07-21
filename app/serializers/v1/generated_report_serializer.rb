@@ -12,7 +12,7 @@ class V1::GeneratedReportSerializer < V1Serializer
   end
 
   attribute :downloaded do |object, params|
-    report = DownloadedReport.find_by(user_id: params[:user], generated_report_id: object.id)
+    report = DownloadedReport.find_by(user_id: params[:user_id], generated_report_id: object.id)
     report.nil? ? false : report.downloaded?
   end
 end

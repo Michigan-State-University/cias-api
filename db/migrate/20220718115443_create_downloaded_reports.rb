@@ -7,5 +7,6 @@ class CreateDownloadedReports < ActiveRecord::Migration[6.1]
 
       t.timestamps
     end
+    add_index(:downloaded_reports, [:user_id, :generated_report_id])
   end
 end
