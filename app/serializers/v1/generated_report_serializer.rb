@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::GeneratedReportSerializer < V1Serializer
+  include FastJsonapi::ObjectSerializer
   attributes :name, :report_for
 
   attribute :pdf_report_url do |object|
@@ -12,7 +13,6 @@ class V1::GeneratedReportSerializer < V1Serializer
   end
 
   attribute :downloaded do |object, params|
-    report = DownloadedReport.find_by(user_id: params[:user_id], generated_report_id: object.id)
-    report.nil? ? false : report.downloaded?
+    object.downloaded?(params[:user_id])
   end
 end

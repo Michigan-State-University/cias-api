@@ -28,6 +28,9 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
     let!(:third_party_report) do
       create(:generated_report, :with_pdf_report, :third_party, user_session: user_session2)
     end
+    let!(:downloaded_report_third_party) do
+      create(:downloaded_report, generated_report: third_party_report, user: user)
+    end
 
     before do
       get v1_generated_reports_path, params: params, headers: headers
@@ -71,7 +74,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
             'report_for' => 'third_party',
             'pdf_report_url' => include('example_report.pdf'),
             'created_at' => Time.current.iso8601,
-            'downloaded' => false
+            'downloaded' => true
           )
         )
       end

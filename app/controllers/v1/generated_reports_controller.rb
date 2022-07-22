@@ -7,7 +7,7 @@ class V1::GeneratedReportsController < V1Controller
     collection = generated_reports_scope.order(created_at: order)
     paginated_collection = paginate(collection, params)
     render json: serialized_hash(paginated_collection, controller_name.classify,
-                                 { user_id: current_v1_user.id }).merge(reports_size: collection.size)
+                                 params: { user_id: current_v1_user.id }).merge(reports_size: collection.size)
   end
 
   private
