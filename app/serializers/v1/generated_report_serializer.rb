@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class V1::GeneratedReportSerializer < V1Serializer
-  include FastJsonapi::ObjectSerializer
   attributes :name, :report_for
 
   attribute :pdf_report_url do |object|
