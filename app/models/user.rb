@@ -70,6 +70,8 @@ class User < ApplicationRecord
   # REPORTS AVAILABLE FOR THIRD PARTY USER
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
                                                  dependent: :destroy
+
+  # DOWNLOADED REPORTS AVAILABLE FOR USER
   has_many :downloaded_reports, dependent: :destroy
   has_many :generated_reports, through: :downloaded_reports
 
