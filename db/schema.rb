@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_08_082300) do
+ActiveRecord::Schema.define(version: 2022_07_21_155540) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -543,7 +543,7 @@ ActiveRecord::Schema.define(version: 2022_06_08_082300) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
-    t.string "type", default: "SmsPlan", null: false
+    t.string "type", default: "SmsPlan::Normal", null: false
     t.boolean "include_first_name"
     t.boolean "include_last_name"
     t.boolean "include_phone_number"
