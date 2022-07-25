@@ -9,6 +9,9 @@ class GeneratedReport < ApplicationRecord
   has_many :generated_reports_third_party_users, dependent: :destroy
   has_many :third_party_users, through: :generated_reports_third_party_users, source: :third_party
 
+  has_many :downloaded_reports, dependent: :destroy
+  has_many :users, through: :downloaded_reports
+
   delegate :name, to: :report_template, prefix: true
 
   scope :for_third_party_user, lambda { |user|
@@ -25,7 +28,7 @@ class GeneratedReport < ApplicationRecord
   }
 
   def downloaded?(user_id)
-    downloaded_report = DownloadedReport.find_by(user_id: user_id, generated_report_id: id)
+    downloaded_report = DownloadedReport.includes(:user, :generated_report).find_by(user_id: user_id, generated_report_id: id)
     downloaded_report.nil? ? false : downloaded_report.downloaded?
   end
 end
