@@ -28,7 +28,7 @@ class GeneratedReport < ApplicationRecord
   }
 
   def downloaded?(user_id)
-    downloaded_report = DownloadedReport.includes(:user, :generated_report).find_by(user_id: user_id, generated_report_id: id)
+    downloaded_report = DownloadedReport.find_by(user_id: user_id, generated_report_id: id)
     downloaded_report.nil? ? false : downloaded_report.downloaded?
   end
 end
