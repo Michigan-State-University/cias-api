@@ -3,24 +3,18 @@
 class V1::DownloadedReportsController < V1Controller
   def create
     authorize! :create, DownloadedReport
-    if already_downloaded?
-      render json: { message: 'Report was already marked as downloaded' }.to_json, status: :unprocessable_entity
-    else
-      report_status = DownloadedReport.create!(
-        user_id: current_v1_user.id,
-        generated_report_id: report_id_param,
-        downloaded: true
-      )
-
-      render json: serialized_response(report_status), status: :created
+    status_code = :ok
+    report = DownloadedReport.find_or_create_by!(
+      user_id: current_v1_user.id,
+      generated_report_id: report_id_param,
+      downloaded: true
+    ) do
+      status_code = :created
     end
+    render json: serialized_response(report), status: status_code
   end
 
   private
-
-  def already_downloaded?
-    !DownloadedReport.find_by(user_id: current_v1_user.id, generated_report_id: report_id_param).nil?
-  end
 
   def report_id_param
     params.require(:report_id)

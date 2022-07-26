@@ -84,7 +84,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
       let!(:request2) { post v1_downloaded_reports_path, params: params, headers: headers }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:ok)
         expect(DownloadedReport.count).to eq(1)
       end
     end
