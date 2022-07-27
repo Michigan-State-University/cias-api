@@ -13,6 +13,5 @@ class Ability::Participant < Ability::Base
   def participant
     enable_fill_in_access(user.id, Intervention.available_for_participant(user.email))
     can %i[read get_protected_attachment], GeneratedReport, participant_id: user.id, report_for: 'participant'
-    can :create, DownloadedReport, user_id: user.id
   end
 end

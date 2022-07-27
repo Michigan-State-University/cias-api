@@ -17,7 +17,6 @@ class Ability::Admin < Ability::Base
       report.user_session.session.intervention.user_id != user.id
     end
     cannot :manage, GeneratedReport
-    cannot :manage, DownloadedReport
     can :manage, GeneratedReport, user_session: { session: { intervention: { user_id: user.id } } }
   end
 end

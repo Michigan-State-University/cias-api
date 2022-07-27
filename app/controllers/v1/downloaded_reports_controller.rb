@@ -2,7 +2,6 @@
 
 class V1::DownloadedReportsController < V1Controller
   def create
-    authorize! :create, DownloadedReport
     status_code = :ok
     report = DownloadedReport.find_or_create_by!(
       user_id: current_v1_user.id,
