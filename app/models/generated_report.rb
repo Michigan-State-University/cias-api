@@ -8,9 +8,7 @@ class GeneratedReport < ApplicationRecord
 
   has_many :generated_reports_third_party_users, dependent: :destroy
   has_many :third_party_users, through: :generated_reports_third_party_users, source: :third_party
-
   has_many :downloaded_reports, dependent: :destroy
-  has_many :users, through: :downloaded_reports
 
   delegate :name, to: :report_template, prefix: true
 
