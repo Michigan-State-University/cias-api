@@ -5,6 +5,10 @@ class ConversationChannel < ApplicationCable::Channel
 
   def subscribed
     stream_from current_channel_id
+    if intervention_id.present? && no_navigator_available?(intervention_id) # rubocop:disable Style/GuardClause
+      ActionCable.server.broadcast(current_channel_id,
+                                   generic_message({}, 'navigator_unavailable', 404))
+    end
   end
 
   def unsubscribed
@@ -41,7 +45,7 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def on_conversation_created(data)
-    navigator = fetch_available_navigator
+    navigator = fetch_available_navigator(data['interventionId'])
     interlocutors = [LiveChat::Interlocutor.new(user_id: navigator.id), LiveChat::Interlocutor.new(user_id: current_user.id)]
     conversation = LiveChat::Conversation.create!(live_chat_interlocutors: interlocutors, intervention_id: data['interventionId'])
     conversation.messages << LiveChat::Message.new(content: data['firstMessageContent'], live_chat_interlocutor: interlocutors[1])
@@ -83,17 +87,29 @@ class ConversationChannel < ApplicationCable::Channel
     @current_channel_id ||= user_channel_id(current_user)
   end
 
-  def fetch_available_navigator
-    active_navigators = User.limit_to_roles(['navigator']).
-      where(online: true).
-      includes(:conversations).
-      # I could not, for the life of me, do it using active record :/
-      sort_by { |user| user.conversations.where(archived: false).count }
+  def fetch_available_navigator(intervention_id)
+    active_navigators = fetch_online_navigators(intervention_id)
     if active_navigators.empty?
       raise LiveChat::NavigatorUnavailableException.new(I18n.t('activerecord.errors.models.live_chat.conversation.no_navigator_available'),
                                                         current_channel_id)
     end
 
     active_navigators.first
+  end
+
+  def no_navigator_available?(intervention_id)
+    !Intervention.find(intervention_id).navigators.exists?(online: true)
+  end
+
+  def fetch_online_navigators(intervention_id)
+    intervention = Intervention.find(intervention_id)
+    intervention.navigators.
+          where(online: true).
+          includes(:conversations).
+          sort_by { |user| user.conversations.where(archived: false).count }
+  end
+
+  def intervention_id
+    params[:intervention_id]
   end
 end

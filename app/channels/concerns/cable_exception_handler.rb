@@ -9,7 +9,7 @@ module CableExceptionHandler
     end
 
     rescue_from LiveChat::NavigatorUnavailableException do |exc|
-      ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 404, 'navigator_unavailable'))
+      ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 404, 'navigator_unavailable_error'))
     end
   end
 
