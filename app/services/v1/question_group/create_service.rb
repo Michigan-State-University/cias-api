@@ -20,7 +20,9 @@ class V1::QuestionGroup::CreateService
     qg_plain.position = session.question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
     qg_plain.save!
 
-    questions.update_all(question_group_id: qg_plain.id) # rubocop:disable Rails/SkipsModelValidations
+    questions.each do |question|
+      qg_plain.questions << question
+    end
     create_new_questions(qg_plain, questions_params)
 
     qg_plain

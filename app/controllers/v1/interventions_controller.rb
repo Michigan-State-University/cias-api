@@ -36,6 +36,14 @@ class V1::InterventionsController < V1Controller
     render status: :ok
   end
 
+  def export
+    authorize! :update, Intervention
+
+    Intervention::ExportJob.perform_later(current_v1_user.id, params[:id])
+
+    render status: :ok
+  end
+
   private
 
   def interventions_scope
@@ -57,7 +65,7 @@ class V1::InterventionsController < V1Controller
       params.require(:intervention).permit(:status, :cat_mh_pool, :is_access_revoked)
     else
       params.require(:intervention).permit(:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id, :cat_mh_application_id,
-                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type)
+                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit)
     end
   end
 

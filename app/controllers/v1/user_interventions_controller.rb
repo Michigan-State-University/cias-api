@@ -22,6 +22,8 @@ class V1::UserInterventionsController < V1Controller
       health_clinic_id: health_clinic_id
     )
 
+    current_v1_user.update!(quick_exit_enabled: intervention_load.quick_exit)
+
     render json: serialized_response(user_intervention)
   end
 
@@ -29,6 +31,10 @@ class V1::UserInterventionsController < V1Controller
 
   def user_intervention_load
     user_intervention_scope.find(params[:id])
+  end
+
+  def intervention_load
+    Intervention.find(intervention_id)
   end
 
   def user_intervention_scope

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
   let!(:user) { create(:user, :confirmed, :researcher, created_at: 1.day.ago) }
   let!(:participant) { create(:user, :confirmed, :participant) }
-  let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id) }
+  let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true) }
   let!(:intervention_status) { :published }
   let!(:session) { create(:session, intervention_id: intervention.id) }
   let!(:invitation_email) { 'a@a.com' }
@@ -34,6 +34,11 @@ RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
 
       it 'creates correct session invites' do
         expect(session.reload.invitations.map(&:email)).to match_array([invitation_email, participant.email])
+      end
+
+      it 'set correct quick_exit_enabled for user' do
+        expect(participant.reload.quick_exit_enabled).to be true
+        expect(User.find_by(email: invitation_email).reload.quick_exit_enabled).to be true
       end
     end
 

@@ -15,14 +15,14 @@ class Ability::EInterventionAdmin < Ability::Researcher
     can :manage, UserIntervention, intervention: { user_id: user.id }
     can %i[read update], Organization, id: user.accepted_organization_ids
     can :invite_organization_admin, Organization, id: user.accepted_organization_ids
-    can :manage, HealthSystem, organization: { id: user.organizable_id }
-    can :invite_health_system_admin, HealthSystem, organization: { id: user.organizable_id }
-    can :manage, HealthClinic, health_system: { organization: { id: user.organizable_id } }
-    can :invite_health_clinic_admin, HealthClinic, health_system: { organization: { id: user.organizable_id } }
-    can :manage, ReportingDashboard, organization: { id: user.organizable_id }
-    can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.organizable_id } }
-    can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.organizable_id } } }
-    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { id: user.organizable_id } } } }
+    can :manage, HealthSystem, organization: { id: user.accepted_organization_ids }
+    can :invite_health_system_admin, HealthSystem, organization: { id: user.accepted_organization_ids }
+    can :manage, HealthClinic, health_system: { organization: { id: user.accepted_organization_ids } }
+    can :invite_health_clinic_admin, HealthClinic, health_system: { organization: { id: user.accepted_organization_ids } }
+    can :manage, ReportingDashboard, organization: { id: user.accepted_organization_ids }
+    can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.accepted_organization_ids } }
+    can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } }
+    can :read, ChartStatistic, organization_id: user.accepted_organization_ids
   end
 
   def users_in_organization(user)
