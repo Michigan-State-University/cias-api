@@ -89,6 +89,8 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
           expect(json_response['data']['relationships']['questions']['data'].size).to eq 3
           expect(json_response['included'][0]['attributes']['title']).to eq 'Question Id Title'
           expect(json_response['included'][2]['attributes']['title']).to eq 'Question Id Title'
+          expect(QuestionGroup.find(json_response['data']['id']).questions.size).to eq question_ids.size
+          expect { QuestionGroup.find(question_group.id) }.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
 

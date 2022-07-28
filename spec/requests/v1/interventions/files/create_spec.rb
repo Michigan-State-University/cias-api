@@ -26,7 +26,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/files', type: :request d
         file_url = polymorphic_url(intervention.reload.files.first).sub('http://www.example.com/', '')
         expect(json_response['data']['attributes']['files'].first).to include(
           'id' => intervention.reload.files.first.id,
-          'name' => 'test_image_1.jpg',
+          'name' => include('test_image_1.jpg'),
           'url' => include(file_url)
         )
       end

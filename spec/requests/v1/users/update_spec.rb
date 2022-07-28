@@ -207,10 +207,15 @@ describe 'PATCH /v1/users/:id', type: :request do
             context 'with answer' do
               let!(:other_user) { create(:user, :participant, :confirmed, active: false) }
               let!(:user_id) { other_user.id }
-              let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+              let(:intervention) { create(:intervention, user: current_user) }
+              let!(:session) { create(:session, intervention: intervention) }
               let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
               let!(:question) { create(:question_slider, question_group: question_group) }
-              let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: other_user, session: session)) }
+              let(:user_intervention) { create(:user_intervention, intervention: intervention, user: other_user) }
+              let!(:answer) do
+                create(:answer_slider, question: question,
+                                       user_session: create(:user_session, user: other_user, session: session, user_intervention: user_intervention))
+              end
               let!(:params) do
                 {
                   user: {
@@ -259,10 +264,15 @@ describe 'PATCH /v1/users/:id', type: :request do
       context 'when current_user updates participant' do
         let!(:other_user) { create(:user, :participant, :confirmed) }
         let!(:user_id) { other_user.id }
-        let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+        let(:intervention) { create(:intervention, user: current_user) }
+        let!(:session) { create(:session, intervention: intervention) }
         let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
         let!(:question) { create(:question_slider, question_group: question_group) }
-        let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: other_user, session: session)) }
+        let(:user_intervention) { create(:user_intervention, user: other_user, intervention: intervention) }
+        let!(:answer) do
+          create(:answer_slider, question: question,
+                                 user_session: create(:user_session, user: other_user, session: session, user_intervention: user_intervention))
+        end
 
         before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
 

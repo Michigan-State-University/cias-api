@@ -38,6 +38,7 @@ Rails.application.routes.draw do
 
     resources :interventions, only: %i[index show create update] do
       post 'clone', on: :member
+      post 'export', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
@@ -129,6 +130,7 @@ Rails.application.routes.draw do
     resources :user_sessions, only: %i[create] do
       resources :questions, only: %i[index], module: 'user_sessions'
       resources :answers, only: %i[index show create], module: 'user_sessions'
+      patch 'quick_exit', to: 'user_sessions#quick_exit'
     end
 
     resources :teams, only: %i[index show create update destroy] do

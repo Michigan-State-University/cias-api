@@ -33,4 +33,8 @@ class V1::UserSessionSerializer < V1Serializer
   attribute :intervention_type do |object|
     object.session.intervention.type
   end
+
+  attribute :quick_exit_enabled do |object|
+    object.session.intervention.quick_exit
+  end
 end

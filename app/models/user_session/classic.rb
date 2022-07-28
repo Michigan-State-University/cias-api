@@ -30,6 +30,7 @@ class UserSession::Classic < UserSession
 
     cancel_timeout_job
     update(finished_at: DateTime.current)
+    reload
 
     GenerateUserSessionReportsJob.perform_later(id)
 
