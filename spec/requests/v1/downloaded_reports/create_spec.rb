@@ -31,7 +31,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
       before { request }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:ok)
         expect(DownloadedReport.count).to eq(1)
       end
 
@@ -39,8 +39,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
         expect(json_response['data']['attributes']).to include(
           {
             'user_id' => user.id,
-            'generated_report_id' => participant_report.id,
-            'downloaded' => true
+            'generated_report_id' => participant_report.id
           }
         )
       end
@@ -92,8 +91,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
         expect(json_response['data']['attributes']).to include(
           {
             'user_id' => user.id,
-            'generated_report_id' => participant_report.id,
-            'downloaded' => true
+            'generated_report_id' => participant_report.id
           }
         )
       end
@@ -128,7 +126,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
       before { request }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:ok)
         expect(DownloadedReport.count).to eq(1)
       end
 
@@ -136,7 +134,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
         before { request }
 
         it 'returns correct status' do
-          expect(response).to have_http_status(:created)
+          expect(response).to have_http_status(:ok)
           expect(DownloadedReport.count).to eq(1)
         end
 
@@ -144,8 +142,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
           expect(json_response['data']['attributes']).to include(
             {
               'user_id' => user.id,
-              'generated_report_id' => third_party_report.id,
-              'downloaded' => true
+              'generated_report_id' => third_party_report.id
             }
           )
         end
@@ -169,7 +166,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
       before { request }
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:created)
+        expect(response).to have_http_status(:ok)
         expect(DownloadedReport.count).to eq(1)
       end
 
@@ -177,8 +174,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
         expect(json_response['data']['attributes']).to include(
           {
             'user_id' => user.id,
-            'generated_report_id' => report.id,
-            'downloaded' => true
+            'generated_report_id' => report.id
           }
         )
       end

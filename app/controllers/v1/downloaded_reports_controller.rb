@@ -2,15 +2,11 @@
 
 class V1::DownloadedReportsController < V1Controller
   def create
-    status_code = :ok
     report = DownloadedReport.find_or_create_by!(
       user_id: current_v1_user.id,
-      generated_report_id: report_id_param,
-      downloaded: true
-    ) do
-      status_code = :created
-    end
-    render json: serialized_response(report), status: status_code
+      generated_report_id: report_id_param
+    )
+    render json: serialized_response(report), status: :ok
   end
 
   private
