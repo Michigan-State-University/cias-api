@@ -13,7 +13,7 @@ class V1::GeneratedReportsController < V1Controller
   private
 
   def generated_reports_scope
-    GeneratedReportFinder.search(filter_params, current_v1_user)
+    GeneratedReportFinder.search(filter_params, current_v1_user).includes(:downloaded_reports)
   end
 
   def filter_params

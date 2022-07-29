@@ -192,7 +192,6 @@ ActiveRecord::Schema.define(version: 2022_07_18_115443) do
   create_table "downloaded_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "generated_report_id", null: false
-    t.boolean "downloaded", default: false, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["generated_report_id"], name: "index_downloaded_reports_on_generated_report_id"
