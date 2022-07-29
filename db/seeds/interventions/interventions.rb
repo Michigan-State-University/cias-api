@@ -8,8 +8,8 @@ require_relative './/db_handler'
 require_relative './/question_data_handler'
 
 NUM_OF_USERS = 3
-INTERVENTIONS_PER_USER = 9
-SESSIONS_PER_INTERVENTION = 9
+INTERVENTIONS_PER_USER = 3
+SESSIONS_PER_INTERVENTION = 3
 QUESTION_GROUPS_PER_SESSION = 3
 QUESTIONS_PER_QUESTION_GROUP = 3
 ANSWERS_PER_QUESTION = 3
@@ -17,6 +17,8 @@ ANSWERS_PER_QUESTION = 3
 INTERVENTION_STATUS = %w[draft published closed archived].freeze
 INTERVENTION_NAMES = ['Drugs intervention', 'Smoking intervention', 'Alcohol intervention'].freeze
 INTERVENTION_NAMES_DIRECTED = ['Husbands', 'Pregnant women', 'Underage teenagers'].freeze
+
+QUESTIONS = [single, number].freeze
 
 CURRENT_TIME = Time.zone.now
 
@@ -79,8 +81,8 @@ intervention_ids.each do |intervention_id|
 
     data = [
       fake_uuid, intervention_id, 'Pregnancy 1st Trimester', 's123', CURRENT_TIME.to_s, CURRENT_TIME.to_s, index,
-       session_settings, 'after_fill', [{ 'payload' => '', 'patterns' => [] }.to_json], 'Session::Classic',
-       144, 1, CURRENT_TIME.to_s, 3000
+      session_settings, 'after_fill', [{ 'payload' => '', 'patterns' => [] }.to_json], 'Session::Classic',
+      144, 1, CURRENT_TIME.to_s, 3000
     ]
 
     session_handler.add_data(data)
@@ -99,7 +101,7 @@ session_ids.each do |session_id|
 
     data = [
       fake_uuid, session_id, "Group #{index + 1}", index, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
-       'QuestionGroup::Plain', QUESTIONS_PER_QUESTION_GROUP
+      'QuestionGroup::Plain', QUESTIONS_PER_QUESTION_GROUP
       ]
 
     question_group_handler.add_data(data)
@@ -107,7 +109,7 @@ session_ids.each do |session_id|
   end
   finish_group = [
     Faker::Internet.unique.uuid, session_id, 'Finish Group', 999_999, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
-     'QuestionGroup::Finish', 1
+    'QuestionGroup::Finish', 1
   ]
   question_group_handler.add_data(finish_group)
 end
@@ -120,13 +122,22 @@ question_group_ids.each do |question_group_id|
   position = 0
   QUESTIONS_PER_QUESTION_GROUP.times do
     fake_uuid = Faker::Internet.unique.uuid
+    question = QUESTIONS.sample
 
     data = [
-      fake_uuid, single.type, question_group_id, single.settings, position, "Good title", 'Good subtitle',
-       single.narrator, single.formulas, single.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, single.original_text
+      fake_uuid, question.type, question_group_id, question.settings, position, 'Good title', 'Good subtitle',
+      question.narrator, question.formulas, question.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, question.original_text
     ]
     question_handler.add_data(data)
+    position += 1
   end
+  next unless position == QUESTIONS_PER_QUESTION_GROUP
+
+  final_question = [
+    Faker::Internet.unique.uuid, final.type, question_group_id, final.settings, position, 'Final title', 'Final subtitle',
+    final.narrator, final.formulas, final.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, final.original_text
+  ]
+  question_handler.add_data(final_question)
 end
 question_handler.save_to_db('questions')
 
