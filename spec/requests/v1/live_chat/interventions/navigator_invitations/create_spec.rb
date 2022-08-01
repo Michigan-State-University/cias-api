@@ -5,7 +5,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', 
   let(:intervention) { create(:intervention, user: admin) }
 
   let(:emails) do
-    (5..10).map { |i| "email_#{i}@navigator.org" }
+    (5..10).map { |i| "emailUPPERCASE_#{i}@navigator.org" }
   end
 
   let(:request) do
