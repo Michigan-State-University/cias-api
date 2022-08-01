@@ -150,8 +150,8 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
     end
   end
 
-  context 'for others' do
-    let!(:user) { create(:user, :confirmed) }
+  context 'for researcher' do
+    let!(:user) { create(:user, :confirmed, :researcher) }
     let(:headers) { user.create_new_auth_token }
 
     let!(:report) { create(:generated_report) }
@@ -176,6 +176,65 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
             'user_id' => user.id,
             'generated_report_id' => report.id
           }
+        )
+      end
+    end
+  end
+
+  context 'for team admin' do
+    let!(:user) { create(:user, :confirmed, :team_admin) }
+    let(:headers) { user.create_new_auth_token }
+
+    let!(:report) { create(:generated_report) }
+    let(:params) do
+      {
+        report_id: report.id
+      }
+    end
+    let(:request) { post v1_downloaded_reports_path, params: params, headers: headers }
+
+    context 'when marks report as downloaded' do
+      before { request }
+
+      it 'returns correct status' do
+        expect(response).to have_http_status(:ok)
+        expect(DownloadedReport.count).to eq(1)
+      end
+
+      it 'returns proper data' do
+        expect(json_response['data']['attributes']).to include(
+          {
+            'user_id' => user.id,
+            'generated_report_id' => report.id
+          }
+        )
+      end
+    end
+  end
+
+  context 'for guest' do
+    let!(:user) { create(:user, :confirmed) }
+    let(:headers) { user.create_new_auth_token }
+
+    let!(:report) { create(:generated_report) }
+    let(:params) do
+      {
+        report_id: report.id
+      }
+    end
+    let(:request) { post v1_downloaded_reports_path, params: params, headers: headers }
+
+    context 'when marks report as downloaded' do
+      before { request }
+
+      it 'returns correct status' do
+        expect(response).to have_http_status(:forbidden)
+        expect(DownloadedReport.count).to eq(0)
+      end
+
+      it 'returns proper data' do
+        expect(json_response).to include(
+          { 'message' => 'You are not authorized to access this page.' }
         )
       end
     end

@@ -33,6 +33,7 @@ class Ability::Researcher < Ability::Base
 
     can %i[read get_protected_attachment], GeneratedReport,
         user_session: { session: { intervention: { user_id: user.id } } }
+    can :create, DownloadedReport
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
     enable_google_access
   end

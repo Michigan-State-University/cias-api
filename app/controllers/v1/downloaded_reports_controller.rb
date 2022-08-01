@@ -2,6 +2,7 @@
 
 class V1::DownloadedReportsController < V1Controller
   def create
+    authorize! :create, DownloadedReport
     report = DownloadedReport.find_or_create_by!(
       user_id: current_v1_user.id,
       generated_report_id: report_id_param
