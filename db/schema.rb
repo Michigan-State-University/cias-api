@@ -138,8 +138,8 @@ ActiveRecord::Schema.define(version: 2022_07_21_155540) do
   end
 
   create_table "cat_mh_variables", force: :cascade do |t|
-    t.integer "cat_mh_test_attribute_id"
-    t.integer "cat_mh_test_type_id"
+    t.bigint "cat_mh_test_attribute_id"
+    t.bigint "cat_mh_test_type_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cat_mh_test_attribute_id"], name: "index_cat_mh_variables_on_cat_mh_test_attribute_id"
@@ -574,7 +574,7 @@ ActiveRecord::Schema.define(version: 2022_07_21_155540) do
 
   create_table "tests", force: :cascade do |t|
     t.uuid "session_id"
-    t.integer "cat_mh_test_type_id"
+    t.bigint "cat_mh_test_type_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cat_mh_test_type_id"], name: "index_tests_on_cat_mh_test_type_id"
@@ -668,7 +668,7 @@ ActiveRecord::Schema.define(version: 2022_07_21_155540) do
     t.datetime "invitation_accepted_at"
     t.integer "invitation_limit"
     t.string "invited_by_type"
-    t.integer "invited_by_id"
+    t.bigint "invited_by_id"
     t.integer "invitations_count", default: 0
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
