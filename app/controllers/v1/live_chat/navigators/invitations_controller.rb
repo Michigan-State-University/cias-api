@@ -13,7 +13,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
     authorize! :update, Intervention
 
     created_invitations = V1::LiveChat::InviteNavigators.call(
-      navigator_invitation_params[:emails],
+      navigator_invitation_params[:emails].map(&:downcase),
       Intervention.find(intervention_id)
     )
 
