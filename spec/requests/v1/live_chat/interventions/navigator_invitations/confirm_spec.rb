@@ -21,13 +21,19 @@ RSpec.describe 'GET /v1/live_chat/navigators/invitations/confirm', type: :reques
   end
 
   context 'Error behaviour' do
-    context 'Returns 404 status code when no invitation present' do
+    let(:error_message) do
+      { error: Base64.encode64(I18n.t('live_chat.navigators.invitations.error')) }.to_query
+    end
+    let(:error_path) do
+      "#{ENV['WEB_URL']}?#{error_message}"
+    end
+
+    context 'Redirects to web app with correct message' do
       let(:navigator) { create(:user, :researcher, :confirmed) }
       let(:invited_email) { navigator.email }
 
-      it do
-        request
-        expect(response).to have_http_status(:not_found)
+      it 'redirect user to the web app with error message' do
+        expect(request).to redirect_to(error_path)
       end
     end
   end

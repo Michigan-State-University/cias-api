@@ -29,8 +29,13 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
   def confirm
     intervention = Intervention.find(intervention_id)
+    invitation = intervention.live_chat_navigator_invitations.find_by(email: email, intervention_id: intervention.id)
+    if invitation.nil?
+      redirect_to_web_app(error: I18n.t('live_chat.navigators.invitations.error'))
+      return
+    end
     intervention.navigators << User.find_by(email: email)
-    intervention.live_chat_navigator_invitations.find_by!(email: email, intervention_id: intervention.id).update!(accepted_at: DateTime.now)
+    invitation.update!(accepted_at: DateTime.now)
 
     redirect_to_web_app(success: I18n.t('live_chat.navigators.invitations.success', intervention_name: intervention.name))
   end

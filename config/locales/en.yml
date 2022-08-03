@@ -102,6 +102,7 @@ en:
     navigators:
       invitations:
         success: "You have successfully accepted the invitation to intervention %{intervention_name}"
+        error: "Your navigator invitation has been cancelled"
   organizable_mailer:
     invite_user:
       subject:      You've been invited to the %{organizable_type}
