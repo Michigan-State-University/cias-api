@@ -7,15 +7,15 @@ require 'json'
 require_relative './/db_handler'
 require_relative './/question_data_handler'
 
+# rubocop:disable Metrics/ClassLength, Rails/Output
 class SeedIntervention
   extend FactoryBot::Syntax::Methods
-
   NUM_OF_USERS = 3
-  INTERVENTIONS_PER_USER = 3
-  SESSIONS_PER_INTERVENTION = 3
-  QUESTION_GROUPS_PER_SESSION = 3
-  QUESTIONS_PER_QUESTION_GROUP = 3
-  ANSWERS_PER_QUESTION = 3
+  INTERVENTIONS_PER_USER = 100
+  SESSIONS_PER_INTERVENTION = 10
+  QUESTION_GROUPS_PER_SESSION = 1
+  QUESTIONS_PER_QUESTION_GROUP = 1
+  ANSWERS_PER_QUESTION = 1
 
   INTERVENTION_STATUS = %w[draft published closed archived].freeze
   INTERVENTION_NAMES = ['Drugs intervention', 'Smoking intervention', 'Alcohol intervention'].freeze
@@ -39,16 +39,8 @@ class SeedIntervention
 
   user_session_columns = %w[id user_id session_id finished_at created_at updated_at last_answer_at type user_intervention_id]
 
-  answer_columns = %w[id type question_id created_at updated_at user_session_id skipped next_session_id]
-
   file = Rails.root.join('tmp/csv/test.csv')
-  intervention_handler = DBHandler.new(file, intervention_columns)
-  session_handler = DBHandler.new(file, session_columns)
-  question_group_handler = DBHandler.new(file, question_group_columns)
-  question_handler = DBHandler.new(file, question_columns)
-  user_intervention_handler = DBHandler.new(file, user_intervention_columns)
-  user_session_handler = DBHandler.new(file, user_session_columns)
-  answer_handler = DBHandler.new(file, answer_columns)
+  data_handler = DBHandler.new(file)
 
   NUM_OF_USERS.times do |index|
     @user = create(
@@ -61,136 +53,153 @@ class SeedIntervention
     )
     @user.skip_confirmation!
     @user.save!
-    p "#{index}/#{NUM_OF_USERS} users created"
+    p "#{index+1}/#{NUM_OF_USERS} users created"
   end
 
   user_ids = User.ids
-  intervention_handler.clear_file
-  index = 1
+  data_handler.new_table('interventions', intervention_columns)
+  index = 0
+  max_index = user_ids.count * INTERVENTIONS_PER_USER
+  data = []
   user_ids.each do |user_id|
     INTERVENTIONS_PER_USER.times do
       fake_uuid = Faker::Internet.unique.uuid
       intervention_name = INTERVENTION_NAMES.sample + " for #{INTERVENTION_NAMES_DIRECTED.sample}"
-      data = [
-        fake_uuid, intervention_name, user_id, INTERVENTION_STATUS.sample,
-        'anyone', CURRENT_TIME.to_s, CURRENT_TIME.to_s, 27, SESSIONS_PER_INTERVENTION
-      ]
-
-      intervention_handler.add_data(data)
-      p "#{index += 1}/#{User.count * INTERVENTIONS_PER_USER} interventions created"
+      data.append(
+        [fake_uuid, intervention_name, user_id, INTERVENTION_STATUS.sample,
+         'anyone', CURRENT_TIME.to_s, CURRENT_TIME.to_s, 27, SESSIONS_PER_INTERVENTION]
+      )
+      p "#{index += 1}/#{max_index} interventions created"
     end
   end
-  intervention_handler.save_to_db('interventions')
+  data_handler.save_data_to_db(data)
 
+  data_handler.new_table('sessions', session_columns)
   intervention_ids = Intervention.ids
   session_settings = { 'narrator' => { 'voice' => true, 'animation' => true } }.to_json
-
-  session_handler.clear_file
-  index = 1
+  index = 0
+  max_index = intervention_ids.count * SESSIONS_PER_INTERVENTION
+  data = []
   intervention_ids.each do |intervention_id|
     position_counter = 0
     SESSIONS_PER_INTERVENTION.times do
       fake_uuid = Faker::Internet.unique.uuid
 
-      data = [
-        fake_uuid, intervention_id, 'Pregnancy 1st Trimester', 's123', CURRENT_TIME.to_s, CURRENT_TIME.to_s, position_counter,
-        session_settings, 'after_fill', [{ 'payload' => '', 'patterns' => [] }.to_json], 'Session::Classic',
-        144, 1, CURRENT_TIME.to_s, 3000
-      ]
+      data.append(
+        [fake_uuid, intervention_id, 'Pregnancy 1st Trimester', 's123', CURRENT_TIME.to_s, CURRENT_TIME.to_s, position_counter,
+         session_settings, 'after_fill', [{ 'payload' => '', 'patterns' => [] }.to_json], 'Session::Classic',
+         144, 1, CURRENT_TIME.to_s, 3000]
+      )
 
-      session_handler.add_data(data)
       position_counter += 1
-      p "#{index += 1}/#{Intervention.count * SESSIONS_PER_INTERVENTION} sessions created"
+      p "#{index += 1}/#{max_index} sessions created"
     end
   end
-  session_handler.save_to_db('sessions')
+  data_handler.save_data_to_db(data)
 
-  question_group_handler.clear_file
+  data_handler.new_table('question_groups', question_group_columns)
   session_ids = Session.ids
-  index = 1
+  index = 0
+  max_index = session_ids.count * QUESTION_GROUPS_PER_SESSION
+  data = []
   session_ids.each do |session_id|
     position_counter = 0
-    QUESTION_GROUPS_PER_SESSION.times do
+    (QUESTION_GROUPS_PER_SESSION - 1).times do
       fake_uuid = Faker::Internet.unique.uuid
-
-      data = [
-        fake_uuid, session_id, "Group #{position_counter + 1}", position_counter, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
-        'QuestionGroup::Plain', QUESTIONS_PER_QUESTION_GROUP
-      ]
-
-      question_group_handler.add_data(data)
+      data.append(
+        [fake_uuid, session_id, "Group #{position_counter + 1}", position_counter, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
+         'QuestionGroup::Plain', QUESTIONS_PER_QUESTION_GROUP]
+      )
       position_counter += 1
-      p "#{index += 1}/#{Session.count * QUESTION_GROUPS_PER_SESSION} question groups created"
+      p "#{index += 1}/#{max_index} question groups created"
     end
-    finish_group = [
-      Faker::Internet.unique.uuid, session_id, 'Finish Group', 999_999, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
-      'QuestionGroup::Finish', 1
-    ]
-    question_group_handler.add_data(finish_group)
-    p "#{index += 1}/#{Session.count * QUESTION_GROUPS_PER_SESSION} question groups created"
+    data.append(
+      [Faker::Internet.unique.uuid, session_id, 'Finish Group', 999_999, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
+       'QuestionGroup::Finish', 1]
+    )
+    p "#{index += 1}/#{max_index} question groups created"
   end
-  question_group_handler.save_to_db('question_groups')
+  data_handler.save_data_to_db(data)
 
-  question_handler.clear_file
+  data_handler.new_table('questions', question_columns)
   question_group_ids = QuestionGroup.ids
-  index = 1
+  index = 0
+  max_index = question_group_ids.count * QUESTIONS_PER_QUESTION_GROUP
+  data = []
   question_group_ids.each do |question_group_id|
     position = 0
-    QUESTIONS_PER_QUESTION_GROUP.times do
+    (QUESTIONS_PER_QUESTION_GROUP - 1).times do
       fake_uuid = Faker::Internet.unique.uuid
       question = QUESTIONS.sample
 
-      data = [
-        fake_uuid, question.type, question_group_id, question.settings, position, question.title, question.subtitle,
-        question.narrator, question.formulas, question.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, question.original_text
-      ]
-      question_handler.add_data(data)
+      data.append(
+        [fake_uuid, question.type, question_group_id, question.settings, position, question.title, question.subtitle,
+         question.narrator, question.formulas, question.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, question.original_text]
+      )
+
       position += 1
-      p "#{index += 1}/#{QuestionGroup.count * QUESTIONS_PER_QUESTION_GROUP} questions created"
+      p "#{index += 1}/#{max_index} questions created"
     end
     next unless QuestionGroup.find_by(id: question_group_id).title == 'Finish Group'
 
-    final_question = [
-      Faker::Internet.unique.uuid, final_q.type, question_group_id, final_q.settings, position, 'Thanks for your input!', 'Final screen',
-      final_q.narrator, final_q.formulas, final_q.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, final_q.original_text
-    ]
-    question_handler.add_data(final_question)
-    p "#{index += 1}/#{QuestionGroup.count * QUESTIONS_PER_QUESTION_GROUP} questions created"
+    data.append(
+      [Faker::Internet.unique.uuid, final_q.type, question_group_id, final_q.settings, position, final_q.title, final_q.subtitle,
+       final_q.narrator, final_q.formulas, final_q.body, CURRENT_TIME.to_s, CURRENT_TIME.to_s, final_q.original_text]
+    )
+    p "#{index += 1}/#{max_index} questions created"
   end
-  question_handler.save_to_db('questions')
+  data_handler.save_data_to_db(data)
 
-  user_intervention_handler.clear_file
+  data_handler.new_table('user_interventions', user_intervention_columns)
+  index = 0
+  max_index = intervention_ids.count
+  data = []
   intervention_ids.each do |intervention_id|
     fake_uuid = Faker::Internet.unique.uuid
 
-    data = [
-      fake_uuid, Intervention.find_by(id: intervention_id).user.id, intervention_id, 3, 'completed',
-      CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s
-    ]
-    user_intervention_handler.add_data(data)
+    data.append(
+      [fake_uuid, Intervention.find_by(id: intervention_id).user.id, intervention_id, 3, 'completed',
+       CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s]
+    )
+    p "#{index += 1}/#{max_index} user interventions created"
   end
-  user_intervention_handler.save_to_db('user_interventions')
+  data_handler.save_data_to_db(data)
 
-  user_session_handler.clear_file
-  user_interventions_ids = UserIntervention.ids
+  data_handler.new_table('user_sessions', user_session_columns)
+  user_interventions_ids = UserIntervention.ids[0..ANSWERS_PER_QUESTION]
+  index = 0
+  max_index = user_ids.count * ANSWERS_PER_QUESTION
+  data = []
   user_ids.each do |user_id|
-    session_ids.zip(user_interventions_ids).each do |session_id, user_intervention_id|
+    session_ids[0..ANSWERS_PER_QUESTION - 1].zip(user_interventions_ids).each do |session_id, user_intervention_id|
       @user_intervention_id ||= user_intervention_id
       fake_uuid = Faker::Internet.unique.uuid
 
-      data = [
-        fake_uuid, user_id, session_id, CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
-        'UserSession::Classic', @user_intervention_id
-      ]
-      user_session_handler.add_data(data)
+      data.append(
+        [fake_uuid, user_id, session_id, CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
+         'UserSession::Classic', @user_intervention_id]
+      )
+      p "#{index += 1}/#{max_index} user sessions created"
     end
   end
-  user_session_handler.save_to_db('user_sessions')
+  data_handler.save_data_to_db(data)
 
-  answer_handler.clear_file
+  index = 0
+  max_index = Question.count * ANSWERS_PER_QUESTION - (QuestionGroup.count * QUESTION_GROUPS_PER_SESSION)
   Question.find_each do |question|
-    UserSession.find_each do |user_session|
-      create(:answer, user_session: user_session, type: "Answer::#{question.type.demodulize}")
+    UserSession.limit(ANSWERS_PER_QUESTION).find_each do |user_session|
+      case question.type.demodulize
+      when 'Single'
+        type = :answer_single
+      when 'Number'
+        type = :answer_number
+      when 'Date'
+        type = :answer_date
+      else
+        next
+      end
+      create(type, question: question, user_session: user_session, next_session_id: nil, created_at: CURRENT_TIME, updated_at: CURRENT_TIME)
+      p "#{index += 1}/#{max_index} answers created"
     end
   end
 
