@@ -5,4 +5,14 @@ class V1::LiveChat::Interventions::NavigatorSetupSerializer < V1Serializer
 
   has_many :participant_links, serializer: V1::LiveChat::Interventions::ParticipantLinkSerializer
   has_one :phone, serializer: V1::PhoneSerializer
+
+  attribute :participant_files do |object|
+    (object.participant_files || []).map do |file_data|
+      {
+        id: file_data.id,
+        name: file_data.blob.filename,
+        url: ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(file_data, only_path: true)
+      }
+    end
+  end
 end

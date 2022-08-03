@@ -35,6 +35,7 @@ module Log::UserRequest
     params[:report_template]&.delete(:logo)
     params[:variant]&.delete(:image)
     params[:intervention]&.delete(:files)
+    params[:navigator_setup]&.delete(:participant_files)
     params[:logo]&.delete(:file)
     params.delete(:password)
     params.delete(:password_confirmation)

@@ -57,6 +57,8 @@ en:
                 too_long: 'length cannot exceed %{limit} characters.'
           navigator:
             not_researcher: 'User cannot become a navigator'
+          navigator_setup:
+            file_too_big: 'One of the files is too big. Limit: 5 Mb'
       messages:
         undestroyable: Forbidden operation
   interventions:

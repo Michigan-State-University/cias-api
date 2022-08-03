@@ -7,5 +7,7 @@ class LiveChat::Interventions::NavigatorSetup < ApplicationRecord
   has_many :participant_links, class_name: 'LiveChat::Interventions::ParticipantLink', dependent: :destroy
   has_one :phone, dependent: :nullify
 
+  has_many_attached :participant_files
+
   enum notify_by: { email: 0, sms: 1 }
 end
