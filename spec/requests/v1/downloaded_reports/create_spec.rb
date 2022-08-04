@@ -100,9 +100,10 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
 
   context 'for third party' do
     let!(:user) { create(:user, :confirmed, :third_party) }
+    let!(:user_session) { create(:user_session, user: user) }
     let(:headers) { user.create_new_auth_token }
 
-    let!(:third_party_report) { create(:generated_report, :third_party) }
+    let!(:third_party_report) { create(:generated_report, :third_party, user_session: user_session) }
     let(:params) do
       {
         report_id: third_party_report.id
@@ -183,9 +184,11 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
 
   context 'for team admin' do
     let!(:user) { create(:user, :confirmed, :team_admin) }
+    let!(:user_session) { create(:user_session, user: user) }
+
     let(:headers) { user.create_new_auth_token }
 
-    let!(:report) { create(:generated_report) }
+    let!(:report) { create(:generated_report, user_session: user_session) }
     let(:params) do
       {
         report_id: report.id
