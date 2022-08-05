@@ -666,4 +666,26 @@ FactoryBot.define do
       body { { data: [] } }
     end
   end
+
+  factory :question_henry_ford, class: Question::HenryFord do
+    title { 'HenryFord' }
+    type { Question::HenryFord }
+    body do
+      {
+        data: [
+          {
+            payload: 'Never',
+            value: 'Never'
+          },
+          {
+            payload: 'Monthly or less',
+            value: 'Monthly or less'
+          }
+        ],
+        variable: {
+          name: 'AUDIT_1'
+        }
+      }
+    end
+  end
 end

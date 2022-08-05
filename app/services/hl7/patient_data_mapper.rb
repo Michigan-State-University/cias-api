@@ -1,0 +1,51 @@
+# frozen_string_literal: true
+
+class Hl7::PatientDataMapper
+  FIRST_SEGMENT_TYPE = 'MSH' # Message Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/MSH
+  ENCODING_CHARACTERS = '^~\\&' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.2
+  MSH_SENDING_APPLICATION = 'LogicSoln' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.3
+  MSH_SENDING_FACILITY = 'HFHS'
+  MSH_RECEIVING_FACILITY = 'HFH'
+  MSH_MESSAGE_TYPE = 'ORU' # Unsolicited transmission of an observation -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0076
+  MSH_TRIGGER_EVENT = 'R01' #	ORU/ACK - Unsolicited transmission of an observation message -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0003
+  MSH_VERSION_ID = '2.3' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.12
+
+  SECOND_SEGMENT_TYPE = 'PID' # Patient Identification -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/PID
+
+  def self.call(user_id, user_session_id)
+    new(user_id, user_session_id).call
+  end
+
+  def initialize(user_id, user_session_id)
+    @user = User.find(user_id)
+    @user_session = UserSession.find(user_session_id)
+  end
+
+  def call
+    # rubocop:disable Layout/LineLength
+    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{MSH_SENDING_FACILITY}||#{MSH_RECEIVING_FACILITY}|#{date_now}||#{MSH_MESSAGE_TYPE}^#{MSH_TRIGGER_EVENT}|#{message_count}|#{ENV.fetch('PROCESSING')}|#{MSH_VERSION_ID}|||
+       #{SECOND_SEGMENT_TYPE}|||#{user.hfhs_patient_id}||#{user.last_name}^#{user.first_name}||#{dob_in_correct_format}|#{sex}]
+    # rubocop:enable Layout/LineLength
+  end
+
+  attr_reader :user, :user_session
+
+  private
+
+  def date_now
+    DateTime.now.strftime('%Y%m%d%H%M')
+  end
+
+  def dob_in_correct_format
+    user.dob&.strftime('%Y%m%d')
+  end
+
+  def sex
+    user.sex || 'U' # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0001
+  end
+
+  # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.10
+  def message_count
+    user_session.answers.hfhs.count
+  end
+end

@@ -20,6 +20,8 @@ class Answer < ApplicationRecord
     relation
   }
 
+  scope :hfhs, -> { where(type: Answer::HenryFord.name) }
+
   encrypts :body, type: :json, migrating: true
 
   default_scope { order(:created_at) }

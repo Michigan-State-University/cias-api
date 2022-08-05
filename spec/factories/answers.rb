@@ -91,5 +91,9 @@ FactoryBot.define do
     factory :answer_cat_mh, class: Answer::CatMh do
       type { Answer::CatMh }
     end
+    factory :answer_henry_ford, class: Answer::HenryFord do
+      type { Answer::HenryFord }
+      association :question, factory: :question_henry_ford
+    end
   end
 end
