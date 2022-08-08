@@ -11,7 +11,8 @@ class V1::LiveChat::InviteNavigators
   end
 
   def call
-    users_exists = User.where(email: emails)
+    user_emails_to_invite = filter_invited_navigators(emails)
+    users_exists = User.where(email: user_emails_to_invite)
     check_roles_of_existing_users(users_exists)
 
     invitations = []
@@ -19,15 +20,12 @@ class V1::LiveChat::InviteNavigators
       add_navigator_role(users_exists)
       invite_new_users_to_system(emails - users_exists.map(&:email))
 
-      User.where(email: emails).find_each do |user|
-        next if intervention.live_chat_navigator_invitations.exists?(email: user.email)
-        next if intervention.navigators.exists?(email: user.email)
-
+      User.where(email: user_emails_to_invite).find_each do |user|
         invitations << LiveChat::Interventions::NavigatorInvitation.create(email: user.email, intervention: @intervention)
       end
     end
 
-    Navigators::InvitationJob.perform_later(emails, intervention.id)
+    Navigators::InvitationJob.perform_later(user_emails_to_invite, intervention.id)
     invitations
   end
 
@@ -52,5 +50,9 @@ class V1::LiveChat::InviteNavigators
     emails.each do |email|
       User.invite!(email: email, roles: ['navigator'])
     end
+  end
+
+  def filter_invited_navigators(emails)
+    emails.select { |email| !intervention.live_chat_navigator_invitations.exists?(email: email) && !intervention.navigators.exists?(email: email) }
   end
 end
