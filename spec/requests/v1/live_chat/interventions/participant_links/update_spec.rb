@@ -5,12 +5,12 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups/participan
   let!(:intervention) { create(:intervention, :with_navigator_setup, user: user) }
   let(:headers) { user.create_new_auth_token }
   let!(:participant_link) do
-    LiveChat::Interventions::ParticipantLink.create!(
+    LiveChat::Interventions::Link.create!(
       navigator_setup: intervention.navigator_setup, url: 'https://google.com', display_name: 'This is my favourite website'
     )
   end
   let(:request) do
-    patch v1_live_chat_intervention_navigator_setups_participant_link_path(id: intervention.id, participant_link_id: participant_link.id),
+    patch v1_live_chat_intervention_navigator_setups_link_path(id: intervention.id, link_id: participant_link.id),
           params: params, headers: headers
   end
 
@@ -19,7 +19,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups/participan
   context 'correctly updates participant link' do
     let(:params) do
       {
-        participant_link: {
+        link: {
           url: 'https://bing.com',
           display_name: 'That\'s a much better search engine'
         }
@@ -49,7 +49,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups/participan
     context 'url too long' do
       let(:params) do
         {
-          participant_link: {
+          link: {
             display_name: 'I\'m very long',
             url: 'x' * 2500
           }

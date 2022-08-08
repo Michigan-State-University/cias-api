@@ -29,7 +29,7 @@ class Ability::Researcher < Ability::Base
         user_session: { session: { intervention: { user_id: user.id } } }
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
     can %i[index create], LiveChat::Conversation
-    can :delete, LiveChat::Interventions::ParticipantLink
+    can :delete, LiveChat::Interventions::Link
 
     enable_questions_access(user.id)
     enable_report_template_access(user.id)

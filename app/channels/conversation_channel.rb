@@ -68,7 +68,7 @@ class ConversationChannel < ApplicationCable::Channel
   def on_no_navigator_available(data)
     intervention = Intervention.find(data['interventionId'])
     setup = intervention.navigator_setup
-    response_data = V1::LiveChat::Interventions::NavigatorSetupSerializer.new(setup, { include: %i[participant_links phone] })
+    response_data = V1::LiveChat::Interventions::LiveChatSetupSerializer.new(setup, { include: %i[participant_links phone] })
     ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'navigator_unavailable_setup_sent'))
   end
 

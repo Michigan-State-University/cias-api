@@ -230,8 +230,8 @@ Rails.application.routes.draw do
         resources :navigators, controller: 'interventions/navigators', only: :index
         resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'
         namespace :navigator_setups do
-          resources :participant_links, only: %i[create update destroy], param: :participant_link_id,
-                                        controller: '/v1/live_chat/interventions/participant_links'
+          resources :links, only: %i[create update destroy], param: :link_id,
+                            controller: '/v1/live_chat/interventions/links'
           resources :participant_files, only: %i[create destroy], controller: '/v1/live_chat/interventions/navigator_setups/files', param: :participant_file_id
         end
       end

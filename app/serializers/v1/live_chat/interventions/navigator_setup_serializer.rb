@@ -3,7 +3,8 @@
 class V1::LiveChat::Interventions::NavigatorSetupSerializer < V1Serializer
   attributes :id, :notify_by, :contact_email, :no_navigator_available_message, :is_navigator_notification_on
 
-  has_many :participant_links, serializer: V1::LiveChat::Interventions::ParticipantLinkSerializer
+  has_many :participant_links, serializer: V1::LiveChat::Interventions::LinkSerializer
+  has_many :navigator_links, serializer: V1::LiveChat::Interventions::LinkSerializer
   has_one :phone, serializer: V1::PhoneSerializer
 
   attribute :participant_files do |object|

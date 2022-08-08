@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_13_082632) do
+ActiveRecord::Schema.define(version: 2022_08_01_055341) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -138,8 +138,8 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
   end
 
   create_table "cat_mh_variables", force: :cascade do |t|
-    t.integer "cat_mh_test_attribute_id"
-    t.integer "cat_mh_test_type_id"
+    t.bigint "cat_mh_test_attribute_id"
+    t.bigint "cat_mh_test_type_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cat_mh_test_attribute_id"], name: "index_cat_mh_variables_on_cat_mh_test_attribute_id"
@@ -391,6 +391,15 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "live_chat_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.text "url", null: false
+    t.string "display_name", default: "", null: false
+    t.uuid "navigator_setup_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "link_for", default: 0
+  end
+
   create_table "live_chat_messages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text "content", default: "", null: false
     t.uuid "conversation_id", null: false
@@ -408,14 +417,6 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "is_navigator_notification_on", default: true
-  end
-
-  create_table "live_chat_participant_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.text "url", null: false
-    t.string "display_name", default: "", null: false
-    t.uuid "navigator_setup_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "messages", force: :cascade do |t|
@@ -637,7 +638,7 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
 
   create_table "tests", force: :cascade do |t|
     t.uuid "session_id"
-    t.integer "cat_mh_test_type_id"
+    t.bigint "cat_mh_test_type_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cat_mh_test_type_id"], name: "index_tests_on_cat_mh_test_type_id"
@@ -731,7 +732,7 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
     t.datetime "invitation_accepted_at"
     t.integer "invitation_limit"
     t.string "invited_by_type"
-    t.integer "invited_by_id"
+    t.bigint "invited_by_id"
     t.integer "invitations_count", default: 0
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
@@ -808,10 +809,10 @@ ActiveRecord::Schema.define(version: 2022_07_13_082632) do
   add_foreign_key "live_chat_conversations", "interventions"
   add_foreign_key "live_chat_interlocutors", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_interlocutors", "users"
+  add_foreign_key "live_chat_links", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_messages", "live_chat_interlocutors"
   add_foreign_key "live_chat_navigator_setups", "interventions"
-  add_foreign_key "live_chat_participant_links", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"

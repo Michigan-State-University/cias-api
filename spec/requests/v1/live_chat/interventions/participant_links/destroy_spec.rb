@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participant_links/:participant_link_id', type: :request do
+RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participant_links/:link_id', type: :request do
   let(:user) { create(:user, :admin, :confirmed) }
   let!(:intervention) { create(:intervention, :with_navigator_setup, user: user) }
   let(:headers) { user.create_new_auth_token }
   let!(:participant_link) do
-    LiveChat::Interventions::ParticipantLink.create!(
+    LiveChat::Interventions::Link.create!(
       navigator_setup: intervention.navigator_setup, url: 'https://google.com', display_name: 'This is my favourite website'
     )
   end
   let(:request) do
-    delete v1_live_chat_intervention_navigator_setups_participant_link_path(id: intervention.id, participant_link_id: participant_link.id),
+    delete v1_live_chat_intervention_navigator_setups_link_path(id: intervention.id, link_id: participant_link.id),
            headers: headers
   end
 
@@ -21,7 +21,7 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participa
     end
 
     it 'remove link from db' do
-      expect { request }.to change(LiveChat::Interventions::ParticipantLink, :count).by(-1)
+      expect { request }.to change(LiveChat::Interventions::Link, :count).by(-1)
     end
   end
 
