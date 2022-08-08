@@ -9,44 +9,30 @@ describe DownloadedReport do
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
   let_it_be(:team3_researcher) { create(:user, :confirmed, :researcher, team_id: team3.id) }
-  let_it_be(:team1_intervention1) { create(:intervention, user_id: team1.team_admin.id) }
-  let_it_be(:team1_intervention2) { create(:intervention, user_id: team1_researcher.id) }
-  let_it_be(:team2_intervention1) { create(:intervention, user_id: team2.team_admin.id) }
-  let_it_be(:team2_intervention2) { create(:intervention, user_id: team2_researcher.id) }
-  let_it_be(:team3_intervention1) { create(:intervention, user_id: team3_researcher.id) }
 
-  before_all do
-    RSpec::Mocks.with_temporary_scope do
-      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+  let!(:team1_session1) { create(:session, intervention: create(:intervention, user_id: team1.team_admin.id)) }
+  let!(:team1_session2) { create(:session, intervention: create(:intervention, user_id: team1_researcher.id)) }
+  let!(:team2_session1) { create(:session, intervention: create(:intervention, user_id: team2.team_admin.id)) }
+  let!(:team2_session2) { create(:session, intervention: create(:intervention, user_id: team2_researcher.id)) }
+  let!(:team3_session1) { create(:session, intervention: create(:intervention, user_id: team3_researcher.id)) }
 
-      team1_session1 = create(:session, intervention: team1_intervention1)
-      team1_session2 = create(:session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
-      team3_session1 = create(:session, intervention: team3_intervention1)
+  let!(:team1_generated_report1) { create(:generated_report, user_session: create(:user_session, session: team1_session1)) }
+  let!(:team1_generated_report2) { create(:generated_report, user_session: create(:user_session, session: team1_session2)) }
+  let!(:team2_generated_report1) { create(:generated_report, user_session: create(:user_session, session: team2_session1)) }
+  let!(:team2_generated_report2) { create(:generated_report, user_session: create(:user_session, session: team2_session2)) }
+  let!(:team3_generated_report1) { create(:generated_report, user_session: create(:user_session, session: team3_session1)) }
 
-      team1_user_session1 = create(:user_session, session: team1_session1)
-      team1_user_session2 = create(:user_session, session: team1_session2)
-      team2_user_session1 = create(:user_session, session: team2_session1)
-      team2_user_session2 = create(:user_session, session: team2_session2)
-      team3_user_session1 = create(:user_session, session: team3_session1)
-
-      @team1_generated_report1 = create(:generated_report, user_session: team1_user_session1)
-      @team1_generated_report2 = create(:generated_report, user_session: team1_user_session2)
-      @team2_generated_report1 = create(:generated_report, user_session: team2_user_session1)
-      @team2_generated_report2 = create(:generated_report, user_session: team2_user_session2)
-      @team3_generated_report1 = create(:generated_report, user_session: team3_user_session1)
-    end
-  end
-
-  let(:team1_downloaded_report1) { create(:downloaded_report, generated_report: @team1_generated_report1, user: user) }
-  let(:team1_downloaded_report2) { create(:downloaded_report, generated_report: @team1_generated_report2, user: user) }
-  let(:team2_downloaded_report1) { create(:downloaded_report, generated_report: @team2_generated_report1, user: user) }
-  let(:team2_downloaded_report2) { create(:downloaded_report, generated_report: @team2_generated_report2, user: user) }
-  let(:team3_downloaded_report1) { create(:downloaded_report, generated_report: @team3_generated_report1, user: user) }
-
-  describe 'abilities' do
+  context 'abilities' do
     subject(:ability) { Ability.new(user) }
+
+    let(:team1_downloaded_report1) { create(:downloaded_report, generated_report: team1_generated_report1, user_id: user.id) }
+    let(:team1_downloaded_report2) { create(:downloaded_report, generated_report: team1_generated_report2, user_id: user.id) }
+    let(:team2_downloaded_report1) { create(:downloaded_report, generated_report: team2_generated_report1, user_id: user.id) }
+    let(:team2_downloaded_report2) { create(:downloaded_report, generated_report: team2_generated_report2, user_id: user.id) }
+    let(:team3_downloaded_report1) { create(:downloaded_report, generated_report: team3_generated_report1, user_id: user.id) }
+
+    let(:third_party_report) { create(:generated_report, :third_party, third_party_id: user.id) }
+    let(:participant_report) { create(:generated_report, :participant, participant_id: user.id) }
 
     context 'team admin' do
       let(:user) { team1.team_admin }
@@ -80,25 +66,16 @@ describe DownloadedReport do
 
     context 'participant' do
       let(:user) { create(:user, :confirmed, :participant) }
-      let!(:user_session) { create(:user_session, user: user) }
-      let!(:third_party_report) do
-        create(:generated_report, :third_party, user_session: user_session)
-      end
-      let!(:not_shown_participant_report) do
-        create(:generated_report, :participant, user_session: user_session)
-      end
-      let!(:shown_participant_report) do
-        create(:generated_report, :participant, participant_id: user.id, user_session: user_session)
-      end
 
+      let!(:shown_participant_report_downloaded) do
+        create(:downloaded_report, user_id: user.id, generated_report: create(:generated_report, :participant,
+                                                                              participant_id: user.id))
+      end
       let!(:third_party_report_downloaded) do
-        create(:downloaded_report, generated_report: third_party_report, user: user)
+        create(:downloaded_report, generated_report: third_party_report, user_id: user.id)
       end
       let!(:not_shown_participant_report_downloaded) do
-        create(:downloaded_report, generated_report: not_shown_participant_report, user: user)
-      end
-      let!(:shown_participant_report_downloaded) do
-        create(:downloaded_report, generated_report: shown_participant_report, user: user)
+        create(:downloaded_report, user_id: user.id, generated_report: create(:generated_report, :participant))
       end
 
       it 'can mark only his report if the report kind is \'participant\' and report is shown to participant' do
@@ -113,24 +90,15 @@ describe DownloadedReport do
 
     context 'third party' do
       let(:user) { create(:user, :confirmed, :third_party) }
-      let!(:third_party_report) do
-        create(:generated_report, :third_party, third_party_id: user.id)
-      end
-      let!(:participant_report) do
-        create(:generated_report, :participant, :shared_to_third_party)
-      end
-      let!(:other_third_party_report) do
-        create(:generated_report, :third_party, :shared_to_third_party)
-      end
 
       let!(:third_party_report_downloaded) do
-        create(:downloaded_report, generated_report: third_party_report, user: user)
+        create(:downloaded_report, generated_report: third_party_report, user_id: user.id)
       end
       let!(:participant_report_downloaded) do
-        create(:downloaded_report, generated_report: participant_report, user: user)
+        create(:downloaded_report, generated_report: participant_report, user_id: user.id)
       end
       let!(:other_third_party_report_downloaded) do
-        create(:downloaded_report, generated_report: other_third_party_report, user: user)
+        create(:downloaded_report, user_id: user.id, generated_report: create(:generated_report, :third_party))
       end
 
       it 'can mark only his report if the report kind is \'third_party\' and report is shared with him' do
@@ -138,8 +106,8 @@ describe DownloadedReport do
 
         expect(subject).to have_abilities({ create: false }, team1_downloaded_report1)
         expect(subject).to have_abilities({ create: false }, team2_downloaded_report1)
-        expect(subject).to have_abilities({ create: false }, other_third_party_report_downloaded)
         expect(subject).to have_abilities({ create: false }, participant_report_downloaded)
+        expect(subject).to have_abilities({ create: false }, other_third_party_report_downloaded)
       end
     end
   end
