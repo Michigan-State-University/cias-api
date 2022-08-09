@@ -13,12 +13,12 @@ return puts '# Will not pollute database by fake data in production environment'
 # rubocop:disable Metrics/ClassLength
 class SeedIntervention
   extend FactoryBot::Syntax::Methods
-  NUM_OF_USERS = 3
+  NUM_OF_USERS = 1
   INTERVENTIONS_PER_USER = 100
   SESSIONS_PER_INTERVENTION = 10
   QUESTION_GROUPS_PER_SESSION = 5
   QUESTIONS_PER_QUESTION_GROUP = 5
-  ANSWERS_PER_QUESTION = 5
+  ANSWERS_PER_QUESTION = 1
 
   INTERVENTION_STATUS = %w[draft published closed archived].freeze
   INTERVENTION_NAMES = ['Drugs intervention', 'Smoking intervention', 'Alcohol intervention'].freeze
@@ -127,11 +127,11 @@ class SeedIntervention
   data_handler.new_table('questions', question_columns)
   question_group_ids = QuestionGroup.ids
   index = 0
-  max_index = question_group_ids.count * QUESTIONS_PER_QUESTION_GROUP
+  max_index = question_group_ids.count * QUESTIONS_PER_QUESTION_GROUP + session_ids.count
   data = []
   question_group_ids.each do |question_group_id|
     position = 0
-    (QUESTIONS_PER_QUESTION_GROUP - 1).times do
+    QUESTIONS_PER_QUESTION_GROUP.times do
       fake_uuid = Faker::Internet.unique.uuid
       question = QUESTIONS.sample
 
@@ -155,9 +155,9 @@ class SeedIntervention
 
   data_handler.new_table('user_interventions', user_intervention_columns)
   index = 0
-  max_index = intervention_ids.count
+  max_index = intervention_ids.count * ANSWERS_PER_QUESTION
   data = []
-  intervention_ids.each do |intervention_id|
+  intervention_ids[0..ANSWERS_PER_QUESTION - 1].each do |intervention_id|
     fake_uuid = Faker::Internet.unique.uuid
 
     data.append(
@@ -175,12 +175,12 @@ class SeedIntervention
   data = []
   user_ids.each do |user_id|
     session_ids[0..ANSWERS_PER_QUESTION - 1].zip(user_interventions_ids).each do |session_id, user_intervention_id|
-      @user_intervention_id ||= user_intervention_id
+      user_intervention_id_fixed = user_intervention_id unless user_intervention_id.nil?
       fake_uuid = Faker::Internet.unique.uuid
 
       data.append(
         [fake_uuid, user_id, session_id, CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s, CURRENT_TIME.to_s,
-         'UserSession::Classic', @user_intervention_id]
+         'UserSession::Classic', user_intervention_id_fixed]
       )
       p "#{index += 1}/#{max_index} user sessions created"
     end
@@ -188,7 +188,7 @@ class SeedIntervention
   data_handler.save_data_to_db(data)
 
   index = 0
-  max_index = Question.count * ANSWERS_PER_QUESTION
+  max_index = Question.count * ANSWERS_PER_QUESTION - session_ids.count
   Question.find_each do |question|
     UserSession.limit(ANSWERS_PER_QUESTION).find_each do |user_session|
       case question.type.demodulize
@@ -201,7 +201,7 @@ class SeedIntervention
       else
         next
       end
-      create(type, question: question, user_session: user_session, next_session_id: nil, created_at: CURRENT_TIME, updated_at: CURRENT_TIME)
+      create(type, question_id: question.id, user_session: user_session, next_session_id: nil, created_at: CURRENT_TIME, updated_at: CURRENT_TIME)
       p "#{index += 1}/#{max_index} answers created"
     end
   end
