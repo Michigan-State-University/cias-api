@@ -26,7 +26,6 @@ class GeneratedReport < ApplicationRecord
   }
 
   def downloaded?(user_id)
-    downloaded_report = downloaded_reports.find_by(user_id: user_id, generated_report_id: id)
-    !downloaded_report.nil?
+    downloaded_reports.exists?(user_id: user_id, generated_report_id: id)
   end
 end
