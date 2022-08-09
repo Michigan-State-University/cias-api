@@ -6,7 +6,11 @@ require 'faker'
 require_relative './/db_handler'
 require_relative './/question_data_handler'
 
-# rubocop:disable Metrics/ClassLength, Rails/Output
+# rubocop:disable Lint/TopLevelReturnWithArgument, Rails/Output
+return puts '# Will not pollute database by fake data in production environment' if Rails.env.production?
+# rubocop:enable Lint/TopLevelReturnWithArgument
+
+# rubocop:disable Metrics/ClassLength
 class SeedIntervention
   extend FactoryBot::Syntax::Methods
   NUM_OF_USERS = 3
@@ -206,3 +210,4 @@ class SeedIntervention
   p 'Example user password: Qwerty!@#456'
   p "Example user verification code: verification_code_#{@user.uid}"
 end
+# rubocop:enable Metrics/ClassLength, Rails/Output
