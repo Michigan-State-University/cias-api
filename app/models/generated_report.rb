@@ -11,6 +11,7 @@ class GeneratedReport < ApplicationRecord
   has_many :downloaded_reports, dependent: :destroy
 
   delegate :name, to: :report_template, prefix: true
+
   scope :for_third_party_user, lambda { |user|
     joins(:generated_reports_third_party_users).where(generated_reports_third_party_users: { third_party_id: user.id })
   }

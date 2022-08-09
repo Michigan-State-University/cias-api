@@ -3,24 +3,40 @@
 require 'cancan/matchers'
 
 describe DownloadedReport do
-  let_it_be(:team1) { create(:team) }
-  let_it_be(:team2) { create(:team) }
-  let_it_be(:team3) { create(:team, team_admin: team1.team_admin) }
-  let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
-  let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
-  let_it_be(:team3_researcher) { create(:user, :confirmed, :researcher, team_id: team3.id) }
+  let!(:team1) { create(:team) }
+  let!(:team2) { create(:team) }
+  let!(:team3) { create(:team, team_admin: team1.team_admin) }
 
-  let!(:team1_session1) { create(:session, intervention: create(:intervention, user_id: team1.team_admin.id)) }
-  let!(:team1_session2) { create(:session, intervention: create(:intervention, user_id: team1_researcher.id)) }
-  let!(:team2_session1) { create(:session, intervention: create(:intervention, user_id: team2.team_admin.id)) }
-  let!(:team2_session2) { create(:session, intervention: create(:intervention, user_id: team2_researcher.id)) }
-  let!(:team3_session1) { create(:session, intervention: create(:intervention, user_id: team3_researcher.id)) }
+  let!(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
+  let!(:team3_researcher) { create(:user, :confirmed, :researcher, team_id: team3.id) }
 
-  let!(:team1_generated_report1) { create(:generated_report, user_session: create(:user_session, session: team1_session1)) }
-  let!(:team1_generated_report2) { create(:generated_report, user_session: create(:user_session, session: team1_session2)) }
-  let!(:team2_generated_report1) { create(:generated_report, user_session: create(:user_session, session: team2_session1)) }
-  let!(:team2_generated_report2) { create(:generated_report, user_session: create(:user_session, session: team2_session2)) }
-  let!(:team3_generated_report1) { create(:generated_report, user_session: create(:user_session, session: team3_session1)) }
+  let!(:team1_generated_report1) do
+    create(:generated_report, user_session:
+      create(:user_session, session:
+        create(:session, intervention:
+          create(:intervention, user_id: team1.team_admin.id))))
+  end
+
+  let!(:team1_generated_report2) do
+    create(:generated_report, user_session:
+      create(:user_session, session:
+        create(:session, intervention:
+          create(:intervention, user_id: team1_researcher.id))))
+  end
+
+  let!(:team2_generated_report1) do
+    create(:generated_report, user_session:
+      create(:user_session, session:
+        create(:session, intervention:
+          create(:intervention, user_id: team2.team_admin.id))))
+  end
+
+  let!(:team3_generated_report1) do
+    create(:generated_report, user_session:
+      create(:user_session, session:
+        create(:session, intervention:
+          create(:intervention, user_id: team3_researcher.id))))
+  end
 
   context 'abilities' do
     subject(:ability) { Ability.new(user) }
@@ -28,7 +44,6 @@ describe DownloadedReport do
     let(:team1_downloaded_report1) { create(:downloaded_report, generated_report: team1_generated_report1, user_id: user.id) }
     let(:team1_downloaded_report2) { create(:downloaded_report, generated_report: team1_generated_report2, user_id: user.id) }
     let(:team2_downloaded_report1) { create(:downloaded_report, generated_report: team2_generated_report1, user_id: user.id) }
-    let(:team2_downloaded_report2) { create(:downloaded_report, generated_report: team2_generated_report2, user_id: user.id) }
     let(:team3_downloaded_report1) { create(:downloaded_report, generated_report: team3_generated_report1, user_id: user.id) }
 
     let(:third_party_report) { create(:generated_report, :third_party, third_party_id: user.id) }
