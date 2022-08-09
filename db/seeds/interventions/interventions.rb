@@ -2,7 +2,6 @@
 
 require 'factory_bot_rails'
 require 'faker'
-require 'json'
 
 require_relative './/db_handler'
 require_relative './/question_data_handler'
@@ -13,9 +12,9 @@ class SeedIntervention
   NUM_OF_USERS = 3
   INTERVENTIONS_PER_USER = 100
   SESSIONS_PER_INTERVENTION = 10
-  QUESTION_GROUPS_PER_SESSION = 1
-  QUESTIONS_PER_QUESTION_GROUP = 1
-  ANSWERS_PER_QUESTION = 1
+  QUESTION_GROUPS_PER_SESSION = 5
+  QUESTIONS_PER_QUESTION_GROUP = 5
+  ANSWERS_PER_QUESTION = 5
 
   INTERVENTION_STATUS = %w[draft published closed archived].freeze
   INTERVENTION_NAMES = ['Drugs intervention', 'Smoking intervention', 'Alcohol intervention'].freeze
@@ -39,7 +38,7 @@ class SeedIntervention
 
   user_session_columns = %w[id user_id session_id finished_at created_at updated_at last_answer_at type user_intervention_id]
 
-  file = Rails.root.join('tmp/csv/test.csv')
+  file = Rails.root.join('tmp/db_seed.csv')
   data_handler = DBHandler.new(file)
 
   NUM_OF_USERS.times do |index|
@@ -53,7 +52,7 @@ class SeedIntervention
     )
     @user.skip_confirmation!
     @user.save!
-    p "#{index+1}/#{NUM_OF_USERS} users created"
+    p "#{index + 1}/#{NUM_OF_USERS} users created"
   end
 
   user_ids = User.ids
@@ -185,7 +184,7 @@ class SeedIntervention
   data_handler.save_data_to_db(data)
 
   index = 0
-  max_index = Question.count * ANSWERS_PER_QUESTION - (QuestionGroup.count * QUESTION_GROUPS_PER_SESSION)
+  max_index = Question.count * ANSWERS_PER_QUESTION
   Question.find_each do |question|
     UserSession.limit(ANSWERS_PER_QUESTION).find_each do |user_session|
       case question.type.demodulize

@@ -21,6 +21,7 @@ require 'google/cloud/translate/v2'
 require 'faker'
 require 'active_storage_validations/matchers'
 require 'rake'
+require 'rspec-benchmark'
 
 class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   def audio_content
@@ -77,6 +78,9 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   config.include ActiveStorageValidations::Matchers
+
+  # Rspec Benchmarking
+  config.include RSpec::Benchmark::Matchers
 
   config.before do
     tts_instance = instance_double(Google::Cloud::TextToSpeech::V1::TextToSpeech::Client)

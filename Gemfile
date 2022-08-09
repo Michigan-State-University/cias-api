@@ -41,7 +41,6 @@ gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
 gem 'rack', '>= 2.2.3.1'
-gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.4.3'
 gem 'secure_headers'
 gem 'airbrake'
@@ -94,6 +93,7 @@ group :test do
   gem 'timecop'
   gem 'database_cleaner-active_record'
   gem 'action-cable-testing', '~> 0.6.1'
+  gem 'rspec-benchmark'
 end
 
 group :production do
