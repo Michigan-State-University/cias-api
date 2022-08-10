@@ -65,11 +65,11 @@ class ConversationChannel < ApplicationCable::Channel
     end
   end
 
-  def on_no_navigator_available(data)
+  def on_fetch_live_chat_setup(data)
     intervention = Intervention.find(data['interventionId'])
     setup = intervention.navigator_setup
     response_data = V1::LiveChat::Interventions::LiveChatSetupSerializer.new(setup, { include: %i[participant_links phone] })
-    ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'navigator_unavailable_setup_sent'))
+    ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'live_chat_setup_fetched'))
   end
 
   private
