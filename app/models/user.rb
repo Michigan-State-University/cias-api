@@ -72,6 +72,9 @@ class User < ApplicationRecord
                                                  dependent: :destroy
   has_many :downloaded_reports, dependent: :destroy
 
+  # DOWNLOADED REPORTS
+  has_many :downloaded_reports, dependent: :destroy
+
   # CHARTS
   has_many :chart_statistics, dependent: :nullify # statistics of user answers
 
