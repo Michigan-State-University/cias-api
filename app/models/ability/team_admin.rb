@@ -38,6 +38,9 @@ class Ability::TeamAdmin < Ability::Base
 
     can :read, GeneratedReport,
         user_session: { session: { intervention: { user_id: team_members_ids } } }
+    can :create, DownloadedReport,
+        generated_report: { user_session: { session: { intervention: { user_id: team_members_ids } } } }
+
     can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: team_members_ids } } }
     enable_google_access
   end
