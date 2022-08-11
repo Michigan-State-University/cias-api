@@ -232,7 +232,7 @@ Rails.application.routes.draw do
         namespace :navigator_setups do
           resources :links, only: %i[create update destroy], param: :link_id,
                             controller: '/v1/live_chat/interventions/links'
-          resources :participant_files, only: %i[create destroy], controller: '/v1/live_chat/interventions/navigator_setups/files', param: :participant_file_id
+          resources :files, only: %i[create destroy], controller: '/v1/live_chat/interventions/files', param: :file_id
         end
       end
 

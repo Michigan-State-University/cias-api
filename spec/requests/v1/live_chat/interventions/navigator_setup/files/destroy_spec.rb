@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participant_files/:participant_file_id', type: :request do
+RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/files/:file_id', type: :request do
   let(:user) { create(:user, :admin, :confirmed) }
   let(:intervention) { create(:intervention, :with_navigator_setup, user: user) }
   let(:file) { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true) }
@@ -8,7 +8,7 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participa
   let(:headers) { user.create_new_auth_token }
 
   let(:request) do
-    delete v1_live_chat_intervention_navigator_setups_participant_file_path(id: intervention.id, participant_file_id: file_id),
+    delete v1_live_chat_intervention_navigator_setups_file_path(id: intervention.id, file_id: file_id),
            headers: headers
   end
 
