@@ -553,7 +553,7 @@ ActiveRecord::Schema.define(version: 2022_07_18_115443) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
-    t.string "type", default: "SmsPlan", null: false
+    t.string "type", default: "SmsPlan::Normal", null: false
     t.boolean "include_first_name"
     t.boolean "include_last_name"
     t.boolean "include_phone_number"

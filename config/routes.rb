@@ -159,6 +159,11 @@ Rails.application.routes.draw do
           end
         end
         resources :interventions, only: :index, controller: :interventions
+        scope module: 'interventions' do
+          resources :interventions do
+            resources :invitations, only: %i[create]
+          end
+        end
         scope module: 'sessions' do
           resources :sessions do
             resources :invitations, only: %i[index create]
