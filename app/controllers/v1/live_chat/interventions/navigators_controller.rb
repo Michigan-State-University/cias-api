@@ -7,10 +7,23 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
     render json: navigators_response(navigators_load)
   end
 
+  def destroy
+    authorize! :update, Intervention
+
+    navigator = intervention_load.intervention_navigators.find_by!(user_id: intervention_navigator_id)
+    navigator.destroy!
+
+    head :no_content
+  end
+
   private
 
   def intervention_id
     params[:id]
+  end
+
+  def intervention_navigator_id
+    params[:navigator_id]
   end
 
   def intervention_load

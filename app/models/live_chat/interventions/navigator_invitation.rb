@@ -6,5 +6,5 @@ class LiveChat::Interventions::NavigatorInvitation < ApplicationRecord
   encrypts :email
   blind_index :email
 
-  scope :not_accepted, ->(intervention_id) { where(intervention_id: intervention_id, accepted_at: nil) }
+  scope :not_accepted, -> { where(accepted_at: nil) }
 end

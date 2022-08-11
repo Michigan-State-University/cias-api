@@ -53,6 +53,8 @@ class V1::LiveChat::InviteNavigators
   end
 
   def filter_invited_navigators(emails)
-    emails.select { |email| !intervention.live_chat_navigator_invitations.exists?(email: email) && !intervention.navigators.exists?(email: email) }
+    emails.select do |email|
+      !intervention.live_chat_navigator_invitations.not_accepted.exists?(email: email) && !intervention.navigators.exists?(email: email)
+    end
   end
 end

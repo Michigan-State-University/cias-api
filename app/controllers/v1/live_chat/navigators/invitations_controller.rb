@@ -29,7 +29,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
   def confirm
     intervention = Intervention.find(intervention_id)
-    invitation = intervention.live_chat_navigator_invitations.find_by(email: email, intervention_id: intervention.id)
+    invitation = intervention.live_chat_navigator_invitations.not_accepted.find_by(email: email, intervention_id: intervention.id)
     if invitation.nil?
       redirect_to_web_app(error: I18n.t('live_chat.navigators.invitations.error'))
       return
@@ -69,6 +69,6 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
   end
 
   def not_accepted_invitations
-    intervention_load.live_chat_navigator_invitations.not_accepted(intervention_id)
+    intervention_load.live_chat_navigator_invitations.not_accepted
   end
 end

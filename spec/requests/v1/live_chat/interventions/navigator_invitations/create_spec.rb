@@ -76,4 +76,26 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', 
       expect { request }.not_to change(User, :count)
     end
   end
+
+  context 'Removed navigator that is added again' do
+    let(:params) do
+      {
+        navigator_invitation: {
+          emails: [navigator.email]
+        }
+      }
+    end
+    let(:navigator) { create(:user, :confirmed, :navigator) }
+    let(:navigator_invitation) { create(:navigator_invitation, intervention: intervention, email: navigator.email, accepted_at: DateTime.now) }
+
+    before { request }
+
+    it 'returns correct status code (OK)' do
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'correctly sends an invitation for previously removed navigator' do
+      expect(intervention.live_chat_navigator_invitations.not_accepted.count).to be 1
+    end
+  end
 end
