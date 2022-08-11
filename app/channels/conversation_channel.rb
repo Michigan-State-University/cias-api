@@ -5,9 +5,12 @@ class ConversationChannel < ApplicationCable::Channel
 
   def subscribed
     stream_from current_channel_id
-    if intervention_id.present? && no_navigator_available?(intervention_id) # rubocop:disable Style/GuardClause
-      ActionCable.server.broadcast(current_channel_id,
-                                   generic_message({}, 'navigator_unavailable', 404))
+    if intervention_id.present? # rubocop:disable Style/GuardClause
+      if no_navigator_available?(intervention_id)
+        ActionCable.server.broadcast(current_channel_id,
+                                     generic_message({}, 'navigator_unavailable', 404))
+      end
+      stream_from intervention_channel_id(intervention_id)
     end
   end
 
@@ -84,6 +87,10 @@ class ConversationChannel < ApplicationCable::Channel
       topic: topic,
       status: status
     }
+  end
+
+  def intervention_channel_id(intervention_id)
+    "intervention_channel_#{intervention_id}"
   end
 
   def user_channel_id(user)
