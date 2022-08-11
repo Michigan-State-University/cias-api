@@ -191,6 +191,7 @@ Rails.application.routes.draw do
                                              as: :health_clinic_invitations_confirm
 
     resources :generated_reports, only: :index
+    resources :downloaded_reports, only: :create
 
     scope module: :google_tts do
       resources :languages, only: :index do
