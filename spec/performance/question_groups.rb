@@ -19,4 +19,3 @@ RSpec.describe 'Performance', type: :request do
     end
   end
 end
-
