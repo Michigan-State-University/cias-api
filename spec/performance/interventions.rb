@@ -12,12 +12,12 @@ RSpec.describe 'Performance', type: :request do
     it 'performs index in correct time' do
       # TO FIX
       expect { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
-        .to perform_under(0.5).sample(10)
+        .to perform_under(0.50).sample(10)
     end
 
     it 'performs show in correct time' do
       expect { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
-        .to perform_under(0.25).sample(10)
+        .to perform_under(0.2).sample(10)
     end
   end
 end

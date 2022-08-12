@@ -17,16 +17,22 @@ class DBHandler
     data.each do |data_row|
       data_row.each do |data_value|
         data_value.delete('"') if instance_of? String
+
+        if data_value.instance_of? Hash
+          data_value.each do |k, v|
+            data_value[k] = v.to_s.gsub(/\r\n?/, "").delete("\n").delete("\r")
+          end
+        end
       end
     end
 
     CSV.open(@file, 'a') do |csv|
-      data.each do |column|
-        csv << column
-      end
+      data.each { |column| csv << column }
     end
 
-    sql = "COPY #{@table_name}(#{@headers.to_s.sub('[', '').sub(']', '')}) FROM '#{@file}' DELIMITER ',' CSV HEADER;"
+    sql_table_headers = @headers.to_s.sub('[', '').sub(']', '')
+
+    sql = "COPY #{@table_name}(#{sql_table_headers}) FROM '#{@file}' DELIMITER ',' CSV HEADER;"
     ActiveRecord::Base.connection.exec_query(sql)
   end
 
