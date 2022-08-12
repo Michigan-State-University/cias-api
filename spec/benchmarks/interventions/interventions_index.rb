@@ -3,7 +3,7 @@
 require 'benchmark/ips'
 
 RSpec.describe 'Benchmark', type: :request do
-  context 'Intervention' do
+  context 'Interventions' do
     let!(:user) { create(:user, :confirmed, :admin) }
     let!(:params_long) { { start_index: 0, end_index: 49 } }
     let!(:params_short) { { start_index: 0, end_index: 24 } }

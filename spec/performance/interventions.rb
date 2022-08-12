@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Performance', type: :request do
-  context 'Intervention' do
+  context 'Interventions' do
     let!(:user) { create(:user, :confirmed, :admin) }
     let!(:params) { { start_index: 0, end_index: 50 } }
     let!(:interventions) { create_list(:intervention, 50, :published, user_id: user.id) }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'Performance', type: :request do
-  context 'Report templates' do
+  context 'Question groups' do
     let!(:user) { create(:user, :confirmed, :admin) }
     let!(:headers) { user.create_new_auth_token }
     let!(:session) { create(:session) }

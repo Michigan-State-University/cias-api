@@ -18,8 +18,6 @@ RSpec.describe 'Performance', type: :request do
     it 'performs show in correct time' do
       expect { get v1_intervention_session_path(intervention_id: intervention.id, id: session.id), headers: headers }
         .to perform_under(0.2).sample(10)
-      require 'pry'
-      binding.pry
     end
   end
 end

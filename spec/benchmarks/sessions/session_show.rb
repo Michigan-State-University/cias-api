@@ -3,7 +3,7 @@
 require 'benchmark/ips'
 
 RSpec.describe 'Benchmark', type: :request do
-  context 'Sessions' do
+  context 'Session' do
     let!(:user) { create(:user, :confirmed, :admin) }
     let!(:headers) { user.create_new_auth_token }
     let!(:intervention) { create(:intervention, :published, user_id: user.id) }
