@@ -33,7 +33,7 @@ class SeedIntervention
   data_handler = DBHandler.new(file)
 
   (NUM_OF_USERS - 1).times do |index|
-    user = create(
+    create(
       :user,
       :confirmed,
       email: "#{Time.current.to_i}_#{SecureRandom.hex(10)}@participant.true",
@@ -55,7 +55,6 @@ class SeedIntervention
     roles: %w[researcher]
   )
   p "#{NUM_OF_USERS}/#{NUM_OF_USERS} users created"
-
 
   user_ids = User.researchers.ids
   data_handler.new_table('interventions', Intervention.column_names)
@@ -186,7 +185,7 @@ class SeedIntervention
       type = answer_type_for(question.type.demodulize)
 
       create(type, id: Faker::Internet.unique.uuid, question_id: question.id, user_session_id: user_session_id,
-             next_session_id: nil, created_at: CURRENT_TIME, updated_at: CURRENT_TIME, skipped: false)
+                   next_session_id: nil, created_at: CURRENT_TIME, updated_at: CURRENT_TIME, skipped: false)
 
       p "#{index += 1}/#{max_index} answers created"
     end
@@ -196,4 +195,5 @@ class SeedIntervention
   p 'Example user password: Password1!'
   p "Example user verification code: verification_code_#{researcher.uid}"
 end
+
 # rubocop:enable Metrics/ClassLength, Rails/Output

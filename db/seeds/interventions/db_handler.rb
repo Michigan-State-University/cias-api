@@ -18,10 +18,10 @@ class DBHandler
       data_row.each do |data_value|
         data_value.delete('"') if instance_of? String
 
-        if data_value.instance_of? Hash
-          data_value.each do |k, v|
-            data_value[k] = v.to_s.gsub(/\r\n?/, "").delete("\n").delete("\r")
-          end
+        next unless data_value.instance_of? Hash
+
+        data_value.each do |k, v|
+          data_value[k] = v.to_s.gsub(/\r\n?/, '').delete("\n").delete("\r")
         end
       end
     end
