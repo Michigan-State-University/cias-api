@@ -18,7 +18,7 @@ class V1::LiveChat::InviteNavigators
     invitations = []
     ActiveRecord::Base.transaction do
       add_navigator_role(users_exists)
-      invite_new_users_to_system(emails - users_exists.map(&:email))
+      invite_new_users_to_system(user_emails_to_invite - users_exists.map(&:email))
 
       User.where(email: user_emails_to_invite).find_each do |user|
         invitations << LiveChat::Interventions::NavigatorInvitation.create(email: user.email, intervention: @intervention)
