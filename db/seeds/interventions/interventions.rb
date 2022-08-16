@@ -17,6 +17,7 @@ class SeedIntervention
   NUM_OF_USERS = 2
   INTERVENTIONS_PER_USER = 100
   SESSIONS_PER_INTERVENTION = 10
+  REPORTS_PER_SESSION = 20
   QUESTION_GROUPS_PER_SESSION = 5
   QUESTIONS_PER_QUESTION_GROUP = 5
   ANSWERS_PER_QUESTION = 1
@@ -40,7 +41,7 @@ class SeedIntervention
       password: 'Password1!',
       first_name: Faker::Name.first_name,
       last_name: Faker::Name.last_name,
-      roles: %w[participant]
+      roles: %w[participant third_party]
     )
     p "#{index + 1}/#{NUM_OF_USERS} users created"
   end
@@ -52,7 +53,7 @@ class SeedIntervention
     password: 'Password1!',
     first_name: Faker::Name.first_name,
     last_name: Faker::Name.last_name,
-    roles: %w[researcher]
+    roles: %w[researcher admin]
   )
   p "#{NUM_OF_USERS}/#{NUM_OF_USERS} users created"
 
@@ -99,8 +100,36 @@ class SeedIntervention
   end
   data_handler.save_data_to_db(data)
 
-  data_handler.new_table('question_groups', QuestionGroup.column_names)
+  data_handler.new_table('report_templates', ReportTemplate.column_names)
   session_ids = Session.ids
+  index = 0
+  max_index = session_ids.count
+  data = []
+  position = 0
+  session_ids.each do |session_id|
+    next if ReportTemplate.find_by(session_id: session_id)
+
+    fake_uuid = Faker::Internet.unique.uuid
+    if position.even?
+      data.append(
+        [fake_uuid, "Report #{position}", 'participant', session_id, 'Good job!', CURRENT_TIME.to_s, CURRENT_TIME.to_s,
+         { 'name' => "Report #{position}", 'summary' => 'Good job!' }.to_json]
+      )
+    end
+
+    if position.odd?
+      data.append(
+        [fake_uuid, "Report #{position}", 'third_party', session_id, 'Good job!', CURRENT_TIME.to_s, CURRENT_TIME.to_s,
+         { 'name' => "Report #{position}", 'summary' => 'Good job!' }.to_json]
+      )
+    end
+
+    position += 1
+    p "#{index += 1}/#{max_index} report templates created"
+  end
+  data_handler.save_data_to_db(data)
+
+  data_handler.new_table('question_groups', QuestionGroup.column_names)
   index = 0
   max_index = session_ids.count * QUESTION_GROUPS_PER_SESSION
   data = []
@@ -175,6 +204,39 @@ class SeedIntervention
       )
       p "#{index += 1}/#{max_index} user sessions created"
     end
+  end
+  data_handler.save_data_to_db(data)
+
+  data_handler.new_table('generated_reports', GeneratedReport.column_names)
+  data = []
+  index = 0
+  max_index = ReportTemplate.count * REPORTS_PER_SESSION
+  ReportTemplate.all.zip(UserSession.all).each do |report_template, user_session|
+    REPORTS_PER_SESSION.times do
+      fake_uuid = Faker::Internet.unique.uuid
+      data.append(
+        [fake_uuid, "#{user_session.user.first_name} report", report_template.id,
+         user_session.id, report_template.report_for,
+         CURRENT_TIME.to_s, CURRENT_TIME.to_s, user_session.user.id]
+      )
+      p "#{index += 1}/#{max_index} generated reports created"
+    end
+  end
+  data_handler.save_data_to_db(data)
+
+  data_handler.new_table('generated_reports_third_party_users', GeneratedReportsThirdPartyUser.column_names)
+  data = []
+  index = 0
+  max_index = GeneratedReport.count / 2
+  third_party_id = User.first.id
+  GeneratedReport.all.each do |generated_report|
+    next unless generated_report.report_for == 'third_party'
+
+    fake_uuid = Faker::Internet.unique.uuid
+    data.append(
+      [fake_uuid, generated_report.id, third_party_id, CURRENT_TIME.to_s, CURRENT_TIME.to_s]
+    )
+    p "#{index += 1}/#{max_index} generated reports for third party created"
   end
   data_handler.save_data_to_db(data)
 
