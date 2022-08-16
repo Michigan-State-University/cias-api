@@ -20,6 +20,14 @@ class V1::LiveChat::ConversationsController < V1Controller
 
   private
 
+  def archived_filter_params
+    params.permit(:archived)
+  end
+
+  def archived?
+    !archived_filter_params[:archived].nil?
+  end
+
   def conversation_params
     params.require(:conversation).permit(:intervention_id, user_ids: [])
   end
@@ -37,6 +45,6 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def user_conversations
-    LiveChat::Conversation.active_user_conversations(current_v1_user)
+    LiveChat::Conversation.user_conversations(current_v1_user, archived?)
   end
 end
