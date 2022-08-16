@@ -60,7 +60,7 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
     end
   end
 
-  context 'returns only non-archived conversations' do
+  context 'returns only archived conversations' do
     let(:param) { { archived: true } }
     let(:request) { get v1_live_chat_conversations_path, params: param, headers: user.create_new_auth_token }
 
