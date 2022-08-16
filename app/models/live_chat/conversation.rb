@@ -9,6 +9,6 @@ class LiveChat::Conversation < ApplicationRecord
   has_many :users, through: :live_chat_interlocutors
 
   scope :user_conversations, lambda { |user, is_archived|
-    LiveChat::Conversation.where(archived: is_archived).joins(:live_chat_interlocutors).where(live_chat_interlocutors: { user_id: user.id })
+    LiveChat::Conversation.joins(:live_chat_interlocutors).where(archived: is_archived, live_chat_interlocutors: { user_id: user.id })
   }
 end
