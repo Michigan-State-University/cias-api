@@ -25,7 +25,7 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def archived?
-    !archived_filter_params[:archived].nil?
+    archived_filter_params[:archived] || false
   end
 
   def conversation_params
