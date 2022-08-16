@@ -65,7 +65,7 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
     let(:request) { get v1_live_chat_conversations_path, params: param, headers: user.create_new_auth_token }
 
     it 'returns only archived data' do
-      expect(json_response['data'].length).to eq 3
+      expect(json_response['data'].length).to eq archived_conversations.length
     end
   end
 
