@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::UserInterventionSerializer < V1Serializer
+  include FileHelper
   attributes :completed_sessions, :status, :last_answer_date
 
   attribute :sessions_in_intervention do |object|
@@ -34,11 +35,7 @@ class V1::UserInterventionSerializer < V1Serializer
 
   def self.file_data(object)
     object.intervention.files.map do |file|
-      {
-        id: file.id,
-        name: file.blob.filename,
-        url: ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
-      }
+      map_file_data(file)
     end
   end
 end

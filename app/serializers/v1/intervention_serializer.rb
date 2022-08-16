@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::InterventionSerializer < V1Serializer
+  include FileHelper
   attributes :id, :user_id, :type, :name, :status, :shared_to, :organization_id, :google_language_id, :created_at, :updated_at, :published_at,
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
              :additional_text, :original_text, :quick_exit, :live_chat_enabled
@@ -75,11 +76,7 @@ class V1::InterventionSerializer < V1Serializer
 
   def self.files_info(object)
     object.files.map do |file|
-      {
-        id: file.id,
-        name: file.blob.filename,
-        url: ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
-      }
+      map_file_data(file)
     end
   end
 end
