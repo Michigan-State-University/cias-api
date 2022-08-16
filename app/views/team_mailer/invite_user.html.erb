@@ -184,7 +184,7 @@
                         <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                           <div style="font-family:DM Sans, Helvetica, Arial;font-size:20px;font-weight:700;line-height:1;text-align:center;color:#2F3850;">
                             <! -- MAIN-TEXT START -->
-                            <%= t('team_mailer.invite_user.body', team_name: @team.name) %><br />
+                            <%= t('team_mailer.invite_user.body', team_name: @team.name, roles: @roles) %><br />
                             <br />
                             <%= t('team_mailer.invite_user.instruction') %>
                             <! -- MAIN-TEXT END -->

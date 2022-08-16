@@ -91,7 +91,7 @@ en:
     invite_user:
       subject:      You've been invited to the Team
       header:       '%{team_name} Invitation'
-      body:         "You've been invited to the %{team_name}."
+      body:         "You've been invited as %{roles} to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
       button_text:  Accept the Invitation
   organizables:

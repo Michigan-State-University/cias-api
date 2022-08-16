@@ -164,4 +164,9 @@ class Intervention < ApplicationRecord
   def intervention_have_cat_mh_sessions?
     sessions.where(type: 'Session::CatMh').any?
   end
+
+  def navigator_from_team
+    id_scope = user.team_admin? ? user.admins_teams.pluck(:id) : user.team_id
+    User.limit_to_roles('navigator').where(team_id: id_scope)
+  end
 end
