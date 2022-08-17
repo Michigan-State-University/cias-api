@@ -13,7 +13,8 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   def destroy
     authorize! :update, Intervention
 
-    ActiveStorage::Attachment.accessible_by(current_ability).find(file_id)&.purge_later
+    selected_files(params[:files_for]).find(file_id).purge_later
+
     head :no_content
   end
 
@@ -44,7 +45,11 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   end
 
   def assign_file_to_setup!
-    files_collection = setup_load.public_send("#{files_for.singularize}_files")
+    files_collection = selected_files(files_for)
     files.each { |file| files_collection&.attach(file) }
+  end
+
+  def selected_files(files_for)
+    setup_load.public_send("#{files_for.singularize}_files")
   end
 end

@@ -6,9 +6,10 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/files/:fi
   let(:file) { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true) }
   let(:file_id) { intervention.navigator_setup.participant_files.first.id }
   let(:headers) { user.create_new_auth_token }
+  let(:files_for) { 'participant' }
 
   let(:request) do
-    delete v1_live_chat_intervention_navigator_setups_file_path(id: intervention.id, file_id: file_id),
+    delete v1_live_chat_intervention_navigator_setups_file_path(id: intervention.id, file_id: file_id, files_for: files_for),
            headers: headers
   end
 
