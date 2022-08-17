@@ -218,3 +218,8 @@ en:
       click_the_link: "Click the link to accept invitation"
       navigator_invite: "Navigator intervention invite"
       accept: "Accept invitation"
+    from_team:
+      invitation:
+        subject: 'Welcome as a navigator in new intervention!'
+        navigator_invite: "Navigator intervention invite"
+        body: "You have been invited as navigator to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />Now you can chat with participants to help them with their troubles or concerns in this intervention."

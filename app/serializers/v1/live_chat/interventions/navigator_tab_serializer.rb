@@ -3,14 +3,14 @@
 class V1::LiveChat::Interventions::NavigatorTabSerializer < V1Serializer
   include UserHelper
 
-  attribute :send_invitations do |object|
+  attribute :sent_invitations do |object|
     (object.live_chat_navigator_invitations.not_accepted || []).map do |invitation|
       map_invitation(invitation)
     end
   end
 
   attribute :navigators_in_team do |object|
-    (object.navigator_from_team || []).map do |navigator|
+    (object.navigators_from_team || []).map do |navigator|
       map_navigator_data(navigator)
     end
   end

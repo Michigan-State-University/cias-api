@@ -227,7 +227,7 @@ Rails.application.routes.draw do
       end
 
       scope '/intervention/:id', as: :intervention do
-        resources :navigators, controller: 'interventions/navigators', only: %i[index destroy], param: :navigator_id
+        resources :navigators, controller: 'interventions/navigators', only: %i[index destroy create], param: :navigator_id
         resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'
         resource :navigator_tab, only: %i[show], controller: 'navigators/tabs'
         namespace :navigator_setups do

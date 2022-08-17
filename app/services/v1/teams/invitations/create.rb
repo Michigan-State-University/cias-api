@@ -38,12 +38,9 @@ class V1::Teams::Invitations::Create
   end
 
   def assign_missing_role!
-    if user.researcher? && user.roles.exclude?('navigator') && roles.include?('navigator')
-      user.update(roles: user.roles << 'navigator')
-    elsif user.navigator? && roles.include?('researcher')
-      return false
-    end
+    return false if user.navigator? && roles.include?('researcher')
 
+    user.update(roles: user.roles << 'navigator')
     true
   end
 end

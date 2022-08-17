@@ -7,6 +7,13 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
     render json: navigators_response(navigators_load)
   end
 
+  def create
+    authorize! :update, Intervention
+
+    added_navigator = V1::LiveChat::Interventions::Navigators::Assign.call(navigator_id, intervention_load)
+    render json: navigators_response(added_navigator)
+  end
+
   def destroy
     authorize! :update, Intervention
 
@@ -36,5 +43,9 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
 
   def navigators_response(data)
     V1::LiveChat::Interventions::NavigatorSerializer.new(data)
+  end
+
+  def navigator_id
+    params['navigator_id']
   end
 end
