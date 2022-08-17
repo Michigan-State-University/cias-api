@@ -35,6 +35,6 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
 
   def navigator_setup_params
     params.require(:navigator_setup).permit(:contact_email, :notify_by, :no_navigator_available_message, :is_navigator_notification_on,
-                                            :phone, phone: %i[iso number prefix])
+                                            :phone, :filled_script_template, phone: %i[iso number prefix])
   end
 end

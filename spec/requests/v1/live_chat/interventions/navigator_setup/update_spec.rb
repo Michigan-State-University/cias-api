@@ -9,8 +9,6 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     patch v1_live_chat_intervention_navigator_setup_path(id: intervention.id), headers: headers, params: params
   end
 
-  before { request }
-
   context 'correctly updates navigator setup' do
     let(:params) do
       {
@@ -23,10 +21,12 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     end
 
     it 'returns correct status code (OK)' do
+      request
       expect(response).to have_http_status(:ok)
     end
 
     it 'correctly updates setup attributes' do
+      request
       setup = intervention.navigator_setup.reload
       expect(setup.is_navigator_notification_on).to eq false
       expect(setup.contact_email).to eq 'mike.wazowski@monsters-inc.com'
@@ -47,6 +47,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       end
 
       it do
+        request
         phone = intervention.navigator_setup.phone
         expect(phone).not_to be nil
         expect(phone.number).to eq 111_111_111.to_s
@@ -71,10 +72,71 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       end
 
       it do
+        request
         phone = intervention.navigator_setup.reload.phone
         expect(phone.number).to eq 111_222_333.to_s
         expect(phone.iso).to eq 'PL'
         expect(phone.prefix).to eq '+43'
+      end
+    end
+
+    context 'Script template upload' do
+      let(:file) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', false) }
+
+      context 'Correctly uploads file' do
+        let(:params) do
+          {
+            navigator_setup: {
+              filled_script_template: file
+            }
+          }
+        end
+
+        it 'returns correct status code (OK)' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'has a file assigned' do
+          request
+          expect(intervention.navigator_setup.reload.filled_script_template.attached?).to be true
+        end
+
+        it 'returns correct file data' do
+          request
+          expect(json_response['data']['attributes']['filled_script_template']).to include(
+            {
+              'id' => intervention.navigator_setup.reload.filled_script_template.id,
+              'name' => include('test_empty.csv'),
+              'url' => include(polymorphic_url(intervention.navigator_setup.filled_script_template).sub('http://www.example.com/', ''))
+            }
+          )
+        end
+      end
+
+      context 'Deletes file when sent nil' do
+        let(:params) do
+          {
+            navigator_setup: {
+              filled_script_template: nil
+            }
+          }
+        end
+
+        before do
+          intervention.navigator_setup.filled_script_template.attach(file)
+        end
+
+        it 'returns correct status code (OK)' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'correctly deletes previous file' do
+          request
+          expect(intervention.navigator_setup.reload.filled_script_template.attached?).to eq false
+          expect(ActiveStorage::Attachment.count).to be 0
+        end
       end
     end
   end
@@ -91,6 +153,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     end
 
     it do
+      request
       expect(intervention.navigator_setup.reload.phone).to be nil
       expect(Phone.count).to eq 0
     end
@@ -100,6 +163,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     let(:params) { {} }
 
     it do
+      request
       expect(response).to have_http_status(:bad_request)
     end
   end

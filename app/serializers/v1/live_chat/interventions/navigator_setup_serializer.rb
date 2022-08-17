@@ -19,4 +19,8 @@ class V1::LiveChat::Interventions::NavigatorSetupSerializer < V1Serializer
       map_file_data(file_data)
     end
   end
+
+  attribute :filled_script_template do |object|
+    map_file_data(object.filled_script_template) if object.filled_script_template.attached?
+  end
 end

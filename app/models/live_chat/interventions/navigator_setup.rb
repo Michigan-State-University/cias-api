@@ -12,6 +12,9 @@ class LiveChat::Interventions::NavigatorSetup < ApplicationRecord
 
   has_many_attached :participant_files, dependent: :purge_later
   has_many_attached :navigator_files, dependent: :purge_later
+  has_one_attached :filled_script_template, dependent: :purge_later
+
+  validates :filled_script_template, content_type: %w[text/csv], size: { less_than: 5.megabytes }
 
   enum notify_by: { email: 0, sms: 1 }
 end
