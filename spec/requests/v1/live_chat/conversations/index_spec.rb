@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
-  let!(:user) { create(:user, :confirmed, :admin) }
+  let!(:user) { create(:user, :confirmed, :navigator) }
   let!(:other_user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention, user: user) }
   let!(:interlocutors) { conversations.map { |conv| create(:live_chat_interlocutor, user: user, conversation: conv) } }
@@ -26,10 +26,14 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
 
   before do
     allow_any_instance_of(V1Controller).to receive(:current_v1_user).and_return(user)
-    request
   end
 
   context 'returns correct conversation data' do
+    before do
+      intervention.navigators << user
+      request
+    end
+
     it 'returns correct amount of conversations' do
       expect(json_response['data'].length).to eq conversations.length
     end
@@ -64,7 +68,10 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
     let(:param) { { archived: true } }
     let(:request) { get v1_live_chat_conversations_path, params: param, headers: user.create_new_auth_token }
 
+    before { intervention.navigators << user }
+
     it 'returns only archived data' do
+      request
       expect(json_response['data'].length).to eq archived_conversations.length
     end
   end
@@ -72,6 +79,19 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
   context 'when user don\'t have permission' do
     let(:user) { create(:user, :health_clinic_admin, :confirmed) }
 
+    before { request }
+
     it { expect(response).to have_http_status(:forbidden) }
+  end
+
+  context 'when user is not a navigator in the intervention' do
+    before do
+      intervention.intervention_navigators.destroy_all
+      request
+    end
+
+    it 'returns no data from the intervention' do
+      expect(json_response['data'].length).to eq 0
+    end
   end
 end

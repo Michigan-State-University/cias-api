@@ -11,4 +11,10 @@ class LiveChat::Conversation < ApplicationRecord
   scope :user_conversations, lambda { |user, is_archived|
     LiveChat::Conversation.joins(:live_chat_interlocutors).where(archived: is_archived, live_chat_interlocutors: { user_id: user.id })
   }
+
+  scope :navigator_conversations, lambda { |user, is_archived = false|
+    user_conversations(user, is_archived).
+      joins(intervention: :intervention_navigators).
+      where(intervention_navigators: { user_id: user.id })
+  }
 end

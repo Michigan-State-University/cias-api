@@ -45,6 +45,6 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def user_conversations
-    LiveChat::Conversation.user_conversations(current_v1_user, archived?)
+    LiveChat::Conversation.navigator_conversations(current_v1_user, archived?)
   end
 end

@@ -18,7 +18,10 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
     authorize! :update, Intervention
 
     navigator = intervention_load.intervention_navigators.find_by!(user_id: intervention_navigator_id)
-    navigator.destroy!
+    ActiveRecord::Base.transaction do
+      LiveChat::Conversation.navigator_conversations(navigator.user).update_all(archived: true) # rubocop:disable Rails/SkipsModelValidations
+      navigator.destroy!
+    end
 
     head :no_content
   end

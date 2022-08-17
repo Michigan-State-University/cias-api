@@ -41,4 +41,19 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigators/:navigator_id',
       end
     end
   end
+
+  context 'Conversation archiving' do
+    let!(:navigator_conversations) do
+      [
+        create(:live_chat_conversation, intervention: intervention, live_chat_interlocutors: [LiveChat::Interlocutor.new(user_id: navigator.id)]),
+        create(:live_chat_conversation, intervention: intervention, live_chat_interlocutors: [LiveChat::Interlocutor.new(user_id: navigator.id)]),
+        create(:live_chat_conversation, intervention: intervention, live_chat_interlocutors: [LiveChat::Interlocutor.new(user_id: navigator.id)])
+      ]
+    end
+
+    it 'correctly archives all active conversations from navigator' do
+      request
+      expect(navigator_conversations.each(&:reload).map(&:archived)).to eq [true, true, true]
+    end
+  end
 end
