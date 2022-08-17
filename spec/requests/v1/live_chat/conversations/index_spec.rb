@@ -17,6 +17,9 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
     ]
   end
 
+  let!(:archived_conversations) { create_list(:live_chat_conversation, 3, intervention_id: intervention.id, archived: true) }
+  let!(:interlocutors_archive) { archived_conversations.map { |conv| create(:live_chat_interlocutor, user: user, conversation: conv) } }
+
   let(:request) do
     get v1_live_chat_conversations_path, headers: user.create_new_auth_token
   end
@@ -55,14 +58,14 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
       end
       expect(json_response['data'].map { |h| h['attributes'] }.pluck('last_message').map { |h| h.except('created_at') }).to eq expected
     end
+  end
 
-    # TODO: change this back to 'context' when we actually start filtering the archived conversations out
-    xcontext 'returns only non-archived conversations' do
-      let!(:archived_conversations) { create_list(:live_chat_conversation, 3, intervention: intervention, archived: true) }
+  context 'returns only archived conversations' do
+    let(:param) { { archived: true } }
+    let(:request) { get v1_live_chat_conversations_path, params: param, headers: user.create_new_auth_token }
 
-      it do
-        expect(json_response['data'].length).to eq conversations.length
-      end
+    it 'returns only archived data' do
+      expect(json_response['data'].length).to eq archived_conversations.length
     end
   end
 
