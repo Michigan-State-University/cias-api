@@ -14,7 +14,7 @@ return puts '# Will not pollute database by fake data in production environment'
 # rubocop:disable Metrics/ClassLength
 class SeedIntervention
   extend FactoryBot::Syntax::Methods
-  NUM_OF_USERS = 2
+  NUM_OF_USERS = 10
   INTERVENTIONS_PER_USER = 100
   SESSIONS_PER_INTERVENTION = 10
   REPORTS_PER_SESSION = 20
@@ -105,9 +105,9 @@ class SeedIntervention
   index = 0
   max_index = session_ids.count
   data = []
-  position = 0
+  position = ReportTemplate.count
   session_ids.each do |session_id|
-    next if ReportTemplate.find_by(session_id: session_id)
+    next unless ReportTemplate.where('name = ? AND session_id = ?', "Report #{position}", session_id).empty?
 
     fake_uuid = Faker::Internet.unique.uuid
     if position.even?
