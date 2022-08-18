@@ -13,7 +13,7 @@ class Ability::TeamAdmin < Ability::Base
   private
 
   def team_admin
-    can %i[read update invite_researcher remove_researcher], Team, team_admin_id: user.id
+    can %i[read update invite_researcher remove_team_member], Team, team_admin_id: user.id
     can %i[read update active], User, id: team_members_and_researchers_participants
     can :list_researchers, User, team_id: team_admin_teams_ids
     can :manage, Intervention, user_id: team_members_ids
