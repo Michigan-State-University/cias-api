@@ -9,7 +9,8 @@ class Ability::EInterventionAdmin < Ability::Researcher
   private
 
   def e_intervention_admin
-    can %i[read list_researchers], User, id: participants_researchers_and_e_intervention_admins(user)
+    can %i[read list_researchers], User, id: participants_and_researchers(user)
+    can %i[read update], User, id: users_in_organization(user)
     can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.accepted_organization_ids)
     can :manage, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, UserIntervention, intervention: { user_id: user.id }
@@ -26,7 +27,7 @@ class Ability::EInterventionAdmin < Ability::Researcher
   end
 
   def users_in_organization(user)
-    organizations = user.organizations.joins(:health_systems, :health_clinics)
+    organizations = user.accepted_organization.joins(:health_systems, :health_clinics)
     return [] if organizations.blank?
 
     organization_ids = organizations.pluck(:id)

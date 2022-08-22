@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_21_155540) do
+ActiveRecord::Schema.define(version: 2022_08_18_103455) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -187,6 +187,16 @@ ActiveRecord::Schema.define(version: 2022_07_21_155540) do
     t.integer "position", default: 1, null: false
     t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
+  end
+
+  create_table "downloaded_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "generated_report_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["generated_report_id"], name: "index_downloaded_reports_on_generated_report_id"
+    t.index ["user_id", "generated_report_id"], name: "index_downloaded_reports_on_user_id_and_generated_report_id"
+    t.index ["user_id"], name: "index_downloaded_reports_on_user_id"
   end
 
   create_table "e_intervention_admin_organizations", force: :cascade do |t|
@@ -735,6 +745,8 @@ ActiveRecord::Schema.define(version: 2022_07_21_155540) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "downloaded_reports", "generated_reports"
+  add_foreign_key "downloaded_reports", "users"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
