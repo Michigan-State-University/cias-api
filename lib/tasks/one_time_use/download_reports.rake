@@ -13,7 +13,7 @@ namespace :one_time_use do
   end
 
   task mark_reports_as_downloaded: :environment do
-    report_counter = GeneratedReport.count + GeneratedReportsThirdPartyUser.count
+    report_counter = GeneratedReport.participant.count + GeneratedReportsThirdPartyUser.count
     index = 0
     GeneratedReport.find_each do |report|
       case report.report_for
