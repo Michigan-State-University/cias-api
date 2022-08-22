@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-namespace :reports do
+namespace :one_time_use do
   desc 'Mark all generated reports as downloaded in downloaded_reports model'
 
   def mark_as_downloaded(user_id, generated_report_id)
@@ -10,7 +10,7 @@ namespace :reports do
     )
   end
 
-  task download: :environment do
+  task mark_reports_as_downloaded: :environment do
     report_counter = GeneratedReport.count + GeneratedReportsThirdPartyUser.count
     index = 0
     GeneratedReport.find_each do |report|
