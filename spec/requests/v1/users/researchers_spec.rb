@@ -28,7 +28,7 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
   end
 
   context 'when current_user is admin' do
-    let(:researchers) { [other_researcher, researcher, e_intervention_admin] }
+    let(:researchers) { [other_researcher, researcher, e_intervention_admin, team_admin] }
 
     context 'without pagination params' do
       before { request }

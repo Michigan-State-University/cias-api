@@ -86,7 +86,7 @@ class User < ApplicationRecord
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
-  scope :with_intervention_creation_access, -> { limit_to_roles(%w[e_intervention_admin researcher]) }
+  scope :with_intervention_creation_access, -> { limit_to_roles(%w[e_intervention_admin researcher team_admin]) }
   scope :e_intervention_admins, -> { limit_to_roles('e_intervention_admin') }
   scope :third_parties, -> { limit_to_roles('third_party') }
   scope :from_team, ->(team_id) { team_id.present? ? left_joins(:organization_invitations).where(users: { team_id: team_id }) : User.none }
@@ -264,7 +264,7 @@ class User < ApplicationRecord
 
     def users_for_team(params, scope)
       scope = scope.from_team(params[:team_id])
-      scope.or(participants_with_answers(scope)) # participants of researchers and e_intervention admins of team
+      scope.or(participants_with_answers(scope.or(User.where(id: params[:user_id])))) # participants of researchers and e_intervention admins of team
     end
   end
 end

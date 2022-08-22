@@ -17,7 +17,7 @@ class V1::Question::ShareService
   attr_reader :question_ids, :researcher_ids, :user
 
   def call
-    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids) && proper_researchers?(researchers, researcher_ids) # here
+    raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids) && proper_researchers?(researchers, researcher_ids)
 
     researchers.each do |researcher|
       question_group = prepare_question_group(researcher, questions.first.question_group)

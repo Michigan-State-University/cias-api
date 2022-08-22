@@ -206,6 +206,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     let!(:team_participant) { create(:user, :participant, :confirmed) }
     let!(:team_participant2) { create(:user, :participant, :confirmed) }
+    let!(:team_admin_participant) { create(:user, :participant, :confirmed) }
     let!(:other_team_participant) { create(:user, :participant, first_name: 'John', team_id: team1.id) }
 
     let!(:team_researcher) { create(:user, :researcher, :confirmed, team_id: team1.id) }
@@ -231,8 +232,18 @@ RSpec.describe 'GET /v1/users', type: :request do
       create(:answer_slider, question: question, user_session: user_session)
     end
 
+    let!(:answer3) do
+      intervention = create(:intervention, user: current_user)
+      user_intervention = create(:user_intervention, intervention: intervention, user: team_admin_participant)
+      session = create(:session, intervention: intervention)
+      user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_admin_participant)
+      question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
+      question = create(:question_slider, question_group: question_group)
+      create(:answer_slider, question: question, user_session: user_session)
+    end
+
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
-    let(:users) { [*team1.users, current_user, team_participant, team_participant2] }
+    let(:users) { [*team1.users, current_user, team_participant, team_participant2, team_admin_participant] }
 
     let!(:team2) { create(:team) }
     let!(:other_researchers) do
@@ -263,7 +274,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with team_id params' do
       let!(:params) { { team_id: team1.id } }
-      let!(:users) { [*team1.users, team_participant, team_participant2] }
+      let!(:users) { [*team1.users, team_participant, team_participant2, team_admin_participant] }
 
       before do
         request
