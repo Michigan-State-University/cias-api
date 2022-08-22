@@ -4,7 +4,7 @@ namespace :one_time_use do
   desc 'Mark all generated reports as downloaded in downloaded_reports model'
 
   def mark_as_downloaded(user_id, generated_report_id)
-    return unless User.find_by(user_id)
+    return unless User.find_by(id: user_id)
 
     DownloadedReport.find_or_create_by!(
       user_id: user_id,
