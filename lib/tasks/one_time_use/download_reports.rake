@@ -13,23 +13,16 @@ namespace :one_time_use do
   end
 
   task mark_reports_as_downloaded: :environment do
-    report_counter = GeneratedReport.participant.count + GeneratedReportsThirdPartyUser.count
     index = 0
-    GeneratedReport.find_each do |report|
-      case report.report_for
-      when 'participant'
-        mark_as_downloaded(report.participant_id, report.id)
-        p "Done #{index += 1}/#{report_counter} reports"
-
-      when 'third_party'
-        GeneratedReportsThirdPartyUser.where(generated_report_id: report.id).find_each do |third_party_report|
-          mark_as_downloaded(third_party_report.third_party_id, report.id)
-          p "Done #{index += 1}/#{report_counter} reports"
-        end
-
-      else
-        next
+    users = User.limit_to_roles(%w[participant third_party researcher e_intervention_admin team_admin admin])
+    users_count = users.count
+    users.find_each do |user|
+      GeneratedReport.accessible_by(user.ability).find_each do |report|
+        mark_as_downloaded(user.id, report.id)
       end
+      p "Marking as download for users #{index}/#{users_count}"
+      index += 1
     end
+    p "Rake done!"
   end
 end
