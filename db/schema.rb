@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_01_055341) do
+ActiveRecord::Schema.define(version: 2022_08_24_134311) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -417,6 +417,22 @@ ActiveRecord::Schema.define(version: 2022_08_01_055341) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "is_navigator_notification_on", default: true
+  end
+
+  create_table "live_chat_notifications", force: :cascade do |t|
+    t.string "object_type", null: false
+    t.bigint "object_id", null: false
+    t.datetime "timestamp"
+    t.string "type"
+    t.boolean "isRead"
+    t.string "optional_link"
+    t.string "title"
+    t.text "description"
+    t.string "image_src"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["object_type", "object_id"], name: "index_live_chat_notifications_on_object"
   end
 
   create_table "messages", force: :cascade do |t|
