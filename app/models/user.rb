@@ -213,11 +213,15 @@ class User < ApplicationRecord
     Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
-  private
-
   def team_admin?
     roles.include?('team_admin')
   end
+
+  def admin?
+    roles.include?('admin')
+  end
+
+  private
 
   def team_is_present?
     return if Team.exists?(team_admin_id: id)

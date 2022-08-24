@@ -63,6 +63,9 @@ class V1::InterventionsController < V1Controller
   def intervention_params
     if params[:id].present? && intervention_load.published?
       params.require(:intervention).permit(:status, :cat_mh_pool, :is_access_revoked)
+    elsif current_v1_user.admin?
+      params.require(:intervention).permit(:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id, :cat_mh_application_id,
+                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit, :hfhs_access)
     else
       params.require(:intervention).permit(:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id, :cat_mh_application_id,
                                            :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit)

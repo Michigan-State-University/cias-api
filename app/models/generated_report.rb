@@ -21,6 +21,7 @@ class GeneratedReport < ApplicationRecord
 
   enum report_for: {
     third_party: 'third_party',
-    participant: 'participant'
+    participant: 'participant',
+    henry_fords_hospital: 'henry_fords_hospital'
   }
 end

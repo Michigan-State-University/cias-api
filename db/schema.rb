@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_15_102014) do
+ActiveRecord::Schema.define(version: 2022_08_09_051534) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -346,6 +346,7 @@ ActiveRecord::Schema.define(version: 2022_07_15_102014) do
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
+    t.boolean "hfhs_access", default: false
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
