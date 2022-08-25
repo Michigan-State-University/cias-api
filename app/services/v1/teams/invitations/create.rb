@@ -14,7 +14,7 @@ class V1::Teams::Invitations::Create
   def call
     return if invitation_already_exists?
     return unless user.confirmed?
-    return unless assign_missing_role!
+    return unless assign_roles!
 
     invitation = TeamInvitation.create!(
       user_id: user.id,
@@ -37,10 +37,9 @@ class V1::Teams::Invitations::Create
     TeamInvitation.not_accepted.exists?(user_id: user.id, team_id: team.id)
   end
 
-  def assign_missing_role!
-    return false if user.navigator? && roles.include?('researcher')
+  def assign_roles!
+    new_roles = user.roles + roles
 
-    user.update(roles: user.roles << 'navigator')
-    true
+    user.update(roles: new_roles.uniq)
   end
 end
