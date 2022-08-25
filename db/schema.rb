@@ -419,18 +419,6 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
     t.boolean "is_navigator_notification_on", default: true
   end
 
-  create_table "live_chat_notifications", force: :cascade do |t|
-    t.string "notifiable_type", null: false
-    t.bigint "notifiable_id", null: false
-    t.string "notification_type"
-    t.boolean "is_read"
-    t.jsonb "notification_params"
-    t.uuid "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["notifiable_type", "notifiable_id"], name: "index_live_chat_notifications_on_notifiable"
-  end
-
   create_table "messages", force: :cascade do |t|
     t.text "body", null: false
     t.string "status", default: "new", null: false
@@ -449,6 +437,21 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email_bidx"], name: "index_navigator_invitations_on_email_bidx"
     t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.integer "notification_type", default: 0
+    t.boolean "is_read", default: false
+    t.string "optional_link"
+    t.string "title"
+    t.string "description"
+    t.string "image_url"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
