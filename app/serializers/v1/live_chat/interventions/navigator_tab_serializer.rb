@@ -10,7 +10,7 @@ class V1::LiveChat::Interventions::NavigatorTabSerializer < V1Serializer
   end
 
   attribute :navigators_in_team do |object|
-    object.available_navigator_from_team.map do |navigator|
+    (object.navigators_from_team || []).map do |navigator|
       map_navigator_data(navigator)
     end
   end

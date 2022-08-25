@@ -51,14 +51,6 @@ RSpec.describe 'GET /v1/live_chat/intervention/:id/navigator_tab', type: :reques
         expect(json_response['data']['attributes']['navigators_in_team'].size).to be(0)
       end
     end
-
-    context 'when navigator in team is already navigator in intervention' do
-      let(:intervention) { create(:intervention, :with_navigator_setup, user: user, navigators: [navigator]) }
-
-      it 'returns correct navigators in team count' do
-        expect(json_response['data']['attributes']['navigators_in_team'].size).to be(0)
-      end
-    end
   end
 
   context 'when user has no permission to intervention' do

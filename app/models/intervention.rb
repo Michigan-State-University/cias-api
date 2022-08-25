@@ -165,10 +165,8 @@ class Intervention < ApplicationRecord
     sessions.where(type: 'Session::CatMh').any?
   end
 
-  def available_navigator_from_team
+  def navigators_from_team
     id_scope = user.team_admin? ? user.admins_teams.pluck(:id) : user.team_id
-    return User.none if id_scope.blank?
-
-    User.limit_to_roles('navigator').where(team_id: id_scope).where.not(id: navigators.pluck(:id))
+    User.limit_to_roles('navigator').where(team_id: id_scope) if id_scope.present?
   end
 end
