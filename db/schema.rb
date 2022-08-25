@@ -420,19 +420,15 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
   end
 
   create_table "live_chat_notifications", force: :cascade do |t|
-    t.string "object_type", null: false
-    t.bigint "object_id", null: false
-    t.datetime "timestamp"
-    t.string "type"
-    t.boolean "isRead"
-    t.string "optional_link"
-    t.string "title"
-    t.text "description"
-    t.string "image_src"
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.string "notification_type"
+    t.boolean "is_read"
+    t.jsonb "notification_params"
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["object_type", "object_id"], name: "index_live_chat_notifications_on_object"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_live_chat_notifications_on_notifiable"
   end
 
   create_table "messages", force: :cascade do |t|

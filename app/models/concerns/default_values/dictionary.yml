@@ -22,7 +22,7 @@ question:
     settings:
       voice: true
       animation: true
-    blocks: []
+    blocks: [ ]
   formulas: [
     {
       payload: '',
@@ -30,23 +30,23 @@ question:
     }
   ]
   body:
-    data: []
+    data: [ ]
   original_text:
     {
-      title : '',
+      title: '',
       subtitle: '',
       image_description: ''
     }
 report_template:
   original_text:
     {
-      summary : '',
+      summary: '',
       name: ''
     }
 report_template/section:
   original_text:
     {
-      title : '',
+      title: '',
       content: ''
     }
 sms_plan:
@@ -68,6 +68,13 @@ chart:
       label: 'NotMatched',
       color: '#E2B1F4'
     }
+live_chat:
+  notification_params: {
+    link: '',
+    image_src: '',
+    title: '',
+    description: ''
+  }
 user:
   roles:
     - participant
