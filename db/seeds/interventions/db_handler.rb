@@ -5,6 +5,7 @@ require 'csv'
 class DBHandler
   def initialize(file)
     @file = file
+    @data = []
   end
 
   def new_table(table_name, headers)
@@ -13,8 +14,13 @@ class DBHandler
     clear_file
   end
 
-  def save_data_to_db(data)
-    data.each do |data_row|
+  def store_data(data_array)
+    fake_uuid = Faker::Internet.unique.uuid
+    @data << [fake_uuid] + data_array
+  end
+
+  def save_data_to_db
+    @data.each do |data_row|
       data_row.each do |data_value|
         data_value.delete('"') if instance_of? String
 
@@ -27,8 +33,10 @@ class DBHandler
     end
 
     CSV.open(@file, 'a') do |csv|
-      data.each { |column| csv << column }
+      @data.each { |column| csv << column }
     end
+
+    @data = []
 
     sql_table_headers = @headers.to_s.sub('[', '').sub(']', '')
 
