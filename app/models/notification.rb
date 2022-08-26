@@ -4,7 +4,7 @@ class Notification < ApplicationRecord
   belongs_to :notifiable, polymorphic: true
   belongs_to :user
 
-  enum type: {
+  enum category: {
     inform: 0,
     alert: 1
   }
