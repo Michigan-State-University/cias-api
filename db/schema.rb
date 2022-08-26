@@ -439,19 +439,18 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
     t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
   end
 
-  create_table "notifications", force: :cascade do |t|
+  create_table "notifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "notifiable_type", null: false
     t.bigint "notifiable_id", null: false
-    t.integer "notification_type", default: 0
+    t.integer "type", default: 0, null: false
     t.boolean "is_read", default: false
-    t.string "optional_link"
-    t.string "title"
-    t.string "description"
-    t.string "image_url"
+    t.jsonb "data"
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["type"], name: "index_notifications_on_type"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
