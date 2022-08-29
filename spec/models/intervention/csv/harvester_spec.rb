@@ -676,6 +676,191 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.rows).to eq [[user.id, user.email, user_session.created_at, nil, nil, 1]]
         end
       end
+
+      context 'when tlfb - scenario without group' do
+        let!(:question_group) { create(:tlfb_group, session: session) }
+        let!(:questions) { question_group.questions }
+        let!(:question_body) do
+          {
+            'data' => [{ 'payload' =>
+                          { 'substances' => [{ 'name' => 'drug', 'variable' => 'drug' }, { 'name' => 'alcohol', 'variable' => 'alcohol' }],
+                            'head_question' => 'head question',
+                            'question_title' => 'question title',
+                            'substance_groups' => [],
+                            'substance_question' => 'question',
+                            'substances_with_group' => false } }]
+          }
+        end
+        let!(:answer_body) do
+          {
+            'consumptions' => [
+              { 'amount' => nil, 'consumed' => true, 'variable' => 'drug' },
+              { 'amount' => nil, 'consumed' => false, 'variable' => 'alcohol' }
+            ],
+            'substances_consumed' => true
+          }
+        end
+        let!(:question) { questions.last.update!(body: question_body) }
+        let!(:day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }
+        let!(:consumption_result) { create(:tlfb_consumption_result, day: day, body: answer_body) }
+
+        it 'save every variables and scores to csv' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.drug_d1", "#{session.variable}.tlfb.alcohol_d1",
+                                        "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                        "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user.id, user.email, 1, 0, user_session.created_at, nil, nil]]
+        end
+
+        context 'csv will be generated with default value' do
+          let!(:answer_body) do
+            {
+              'consumptions' => [
+                { 'amount' => nil, 'consumed' => true, 'variable' => 'drug' }
+              ],
+              'substances_consumed' => true
+            }
+          end
+
+          it 'save every variables and scores to csv' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.drug_d1", "#{session.variable}.tlfb.alcohol_d1",
+                                          "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                          "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[user.id, user.email, 1, 0, user_session.created_at, nil, nil]]
+          end
+        end
+      end
+
+      context 'when tlfb - scenario with group' do
+        let!(:question_group) { create(:tlfb_group, session: session) }
+        let!(:questions) { question_group.questions }
+        let!(:question_body) do
+          {
+            'data' => [{ 'payload' =>
+                           {
+                             'substances' => [],
+                             'head_question' => 'head question',
+                             'question_title' => 'question title',
+                             'substance_groups' => [
+                               {
+                                 'name' => 'Alcohol',
+                                 'substances' => [
+                                   {
+                                     'name' => 'vodka',
+                                     'unit' => 'shots',
+                                     'variable' => 'vodka'
+                                   },
+                                   {
+                                     'name' => 'wine',
+                                     'unit' => 'glasses',
+                                     'variable' => 'wine'
+                                   }
+                                 ]
+                               },
+                               {
+                                 'name' => 'Drugs',
+                                 'substances' => [
+                                   {
+                                     'name' => 'cacao',
+                                     'unit' => 'grams',
+                                     'variable' => 'cacao'
+                                   }
+                                 ]
+                               }
+                             ],
+                             'substance_question' => 'question',
+                             'substances_with_group' => true
+                           } }]
+          }
+        end
+        let!(:question) { questions.last.update!(body: question_body) }
+        let!(:day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }
+
+        context 'with consumption result' do
+          let!(:consumption_result) { create(:tlfb_consumption_result, day: day, body: answer_body) }
+          let!(:answer_body) do
+            {
+              'consumptions' => [
+                { 'amount' => 10, 'consumed' => nil, 'variable' => 'vodka' },
+                { 'amount' => 3, 'consumed' => nil, 'variable' => 'wine' },
+                { 'amount' => 15, 'consumed' => nil, 'variable' => 'cacao' }
+              ],
+              'substances_consumed' => true
+            }
+          end
+
+          it 'save every variables and scores to csv' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.vodka_d1", "#{session.variable}.tlfb.wine_d1",
+                                          "#{session.variable}.tlfb.cacao_d1", "#{session.variable}.metadata.session_start",
+                                          "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[user.id, user.email, 10, 3, 15, user_session.created_at, nil, nil]]
+          end
+
+          context 'csv will be generated with default value' do
+            let!(:answer_body) do
+              {
+                'consumptions' => [
+                  { 'amount' => 10, 'consumed' => nil, 'variable' => 'vodka' },
+                  { 'amount' => 3, 'consumed' => nil, 'variable' => 'wine' }
+                ],
+                'substances_consumed' => true
+              }
+            end
+
+            it 'save every variables and scores to csv' do
+              subject.collect
+              expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.vodka_d1", "#{session.variable}.tlfb.wine_d1",
+                                            "#{session.variable}.tlfb.cacao_d1", "#{session.variable}.metadata.session_start",
+                                            "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+              expect(subject.rows).to eq [[user.id, user.email, 10, 3, 0, user_session.created_at, nil, nil]]
+            end
+          end
+        end
+
+        context 'without consumption result' do
+          it 'generate csv without answers' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.vodka_d1", "#{session.variable}.tlfb.wine_d1",
+                                          "#{session.variable}.tlfb.cacao_d1", "#{session.variable}.metadata.session_start",
+                                          "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[user.id, user.email, nil, nil, nil, user_session.created_at, nil, nil]]
+          end
+        end
+      end
+
+      context 'when tlfb - simple question yes or no' do
+        let!(:question_group) { create(:tlfb_group, session: session) }
+        let!(:questions) { question_group.questions }
+        let!(:question_body) do
+          {
+            'data' => [{ 'payload' =>
+                           { 'head_question' => 'head question',
+                             'question_title' => 'question title',
+                             'substances' => [],
+                             'substance_question' => 'question',
+                             'substances_with_group' => false } }]
+          }
+        end
+        let!(:answer_body) do
+          {
+            'consumptions' => [],
+            'substances_consumed' => true
+          }
+        end
+        let!(:question) { questions.last.update!(body: question_body) }
+        let!(:day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }
+        let!(:consumption_result) { create(:tlfb_consumption_result, day: day, body: answer_body) }
+
+        it 'save every variables and scores to csv' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.tlfb.#{question_group.title_as_variable}_d1",
+                                        "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                        "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user.id, user.email, 1, user_session.created_at, nil, nil]]
+        end
+      end
     end
   end
 end

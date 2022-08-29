@@ -4,6 +4,10 @@ module ExceptionHandler
   extend ActiveSupport::Concern
 
   included do
+    rescue_from ActiveRecord::ActiveRecordError do |exc|
+      render json: msg(exc), status: :bad_request
+    end
+
     rescue_from ActionController::ParameterMissing do |exc|
       notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :bad_request
