@@ -674,7 +674,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                         "#{session.variable}.metadata.session_duration", "#{session.variable}.metadata.quick_exit"]
           expect(subject.rows).to eq [[user.id, user.email, user_session.created_at, nil, nil, 1]]
-        end 
+        end
       end
 
       context 'when tlfb - scenario without group' do
