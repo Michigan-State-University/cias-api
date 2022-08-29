@@ -12,6 +12,7 @@ class V1::Question::Destroy
 
   def call
     raise ActiveRecord::RecordNotFound unless proper_questions?
+    raise ActiveRecord::ActiveRecordError if not_all_tlfb_group?
 
     Question.transaction do
       chosen_questions.each do |question|
@@ -24,6 +25,16 @@ class V1::Question::Destroy
   end
 
   private
+
+  def not_all_tlfb_group?
+    return false unless chosen_questions.pluck(:type).any? { |type| type.include?('Tlfb') }
+
+    tlfb_questions = chosen_questions.tlfb
+
+    return true if (tlfb_questions.pluck(:question_group_id).uniq.count * 3) != tlfb_questions.count
+
+    false
+  end
 
   def proper_questions?
     question_ids && chosen_questions.size == question_ids.size

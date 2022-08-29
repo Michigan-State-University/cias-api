@@ -16,8 +16,10 @@ class V1::QuestionGroup::CreateService
   end
 
   def call
-    qg_plain = QuestionGroup::Plain.new(session_id: session.id, **question_group_params)
-    qg_plain.position = session.question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
+    raise ActiveRecord::ActiveRecordError if questions.tlfb.any?
+
+    qg_plain = QuestionGroup.new(session_id: session.id, **question_group_params)
+    qg_plain.position = session.question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
     qg_plain.save!
 
     questions.each do |question|

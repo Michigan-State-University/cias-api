@@ -178,6 +178,14 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
+  create_table "consumption_results", force: :cascade do |t|
+    t.jsonb "body"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "day_id", null: false
+    t.index ["day_id"], name: "index_consumption_results_on_day_id"
+  end
+
   create_table "dashboard_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.string "description"
@@ -187,6 +195,16 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.integer "position", default: 1, null: false
     t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
+  end
+
+  create_table "days", force: :cascade do |t|
+    t.date "exact_date", null: false
+    t.uuid "user_session_id", null: false
+    t.uuid "question_group_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_group_id"], name: "index_days_on_question_group_id"
+    t.index ["user_session_id"], name: "index_days_on_user_session_id"
   end
 
   create_table "downloaded_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -206,6 +224,14 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["organization_id"], name: "index_e_intervention_admin_organizations_on_organization_id"
     t.index ["user_id"], name: "index_e_intervention_admin_organizations_on_user_id"
+  end
+
+  create_table "events", force: :cascade do |t|
+    t.string "name", default: ""
+    t.bigint "day_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["day_id"], name: "index_events_on_day_id"
   end
 
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -745,8 +771,12 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "consumption_results", "days"
+  add_foreign_key "days", "question_groups"
+  add_foreign_key "days", "user_sessions"
   add_foreign_key "downloaded_reports", "generated_reports"
   add_foreign_key "downloaded_reports", "users"
+  add_foreign_key "events", "days"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
