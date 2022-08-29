@@ -14,6 +14,18 @@ return puts '# Will not pollute database by fake data in production environment'
 class SeedIntervention
   extend FactoryBot::Syntax::Methods
 
+  def self.create_user(roles)
+    create(
+      :user,
+      :confirmed,
+      email: "#{Time.current.to_i}_#{SecureRandom.hex(10)}@#{roles[0]}.true",
+      password: 'Password1!',
+      first_name: Faker::Name.first_name,
+      last_name: Faker::Name.last_name,
+      roles: roles
+    )
+  end
+
   NUM_OF_USERS = 10
   INTERVENTIONS_PER_USER = 100
   SESSIONS_PER_INTERVENTION = 10
@@ -42,115 +54,125 @@ class SeedIntervention
   p "#{NUM_OF_USERS}/#{NUM_OF_USERS} users created"
 
   researcher_ids = User.researchers.ids
-  data_handler.new_table('interventions', Intervention.column_names)
+  data_handler.new_table('interventions', Intervention.columns_hash)
+  default_data = data_handler.default_values
+
   index = 0
   max_index = researcher_ids.count * INTERVENTIONS_PER_USER
 
-  intervention_name = INTERVENTION_NAMES.sample + " for #{INTERVENTION_NAMES_DIRECTED.sample}"
-  published_at = CURRENT_TIME
-  status = INTERVENTION_STATUS.sample
-  shared_to = 'anyone'
-  created_at = CURRENT_TIME
-  updated_at = CURRENT_TIME
-  organization_id = nil
-  google_language_id = 27
-  from_deleted_organization = false
-  type = 'Intervention'
-  additional_text = 'Eat your veggies!'
-  original_text = nil
-  cat_mh_application_id = nil
-  cat_mh_organization_id = nil
-  cat_mh_pool = nil
-  created_cat_mh_session_count = 0
-  is_access_revoked = true
-  license_type = 'limited'
-  is_hidden = false
-  sessions_count = SESSIONS_PER_INTERVENTION
-  quick_exit = false
+  data = {
+    shared_to: 'anyone',
+    google_language_id: 27,
+    type: 'Intervention',
+    additional_text: 'Eat your veggies!',
+    license_type: 'limited',
+    is_access_revoked: true,
+    sessions_count: SESSIONS_PER_INTERVENTION,
+    organization_id: nil
+  }
+  data = default_data.merge(data)
 
   researcher_ids.each do |researcher_id|
     INTERVENTIONS_PER_USER.times do
-      data_handler.store_data(
-        [intervention_name, researcher_id, published_at, status, shared_to, created_at, updated_at, organization_id,
-         google_language_id, from_deleted_organization, type, additional_text, original_text, cat_mh_application_id,
-         cat_mh_organization_id, cat_mh_pool, created_cat_mh_session_count, is_access_revoked, license_type, is_hidden,
-         sessions_count, quick_exit]
-      )
+      data[:name] = INTERVENTION_NAMES.sample + " for #{INTERVENTION_NAMES_DIRECTED.sample}"
+      data[:status] = INTERVENTION_STATUS.sample
+      data[:user_id] = researcher_id
+      data_handler.store_data(data)
       p "#{index += 1}/#{max_index} interventions created"
     end
   end
   data_handler.save_data_to_db
+  p 'Successfully added Interventions to database!'
 
-  data_handler.new_table('sessions', Session.column_names)
+  data_handler.new_table('sessions', Session.columns_hash)
+  default_data = data_handler.default_values
+
   intervention_ids = Intervention.ids
-  session_settings = { 'narrator' => { 'voice' => true, 'animation' => true } }.to_json
-  session_formulas = [{ 'payload' => '', 'patterns' => [] }.to_json]
+
   index = 0
   max_index = intervention_ids.count * SESSIONS_PER_INTERVENTION
-  data = []
+
+  data = {
+    name: 'Pregnancy 1st Trimester',
+    schedule: 'after_fill',
+    schedule_payload: 1,
+    report_templates_count: SESSIONS_PER_INTERVENTION,
+    variable: 's123',
+    google_tts_voice_id: 144,
+    type: 'Session::Classic',
+    estimated_time: 3000,
+    cat_mh_language_id: 1,
+    cat_mh_time_frame_id: 1,
+    cat_mh_population_id: 1
+  }
+  data = default_data.merge(data)
+
   intervention_ids.each do |intervention_id|
     position_counter = 0
     SESSIONS_PER_INTERVENTION.times do
-      fake_uuid = Faker::Internet.unique.uuid
-
-      data.append(
-        [fake_uuid, intervention_id, session_settings, position_counter, 'Pregnancy 1st Trimester', 'after_fill', 1,
-         CURRENT_TIME, session_formulas, CURRENT_TIME, CURRENT_TIME, 0, 0, '0', 's123', nil, 144,
-         'Session::Classic', nil, nil, nil, nil, 3000]
-      )
-
+      data[:intervention_id] = intervention_id
+      data[:position] = position_counter
+      data_handler.store_data(data)
       position_counter += 1
+
       p "#{index += 1}/#{max_index} sessions created"
     end
   end
-  data_handler.save_data_to_db(data)
+  data_handler.save_data_to_db
+  p 'Successfully added Sessions to database!'
 
-  data_handler.new_table('report_templates', ReportTemplate.column_names)
+  data_handler.new_table('report_templates', ReportTemplate.columns_hash)
+  default_data = data_handler.default_values
+
   session_ids = Session.ids
+
   index = 0
   max_index = session_ids.count
-  data = []
+
+  data = {
+    report_for: 'participant',
+    summary: 'Good job!',
+  }
+  data = default_data.merge(data)
+
   position = ReportTemplate.count
   session_ids.each do |session_id|
     next unless ReportTemplate.where('name = ? AND session_id = ?', "Report #{position}", session_id).empty?
 
-    fake_uuid = Faker::Internet.unique.uuid
-    if position.even?
-      data.append(
-        [fake_uuid, "Report #{position}", 'participant', session_id, 'Good job!', CURRENT_TIME, CURRENT_TIME,
-         { 'name' => "Report #{position}", 'summary' => 'Good job!' }.to_json]
-      )
-    end
-
-    if position.odd?
-      data.append(
-        [fake_uuid, "Report #{position}", 'third_party', session_id, 'Good job!', CURRENT_TIME, CURRENT_TIME,
-         { 'name' => "Report #{position}", 'summary' => 'Good job!' }.to_json]
-      )
-    end
-
+    data[:name] = "Report #{position}"
+    data[:session_id] = session_id
+    data_handler.store_data(data)
     position += 1
+
     p "#{index += 1}/#{max_index} report templates created"
   end
-  data_handler.save_data_to_db(data)
+  data_handler.save_data_to_db
+  p 'Successfully added ReportTemplates to database!'
 
-  data_handler.new_table('question_groups', QuestionGroup.column_names)
+  data_handler.new_table('question_groups', QuestionGroup.columns_hash)
+  default_data = data_handler.default_values
+
   index = 0
   max_index = session_ids.count * QUESTION_GROUPS_PER_SESSION
-  data = []
+
+  data = default_data
+
   session_ids.each do |session_id|
     position_counter = 0
     (QUESTION_GROUPS_PER_SESSION - 1).times do
-      fake_uuid = Faker::Internet.unique.uuid
-      data.append(
-        [fake_uuid, session_id, "Group #{position_counter + 1}", position_counter, CURRENT_TIME, CURRENT_TIME,
-         'QuestionGroup::Plain', QUESTIONS_PER_QUESTION_GROUP]
-      )
+      data[:session_id] = session_id
+      data[:title] = "Group #{position_counter}"
+      data[:position] = position_counter
+      data[:type] = 'QuestionGroup::Plain'
+      data[:questions_count] = QUESTIONS_PER_QUESTION_GROUP
+      data_handler.store_data(data)
       position_counter += 1
+
       p "#{index += 1}/#{max_index} question groups created"
     end
   end
-  data_handler.save_data_to_db(data)
+  data_handler.save_data_to_db
+  p 'Successfully added QuestionGroups to database!'
 
   data_handler.new_table('questions', Question.column_names)
   question_group_ids = QuestionGroup.ids
@@ -260,21 +282,6 @@ class SeedIntervention
   p "Example user email: #{researcher.email}"
   p 'Example user password: Password1!'
   p "Example user verification code: verification_code_#{researcher.uid}"
-
-  private
-
-  def self.create_user(roles)
-    create(
-      :user,
-      :confirmed,
-      email: "#{Time.current.to_i}_#{SecureRandom.hex(10)}@#{roles[0]}.true",
-      password: 'Password1!',
-      first_name: Faker::Name.first_name,
-      last_name: Faker::Name.last_name,
-      roles: roles
-    )
-  end
-
 end
 
 # rubocop:enable Metrics/ClassLength, Rails/Output

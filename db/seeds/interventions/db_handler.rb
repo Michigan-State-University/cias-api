@@ -8,15 +8,39 @@ class DBHandler
     @data = []
   end
 
-  def new_table(table_name, headers)
+  def new_table(table_name, columns)
     @table_name = table_name
-    @headers = headers
+    @headers = columns.keys.map(&:to_s)
+    @data_types = @headers.zip(columns.values.map(&:type)).to_h
     clear_file
   end
 
-  def store_data(data_array)
-    fake_uuid = Faker::Internet.unique.uuid
-    @data << [fake_uuid] + data_array
+  def default_values
+    default_values = {}
+    @headers.each do |column|
+      data_type = @data_types[column]
+      case data_type
+      when :uuid
+        value = Faker::Internet.unique.uuid
+      when :string
+        value = ''
+      when :datetime
+        value = Time.zone.now.to_s
+      when :integer
+        value = 0
+      when :boolean
+        value = false
+      else
+        value = nil
+      end
+      default_values[column.to_sym] = value
+    end
+    default_values
+  end
+
+  def store_data(data)
+    data[:id] = Faker::Internet.unique.uuid
+    @data << data.values
   end
 
   def save_data_to_db
