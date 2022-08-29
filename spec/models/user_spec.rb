@@ -18,6 +18,7 @@ describe User, type: :model do
   it { should have_one(:phone).dependent(:destroy) }
   it { should have_one_attached(:avatar) }
   it { should have_many(:generated_reports_third_party_users).dependent(:destroy) }
+  it { should have_many(:notifications).dependent(:destroy) }
 
   it { should belong_to(:team).optional(true) }
   it { should belong_to(:organizable).optional(true) }
@@ -99,7 +100,7 @@ describe User, type: :model do
     context 'roles changed' do
       it 'removes current user tokens' do
         expect { user.update(roles: ['researcher']) }.to change { user.reload.tokens }
-          .from(user.tokens).to({})
+                                                           .from(user.tokens).to({})
       end
     end
 
@@ -112,7 +113,7 @@ describe User, type: :model do
     context 'active changed to inactive' do
       it 'removes current user tokens' do
         expect { user.update(active: false) }.to change { user.reload.tokens }
-          .from(user.tokens).to({})
+                                                   .from(user.tokens).to({})
       end
     end
 

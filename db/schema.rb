@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_01_055341) do
+ActiveRecord::Schema.define(version: 2022_08_24_134311) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -437,6 +437,18 @@ ActiveRecord::Schema.define(version: 2022_08_01_055341) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["email_bidx"], name: "index_navigator_invitations_on_email_bidx"
     t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
+  end
+
+  create_table "notifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.boolean "is_read", default: false
+    t.jsonb "data"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

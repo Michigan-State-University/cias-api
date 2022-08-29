@@ -78,6 +78,9 @@ class User < ApplicationRecord
   has_many :interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :restrict_with_exception
   has_many :conversations, class_name: 'LiveChat::Conversation', through: :interlocutors
 
+  # NOTIFICATIONS
+  has_many :notifications, dependent: :destroy
+
   # USER IN GENERAL
   has_many :user_verification_codes, dependent: :destroy
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')

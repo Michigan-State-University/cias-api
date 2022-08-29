@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "conversation_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "conversation_id",
+    "user_id",
+    "first_name",
+    "last_name",
+    "message",
+    "category"
+  ],
+  "additionalProperties": false
+}
