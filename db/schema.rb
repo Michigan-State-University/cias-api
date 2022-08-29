@@ -445,10 +445,8 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
     t.boolean "is_read", default: false
     t.jsonb "data"
     t.uuid "user_id", null: false
-    t.uuid "conversation_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["conversation_id"], name: "index_notifications_on_conversation_id"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
@@ -827,7 +825,6 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
   add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_messages", "live_chat_interlocutors"
   add_foreign_key "live_chat_navigator_setups", "interventions"
-  add_foreign_key "notifications", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
