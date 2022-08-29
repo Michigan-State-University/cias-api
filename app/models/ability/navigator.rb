@@ -10,5 +10,6 @@ class Ability::Navigator < Ability::Base
 
   def navigator
     can :index, LiveChat::Conversation
+    can :read, LiveChat::Interventions::NavigatorSetup, intervention: { navigators: { id: user.id } }
   end
 end
