@@ -5,7 +5,7 @@ class Notification < ApplicationRecord
   belongs_to :user
 
   validates :data, json: { schema: lambda {
-    Rails.root.join("#{json_schema_path}/conversation_data.json").to_s
+    Rails.root.join("#{json_schema_path}/notification_data.json").to_s
   }, message: lambda { |err|
     err
   } }
