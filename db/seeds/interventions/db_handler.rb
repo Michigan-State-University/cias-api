@@ -8,10 +8,15 @@ class DBHandler
     @data = []
   end
 
-  def new_table(table_name, columns)
+  def new_table_with_default_values(table_name, columns_hash)
+    new_table(table_name, columns_hash)
+    default_values
+  end
+
+  def new_table(table_name, columns_hash)
     @table_name = table_name
-    @headers = columns.keys.map(&:to_s)
-    @data_types = @headers.zip(columns.values.map(&:type)).to_h
+    @headers = columns_hash.keys.map(&:to_s)
+    @data_types = @headers.zip(columns_hash.values.map(&:type)).to_h
     clear_file
   end
 

@@ -11,12 +11,11 @@ def single_q
 
   narrator = { blocks:
                  [{ text: ['Single'],
-                    type: 'ReadQuestion',
-                    action: 'NO_ACTION',
-                    sha256: ['0004267f8d1a553971f1b7bd24c87fec50af8db465510f944e2a563e8da94f51'],
+                    type: '',
+                    action: '',
+                    sha256: [''],
                     animation: 'rest',
-                    audio_urls:
-                      [''],
+                    audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
                settings: { voice: true, animation: true } }
 
@@ -37,12 +36,11 @@ def number_q
 
   narrator = { blocks:
                  [{ text: ['Number'],
-                    type: 'ReadQuestion',
-                    action: 'NO_ACTION',
-                    sha256: ['13666aa9a466a975a7629fddc4a8a860586ddf9daf8733ab9de996bc98b35ae5'],
-                    animation: 'rest',
-                    audio_urls:
-                      [''],
+                    type: '',
+                    action: '',
+                    sha256: [''],
+                    animation: '',
+                    audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
                settings: { voice: true, animation: true } }
 
@@ -64,12 +62,11 @@ def date_q
 
   narrator = { blocks:
                  [{ text: ['Date'],
-                    type: 'ReadQuestion',
-                    action: 'NO_ACTION',
-                    sha256: ['5b90b52baf4f794327162dd801834ecc1991a7f93801223c3f20ffa0fa501633'],
-                    animation: 'rest',
-                    audio_urls:
-                      [''],
+                    type: '',
+                    action: '',
+                    sha256: [''],
+                    animation: '',
+                    audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
                settings: { voice: true, animation: true } }
 
@@ -91,12 +88,11 @@ def multi_q
 
   narrator = { blocks:
                  [{ text: ['Select all symptoms'],
-                    type: 'ReadQuestion',
-                    action: 'NO_ACTION',
-                    sha256: ['13102d9211d0ae05caa9dff55afbb0715c15500b8d78a9ad53acb571af088764'],
-                    animation: 'rest',
-                    audio_urls:
-                      [''],
+                    type: '',
+                    action: '',
+                    sha256: [''],
+                    animation: '',
+                    audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
                settings: { voice: true, animation: true } }
 
@@ -120,12 +116,11 @@ def free_q
 
   narrator = { blocks:
                  [{ text: ['Your feedback'],
-                    type: 'ReadQuestion',
-                    action: 'NO_ACTION',
-                    sha256: ['28905bbdf618e7ea58374dc0233a81f32aea13cd0b1c6063c352a07b5e6c6aa2'],
-                    animation: 'rest',
-                    audio_urls:
-                      [''],
+                    type: '',
+                    action: '',
+                    sha256: [''],
+                    animation: '',
+                    audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
                settings: { voice: true, animation: true } }
 
@@ -147,12 +142,11 @@ def currency_q
 
   narrator = { blocks:
                  [{ text: ['Give estimated value spent on alcohol'],
-                    type: 'ReadQuestion',
-                    action: 'NO_ACTION',
-                    sha256: ['4cd0ac1d2a003a6fd8367e2077c6135756b5bce1a6ae640a69541e8430314cfa'],
-                    animation: 'rest',
-                    audio_urls:
-                      [''],
+                    type: '',
+                    action: '',
+                    sha256: [''],
+                    animation: '',
+                    audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
                settings: { voice: true, animation: true } }
 
