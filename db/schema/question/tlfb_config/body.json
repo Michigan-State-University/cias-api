@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "object",
+              "properties": {
+                "days_count": {
+                  "type": "string"
+                },
+                "start_date": {
+                  "type": "string"
+                },
+                "end_date": {
+                  "type": "string"
+                },
+                "choose_date_range": {
+                  "type": "boolean"
+                },
+                "display_helping_materials": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "days_count",
+                "choose_date_range",
+                "display_helping_materials"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "additionalProperties": false
+}

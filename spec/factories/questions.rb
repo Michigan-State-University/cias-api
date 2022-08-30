@@ -666,4 +666,69 @@ FactoryBot.define do
       body { { data: [] } }
     end
   end
+
+  factory :question_tlfb_config, class: Question::TlfbConfig do
+    title { 'TlfbConfig' }
+    type { Question::TlfbConfig }
+    body do
+      {
+        data: [
+          {
+            payload: {
+              days_count: '1',
+              start_date: (DateTime.now - 1.day).to_s,
+              end_date: DateTime.now,
+              choose_date_range: false,
+              display_helping_materials: false
+            }
+          }
+        ]
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+  end
+
+  factory :question_tlfb_event, class: Question::TlfbEvents do
+    title { 'TlfbEvents' }
+    type { Question::TlfbEvents }
+    body do
+      {
+        data: [
+          {
+            payload:
+              {
+                screen_title: '',
+                screen_question: ''
+              }
+          }
+        ]
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+  end
+
+  factory :question_tlfb_question, class: Question::TlfbQuestion do
+    title { 'TlfbQuestion' }
+    type { Question::TlfbQuestion }
+    body do
+      {
+        data: [
+          {
+            payload:
+              {
+                question_title: '',
+                head_question: '',
+                substance_question: '',
+                substances_with_group: true,
+                substances: []
+              }
+          }
+        ]
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+  end
 end

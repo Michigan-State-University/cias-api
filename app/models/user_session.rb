@@ -7,6 +7,7 @@ class UserSession < ApplicationRecord
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
   has_many :generated_reports, dependent: :destroy
+  has_many :tlfb_days, class_name: 'Tlfb::Day', dependent: :destroy
   belongs_to :health_clinic, optional: true
 
   def finish(_send_email: true)

@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Question::Create do
-  subject { described_class.call(questions_scope, question_params) }
+  subject { described_class.call(question_group_load, question_params) }
 
   let(:question_group) { create(:question_group) }
   let!(:questions) { create_list(:question_single, 3, title: 'Question Id Title', question_group: question_group) }
   let(:question_group_load) { QuestionGroup.includes(:questions).find(question_group.id) }
-  let(:questions_scope) { question_group_load.questions.order(:position) }
   let(:blocks) { [] }
   let(:question_params) do
     {
@@ -66,7 +65,7 @@ RSpec.describe V1::Question::Create do
 
   describe 'params are valid' do
     let(:result) do
-      described_class.call(questions_scope, question_params)
+      described_class.call(question_group_load, question_params)
     end
 
     it 'question have right position' do
