@@ -11,8 +11,8 @@ def create_generated_reports(data_handler, max_per_session)
 
   report_templates = ReportTemplate.all
   user_sessions = UserSession.all
-  report_templates.zip(user_sessions).each do |report_template, user_session|
-    max_per_session.times do
+  report_templates.each do |report_template|
+    user_sessions[0..max_per_session - 1].each do |user_session|
       data[:name] = "#{user_session.user.first_name} report"
       data[:report_template_id] = report_template.id
       data[:user_session_id] = user_session.id
