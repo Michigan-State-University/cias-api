@@ -14,10 +14,10 @@ def single_q
                     type: '',
                     action: '',
                     sha256: [''],
-                    animation: 'rest',
+                    animation: '',
                     audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
-               settings: { voice: true, animation: true } }
+               settings: { voice: false, animation: false } }
 
   formulas = [{ payload: '', patterns: [] }]
 
@@ -42,7 +42,7 @@ def number_q
                     animation: '',
                     audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
-               settings: { voice: true, animation: true } }
+               settings: { voice: false, animation: false } }
 
   formulas = [{ payload: '', patterns: [] }]
 
@@ -68,7 +68,7 @@ def date_q
                     animation: '',
                     audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
-               settings: { voice: true, animation: true } }
+               settings: { voice: false, animation: false } }
 
   formulas = [{ payload: '', patterns: [] }]
 
@@ -94,7 +94,7 @@ def multi_q
                     animation: '',
                     audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
-               settings: { voice: true, animation: true } }
+               settings: { voice: false, animation: false } }
 
   formulas = [{ payload: '', patterns: [] }]
 
@@ -122,7 +122,7 @@ def free_q
                     animation: '',
                     audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
-               settings: { voice: true, animation: true } }
+               settings: { voice: false, animation: false } }
 
   formulas = [{ payload: '', patterns: [] }]
 
@@ -148,7 +148,7 @@ def currency_q
                     animation: '',
                     audio_urls: [''],
                     endPosition: { x: 600, y: 550 } }],
-               settings: { voice: true, animation: true } }
+               settings: { voice: false, animation: false } }
 
   formulas = [{ payload: '', patterns: [] }]
 
