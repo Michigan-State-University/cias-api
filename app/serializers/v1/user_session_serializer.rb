@@ -26,6 +26,10 @@ class V1::UserSessionSerializer < V1Serializer
     object.session.id
   end
 
+  attribute :session_name do |object|
+    object.session.name
+  end
+
   attribute :scheduled_at do |object|
     object.scheduled_at&.iso8601
   end
