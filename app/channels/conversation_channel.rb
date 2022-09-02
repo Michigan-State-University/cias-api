@@ -2,6 +2,7 @@
 
 class ConversationChannel < ApplicationCable::Channel
   include CableExceptionHandler
+  include MessageHandler
 
   def subscribed
     stream_from current_channel_id
@@ -80,14 +81,6 @@ class ConversationChannel < ApplicationCable::Channel
 
   def format_chat_message(message)
     generic_message(V1::LiveChat::MessageSerializer.new(message).serializable_hash, 'message_sent')
-  end
-
-  def generic_message(payload, topic, status = 200)
-    {
-      data: payload,
-      topic: topic,
-      status: status
-    }
   end
 
   def intervention_channel_id(intervention_id)

@@ -2,6 +2,7 @@
 
 module CableExceptionHandler
   extend ActiveSupport::Concern
+  include MessageHandler
 
   included do
     rescue_from LiveChat::OperationInvalidException do |exc|
@@ -11,18 +12,5 @@ module CableExceptionHandler
     rescue_from LiveChat::NavigatorUnavailableException do |exc|
       ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 404, 'navigator_unavailable_error'))
     end
-  end
-
-  protected
-
-  def format_error_message(exc, status, topic, **additional_error_data)
-    {
-      data: {
-        error: exc.message,
-        **additional_error_data
-      },
-      status: status,
-      topic: topic
-    }
   end
 end

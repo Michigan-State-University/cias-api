@@ -1,10 +1,14 @@
 # frozen_string_literal: true
 
 class NotificationChannel < ApplicationCable::Channel
+  include MessageHandler
+
   def subscribed
-    stream_from "notification_channel_#{current_user.id}"
+    stream_from user_channel_id
     current_user.update!(online: true)
     update_navigator_availability
+    ensure_confirmation_sent
+    return_unread_notifications
   end
 
   def unsubscribed
@@ -13,7 +17,16 @@ class NotificationChannel < ApplicationCable::Channel
     update_navigator_availability
   end
 
+  def on_read_notification(data)
+    Notification.find(data['notificationId']).mark_as_readed
+  end
+
   private
+
+  def return_unread_notifications
+    response_data = V1::NotificationSerializer.new(Notification.unread_notifications(current_user.id))
+    ActionCable.server.broadcast(user_channel_id, generic_message(response_data, 'unread_notifications_fetched'))
+  end
 
   def update_navigator_availability
     return unless current_user.navigator?
@@ -38,5 +51,17 @@ class NotificationChannel < ApplicationCable::Channel
 
   def navigator_availability_status(count)
     count.positive? ? [200, 'navigator_available'] : [404, 'navigator_unavailable']
+  end
+
+  def user_channel_id
+    "notification_channel_#{current_user.id}"
+  end
+
+  def generic_message(payload, topic, status = 200)
+    {
+      data: payload,
+      topic: topic,
+      status: status
+    }
   end
 end

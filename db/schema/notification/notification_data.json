@@ -19,9 +19,6 @@
     },
     "message": {
       "type": "string"
-    },
-    "category": {
-      "type": "string"
     }
   },
   "required": [
@@ -29,8 +26,7 @@
     "user_id",
     "first_name",
     "last_name",
-    "message",
-    "category"
+    "message"
   ],
   "additionalProperties": false
 }

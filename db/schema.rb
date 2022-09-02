@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_24_134311) do
+ActiveRecord::Schema.define(version: 2022_08_30_060731) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -447,6 +447,7 @@ ActiveRecord::Schema.define(version: 2022_08_24_134311) do
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "event", default: 0, null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
