@@ -37,4 +37,8 @@ class V1::UserSessionSerializer < V1Serializer
   attribute :quick_exit_enabled do |object|
     object.session.intervention.quick_exit
   end
+
+  attribute :shared_to do |object|
+    object.session.intervention.shared_to
+  end
 end

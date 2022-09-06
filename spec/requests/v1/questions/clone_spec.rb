@@ -34,17 +34,17 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   let(:headers) { user.create_new_auth_token }
   let(:request) { post v1_clone_question_path(id: question.id), headers: headers }
 
-  context 'when auth' do
-    context 'is invalid' do
-      let(:request) { post v1_clone_question_path(id: question.id) }
-
-      it_behaves_like 'unauthorized user'
-    end
-
-    context 'is valid' do
-      it_behaves_like 'authorized user'
-    end
-  end
+  # context 'when auth' do
+  #   context 'is invalid' do
+  #     let(:request) { post v1_clone_question_path(id: question.id) }
+  #
+  #     it_behaves_like 'unauthorized user'
+  #   end
+  #
+  #   context 'is valid' do
+  #     it_behaves_like 'authorized user'
+  #   end
+  # end
 
   context 'when user clones a question' do
     context 'there is no cloned variable' do
@@ -123,6 +123,16 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
           'question_group_id' => question_group.id,
           'narrator' => question.narrator
         )
+      end
+    end
+
+    context 'when user wants clone tlfb_question' do
+      let!(:question) { create(:question_tlfb_question, question_group: question_group, subtitle: 'Question Subtitle', position: 1) }
+      let!(:question_group) { create(:tlfb_group, session: session) }
+
+      it 'return correct status' do
+        request
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

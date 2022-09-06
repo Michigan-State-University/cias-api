@@ -39,4 +39,8 @@ class Chart < ApplicationRecord
   def json_schema_path
     @json_schema_path ||= 'db/schema/chart'
   end
+
+  def ability_to_clone?
+    true
+  end
 end

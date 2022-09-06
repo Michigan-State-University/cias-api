@@ -6,14 +6,14 @@ class V1::GeneratedReportsController < V1Controller
 
     collection = generated_reports_scope.order(created_at: order)
     paginated_collection = paginate(collection, params)
-
-    render json: serialized_hash(paginated_collection).merge(reports_size: collection.size)
+    render json: serialized_hash(paginated_collection, controller_name.classify,
+                                 params: { user_id: current_v1_user.id }).merge(reports_size: collection.size)
   end
 
   private
 
   def generated_reports_scope
-    GeneratedReportFinder.search(filter_params, current_v1_user)
+    GeneratedReportFinder.search(filter_params, current_v1_user).includes(:downloaded_reports)
   end
 
   def filter_params

@@ -124,6 +124,7 @@ Rails.application.routes.draw do
 
     post 'question_groups/share_externally', to: 'question_groups#share_externally'
     post 'question_groups/duplicate_internally', to: 'question_groups#duplicate_internally'
+    get 'calendar_data', to: 'tlfb/days#index', as: :calendar_data
 
     resources :user_interventions, only: %i[index show create]
 
@@ -131,6 +132,11 @@ Rails.application.routes.draw do
       resources :questions, only: %i[index], module: 'user_sessions'
       resources :answers, only: %i[index show create], module: 'user_sessions'
       patch 'quick_exit', to: 'user_sessions#quick_exit'
+    end
+
+    namespace :tlfb do
+      resources :events, only: %i[destroy create update]
+      resources :consumption_results, only: %i[create update]
     end
 
     resources :teams, only: %i[index show create update destroy] do
@@ -159,6 +165,11 @@ Rails.application.routes.draw do
           end
         end
         resources :interventions, only: :index, controller: :interventions
+        scope module: 'interventions' do
+          resources :interventions do
+            resources :invitations, only: %i[create]
+          end
+        end
         scope module: 'sessions' do
           resources :sessions do
             resources :invitations, only: %i[index create]
@@ -186,6 +197,7 @@ Rails.application.routes.draw do
                                              as: :health_clinic_invitations_confirm
 
     resources :generated_reports, only: :index
+    resources :downloaded_reports, only: :create
 
     scope module: :google_tts do
       resources :languages, only: :index do

@@ -57,6 +57,10 @@ class SmsPlan < ApplicationRecord
     type.eql? 'SmsPlan::Alert'
   end
 
+  def ability_to_clone?
+    true
+  end
+
   def self.detailed_search(params)
     scope = all
     scope.limit_to_types(params[:types])
