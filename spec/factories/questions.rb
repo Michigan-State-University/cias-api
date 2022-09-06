@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
+  narrator_default_settings = {
+    voice: true,
+    animation: true,
+    character: 'peedy'
+  }
+
   factory :question do
     body do
       {
@@ -280,7 +286,8 @@ FactoryBot.define do
         {
           settings: {
             voice: false,
-            animation: true
+            animation: true,
+            character: 'peedy'
           },
           blocks: []
         }
@@ -359,10 +366,7 @@ FactoryBot.define do
     trait :narrator_blocks_empty do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: []
         }
       end
@@ -371,10 +375,7 @@ FactoryBot.define do
     trait :narrator_block_one do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: ['Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.'],
@@ -390,10 +391,7 @@ FactoryBot.define do
     trait :narrator_block_one_another_type do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: [],
@@ -409,10 +407,7 @@ FactoryBot.define do
     trait :narrator_blocks_types do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: [
@@ -439,10 +434,7 @@ FactoryBot.define do
     trait :narrator_blocks_types_with_name_variable do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               # rubocop:disable Layout/LineLength
@@ -466,10 +458,7 @@ FactoryBot.define do
     trait :narrator_blocks_with_speech_empty do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: ['Working together as an interdisciplinary team, many highly trained health professionals'],

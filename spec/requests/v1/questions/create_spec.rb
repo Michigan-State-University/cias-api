@@ -60,7 +60,8 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
           blocks: blocks,
           settings: {
             voice: true,
-            animation: true
+            animation: true,
+            character: 'peedy'
           }
         }
       }

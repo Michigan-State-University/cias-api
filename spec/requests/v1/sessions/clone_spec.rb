@@ -64,7 +64,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
                                  ],
                                  settings: {
                                    voice: true,
-                                   animation: true
+                                   animation: true,
+                                   character: 'peedy'
                                  }
                                })
     end
