@@ -77,11 +77,16 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
   end
 
   context 'when user don\'t have permission' do
-    let(:user) { create(:user, :health_clinic_admin, :confirmed) }
+    let(:health_clinic_admin) { create(:user, :health_clinic_admin, :confirmed) }
 
-    before { request }
+    before do
+      allow_any_instance_of(V1Controller).to receive(:current_v1_user).and_return(health_clinic_admin)
+    end
 
-    it { expect(response).to have_http_status(:forbidden) }
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
   end
 
   context 'when user is not a navigator in the intervention' do

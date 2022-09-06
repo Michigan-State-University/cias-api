@@ -18,4 +18,8 @@ class LiveChat::Conversation < ApplicationRecord
       joins(intervention: :intervention_navigators).
       where(intervention_navigators: { user_id: user.id })
   }
+
+  def navigator
+    users.limit_to_roles('navigator').first
+  end
 end
