@@ -40,7 +40,7 @@ class V1::Users::InvitationsController < V1Controller
 
     # Unfortunetly find_by_invitation_token method doesn't raise exception when there is no user
     # and there is no version with !
-    raise ActiveRecord::RecordNotFound if user.blank?
+    return redirect_to_web_app(error: I18n.t('users.invite.not_active')) if user.blank?
 
     redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{invitation_token}&email=#{user.email}&role=#{user.roles.first}"
   end
@@ -88,5 +88,11 @@ class V1::Users::InvitationsController < V1Controller
 
   def invitation_token
     params[:invitation_token]
+  end
+
+  def redirect_to_web_app(**message)
+    message.transform_values! { |v| Base64.encode64(v) }
+
+    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
   end
 end

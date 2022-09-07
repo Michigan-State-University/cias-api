@@ -17,11 +17,27 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let(:status) { 'draft' }
     let(:user) { participant }
 
-    before do
-      get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+    context 'tlfb logic' do
+      let!(:tlfb_session) { create(:session, intervention_id: intervention.id) }
+      let!(:tlfb_question_group) { create(:tlfb_group, session: tlfb_session) }
+      let!(:tlfb_user_session) do
+        create(:user_session, user_id: participant.id, session_id: tlfb_session.id, name_audio_id: audio_id, user_intervention: user_int)
+      end
+
+      before do
+        get v1_user_session_questions_url(tlfb_user_session.id), headers: user.create_new_auth_token
+      end
+
+      it 'skip tlfbConfig and return tlfbEvent' do
+        expect(json_response['data']['attributes']['type']).to eq('Question::TlfbEvents')
+      end
     end
 
     context 'branching logic' do
+      before do
+        get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+      end
+
       context 'returns finish screen if only question' do
         it { expect(json_response['data']['attributes']['type']).to eq 'Question::Finish' }
       end
@@ -723,6 +739,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     context 'speech reflections' do
       let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let(:question) { questions.first }
+
+      before do
+        get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+      end
 
       context 'reflection block' do
         context 'correctly setup' do

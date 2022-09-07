@@ -35,7 +35,7 @@ describe 'GET /v1/users/invitations', type: :request do
       it 'redirects to web app register page' do
         request
 
-        expect(response).to have_http_status(:not_found)
+        expect(response).to have_http_status(:found)
       end
     end
   end

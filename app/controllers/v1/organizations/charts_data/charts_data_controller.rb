@@ -61,12 +61,10 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     params[:chart_id]
   end
 
-  def load_chart_statistics
-    ChartStatistic.accessible_by(current_ability).where(chart_id: chart_id)
-  end
-
   def load_charts
-    Chart.accessible_by(current_ability).where(status: statuses)
+    Chart.accessible_by(current_ability)
+         .includes(dashboard_section: :reporting_dashboard)
+         .where(status: statuses, dashboard_section: { reporting_dashboards: { organization_id: organization.id } })
   end
 
   def load_chart
@@ -78,7 +76,10 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     data_collection = data_collection&.by_health_clinic_ids(clinic_ids) if clinic_ids.present?
     data_collection = data_collection&.where(chart_id: chart_id) if chart_id.present?
     data_collection = data_collection&.filled_between(date_range) if date_offset.present?
-    data_collection&.joins(:chart)
+    data_collection = data_collection&.joins(:chart)
+    return data_collection if statuses.blank?
+
+    data_collection&.where(chart: { status: statuses })
   end
 
   def charts_data_response(charts_data)

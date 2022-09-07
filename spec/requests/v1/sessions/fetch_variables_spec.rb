@@ -24,7 +24,9 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
                                                                      { payload: '',
                                                                        variable: { value: '2' } }] } }] }, question_group: question_group, position: 3),
         create(:question_currency, subtitle: 'currency', body: { variable: { name: 'what' }, data: [{ payload: '' }] }, question_group: question_group,
-                                   position: 4)
+                                   position: 4),
+        create(:question_number, subtitle: 'number', body: { variable: { name: 'number' }, data: [{ payload: '' }] }, question_group: question_group,
+                                 position: 5)
       ]
     end
 
@@ -55,8 +57,8 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
         get v1_fetch_variables_path(id: session.id), headers: headers
       end
 
-      it_behaves_like 'correct classic session', 8, %w[var1 im_a_variable dep rivia is_with_x x y what],
-                      ['single', 'multi', 'grid', 'currency',
+      it_behaves_like 'correct classic session', 9, %w[var1 im_a_variable dep number rivia is_with_x x y what],
+                      ['single', 'multi', 'grid', 'currency', 'number',
                        '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>']
     end
 
@@ -95,7 +97,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 7, %w[var1 im_a_variable dep rivia is_with_x x y], %w[single multi grid]
+        it_behaves_like 'correct classic session', 8, %w[var1 im_a_variable dep number rivia is_with_x x y], %w[single multi grid number]
       end
 
       context 'include current question' do
