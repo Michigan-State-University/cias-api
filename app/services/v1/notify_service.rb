@@ -17,6 +17,6 @@ class V1::NotifyService
     notification_channel = "notification_channel_#{notification.user.id}"
 
     ActionCable.server.broadcast(notification_channel,
-                                 generic_message(V1::NotificationSerializer.new(notification).serializable_hash, "#{notification.event}_notification"))
+                                 generic_message(V1::NotificationSerializer.new(notification).serializable_hash, 'new_notification'))
   end
 end
