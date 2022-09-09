@@ -23,7 +23,7 @@ class ConversationChannel < ApplicationCable::Channel
 
   def on_message_sent(data)
     # format will be for example: { 'action' => 'on_message', 'content' => 'this is the content of the message' }
-    conversation = LiveChat::Conversation.find(data['conversationId'])
+    conversation = fetch_conversation(data)
     sender = LiveChat::Interlocutor.find(data['interlocutorId'])
     begin
       message = LiveChat::Message.create!(conversation: conversation, content: data['content'], live_chat_interlocutor: sender)
@@ -49,6 +49,14 @@ class ConversationChannel < ApplicationCable::Channel
     end
   end
 
+  def on_current_screen_title_changed(data)
+    conversation = fetch_conversation(data)
+    conversation.update!(current_screen_title: data['currentScreenTitle'])
+    response = generic_message({ currentScreenTitle: conversation.current_screen_title }, 'current_screen_title_changed')
+    navigator = fetch_conversation_navigator(conversation)
+    ActionCable.server.broadcast(user_channel_id(navigator), response)
+  end
+
   def on_conversation_created(data)
     navigator = fetch_available_navigator(data['interventionId'])
     interlocutors = [LiveChat::Interlocutor.new(user_id: navigator.id), LiveChat::Interlocutor.new(user_id: current_user.id)]
@@ -62,7 +70,7 @@ class ConversationChannel < ApplicationCable::Channel
 
   def on_conversation_archived(data)
     # this event should only fire when navigator ends the conversation; therefore, current user should always be a navigator
-    conversation = LiveChat::Conversation.find(data['conversationId'])
+    conversation = fetch_conversation(data)
     conversation.update!(archived: true)
     response = generic_message({ conversationId: conversation.id }, 'conversation_archived')
     conversation.users.each do |user|
@@ -115,6 +123,14 @@ class ConversationChannel < ApplicationCable::Channel
           where(online: true).
           includes(:conversations).
           sort_by { |user| user.conversations.where(archived: false).count }
+  end
+
+  def fetch_conversation_navigator(conversation)
+    conversation.users.limit_to_roles('navigator').first
+  end
+
+  def fetch_conversation(data)
+    LiveChat::Conversation.find(data['conversationId'])
   end
 
   def intervention_id

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::ConversationSerializer < V1Serializer
-  attributes :id, :intervention_id, :archived
+  attributes :id, :intervention_id, :current_screen_title, :archived
 
   has_many :live_chat_interlocutors, serializer: V1::LiveChat::InterlocutorSerializer
 

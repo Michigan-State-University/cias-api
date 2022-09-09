@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_30_060731) do
+ActiveRecord::Schema.define(version: 2022_09_01_140940) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -382,6 +382,7 @@ ActiveRecord::Schema.define(version: 2022_08_30_060731) do
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "intervention_id", null: false
     t.boolean "archived", default: false, null: false
+    t.string "current_screen_title"
   end
 
   create_table "live_chat_interlocutors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
