@@ -6,9 +6,9 @@ require 'faker'
 NUM_OF_USERS = 10
 INTERVENTIONS_PER_RESEARCHER = 10
 SESSIONS_PER_INTERVENTION = 8
-QUESTION_GROUPS_PER_SESSION = 50
-QUESTIONS_PER_QUESTION_GROUP = 10
-ANSWERS_PER_QUESTION = 50
+QUESTION_GROUPS_PER_SESSION = 20
+QUESTIONS_PER_QUESTION_GROUP = 8
+ANSWERS_PER_QUESTION = 10
 REPORTS_PER_SESSION = 8 # Limited by number of participants.
 
 INTERVENTION_STATUS = %w[draft published closed archived].freeze
@@ -56,11 +56,11 @@ class DBSeed
       intervention.name = "#{INTERVENTION_NAMES.sample} for #{INTERVENTION_NAMES_DIRECTED.sample}"
       intervention.save!
 
-      create_list(:session, SESSIONS_PER_INTERVENTION, intervention: intervention, name: 'Pregnancy 1st Trimester') do |session|
+      create_list(:session, SESSIONS_PER_INTERVENTION, intervention: intervention) do |session|
         session.name = Faker::Movies::HarryPotter.quote.capitalize
         session.save!
 
-        create_list(:question_group, QUESTION_GROUPS_PER_SESSION, session: session) do |question_group|
+        create_list(:question_group, QUESTION_GROUPS_PER_SESSION, session_id: session.id) do |question_group|
           question_group.title = Faker::Music::Prince.song
           question_group.save!
           QUESTIONS_PER_QUESTION_GROUP.times do
@@ -68,7 +68,7 @@ class DBSeed
               QUESTION_TYPES.sample,
               title: "<h1>#{Faker::TvShows::Simpsons.quote.capitalize}</h1>",
               subtitle: Faker::Marketing.buzzwords.capitalize,
-              question_group: question_group
+              question_group_id: question_group.id
             )
             p "#{researcher_index += 1}/#{researcher_index_max} researcher data created"
           end
@@ -82,10 +82,10 @@ class DBSeed
   participant_index_max = User.limit_to_roles('participant').count * Question.count
 
   User.limit_to_roles('participant').pluck(:id).each do |participant_id|
-    Intervention.includes(:sessions).find_each do |intervention|
+    Intervention.includes({ sessions: { question_groups: :questions } }).find_each do |intervention|
       user_intervention = create(:user_intervention, :completed, user_id: participant_id, intervention_id: intervention.id)
 
-      intervention.sessions.includes({ question_groups: :questions }).each do |session|
+      intervention.sessions.each do |session|
         create(:user_session, user_id: participant_id, session_id: session.id, user_intervention_id: user_intervention.id) do |user_session|
           user_session.save!
 
@@ -97,8 +97,8 @@ class DBSeed
               create_list(
                 :answer,
                 ANSWERS_PER_QUESTION,
-                question: question,
-                user_session: user_session,
+                question_id: question.id,
+                user_session_id: user_session.id,
                 type: "Answer::#{question.type.demodulize}"
               ) do |answer|
                 unless question.body['variable'].nil?
@@ -129,7 +129,7 @@ class DBSeed
         :with_pdf_report,
         name: "#{user_session.user.first_name} report",
         user_session_id: user_session.id,
-        report_template: report_template
+        report_template_id: report_template.id
       )
       p "#{report_index += 1}/#{report_index_max} reports created"
     end
