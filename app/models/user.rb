@@ -217,6 +217,12 @@ class User < ApplicationRecord
     Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
+  def participants_in_intervention(intervention)
+    participants = User.participants
+    users_in_intervention_ids = UserIntervention.where(user: participants, intervention_id: intervention).pluck(:user_id)
+    participants.where(id: users_in_intervention_ids).pluck(:id)
+  end
+
   private
 
   def team_admin?

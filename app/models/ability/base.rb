@@ -29,7 +29,7 @@ class Ability::Base
     result = logged_user_intervention(user)
     return User.none if result.blank?
 
-    User.participants.select { |participant| UserIntervention.where(user_id: participant.id, intervention_id: result).any? }.pluck(:id)
+    user.participants_in_intervention(result)
   end
 
   def participants_and_researchers(user)
