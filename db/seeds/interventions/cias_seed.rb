@@ -6,9 +6,9 @@ require 'faker'
 NUM_OF_USERS = 10
 INTERVENTIONS_PER_RESEARCHER = 10
 SESSIONS_PER_INTERVENTION = 8
-QUESTION_GROUPS_PER_SESSION = 20
+QUESTION_GROUPS_PER_SESSION = 8
 QUESTIONS_PER_QUESTION_GROUP = 8
-ANSWERS_PER_QUESTION = 10
+ANSWERS_PER_QUESTION = 5
 REPORTS_PER_SESSION = 8 # Limited by number of participants.
 
 INTERVENTION_STATUS = %w[draft published closed archived].freeze
@@ -47,22 +47,25 @@ class DBSeed
   p "#{NUM_OF_USERS}/#{NUM_OF_USERS} users created"
 
   researcher_index = 0
-  researcher_index_max = INTERVENTIONS_PER_RESEARCHER * SESSIONS_PER_INTERVENTION * User.limit_to_roles('researcher').count *
+  researcher_index_max = User.limit_to_roles('researcher').count * INTERVENTIONS_PER_RESEARCHER * SESSIONS_PER_INTERVENTION *
                          QUESTION_GROUPS_PER_SESSION * QUESTIONS_PER_QUESTION_GROUP
 
-  User.all.limit_to_roles('researcher').each do |researcher|
-    create_list(:intervention, INTERVENTIONS_PER_RESEARCHER, user: researcher) do |intervention|
+  User.limit_to_roles('researcher').pluck(:id).each do |researcher_id|
+    create_list(:intervention, INTERVENTIONS_PER_RESEARCHER, user_id: researcher_id) do |intervention|
       intervention.status = INTERVENTION_STATUS.sample
       intervention.name = "#{INTERVENTION_NAMES.sample} for #{INTERVENTION_NAMES_DIRECTED.sample}"
       intervention.save!
 
-      create_list(:session, SESSIONS_PER_INTERVENTION, intervention: intervention) do |session|
+      create_list(:session, SESSIONS_PER_INTERVENTION, intervention_id: intervention.id) do |session|
         session.name = Faker::Movies::HarryPotter.quote.capitalize
         session.save!
+
+        create(:report_template, :participant, session_id: session.id, summary: Faker::Movies::HowToTrainYourDragon.character)
 
         create_list(:question_group, QUESTION_GROUPS_PER_SESSION, session_id: session.id) do |question_group|
           question_group.title = Faker::Music::Prince.song
           question_group.save!
+
           QUESTIONS_PER_QUESTION_GROUP.times do
             create(
               QUESTION_TYPES.sample,
@@ -73,7 +76,6 @@ class DBSeed
             p "#{researcher_index += 1}/#{researcher_index_max} researcher data created"
           end
         end
-        create(:report_template, :participant, session_id: session.id, summary: Faker::Movies::HowToTrainYourDragon.character)
       end
     end
   end
@@ -94,13 +96,8 @@ class DBSeed
               p "#{participant_index += 1}/#{participant_index_max} participants data created"
               next if question.type == 'Question::Finish'
 
-              create_list(
-                :answer,
-                ANSWERS_PER_QUESTION,
-                question_id: question.id,
-                user_session_id: user_session.id,
-                type: "Answer::#{question.type.demodulize}"
-              ) do |answer|
+              create_list(:answer, ANSWERS_PER_QUESTION, question_id: question.id, user_session_id: user_session.id,
+                                                         type: "Answer::#{question.type.demodulize}") do |answer|
                 unless question.body['variable'].nil?
                   answer.body = { data: [
                     {
@@ -120,8 +117,8 @@ class DBSeed
 
   report_index = 0
   report_index_max = Session.count * [REPORTS_PER_SESSION, User.limit_to_roles('participant').count].min
-  Session.find_each do |session|
-    report_template = session.report_templates.last
+  Session.includes(:user_sessions, :report_templates).find_each do |session|
+    report_template_id = session.report_templates.last.id
     session.user_sessions.limit(REPORTS_PER_SESSION).each do |user_session|
       create(
         :generated_report,
@@ -129,7 +126,7 @@ class DBSeed
         :with_pdf_report,
         name: "#{user_session.user.first_name} report",
         user_session_id: user_session.id,
-        report_template_id: report_template.id
+        report_template_id: report_template_id
       )
       p "#{report_index += 1}/#{report_index_max} reports created"
     end
