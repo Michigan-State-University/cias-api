@@ -219,7 +219,7 @@ class User < ApplicationRecord
 
   def participants_in_intervention(intervention)
     participants = User.participants
-    users_in_intervention_ids = UserIntervention.where(user: participants, intervention_id: intervention).pluck(:user_id)
+    users_in_intervention_ids = UserIntervention.where(user: participants, intervention_id: intervention).pluck(:user_id).uniq
     participants.where(id: users_in_intervention_ids).pluck(:id)
   end
 
