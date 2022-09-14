@@ -18,7 +18,21 @@ class V1::LiveChat::ConversationsController < V1Controller
     render json: V1::LiveChat::ConversationSerializer.new(conversation)
   end
 
+  def generate_transcript
+    authorize! :generate_transcript, LiveChat::Conversation
+
+    return render status: :method_not_allowed if conversation_load.transcript.attached? && conversation_load.archived
+
+    LiveChat::GenerateConversationTranscriptJob.perform_later(conversation_load.id, current_v1_user.id)
+
+    render status: :created
+  end
+
   private
+
+  def conversation_load
+    @conversation_load ||= LiveChat::Conversation.accessible_by(current_ability).find(params[:conversation_id])
+  end
 
   def archived_filter_params
     params.permit(:archived)
@@ -46,5 +60,9 @@ class V1::LiveChat::ConversationsController < V1Controller
 
   def user_conversations
     LiveChat::Conversation.navigator_conversations(current_v1_user, archived?)
+  end
+
+  def intervention_load
+    Intervention.accessible_by(current_ability).find(intervention_id)
   end
 end

@@ -223,3 +223,11 @@ en:
         subject: 'Welcome as a navigator in new intervention!'
         navigator_invite: "Navigator intervention invite"
         body: "You have been invited as navigator to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />Now you can chat with participants to help them with their troubles or concerns in this intervention."
+  transcript_mailer:
+    open_inbox: "See your inbox"
+    conversation_transcript_ready:
+      subject: "Your transcript is ready"
+      body: "Your transcript of one of conversations in the intervention <span style='color:#C866EA;'>%{intervention_name}</span> is ready."
+    intervention_conversation_transcripts_ready:
+      subject: "Your transcripts are ready"
+      body: "Your conversation transcripts from intervention <span style='color:#C866EA;'>%{intervention_name}</span> are ready."

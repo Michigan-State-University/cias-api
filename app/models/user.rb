@@ -236,6 +236,10 @@ class User < ApplicationRecord
     roles.include?('navigator')
   end
 
+  def guest?
+    roles.include?('guest')
+  end
+
   private
 
   def team_is_present?

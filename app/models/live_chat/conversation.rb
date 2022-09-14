@@ -9,6 +9,8 @@ class LiveChat::Conversation < ApplicationRecord
   has_many :users, through: :live_chat_interlocutors
   has_many :notifications, as: :notifiable, dependent: :destroy
 
+  has_one_attached :transcript, dependent: :purge_later
+
   scope :user_conversations, lambda { |user, is_archived|
     LiveChat::Conversation.joins(:live_chat_interlocutors).where(archived: is_archived, live_chat_interlocutors: { user_id: user.id })
   }

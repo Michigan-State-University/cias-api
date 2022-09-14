@@ -223,6 +223,7 @@ Rails.application.routes.draw do
 
     namespace :live_chat do
       resources :conversations, only: %i[index create] do
+        post 'generate_transcript', controller: '/v1/live_chat/conversations'
         resources :messages, only: %i[index], controller: 'conversations/messages'
       end
 

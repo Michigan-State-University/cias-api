@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::ConversationSerializer < V1Serializer
+  include FileHelper
   attributes :id, :intervention_id, :current_screen_title, :archived
 
   has_many :live_chat_interlocutors, serializer: V1::LiveChat::InterlocutorSerializer
@@ -23,5 +24,9 @@ class V1::LiveChat::ConversationSerializer < V1Serializer
 
   attribute :intervention_name do |object|
     object.intervention.name
+  end
+
+  attribute :transcript do |object|
+    map_file_data(object.transcript) if object.transcript.attached?
   end
 end
