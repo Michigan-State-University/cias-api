@@ -1,8 +1,7 @@
 class CreateNotifications < ActiveRecord::Migration[6.1]
   def change
     create_table :notifications, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
-      t.string :notifiable_type, null: false
-      t.uuid :notifiable_id, null: false
+      t.references :notifiable, polymorphic: true, null: false
       t.boolean :is_read, default: false
       t.jsonb :data
       t.uuid :user_id, null: false, foreign_key: true
