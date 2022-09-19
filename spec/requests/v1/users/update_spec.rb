@@ -88,6 +88,25 @@ describe 'PATCH /v1/users/:id', type: :request do
             )
           end
         end
+
+        context 'with invalid params' do
+          let(:params) do
+            {
+              user: {
+                first_name: '',
+                last_name: '',
+                sms_notification: false,
+                description: 'Some details about user'
+              }
+            }
+          end
+
+          it { expect(response).to have_http_status(:unprocessable_entity) }
+
+          it 'contains correct error message' do
+            expect(json_response['message']).to include "Validation failed: First name can't be blank, Last name can't be blank"
+          end
+        end
       end
 
       context 'when current_user updates other user' do
