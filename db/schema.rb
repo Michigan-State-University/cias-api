@@ -442,14 +442,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_140940) do
 
   create_table "notifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "notifiable_type", null: false
-    t.bigint "notifiable_id", null: false
+    t.uuid "notifiable_id", null: false
     t.boolean "is_read", default: false
     t.jsonb "data"
     t.uuid "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "event", default: 0, null: false
-    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
