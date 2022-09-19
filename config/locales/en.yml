@@ -23,6 +23,7 @@ en:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
             cat_mh_setting: 'Intervention should have all cat mh settings before publishing. ERROR_FLAG:CatMhWrongSettings'
+            live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
         user:
           attributes:
             roles:
@@ -48,6 +49,18 @@ en:
           attributes:
             variable:
               already_exists: already exists
+        live_chat:
+          conversation:
+            no_navigator_available: "No navigators are currently present."
+          message:
+            sent_in_archived_conversation: "Cannot send messages in archived conversations!"
+            attributes:
+              content:
+                too_long: 'length cannot exceed %{limit} characters.'
+          navigator:
+            not_researcher: 'User cannot become a navigator'
+          navigator_setup:
+            file_too_big: 'One of the files is too big. Limit: 5 Mb'
       messages:
         undestroyable: Forbidden operation
   interventions:
@@ -81,13 +94,18 @@ en:
     invite_user:
       subject:      You've been invited to the Team
       header:       '%{team_name} Invitation'
-      body:         "You've been invited to the %{team_name}."
+      body:         "You've been invited as %{roles} to the %{team_name}."
       instruction:  'Click the link below to accept the invitation and join the team.'
       button_text:  Accept the Invitation
   organizables:
     invitations:
       accepted: "You've successfully joined %{organizable_type} %{organizable_name}."
       not_found: "%{organizable_type} Invitation not found"
+  live_chat:
+    navigators:
+      invitations:
+        success: "You have successfully accepted the invitation to intervention %{intervention_name}"
+        error: "Your navigator invitation has been cancelled"
   organizable_mailer:
     invite_user:
       subject:      You've been invited to the %{organizable_type}
@@ -197,3 +215,22 @@ en:
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
       ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href=\"mailto:cias@msu.edu\">cias@msu.edu</a>. Thank you!<br /><br />"
+  navigator_mailer:
+    invitation:
+      subject: "Welcome to the navigator role in CIAS!"
+      click_the_link: "Click the link to accept invitation"
+      navigator_invite: "Navigator intervention invite"
+      accept: "Accept invitation"
+    from_team:
+      invitation:
+        subject: 'Welcome as a navigator in new intervention!'
+        navigator_invite: "Navigator intervention invite"
+        body: "You have been invited as navigator to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />Now you can chat with participants to help them with their troubles or concerns in this intervention."
+  transcript_mailer:
+    open_inbox: "See your inbox"
+    conversation_transcript_ready:
+      subject: "Your transcript is ready"
+      body: "Your transcript of one of conversations in the intervention <span style='color:#C866EA;'>%{intervention_name}</span> is ready."
+    intervention_conversation_transcripts_ready:
+      subject: "Your transcripts are ready"
+      body: "Your conversation transcripts from intervention <span style='color:#C866EA;'>%{intervention_name}</span> are ready."

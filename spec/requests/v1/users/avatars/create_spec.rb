@@ -80,7 +80,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
     end
   end
 
-  %w[guest participant e_intervention_admin team_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+  %w[guest participant organization_admin health_system_admin health_clinic_admin third_party].each do |role|
     context "when current_user is #{role}" do
       let(:current_user) { create(:user, :confirmed, role) }
 
@@ -96,20 +96,22 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
     end
   end
 
-  context 'when user is researcher' do
-    let(:current_user) { create(:user, :confirmed, :researcher) }
+  %w[team_admin e_intervention_admin researcher].each do |role|
+    context "when current_user is #{role}" do
+      let(:current_user) { create(:user, :confirmed, :researcher) }
 
-    context 'when current_user updates itself' do
-      it_behaves_like 'permitted user'
-    end
+      context 'when current_user updates itself' do
+        it_behaves_like 'permitted user'
+      end
 
-    context 'when current_user updates other user' do
-      let(:user_id) { other_user.id }
+      context 'when current_user updates other user' do
+        let(:user_id) { other_user.id }
 
-      it { expect(response).to have_http_status(:forbidden) }
+        it { expect(response).to have_http_status(:forbidden) }
 
-      it 'response contains proper error message' do
-        expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        end
       end
     end
   end

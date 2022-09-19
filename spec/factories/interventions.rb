@@ -15,6 +15,28 @@ FactoryBot.define do
       status { 'archived' }
     end
     shared_to { 'anyone' }
+
+    trait :with_navigator_setup do
+      after(:build) do |intervention|
+        intervention.live_chat_enabled = true
+      end
+    end
+
+    trait :with_navigators do
+      after(:build) do |intervention|
+        intervention.navigators << create(:user, :confirmed, :navigator)
+      end
+    end
+
+    trait :with_navigator_setup_and_phone do
+      after(:build) do |intervention|
+        intervention.live_chat_enabled = true
+      end
+
+      after(:create) do |intervention|
+        intervention.navigator_setup.update!(phone: Phone.new(number: '111111111', prefix: '+48', iso: 'PL'))
+      end
+    end
   end
 
   factory :intervention_with_logo, class: Intervention do

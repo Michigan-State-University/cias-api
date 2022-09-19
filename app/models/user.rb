@@ -21,7 +21,7 @@ class User < ApplicationRecord
 
   # Order of roles is important because final authorization is the sum of all roles
   APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
-                 organization_admin researcher e_intervention_admin team_admin admin].freeze
+                 organization_admin researcher e_intervention_admin team_admin admin navigator].freeze
 
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
@@ -77,6 +77,13 @@ class User < ApplicationRecord
 
   # CHARTS
   has_many :chart_statistics, dependent: :nullify # statistics of user answers
+
+  # LIVE CHAT
+  has_many :interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :restrict_with_exception
+  has_many :conversations, class_name: 'LiveChat::Conversation', through: :interlocutors
+
+  # NOTIFICATIONS
+  has_many :notifications, dependent: :destroy
 
   # USER IN GENERAL
   has_many :user_verification_codes, dependent: :destroy
@@ -204,7 +211,7 @@ class User < ApplicationRecord
   end
 
   def self.include_researcher_or_e_intervention_admin?(user_roles)
-    user_roles.include?('researcher') || user_roles.include?('e_intervention_admin')
+    (user_roles.include?('researcher') && user_roles.size == 1) || user_roles.include?('e_intervention_admin')
   end
 
   def active_for_authentication?
@@ -217,11 +224,27 @@ class User < ApplicationRecord
     Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
-  private
-
   def team_admin?
     roles.include?('team_admin')
   end
+
+  def e_intervention_admin?
+    roles.include?('e_intervention_admin')
+  end
+
+  def researcher?
+    roles.include?('researcher')
+  end
+
+  def navigator?
+    roles.include?('navigator')
+  end
+
+  def guest?
+    roles.include?('guest')
+  end
+
+  private
 
   def team_is_present?
     return if Team.exists?(team_admin_id: id)

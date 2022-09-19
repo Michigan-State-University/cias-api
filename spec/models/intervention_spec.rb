@@ -11,6 +11,7 @@ RSpec.describe Intervention, type: :model do
     it { should belong_to(:user) }
     it { should have_many(:sessions) }
     it { should have_many(:user_interventions) }
+    it { should have_many(:conversations) }
     it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { expect(initial_status.draft?).to be true }
