@@ -8,6 +8,7 @@ class GeneratedReport < ApplicationRecord
 
   has_many :generated_reports_third_party_users, dependent: :destroy
   has_many :third_party_users, through: :generated_reports_third_party_users, source: :third_party
+  has_many :downloaded_reports, dependent: :destroy
 
   delegate :name, to: :report_template, prefix: true
 
@@ -23,4 +24,8 @@ class GeneratedReport < ApplicationRecord
     third_party: 'third_party',
     participant: 'participant'
   }
+
+  def downloaded?(user_id)
+    downloaded_reports.exists?(user_id: user_id, generated_report_id: id)
+  end
 end

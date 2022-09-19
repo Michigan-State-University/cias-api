@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "object",
+              "properties": {
+                "question_title": {
+                  "type": "string"
+                },
+                "head_question": {
+                  "type": "string"
+                },
+                "substance_question": {
+                  "type": "string"
+                },
+                "substance_groups": {
+                  "type": "array",
+                  "items": {}
+                },
+                "substances_with_group": {
+                  "type": "boolean"
+                },
+                "substances": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "required": [
+                "question_title",
+                "head_question",
+                "substance_question",
+                "substances_with_group"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "payload"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "required": [
+    "data"
+  ],
+  "additionalProperties": false
+}

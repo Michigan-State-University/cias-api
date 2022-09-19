@@ -12,15 +12,16 @@ class V1::Question::CloneMultiple
 
   def call
     raise ActiveRecord::RecordNotFound unless proper_questions?(questions, question_ids)
+    raise ActiveRecord::ActiveRecordError if inconsistent_questions?(questions)
 
     ActiveRecord::Base.transaction do
-      question_group_id = questions.first&.question_group_id
-      question_group = if all_questions_from_one_question_group?(questions, question_group_id)
-                         questions.first&.question_group
+      existed_question_group = questions.first&.question_group
+      question_group = if duplicate_to_existed_question_group?(questions, existed_question_group)
+                         existed_question_group
                        else
                          question_groups = questions.first.session.question_groups
-                         position = question_groups.where(type: 'QuestionGroup::Plain').last&.position.to_i + 1
-                         question_groups.create!(title: 'Copied Questions', position: position)
+                         position = question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
+                         question_groups.create!(title: 'Copied Questions', position: position, type: question_group_type)
                        end
 
       clone_questions(questions, question_group)
@@ -29,12 +30,32 @@ class V1::Question::CloneMultiple
 
   private
 
+  def inconsistent_questions?(questions)
+    return true if (questions.tlfb.any? && questions.without_tlfb.any?) || (questions.tlfb.any? && incorrect_tlfb_group?(questions))
+
+    false
+  end
+
+  def incorrect_tlfb_group?(questions)
+    questions.count != 3 || (
+      questions.where(type: 'Question::TlfbConfig').blank? ||
+      questions.where(type: 'Question::TlfbEvents').blank? ||
+      questions.where(type: 'Question::TlfbQuestion').blank?
+    )
+  end
+
+  def question_group_type
+    questions.tlfb.any? ? 'QuestionGroup::Tlfb' : 'QuestionGroup::Plain'
+  end
+
   def proper_questions?(questions, question_ids)
     question_ids && questions.size == question_ids.size
   end
 
-  def all_questions_from_one_question_group?(questions, question_group_id)
-    questions.all? { |question| question.question_group_id.eql?(question_group_id) }
+  def duplicate_to_existed_question_group?(questions, question_group)
+    return false if question_group.type.eql? 'QuestionGroup::Tlfb'
+
+    questions.all? { |question| question.question_group_id.eql?(question_group.id) }
   end
 
   def clone_questions(questions, question_group)

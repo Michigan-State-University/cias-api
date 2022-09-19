@@ -9,8 +9,11 @@ class Ability::EInterventionAdmin < Ability::Base
   private
 
   def e_intervention_admin
-    can %i[read list_researchers], User, id: researchers_and_e_intervention_admins(user)
+    can %i[read list_researchers], User, id: participants_and_researchers(user)
+    can %i[read update], User, id: users_in_organization(user)
     can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.accepted_organization_ids)
+    can :manage, UserSession, session: { intervention: { user_id: user.id } }
+    can :manage, UserIntervention, intervention: { user_id: user.id }
     can %i[read update], Organization, id: user.accepted_organization_ids
     can :invite_organization_admin, Organization, id: user.accepted_organization_ids
     can :manage, HealthSystem, organization: { id: user.accepted_organization_ids }
@@ -20,11 +23,11 @@ class Ability::EInterventionAdmin < Ability::Base
     can :manage, ReportingDashboard, organization: { id: user.accepted_organization_ids }
     can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.accepted_organization_ids } }
     can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } }
-    can :read, ChartStatistic, chart: { dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } } }
+    can :read, ChartStatistic, organization_id: user.accepted_organization_ids
   end
 
   def users_in_organization(user)
-    organizations = user.organizations.joins(:health_systems, :health_clinics)
+    organizations = user.accepted_organization.joins(:health_systems, :health_clinics)
     return [] if organizations.blank?
 
     organization_ids = organizations.pluck(:id)

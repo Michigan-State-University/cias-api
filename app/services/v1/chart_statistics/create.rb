@@ -22,7 +22,7 @@ class V1::ChartStatistics::Create
       health_clinic: health_clinic,
       chart: chart,
       user: user_session.user,
-      filled_at: user_session.finished_at
+      filled_at: user_session.finished_at || DateTime.current
     )
   end
 

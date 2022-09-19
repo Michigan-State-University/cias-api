@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class Ability::TeamAdmin < Ability::Base
+  include Ability::Generic::GoogleAccess
   include Ability::Generic::ReportTemplateAccess
   include Ability::Generic::SmsPlanAccess
   include Ability::Generic::QuestionAccess
+  include Ability::Generic::CatMhAccess
 
   def definition
     super
@@ -31,6 +33,15 @@ class Ability::TeamAdmin < Ability::Base
     enable_questions_access(team_members_ids)
     enable_report_template_access(team_members_ids)
     enable_sms_plan_access({ intervention: { user_id: team_members_ids } })
+    enable_cat_mh_access
+
+    can :read, GeneratedReport,
+        user_session: { session: { intervention: { user_id: team_members_ids } } }
+    can :create, DownloadedReport,
+        generated_report: { user_session: { session: { intervention: { user_id: team_members_ids } } } }
+
+    can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: team_members_ids } } }
+    enable_google_access
   end
 
   def team_members_ids

@@ -14,6 +14,8 @@ en:
       title: Finish Group
     plain:
       title: Next Group
+    tlfb:
+      title: TLFB Study Group
   activerecord:
     errors:
       models:
@@ -81,6 +83,7 @@ en:
   users:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
+      not_active: "Invitation has been cancelled or was already used"
     preview:
       cat_mh: "User preview is unavailable for CAT-MH sessions"
   teams:

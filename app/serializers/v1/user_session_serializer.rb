@@ -42,6 +42,10 @@ class V1::UserSessionSerializer < V1Serializer
     object.session.intervention.quick_exit
   end
 
+  attribute :shared_to do |object|
+    object.session.intervention.shared_to
+  end
+
   attribute :live_chat_enabled do |object|
     object.session.intervention.live_chat_enabled
   end

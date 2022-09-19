@@ -6,8 +6,6 @@ class V1::InterventionSerializer < V1Serializer
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
              :additional_text, :original_text, :quick_exit, :live_chat_enabled
 
-  has_many :sessions, serializer: V1::SessionSerializer
-
   cache_options(store: Rails.cache, expires_in: 24.hours)  # temporary length, might be a subject to change
 
   attribute :first_session_language do |object|

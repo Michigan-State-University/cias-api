@@ -56,6 +56,8 @@ class Question < ApplicationRecord
   after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
 
+  scope :tlfb, -> { where('type like ?', '%Tlfb%') }
+  scope :without_tlfb, -> { where('type not like ?', '%Tlfb%') }
   default_scope { order(:position) }
 
   def subclass_name
@@ -82,11 +84,12 @@ class Question < ApplicationRecord
     self
   end
 
-  def another_or_feedback(next_obj, answers_var_values)
-    return next_obj unless next_obj.is_a?(::Question::Feedback)
+  def ability_to_clone?
+    true
+  end
 
-    next_obj.apply_formula(answers_var_values)
-    next_obj
+  def prepare_to_display(_answers_var_values = nil)
+    self
   end
 
   def variable_clone_prefix(_taken_variables) end

@@ -10,4 +10,8 @@ class V1::GeneratedReportSerializer < V1Serializer
   attribute :created_at do |object|
     object.created_at.iso8601
   end
+
+  attribute :downloaded do |object, params|
+    object.downloaded?(params[:user_id])
+  end
 end

@@ -36,6 +36,12 @@ class Ability::Researcher < Ability::Base
     enable_report_template_access(user.id)
     enable_sms_plan_access(logged_user_sessions(user))
     enable_cat_mh_access
+
+    can %i[read get_protected_attachment], GeneratedReport,
+        user_session: { session: { intervention: { user_id: user.id } } }
+    can :create, DownloadedReport, generated_report: { user_session: { session: { intervention: { user_id: user.id } } } }
+    can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
     enable_google_access
+    can :manage, Tlfb::ConsumptionResult, user_session: { session: { intervention: { user_id: user.id } } }
   end
 end

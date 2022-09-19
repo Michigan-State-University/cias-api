@@ -7,7 +7,10 @@ RSpec.describe V1::Intervention::Publish do
   let!(:session) { create(:session, intervention: intervention) }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
-  let!(:answers) { create_list(:answer_single, 4, question: question) }
+  let!(:preview_session_user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+  let!(:user_intervention) { create(:user_intervention, intervention: intervention, user: preview_session_user) }
+  let!(:user_session) { create(:user_session, user_id: preview_session_user.id, session_id: session.id, user_intervention: user_intervention) }
+  let!(:answers) { create_list(:answer_single, 4, question: question, user_session: user_session) }
   let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
   let!(:third_session) { create(:session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload) }
   let(:schedule) { 'after_fill' }
@@ -27,7 +30,6 @@ RSpec.describe V1::Intervention::Publish do
   context 'intervention status change publish' do
     it 'calls correct methods on execute' do
       allow(instance).to receive(:calculate_days_after_schedule)
-      allow(instance).to receive(:delete_draft_answers)
       allow(instance).to receive(:timestamp_published_at)
       described_class.new(intervention).execute
     end
@@ -43,14 +45,13 @@ RSpec.describe V1::Intervention::Publish do
     end
 
     context 'when we have preview data' do
-      let!(:preview_session_user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
       let!(:preview_user_phone) { create(:phone, :confirmed, user: preview_session_user) }
       let!(:user_log_request) { create(:user_log_request, user: preview_session_user) }
-      let!(:user_session) { create(:user_session, user_id: preview_session_user.id, session_id: session.id) }
 
       it 'clear preview users and preview user sessions' do
         described_class.new(intervention).execute
         expect(User.exists?(id: preview_session_user.id)).to eq false
+        expect(UserIntervention.exists?(id: user_session.id)).to eq false
         expect(UserSession.exists?(id: user_session.id)).to eq false
         expect(UserLogRequest.exists?(user_id: preview_session_user.id)).to eq false
         expect(Phone.exists?(id: preview_user_phone.id)).to eq false

@@ -298,4 +298,36 @@ RSpec.describe Answer, type: :model do
       it { expect(wrong_type.save).to eq false }
     end
   end
+
+  describe 'Answer::TlfbEvents' do
+    describe 'expected behaviour' do
+      subject(:answer_tlfb_event) { create(:answer_tlfb_event) }
+
+      it { should belong_to(:question).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_tlfb_event, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
+
+  describe 'Answer::TlfbQuestion' do
+    describe 'expected behaviour' do
+      subject(:answer_tlfb_question) { create(:answer_tlfb_question) }
+
+      it { should belong_to(:question).optional(true) }
+      it { should belong_to(:user_session).optional(true) }
+      it { should be_valid }
+    end
+
+    describe 'mismatch type question and answer' do
+      let(:wrong_type) { build(:answer_tlfb_question, :wrong_type) }
+
+      it { expect(wrong_type.save).to eq false }
+    end
+  end
 end

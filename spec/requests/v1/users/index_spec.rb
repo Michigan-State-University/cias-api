@@ -123,13 +123,13 @@ RSpec.describe 'GET /v1/users', type: :request do
   # RESEARCHER
   context 'when current_user is researcher' do
     let(:current_user) { researcher }
+    let(:intervention) { create(:intervention, user: current_user) }
     let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
     let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
     let!(:question) { create(:question_slider, question_group: question_group) }
-    let!(:answer) do
-      create(:answer_slider, question: question,
-                             user_session: create(:user_session, user: participant1, session: session))
-    end
+    let(:user_intervention) { create(:user_intervention, user: participant1, intervention: intervention) }
+    let(:user_session) { create(:user_session, user: participant1, session: session, user_intervention: user_intervention) }
+    let!(:answer) { create(:answer_slider, question: question, user_session: user_session) }
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
 
     context 'without params' do
@@ -155,12 +155,14 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'when researcher does not have any session but participant answered other user question' do
       let!(:params) { {} }
-      let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
+      let(:intervention) { create(:intervention) }
+      let!(:session) { create(:session, intervention: intervention) }
       let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
       let!(:question) { create(:question_slider, question_group: question_group) }
+      let(:user_intervention) { create(:user_intervention, intervention: intervention, user: participant1) }
       let!(:answer) do
         create(:answer_slider, question: question,
-                               user_session: create(:user_session, user: participant1, session: session))
+                               user_session: create(:user_session, user: participant1, session: session, user_intervention: user_intervention))
       end
 
       before { request }
@@ -204,27 +206,44 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     let!(:team_participant) { create(:user, :participant, :confirmed) }
     let!(:team_participant2) { create(:user, :participant, :confirmed) }
+    let!(:team_admin_participant) { create(:user, :participant, :confirmed) }
     let!(:other_team_participant) { create(:user, :participant, first_name: 'John', team_id: team1.id) }
 
     let!(:team_researcher) { create(:user, :researcher, :confirmed, team_id: team1.id) }
     let!(:team_intervention_admin) { create(:user, :e_intervention_admin, :confirmed, team_id: team1.id) }
 
     let!(:answer1) do
-      session = create(:session, intervention: create(:intervention, user: team_researcher))
+      intervention = create(:intervention, user: team_researcher)
+      user_intervention = create(:user_intervention, intervention: intervention, user: team_participant)
+      session = create(:session, intervention: intervention)
+      user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_participant)
       question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
       question = create(:question_slider, question_group: question_group)
-      create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant, session: session))
+      create(:answer_slider, question: question, user_session: user_session)
     end
 
     let!(:answer2) do
-      session = create(:session, intervention: create(:intervention, user: team_intervention_admin))
+      intervention = create(:intervention, user: team_intervention_admin)
+      user_intervention = create(:user_intervention, intervention: intervention, user: team_participant2)
+      session = create(:session, intervention: intervention)
+      user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_participant2)
       question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
       question = create(:question_slider, question_group: question_group)
-      create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant2, session: session))
+      create(:answer_slider, question: question, user_session: user_session)
+    end
+
+    let!(:answer3) do
+      intervention = create(:intervention, user: current_user)
+      user_intervention = create(:user_intervention, intervention: intervention, user: team_admin_participant)
+      session = create(:session, intervention: intervention)
+      user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_admin_participant)
+      question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
+      question = create(:question_slider, question_group: question_group)
+      create(:answer_slider, question: question, user_session: user_session)
     end
 
     let(:request) { get v1_users_path, params: params, headers: current_user.create_new_auth_token }
-    let(:users) { [*team1.users, current_user, team_participant, team_participant2] }
+    let(:users) { [*team1.users, current_user, team_participant, team_participant2, team_admin_participant] }
 
     let!(:team2) { create(:team) }
     let!(:other_researchers) do
@@ -255,7 +274,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'with team_id params' do
       let!(:params) { { team_id: team1.id } }
-      let!(:users) { [*team1.users, team_participant, team_participant2] }
+      let!(:users) { [*team1.users, team_participant, team_participant2, team_admin_participant] }
 
       before do
         request

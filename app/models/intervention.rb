@@ -170,4 +170,8 @@ class Intervention < ApplicationRecord
     id_scope = user.team_admin? ? user.admins_teams.pluck(:id) : user.team_id
     User.limit_to_roles('navigator').where(team_id: id_scope) if id_scope.present?
   end
+
+  def ability_to_clone?
+    true
+  end
 end
