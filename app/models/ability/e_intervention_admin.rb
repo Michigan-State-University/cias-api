@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Ability::EInterventionAdmin < Ability::Researcher
+class Ability::EInterventionAdmin < Ability::Base
   def definition
     super
     e_intervention_admin if role?(class_name)

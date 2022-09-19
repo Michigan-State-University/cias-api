@@ -49,6 +49,7 @@ Rails.application.routes.draw do
       patch 'sessions/position', to: 'sessions#position'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy]
+      resources :navigator_invitations, only: %i[index destroy create], controller: '/v1/live_chat/navigators/invitations'
     end
 
     scope 'interventions/:interventions_id', as: 'intervention' do
@@ -140,7 +141,7 @@ Rails.application.routes.draw do
     end
 
     resources :teams, only: %i[index show create update destroy] do
-      delete :remove_researcher
+      delete :remove_team_member
       scope module: 'teams' do
         resources :invitations, only: :create
       end
@@ -230,6 +231,31 @@ Rails.application.routes.draw do
       resources :test_types, controller: :test_types, only: :index
       resources :populations, controller: :populations, only: :index
       get 'available_test_types', to: 'test_types#available_tests'
+    end
+
+    namespace :live_chat do
+      resources :conversations, only: %i[index create] do
+        post 'generate_transcript', controller: '/v1/live_chat/conversations'
+        resources :messages, only: %i[index], controller: 'conversations/messages'
+      end
+
+      scope '/intervention/:id', as: :intervention do
+        resources :navigators, controller: 'interventions/navigators', only: %i[index destroy create], param: :navigator_id
+        resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'
+        resource :navigator_tab, only: %i[show], controller: 'navigators/tabs'
+        resource :navigator_helping_materials, only: %i[show], controller: 'navigators/helping_materials'
+        namespace :navigator_setups do
+          resources :links, only: %i[create update destroy], param: :link_id,
+                            controller: '/v1/live_chat/interventions/links'
+          resources :files, only: %i[create destroy], controller: '/v1/live_chat/interventions/files', param: :file_id
+        end
+      end
+
+      namespace :navigators do
+        scope :invitations do
+          get 'confirm', to: 'invitations#confirm'
+        end
+      end
     end
 
     get 'me', to: 'users#me', as: :get_user_details

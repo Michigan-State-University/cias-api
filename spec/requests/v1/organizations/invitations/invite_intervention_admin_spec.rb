@@ -32,7 +32,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
             email: params[:email],
             organizable_id: organization.id,
             confirmed_at: nil,
-            roles: ['e_intervention_admin'],
+            roles: %w[researcher e_intervention_admin],
             active: false
           )
         end

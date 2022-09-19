@@ -46,7 +46,8 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
-              'files' => []
+              'files' => [],
+              'live_chat_enabled' => false
             }
           }
         },
@@ -66,7 +67,8 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
-              'files' => []
+              'files' => [],
+              'live_chat_enabled' => false
             }
           }
         },
@@ -86,7 +88,8 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
-              'files' => []
+              'files' => [],
+              'live_chat_enabled' => false
             }
           }
         },
@@ -106,7 +109,8 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
-              'files' => []
+              'files' => [],
+              'live_chat_enabled' => false
             }
           }
         }

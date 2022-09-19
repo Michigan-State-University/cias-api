@@ -30,7 +30,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
         team_admin_id: new_team_admin.id
       )
       expect(new_team_admin.reload).to have_attributes(
-        roles: ['team_admin'],
+        roles: %w[researcher team_admin],
         team_id: nil
       )
     end
