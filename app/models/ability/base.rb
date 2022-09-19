@@ -26,10 +26,11 @@ class Ability::Base
   end
 
   def participants_with_answers(user)
-    result = logged_user_intervention(user)
-    return User.none if result.blank?
+    user_interventions = logged_user_intervention(user)
+    return User.none if user_interventions.blank?
 
-    User.participants.select { |participant| UserIntervention.where(user_id: participant.id, intervention_id: result).any? }.pluck(:id)
+    User.participants.left_joins(:user_interventions).where(user_interventions: { intervention_id: user_interventions })
+        .distinct.pluck(:id)
   end
 
   def participants_and_researchers(user)
