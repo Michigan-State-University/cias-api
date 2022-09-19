@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Notifications::Message
+  include Rails.application.routes.url_helpers
+
   def self.call(conversation, message)
     new(conversation, message).call
   end
