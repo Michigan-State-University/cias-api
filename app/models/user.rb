@@ -231,12 +231,12 @@ class User < ApplicationRecord
   end
 
   def invitation_pending?
-    return false if created_or_not_invited_user?
+    return false if confirmed_or_not_invited_user?
 
     invitation_accepted_at.nil?
   end
 
-  def created_or_not_invited_user?
+  def confirmed_or_not_invited_user?
     confirmed_at.present? || invitation_token.nil?
   end
 
