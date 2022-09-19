@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_01_140940) do
+ActiveRecord::Schema.define(version: 2022_09_19_064935) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -442,7 +442,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_140940) do
 
   create_table "notifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "notifiable_type", null: false
-    t.bigint "notifiable_id", null: false
+    t.uuid "notifiable_id", null: false
     t.boolean "is_read", default: false
     t.jsonb "data"
     t.uuid "user_id", null: false
