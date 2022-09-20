@@ -28,6 +28,7 @@ class V1::UsersController < V1Controller
     return if invalid_names?
 
     user = V1::Users::Update.call(user_load, user_params)
+
     render json: serialized_response(user)
   end
 
