@@ -121,7 +121,7 @@ class V1::UsersController < V1Controller
   def invalid_names?
     invalid_attrs = []
     %w[first_name last_name].each do |attr|
-      next if param_dont_exist_or_have_value(attr)
+      next if param_dont_exist_or_have_value?(attr)
 
       invalid_attrs << attr
     end
@@ -131,7 +131,7 @@ class V1::UsersController < V1Controller
                                    attr: invalid_attrs.join(' and ').humanize) }, status: :unprocessable_entity
   end
 
-  def param_dont_exist_or_have_value(param)
+  def param_dont_exist_or_have_value?(param)
     !user_data.key?(param) || user_data[param].present?
   end
 
