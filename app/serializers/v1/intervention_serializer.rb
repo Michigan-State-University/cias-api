@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 class V1::InterventionSerializer < V1Serializer
+  include FileHelper
   attributes :id, :user_id, :type, :name, :status, :shared_to, :organization_id, :google_language_id, :created_at, :updated_at, :published_at,
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
-             :additional_text, :original_text, :quick_exit
-
-  has_many :sessions, serializer: V1::SessionSerializer
+             :additional_text, :original_text, :quick_exit, :live_chat_enabled
 
   cache_options(store: Rails.cache, expires_in: 24.hours)  # temporary length, might be a subject to change
 
@@ -69,17 +68,17 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions.exists?(type: 'Session::CatMh')
   end
 
+  attribute :conversations_transcript do |object|
+    map_file_data(object.conversations_transcript) if object.conversations_transcript.attached?
+  end
+
   def self.newest_csv_link(object)
     ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end
 
   def self.files_info(object)
     object.files.map do |file|
-      {
-        id: file.id,
-        name: file.blob.filename,
-        url: ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
-      }
+      map_file_data(file)
     end
   end
 end

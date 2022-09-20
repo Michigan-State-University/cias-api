@@ -26,6 +26,10 @@ class V1::UserSessionSerializer < V1Serializer
     object.session.id
   end
 
+  attribute :session_name do |object|
+    object.session.name
+  end
+
   attribute :scheduled_at do |object|
     object.scheduled_at&.iso8601
   end
@@ -40,5 +44,9 @@ class V1::UserSessionSerializer < V1Serializer
 
   attribute :shared_to do |object|
     object.session.intervention.shared_to
+  end
+
+  attribute :live_chat_enabled do |object|
+    object.session.intervention.live_chat_enabled
   end
 end
