@@ -89,12 +89,13 @@ describe 'PATCH /v1/users/:id', type: :request do
           end
         end
 
-        context 'with invalid params' do
+        context 'with invalid first_name and last_name params' do
           let(:params) do
             {
               user: {
                 first_name: '',
                 last_name: '',
+                roles: %w[admin],
                 sms_notification: false,
                 description: 'Some details about user'
               }
