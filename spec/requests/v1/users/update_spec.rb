@@ -94,10 +94,7 @@ describe 'PATCH /v1/users/:id', type: :request do
             {
               user: {
                 first_name: '',
-                last_name: '',
-                roles: %w[admin],
-                sms_notification: false,
-                description: 'Some details about user'
+                last_name: ''
               }
             }
           end
@@ -105,7 +102,7 @@ describe 'PATCH /v1/users/:id', type: :request do
           it { expect(response).to have_http_status(:unprocessable_entity) }
 
           it 'contains correct error message' do
-            expect(json_response['message']).to include "Validation failed: First name can't be blank, Last name can't be blank"
+            expect(json_response['message']).to include 'First name and last name cannot be blank'
           end
         end
       end

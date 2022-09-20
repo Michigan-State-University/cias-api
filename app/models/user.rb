@@ -34,7 +34,6 @@ class User < ApplicationRecord
   validates :time_zone, inclusion: { in: TIME_ZONES }
   validate :team_is_present?, if: :team_admin?, on: :update
   validates :terms, acceptance: { on: :create, accept: true }
-  validate  :first_and_last_name_present?
 
   # PHONE NUMBER
   has_one :phone, dependent: :destroy
@@ -228,23 +227,6 @@ class User < ApplicationRecord
     return if Team.exists?(team_admin_id: id)
 
     errors.add(:roles, :team_admin_must_have_a_team)
-  end
-
-  def first_and_last_name_present?
-    return if role?('guest') || invitation_pending?
-
-    errors.add(:first_name, 'can\'t be blank') if first_name.blank?
-    errors.add(:last_name, 'can\'t be blank') if last_name.blank?
-  end
-
-  def invitation_pending?
-    return false if confirmed_or_not_invited_user?
-
-    invitation_accepted_at.nil?
-  end
-
-  def confirmed_or_not_invited_user?
-    confirmed_at.present? || invitation_token.nil?
   end
 
   def invalidate_token_after_changes
