@@ -7,7 +7,9 @@ namespace :users do
     User.find_each.with_index do |user, index|
       p "Checking and updating user: Progress #{index + 1}/#{user_count}"
 
-      user.update!(roles: %w[researcher team_admin]) if user.team_admin?
+      user.update!(roles: ['researcher']) if user.team_admin? && user.team.nil?
+
+      user.update!(roles: %w[researcher team_admin]) if user.team_admin? && !user.team.nil?
 
       user.update!(roles: (['researcher'] << user.roles).flatten.uniq) if user.e_intervention_admin?
     end
