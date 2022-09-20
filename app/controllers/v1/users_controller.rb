@@ -25,13 +25,10 @@ class V1::UsersController < V1Controller
 
   def update
     authorize_update_abilities
-    if valid_names?
-      user = V1::Users::Update.call(user_load, user_params)
+    return if invalid_names?
 
-      return render json: serialized_response(user)
-    end
-    render json: { message: I18n.t('activerecord.errors.models.user.attributes.blank_attr.attr_cannot_be_blank',
-                                   attr: 'First name and last name') }, status: :unprocessable_entity
+    user = V1::Users::Update.call(user_load, user_params)
+    render json: serialized_response(user)
   end
 
   def destroy
@@ -120,11 +117,17 @@ class V1::UsersController < V1Controller
     end
   end
 
-  def valid_names?
-    %i[first_name last_name].each do |attr|
-      return false if user_data.key?(attr) && user_data[attr].blank?
+  def invalid_names?
+    invalid_attrs = []
+    %w[first_name last_name].each do |attr|
+      next if user_data.key?(attr) && user_data[attr].present?
+
+      invalid_attrs << attr
     end
-    true
+    return false if invalid_attrs.blank?
+
+    render json: { message: I18n.t('activerecord.errors.models.user.attributes.blank_attr.attr_cannot_be_blank',
+                                   attr: invalid_attrs.join(' and ').humanize) }, status: :unprocessable_entity
   end
 
   def authorize_update_abilities

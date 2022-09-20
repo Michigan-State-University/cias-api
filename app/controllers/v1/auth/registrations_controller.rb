@@ -6,27 +6,23 @@ class V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsControll
   prepend Auth::Default
 
   def create
-    if valid_names?
-      super
-    else
-      render json: { message: I18n.t('activerecord.errors.models.user.attributes.blank_attr.attr_cannot_be_blank',
-                                     attr: 'First name and last name') }, status: :unprocessable_entity
-    end
+    return if invalid_names?
+
+    super
   end
 
   private
 
-  def valid_names?
-    [first_name, last_name].each do |attr|
-      return false if attr.blank?
+  def invalid_names?
+    invalid_attr = []
+    %w[first_name last_name].each do |attr|
+      next if params[attr].present?
+
+      invalid_attr << attr
     end
-  end
+    return false if invalid_attr.blank?
 
-  def first_name
-    params['first_name']
-  end
-
-  def last_name
-    params['last_name']
+    render json: { message: I18n.t('activerecord.errors.models.user.attributes.blank_attr.attr_cannot_be_blank',
+                                   attr: invalid_attr.join(' and ').humanize) }, status: :unprocessable_entity
   end
 end
