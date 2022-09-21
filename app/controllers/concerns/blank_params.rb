@@ -8,7 +8,7 @@ module BlankParams
       params_names = Array(params_names)
 
       params_names.each do |attr|
-        next unless -> { params.key?(attr) && params[attr].blank? }.call
+        next unless params.key?(attr) && params[attr].blank?
 
         raise ArgumentError, attr.humanize
       end

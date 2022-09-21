@@ -26,7 +26,7 @@ class V1::UsersController < V1Controller
 
   def update
     authorize_update_abilities
-    invalid_names?
+    check_for_blank_params
 
     user = V1::Users::Update.call(user_load, user_params)
 
@@ -119,7 +119,7 @@ class V1::UsersController < V1Controller
     end
   end
 
-  def invalid_names?
+  def check_for_blank_params
     error_message_on_blank_param(user_data, %w[first_name last_name])
   end
 
