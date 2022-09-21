@@ -82,12 +82,10 @@ RSpec.describe 'POST /v1/auth', type: :request do
     end
 
     it 'return correct status' do
-      request
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it 'have correct message' do
-      request
       expect(json_response['message']).to eq('First name and last name cannot be blank')
     end
 
