@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::UsersController < V1Controller
+  include BlankParams
   skip_before_action :authenticate_user!, only: %i[confirm_logging_code]
 
   def index
@@ -25,7 +26,7 @@ class V1::UsersController < V1Controller
 
   def update
     authorize_update_abilities
-    return if invalid_names?
+    invalid_names?
 
     user = V1::Users::Update.call(user_load, user_params)
 
@@ -119,20 +120,7 @@ class V1::UsersController < V1Controller
   end
 
   def invalid_names?
-    invalid_attrs = []
-    %w[first_name last_name].each do |attr|
-      next unless param_exist_and_is_blank?(attr)
-
-      invalid_attrs << attr
-    end
-    return false if invalid_attrs.blank?
-
-    render json: { message: I18n.t('activerecord.errors.models.user.attributes.blank_attr.attr_cannot_be_blank',
-                                   attr: invalid_attrs.join(' and ').humanize) }, status: :unprocessable_entity
-  end
-
-  def param_exist_and_is_blank?(param)
-    user_data.key?(param) && user_data[param].blank?
+    error_message_on_blank_param(user_data, %w[first_name last_name])
   end
 
   def authorize_update_abilities

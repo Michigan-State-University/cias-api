@@ -30,8 +30,6 @@ en:
               organization_id_is_required_for_organization_admin: 'Organization Admin must have an organization'
             team_id:
               team_admin_already_exists_for_the_team: 'There should be only one Team Admin in a team. The chosen team already has Team Admin'
-            blank_attr:
-              attr_cannot_be_blank: '%{attr} cannot be blank'
         team_invitation:
           attributes:
             user_id:

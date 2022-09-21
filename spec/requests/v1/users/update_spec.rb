@@ -99,10 +99,25 @@ describe 'PATCH /v1/users/:id', type: :request do
             }
           end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(response).to have_http_status(:bad_request) }
 
           it 'contains correct error message' do
-            expect(json_response['message']).to include 'First name and last name cannot be blank'
+            expect(json_response['message']).to include 'First name cannot be blank'
+          end
+
+          context 'after change in params' do
+            let(:params) do
+              {
+                user: {
+                  first_name: 'Jan',
+                  last_name: ''
+                }
+              }
+            end
+
+            it 'contains correct error message' do
+              expect(json_response['message']).to include 'Last name cannot be blank'
+            end
           end
         end
       end
