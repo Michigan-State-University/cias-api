@@ -2,15 +2,20 @@
 
 module BlankParams
   extend ActiveSupport::Concern
-  include ExceptionHandler
 
-  def error_message_on_blank_param(params, params_names)
-    params_names = Array(params_names)
+  included do
+    def error_message_on_blank_param(params, params_names)
+      params_names = Array(params_names)
 
-    params_names.each do |attr|
-      next unless -> { params.key?(attr) && params[attr].blank? }.call
+      params_names.each do |attr|
+        next unless -> { params.key?(attr) && params[attr].blank? }.call
 
-      raise ActionController::ParameterMissing, "#{attr.humanize} cannot be blank"
+        raise ArgumentError, attr.humanize
+      end
+    end
+
+    rescue_from ArgumentError do |exc|
+      render json: { message: "Param: #{exc.message} cannot be blank" }, status: :bad_request
     end
   end
 end
