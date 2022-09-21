@@ -26,6 +26,8 @@ class V1::QuestionsController < V1Controller
   def update
     authorize! :update, Question
 
+    return if invalid_variable?
+
     question = V1::Question::Update.call(question_load, question_params)
     invalidate_cache(question)
 
@@ -129,5 +131,27 @@ class V1::QuestionsController < V1Controller
 
   def position_params
     params.require(:question).permit(position: %i[id position question_group_id])
+  end
+
+  def invalid_variable?
+    return false if variable_name.blank? || special_variable?
+
+    if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable_name)
+      false
+    else
+      render json: { message: 'Invalid variable name' }, status: :unprocessable_entity
+    end
+  end
+
+  def variable_name
+    params.fetch(:question, {})
+          .fetch(:body, {})
+          .fetch(:variable, {})
+          .fetch(:name, '')
+          .to_s
+  end
+
+  def special_variable?
+    variable_name.start_with?('.:') && variable_name.end_with?(':.')
   end
 end
