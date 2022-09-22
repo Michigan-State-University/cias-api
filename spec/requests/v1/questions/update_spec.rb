@@ -145,9 +145,14 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       }
     end
 
-    it 'respond with correct error message' do
+    before do
       request
-      expect(json_response['message']).to eq 'Invalid variable name'
+    end
+
+    it { expect(response).to have_http_status(:unprocessable_entity) }
+
+    it 'respond with correct error message' do
+      expect(json_response['message']).to eq 'Validation failed: Variable name is in invalid format'
     end
   end
 end

@@ -36,6 +36,7 @@ en:
               already_exists: already exists
         question_group:
           question: '%{question_type} can appear only once per session'
+          question_variable: 'Variable name is in invalid format'
         organization_invitation:
           attributes:
             user_id:
