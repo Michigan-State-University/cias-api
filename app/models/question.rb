@@ -177,11 +177,9 @@ class Question < ApplicationRecord
 
   def correct_variable_format
     question_variables.each do |variable|
-      next if variable.blank? || special_variable?(variable)
+      next if variable.blank? || special_variable?(variable) || tlfb_variable?(variable)
 
       next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
-
-      next if tlfb_variable?
 
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
     end
