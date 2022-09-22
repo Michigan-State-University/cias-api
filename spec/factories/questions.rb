@@ -740,11 +740,13 @@ FactoryBot.define do
         data: [
           {
             payload: 'Never',
-            value: 'Never'
+            value: 'Never',
+            hfh_value: 'hfh1'
           },
           {
             payload: 'Monthly or less',
-            value: 'Monthly or less'
+            value: 'Monthly or less',
+            hfh_value: 'hfh2'
           }
         ],
         variable: {
