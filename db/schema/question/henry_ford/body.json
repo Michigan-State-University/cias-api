@@ -17,11 +17,15 @@
             },
             "original_text" : {
               "type": "string"
+            },
+            "hfh_value": {
+              "type": "string"
             }
           },
           "required": [
             "payload",
-            "value"
+            "value",
+            "hfh_value"
           ],
           "additionalProperties": false
         }
