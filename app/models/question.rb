@@ -176,20 +176,17 @@ class Question < ApplicationRecord
   end
 
   def correct_variable_format
-    return if variable_name.blank? || special_variable?
+    question_variables.each do |variable|
+      next if variable.blank? || special_variable?(variable)
 
-    return if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable_name)
+      next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
 
-    errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+      errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+    end
+    true
   end
 
-  def variable_name
-    body.fetch('variable', {})
-        .fetch('name', '')
-        .to_s
-  end
-
-  def special_variable?
-    variable_name.start_with?('.:') && variable_name.end_with?(':.')
+  def special_variable?(var)
+    var.start_with?('.:') && var.end_with?(':.')
   end
 end
