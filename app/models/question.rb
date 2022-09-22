@@ -181,6 +181,8 @@ class Question < ApplicationRecord
 
       next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
 
+      next if tlfb_variable?
+
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
     end
     true
@@ -188,5 +190,9 @@ class Question < ApplicationRecord
 
   def special_variable?(var)
     var.start_with?('.:') && var.end_with?(':.')
+  end
+
+  def tlfb_variable?(var)
+    var.start_with?('tlfb.') && var.include?('_d')
   end
 end
