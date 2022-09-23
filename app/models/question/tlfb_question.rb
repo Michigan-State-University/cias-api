@@ -41,14 +41,4 @@ class Question::TlfbQuestion < Question::Tlfb
     title_as_variable = question_group.title_as_variable
     number_of_days.times.map { |i| "tlfb.#{title_as_variable}_d#{i + 1}" } # rubocop:disable Performance/TimesMap
   end
-
-  def correct_variable_format
-    return if no_substances?
-
-    super
-  end
-
-  def no_substances?
-    body['data'][0]['payload']['substances'].empty?
-  end
 end

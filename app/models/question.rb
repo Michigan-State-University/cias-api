@@ -176,6 +176,8 @@ class Question < ApplicationRecord
   end
 
   def correct_variable_format
+    return unless accessible_variable?
+
     question_variables.each do |variable|
       next if variable.blank? || special_variable?(variable) || tlfb_variable?(variable)
 
@@ -183,7 +185,12 @@ class Question < ApplicationRecord
 
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
     end
-    true
+  end
+
+  def accessible_variable?
+    question_variables
+  rescue NoMethodError
+    false
   end
 
   def special_variable?(var)
