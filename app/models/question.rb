@@ -179,7 +179,7 @@ class Question < ApplicationRecord
     return unless accessible_variable?
 
     question_variables.each do |variable|
-      next if variable.blank? || special_variable?(variable) || tlfb_variable?(variable)
+      next if variable.blank? || special_variable?(variable)
 
       next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
 
@@ -194,10 +194,6 @@ class Question < ApplicationRecord
   end
 
   def special_variable?(var)
-    var.start_with?('.:') && var.end_with?(':.')
-  end
-
-  def tlfb_variable?(var)
-    var.start_with?('tlfb.') && var.include?('_d')
+    (var.start_with?('.:') && var.end_with?(':.')) || (var.start_with?('tlfb.') && var.include?('_d'))
   end
 end
