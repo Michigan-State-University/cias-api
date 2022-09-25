@@ -185,7 +185,7 @@ class Question < ApplicationRecord
     end
   end
 
-  def special_variable?(var)
+  def special_variable?(_var)
     false
   end
 end
