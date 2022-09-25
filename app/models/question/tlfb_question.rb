@@ -51,6 +51,6 @@ class Question::TlfbQuestion < Question::Tlfb
   end
 
   def no_substances?
-    body['data'][0]['payload']['substances'].empty?
+    body['data'][0]['payload']['substances'].blank? && body['data'][0]['payload']['substance_groups'].blank?
   end
 end
