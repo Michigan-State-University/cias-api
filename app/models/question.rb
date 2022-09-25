@@ -176,7 +176,7 @@ class Question < ApplicationRecord
   end
 
   def correct_variable_format
-    return unless accessible_variable?
+    return if body['data'].empty?
 
     question_variables.each do |variable|
       next if variable.blank? || special_variable?(variable) || /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
@@ -185,13 +185,7 @@ class Question < ApplicationRecord
     end
   end
 
-  def accessible_variable?
-    question_variables
-  rescue NoMethodError
-    false
-  end
-
   def special_variable?(var)
-    (var.start_with?('.:') && var.end_with?(':.')) || (var.start_with?('tlfb.') && var.include?('_d'))
+    false
   end
 end

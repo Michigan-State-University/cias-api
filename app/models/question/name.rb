@@ -16,4 +16,10 @@ class Question::Name < Question
   def question_variables
     ['.:name:.']
   end
+
+  private
+
+  def special_variable?(var)
+    var == '.:name:.'
+  end
 end
