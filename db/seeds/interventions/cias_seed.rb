@@ -6,9 +6,9 @@ require 'faker'
 NUM_OF_USERS = 10
 INTERVENTIONS_PER_RESEARCHER = 10
 SESSIONS_PER_INTERVENTION = 8
-QUESTION_GROUPS_PER_SESSION = 8
-QUESTIONS_PER_QUESTION_GROUP = 8
-ANSWERS_PER_QUESTION = 5
+QUESTION_GROUPS_PER_SESSION = 20
+QUESTIONS_PER_QUESTION_GROUP = 5
+ANSWERS_PER_QUESTION = 2
 REPORTS_PER_SESSION = 8 # Limited by number of participants.
 
 INTERVENTION_STATUS = %w[draft published closed archived].freeze
@@ -38,6 +38,23 @@ class DBSeed
     )
   end
 
+  def self.create_variable!(question)
+    if question.type == 'Question::Multiple'
+      question.body['data'].each do |row|
+        row['variable']['name'] = Faker::Alphanumeric.unique.alpha(number: 14)
+      end
+    elsif question.type == 'Question::Grid'
+      question.body['data'][0]['payload']['rows'].each do |row|
+        row['variable']['name'] = Faker::Alphanumeric.unique.alpha(number: 14)
+      end
+    else
+      unless question.question_variables.empty? || question.question_variables.include?('.:name:.')
+        question.body['variable']['name'] = Faker::Alphanumeric.unique.alpha(number: 14)
+      end
+    end
+    question.save!
+  end
+
   (NUM_OF_USERS - 1).times do |index|
     create_user(['participant'])
     p "#{index + 1}/#{NUM_OF_USERS} users created"
@@ -63,16 +80,18 @@ class DBSeed
         create(:report_template, :participant, session_id: session.id, summary: Faker::Movies::HowToTrainYourDragon.character)
 
         create_list(:question_group, QUESTION_GROUPS_PER_SESSION, session_id: session.id) do |question_group|
-          question_group.title = Faker::Music::Prince.song
+          question_group.title = Faker::Movie.title
           question_group.save!
 
           QUESTIONS_PER_QUESTION_GROUP.times do
-            create(
+            question = create(
               QUESTION_TYPES.sample,
-              title: "<h1>#{Faker::TvShows::Simpsons.quote.capitalize}</h1>",
-              subtitle: Faker::Marketing.buzzwords.capitalize,
+              title: Faker::TvShows::Simpsons.quote.capitalize,
+              subtitle: "<h1>#{Faker::Marketing.buzzwords.capitalize}</h1>",
               question_group_id: question_group.id
             )
+            create_variable!(question)
+
             p "#{researcher_index += 1}/#{researcher_index_max} researcher data created"
           end
         end
@@ -98,13 +117,14 @@ class DBSeed
 
               create_list(:answer, ANSWERS_PER_QUESTION, question_id: question.id, user_session_id: user_session.id,
                                                          type: "Answer::#{question.type.demodulize}") do |answer|
-                unless question.body['variable'].nil?
-                  answer.body = { data: [
-                    {
-                      var: question.body['variable']['name'],
-                      value: Faker::Number.between(from: 0, to: 10)
+                unless question.question_variables.empty?
+                  answer.body['data'] = []
+                  question.question_variables do |variable_name|
+                    answer.body['data'] << {
+                      'var' => variable_name,
+                      'value' => Faker::Number.between(from: 0, to: 10)
                     }
-                  ] }
+                  end
                   answer.save!
                 end
               end
