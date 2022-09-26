@@ -30,7 +30,7 @@ class Hl7::AnswersMapper
   end
 
   def answer_data(answer)
-    answer.decrypted_body.dig('data', 0, 'value')
+    answer.decrypted_body.dig('data', 0, 'hfh_value')
   end
 
   def date_of_answer(answer)
