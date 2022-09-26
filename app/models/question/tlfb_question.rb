@@ -12,14 +12,10 @@ class Question::TlfbQuestion < Question::Tlfb
   end
 
   def question_variables
-    if body_data[0]['payload']['substance_groups'].blank? && body_data[0]['payload']['substances'].blank?
+    if base_question_variables.empty?
       add_column_names_for_simple_question
-    elsif body_data[0]['payload']['substances_with_group']
-      body_data[0]['payload']['substance_groups'].flat_map do |substance_group|
-        add_column_names(substance_group['substances'])
-      end
     else
-      add_column_names(body_data[0]['payload']['substances'])
+      add_column_names(base_question_variables)
     end
   end
 
@@ -43,7 +39,25 @@ class Question::TlfbQuestion < Question::Tlfb
   end
 
   def correct_variable_format
-    super unless no_substances?
+    return if no_substances?
+
+    base_question_variables.flat_map {|e| e['variable'] }.each do |variable|
+      next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
+
+      errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+    end
+  end
+
+  def base_question_variables
+    if body_data[0]['payload']['substance_groups'].blank? && body_data[0]['payload']['substances'].blank?
+      []
+    elsif body_data[0]['payload']['substances_with_group']
+      body_data[0]['payload']['substance_groups'].flat_map do |substance_group|
+        substance_group['substances']
+      end
+    else
+      body_data[0]['payload']['substances']
+    end
   end
 
   def special_variable?(var)
