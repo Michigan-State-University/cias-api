@@ -39,9 +39,7 @@ class Question::TlfbQuestion < Question::Tlfb
   end
 
   def correct_variable_format
-    return if no_substances?
-
-    base_question_variables.flat_map {|e| e['variable'] }.each do |variable|
+    base_question_variables.flat_map { |e| e['variable'] }.each do |variable|
       next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
 
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
@@ -58,13 +56,5 @@ class Question::TlfbQuestion < Question::Tlfb
     else
       body_data[0]['payload']['substances']
     end
-  end
-
-  def special_variable?(var)
-    (var.start_with?('tlfb.') && var.include?('_d'))
-  end
-
-  def no_substances?
-    body['data'][0]['payload']['substances'].blank? && body['data'][0]['payload']['substance_groups'].blank?
   end
 end
