@@ -50,6 +50,7 @@ class Question < ApplicationRecord
                                                    }, message: lambda { |err|
                                                                  err
                                                                } }
+  validate :correct_variable_format
 
   delegate :session, to: :question_group
 
@@ -172,5 +173,19 @@ class Question < ApplicationRecord
 
   def json_schema_path
     @json_schema_path ||= 'db/schema/question'
+  end
+
+  def correct_variable_format
+    return if body['data'].empty?
+
+    question_variables.each do |variable|
+      next if variable.blank? || special_variable?(variable) || /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
+
+      errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+    end
+  end
+
+  def special_variable?(_var)
+    false
   end
 end

@@ -185,4 +185,73 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       expect(response).to have_http_status(:bad_request)
     end
   end
+
+  context 'when user wants to create question with invalid variables' do
+    let(:params) do
+      {
+        question: {
+          type: 'Question::Multiple',
+          position: 99,
+          title: 'Question Test 1',
+          subtitle: 'test 1',
+          formulas: [{
+            payload: 'test',
+            patterns: [
+              {
+                match: '= 5',
+                target: [{
+                  type: 'Session',
+                  probability: '100',
+                  id: ''
+                }]
+              },
+              {
+                match: '> 5',
+                target: [{
+                  type: 'Question',
+                  probability: '100',
+                  id: ''
+                }]
+              }
+            ]
+          }],
+          body: {
+            data: [
+              {
+                payload: 'create1',
+                variable: {
+                  name: '1_Inv@l!d',
+                  value: '1'
+                }
+              },
+              {
+                payload: 'create2',
+                variable: {
+                  name: '2_Inv@l!d',
+                  value: '2'
+                }
+              }
+            ]
+          },
+          narrator: {
+            blocks: blocks,
+            settings: {
+              voice: true,
+              animation: true
+            }
+          }
+        }
+      }
+    end
+
+    before do
+      request
+    end
+
+    it { expect(response).to have_http_status(:unprocessable_entity) }
+
+    it 'respond with correct error message' do
+      expect(json_response['message']).to eq 'Validation failed: Variable name is in invalid format'
+    end
+  end
 end

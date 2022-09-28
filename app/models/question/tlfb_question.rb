@@ -12,14 +12,10 @@ class Question::TlfbQuestion < Question::Tlfb
   end
 
   def question_variables
-    if body_data[0]['payload']['substance_groups'].blank? && body_data[0]['payload']['substances'].blank?
+    if substances.empty?
       add_column_names_for_simple_question
-    elsif body_data[0]['payload']['substances_with_group']
-      body_data[0]['payload']['substance_groups'].flat_map do |substance_group|
-        add_column_names(substance_group['substances'])
-      end
     else
-      add_column_names(body_data[0]['payload']['substances'])
+      add_column_names(substances)
     end
   end
 
@@ -37,8 +33,28 @@ class Question::TlfbQuestion < Question::Tlfb
     question_group.questions.find_by(type: 'Question::TlfbConfig').body_data.first.dig('payload', 'days_count').to_i
   end
 
+  def substances
+    if body_data[0]['payload']['substance_groups'].blank? && body_data[0]['payload']['substances'].blank?
+      []
+    elsif body_data[0]['payload']['substances_with_group']
+      body_data[0]['payload']['substance_groups'].flat_map do |substance_group|
+        substance_group['substances']
+      end
+    else
+      body_data[0]['payload']['substances']
+    end
+  end
+
   def add_column_names_for_simple_question
     title_as_variable = question_group.title_as_variable
     number_of_days.times.map { |i| "tlfb.#{title_as_variable}_d#{i + 1}" } # rubocop:disable Performance/TimesMap
+  end
+
+  def correct_variable_format
+    substances.flat_map { |e| e['variable'] }.each do |variable|
+      next if /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
+
+      errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+    end
   end
 end

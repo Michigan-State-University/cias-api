@@ -32,7 +32,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
             }
           ],
           variable: {
-            name: 'var test 1'
+            name: 'var_test_1'
           }
         }
       }
@@ -106,7 +106,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               }
             ],
             variable: {
-              name: 'var test 1'
+              name: 'var_test_1'
             }
           },
           formulas: []
@@ -117,6 +117,42 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     it 'lets users assign empty array of formulas' do
       request
       expect(json_response['data']['attributes']['formulas']).to eq []
+    end
+  end
+
+  context 'invalid body data' do
+    let(:params) do
+      {
+        question: {
+          type: question.type,
+          position: 999,
+          title: 'Question Test 1',
+          subtitle: 'test 1',
+          body: {
+            data: [
+              {
+                payload: {
+                  start_value: 'test 1',
+                  end_value: 'test 1'
+                }
+              }
+            ],
+            variable: {
+              name: '1_INVALID_VAR***'
+            }
+          }
+        }
+      }
+    end
+
+    before do
+      request
+    end
+
+    it { expect(response).to have_http_status(:unprocessable_entity) }
+
+    it 'respond with correct error message' do
+      expect(json_response['message']).to eq 'Validation failed: Variable name is in invalid format'
     end
   end
 end
