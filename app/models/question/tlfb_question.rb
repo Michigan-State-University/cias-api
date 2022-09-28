@@ -13,24 +13,32 @@ class Question::TlfbQuestion < Question::Tlfb
 
   def translate_body(translator, source_language_name_short, destination_language_name_short)
     body['data'].each do |record|
-      record['original_text'] = Marshal.load(Marshal.dump(record['payload']))
-      %w[question_title head_question substance_question].each do |question_data|
-        record['payload'][question_data] = translator.translate(record['payload'][question_data], source_language_name_short, destination_language_name_short)
-      end
+      record['original_text'] = record['payload'].deep_dup
+      translate_question_data(record, translator, source_language_name_short, destination_language_name_short)
 
-      if record['payload']['substance_groups'].present?
-        record['payload']['substance_groups'].flat_map do |substance_group|
-          substance_group['name'] = translator.translate(substance_group['name'], source_language_name_short, destination_language_name_short)
-          translate_substances(substance_group['substances'], translator, source_language_name_short, destination_language_name_short)
-        end
-      elsif record['payload']['substances'].present?
-        translate_substances(record['payload']['substances'], translator, source_language_name_short, destination_language_name_short)
-      end
+      translate_substances_in_question(record, translator, source_language_name_short, destination_language_name_short)
     end
   end
 
+  def translate_question_data(record, translator, source_language_name_short, destination_language_name_short)
+    %w[question_title head_question substance_question].each do |question_data|
+      record['payload'][question_data] = translator.translate(record['payload'][question_data], source_language_name_short, destination_language_name_short)
+    end
+  end
+
+  def translate_substances_in_question(record, translator, source_language_name_short, destination_language_name_short)
+    record['payload']['substance_groups']&.each do |substance_group|
+      substance_group['name'] = translator.translate(substance_group['name'], source_language_name_short, destination_language_name_short)
+      translate_substances(substance_group['substances'], translator, source_language_name_short, destination_language_name_short)
+    end
+
+    return if record['payload']['substances'].blank?
+
+    translate_substances(record['payload']['substances'], translator, source_language_name_short, destination_language_name_short)
+  end
+
   def translate_substances(substances, translator, source_language_name_short, destination_language_name_short)
-    substances.flat_map do |substance|
+    substances.each do |substance|
       %w[name unit].each do |property|
         translated = translator.translate(substance[property], source_language_name_short, destination_language_name_short)
         substance[property] = translated
