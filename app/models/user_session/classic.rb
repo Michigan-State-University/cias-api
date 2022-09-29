@@ -39,7 +39,7 @@ class UserSession::Classic < UserSession
     V1::UserSessionScheduleService.new(self).schedule if send_email
     V1::ChartStatistics::CreateForUserSession.call(self)
 
-    Hfhs::SendAnswersJob.perform_later(id) if session.intervention.hfhs_access?
+    # Hfhs::SendAnswersJob.perform_later(id) if session.intervention.hfhs_access?
 
     update_user_intervention(session_is_finished: true)
   end

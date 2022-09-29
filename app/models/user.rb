@@ -83,6 +83,9 @@ class User < ApplicationRecord
   attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
   attribute :roles, :string, array: true, default: assign_default_values('roles')
 
+  # HENRY FORDS
+  has_one :hfhs_patient_detail, dependent: :nullify
+
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
@@ -223,6 +226,14 @@ class User < ApplicationRecord
 
   def admin?
     roles.include?('admin')
+  end
+
+  def guest?
+    roles.include?('guest')
+  end
+
+  def preview_session?
+    roles.include?('preview_session')
   end
 
   private

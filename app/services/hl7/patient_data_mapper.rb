@@ -24,7 +24,7 @@ class Hl7::PatientDataMapper
   def call
     # rubocop:disable Layout/LineLength
     %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{MSH_SENDING_FACILITY}||#{MSH_RECEIVING_FACILITY}|#{date_now}||#{MSH_MESSAGE_TYPE}^#{MSH_TRIGGER_EVENT}|#{message_count}|#{ENV.fetch('PROCESSING')}|#{MSH_VERSION_ID}|||
-       #{SECOND_SEGMENT_TYPE}|||#{user.hfhs_patient_id}||#{user.last_name}^#{user.first_name}||#{dob_in_correct_format}|#{sex}]
+       #{SECOND_SEGMENT_TYPE}|||#{user.hfhs_patient_detail.patient_id}||#{user.hfhs_patient_detail.last_name}^#{user.hfhs_patient_detail.first_name}||#{dob_in_correct_format}|#{sex}]
     # rubocop:enable Layout/LineLength
   end
 
@@ -37,11 +37,11 @@ class Hl7::PatientDataMapper
   end
 
   def dob_in_correct_format
-    user.dob&.strftime('%Y%m%d')
+    user.hfhs_patient_detail.dob&.to_datetime&.strftime('%Y%m%d')
   end
 
   def sex
-    user.sex || 'U' # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0001
+    user.hfhs_patient_detail.sex || 'U' # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0001
   end
 
   # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.10

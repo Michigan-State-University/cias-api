@@ -49,6 +49,6 @@ class Api::Hfhs::Reports
   end
 
   def patient_id
-    user_session.user.hfhs_patient_id
+    user_session.user.hfhs_patient_detail.patient_id
   end
 end

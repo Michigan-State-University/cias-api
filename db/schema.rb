@@ -351,6 +351,28 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 
+  create_table "hfhs_patient_details", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "patient_id_ciphertext"
+    t.string "first_name_ciphertext"
+    t.string "last_name_ciphertext"
+    t.string "dob_ciphertext"
+    t.string "sex_ciphertext"
+    t.string "visit_id_ciphertext", default: ""
+    t.string "zip_code_ciphertext", default: ""
+    t.string "patient_id_bidx"
+    t.string "first_name_bidx"
+    t.string "last_name_bidx"
+    t.string "dob_bidx"
+    t.string "sex_bidx"
+    t.string "zip_code_bidx"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.uuid "user_id"
+    t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
+    t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
+    t.index ["user_id"], name: "index_hfhs_patient_details_on_user_id"
+  end
+
   create_table "intervention_accesses", force: :cascade do |t|
     t.uuid "intervention_id", null: false
     t.string "email", null: false
@@ -736,11 +758,6 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
     t.boolean "quick_exit_enabled", default: false, null: false
-    t.string "hfhs_patient_id"
-    t.datetime "dob"
-    t.string "sex"
-    t.string "hfhs_visit_id", default: ""
-    t.string "zip_code", default: ""
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -784,6 +801,7 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
   add_foreign_key "downloaded_reports", "users"
   add_foreign_key "events", "days"
   add_foreign_key "google_languages", "google_tts_languages"
+  add_foreign_key "hfhs_patient_details", "users"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"

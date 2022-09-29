@@ -6,12 +6,13 @@ class SummonUsers
   class << self
     def onboarding
       summon_many
+      create_example_hfhs_data
     end
 
     private
 
     def summon_many
-      roles.each_with_index do |role, _index|
+      roles.each do |role|
         u = User.new(
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,
@@ -22,6 +23,29 @@ class SummonUsers
         u.confirm
         u.save
         u.user_verification_codes.create(code: SecureRandom.base64(6), confirmed: true)
+      end
+    end
+
+    def create_example_hfhs_data
+      HfhsPatientDetail.create(
+        first_name: 'Cias',
+        last_name: 'Team',
+        sex: 'U',
+        dob: Date.new(1978, 8, 9),
+        zip_code: '49201-1653',
+        patient_id: '89008700',
+        visit_id: 'H93905_1010010049_10727228307'
+      )
+
+      %w[89008709 1482928].each do |mrn|
+        HfhsPatientDetail.create(
+          first_name: 'Fred',
+          last_name: 'Flintstone',
+          sex: 'M',
+          dob: Date.new(2002, 2, 2),
+          zip_code: '49201-1653',
+          patient_id: mrn
+        )
       end
     end
 

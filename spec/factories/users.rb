@@ -53,6 +53,19 @@ FactoryBot.define do
       end
     end
 
+    trait :with_hfhs_patient_detail do
+      after(:create) do |user|
+        HfhsPatientDetail.create(patient_id: '89000344',
+                                 first_name: user.first_name,
+                                 last_name: user.last_name,
+                                 dob: (DateTime.now - 20.years).to_s,
+                                 sex: 'F',
+                                 visit_id: '',
+                                 zip_code: '48127',
+                                 user: user)
+      end
+    end
+
     trait :organization_admin do
       roles { %w[organization_admin] }
     end

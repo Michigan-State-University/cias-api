@@ -7,7 +7,8 @@ describe Hl7::UserSessionMapper do
 
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:session) { create(:session) }
-  let!(:user_session) { create(:user_session, finished_at: DateTime.now) }
+  let!(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
+  let!(:user_session) { create(:user_session, finished_at: DateTime.now, user: patient) }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question1) { create(:question_henry_ford, question_group: question_group) }
   let!(:question2) { create(:question_henry_ford, question_group: question_group) }

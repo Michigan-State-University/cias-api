@@ -197,3 +197,6 @@ en:
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
       ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href=\"mailto:cias@msu.edu\">cias@msu.edu</a>. Thank you!<br /><br />"
+  hfhs_patient_detail:
+    not_unique: 'Found more patients matching these criteria'
+    not_found: 'HfhsPatientDetail instance not found'

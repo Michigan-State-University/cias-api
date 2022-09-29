@@ -29,7 +29,7 @@ class Hl7::UserSessionMapper
   private
 
   def visit_id
-    user_session.user.hfhs_visit_id
+    user_session.user.hfhs_patient_detail.visit_id
   end
 
   def finished_date

@@ -119,7 +119,12 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                 'first_name' => e_intervention_admin.first_name,
                 'last_name' => e_intervention_admin.last_name,
                 'roles' => ['e_intervention_admin']
-              )
+              ),
+          'relationships' => {
+            'hfhs_patient_detail' => {
+              'data' => nil
+            }
+          }
         ).and include(
           'id' => deleted_health_clinic.id,
           'type' => 'health_clinic',
@@ -210,7 +215,12 @@ RSpec.describe 'GET /v1/organizations/:id', type: :request do
                        'first_name' => organization_admin.first_name,
                        'last_name' => organization_admin.last_name,
                        'roles' => ['organization_admin']
-                     )
+                     ),
+            'relationships' => {
+              'hfhs_patient_detail' => {
+                'data' => nil
+              }
+            }
           }
         )
       end

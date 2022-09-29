@@ -3,11 +3,11 @@
 require 'rails_helper'
 
 describe Hl7::PatientDataMapper do
-  subject { described_class.call(participant.id, user_session.id) }
+  subject { described_class.call(patient.id, user_session.id) }
 
-  let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:session) { create(:session) }
-  let!(:user_session) { create(:user_session) }
+  let!(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
+  let!(:user_session) { create(:user_session, user: patient) }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question1) { create(:question_henry_ford, question_group: question_group) }
   let!(:question2) { create(:question_henry_ford, question_group: question_group) }
@@ -20,7 +20,7 @@ describe Hl7::PatientDataMapper do
     it {
       expect(subject).to include(
         "MSH|^~\\&|LogicSoln|HFHS||HFH|#{DateTime.now.strftime('%Y%m%d%H%M')}||ORU^R01|2|T|2.3|||",
-        "PID|||||#{participant.last_name}^#{participant.first_name}|||U"
+        "PID|||#{patient.hfhs_patient_detail.patient_id}||#{patient.last_name}^#{patient.first_name}||#{patient.hfhs_patient_detail.dob.to_datetime.strftime('%Y%m%d')}|F"
       )
     }
   end

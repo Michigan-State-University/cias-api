@@ -34,7 +34,7 @@ class Hl7::ReportMapper
   private
 
   def visit_id
-    user_session.user.hfhs_visit_id
+    user_session.user.hfhs_patient_detail.visit_id
   end
 
   def report_type
@@ -46,7 +46,7 @@ class Hl7::ReportMapper
   end
 
   def hfhs_patient_id
-    user_session.user.hfhs_patient_id
+    user_session.user.hfhs_patient_detail.patient_id
   end
 
   def file_base64

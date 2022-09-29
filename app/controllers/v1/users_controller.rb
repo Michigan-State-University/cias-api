@@ -61,10 +61,17 @@ class V1::UsersController < V1Controller
   end
 
   def me
-    render json: serialized_response(current_v1_user)
+    render json: me_response
   end
 
   private
+
+  def me_response
+    V1::UserSerializer.new(
+      current_v1_user,
+      { include: %i[hfhs_patient_detail] }
+    )
+  end
 
   def users_scope
     User.accessible_by(current_v1_user.ability).includes(:team, :phone, :avatar_attachment)

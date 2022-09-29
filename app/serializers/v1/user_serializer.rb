@@ -6,6 +6,8 @@ class V1::UserSerializer < V1Serializer
 
   cache_options store: Rails.cache, expires_in: 24.hours
 
+  has_one :hfhs_patient_detail, serializer: V1::HfhsPatientDetailSerializer
+
   attribute :avatar_url do |object|
     polymorphic_url(object.avatar) if object.avatar.attached?
   end

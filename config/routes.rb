@@ -34,6 +34,10 @@ Rails.application.routes.draw do
         resource :avatars, only: %i[create destroy]
       end
     end
+    namespace :henry_ford do
+      post 'verify', to: 'patient_details#verify'
+    end
+
     resources :preview_session_users, only: :create
 
     resources :interventions, only: %i[index show create update] do

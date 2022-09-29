@@ -17,7 +17,7 @@ class Api::Hfhs::UserSession
     token  = Api::Hfhs::Authentication.call
     return if token.nil?
 
-    baerer_token = "#{token[:token_type]}  #{token[:access_token]}"
+    baerer_token = "#{token[:token_type]} #{token[:access_token]}"
 
     Faraday.post(ENDPOINT) do |request|
       request.headers['Content-Type'] = 'application/json'
@@ -42,7 +42,7 @@ class Api::Hfhs::UserSession
   end
 
   def patient_id
-    user_session.user.hfhs_patient_id
+    user_session.user.hfhs_patient_detail.patient_id
   end
 
   def hl7_data
@@ -50,6 +50,6 @@ class Api::Hfhs::UserSession
   end
 
   def no_data_to_hfhs?
-    user_session.answers.where(type: 'Question::HenryFord').blank?
+    user_session.answers.where(type: 'Answer::HenryFord').blank?
   end
 end
