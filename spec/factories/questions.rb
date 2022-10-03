@@ -698,8 +698,8 @@ FactoryBot.define do
           {
             payload:
               {
-                screen_title: '',
-                screen_question: ''
+                screen_title: 'Hello',
+                screen_question: 'Did you drink alcohol today?'
               }
           }
         ]
@@ -718,9 +718,9 @@ FactoryBot.define do
           {
             payload:
               {
-                question_title: '',
-                head_question: '',
-                substance_question: '',
+                question_title: 'Questions',
+                head_question: 'Test question',
+                substance_question: 'Test substance question',
                 substances_with_group: true,
                 substances: []
               }
@@ -730,5 +730,52 @@ FactoryBot.define do
     end
     sequence(:position) { |s| s }
     association :question_group
+
+    trait :with_substances do
+      body do
+        {
+          data: [
+            {
+              payload:
+                {
+                  question_title: 'Questions',
+                  head_question: 'Test question',
+                  substance_question: 'Test substance question',
+                  substances_with_group: false,
+                  substances: [{ 'name' => 'Gin', 'variable' => 'gin' }, { 'name' => 'Wine', 'variable' => 'wine' }]
+                }
+            }
+          ]
+        }
+      end
+    end
+
+    trait :with_substance_groups do
+      body do
+        {
+          data: [
+            {
+              payload:
+                {
+                  question_title: 'Questions',
+                  head_question: 'Test question',
+                  substance_question: 'Test substance question',
+                  substances_with_group: true,
+                  substance_groups: [
+                    { 'name' => 'Smokers group', 'substances' => [
+                      { 'name' => 'cigarettes', 'unit' => 'cigs', 'variable' => 'cigarettes' },
+                      { 'name' => 'cannabis', 'unit' => 'grams', 'variable' => 'cannabis' }
+                    ] },
+                    { 'name' => 'Alcohol group', 'substances' => [
+                      { 'name' => 'Vodka', 'unit' => 'shots', 'variable' => 'vodka' },
+                      { 'name' => 'Beer', 'unit' => 'cups', 'variable' => 'beer' }
+                    ] }
+                  ]
+                }
+            }
+          ]
+        }
+      end
+    end
   end
 end
