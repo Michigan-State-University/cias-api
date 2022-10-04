@@ -95,6 +95,7 @@ group :test do
   gem 'database_cleaner-active_record'
   gem 'action-cable-testing', '~> 0.6.1'
   gem 'rspec-benchmark'
+  gem 'benchmark-ips'
 end
 
 group :production do

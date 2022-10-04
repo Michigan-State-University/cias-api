@@ -98,6 +98,7 @@ GEM
     aws-sigv4 (1.2.3)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.16)
+    benchmark-ips (2.10.0)
     benchmark-malloc (0.2.0)
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
@@ -562,6 +563,7 @@ DEPENDENCIES
   activestorage (>= 6.1.4.7)
   airbrake
   aws-sdk-s3
+  benchmark-ips
   blind_index
   bootsnap (>= 1.4)
   brakeman (~> 5.0.2)
@@ -638,4 +640,4 @@ RUBY VERSION
    ruby 2.7.2p137
 
 BUNDLED WITH
-   2.2.22
+   2.3.22
