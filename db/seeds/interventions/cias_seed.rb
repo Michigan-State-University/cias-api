@@ -23,8 +23,6 @@ INTERVENTION_NAMES_DIRECTED = ['Husbands', 'Pregnant women', 'Underage teenagers
 
 QUESTION_TYPES = %i[question_feedback question_grid question_information question_multiple question_number question_single
                     question_free_response question_date question_currency].freeze
-
-CURRENT_TIME = Time.zone.now
 # rubocop:disable Lint/TopLevelReturnWithArgument, Rails/Output
 return puts '# Will not pollute database. Generator is disabled on this environment' unless ENV['GENERATOR_ENABLED'] == '1'
 # rubocop:enable Lint/TopLevelReturnWithArgument

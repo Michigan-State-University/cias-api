@@ -142,29 +142,23 @@ FactoryBot.define do
             payload: {
               rows: [
                 {
-                  payload: Faker::Music.band,
+                  payload: '',
                   variable: {
                     name: 'row1'
-                  }
-                },
-                {
-                  payload: Faker::Music.band,
-                  variable: {
-                    name: 'row2'
                   }
                 }
               ],
               columns: [
                 {
-                  payload: '1',
+                  payload: '',
                   variable: {
                     value: '1'
                   }
                 },
                 {
-                  payload: '2',
+                  payload: '',
                   variable: {
-                    value: '2'
+                    value: '1'
                   }
                 }
               ]
