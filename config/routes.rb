@@ -35,6 +35,7 @@ Rails.application.routes.draw do
       end
     end
     namespace :henry_ford do
+      post 'new_patient', to: 'patient_details#create'
       post 'verify', to: 'patient_details#verify'
     end
 

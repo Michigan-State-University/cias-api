@@ -8,5 +8,8 @@ class HfhsPatientDetail < ApplicationRecord
   encrypts :dob, type: :date
   blind_index :patient_id, :first_name, :last_name, :dob, :sex, :zip_code
 
+  alias_attribute :zip, :zip_code
+  alias_attribute :gender, :sex
+
   belongs_to :user, optional: true
 end
