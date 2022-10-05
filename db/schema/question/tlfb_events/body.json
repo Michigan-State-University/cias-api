@@ -25,6 +25,18 @@
                 "screen_question"
               ],
               "additionalProperties": false
+            },
+            "original_text": {
+              "type": "object",
+              "properties": {
+                "screen_title": {
+                  "type": "string"
+                },
+                "screen_question": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
             }
           },
           "required": [
