@@ -10,7 +10,7 @@ module UserHelper
         first_name: navigator.first_name,
         last_name: navigator.last_name,
         email: navigator.email,
-        avatar_url: navigator.avatar.attached? ? polymorphic_url(object.avatar) : nil
+        avatar_url: navigator.avatar.attached? ? polymorphic_url(navigator.avatar) : nil
       }
     end
 
