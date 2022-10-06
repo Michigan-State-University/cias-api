@@ -77,8 +77,12 @@ class Session::Classic < Session
       comparator = to_boolean(filter_options[:include_current_question]) ? '<=' : '<'
       filtered = filtered.where(question_group: target_question.question_group).where("questions.position #{comparator} ?", target_question.position)
     end
+
     filtered = filtered.where(type: digit_variable_questions) if filter_options[:only_digit_variables]
-    filtered.map { |question| { subtitle: question.subtitle, variables: present_variables(question.question_variables) } }
+    filtered.filter_map do |question|
+      variables = present_variables(question.question_variables)
+      { subtitle: question.subtitle, variables: variables } if variables.present?
+    end
   end
 
   def assign_google_tts_voice(first_session)
