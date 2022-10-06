@@ -14,6 +14,8 @@ class LiveChat::Message < ApplicationRecord
 
   after_create :create_notification
 
+  encrypts :content
+
   private
 
   def conversation_archived?
