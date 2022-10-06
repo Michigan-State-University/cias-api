@@ -99,7 +99,7 @@ class Session::Classic < Session
   end
 
   def digit_variable_questions
-    %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number]
+    %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number Question::HenryFord]
   end
 
   def create_core_children
