@@ -30,6 +30,6 @@ class V1::UserSessions::QuestionsController < V1Controller
   end
 
   def cat_mh_connection_error?(question)
-    question['error'] == 'Request Time-out'
+    question['status'] == 400 && question['error'] == 'Request Time-out'
   end
 end
