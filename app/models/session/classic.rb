@@ -78,7 +78,7 @@ class Session::Classic < Session
       filtered = filtered.where(question_group: target_question.question_group).where("questions.position #{comparator} ?", target_question.position)
     end
     filtered = filtered.where(type: digit_variable_questions) if filter_options[:only_digit_variables]
-    filtered.map { |question| { subtitle: question.subtitle, variables: question.question_variables } }
+    filtered.map { |question| { subtitle: question.subtitle, variables: present_variables(question.question_variables) } }
   end
 
   def assign_google_tts_voice(first_session)
@@ -100,6 +100,10 @@ class Session::Classic < Session
 
   def digit_variable_questions
     %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number Question::HenryFord]
+  end
+
+  def present_variables(variables)
+    variables.filter(&:present?)
   end
 
   def create_core_children
