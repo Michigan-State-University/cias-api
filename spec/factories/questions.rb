@@ -754,5 +754,8 @@ FactoryBot.define do
         }
       }
     end
+
+    sequence(:position) { |s| s }
+    association :question_group
   end
 end
