@@ -58,8 +58,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
       end
 
       it_behaves_like 'correct classic session', 9, %w[var1 im_a_variable dep number rivia is_with_x x y what],
-                      ['single', 'multi', 'grid', 'currency', 'number',
-                       '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>']
+                      %w[single multi grid currency number]
     end
 
     context 'with question filters' do
