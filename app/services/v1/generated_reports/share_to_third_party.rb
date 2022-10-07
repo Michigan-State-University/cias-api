@@ -81,6 +81,7 @@ class V1::GeneratedReports::ShareToThirdParty
                                                   [answer.body_data&.first&.dig('value')&.delete(' ')&.split(','),
                                                    answer.body_data&.first&.dig('report_template_ids')]
                                                 end
+                                                    .filter(&:all?)
                                                     .each_with_object(Hash.new([])) { |(email, rep_id), hash| hash[email] += rep_id } # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
     # rubocop:enable Layout/LineLength
     # rubocop:enable Style/MultilineBlockChain
