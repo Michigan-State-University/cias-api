@@ -46,7 +46,7 @@ class Intervention < ApplicationRecord
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
 
   before_validation :assign_default_google_language
-  after_update_commit :status_change
+  after_update_commit :status_change, :hf_access_change
 
   def assign_default_google_language
     self.google_language = GoogleLanguage.find_by(language_code: 'en') if google_language.nil?
@@ -56,6 +56,14 @@ class Intervention < ApplicationRecord
     return unless saved_change_to_attribute?(:status)
 
     ::Interventions::PublishJob.perform_later(id) if status == 'published'
+  end
+
+  def hf_access_change
+    return if hfhs_access
+
+    sessions.map(&:questions).flatten.each do |question|
+      question.destroy if question.type == 'Question::HenryFordInitial'
+    end
   end
 
   def export_answers_as(type:)
