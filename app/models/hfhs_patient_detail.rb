@@ -12,4 +12,6 @@ class HfhsPatientDetail < ApplicationRecord
   alias_attribute :gender, :sex
 
   belongs_to :user, optional: true
+
+  validates :patient_id, :first_name, :last_name, :sex, :zip_code, :dob, presence: true
 end

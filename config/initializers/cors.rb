@@ -16,4 +16,12 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
              expose: %w[Access-Token Expiry Token-Type Uid Client],
              methods: %i[delete get options patch post put]
   end
+
+  allow do
+    origins ENV['HENRY_FORD_HEALTH_URL']
+    resource '/v1/henry_ford/patient_details',
+             credentials: true,
+             expose: %w[Access-Token Expiry Token-Type Uid Client],
+             methods: %i[post]
+  end
 end
