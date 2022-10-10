@@ -861,6 +861,59 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.rows).to eq [[user.id, user.email, 1, user_session.created_at, nil, nil]]
         end
       end
+
+      context 'when henry ford' do
+        let!(:intervention) { create(:intervention, hfhs_access: true) }
+        let!(:user) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
+        let!(:user_session) { create(:user_session, user: user, session: question.question_group.session) }
+        let!(:patient_details) { user.hfhs_patient_detail }
+
+        context 'initial screen' do
+          let!(:question) { create(:question_henry_ford_initial, question_group: question_group) }
+
+          it 'save header and the value to csv' do
+            subject.collect
+            expect(subject.header).to include(:user_id, :email, "#{session.variable}.hfs.patient_id", "#{session.variable}.hfs.first_name",
+                                              "#{session.variable}.hfs.last_name", "#{session.variable}.hfs.gender", "#{session.variable}.hfs.date_of_birth",
+                                              "#{session.variable}.hfs.zip_code", "#{session.variable}.metadata.session_start",
+                                              "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration")
+
+            expect(subject.rows.first).to include(user.id, user.email, patient_details.patient_id, patient_details.first_name, patient_details.last_name,
+                                                  patient_details.dob, patient_details.sex, patient_details.zip_code, user_session.created_at, nil, nil)
+          end
+        end
+
+        context 'question' do
+          let!(:question_body) do
+            {
+              'data' => [
+                { 'value' => '1', 'payload' => '', 'hfh_value' => '' },
+                { 'value' => '2', 'payload' => '', 'hfh_value' => '' }
+              ],
+              'variable' => { 'name' => 'test_hf' }
+            }
+          end
+          let!(:answer_body) do
+            {
+              'data' => [
+                {
+                  'var' => 'test_hf',
+                  'value' => '1'
+                }
+              ]
+            }
+          end
+          let!(:question) { create(:question_henry_ford, question_group: question_group, body: question_body, position: 1) }
+          let!(:answer) { create(:answer_henry_ford, question: question, body: answer_body, user_session: user_session) }
+
+          it 'save every variables and scores to csv' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_hf", "#{session.variable}.metadata.session_start",
+                                          "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+          end
+        end
+      end
     end
   end
 end

@@ -74,6 +74,7 @@ class Intervention::Csv::Harvester
           end
         end
 
+        fill_hf_initial_screen(row_index, user_session)
         fill_by_tlfb_research(row_index, user_session)
         metadata(session_variable, user_session, row_index)
         quick_exit(session_variable, row_index, user_session)
@@ -140,6 +141,28 @@ class Intervention::Csv::Harvester
 
   def boolean_to_int(value)
     value ? 1 : 0
+  end
+
+  def fill_hf_initial_screen(row_index, user_session)
+    return unless user_session.session.intervention.hfhs_access
+
+    attrs = Question::HenryFordInitial.csv_decoded_attrs
+    patient_details = patient_details(user_session, attrs)
+    return if patient_details.empty?
+
+    session_variable = user_session.session.variable
+    attrs = Question::HenryFordInitial.rename_attrs!(attrs)
+    attrs.each_with_index do |column, index|
+      var_index = header.index("#{session_variable}.hfs.#{column}")
+      next if var_index.nil?
+
+      rows[row_index][var_index] = patient_details[index]
+    end
+  end
+
+  def patient_details(user_session, attrs)
+    details = HfhsPatientDetail.find_by(user_id: user_session.user.id).attributes
+    details.fetch_values(*attrs)
   end
 
   def fill_by_tlfb_research(row_index, user_session)

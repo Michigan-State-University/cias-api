@@ -732,6 +732,17 @@ FactoryBot.define do
     association :question_group
   end
 
+  factory :question_henry_ford_initial, class: Question::HenryFordInitial do
+    title { 'HenryFord Initial' }
+    type { Question::HenryFordInitial }
+    body do
+      {
+        data: []
+      }
+    end
+    association :question_group
+  end
+
   factory :question_henry_ford, class: Question::HenryFord do
     title { 'HenryFord' }
     type { Question::HenryFord }
