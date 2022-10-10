@@ -61,9 +61,7 @@ class Intervention < ApplicationRecord
   def hf_access_change
     return if hfhs_access
 
-    sessions.map(&:questions).flatten.each do |question|
-      question.destroy if question.type == 'Question::HenryFordInitial'
-    end
+    ::Question::HenryFordInitial.joins(:question_group).where(question_groups: { session: sessions }).delete_all
   end
 
   def export_answers_as(type:)
