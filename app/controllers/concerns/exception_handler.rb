@@ -49,6 +49,11 @@ module ExceptionHandler
       notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
+
+    rescue_from ActionController::BadRequest do |exc|
+      notify_airbrake(exc, params.permit!)
+      render json: msg(exc), status: :bad_request
+    end
   end
 
   private
