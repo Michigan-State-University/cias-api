@@ -5,7 +5,7 @@ class Question::HenryFordInitial < Question
 
   def csv_header_names
     session_variable = question_group.session.variable
-    rename_attrs!(csv_decoded_attrs).map { |attr| "#{session_variable}.hfs.#{attr}" }
+    rename_attrs(csv_decoded_attrs).map { |attr| "#{session_variable}.hfs.#{attr}" }
   end
 
   def ability_to_clone?
@@ -16,7 +16,7 @@ class Question::HenryFordInitial < Question
     %w[patient_id first_name last_name sex dob zip_code]
   end
 
-  def rename_attrs!(attrs)
+  def rename_attrs(attrs)
     renamed = { 'sex' => 'gender', 'dob' => 'date_of_birth' }
     attrs.map { |attr| renamed.key?(attr) ? renamed[attr] : attr }
   end

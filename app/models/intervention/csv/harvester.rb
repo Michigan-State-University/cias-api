@@ -160,7 +160,7 @@ class Intervention::Csv::Harvester
     return if patient_details.empty?
 
     session_variable = user_session.session.variable
-    attrs = question.rename_attrs!(attrs)
+    attrs = question.rename_attrs(attrs)
     attrs.each_with_index do |column, index|
       var_index = header.index("#{session_variable}.hfs.#{column}")
       next if var_index.nil?
