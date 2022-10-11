@@ -30,6 +30,7 @@ class Intervention::Csv::Harvester
 
       header.concat(session_times_metadata(session))
       header.concat(quick_exit_header(session))
+      header.concat(hf_headers(session))
     end
 
     header.flatten!
@@ -143,15 +144,23 @@ class Intervention::Csv::Harvester
     value ? 1 : 0
   end
 
+  def hf_headers(session)
+    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: session })
+    return [] if hf_initial_question.nil?
+
+    hf_initial_question.csv_header_names
+  end
+
   def fill_hf_initial_screen(row_index, user_session)
     return unless user_session.session.intervention.hfhs_access
 
-    attrs = Question::HenryFordInitial.csv_decoded_attrs
+    question = ::Question::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
+    attrs = question&.csv_decoded_attrs
     patient_details = patient_details(user_session, attrs)
     return if patient_details.empty?
 
     session_variable = user_session.session.variable
-    attrs = Question::HenryFordInitial.rename_attrs!(attrs)
+    attrs = question.rename_attrs!(attrs)
     attrs.each_with_index do |column, index|
       var_index = header.index("#{session_variable}.hfs.#{column}")
       next if var_index.nil?
