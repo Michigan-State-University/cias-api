@@ -50,8 +50,7 @@ module ExceptionHandler
       render json: msg(exc), status: :unprocessable_entity
     end
 
-    rescue_from ActionController::BadRequest do |exc|
-      notify_airbrake(exc, params.permit!)
+    rescue_from ArgumentError do |exc|
       render json: msg(exc), status: :bad_request
     end
   end
