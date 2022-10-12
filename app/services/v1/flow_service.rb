@@ -24,7 +24,14 @@ class V1::FlowService
   def user_session_question(preview_question_id)
     if user_session.type == 'UserSession::CatMh'
       cat_mh_question = @cat_mh_api.get_next_question(user_session)
-      raise ArgumentError, I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed') if cat_mh_question['status'] >= 400
+      if cat_mh_question['status'] >= 400
+        error_message = {
+          title: I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.title'),
+          body: I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.body'),
+          button: I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.button'),
+        }
+        raise CatMh::ConnectionFailedException, error_message.to_json
+      end
 
       user_session.finish if cat_mh_question['body']['questionID'] == -1
       question = prepare_question(user_session, cat_mh_question['body'])

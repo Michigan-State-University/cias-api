@@ -50,8 +50,11 @@ module ExceptionHandler
       render json: msg(exc), status: :unprocessable_entity
     end
 
-    rescue_from ArgumentError do |exc|
-      render json: msg(exc), status: :bad_request
+    rescue_from CatMh::ConnectionFailedException do |exc|
+      message = msg(exc)
+      message[:message] = JSON.parse(message[:message])
+
+      render json: message, status: :bad_request
     end
   end
 
