@@ -214,8 +214,8 @@ en:
       body: 'Something goes wrong while translating your intervention. Please try again.'
   mailer:
     footnote:
-      not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
-      ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href=\"mailto:cias@msu.edu\">cias@msu.edu</a>. Thank you!<br /><br />"
+      not_reply: 'Please do not reply to this email, which does not accept incoming messages. If you need assistance with this software, please contact the person or group that referred you to this site. Thank you!<br /><br />'
+      ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. If you need assistance with this software, please contact the person or group that referred you to this site. Thank you!<br /><br />"
   navigator_mailer:
     invitation:
       subject: "Welcome to the navigator role in CIAS!"
