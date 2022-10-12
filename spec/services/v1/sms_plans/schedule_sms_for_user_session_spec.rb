@@ -452,6 +452,15 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
           it_behaves_like 'correct sms job queue'
         end
+
+        context 'when guest user' do
+          let!(:user) { create(:user, :guest, first_name: nil, last_name: nil) }
+          let!(:content) do
+            "First name not provided\nLast name not provided\nE-mail not provided\n#{phone.full_number}\n#{sms_plan.no_formula_text}"
+          end
+
+          it_behaves_like 'correct sms job queue'
+        end
       end
     end
   end
