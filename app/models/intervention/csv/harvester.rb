@@ -32,6 +32,7 @@ class Intervention::Csv::Harvester
       header.concat(quick_exit_header(session))
     end
 
+    header.unshift(hf_headers(sessions))
     header.flatten!
     header.unshift(:email)
     header.unshift(:user_id)
@@ -74,6 +75,7 @@ class Intervention::Csv::Harvester
           end
         end
 
+        fill_hf_initial_screen(row_index, user_session)
         fill_by_tlfb_research(row_index, user_session)
         metadata(session_variable, user_session, row_index)
         quick_exit(session_variable, row_index, user_session)
@@ -140,6 +142,37 @@ class Intervention::Csv::Harvester
 
   def boolean_to_int(value)
     value ? 1 : 0
+  end
+
+  def hf_headers(sessions)
+    return [] unless sessions.first&.intervention&.hfhs_access
+
+    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: sessions })
+    return [] if hf_initial_question.nil?
+
+    hf_initial_question.csv_header_names
+  end
+
+  def fill_hf_initial_screen(row_index, user_session)
+    return unless user_session.session.intervention.hfhs_access
+
+    question = ::Question::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
+    attrs = question&.csv_decoded_attrs
+    patient_details = patient_details(user_session, attrs)
+    return if patient_details.empty?
+
+    attrs = question.rename_attrs(attrs)
+    attrs.each_with_index do |column, index|
+      var_index = header.index("hfh.#{column}")
+      next if var_index.nil?
+
+      rows[row_index][var_index] = patient_details[index]
+    end
+  end
+
+  def patient_details(user_session, attrs)
+    details = HfhsPatientDetail.find_by(user_id: user_session.user.id).attributes
+    details.fetch_values(*attrs)
   end
 
   def fill_by_tlfb_research(row_index, user_session)

@@ -103,7 +103,7 @@ class Session::Classic < Session
   end
 
   def digit_variable_questions
-    %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number Question::HenryFord]
+    %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number]
   end
 
   def present_variables(variables)
