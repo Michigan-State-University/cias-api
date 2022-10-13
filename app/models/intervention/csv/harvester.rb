@@ -23,16 +23,25 @@ class Intervention::Csv::Harvester
   private
 
   def set_headers
+    hfh_headers = []
     sessions.order(:position).each do |session|
+      hfh_headers << hf_headers(session)
       session.fetch_variables.each do |question_hash|
-        question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var) }
+        question_hash[:variables].each do |var|
+          csv_header = add_session_variable_to_question_variable(session, var)
+          if var.start_with?('hfh.')
+            hfh_headers << csv_header
+          else
+            header << csv_header
+          end
+        end
       end
 
       header.concat(session_times_metadata(session))
       header.concat(quick_exit_header(session))
-      header.concat(hf_headers(session))
     end
 
+    header.unshift(hfh_headers)
     header.flatten!
     header.unshift(:email)
     header.unshift(:user_id)
@@ -145,6 +154,8 @@ class Intervention::Csv::Harvester
   end
 
   def hf_headers(session)
+    return [] unless session.intervention.hfhs_access
+
     hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: session })
     return [] if hf_initial_question.nil?
 
@@ -162,7 +173,7 @@ class Intervention::Csv::Harvester
     session_variable = user_session.session.variable
     attrs = question.rename_attrs(attrs)
     attrs.each_with_index do |column, index|
-      var_index = header.index("#{session_variable}.hfs.#{column}")
+      var_index = header.index("#{session_variable}.hfh.#{column}")
       next if var_index.nil?
 
       rows[row_index][var_index] = patient_details[index]

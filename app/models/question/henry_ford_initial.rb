@@ -5,7 +5,7 @@ class Question::HenryFordInitial < Question
 
   def csv_header_names
     session_variable = question_group.session.variable
-    rename_attrs(csv_decoded_attrs).map { |attr| "#{session_variable}.hfs.#{attr}" }
+    rename_attrs(csv_decoded_attrs).map { |attr| "#{session_variable}.hfh.#{attr}" }
   end
 
   def ability_to_clone?
