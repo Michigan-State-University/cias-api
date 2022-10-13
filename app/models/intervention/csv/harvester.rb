@@ -28,11 +28,11 @@ class Intervention::Csv::Harvester
         question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var) }
       end
 
-      header.concat(hf_headers(session))
       header.concat(session_times_metadata(session))
       header.concat(quick_exit_header(session))
     end
 
+    header.unshift(hf_headers(sessions))
     header.flatten!
     header.unshift(:email)
     header.unshift(:user_id)
@@ -144,10 +144,10 @@ class Intervention::Csv::Harvester
     value ? 1 : 0
   end
 
-  def hf_headers(session)
-    return [] unless session.intervention.hfhs_access
+  def hf_headers(sessions)
+    return [] unless sessions.first.intervention.hfhs_access
 
-    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: session })
+    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: sessions })
     return [] if hf_initial_question.nil?
 
     hf_initial_question.csv_header_names
