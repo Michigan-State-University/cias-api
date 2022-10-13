@@ -874,9 +874,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
           it 'save header and the value to csv' do
             subject.collect
-            expect(subject.header).to include(:user_id, :email, "#{session.variable}.hfh.patient_id", "#{session.variable}.hfh.first_name",
-                                              "#{session.variable}.hfh.last_name", "#{session.variable}.hfh.gender", "#{session.variable}.hfh.date_of_birth",
-                                              "#{session.variable}.hfh.zip_code", "#{session.variable}.metadata.session_start",
+            expect(subject.header).to include(:user_id, :email, 'hfh.patient_id', 'hfh.first_name', 'hfh.last_name', 'hfh.gender',
+                                              'hfh.date_of_birth', 'hfh.zip_code', "#{session.variable}.metadata.session_start",
                                               "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration")
 
             expect(subject.rows.first).to include(user.id, user.email, patient_details.patient_id, patient_details.first_name, patient_details.last_name,

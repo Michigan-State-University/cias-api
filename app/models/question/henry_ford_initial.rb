@@ -4,8 +4,7 @@ class Question::HenryFordInitial < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
   def csv_header_names
-    session_variable = question_group.session.variable
-    rename_attrs(csv_decoded_attrs).map { |attr| "#{session_variable}.hfh.#{attr}" }
+    rename_attrs(csv_decoded_attrs).map { |attr| "hfh.#{attr}" }
   end
 
   def ability_to_clone?
