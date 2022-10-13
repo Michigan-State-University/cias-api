@@ -51,8 +51,7 @@ module ExceptionHandler
     end
 
     rescue_from CatMh::ConnectionFailedException do |exc|
-      message = msg(exc)
-      message[:message] = JSON.parse(message[:message])
+      message = { title: exc.title_text, body: exc.body_text, button: exc.button_text }
 
       render json: message, status: :bad_request
     end
