@@ -176,7 +176,7 @@ class DBSeed
 
   if example_user
     p "Example user email: #{example_user.email}"
-    p 'Example user password: You know it ;)'
+    p 'Example user password: Super secret env variable ;)'
   end
   # rubocop:enable Rails/Output
 end
