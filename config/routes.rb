@@ -18,6 +18,17 @@ Rails.application.routes.draw do
       sessions: 'v1/auth/sessions'
     }
 
+    concern :narrator_changeable do |options|
+      member do
+        resources :change_narrator,
+                  only: %i[create],
+                  param: :object_id,
+                  defaults: options,
+                  as: "#{options[:_as] ||options[:_model].tableize}_narrator",
+                  controller: 'narrator'
+      end
+    end
+
     scope :users do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
@@ -37,6 +48,7 @@ Rails.application.routes.draw do
     resources :preview_session_users, only: :create
 
     resources :interventions, only: %i[index show create update] do
+      concerns :narrator_changeable, { _model: 'Intervention' }
       post 'clone', on: :member
       post 'export', on: :member
       scope module: 'interventions' do
@@ -48,7 +60,9 @@ Rails.application.routes.draw do
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
-      resources :sessions, only: %i[index show create update destroy]
+      resources :sessions, only: %i[index show create update destroy] do
+        concerns :narrator_changeable, { _model: 'Session' }
+      end
     end
 
     scope 'interventions/:interventions_id', as: 'intervention' do
