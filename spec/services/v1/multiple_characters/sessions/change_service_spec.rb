@@ -22,10 +22,10 @@ RSpec.describe V1::MultipleCharacters::Sessions::ChangeService do
                                            'sha256' => ['5b90b52baf4f794327162dd801834ecc1991a7f93801223c3f20ffa0fa501633'],
                                            'animation' => 'pointDown',
                                            'audio_urls' =>
-                                            ['/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTXpsak9XSXdPUzFqTlRsbExUUmpaall0WVdWaVlTMWhObU13WXpRNU1EZ3lPR01HT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--edeed6ebd04f14d6f501256ce459a36ece691a80/5b90b52baf4f794327162dd801834ecc1991a7f93801223c3f20ffa0fa501633.mp3'],
+                                            ['/rails/active_storage/blobs/redirect/example.mp3'],
                                            'endPosition' => { 'x' => 600, 'y' => 550 } },
-                                         { 'text' => [], 'type' => 'Speech', 'action' => 'NO_ACTION', 'sha256' => [], 'animation' => 'listen', 'audio_urls' => [],
-                                           'endPosition' => { 'x' => 600, 'y' => 550 } },
+                                         { 'text' => [], 'type' => 'Speech', 'action' => 'NO_ACTION', 'sha256' => [], 'animation' => 'listen',
+                                           'audio_urls' => [], 'endPosition' => { 'x' => 600, 'y' => 550 } },
                                          { 'type' => 'BodyAnimation', 'animation' => 'congratulate', 'endPosition' => { 'x' => 600, 'y' => 550 } },
                                          { 'type' => 'Pause', 'animation' => 'standStill', 'endPosition' => { 'x' => 600, 'y' => 550 }, 'pauseDuration' => 2 },
                                          { 'type' => 'HeadAnimation', 'animation' => 'eatCracker', 'endPosition' => { 'x' => 600, 'y' => 550 } }],
