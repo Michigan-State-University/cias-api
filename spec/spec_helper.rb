@@ -22,6 +22,7 @@ require 'faker'
 require 'active_storage_validations/matchers'
 require 'rake'
 require 'rspec-benchmark'
+require 'benchmark/ips'
 
 class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   def audio_content

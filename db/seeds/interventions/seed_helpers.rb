@@ -1,12 +1,28 @@
 # frozen_string_literal: true
 
+# rubocop:disable Rails/Output
+def create_participants_and_researchers(participant_num, researcher_num)
+  users_settings = [
+    { role: 'participant', num_to_create: participant_num },
+    { role: 'researcher', num_to_create: researcher_num }
+  ]
+
+  users_settings.each do |users|
+    users[:num_to_create].times do |index|
+      create_user(users[:role])
+      p "#{index + 1}/#{users[:num_to_create]} #{users[:role]}s created"
+    end
+  end
+end
+# rubocop:enable Rails/Output
+
 def create_user(roles, email = nil, password = nil)
   roles = Array(roles)
   create(
     :user,
     :confirmed,
     email: email || "#{Time.current.to_i}_#{SecureRandom.hex(10)}@#{roles[0]}.true",
-    password: password || 'Password1!',
+    password: password || "#{Faker::Alphanumeric.alphanumeric(number: 10).capitalize}!@#",
     first_name: Faker::Name.first_name,
     last_name: Faker::Name.last_name,
     roles: roles
@@ -37,7 +53,7 @@ def create_variable(position, position_extra = nil)
 end
 
 def assign_data_to_answer(answer, question)
-  var_name = question.csv_header_names&.sample
+  var_name = question.question_variables&.sample
   data = []
   case question.type
   when 'Question::Date'
@@ -52,7 +68,8 @@ def assign_data_to_answer(answer, question)
   data << { var: var_name, value: value }
 
   if question.type == 'Question::Grid' || question.type == 'Question::Multiple'
-    var_name = question.csv_header_names
+    data = []
+    var_name = question.question_variables
     var_name.each do |var|
       data << { 'var' => var, 'value' => rand(1..5).to_s }
     end
@@ -82,11 +99,9 @@ def create_branching(question, paths, max_branches)
 end
 
 def branchable_question?(current_question, branch_question)
-  return false if current_question.id == branch_question.id
-
   current_question.position < branch_question.position
 end
 
-def q_groups_from_interv_excluding(property)
-  Intervention.where.not(property).flat_map(&:sessions).flat_map(&:question_groups)
+def q_groups_from_intervention(exclude = {})
+  Intervention.where.not(exclude).flat_map(&:sessions).flat_map(&:question_groups)
 end

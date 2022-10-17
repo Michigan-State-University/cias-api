@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
-require 'benchmark/ips'
-
 RSpec.describe 'Benchmark', type: :request do
-  context 'Interventions' do
-    let!(:user) { create(:user, :confirmed, :admin) }
+  context 'v1/interventions #index' do
+    let!(:admin) { create(:user, :confirmed, :admin) }
     let!(:params_long) { { start_index: 0, end_index: 49 } }
     let!(:params_short) { { start_index: 0, end_index: 24 } }
-    let!(:headers) { user.create_new_auth_token }
-    let!(:interventions) { create_list(:intervention, 50, :published, user_id: user.id) }
+    let!(:headers) { admin.create_new_auth_token }
+    let!(:interventions) { create_list(:intervention, 50, :published, user_id: admin.id) }
 
-    it 'give a proper benchmark' do
+    it 'gives a proper benchmark' do
+      puts "\nEndpoint: v1/interventions #index"
       Benchmark.ips do |x|
         x.config(time: 5, warmup: 2)
 
