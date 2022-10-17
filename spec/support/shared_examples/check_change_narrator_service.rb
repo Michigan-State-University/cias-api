@@ -11,7 +11,7 @@ RSpec.shared_examples 'check change narrator service' do
   end
   let!(:question) do
     create(:question_single, question_group: question_group,
-           narrator: { 'blocks' =>
+                             narrator: { 'blocks' =>
                          [{ 'text' => ['Enter main text/question for screen here'],
                             'type' => 'ReadQuestion',
                             'action' => 'NO_ACTION',
@@ -25,7 +25,7 @@ RSpec.shared_examples 'check change narrator service' do
                           { 'type' => 'BodyAnimation', 'animation' => 'congratulate', 'endPosition' => { 'x' => 600, 'y' => 550 } },
                           { 'type' => 'Pause', 'animation' => 'standStill', 'endPosition' => { 'x' => 600, 'y' => 550 }, 'pauseDuration' => 2 },
                           { 'type' => 'HeadAnimation', 'animation' => 'eatCracker', 'endPosition' => { 'x' => 600, 'y' => 550 } }],
-                       'settings' => { 'voice' => true, 'animation' => true, 'character' => 'peedy' } })
+                                         'settings' => { 'voice' => true, 'animation' => true, 'character' => 'peedy' } })
   end
 
   context 'when all params are valid it narrator updated correctly' do
