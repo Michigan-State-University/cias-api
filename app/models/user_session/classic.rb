@@ -32,14 +32,12 @@ class UserSession::Classic < UserSession
     update(finished_at: DateTime.current)
     reload
 
-    GenerateUserSessionReportsJob.perform_later(id)
-
     decrement_audio_usage
     V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
     V1::ChartStatistics::CreateForUserSession.call(self)
 
-    # Hfhs::SendAnswersJob.perform_later(id) if session.intervention.hfhs_access?
+    AfterFinishUserSessionJob.perform_later(id, session.intervention)
 
     update_user_intervention(session_is_finished: true)
   end

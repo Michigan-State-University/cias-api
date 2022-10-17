@@ -19,8 +19,8 @@ class Api::Hfhs::Reports
 
     baerer_token = "#{token[:token_type]}  #{token[:access_token]}"
 
-    generated_reports.each do |generate_report|
-      @hl7_data = Hl7::GeneratedReportMapper.call(user_session_id, generate_report.id)
+    generated_reports.each do |generated_report|
+      @hl7_data = Hl7::GeneratedReportMapper.call(user_session_id, generated_report.id)
       send_data!(baerer_token)
     end
   end
@@ -30,11 +30,13 @@ class Api::Hfhs::Reports
   private
 
   def generated_reports
-    @generated_reports ||= user_session.generated_reports.where(report_for: 'henry_ford_hospital')
+    @generated_reports ||= user_session.generated_reports.where(report_for: 'henry_ford_health')
   end
 
   def send_data!(token)
-    Faraday.post(ENDPOINT) do |request|
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+
+    connection.post do |request|
       request.headers['Content-Type'] = 'application/json'
       request.headers['Authorization'] = token
       request.body = body

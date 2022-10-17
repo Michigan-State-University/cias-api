@@ -19,7 +19,9 @@ class Api::Hfhs::UserSession
 
     baerer_token = "#{token[:token_type]} #{token[:access_token]}"
 
-    Faraday.post(ENDPOINT) do |request|
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+
+    connection.post do |request|
       request.headers['Content-Type'] = 'application/json'
       request.headers['Authorization'] = baerer_token
       request.body = body
@@ -34,7 +36,7 @@ class Api::Hfhs::UserSession
     {
       'patient_id' => patient_id,
       'data' => hl7_data
-    }
+    }.to_json
   end
 
   def user_session
