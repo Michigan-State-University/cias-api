@@ -105,7 +105,7 @@ FactoryBot.define do
     end
     factory :answer_henry_ford_initial, class: Answer::HenryFordInitial do
       type { Answer::HenryFordInitial }
-      association :question, factory: :question_henry_ford_initial
+      association :question, factory: :question_henry_ford_initial_screen
     end
   end
 end

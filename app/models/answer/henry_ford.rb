@@ -2,6 +2,6 @@
 
 class Answer::HenryFord < Answer
   def csv_header_name(data)
-    "hfh.#{data['var']}"
+    "henry_ford_health.#{data['var']}"
   end
 end

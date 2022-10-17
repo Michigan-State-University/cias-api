@@ -16,4 +16,8 @@ class Question::Name < Question
   def question_variables
     ['.:name:.']
   end
+
+  def ability_to_clone?
+    false
+  end
 end

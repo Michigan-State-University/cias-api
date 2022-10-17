@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::DuplicateWithStructureService
+  UNIQ_QUESTIONS = %w[Question::Name Question::HenryFordInitial].freeze
+  SKIPPABLE_QUESTIONS = %w[Question::HenryFordInitial].freeze
+
   def self.call(session, selected_groups_with_questions)
     new(session, selected_groups_with_questions).call
   end
@@ -44,7 +47,13 @@ class V1::QuestionGroup::DuplicateWithStructureService
   def create_selected_questions_and_assign_to_group(selected_group, question_ids, question_group)
     position = question_group.questions.count + 1
     question_ids.each do |question_id|
-      question_group.questions << Clone::Question.new(selected_group.questions.find(question_id), clean_formulas: true, position: position).execute
+      question = selected_group.questions.find(question_id)
+      session = question_group.session
+      next if skip_question?(question, session.intervention)
+
+      validate_uniqueness_of_question(question, session)
+
+      question_group.questions << Clone::Question.new(question, clean_formulas: true, position: position).execute
       position += 1
     end
   end
@@ -55,5 +64,28 @@ class V1::QuestionGroup::DuplicateWithStructureService
     raise ArgumentError, I18n.t('duplication_with_structure.wrong_sessions') if sessions.count != target_session_ids.size
 
     sessions
+  end
+
+  def validate_uniqueness_of_question(question, session)
+    return unless question.type.in?(UNIQ_QUESTIONS)
+
+    raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session(question, session)
+    raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness(question,
+                                                                                                                                   session.intervention)
+  end
+
+  def uniq_question_already_in_session(question, session)
+    session.questions.where(type: question.type).any? && question.type.in?(UNIQ_QUESTIONS)
+  end
+
+  def validate_hfhs_access_and_uniqueness(question, intervention)
+    return true unless question.type.eql?('Question::HenryFordInitial')
+    return false unless intervention.hfhs_access?
+
+    intervention.hfhs_access? && session.questions.where(type: question.type).blank?
+  end
+
+  def skip_question?(question, intervention)
+    question.type.in?(SKIPPABLE_QUESTIONS) && !intervention.hfhs_access?
   end
 end

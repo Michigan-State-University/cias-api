@@ -66,4 +66,36 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
       expect { subject.call }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  context 'when whe want duplicate uniq question per session' do
+    let!(:question3) { create(:question_name, question_group: question_group) }
+
+    it 'raise exception' do
+      expect { subject.call }.to raise_error(ArgumentError)
+    end
+
+    context 'henry ford health - initial screen and default intervention don\'t have access to HFHS -> initial screen should be skipped ' do
+      let(:intervention) { create(:intervention) }
+      let!(:target_session) { create(:session, intervention: intervention) }
+      let!(:question3) { create(:question_henry_ford_initial_screen, question_group: question_group) }
+      let(:selected_groups_with_questions) do
+        [
+          { 'id' => question_group.id, 'question_ids' => [question1.id, question3.id] }
+        ]
+      end
+
+      it 'raise exception' do
+        expect(subject.call.first.questions_count).to eq 1
+      end
+    end
+
+    context 'henry ford health - two initial screen' do
+      let!(:intervention) { create(:intervention, hfhs_access: true) }
+      let!(:question3) { create(:question_henry_ford_initial_screen, question_group: question_group) }
+
+      it 'raise exception' do
+        expect { subject.call }.to raise_error(ArgumentError)
+      end
+    end
+  end
 end

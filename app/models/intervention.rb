@@ -59,6 +59,7 @@ class Intervention < ApplicationRecord
   end
 
   def hf_access_change
+    return unless saved_change_to_attribute?(:hfhs_access)
     return if hfhs_access
 
     ::Question::HenryFordInitial.joins(:question_group).where(question_groups: { session: sessions }).delete_all

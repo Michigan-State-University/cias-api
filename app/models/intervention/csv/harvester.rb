@@ -163,7 +163,7 @@ class Intervention::Csv::Harvester
 
     attrs = question.rename_attrs(attrs)
     attrs.each_with_index do |column, index|
-      var_index = header.index("hfh.#{column}")
+      var_index = header.index("henry_ford_health.#{column}")
       next if var_index.nil?
 
       rows[row_index][var_index] = patient_details[index]

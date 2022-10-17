@@ -869,14 +869,15 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         let!(:patient_details) { user.hfhs_patient_detail }
 
         context 'initial screen' do
-          let!(:question) { create(:question_henry_ford_initial, question_group: question_group) }
+          let!(:question) { create(:question_henry_ford_initial_screen, question_group: question_group) }
           let!(:answer) { create(:answer_henry_ford_initial, question: question, user_session: user_session) }
 
           it 'save header and the value to csv' do
             subject.collect
-            expect(subject.header).to include(:user_id, :email, 'hfh.patient_id', 'hfh.first_name', 'hfh.last_name', 'hfh.gender',
-                                              'hfh.date_of_birth', 'hfh.zip_code', "#{session.variable}.metadata.session_start",
-                                              "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration")
+            expect(subject.header).to include(:user_id, :email, 'henry_ford_health.patient_id', 'henry_ford_health.first_name', 'henry_ford_health.last_name',
+                                              'henry_ford_health.gender', 'henry_ford_health.date_of_birth', 'henry_ford_health.zip_code',
+                                              "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                              "#{session.variable}.metadata.session_duration")
 
             expect(subject.rows.first).to include(user.id, user.email, patient_details.patient_id, patient_details.first_name, patient_details.last_name,
                                                   patient_details.dob, patient_details.sex, patient_details.zip_code, user_session.created_at, nil, nil)
@@ -908,7 +909,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
           it 'save every variables and scores to csv' do
             subject.collect
-            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.hfh.test_hf", "#{session.variable}.metadata.session_start",
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.henry_ford_health.test_hf", "#{session.variable}.metadata.session_start",
                                           "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
             expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
           end

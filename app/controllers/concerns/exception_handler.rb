@@ -49,6 +49,10 @@ module ExceptionHandler
       notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
+
+    rescue_from ArgumentError do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
   end
 
   private
