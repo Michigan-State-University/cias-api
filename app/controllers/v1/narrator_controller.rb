@@ -20,7 +20,6 @@ class V1::NarratorController < V1Controller
   end
 
   def narrator_params
-    # require 'pry'; binding.pry
     params.require(:narrator).permit(:name, replaced_animations: {})
   end
 
