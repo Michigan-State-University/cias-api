@@ -24,7 +24,7 @@ Rails.application.routes.draw do
                   only: %i[create],
                   param: :object_id,
                   defaults: options,
-                  as: "#{options[:_as] ||options[:_model].tableize}_narrator",
+                  as: "#{options[:_as] || options[:_model].tableize}_narrator",
                   controller: 'narrator'
       end
     end
