@@ -68,4 +68,13 @@ RSpec.describe CloneJobs::Intervention, type: :job do
                                                                    )
     end
   end
+
+  context 'Intervention with HFH access' do
+    let!(:intervention) { create(:intervention, user: user, status: 'published', hfhs_access: true) }
+
+    it 'does not copy over the HFH access setting' do
+      subject
+      expect(Intervention.order(:created_at).last.attributes['hfhs_access']).not_to eq true
+    end
+  end
 end
