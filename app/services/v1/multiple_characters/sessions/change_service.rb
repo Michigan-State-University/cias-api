@@ -22,7 +22,7 @@ class V1::MultipleCharacters::Sessions::ChangeService
 
     session.questions.each do |question|
       update_character(question)
-      update_blocks(question)
+      update_blocks(question) if replacement_animations.present?
 
       question.save!
     end
