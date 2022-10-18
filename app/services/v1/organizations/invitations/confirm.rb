@@ -30,9 +30,7 @@ class V1::Organizations::Invitations::Confirm
   def set_pending_e_intervention_admin
     return unless user.role?('researcher') && !user.role?('e_intervention_admin')
 
-    if can_be_e_intervention_admin?
-      user.update!(roles: user.roles << 'e_intervention_admin')
-    end
+    user.update!(roles: user.roles << 'e_intervention_admin') if can_be_e_intervention_admin?
   end
 
   def can_be_e_intervention_admin?
