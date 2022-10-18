@@ -5,8 +5,10 @@ class NotificationChannel < ApplicationCable::Channel
 
   def subscribed
     stream_from user_channel_id
-    current_user.update!(online: true)
-    update_navigator_availability
+    unless current_user.navigator? && (current_user.researcher? || current_user.admin?)
+      current_user.update!(online: true)
+      update_navigator_availability
+    end
     ensure_confirmation_sent
     return_unread_notifications
   end
@@ -19,6 +21,11 @@ class NotificationChannel < ApplicationCable::Channel
 
   def on_read_notification(data)
     Notification.find(data['notificationId']).mark_as_readed
+  end
+
+  def on_navigator_availability_set(data)
+    current_user.update!(online: data['online'])
+    update_navigator_availability
   end
 
   private
