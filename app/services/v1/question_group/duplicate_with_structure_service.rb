@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::DuplicateWithStructureService
-  UNIQ_QUESTIONS = %w[Question::Name Question::HenryFordInitial].freeze
+  UNIQ_QUESTIONS = %w[Question::Name Question::HenryFordInitial Question::ParticipantReport Question::Phone].freeze
   SKIPPABLE_QUESTIONS = %w[Question::HenryFordInitial].freeze
 
   def self.call(session, selected_groups_with_questions)
