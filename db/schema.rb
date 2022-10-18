@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_18_103455) do
+ActiveRecord::Schema.define(version: 2022_10_18_070738) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -351,6 +351,28 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
   end
 
+  create_table "hfhs_patient_details", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "patient_id_ciphertext"
+    t.string "first_name_ciphertext", null: false
+    t.string "last_name_ciphertext", null: false
+    t.string "dob_ciphertext", null: false
+    t.string "sex_ciphertext", null: false
+    t.string "visit_id_ciphertext", default: ""
+    t.string "zip_code_ciphertext", default: "", null: false
+    t.string "patient_id_bidx"
+    t.string "first_name_bidx"
+    t.string "last_name_bidx"
+    t.string "dob_bidx"
+    t.string "sex_bidx"
+    t.string "zip_code_bidx"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.uuid "user_id"
+    t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
+    t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
+    t.index ["user_id"], name: "index_hfhs_patient_details_on_user_id"
+  end
+
   create_table "intervention_accesses", force: :cascade do |t|
     t.uuid "intervention_id", null: false
     t.string "email", null: false
@@ -382,6 +404,8 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
+    t.boolean "hfhs_access", default: false
+    t.integer "current_narrator", default: 0
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -410,6 +434,51 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "phone_ciphertext"
+  end
+
+  create_table "oauth_access_grants", force: :cascade do |t|
+    t.bigint "resource_owner_id"
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.integer "expires_in", null: false
+    t.text "redirect_uri", null: false
+    t.datetime "created_at", null: false
+    t.datetime "revoked_at"
+    t.string "scopes", default: "", null: false
+    t.index ["application_id"], name: "index_oauth_access_grants_on_application_id"
+    t.index ["resource_owner_id"], name: "index_oauth_access_grants_on_resource_owner_id"
+    t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true
+  end
+
+  create_table "oauth_access_tokens", force: :cascade do |t|
+    t.bigint "resource_owner_id"
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.string "refresh_token"
+    t.integer "expires_in"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.string "scopes"
+    t.string "previous_refresh_token", default: "", null: false
+    t.index ["application_id"], name: "index_oauth_access_tokens_on_application_id"
+    t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
+    t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
+    t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
+  end
+
+  create_table "oauth_applications", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "uid", null: false
+    t.string "secret", null: false
+    t.text "redirect_uri"
+    t.string "scopes", default: "", null: false
+    t.boolean "confidential", default: true, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "owner_id"
+    t.string "owner_type"
+    t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
+    t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -544,6 +613,7 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.bigint "cat_mh_time_frame_id"
     t.bigint "cat_mh_population_id"
     t.integer "estimated_time"
+    t.integer "current_narrator", default: 0
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -778,11 +848,14 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
   add_foreign_key "downloaded_reports", "users"
   add_foreign_key "events", "days"
   add_foreign_key "google_languages", "google_tts_languages"
+  add_foreign_key "hfhs_patient_details", "users"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"

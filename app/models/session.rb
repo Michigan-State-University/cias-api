@@ -30,6 +30,7 @@ class Session < ApplicationRecord
                    after_fill: 'after_fill',
                    days_after_date: 'days_after_date' },
        _prefix: :schedule
+  enum current_narrator: ::Intervention::current_narrators
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention

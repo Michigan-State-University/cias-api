@@ -8,4 +8,14 @@ RSpec.describe V1::MultipleCharacters::Interventions::ChangeService do
   let(:intervention_id) { intervention.id }
 
   it_behaves_like 'check change narrator service'
+
+  context 'update current narrator' do
+    let(:new_character) { 'emmi' }
+    let(:replacement_animations) { { 'rest' => 'restWeightShift' } }
+
+    it do
+      subject
+      expect(intervention.reload.current_narrator).to eql(new_character)
+    end
+  end
 end

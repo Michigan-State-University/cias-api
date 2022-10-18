@@ -44,6 +44,7 @@ class Intervention < ApplicationRecord
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
+  enum current_narrator: { peedy: 0, emmi: 1 }
 
   before_validation :assign_default_google_language
   after_update_commit :status_change

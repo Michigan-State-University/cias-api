@@ -26,6 +26,8 @@ class V1::MultipleCharacters::Sessions::ChangeService
 
       question.save!
     end
+
+    session.update!(current_narrator: new_character)
   end
 
   private
