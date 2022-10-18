@@ -19,7 +19,6 @@ class V1::Organizations::InviteEInterventionAdmin
                               active: false)
       organization.e_intervention_admins << new_user
     else
-      set_researcher_as_e_intervention_admin
       organization.e_intervention_admin_organizations << EInterventionAdminOrganization.new(user: user, organization: organization)
       V1::Organizations::Invitations::Create.call(organization, user)
     end
@@ -35,10 +34,6 @@ class V1::Organizations::InviteEInterventionAdmin
 
   def user_is_not_researcher?
     user&.roles&.exclude?('researcher')
-  end
-
-  def set_researcher_as_e_intervention_admin
-    user.update!(roles: user.roles << 'e_intervention_admin') if user.roles.include?('researcher')
   end
 
   def user
