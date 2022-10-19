@@ -391,8 +391,8 @@ ActiveRecord::Schema.define(version: 2022_10_18_070738) do
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
-    t.integer "current_narrator", default: 0
     t.boolean "live_chat_enabled", default: false, null: false
+    t.integer "current_narrator", default: 0
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
