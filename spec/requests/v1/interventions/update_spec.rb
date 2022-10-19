@@ -291,4 +291,52 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
 
     it { expect(response).to have_http_status(:forbidden) }
   end
+
+  context 'live_chat' do
+    context 'when intervention closed/archived and live chat enabled' do
+      let(:user) { create(:user, :admin, :confirmed) }
+      let(:intervention) { create(:intervention, user: user, status: 'closed') }
+      let(:headers) { user.create_new_auth_token }
+      let(:params) do
+        {
+          intervention: {
+            live_chat_enabled: true
+          }
+        }
+      end
+
+      before { request }
+
+      it 'returns correct status code (Unprocessable entity)' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'sends validation error message' do
+        expect(json_response['message']).to eq 'Validation failed: Live chat cannot be turned on for closed or archived interventions.'
+      end
+    end
+
+    context 'when intervention draft or active' do
+      let(:user) { create(:user, :admin, :confirmed) }
+      let(:intervention) { create(:intervention, user: user, status: 'draft') }
+      let(:headers) { user.create_new_auth_token }
+      let(:params) do
+        {
+          intervention: {
+            live_chat_enabled: true
+          }
+        }
+      end
+
+      before { request }
+
+      it 'returns correct status code (OK)' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns live chat setting' do
+        expect(json_response['data']['attributes']).to include('live_chat_enabled' => true)
+      end
+    end
+  end
 end

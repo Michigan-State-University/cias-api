@@ -23,16 +23,11 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:csv_attachment) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }
 
   let(:attrs) { json_response['data']['attributes'] }
-  let(:response_sessions) { json_response['data']['relationships']['sessions']['data'] }
 
   context 'when user' do
     before { get v1_intervention_path(intervention.id), headers: user.create_new_auth_token }
 
     shared_examples 'permitted user' do
-      it 'contains proper sessions collection' do
-        expect(response_sessions.size).to eq sessions.size and expect(attrs['sessions_size']).to eq sessions.size
-      end
-
       it 'conteins information about first session language' do
         expect(attrs).to include(
           'first_session_language' => 'English (United States)'
@@ -141,10 +136,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
       context 'intervention belongs to him' do
         let(:intervention_user) { researcher }
-
-        it 'contains proper sessions collection' do
-          expect(response_sessions.size).to eq 2 and expect(attrs['sessions_size']).to eq 2
-        end
 
         context 'when intervention does not contain any report' do
           it 'contains proper attributes' do

@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-RSpec.describe 'DELETE /v1/teams/:team_id/remove_researcher', type: :request do
-  let(:request) { delete v1_team_remove_researcher_path(team_id: team.id), params: params, headers: headers }
+RSpec.describe 'DELETE /v1/teams/:team_id/remove_team_member', type: :request do
+  let(:request) { delete v1_team_remove_team_member_path(team_id: team.id), params: params, headers: headers }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
@@ -39,6 +39,15 @@ RSpec.describe 'DELETE /v1/teams/:team_id/remove_researcher', type: :request do
         it 'team admin is not removed from the team' do
           expect { request }.not_to change { user.reload.team_id }
           expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context 'user is navigator' do
+        let(:team_user) { create(:user, :confirmed, :navigator, team_id: team.id) }
+
+        it 'removes reseacher from the team' do
+          expect { request }.to change { team_user.reload.team_id }.from(team.id).to(nil)
+          expect(response).to have_http_status(:ok)
         end
       end
     end

@@ -88,6 +88,38 @@ describe 'PATCH /v1/users/:id', type: :request do
             )
           end
         end
+
+        context 'with invalid first_name and last_name params' do
+          let(:params) do
+            {
+              user: {
+                first_name: '',
+                last_name: ''
+              }
+            }
+          end
+
+          it { expect(response).to have_http_status(:bad_request) }
+
+          it 'contains correct error message' do
+            expect(json_response['message']).to include 'First name cannot be blank'
+          end
+
+          context 'after change in params' do
+            let(:params) do
+              {
+                user: {
+                  first_name: 'Jan',
+                  last_name: ''
+                }
+              }
+            end
+
+            it 'contains correct error message' do
+              expect(json_response['message']).to include 'Last name cannot be blank'
+            end
+          end
+        end
       end
 
       context 'when current_user updates other user' do

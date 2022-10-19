@@ -69,7 +69,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
             'attributes' => include(
               'email' => team_2_admin.email,
               'full_name' => team_2_admin.full_name,
-              'roles' => ['team_admin'],
+              'roles' => %w[researcher team_admin],
               'team_id' => nil,
               'admins_team_ids' => [team2.id]
             )
@@ -79,7 +79,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
             'attributes' => include(
               'email' => team_1_admin.email,
               'full_name' => team_1_admin.full_name,
-              'roles' => ['team_admin'],
+              'roles' => %w[researcher team_admin],
               'team_id' => nil,
               'admins_team_ids' => [team1.id]
             )
@@ -171,7 +171,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
           'attributes' => include(
             'email' => team_1_admin.email,
             'full_name' => team_1_admin.full_name,
-            'roles' => ['team_admin'],
+            'roles' => %w[researcher team_admin],
             'team_id' => nil,
             'admins_team_ids' => [team1.id]
           )

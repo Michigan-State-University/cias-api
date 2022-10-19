@@ -25,6 +25,12 @@ class Ability::Researcher < Ability::Base
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability)
     can :manage, Invitation, invitable_type: 'Intervention', invitable_id: Intervention.accessible_by(ability)
     can :manage, InterventionAccess, intervention: { user_id: user.id }
+    can %i[read get_protected_attachment], GeneratedReport,
+        user_session: { session: { intervention: { user_id: user.id } } }
+    can :get_user_answers, Answer, user_session: { session: { intervention: { user_id: user.id } } }
+    can %i[index create generate_transcript], LiveChat::Conversation
+    can :read, LiveChat::Interventions::NavigatorSetup, intervention: { user_id: user.id }
+    can :delete, LiveChat::Interventions::Link
 
     enable_questions_access(user.id)
     enable_report_template_access(user.id)

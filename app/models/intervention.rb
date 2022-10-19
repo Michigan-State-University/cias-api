@@ -14,6 +14,11 @@ class Intervention < ApplicationRecord
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :intervention_accesses, dependent: :destroy
+  has_one :navigator_setup, class_name: 'LiveChat::Interventions::NavigatorSetup', dependent: :destroy
+  has_many :conversations, class_name: 'LiveChat::Conversation', dependent: :restrict_with_exception
+  has_many :live_chat_navigator_invitations, class_name: 'LiveChat::Interventions::NavigatorInvitation', dependent: :destroy
+  has_many :intervention_navigators, class_name: 'LiveChat::Interventions::Navigator', dependent: :destroy
+  has_many :navigators, through: :intervention_navigators, source: :user
 
   has_many_attached :reports
   has_many_attached :files
@@ -21,6 +26,7 @@ class Intervention < ApplicationRecord
 
   has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
+  has_one_attached :conversations_transcript, dependent: :purge_later
 
   attribute :shared_to, :string, default: 'anyone'
   attribute :original_text, :json, default: { additional_text: '' }
@@ -28,6 +34,7 @@ class Intervention < ApplicationRecord
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
   validate :cat_settings_validation, if: :published?
+  validate :live_chat_validation
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:intervention_accesses).published.not_shared_to_invited
@@ -47,6 +54,7 @@ class Intervention < ApplicationRecord
   enum current_narrator: { peedy: 0, emmi: 1 }
 
   before_validation :assign_default_google_language
+  before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   after_update_commit :status_change
 
   def assign_default_google_language
@@ -139,14 +147,29 @@ class Intervention < ApplicationRecord
     false
   end
 
+  def create_navigator_setup
+    self.navigator_setup = LiveChat::Interventions::NavigatorSetup.new
+  end
+
   def cat_settings_validation
     return if !intervention_have_cat_mh_sessions? || (cat_mh_application_id.present? && cat_mh_organization_id.present?)
 
     errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting') if license_type_limited? && (cat_mh_pool.blank? || cat_mh_pool.negative?) # rubocop:disable Layout/LineLength
   end
 
+  def live_chat_validation
+    return if status == 'published' || status == 'draft'
+
+    errors[:base] << I18n.t('activerecord.errors.models.intervention.attributes.live_chat_wrong_session_status') if live_chat_enabled
+  end
+
   def intervention_have_cat_mh_sessions?
     sessions.where(type: 'Session::CatMh').any?
+  end
+
+  def navigators_from_team
+    id_scope = user.team_admin? ? user.admins_teams.pluck(:id) : user.team_id
+    User.limit_to_roles('navigator').where(team_id: id_scope) if id_scope.present?
   end
 
   def ability_to_clone?

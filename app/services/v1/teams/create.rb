@@ -18,7 +18,7 @@ class V1::Teams::Create
     )
 
     new_team_admin.update!(
-      roles: ['team_admin']
+      roles: (new_team_admin.roles << 'team_admin').uniq
     )
 
     V1::Teams::RemoveUsersActiveInvitations.call(new_team_admin)
@@ -31,7 +31,7 @@ class V1::Teams::Create
   attr_reader :team_params
 
   def new_team_admin
-    @new_team_admin ||= User.limit_to_roles(%w[researcher team_admin])
+    @new_team_admin ||= User.limit_to_roles(%w[researcher])
       .find(team_params[:user_id])
   end
 end

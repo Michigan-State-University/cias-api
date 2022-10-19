@@ -38,7 +38,10 @@ class V1::OrganizationsController < V1Controller
   private
 
   def organization_scope
-    Organization.accessible_by(current_ability)
+    Organization.accessible_by(current_ability).includes(
+      health_systems: %i[health_system_admins health_clinics],
+      health_clinics: %i[health_clinic_admins health_clinic_invitations]
+    )
   end
 
   def organization_load
