@@ -19,6 +19,7 @@ class Intervention < ApplicationRecord
   has_many :live_chat_navigator_invitations, class_name: 'LiveChat::Interventions::NavigatorInvitation', dependent: :destroy
   has_many :intervention_navigators, class_name: 'LiveChat::Interventions::Navigator', dependent: :destroy
   has_many :navigators, through: :intervention_navigators, source: :user
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   has_many_attached :reports
   has_many_attached :files

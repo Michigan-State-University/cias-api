@@ -17,6 +17,7 @@ class Session < ApplicationRecord
 
   has_many :user_sessions, dependent: :destroy, inverse_of: :session
   has_many :users, through: :user_sessions
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 1

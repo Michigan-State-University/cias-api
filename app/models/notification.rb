@@ -6,7 +6,7 @@ class Notification < ApplicationRecord
 
   after_create :send_notification
 
-  enum event: { new_conversation: 0, auto_generated_conversation: 1 }
+  enum event: { new_conversation: 0, auto_generated_conversation: 1, new_narrator_was_set: 2 }
 
   validates :data, json: { schema: lambda {
     Rails.root.join("#{json_schema_path}/notification_data.json").to_s
