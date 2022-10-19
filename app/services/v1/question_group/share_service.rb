@@ -67,7 +67,7 @@ class V1::QuestionGroup::ShareService
 
   def validate_uniqueness(question, question_group)
     return unless [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty,
-                   ::Question::Phone].member? question.class
+                   ::Question::Phone, ::Question::HenryFordInitial].member? question.class
 
     return unless question_type_exist_in_session(question, question_group)
 

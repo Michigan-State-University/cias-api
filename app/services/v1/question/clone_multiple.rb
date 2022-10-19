@@ -77,7 +77,8 @@ class V1::Question::CloneMultiple
   end
 
   def question_type_must_be_unique(question)
-    [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty, ::Question::Phone].member? question.class
+    [::Question::Name, ::Question::ParticipantReport, ::Question::ThirdParty,
+     ::Question::Phone, ::Question::HenryFordInitial].member? question.class
   end
 
   attr_reader :question_ids
