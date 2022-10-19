@@ -51,7 +51,8 @@ class V1::Users::InvitationsController < V1Controller
     user = V1::Users::Invitations::Update.call(accept_invitation_params)
 
     if user.persisted?
-      render json: serialized_response(user, 'User', { only_email: true })
+      prepare_registration_data(user)
+      render json: serialized_hash(user, 'User', { only_email: true }).merge({ verification_code: user_verification_code(user) })
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
@@ -94,5 +95,20 @@ class V1::Users::InvitationsController < V1Controller
     message.transform_values! { |v| Base64.encode64(v) }
 
     redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
+  end
+
+  def user_verification_code(user)
+    user.user_verification_codes.where(confirmed: false).order(created_at: :desc).first&.code
+  end
+
+  # rubocop:disable Naming/AccessorMethodName
+  def set_devise_headers(user)
+    response.headers.merge!(user.create_new_auth_token)
+  end
+  # rubocop:enable Naming/AccessorMethodName
+
+  def prepare_registration_data(user)
+    set_devise_headers(user)
+    user.user_verification_codes.create!(code: SecureRandom.base64(6))
   end
 end
