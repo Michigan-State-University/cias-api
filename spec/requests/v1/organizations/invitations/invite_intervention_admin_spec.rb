@@ -206,7 +206,12 @@ RSpec.describe 'POST /v1/organizations/:organization_id/invitations/invite_inter
 
     it 'changes researcher role to e-intervention admin' do
       request
-      expect(researcher.reload.roles).to include 'e_intervention_admin'
+      expect(researcher.reload.roles).not_to include 'e_intervention_admin'
+    end
+
+    it 'adds user as the e-intervention_admin to the organization' do
+      request
+      expect(organization.e_intervention_admins).to include researcher
     end
   end
 
