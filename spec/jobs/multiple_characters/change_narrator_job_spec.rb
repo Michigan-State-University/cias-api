@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe MultipleCharacters::ChangeNarratorJob, type: :job do
-  subject { described_class.perform_now(model, object_id, new_character, new_animations) }
+  subject { described_class.perform_now(user, model, object_id, new_character, new_animations) }
 
+  let(:user) { create(:user, :confirmed, :researcher) }
   let(:new_character) { 'emmi' }
   let(:new_animations) do
     {

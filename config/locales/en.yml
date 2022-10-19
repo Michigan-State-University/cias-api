@@ -193,6 +193,11 @@ en:
       subject: 'Error during translation'
       header: 'An error has occurred during translation.'
       body: 'Something goes wrong while translating your intervention. Please try again.'
+  multiple_narrators_mailer:
+    subject: 'CIAS narrator change'
+    header: 'CIAS narrator change'
+    body: 'The narrator change in %{intervention_name} went successfully. Click the button below to go back to the app'
+    button_text: 'Go to the app'
   mailer:
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
