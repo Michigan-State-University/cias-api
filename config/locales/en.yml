@@ -185,6 +185,7 @@ en:
     uniqueness_violation: 'Wrong argument. You cannot duplicate questions which should be unique'
     hfhs:
       uniqueness_violation: 'Wrong argument. You cannot duplicate unique questions (e.g. HenryFordInitial)'
+      access_violation: "You can't duplicate Henry Ford Initial Screen to an intervention without access to Henry Ford's system"
     not_researcher: "Access denied. You pass user which can not have intervention"
   translation_mailer:
     subject: 'Translation of %{intervention_name}'
