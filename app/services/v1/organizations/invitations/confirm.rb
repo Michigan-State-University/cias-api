@@ -28,16 +28,12 @@ class V1::Organizations::Invitations::Confirm
   attr_reader :organization, :user, :organization_invitation
 
   def set_pending_e_intervention_admin
-    return unless user.role?('researcher') && !user.role?('e_intervention_admin')
+    return unless user.researcher? && !user.e_intervention_admin?
 
     user.update!(roles: user.roles << 'e_intervention_admin') if can_be_e_intervention_admin?
   end
 
   def can_be_e_intervention_admin?
-    organization_admins_ids = organization.e_intervention_admin_organizations.map(&:user).map(&:id)
-    e_intervention_admin_id = EInterventionAdminOrganization.find_by(user_id: user.id, organization_id: organization.id)&.user&.id
-    return false if organization_admins_ids.empty? || e_intervention_admin_id.nil?
-
-    organization_admins_ids.include? e_intervention_admin_id
+    EInterventionAdminOrganization.exists?(user_id: user.id, organization_id: organization.id)
   end
 end
