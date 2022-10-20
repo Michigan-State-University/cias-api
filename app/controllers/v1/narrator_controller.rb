@@ -4,7 +4,7 @@ class V1::NarratorController < V1Controller
   def create
     authorize! :update, model.safe_constantize
 
-    MultipleCharacters::ChangeNarratorJob.perform_later(current_v1_user, model, object_id, new_narrator, replaced_animation)
+    MultipleCharacters::ChangeNarratorJob.perform_later(current_v1_user.email, model, object_id, new_narrator, replaced_animation)
 
     head :ok
   end

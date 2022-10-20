@@ -198,6 +198,8 @@ en:
     header: 'CIAS narrator change'
     body: 'The narrator change in %{intervention_name} went successfully. Click the button below to go back to the app'
     button_text: 'Go to the app'
+    intervention_link: '%{web_url}/interventions/%{intervention_id}'
+    session_link: '%{web_url}/interventions/%{intervention_id}/sessions/${session_id}'
   mailer:
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. You can reach us directly at <a href="mailto:cias@msu.edu">cias@msu.edu</a>. Thank you!<br /><br />'
