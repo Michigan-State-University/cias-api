@@ -184,7 +184,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
 
     let_it_be(:bar_chart3) do
       create(:chart, formula: formula5, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
-             chart_type: Chart.chart_types[:bar_chart])
+                     chart_type: Chart.chart_types[:bar_chart])
     end
     before_all do
       RSpec::Mocks.with_temporary_scope do
