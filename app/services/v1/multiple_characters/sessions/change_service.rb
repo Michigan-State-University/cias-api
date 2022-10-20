@@ -24,7 +24,7 @@ class V1::MultipleCharacters::Sessions::ChangeService
       next unless valid_change?(question)
 
       update_character(question)
-      update_blocks(question)
+      update_blocks(question) if replacement_animations.present?
 
       question.save!
     end
