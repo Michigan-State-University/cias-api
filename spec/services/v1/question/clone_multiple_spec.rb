@@ -69,4 +69,17 @@ RSpec.describe V1::Question::CloneMultiple do
       expect(question_group.reload.questions.size).to be(4)
     end
   end
+
+  context 'duplicate henry ford - initial screen to the intervention without access to henry ford system' do
+    let!(:hf_intervention) { create(:intervention, hfhs_access: true, user: user) }
+    let(:hf_session) { create(:session, intervention: hf_intervention) }
+    let!(:hf_question_group) { create(:question_group_plain, title: 'Question Group Title', position: 1, session: hf_session) }
+    let!(:hf_initial_question) { create(:question_henry_ford_initial_screen, question_group: hf_question_group) }
+    let(:question_ids) { [hf_initial_question.id] }
+    let(:chosen_questions) { Question.where(id: question_ids) }
+
+    it 'raises exception' do
+      expect { subject.call }.to raise_error(ActiveRecord::ActiveRecordError)
+    end
+  end
 end
