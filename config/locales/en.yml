@@ -23,6 +23,10 @@ en:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
             cat_mh_setting: 'Intervention should have all cat mh settings before publishing. ERROR_FLAG:CatMhWrongSettings'
+            cat_mh_connection_failed:
+              title: "Oops! You can't fill this session"
+              body: 'Unfortunately, something went wrong while downloading the CAT-MH questions. Please try again or contact the researcher who sent this session to you.'
+              button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
         user:
           attributes:
