@@ -84,8 +84,20 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
         ]
       end
 
-      it 'raise exception' do
+      it 'returns only one question' do
         expect(subject.call.first.questions_count).to eq 1
+      end
+
+      context 'invalid duplication of only henry ford health - initial screen' do
+        let(:selected_groups_with_questions) do
+          [
+            { 'id' => question_group.id, 'question_ids' => [question3.id] }
+          ]
+        end
+
+        it 'raises exception' do
+          expect { subject.call }.to raise_error(ArgumentError)
+        end
       end
     end
 

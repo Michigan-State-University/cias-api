@@ -87,7 +87,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def validate_question_group_not_empty(question_group)
-    return unless question_group.questions.empty?
+    return question_group unless question_group.questions.empty?
 
     question_group.destroy!
     raise ArgumentError, I18n.t('duplication_with_structure.wrong_package')
