@@ -47,7 +47,7 @@ RSpec.describe 'POST /v1/interventions/:id/change_narrator', type: :request do
 
     before do
       ActiveJob::Base.queue_adapter = :test
-      allow(MultipleCharacters::ChangeNarratorJob).to receive(:perform_later).with(model, object_id, new_character, new_animations).and_return(true)
+      allow(MultipleCharacters::ChangeNarratorJob).to receive(:perform_later).with(user.email, model, object_id, new_character, new_animations).and_return(true)
     end
 
     it 'return correct status' do
