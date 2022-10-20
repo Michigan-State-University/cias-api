@@ -18,18 +18,19 @@ namespace :interventions do
   private
 
   def check_and_report_templates(question)
+    session = question.question_group.session
     question.body_data.each do |block|
-      remove_nonexistent_reports_from_block(block)
+      remove_nonexistent_reports_from_block(block, session)
     end
 
     question.save!
   end
 
-  def remove_nonexistent_reports_from_block(block)
+  def remove_nonexistent_reports_from_block(block, session)
     report_template_ids = block['report_template_ids']
     return if report_template_ids.blank?
 
-    report_templates = ReportTemplate.where(id: report_template_ids)
+    report_templates = session.report_templates.where(id: report_template_ids)
     return if report_templates.size == report_template_ids.size
 
     block['report_template_ids'] = report_templates.map(&:id)
