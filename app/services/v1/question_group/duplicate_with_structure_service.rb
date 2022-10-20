@@ -35,6 +35,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
       new_question_group = create_new_group_in_session(session, selected_group)
       create_selected_questions_and_assign_to_group(selected_group, question_group['question_ids'], new_question_group)
       new_question_group.reload
+      validate_question_group_not_empty(new_question_group)
     end
   end
 
@@ -83,6 +84,13 @@ class V1::QuestionGroup::DuplicateWithStructureService
     return false unless intervention.hfhs_access?
 
     intervention.hfhs_access? && session.questions.where(type: question.type).blank?
+  end
+
+  def validate_question_group_not_empty(question_group)
+    return unless question_group.questions.empty?
+
+    question_group.destroy!
+    raise ArgumentError, I18n.t('duplication_with_structure.wrong_package')
   end
 
   def skip_question?(question, intervention)
