@@ -21,17 +21,25 @@ class V1::MultipleCharacters::Sessions::ChangeService
     return unless new_character.in?(AVAILABLE_NARRATORS)
 
     session.questions.each do |question|
+      next unless valid_change?(question)
+
       update_character(question)
       update_blocks(question) if replacement_animations.present?
 
       question.save!
     end
+
+    session.update!(current_narrator: new_character)
   end
 
   private
 
   def update_character(question)
     question.narrator['settings']['character'] = new_character
+  end
+
+  def valid_change?(question)
+    question.narrator['settings']['character'] == session.current_narrator
   end
 
   def update_blocks(question)
