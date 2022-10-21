@@ -10,7 +10,7 @@ class Question < ApplicationRecord
   include Translate
 
   UNIQUE_IN_SESSION = %w[Question::Name Question::ParticipantReport Question::ThirdParty Question::Phone
-                        Question::HenryFordInitial].freeze
+                         Question::HenryFordInitial].freeze
 
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
