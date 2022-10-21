@@ -182,7 +182,7 @@ en:
     question_group_title: 'Copy of %{source_group_title}'
     wrong_argument: 'Wrong argument. This service should receive target_session and selected_groups with questions'
     wrong_sessions: "Wrong argument. Can/'t found all passed sessions"
-    wrong_package: "Wrong argument. You only passed parameters which cannot be duplicated"
+    wrong_package: "Wrong argument. You passed questions that cannot be duplicated"
     uniqueness_violation: 'Wrong argument. You cannot duplicate questions which should be unique'
     hfhs:
       uniqueness_violation: 'Wrong argument. You cannot duplicate unique questions (e.g. HenryFordInitial)'

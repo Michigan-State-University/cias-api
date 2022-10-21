@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::DuplicateWithStructureService
-  UNIQ_QUESTIONS = %w[Question::Name Question::HenryFordInitial Question::ParticipantReport Question::Phone].freeze
   SKIPPABLE_QUESTIONS = %w[Question::HenryFordInitial].freeze
 
   def self.call(session, selected_groups_with_questions)
@@ -68,7 +67,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def validate_uniqueness_of_question(question, session)
-    return unless question.type.in?(UNIQ_QUESTIONS)
+    return unless question.type.in?(Question::UNIQUE_IN_SESSION)
 
     raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session(question, session)
     raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness(question,
@@ -76,7 +75,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def uniq_question_already_in_session(question, session)
-    session.questions.where(type: question.type).any? && question.type.in?(UNIQ_QUESTIONS)
+    session.questions.where(type: question.type).any? && question.type.in?(Question::UNIQUE_IN_SESSION)
   end
 
   def validate_hfhs_access_and_uniqueness(question, intervention)
