@@ -121,6 +121,7 @@ class User < ApplicationRecord
 
   # BEFORE/AFTER ACTIONS
   before_save :invalidate_token_after_changes
+  before_update :set_roles_to_uniq, if: :roles_changed?
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
@@ -198,6 +199,10 @@ class User < ApplicationRecord
   def set_terms_confirmed_date
     self.terms_confirmed_at = Time.current
     save!
+  end
+
+  def set_roles_to_uniq
+    self.roles = roles.uniq
   end
 
   def self.users_for_researcher_or_e_intervention_admin(params, scope)
