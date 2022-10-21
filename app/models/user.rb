@@ -202,9 +202,7 @@ class User < ApplicationRecord
   end
 
   def set_roles_to_uniq
-    require 'pry'
-    binding.pry
-    self.roles = self.roles.uniq
+    self.roles = roles.uniq
   end
 
   def self.users_for_researcher_or_e_intervention_admin(params, scope)
