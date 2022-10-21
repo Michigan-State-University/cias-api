@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_18_103455) do
+ActiveRecord::Schema.define(version: 2022_10_18_070738) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -382,6 +382,7 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
+    t.integer "current_narrator", default: 0
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -544,6 +545,7 @@ ActiveRecord::Schema.define(version: 2022_08_18_103455) do
     t.bigint "cat_mh_time_frame_id"
     t.bigint "cat_mh_population_id"
     t.integer "estimated_time"
+    t.integer "current_narrator", default: 0
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
