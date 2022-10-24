@@ -19,12 +19,13 @@
     },
     "message": {
       "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "new_narrator": {
+      "type": "string"
     }
   },
-  "required": [
-    "conversation_id",
-    "user_id",
-    "message"
-  ],
   "additionalProperties": false
 }
