@@ -33,8 +33,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
       selected_group = QuestionGroup.find(question_group['id'])
       new_question_group = create_new_group_in_session(session, selected_group)
       create_selected_questions_and_assign_to_group(selected_group, question_group['question_ids'], new_question_group)
-      new_question_group.reload
-      validate_question_group_not_empty(new_question_group)
+      confirm_questions_presence!(new_question_group.reload)
     end
   end
 
@@ -85,7 +84,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
     intervention.hfhs_access? && session.questions.where(type: question.type).blank?
   end
 
-  def validate_question_group_not_empty(question_group)
+  def confirm_questions_presence!(question_group)
     return question_group unless question_group.questions.empty?
 
     question_group.destroy!
