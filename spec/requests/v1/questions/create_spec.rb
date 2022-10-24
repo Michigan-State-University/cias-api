@@ -237,6 +237,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
           narrator: {
             blocks: blocks,
             settings: {
+              character: 'peedy',
               voice: true,
               animation: true
             }
