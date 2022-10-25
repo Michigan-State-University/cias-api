@@ -7,7 +7,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
   context 'Classic sessions' do
     let!(:intervention) { create(:intervention, user: user) }
     let!(:session) { create(:session, intervention: intervention) }
-    let!(:question_group) { create(:question_group, session: session) }
+    let!(:question_group) { create(:question_group, session: session, position: 1) }
     let!(:questions) do
       [
         create(:question_single, subtitle: 'single', body: { data: [{ payload: '', value: '' }], variable: { name: 'var1' } }, question_group: question_group,
@@ -116,6 +116,39 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
         end
 
         it_behaves_like 'correct classic session', 4, %w[var1 im_a_variable dep rivia], %w[single multi]
+      end
+
+      context 'with questions outside target target question group' do
+        let!(:question_group2) { create(:question_group, session: session, position: 2) }
+        let!(:question_group3) { create(:question_group, session: session, position: 3) }
+
+        let!(:questions2) do
+          [
+            create(:question_single, subtitle: 'var', body: { data: [{ payload: '', value: '' }], variable: { name: 'a' } }, question_group: question_group2,
+                                     position: 1),
+            create(:question_single, subtitle: 'bar', body: { data: [{ payload: '', value: '' }], variable: { name: 'b' } }, question_group: question_group2,
+                                     position: 2),
+            create(:question_single, subtitle: 'car', body: { data: [{ payload: '', value: '' }], variable: { name: 'c' } }, question_group: question_group2,
+                                     position: 3)
+          ]
+        end
+        let!(:questions3) do
+          [
+            create(:question_currency, subtitle: 'mar', body: { variable: { name: 'd' }, data: [{ payload: '' }] }, question_group: question_group3,
+                                       position: 1),
+            create(:question_number, subtitle: 'par', body: { variable: { name: 'e' }, data: [{ payload: '' }] }, question_group: question_group3,
+                                     position: 2)
+          ]
+        end
+
+        let(:params) { { include_current_question: true, question_id: questions2[1].id } }
+
+        let(:request) do
+          get v1_fetch_variables_path(id: session.id), headers: headers, params: params
+        end
+
+        it_behaves_like 'correct classic session', 11, %w[var1 im_a_variable dep rivia is_with_x x y what number a b],
+                        %w[bar currency grid multi number single var]
       end
     end
   end
