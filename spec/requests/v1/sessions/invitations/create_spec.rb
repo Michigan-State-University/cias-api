@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
   let!(:user) { create(:user, :confirmed, :researcher, created_at: 1.day.ago) }
   let!(:participant) { create(:user, :confirmed, :participant) }
-  let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true) }
+  let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true, shared_to: 'registered') }
   let!(:intervention_status) { :published }
   let!(:session) { create(:session, intervention_id: intervention.id) }
   let!(:invitation_email) { 'a@a.com' }

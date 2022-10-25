@@ -154,21 +154,37 @@ en:
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
     inform_to_an_email:
       subject: You have been invited to complete a session.
-      body: You have been invited to complete %{session_name}. Please click in the link to get more information.
+      body: You have been invited to complete %{session_name}. Please click the link to get more information.
       header: Complete a new session
-      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the link below to start the session'
-      button_text: Start the session
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the button below to access.'
+      button_text: Go to the session
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
       invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+    invite_to_session_and_registration:
+      subject: You have been invited to complete a session.
+      body: You have been invited to complete %{session_name}. Please click the link to get more information.
+      header: Complete a new session
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the button below to access'
+      button_text: 'Create an account and go to session'
+      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
+      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
   intervention_mailer:
     inform_to_an_email:
       subject: You have been invited to complete an intervention.
-      body: You have been invited to complete %{intervention_name}. Please click in the link to get more information.
+      body: You have been invited to complete %{intervention_name}. Please click the link to get more information.
       header: Complete a new intervention
-      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span> intervention.<br /><br />Click the link below to start the intervention'
-      button_text: Start the intervention
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span>.<br /><br />Click the button below to access.'
+      button_text: Go to the intervention
       invitation_link: "%{domain}/interventions/%{intervention_id}/invite"
       invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
+    invite_to_intervention_and_registration:
+      subject: You have been invited to complete an intervention.
+      body: You have been invited to complete %{intervention_name}. Please click the link to get more information.
+      header: Complete a new intervention
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span>.<br /><br />Click the button below to access.'
+      button_text: Create an account and go to the intervention
+      invitation_link: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}"
+      invitation_link_from_clinic: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}"
   user_mailer:
     send_verification_login_code:
       subject: Verify your Identity in CIAS

@@ -80,7 +80,7 @@ class V1::Users::InvitationsController < V1Controller
 
   def accept_invitation_params
     params.require(:invitation).permit(:invitation_token, :password, :password_confirmation, :first_name, :last_name,
-                                       :time_zone)
+                                       :time_zone, :terms, :email)
   end
 
   def invited_email
