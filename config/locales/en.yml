@@ -29,6 +29,7 @@ en:
               button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
         user:
+          not_using_invitation_link: "If you want to register by this email, please use the registration link received by email from the researcher."
           attributes:
             roles:
               team_admin_must_have_a_team: 'Team Admin must have a team'
