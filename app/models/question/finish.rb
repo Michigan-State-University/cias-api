@@ -6,9 +6,21 @@ class Question::Finish < Question
   attribute :position, :integer, default: 999_999
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
+  after_create_commit :after_commit_callbacks
+
   attr_readonly :position
 
   def csv_header_names
     []
+  end
+
+  def after_commit_callbacks
+    set_default_narrator
+    initialize_narrator
+  end
+
+  def set_default_narrator
+    narrator['settings']['character'] = session.current_narrator
+    save!
   end
 end

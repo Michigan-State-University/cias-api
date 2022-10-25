@@ -21,6 +21,7 @@ class V1::SessionService
   def create(session_params)
     session = sessions.new(session_params)
     session.assign_google_tts_voice(first_session)
+    session.current_narrator = intervention.current_narrator
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
