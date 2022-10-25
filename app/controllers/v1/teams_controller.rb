@@ -41,10 +41,10 @@ class V1::TeamsController < V1Controller
     head :no_content
   end
 
-  def remove_researcher
-    authorize! :remove_researcher, Team
+  def remove_team_member
+    authorize! :remove_team_member, Team
 
-    team.users.researchers.find(params.require(:user_id)).update!(team_id: nil)
+    team.users.find(params.require(:user_id)).update!(team_id: nil)
 
     render status: :ok
   end

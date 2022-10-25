@@ -3,10 +3,23 @@
 class MultipleCharacters::ChangeNarratorJob < ApplicationJob
   queue_as :default
 
-  def perform(user_email, model, object_id, new_character, new_animations)
+  def perform(user, model, object_id, new_character, new_animations = {})
     "V1::MultipleCharacters::#{model.pluralize}::ChangeService".safe_constantize.
       call(object_id, new_character, new_animations)
 
-    MultipleNarratorsMailer.successfully_changed(user_email, model.safe_constantize.find(object_id)).deliver_now
+    @object = model.safe_constantize.find(object_id)
+    MultipleNarratorsMailer.successfully_changed(user.email, object).deliver_now
+    Notification.create!(user: user, notifiable: object, event: :new_narrator_was_set, data: generate_notification_body)
+  end
+
+  attr_accessor :object
+
+  private
+
+  def generate_notification_body
+    {
+      name: object.name,
+      new_narrator: object.current_narrator
+    }
   end
 end

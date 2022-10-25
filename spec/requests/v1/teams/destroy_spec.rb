@@ -32,7 +32,7 @@ RSpec.describe 'DELETE /v1/teams/:id', type: :request do
         let!(:team_admin) { team.team_admin }
 
         it 'changes team admin role to researcher after removing team' do
-          expect { request }.to change { team_admin.reload.roles }.from(['team_admin']).to(['researcher'])
+          expect { request }.to change { team_admin.reload.roles }.from(%w[researcher team_admin]).to(['researcher'])
         end
       end
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::UserInterventionSerializer < V1Serializer
+  include FileHelper
   attributes :completed_sessions, :status, :last_answer_date
 
   attribute :sessions_in_intervention do |object|
@@ -27,17 +28,14 @@ class V1::UserInterventionSerializer < V1Serializer
       logo_url: object.intervention.logo.attached? ? url_for(object.intervention.logo) : nil,
       image_alt: object.intervention.logo_blob.present? ? object.intervention.logo_blob.description : nil,
       id: object.intervention.id,
-      files: object.intervention.files.attached? ? file_data(object) : []
+      files: object.intervention.files.attached? ? file_data(object) : [],
+      live_chat_enabled: object.intervention.live_chat_enabled
     }
   end
 
   def self.file_data(object)
     object.intervention.files.map do |file|
-      {
-        id: file.id,
-        name: file.blob.filename,
-        url: ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true)
-      }
+      map_file_data(file)
     end
   end
 end

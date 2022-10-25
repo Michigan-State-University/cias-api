@@ -62,4 +62,55 @@ RSpec.describe 'POST /v1/auth', type: :request do
       expect { request }.to avoid_changing { User.count }
     end
   end
+
+  context 'user provided blank first and last_name' do
+    let(:params) do
+      {
+        email: 'test@test.com',
+        password: 'password',
+        password_confirmation: 'password',
+        first_name: '',
+        last_name: '',
+        terms: true,
+        time_zone: 'Europe/Warsaw',
+        confirm_success_url: 'https://cias-web.herokuapp.com/login'
+      }
+    end
+
+    before do
+      request
+    end
+
+    it 'return correct status' do
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'have correct message' do
+      expect(json_response['message']).to include('First name cannot be blank')
+    end
+
+    it 'did\'t add a new user' do
+      expect { request }.to avoid_changing { User.count }
+    end
+
+    context 'after param change' do
+      let(:params) do
+        {
+          email: 'test@test.com',
+          password: 'password',
+          password_confirmation: 'password',
+          first_name: 'first name',
+          last_name: '',
+          terms: true,
+          time_zone: 'Europe/Warsaw',
+          confirm_success_url: 'https://cias-web.herokuapp.com/login'
+        }
+      end
+
+      it 'have correct message after change in params' do
+        request
+        expect(json_response['message']).to include('Last name cannot be blank')
+      end
+    end
+  end
 end

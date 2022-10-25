@@ -50,9 +50,9 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
             let(:new_team_admin) { create(:user, :researcher) }
 
             it 'sets researcher as new team_admin and sets team_admin as researcher' do
-              expect { request }.to change { new_team_admin.reload.roles }.from(['researcher']).to(['team_admin']).and \
+              expect { request }.to change { new_team_admin.reload.roles }.from(['researcher']).to(%w[researcher team_admin]).and \
                 change { team.reload.team_admin_id }.from(previous_team_admin.id).to(new_team_admin.id).and \
-                  change { previous_team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
+                  change { previous_team_admin.reload.roles }.from(%w[researcher team_admin]).to(['researcher']).and \
                     change { previous_team_admin.reload.team_id }.from(nil).to(team.id)
             end
 
@@ -77,10 +77,10 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
             it 'sets team admin as new team_admin and sets an old team_admin as researcher' do
               expect { request }.to avoid_changing { new_team_admin.reload.team_id }.and \
                 change { team.reload.team_admin_id }.from(previous_team_admin.id).to(new_team_admin.id).and \
-                  change { previous_team_admin.reload.roles }.from(['team_admin']).to(['researcher']).and \
+                  change { previous_team_admin.reload.roles }.from(%w[researcher team_admin]).to(['researcher']).and \
                     change { previous_team_admin.reload.team_id }.from(nil).to(team.id)
 
-              expect(new_team_admin.reload.roles).to eq(['team_admin'])
+              expect(new_team_admin.reload.roles).to eq(%w[researcher team_admin])
             end
           end
 
@@ -94,10 +94,10 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
                 change { team.reload.team_admin_id }.from(previous_team_admin.id).to(new_team_admin.id).and \
                   avoid_changing { previous_team_admin.reload.roles }
 
-              expect(new_team_admin.reload.roles).to eq(['team_admin'])
+              expect(new_team_admin.reload.roles).to eq(%w[researcher team_admin])
               expect(previous_team_admin).to have_attributes(
                 team_id: nil,
-                roles: ['team_admin']
+                roles: %w[researcher team_admin]
               )
             end
           end

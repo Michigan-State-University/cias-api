@@ -83,7 +83,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
       result << ("#{user.first_name.presence || I18n.t('sessions.sms_alerts.no_first_name_provided')}\n") if plan.include_first_name
       result << ("#{user.last_name.presence || I18n.t('sessions.sms_alerts.no_last_name_provided')}\n") if plan.include_last_name
     end
-    result << ("#{user.email.presence || I18n.t('sessions.sms_alerts.no_email_provided')}\n") if plan.include_email
+    result << ("#{user_email(user) || I18n.t('sessions.sms_alerts.no_email_provided')}\n") if plan.include_email
     result << ("#{user.phone.present? ? user.phone.full_number : I18n.t('sessions.sms_alerts.no_phone_number_provided')}\n") if plan.include_phone_number
     result + current_content
   end
@@ -138,6 +138,10 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def send_alert(start_time, content, phone)
     SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, phone.user&.id, true)
+  end
+
+  def user_email(user)
+    user.email.presence unless user.role?('guest')
   end
 
   def phone

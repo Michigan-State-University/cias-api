@@ -17,8 +17,9 @@ class V1::Teams::ChangeTeamAdmin
 
     ActiveRecord::Base.transaction do
       if current_admin_of_one_team?
+        current_team_admin.roles.delete('team_admin')
         current_team_admin.update!(
-          roles: ['researcher'],
+          roles: current_team_admin.roles,
           team_id: team.id
         )
       end
@@ -26,7 +27,7 @@ class V1::Teams::ChangeTeamAdmin
       team.update!(team_admin_id: team_admin_id)
 
       new_team_admin.update!(
-        roles: ['team_admin'],
+        roles: (new_team_admin.roles << 'team_admin').uniq,
         team_id: nil # to avoid problems when researcher of the team becomes team_admin for this team
       )
 
@@ -51,7 +52,7 @@ class V1::Teams::ChangeTeamAdmin
   end
 
   def new_team_admin
-    @new_team_admin ||= User.limit_to_roles(%w[researcher team_admin])
+    @new_team_admin ||= User.limit_to_roles(%w[researcher])
       .find(team_admin_id)
   end
 
