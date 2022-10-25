@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::DuplicateWithStructureService
-  UNIQ_QUESTIONS = %w[Question::Name Question::HenryFordInitial Question::ParticipantReport Question::Phone].freeze
   SKIPPABLE_QUESTIONS = %w[Question::HenryFordInitial].freeze
 
   def self.call(session, selected_groups_with_questions)
@@ -34,7 +33,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
       selected_group = QuestionGroup.find(question_group['id'])
       new_question_group = create_new_group_in_session(session, selected_group)
       create_selected_questions_and_assign_to_group(selected_group, question_group['question_ids'], new_question_group)
-      new_question_group.reload
+      confirm_questions_presence!(new_question_group.reload)
     end
   end
 
@@ -67,7 +66,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def validate_uniqueness_of_question(question, session)
-    return unless question.type.in?(UNIQ_QUESTIONS)
+    return unless question.type.in?(Question::UNIQUE_IN_SESSION)
 
     raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session(question, session)
     raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness(question,
@@ -75,7 +74,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def uniq_question_already_in_session(question, session)
-    session.questions.where(type: question.type).any? && question.type.in?(UNIQ_QUESTIONS)
+    session.questions.where(type: question.type).any? && question.type.in?(Question::UNIQUE_IN_SESSION)
   end
 
   def validate_hfhs_access_and_uniqueness(question, intervention)
@@ -83,6 +82,13 @@ class V1::QuestionGroup::DuplicateWithStructureService
     return false unless intervention.hfhs_access?
 
     intervention.hfhs_access? && session.questions.where(type: question.type).blank?
+  end
+
+  def confirm_questions_presence!(question_group)
+    return question_group unless question_group.questions.empty?
+
+    question_group.destroy!
+    raise ArgumentError, I18n.t('duplication_with_structure.wrong_package')
   end
 
   def skip_question?(question, intervention)
