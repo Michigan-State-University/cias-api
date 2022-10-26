@@ -69,7 +69,7 @@ class V1::ReportTemplates::SectionsController < V1Controller
   end
 
   def sections_scope
-    @sections_scope ||= @report_template.sectionsz
+    @sections_scope ||= @report_template.sections
   end
 
   def section_params

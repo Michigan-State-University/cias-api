@@ -49,7 +49,7 @@ class V1::GeneratedReports::GenerateUserSessionReports
   end
 
   def report_templates
-    session.report_templates.includes(:logo_blob, :logo_attachment, :variants, sections: [variants: [image_attachment: :blob]])
+    session.report_templates.includes(:variants, sections: [variants: [image_attachment: :blob]])
   end
 
   def all_var_values
