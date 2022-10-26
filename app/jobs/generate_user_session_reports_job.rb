@@ -5,7 +5,7 @@ class GenerateUserSessionReportsJob < ApplicationJob
 
   def perform(user_session_id)
     V1::GeneratedReports::GenerateUserSessionReports.call(
-      UserSession.find(user_session_id)
+      UserSession.includes(session: { report_templates: %i[sections variants logo_blob logo_attachment] }).find(user_session_id)
     )
   end
 end

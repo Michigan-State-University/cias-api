@@ -84,7 +84,7 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_load
-    questions_scope.find(question_id)
+    questions_scope.includes(question_group: { session: { user_sessions: :name_audio } }).find(question_id)
   end
 
   def chosen_questions

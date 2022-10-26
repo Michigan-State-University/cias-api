@@ -54,7 +54,7 @@ class V1::ReportTemplates::SectionsController < V1Controller
   def reorder_response
     V1::ReportTemplateSerializer.new(
       @report_template,
-      { include: %i[sections variants] }
+      { include: %i[sections variants logo_blob logo_attachment] }
     )
   end
 
