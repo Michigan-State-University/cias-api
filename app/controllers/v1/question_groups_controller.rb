@@ -113,7 +113,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_groups_scope
-    @question_groups_scope ||= QuestionGroup.includes(:session, questions: { image_attachment: :blob, image_blob: :blob })
+    @question_groups_scope ||= QuestionGroup.includes(:session, questions: [:image_blob, image_attachment: :blob])
                                             .accessible_by(current_ability).where(session_id: session_id).order(:position)
   end
 
