@@ -38,7 +38,9 @@ class Hl7::ReportMapper
   end
 
   def report_type
-    report.report_for
+    # 'HFHS Participant Report Type'
+    # 'HFHS_report_type_summary'
+    'HFHSReportTypeSummary'
   end
 
   def finish_date

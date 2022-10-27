@@ -41,7 +41,7 @@ class V1::HenryFord::VerifyService
   end
 
   def assign_patient_details!
-    return if user.guest? || user.preview_session?
+    return if user.preview_session?
 
     user.update(hfhs_patient_detail: @patient_details)
   end

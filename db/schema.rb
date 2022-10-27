@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_08_165507) do
+ActiveRecord::Schema.define(version: 2022_10_25_051236) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -367,10 +367,8 @@ ActiveRecord::Schema.define(version: 2022_10_08_165507) do
     t.string "zip_code_bidx"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.uuid "user_id"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
-    t.index ["user_id"], name: "index_hfhs_patient_details_on_user_id"
   end
 
   create_table "intervention_accesses", force: :cascade do |t|
@@ -803,8 +801,10 @@ ActiveRecord::Schema.define(version: 2022_10_08_165507) do
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
     t.boolean "quick_exit_enabled", default: false, null: false
+    t.uuid "hfhs_patient_detail_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
+    t.index ["hfhs_patient_detail_id"], name: "index_users_on_hfhs_patient_detail_id"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
@@ -846,7 +846,6 @@ ActiveRecord::Schema.define(version: 2022_10_08_165507) do
   add_foreign_key "downloaded_reports", "users"
   add_foreign_key "events", "days"
   add_foreign_key "google_languages", "google_tts_languages"
-  add_foreign_key "hfhs_patient_details", "users"
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
@@ -867,4 +866,5 @@ ActiveRecord::Schema.define(version: 2022_10_08_165507) do
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "user_interventions"
   add_foreign_key "user_sessions", "users"
+  add_foreign_key "users", "hfhs_patient_details"
 end

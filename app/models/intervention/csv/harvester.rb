@@ -159,7 +159,7 @@ class Intervention::Csv::Harvester
     question = ::Question::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
     attrs = question&.csv_decoded_attrs
     patient_details = patient_details(user_session, attrs)
-    return if patient_details.empty?
+    return if patient_details.blank?
 
     attrs = question.rename_attrs(attrs)
     attrs.each_with_index do |column, index|
@@ -171,8 +171,8 @@ class Intervention::Csv::Harvester
   end
 
   def patient_details(user_session, attrs)
-    details = HfhsPatientDetail.find_by(user_id: user_session.user.id).attributes
-    details.fetch_values(*attrs)
+    details = user_session.user.hfhs_patient_detail&.attributes
+    details&.fetch_values(*attrs)
   end
 
   def fill_by_tlfb_research(row_index, user_session)

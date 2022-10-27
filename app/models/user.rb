@@ -84,7 +84,7 @@ class User < ApplicationRecord
   attribute :roles, :string, array: true, default: assign_default_values('roles')
 
   # HENRY FORDS
-  has_one :hfhs_patient_detail, dependent: :nullify
+  belongs_to :hfhs_patient_detail, optional: true
 
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }

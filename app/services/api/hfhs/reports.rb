@@ -20,7 +20,7 @@ class Api::Hfhs::Reports
     baerer_token = "#{token[:token_type]}  #{token[:access_token]}"
 
     generated_reports.each do |generated_report|
-      @hl7_data = Hl7::GeneratedReportMapper.call(user_session_id, generated_report.id)
+      @hl7_data = Hl7::GeneratedReportMapper.call(user_session.id, generated_report.id)
       send_data!(baerer_token)
     end
   end
@@ -47,7 +47,7 @@ class Api::Hfhs::Reports
     {
       'patient_id' => patient_id,
       'data' => hl7_data
-    }
+    }.to_json
   end
 
   def patient_id
