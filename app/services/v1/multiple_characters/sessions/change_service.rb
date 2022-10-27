@@ -20,6 +20,14 @@ class V1::MultipleCharacters::Sessions::ChangeService
   def call
     return unless new_character.in?(AVAILABLE_NARRATORS)
 
+    update_character_in_session_questions if session.is_a?(Session::Classic)
+
+    session.update!(current_narrator: new_character)
+  end
+
+  private
+
+  def update_character_in_session_questions
     session.questions.each do |question|
       next unless valid_change?(question)
 
@@ -28,11 +36,7 @@ class V1::MultipleCharacters::Sessions::ChangeService
 
       question.save!
     end
-
-    session.update!(current_narrator: new_character)
   end
-
-  private
 
   def update_character(question)
     question.narrator['settings']['character'] = new_character

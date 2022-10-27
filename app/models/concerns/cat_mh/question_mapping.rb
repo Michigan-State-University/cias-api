@@ -60,7 +60,11 @@ module CatMh::QuestionMapping
                 }
               }
             ],
-            settings: user_session.session.settings['narrator']
+            settings: {
+              voice: user_session.session.settings['narrator']['voice'],
+              animation: user_session.session.settings['narrator']['animation'],
+              character: user_session.session.current_narrator
+            }
           },
           'body' => {
             'data' => map_cat_answers_for_question(cat_mh_question_hash['questionAnswers'], cat_mh_question_hash['answerType']),
