@@ -10,7 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_03_082248) do
+ActiveRecord::Schema.define(version: 2022_10_28_112039) do
+
+>>>>>>> ffa7f1a5 (Remove notify_by column form navigator setup)
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
