@@ -72,7 +72,8 @@ class V1::Sessions::ReportTemplatesController < V1Controller
     # rubocop:disable Naming/MemoizedInstanceVariableName
     @report_templates_included_scope ||= @session.report_templates.includes(
       :variants,
-      { logo_attachment: :blob, sections: [:variants, { variants: [image_attachment: :blob] }] }
+      { logo_attachment: :blob, pdf_preview_blob: :blob, pdf_preview_attachment: :blob,
+        sections: [:variants, { variants: [image_attachment: :blob] }] }
     )
     # rubocop:enable Naming/MemoizedInstanceVariableName
   end

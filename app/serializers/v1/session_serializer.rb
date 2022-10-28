@@ -13,7 +13,7 @@ class V1::SessionSerializer < V1Serializer
   end
 
   attribute :logo_url do |object|
-    url_for(Intervention.find(object.intervention_id).logo) if Intervention.find(object.intervention_id).logo.attached?
+    url_for(object.intervention.logo) if object.intervention.logo.attached?
   end
 
   attribute :intervention_owner_id do |object|
