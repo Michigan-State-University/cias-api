@@ -12,7 +12,7 @@ RSpec.describe V1::LiveChat::Interventions::UpdateNavigatorSetupService do
   context 'correctly updates navigator setup' do
     let(:params) do
       {
-        contact_email: 'John-Paul-the-2nd@test.com',
+        contact_email: 'John-Paul-the-2nd@test.com'
       }
     end
 
