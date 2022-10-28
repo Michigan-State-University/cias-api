@@ -214,8 +214,8 @@ en:
       body: 'Something goes wrong while translating your intervention. Please try again.'
   multiple_narrators_mailer:
     subject: 'CIAS narrator change'
-    header: 'CIAS narrator change'
-    body: 'The narrator change in %{intervention_name} went successfully. Click the button below to go back to the app'
+    header: 'CIAS Narrator Change'
+    body: 'The narrator change in <span style="color: #c866ea;">%{object_name}</span> went successfully.<br /><br />Click the button below to go back to the app'
     button_text: 'Go to the app'
     intervention_link: '%{web_url}/interventions/%{intervention_id}'
     session_link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
