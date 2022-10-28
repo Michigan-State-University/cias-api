@@ -451,7 +451,6 @@ ActiveRecord::Schema.define(version: 2022_10_03_082248) do
     t.uuid "intervention_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "is_navigator_notification_on", default: true
   end
 
   create_table "messages", force: :cascade do |t|

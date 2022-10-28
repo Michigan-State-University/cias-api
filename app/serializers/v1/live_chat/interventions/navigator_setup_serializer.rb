@@ -2,7 +2,7 @@
 
 class V1::LiveChat::Interventions::NavigatorSetupSerializer < V1Serializer
   include FileHelper
-  attributes :id, :contact_email, :no_navigator_available_message, :is_navigator_notification_on
+  attributes :id, :contact_email, :no_navigator_available_message
 
   has_many :participant_links, serializer: V1::LiveChat::Interventions::LinkSerializer
   has_many :navigator_links, serializer: V1::LiveChat::Interventions::LinkSerializer
