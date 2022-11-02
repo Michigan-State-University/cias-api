@@ -13,8 +13,8 @@ RSpec.describe 'POST /v1/interventions/:id/change_narrator', type: :request do
       narrator: {
         name: 'emmi',
         replaced_animations: {
-          'eatCracker' => 'acknowledge',
-          'standStill' => 'restWeightShift'
+          'HeadAnimation' => { 'eatCracker' => 'acknowledge' },
+          'Pause' => { 'standStill' => 'restWeightShift' }
         }
       }
     }
@@ -40,8 +40,8 @@ RSpec.describe 'POST /v1/interventions/:id/change_narrator', type: :request do
     let(:new_character) { 'emmi' }
     let(:new_animations) do
       {
-        'eatCracker' => 'acknowledge',
-        'standStill' => 'restWeightShift'
+        'HeadAnimation' => { 'eatCracker' => 'acknowledge' },
+        'Pause' => { 'standStill' => 'restWeightShift' }
       }
     end
 

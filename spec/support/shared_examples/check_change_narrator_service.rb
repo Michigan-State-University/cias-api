@@ -5,8 +5,8 @@ RSpec.shared_examples 'check change narrator service' do
   let(:new_character) { 'emmi' }
   let(:replacement_animations) do
     {
-      'eatCracker' => 'acknowledge',
-      'standStill' => 'restWeightShift'
+      'HeadAnimation' => { 'eatCracker' => 'acknowledge' },
+      'Pause' => { 'standStill' => 'restWeightShift' }
     }
   end
   let!(:question) do

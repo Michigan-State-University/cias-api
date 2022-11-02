@@ -11,7 +11,7 @@ RSpec.describe V1::MultipleCharacters::Interventions::ChangeService do
 
   context 'update current narrator' do
     let(:new_character) { 'emmi' }
-    let(:replacement_animations) { { 'rest' => 'restWeightShift' } }
+    let(:replacement_animations) { { 'BodyAnimation' => { 'rest' => 'restWeightShift' } } }
 
     it do
       subject

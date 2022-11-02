@@ -7,8 +7,8 @@ RSpec.describe MultipleCharacters::ChangeNarratorJob, type: :job do
   let(:new_character) { 'emmi' }
   let(:new_animations) do
     {
-      'eatCracker' => 'acknowledge',
-      'standStill' => 'restWeightShift'
+      'HeadAnimation' => { 'eatCracker' => 'acknowledge' },
+      'Pause' => { 'standStill' => 'restWeightShift' }
     }
   end
 

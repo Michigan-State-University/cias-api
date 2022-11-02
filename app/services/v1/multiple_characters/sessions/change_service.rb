@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 class V1::MultipleCharacters::Sessions::ChangeService
+  SPEECH_ANIMATION_BLOCKS = %w[Speech ReadQuestion Reflection ReflectionFormula].freeze
   AVAILABLE_NARRATORS = %w[peedy emmi].freeze
   private_constant :AVAILABLE_NARRATORS
+  private_constant :SPEECH_ANIMATION_BLOCKS
 
   def initialize(session_id, new_character, replacement_animations)
     @session = Session.find(session_id)
@@ -48,8 +50,12 @@ class V1::MultipleCharacters::Sessions::ChangeService
 
   def update_blocks(question)
     question.narrator['blocks'].each do |block|
-      new_animation = replacement_animations[block['animation']]
+      new_animation = replacement_animations.dig(type_of_animation(block['type']), block['animation'])
       block['animation'] = new_animation if new_animation.present?
     end
+  end
+
+  def type_of_animation(type)
+    type.in?(SPEECH_ANIMATION_BLOCKS) ? 'SpeechAnimation' : type
   end
 end

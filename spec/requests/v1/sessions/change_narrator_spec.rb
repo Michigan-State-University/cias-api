@@ -14,8 +14,8 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions/:id/change_narr
       narrator: {
         name: 'emmi',
         replaced_animations: {
-          'eatCracker' => 'acknowledge',
-          'standStill' => 'restWeightShift'
+          'HeadAnimation' => { 'eatCracker' => 'acknowledge' },
+          'Pause' => { 'standStill' => 'restWeightShift' }
         }
       }
     }
@@ -41,8 +41,8 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions/:id/change_narr
     let(:new_character) { 'emmi' }
     let(:new_animations) do
       {
-        'eatCracker' => 'acknowledge',
-        'standStill' => 'restWeightShift'
+        'HeadAnimation' => { 'eatCracker' => 'acknowledge' },
+        'Pause' => { 'standStill' => 'restWeightShift' }
       }
     end
 

@@ -11,7 +11,7 @@ RSpec.describe V1::MultipleCharacters::Sessions::ChangeService do
 
   context 'update current narrator' do
     let(:new_character) { 'emmi' }
-    let(:replacement_animations) { { 'rest' => 'restWeightShift' } }
+    let(:replacement_animations) { { 'BodyAnimation' => { 'rest' => 'restWeightShift' } } }
 
     it do
       subject
@@ -24,7 +24,9 @@ RSpec.describe V1::MultipleCharacters::Sessions::ChangeService do
     let(:new_character) { 'emmi' }
     let(:replacement_animations) do
       {
-        'eatCracker' => 'acknowledge'
+        'HeadAnimation' => {
+          'eatCracker' => 'acknowledge'
+        }
       }
     end
     let!(:question) do
