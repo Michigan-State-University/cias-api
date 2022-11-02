@@ -63,6 +63,7 @@ class V1::GeneratedReports::ShareToThirdParty
           next if email.blank?
           next if report_ids.empty?
 
+          email = email.downcase
           user = User.find_by(email: email)
           next if user.present? && user.not_a_third_party?
 
