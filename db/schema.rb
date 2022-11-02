@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_03_082248) do
+ActiveRecord::Schema.define(version: 2022_10_28_112039) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -449,11 +449,9 @@ ActiveRecord::Schema.define(version: 2022_10_03_082248) do
   create_table "live_chat_navigator_setups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "no_navigator_available_message", default: "", null: false
     t.string "contact_email", default: "", null: false
-    t.integer "notify_by", default: 0, null: false
     t.uuid "intervention_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "is_navigator_notification_on", default: true
   end
 
   create_table "messages", force: :cascade do |t|
