@@ -74,7 +74,8 @@ class Session < ApplicationRecord
     end
 
     ActiveRecord::Base.transaction do
-      User.where(email: emails).find_each do |user|
+      users = User.where(email: emails)
+      users.find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
         user.update!(quick_exit_enabled: intervention.quick_exit)
 
@@ -88,6 +89,10 @@ class Session < ApplicationRecord
           scheduled_at: DateTime.now
         )
         user_intervention.update!(status: 'in_progress') if user_session.finished_at.blank?
+      end
+
+      (emails - users.map(&:email)).each do |email|
+        invitations.create!(email: email, health_clinic_id: health_clinic_id)
       end
     end
 
