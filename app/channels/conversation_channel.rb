@@ -59,6 +59,7 @@ class ConversationChannel < ApplicationCable::Channel
 
   def on_conversation_created(data)
     navigator = fetch_available_navigator(data['interventionId'])
+    handle_summoning_user(current_user, data, navigator)
     interlocutors = [LiveChat::Interlocutor.new(user_id: navigator.id), LiveChat::Interlocutor.new(user_id: current_user.id)]
     conversation = LiveChat::Conversation.create!(live_chat_interlocutors: interlocutors, intervention_id: data['interventionId'])
     conversation.messages << LiveChat::Message.new(content: data['firstMessageContent'], live_chat_interlocutor: interlocutors[1])
@@ -79,10 +80,33 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def on_fetch_live_chat_setup(data)
-    intervention = Intervention.find(data['interventionId'])
+    intervention = fetch_intervention(data)
     setup = intervention.navigator_setup
     response_data = V1::LiveChat::Interventions::LiveChatSetupSerializer.new(setup, { include: %i[participant_links phone] })
     ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'live_chat_setup_fetched'))
+  end
+
+  def on_call_out_navigator(data)
+    intervention = fetch_intervention(data)
+    summoning_user = summoning_user(current_user.id, intervention.id) ||
+                     LiveChat::SummoningUser.create!(user_id: current_user.id, intervention_id: intervention.id)
+
+    unless summoning_user.present? && summoning_user.call_out_available?
+      unlock_time = summoning_user.unlock_next_call_out_time
+      raise LiveChat::CallOutUnavailableException.new('Unavailable to call out navigator', current_channel_id, unlock_time)
+    end
+
+    summoning_user.update!(unlock_next_call_out_time: Time.zone.now + 15.minutes, participant_handled: false)
+    V1::LiveChat::Interventions::Navigators::SendMessages.call(intervention, 'call_out')
+    response_data = { unlockTime: summoning_user.unlock_next_call_out_time }
+    ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'navigators_called_out'))
+  end
+
+  def on_cancel_call_out(data)
+    handle_summoning_user(current_user, data)
+    summoning_user = summoning_user(current_user, data['interventionId'])
+    response_data = { summoningUserId: summoning_user&.id }
+    ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'call_out_canceled'))
   end
 
   private
@@ -125,12 +149,29 @@ class ConversationChannel < ApplicationCable::Channel
           sort_by { |user| user.conversations.where(archived: false).count }
   end
 
+  def fetch_intervention(data)
+    Intervention.find(data['interventionId'])
+  end
+
   def fetch_conversation_navigator(conversation)
     conversation.users.limit_to_roles('navigator').first
   end
 
   def fetch_conversation(data)
     LiveChat::Conversation.find(data['conversationId'])
+  end
+
+  def handle_summoning_user(participant, data, user_to_ignore = nil)
+    intervention = fetch_intervention(data)
+    summoning_user = summoning_user(participant.id, intervention.id)
+    return if summoning_user.nil? || summoning_user.participant_handled
+
+    V1::LiveChat::Interventions::Navigators::SendMessages.call(intervention, 'cancel_call_out', user_to_ignore)
+    summoning_user.update!(participant_handled: true)
+  end
+
+  def summoning_user(user_id, intervention_id)
+    @summoning_user ||= LiveChat::SummoningUser.find_by(user_id: user_id, intervention_id: intervention_id)
   end
 
   def intervention_id

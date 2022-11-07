@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_28_112039) do
+ActiveRecord::Schema.define(version: 2022_10_31_101803) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -454,6 +454,17 @@ ActiveRecord::Schema.define(version: 2022_10_28_112039) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "live_chat_summoning_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "unlock_next_call_out_time"
+    t.boolean "participant_handled", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["intervention_id"], name: "index_live_chat_summoning_users_on_intervention_id"
+    t.index ["user_id"], name: "index_live_chat_summoning_users_on_user_id"
+  end
+
   create_table "messages", force: :cascade do |t|
     t.text "body", null: false
     t.string "status", default: "new", null: false
@@ -867,6 +878,8 @@ ActiveRecord::Schema.define(version: 2022_10_28_112039) do
   add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_messages", "live_chat_interlocutors"
   add_foreign_key "live_chat_navigator_setups", "interventions"
+  add_foreign_key "live_chat_summoning_users", "interventions"
+  add_foreign_key "live_chat_summoning_users", "users"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"

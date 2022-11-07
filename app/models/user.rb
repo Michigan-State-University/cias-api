@@ -81,6 +81,7 @@ class User < ApplicationRecord
   # LIVE CHAT
   has_many :interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :restrict_with_exception
   has_many :conversations, class_name: 'LiveChat::Conversation', through: :interlocutors
+  has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
 
   # NOTIFICATIONS
   has_many :notifications, dependent: :destroy
