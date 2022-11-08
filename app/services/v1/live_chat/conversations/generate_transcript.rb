@@ -3,6 +3,8 @@
 require 'csv'
 
 class V1::LiveChat::Conversations::GenerateTranscript
+  include CsvHelper
+
   attr_reader :csv_content
 
   def self.call(record)
@@ -47,7 +49,7 @@ class V1::LiveChat::Conversations::GenerateTranscript
 
   def process_message(message)
     prefix = message.user.navigator? ? 'N' : 'P'
-    "#{prefix},#{message.created_at.strftime(ENV.fetch('FILE_TIMESTAMP_NOTATION', '%m-%d-%Y_%H%M'))},\"#{message.content}\""
+    "#{prefix},#{format_csv_timestamp(message.created_at)},\"#{message.content}\""
   end
 
   def concat_result(header, transcript)

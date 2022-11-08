@@ -33,7 +33,10 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
           "\"Intervention: #{intervention.name}\"",
           "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
           "\"Participant: #{participant.full_name} <#{participant.email}>\"",
-          messages.map { |m| "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.strftime('%m-%d-%Y_%H%M')},\"#{m.content}\"" }
+          messages.map do |m|
+            "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
+                                                                                    'UTC')).strftime('%m-%d-%Y_%H%M')},\"#{m.content}\""
+          end
         ].flatten
       end
 
@@ -62,7 +65,10 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
           "\"Intervention: #{intervention.name}\"",
           "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
           "\"Participant: <#{guest.id}>\"",
-          messages.map { |m| "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.strftime('%m-%d-%Y_%H%M')},\"#{m.content}\"" }
+          messages.map do |m|
+            "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
+                                                                                    'UTC')).strftime('%m-%d-%Y_%H%M')},\"#{m.content}\""
+          end
         ].flatten
       end
 
@@ -99,7 +105,10 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
           "\"Intervention: #{conv.intervention.name}\"",
           "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
           "\"Participant: #{participant.guest? ? "<#{participant.id}>" : "#{participant.full_name} <#{participant.email}>"}\"",
-          conv.messages.map { |m| "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.strftime('%m-%d-%Y_%H%M')},\"#{m.content}\"" }
+          conv.messages.map do |m|
+            "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
+                                                                                    'UTC')).strftime('%m-%d-%Y_%H%M')},\"#{m.content}\""
+          end
         ]
       end.flatten
     end

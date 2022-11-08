@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Intervention::Csv::Harvester
+  include CsvHelper
+
   DEFAULT_VALUE = 888
   DEFAULT_VALUE_FOR_TLFB_ANSWER = 0
   attr_reader :sessions
@@ -83,9 +85,10 @@ class Intervention::Csv::Harvester
 
   def metadata(session_variable, user_session, row_index)
     session_headers_index = header.index("#{session_variable}.metadata.session_start")
-    session_start = user_session.created_at
+    session_start = to_csv_timestamp(user_session.created_at)
     session_end = user_session.finished_at
     unless session_end.nil?
+      session_end = to_csv_timestamp(session_end)
       rows[row_index][session_headers_index + 2] = time_diff(session_start, session_end) # session duration
       rows[row_index][session_headers_index + 1] = session_end
     end
@@ -136,10 +139,6 @@ class Intervention::Csv::Harvester
 
       rows[row_index][var_index] = DEFAULT_VALUE
     end
-  end
-
-  def boolean_to_int(value)
-    value ? 1 : 0
   end
 
   def fill_by_tlfb_research(row_index, user_session)
