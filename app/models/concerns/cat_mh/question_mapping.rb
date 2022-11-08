@@ -56,7 +56,7 @@ module CatMh::QuestionMapping
                 ],
                 endPosition: {
                   x: 600,
-                  y: 550
+                  y: 100
                 }
               }
             ],

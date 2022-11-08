@@ -993,7 +993,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         'animation' => 'rest',
         'endPosition' => {
           'x' => 600,
-          'y' => 550
+          'y' => 100
         }
       )
       expect(json_response['data']['attributes']['narrator']['blocks'].first['sha256']).not_to be_empty
