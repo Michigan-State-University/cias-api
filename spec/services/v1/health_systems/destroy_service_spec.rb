@@ -16,8 +16,8 @@ RSpec.describe V1::HealthSystems::Destroy, type: :request do
          params: system_admin_params, headers: admin.create_new_auth_token
   end
 
-  let!(:clinic_admin_params) { { email: 'health@clinic.ad', health_clinic_id: health_clinic.id }}
-  let!(:system_admin_params) { { email: 'health@system.ad', health_system_id: health_system.id }}
+  let!(:clinic_admin_params) { { email: 'health@clinic.ad', health_clinic_id: health_clinic.id } }
+  let!(:system_admin_params) { { email: 'health@system.ad', health_system_id: health_system.id } }
 
   context 'valid deletion' do
     before do
@@ -34,12 +34,13 @@ RSpec.describe V1::HealthSystems::Destroy, type: :request do
     end
 
     context 'confirmed invite' do
-      let!(:clinic_admin_params) { { email: 'accepted@clinic.ad', health_clinic_id: health_clinic.id }}
+      let!(:clinic_admin_params) { { email: 'accepted@clinic.ad', health_clinic_id: health_clinic.id } }
 
       before do
         invite_clinic_admin_request
         User.find_by(email: 'accepted@clinic.ad').confirm
       end
+
       it 'do not delete user which accepted an invitation' do
         subject
         expect(User.all).to include(User.find_by(email: 'accepted@clinic.ad'))
