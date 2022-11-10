@@ -79,11 +79,25 @@ RSpec.describe SendFillInvitationJob, type: :job do
 
       it 'return proper body' do
         expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-        expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_from_clinic',
+        expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
                                                                                     domain: ENV['WEB_URL'],
                                                                                     intervention_id: intervention.id,
                                                                                     session_id: session.id,
                                                                                     health_clinic_id: health_clinic.id))
+      end
+
+      context 'shared to registered sends correct email' do
+        let(:intervention) { create(:intervention, status: intervention_status, shared_to: :registered) }
+        let(:health_clinic_id) { nil }
+
+        it do
+          expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
+          expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link',
+                                                                                      domain: ENV['WEB_URL'],
+                                                                                      intervention_id: intervention.id,
+                                                                                      session_id: session.id,
+                                                                                      health_clinic_id: health_clinic.id))
+        end
       end
     end
 

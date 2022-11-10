@@ -159,6 +159,8 @@ en:
       html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the button below to access.'
       button_text: Go to the session
       invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
       invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
     invite_to_session_and_registration:
       subject: CIAS Invitation
