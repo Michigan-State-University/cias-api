@@ -233,7 +233,7 @@ en:
       click_the_link: "Join conversation"
     participant_handled:
       subject: "Participant request for assist - canceled"
-      header: "Participant handled"
+      header: "Participant already doesn’t need help"
       body: "Participant canceled a call out or another navigator has just started a conversation with this participant in %{intervention_name}. You don't have to go to the CIAS and you can ignore the previous helping request."
   transcript_mailer:
     open_inbox: "See your inbox"
