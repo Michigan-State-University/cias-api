@@ -10,10 +10,17 @@ class V1::HealthClinics::Destroy
   end
 
   def call
-    health_clinic.destroy!
+    ActiveRecord::Base.transaction do
+      cancel_user_invitations(health_clinic)
+      health_clinic.destroy!
+    end
   end
 
   private
 
   attr_accessor :health_clinic
+
+  def cancel_user_invitations(health_clinic)
+    User.where(organizable_id: health_clinic.id, active: false, confirmed_at: nil).delete_all
+  end
 end
