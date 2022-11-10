@@ -39,7 +39,7 @@ class V1::InterventionsController < V1Controller
   def export
     authorize! :update, Intervention
 
-    Intervention::ExportJob.perform_later(current_v1_user.id, params[:id])
+    Interventions::ExportJob.perform_later(current_v1_user.id, params[:id])
 
     render status: :ok
   end
