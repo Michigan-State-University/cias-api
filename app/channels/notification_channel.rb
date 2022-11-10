@@ -52,12 +52,12 @@ class NotificationChannel < ApplicationCable::Channel
   def update_navigator_status_in_conversations(intervention)
     conversation_topic, status = current_user.online ? ['current_navigator_available', 200] : ['current_navigator_unavailable', 404]
     intervention.conversations.user_conversations(current_user, false).find_each do |conversation|
-      participant = (conversation.users - [current_user]).first # get the other user in conversation
+      other_interlocutor = (conversation.users - [current_user]).first # get the other user in conversation
       data = {
         interventionId: intervention.id,
         conversationId: conversation.id
       }
-      ActionCable.server.broadcast("user_conversation_channel_#{participant.id}", generic_message(data, conversation_topic, status))
+      ActionCable.server.broadcast("user_conversation_channel_#{other_interlocutor.id}", generic_message(data, conversation_topic, status))
     end
   end
 
