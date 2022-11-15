@@ -13,6 +13,12 @@
             "payload": {
               "type": "object",
               "properties": {
+                "range_start": {
+                  "type": "integer"
+                },
+                "range_end": {
+                  "type": "integer"
+                },
                 "end_value": {
                   "type": "string"
                 },
@@ -20,6 +26,12 @@
                   "type": "string"
                 },
                 "original_text": {
+                  "range_end": {
+                    "type": "integer"
+                  },
+                  "range_start": {
+                    "type": "integer"
+                  },
                   "end_value" : {
                     "type": "string"
                   },
@@ -29,6 +41,8 @@
                 }
               },
               "required": [
+                "range_end",
+                "range_start",
                 "end_value",
                 "start_value"
               ],
