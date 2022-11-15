@@ -50,9 +50,12 @@ class Question::Slider < Question
   end
 
   def change_range_to_integers
-    assign_default_range_values if question_payload['range_start'].blank? || question_payload['range_end'].blank?
-    question_payload['range_start'] = Integer(question_payload['range_start'])
-    question_payload['range_end'] = Integer(question_payload['range_end'])
+    if question_payload['range_start'].blank? || question_payload['range_end'].blank?
+      assign_default_range_values
+    else
+      question_payload['range_start'] = Integer(question_payload['range_start'])
+      question_payload['range_end'] = Integer(question_payload['range_end'])
+    end
   rescue ArgumentError
     raise ActiveRecord::ActiveRecordError, I18n.t('question.slider.range_value_not_a_number')
   end
