@@ -46,22 +46,23 @@ class Question::Slider < Question
   end
 
   def correct_range_format
-    body['data'][0]['payload'].tap do |question_payload|
-      return errors.add(:base, I18n.t('question.slider.invalid_range')) if question_payload['range_start'] >= question_payload['range_end']
-    end
+    errors.add(:base, I18n.t('question.slider.invalid_range')) if question_payload['range_start'] >= question_payload['range_end']
   end
 
   def change_range_to_integers
-    question_payload = body['data'][0]['payload']
-    assign_default_range_values!(question_payload) if question_payload['range_start'].blank? || question_payload['range_end'].blank?
+    assign_default_range_values if question_payload['range_start'].blank? || question_payload['range_end'].blank?
     question_payload['range_start'] = Integer(question_payload['range_start'])
     question_payload['range_end'] = Integer(question_payload['range_end'])
   rescue ArgumentError
     raise ActiveRecord::ActiveRecordError, I18n.t('question.slider.range_value_not_a_number')
   end
 
-  def assign_default_range_values!(payload)
-    payload['range_start'] = 0
-    payload['range_end'] = 100
+  def assign_default_range_values
+    question_payload['range_start'] = 0
+    question_payload['range_end'] = 100
+  end
+
+  def question_payload
+    @question_payload ||= body['data'][0]['payload']
   end
 end
