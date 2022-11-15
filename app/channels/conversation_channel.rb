@@ -51,6 +51,7 @@ class ConversationChannel < ApplicationCable::Channel
 
   def on_current_screen_title_changed(data)
     conversation = fetch_conversation(data)
+    conversation.participant_location_history << data['currentLocation'] if conversation.participant_location_history.last != data['currentLocation']
     conversation.update!(current_screen_title: data['currentScreenTitle'])
     response = generic_message({ currentScreenTitle: conversation.current_screen_title, conversationId: conversation.id }, 'current_screen_title_changed')
     navigator = fetch_conversation_navigator(conversation)
