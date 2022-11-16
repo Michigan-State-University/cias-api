@@ -188,4 +188,12 @@ describe User, type: :model do
 
     it { should be_valid }
   end
+
+  describe 'sends welcoming email for participants after confirming the account' do
+    subject { create(:user, :participant) }
+
+    it do
+      expect { subject.update!(confirmed_at: DateTime.now) }.to change { ActionMailer::Base.deliveries.size }.by(1)
+    end
+  end
 end

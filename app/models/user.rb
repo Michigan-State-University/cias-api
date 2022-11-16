@@ -122,6 +122,7 @@ class User < ApplicationRecord
   # BEFORE/AFTER ACTIONS
   before_save :invalidate_token_after_changes
   before_update :set_roles_to_uniq, if: :roles_changed?
+  after_save :send_welcome_email, if: -> { saved_change_to_attribute?(:confirmed_at) && !confirmed_at.nil? }
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
@@ -251,7 +252,15 @@ class User < ApplicationRecord
     roles.include?('guest')
   end
 
+  def participant?
+    roles.include?('participant')
+  end
+
   private
+
+  def send_welcome_email
+    UserMailer.welcome_email(roles.first, email).deliver_later
+  end
 
   def team_is_present?
     return if Team.exists?(team_admin_id: id)

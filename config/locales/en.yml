@@ -196,6 +196,13 @@ en:
       body_first_paragraph: You recently logged in to CIAS from a browser or app that we don't recognize or your last verification was over 30 days ago.
       body_second_paragraph: To ensure your account's security, we need to verify your identity. Enter the following code where prompted by CIAS.
       verification_code: 'Verification code: %{verification_code}'
+    welcome_email:
+      button_text: Go to the app
+      dashboard_link: "%{web_url}/login"
+      subject: Welcome to CIAS
+      html_body: "You have successfully created a %{role} account!<br /><span style='font-weight: 400'>You can use the link below at any time to access your intervention dashboard.</span>"
+      html_sub_body: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS, please contact your research study team.<br /><br />A quick note: Every 30 days, you will be asked to authenticate your account using a verification code sent to your email.</div>'
+      header: Welcome to CIAS
   clone_mailer:
     intervention:
       subject: 'Copy of %{intervention_name}'
