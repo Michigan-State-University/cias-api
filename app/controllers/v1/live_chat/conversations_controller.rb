@@ -23,7 +23,9 @@ class V1::LiveChat::ConversationsController < V1Controller
 
     return render status: :method_not_allowed if conversation_load.transcript.attached? && conversation_load.archived
 
-    LiveChat::GenerateConversationTranscriptJob.perform_later(conversation_load.id, current_v1_user.id)
+    LiveChat::GenerateTranscriptJob.perform_later(
+      conversation_load.id, LiveChat::Conversation, :transcript, conversation_load.intervention.name, current_v1_user.id
+    )
 
     render status: :created
   end
