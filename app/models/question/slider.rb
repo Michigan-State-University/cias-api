@@ -66,6 +66,6 @@ class Question::Slider < Question
   end
 
   def question_payload
-    @question_payload ||= body['data'][0]['payload']
+    body['data'][0]['payload']
   end
 end
