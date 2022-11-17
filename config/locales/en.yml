@@ -5,6 +5,9 @@ en:
       file: '%m_%d_%Y'
       report_file: '%m_%d_%Y_%H_%M'
   question:
+    slider:
+      invalid_range: 'End value must be larger than the start value'
+      range_value_not_a_number: 'Only numbers are permitted on the range endpoint'
     finish:
       subtitle: '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>'
       text_to_speech: 'Enter main text for screen here. This is the last screen participants will see in this session'
