@@ -190,10 +190,12 @@ describe User, type: :model do
   end
 
   describe 'sends welcoming email for participants after confirming the account' do
-    subject { create(:user, :participant) }
+    let(:user) { create(:user, :participant, confirmed_at: nil) }
+
+    before { ActiveJob::Base.queue_adapter = :test }
 
     it do
-      expect { subject.update!(confirmed_at: DateTime.now) }.to change { ActionMailer::Base.deliveries.size }.by(1)
+      expect { user.confirm }.to have_enqueued_job(ActionMailer::MailDeliveryJob).once
     end
   end
 end
