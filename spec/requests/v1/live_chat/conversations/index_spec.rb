@@ -17,7 +17,7 @@ RSpec.describe 'GET /v1/live_chat/conversations', type: :request do
     ]
   end
 
-  let!(:archived_conversations) { create_list(:live_chat_conversation, 3, intervention_id: intervention.id, archived: true) }
+  let!(:archived_conversations) { create_list(:live_chat_conversation, 3, intervention_id: intervention.id, archived_at: DateTime.now) }
   let!(:interlocutors_archive) { archived_conversations.map { |conv| create(:live_chat_interlocutor, user: user, conversation: conv) } }
 
   let(:request) do

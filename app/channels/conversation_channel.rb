@@ -73,8 +73,8 @@ class ConversationChannel < ApplicationCable::Channel
   def on_conversation_archived(data)
     # this event should only fire when navigator ends the conversation; therefore, current user should always be a navigator
     conversation = fetch_conversation(data)
-    conversation.update!(archived: true)
-    response = generic_message({ conversationId: conversation.id }, 'conversation_archived')
+    conversation.update!(archived_at: DateTime.now)
+    response = generic_message({ conversationId: conversation.id, archivedAt: conversation.archived_at }, 'conversation_archived')
     conversation.users.each do |user|
       ActionCable.server.broadcast(user_channel_id(user), response)
     end
@@ -147,7 +147,7 @@ class ConversationChannel < ApplicationCable::Channel
     intervention.navigators.
           where(online: true).
           includes(:conversations).
-          sort_by { |user| user.conversations.where(archived: false).count }
+          sort_by { |user| user.conversations.where(archived_at: nil).count }
   end
 
   def fetch_intervention(data)

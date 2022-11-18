@@ -2,7 +2,7 @@
 
 class V1::LiveChat::ConversationSerializer < V1Serializer
   include FileHelper
-  attributes :id, :intervention_id, :current_screen_title, :archived
+  attributes :id, :intervention_id, :current_screen_title, :archived_at
 
   has_many :live_chat_interlocutors, serializer: V1::LiveChat::InterlocutorSerializer
 
