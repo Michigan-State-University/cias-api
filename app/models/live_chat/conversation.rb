@@ -30,4 +30,8 @@ class LiveChat::Conversation < ApplicationRecord
   def navigator
     users.limit_to_roles('navigator').first
   end
+
+  def other_user
+    (users - [navigator]).first
+  end
 end
