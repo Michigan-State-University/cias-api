@@ -10,12 +10,11 @@ RSpec.describe V1::Notifications::TranscriptReady do
 
     it 'correctly creates notification with valid data' do
       expect { subject }.to change(Notification, :count).by(1)
-      expect(Notification.first.event).to eq :intervention_conversations_transcripts_ready.to_s
+      expect(Notification.first.event).to eq :intervention_conversations_transcript_ready.to_s
       expect(Notification.first.data).to include(
         'intervention_id' => object.id,
         'intervention_name' => name,
-        'transcript' => nil,
-        'user_id' => user.id
+        'transcript' => nil
       )
     end
   end
@@ -33,8 +32,7 @@ RSpec.describe V1::Notifications::TranscriptReady do
         'conversation_id' => object.id,
         'intervention_name' => name,
         'transcript' => nil,
-        'archived' => false,
-        'user_id' => user.id
+        'archived' => false
       )
     end
   end

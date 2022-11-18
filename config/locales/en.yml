@@ -102,8 +102,6 @@ en:
       accepted: "You've successfully joined %{organizable_type} %{organizable_name}."
       not_found: "%{organizable_type} Invitation not found"
   live_chat:
-    transcript:
-      is_ready: "Your transcript is ready"
     navigators:
       invitations:
         success: "You have successfully accepted the invitation to intervention %{intervention_name}"

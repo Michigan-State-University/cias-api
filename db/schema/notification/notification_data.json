@@ -38,9 +38,5 @@
       "type": "boolean"
     }
   },
-  "required": [
-    "user_id",
-    "message"
-  ],
   "additionalProperties": false
 }

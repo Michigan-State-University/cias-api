@@ -20,7 +20,7 @@ class V1::Notifications::TranscriptReady
   private
 
   def event
-    object.is_a?(LiveChat::Conversation) ? :conversation_transcript_ready : :intervention_conversations_transcripts_ready
+    object.is_a?(LiveChat::Conversation) ? :conversation_transcript_ready : :intervention_conversations_transcript_ready
   end
 
   def notification_object_body
@@ -41,9 +41,7 @@ class V1::Notifications::TranscriptReady
   def transcript_ready_body
     {
       intervention_name: object_name,
-      **notification_object_body,
-      message: I18n.t('live_chat.transcript.is_ready'),
-      user_id: user.id
+      **notification_object_body
     }
   end
 
