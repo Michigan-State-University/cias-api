@@ -23,6 +23,11 @@ class User < ApplicationRecord
   APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
                  organization_admin researcher e_intervention_admin team_admin admin navigator].freeze
 
+  FORMATTING_APP_ROLE_EXCEPTIONS = {
+    'e_intervention_admin' => 'E-intervention admin',
+    'third_party' => 'third party user'
+  }.freeze
+
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
   enumerate_for :roles,
@@ -70,7 +75,6 @@ class User < ApplicationRecord
   # REPORTS AVAILABLE FOR THIRD PARTY USER
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
                                                  dependent: :destroy
-  has_many :downloaded_reports, dependent: :destroy
 
   # DOWNLOADED REPORTS
   has_many :downloaded_reports, dependent: :destroy
@@ -87,8 +91,8 @@ class User < ApplicationRecord
 
   # USER IN GENERAL
   has_many :user_verification_codes, dependent: :destroy
-  attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
-  attribute :roles, :string, array: true, default: assign_default_values('roles')
+  attribute :time_zone, :string, default: -> { ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York') }
+  attribute :roles, :string, array: true, default: -> { assign_default_values('roles') }
 
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
@@ -256,10 +260,14 @@ class User < ApplicationRecord
     roles.include?('participant')
   end
 
+  def human_readable_role
+    FORMATTING_APP_ROLE_EXCEPTIONS[roles.first] || roles.first.tr('_', ' ')
+  end
+
   private
 
   def send_welcome_email
-    UserMailer.welcome_email(roles.first, email).deliver_later
+    UserMailer.welcome_email(human_readable_role, email).deliver_later
   end
 
   def team_is_present?
