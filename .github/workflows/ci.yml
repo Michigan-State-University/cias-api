@@ -95,6 +95,7 @@ jobs:
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
         run: |
+          gem install ffi
           gem install bundler -v "2.2.22"
           bundle config set path 'vendor/bundle'
           bundle install
