@@ -115,7 +115,7 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
           participant_interlocutor = LiveChat::Interlocutor.new(user: participant)
           interlocutors = [navigator_interlocutor, participant_interlocutor]
           conversation = LiveChat::Conversation.create!(live_chat_interlocutors: [navigator_interlocutor, participant_interlocutor], intervention: intervention)
-          conversation.messages << (0...rand(5)).map do
+          conversation.messages << 3.times.map do # rubocop:disable Performance/TimesMap
             LiveChat::Message.new(live_chat_interlocutor: interlocutors.sample, content: message_contents.sample)
           end
           conversation
