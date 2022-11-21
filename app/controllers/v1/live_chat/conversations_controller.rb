@@ -21,14 +21,23 @@ class V1::LiveChat::ConversationsController < V1Controller
   def generate_transcript
     authorize! :generate_transcript, LiveChat::Conversation
 
-    return render status: :method_not_allowed if conversation_load.transcript.attached? && conversation_load.archived
+    return render status: :method_not_allowed unless can_generate_transcript?
 
-    LiveChat::GenerateConversationTranscriptJob.perform_later(conversation_load.id, current_v1_user.id)
+    LiveChat::GenerateTranscriptJob.perform_later(
+      conversation_load.id, LiveChat::Conversation, :transcript, conversation_load.intervention.name, current_v1_user.id
+    )
 
     render status: :created
   end
 
   private
+
+  def can_generate_transcript?
+    conversation = conversation_load
+    return true unless conversation.transcript.attached?
+
+    conversation.archived ? (conversation.transcript.blob.created_at < conversation.archived_at) : true
+  end
 
   def conversation_load
     @conversation_load ||= LiveChat::Conversation.accessible_by(current_ability).find(params[:conversation_id])
@@ -39,7 +48,7 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def archived?
-    archived_filter_params[:archived] || false
+    ActiveRecord::Type::Boolean.new.cast(archived_filter_params[:archived] || false)
   end
 
   def conversation_params

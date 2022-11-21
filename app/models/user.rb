@@ -85,6 +85,7 @@ class User < ApplicationRecord
   # LIVE CHAT
   has_many :interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :restrict_with_exception
   has_many :conversations, class_name: 'LiveChat::Conversation', through: :interlocutors
+  has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
 
   # NOTIFICATIONS
   has_many :notifications, dependent: :destroy
@@ -236,24 +237,10 @@ class User < ApplicationRecord
     Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
-  def team_admin?
-    roles.include?('team_admin')
-  end
-
-  def e_intervention_admin?
-    roles.include?('e_intervention_admin')
-  end
-
-  def researcher?
-    roles.include?('researcher')
-  end
-
-  def navigator?
-    roles.include?('navigator')
-  end
-
-  def guest?
-    roles.include?('guest')
+  APP_ROLES.each do |role|
+    define_method :"#{role}?" do
+      roles.include?(role)
+    end
   end
 
   def participant?

@@ -4,7 +4,7 @@ require 'csv'
 
 class V1::LiveChat::Conversations::GenerateTranscript
   include CsvHelper
-
+  include DateTimeInterface
   attr_reader :csv_content
 
   def self.call(record)
@@ -33,27 +33,29 @@ class V1::LiveChat::Conversations::GenerateTranscript
 
   protected
 
-  def prepare_file_header(conversation)
-    navigator = conversation.users.limit_to_roles('navigator').first
-    participant = conversation.users.limit_to_roles(%w[participant guest]).first
-    [
-      "\"Intervention: #{conversation.intervention.name}\"",
-      "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
-      "\"Participant: #{participant.guest? ? "<#{participant.id}>" : "#{participant.full_name} <#{participant.email}>"}\""
-    ]
+  def prepare_headers
+    raise NotImplementedError, "Subclass did not define #{__method__} method"
   end
 
   def process_conversation(conversation)
-    conversation.messages.map { |message| process_message(message) }
+    [
+      conversation.intervention.name, conversation.participant_location_history, conversation.other_user.id,
+      conversation.created_at.strftime('%m/%d/%Y'), conversation.created_at.strftime('%I:%M:%S %p'), conversation_duration(conversation),
+      *conversation.messages.map { |message| process_message(message) }
+    ]
+  end
+
+  def base_headers
+    # headers are: intervention name, location history (ids), participant id, conversation date, initiation time, duration, and messages
+    # (pad all of the shorter arrays to max)
+    ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration']
   end
 
   def process_message(message)
-    prefix = message.user.navigator? ? 'N' : 'P'
-    "#{prefix},#{format_csv_timestamp(message.created_at)},\"#{message.content}\""
+    "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\""
   end
 
-  def concat_result(header, transcript)
-    @csv_content << header
-    @csv_content << transcript
+  def conversation_duration(conversation)
+    conversation.archived ? time_diff(conversation.created_at, conversation.updated_at) : nil
   end
 end
