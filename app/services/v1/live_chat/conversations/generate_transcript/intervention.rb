@@ -12,7 +12,7 @@ class V1::LiveChat::Conversations::GenerateTranscript::Intervention < V1::LiveCh
 
   def initialize(record)
     super(record)
-    @max_size = max_messages_count
+    @max_size = max_messages_count || 0
   end
 
   protected

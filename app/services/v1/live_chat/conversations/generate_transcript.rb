@@ -22,7 +22,7 @@ class V1::LiveChat::Conversations::GenerateTranscript
 
   def to_csv
     CSV.generate do |csv|
-      @csv_content.each { |row| csv << [row] }
+      @csv_content.each { |row| csv << row }
     end
   end
 
