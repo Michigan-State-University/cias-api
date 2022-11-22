@@ -31,7 +31,7 @@ RSpec.describe 'POST /v1/live_chat/conversations/:conversation_id/generate_trans
   end
 
   context 'When conversation is archived' do
-    let(:conversation) { create(:live_chat_conversation, intervention: intervention, archived: true) }
+    let(:conversation) { create(:live_chat_conversation, intervention: intervention, archived_at: DateTime.now) }
 
     it 'correctly generates csv the first time' do
       expect(response).to have_http_status(:created)
@@ -39,7 +39,7 @@ RSpec.describe 'POST /v1/live_chat/conversations/:conversation_id/generate_trans
 
     context 'returns correct HTTP status code (Method Not Allowed) when generating transcript for the second time' do
       let(:conversation) do
-        create(:live_chat_conversation, intervention: intervention, archived: true,
+        create(:live_chat_conversation, intervention: intervention, archived_at: DateTime.now,
                                         transcript: FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', false))
       end
 

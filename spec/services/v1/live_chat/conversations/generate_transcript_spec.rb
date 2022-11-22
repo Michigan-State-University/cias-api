@@ -30,14 +30,10 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
       end
       let!(:expected) do
         [
-          "\"Intervention: #{intervention.name}\"",
-          "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
-          "\"Participant: #{participant.full_name} <#{participant.email}>\"",
-          messages.map do |m|
-            "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
-                                                                                    'UTC')).strftime('%m-%d-%Y_%H%M')},\"#{m.content}\""
-          end
-        ].flatten
+          ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
+          [intervention.name, conversation.participant_location_history, participant.id, conversation.created_at.strftime('%m/%d/%Y'),
+           conversation.created_at.strftime('%I:%M:%S %p'), nil, '[N] "Hello there"', '[P] "Hello?"', '[N] "Welcome"']
+        ]
       end
 
       it do
@@ -62,14 +58,11 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
 
       let!(:expected) do
         [
-          "\"Intervention: #{intervention.name}\"",
-          "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
-          "\"Participant: <#{guest.id}>\"",
-          messages.map do |m|
-            "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
-                                                                                    'UTC')).strftime('%m-%d-%Y_%H%M')},\"#{m.content}\""
-          end
-        ].flatten
+          ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
+          [intervention.name, conversation.participant_location_history, guest.id, conversation.created_at.strftime('%m/%d/%Y'),
+           conversation.created_at.strftime('%I:%M:%S %p'), nil,
+           *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }]
+        ]
       end
 
       it do
@@ -89,32 +82,64 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
         participant_interlocutor = LiveChat::Interlocutor.new(user: participant)
         conversation = LiveChat::Conversation.create!(live_chat_interlocutors: [navigator_interlocutor, participant_interlocutor], intervention: intervention)
         conversation.messages << [
-          LiveChat::Message.new(content: 'Hey hey people', live_chat_interlocutor: navigator_interlocutor),
-          LiveChat::Message.new(content: 'HTD here', live_chat_interlocutor: participant_interlocutor),
-          LiveChat::Message.new(content: 'Bringing the best software there is', live_chat_interlocutor: navigator_interlocutor)
+          LiveChat::Message.new(live_chat_interlocutor: navigator_interlocutor, content: 'Hey hey people'),
+          LiveChat::Message.new(live_chat_interlocutor: participant_interlocutor, content: 'HTD here'),
+          LiveChat::Message.new(live_chat_interlocutor: navigator_interlocutor, content: 'Bringing the best software there is')
         ]
         conversation
       end
     end
 
     let(:expected) do
-      conversations.map do |conv|
-        navigator = conv.users.limit_to_roles('navigator').first
-        participant = conv.users.limit_to_roles(%w[guest participant]).first
-        [
-          "\"Intervention: #{conv.intervention.name}\"",
-          "\"Navigator: #{navigator.full_name} <#{navigator.email}>\"",
-          "\"Participant: #{participant.guest? ? "<#{participant.id}>" : "#{participant.full_name} <#{participant.email}>"}\"",
-          conv.messages.map do |m|
-            "#{m.user.navigator? ? 'N' : 'P'},#{m.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
-                                                                                    'UTC')).strftime('%m-%d-%Y_%H%M')},\"#{m.content}\""
-          end
-        ]
-      end.flatten
+      [
+        ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
+        *conversations.zip(participants).map do |(conversation, participant)|
+          [
+            intervention.name, conversation.participant_location_history, participant.id, conversation.created_at.strftime('%m/%d/%Y'),
+            conversation.created_at.strftime('%I:%M:%S %p'), nil,
+            *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }
+          ]
+        end
+      ]
     end
 
     it do
       expect(result.csv_content).to eq expected
+    end
+
+    context 'when multiple conversations dont have the same amount of messages' do
+      let!(:conversations) do
+        participants.map do |participant|
+          message_contents = ['Hey hey people', 'HTD here', 'Bringing the best software there is']
+          navigator_interlocutor = LiveChat::Interlocutor.new(user: navigator)
+          participant_interlocutor = LiveChat::Interlocutor.new(user: participant)
+          interlocutors = [navigator_interlocutor, participant_interlocutor]
+          conversation = LiveChat::Conversation.create!(live_chat_interlocutors: [navigator_interlocutor, participant_interlocutor], intervention: intervention)
+          conversation.messages << 3.times.map do # rubocop:disable Performance/TimesMap
+            LiveChat::Message.new(live_chat_interlocutor: interlocutors.sample, content: message_contents.sample)
+          end
+          conversation
+        end
+      end
+
+      let(:expected) do
+        message_count = conversations.map { |c| c.messages.size }.max
+        [
+          ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration',
+           *(0...message_count).map { |i| "Message #{i + 1}" }],
+          *conversations.map do |conversation|
+            array = [intervention.name, conversation.participant_location_history, conversation.other_user.id,
+                     conversation.created_at.strftime('%m/%d/%Y'), conversation.created_at.strftime('%I:%M:%S %p'), nil,
+                     *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }]
+            array << [nil] * (message_count - conversation.messages.size) if array.size < message_count
+            array
+          end
+        ]
+      end
+
+      it do
+        expect(result.csv_content).to eq expected
+      end
     end
   end
 end

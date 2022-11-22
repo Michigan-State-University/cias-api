@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class Intervention::Csv::Harvester
-  include CsvHelper
-
+  include DateTimeInterface
   DEFAULT_VALUE = 888
   DEFAULT_VALUE_FOR_TLFB_ANSWER = 0
   attr_reader :sessions
@@ -85,10 +84,9 @@ class Intervention::Csv::Harvester
 
   def metadata(session_variable, user_session, row_index)
     session_headers_index = header.index("#{session_variable}.metadata.session_start")
-    session_start = to_csv_timestamp(user_session.created_at)
+    session_start = user_session.created_at
     session_end = user_session.finished_at
     unless session_end.nil?
-      session_end = to_csv_timestamp(session_end)
       rows[row_index][session_headers_index + 2] = time_diff(session_start, session_end) # session duration
       rows[row_index][session_headers_index + 1] = session_end
     end
@@ -99,17 +97,6 @@ class Intervention::Csv::Harvester
     session_header_index = header.index("#{session_variable}.metadata.quick_exit")
 
     rows[row_index][session_header_index] = boolean_to_int(user_session.quick_exit) if session_header_index.present?
-  end
-
-  def time_diff(start_time, end_time)
-    seconds_diff = end_time - start_time
-    duration = ActiveSupport::Duration.build(seconds_diff.abs)
-    parts = duration.parts
-    total_hours = (parts[:hours] || 0) + (parts[:days] || 0) * 24
-    format('%<hours>02d:%<minutes>02d:%<seconds>02d',
-           hours: total_hours,
-           minutes: parts[:minutes] || 0,
-           seconds: parts[:seconds] || 0)
   end
 
   def users
@@ -139,6 +126,10 @@ class Intervention::Csv::Harvester
 
       rows[row_index][var_index] = DEFAULT_VALUE
     end
+  end
+
+  def boolean_to_int(value)
+    value ? 1 : 0
   end
 
   def fill_by_tlfb_research(row_index, user_session)
