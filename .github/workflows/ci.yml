@@ -4,7 +4,7 @@ on: push
 jobs:
   setup_environment:
     name: Prepare environment & split tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
       test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
@@ -48,7 +48,7 @@ jobs:
   test:
     name: Test batch no. ${{ matrix.chunk }}
     needs: setup_environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.setup_environment.outputs['test-chunk-ids']) }}

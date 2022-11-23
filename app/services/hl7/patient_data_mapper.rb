@@ -6,29 +6,29 @@ class Hl7::PatientDataMapper
   MSH_SENDING_APPLICATION = 'LogicSoln' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.3
   MSH_SENDING_FACILITY = 'HFHS'
   MSH_RECEIVING_FACILITY = 'HFH'
-  MSH_MESSAGE_TYPE = 'ORU' # Unsolicited transmission of an observation -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0076
-  MSH_TRIGGER_EVENT = 'R01' #	ORU/ACK - Unsolicited transmission of an observation message -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0003
   MSH_VERSION_ID = '2.3' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.12
 
   SECOND_SEGMENT_TYPE = 'PID' # Patient Identification -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/PID
 
-  def self.call(user_id, user_session_id)
-    new(user_id, user_session_id).call
+  def self.call(user_id, user_session_id, msh_message_type, msh_trigger_event)
+    new(user_id, user_session_id, msh_message_type, msh_trigger_event).call
   end
 
-  def initialize(user_id, user_session_id)
+  def initialize(user_id, user_session_id, msh_message_type, msh_trigger_event)
     @user = User.find(user_id)
     @user_session = UserSession.find(user_session_id)
+    @msh_message_type = msh_message_type # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0076
+    @msh_trigger_event = msh_trigger_event # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0003
   end
 
   def call
     # rubocop:disable Layout/LineLength
-    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{MSH_SENDING_FACILITY}||#{MSH_RECEIVING_FACILITY}|#{date_now}||#{MSH_MESSAGE_TYPE}^#{MSH_TRIGGER_EVENT}|#{message_count}|#{ENV.fetch('PROCESSING')}|#{MSH_VERSION_ID}|||
+    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{MSH_SENDING_FACILITY}||#{MSH_RECEIVING_FACILITY}|#{date_now}||#{msh_message_type}^#{msh_trigger_event}|#{message_count}|#{ENV.fetch('PROCESSING')}|#{MSH_VERSION_ID}|||
        #{SECOND_SEGMENT_TYPE}|||#{user.hfhs_patient_detail.patient_id}||#{user.hfhs_patient_detail.last_name}^#{user.hfhs_patient_detail.first_name}||#{dob_in_correct_format}|#{sex}]
     # rubocop:enable Layout/LineLength
   end
 
-  attr_reader :user, :user_session
+  attr_reader :user, :user_session, :msh_message_type, :msh_trigger_event
 
   private
 

@@ -52,6 +52,6 @@ class Hl7::ReportMapper
   end
 
   def file_base64
-    Base64.encode64(report.pdf_report.blob.download)
+    Base64.strict_encode64(report.pdf_report.blob.download)
   end
 end

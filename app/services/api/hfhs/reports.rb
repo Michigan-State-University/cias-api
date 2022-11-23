@@ -17,7 +17,7 @@ class Api::Hfhs::Reports
     token  = Api::Hfhs::Authentication.call
     return if token.nil?
 
-    baerer_token = "#{token[:token_type]}  #{token[:access_token]}"
+    baerer_token = "#{token[:token_type]} #{token[:access_token]}"
 
     generated_reports.each do |generated_report|
       @hl7_data = Hl7::GeneratedReportMapper.call(user_session.id, generated_report.id)
