@@ -31,8 +31,10 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
       let!(:expected) do
         [
           ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
-          [intervention.name, conversation.participant_location_history, participant.id, conversation.created_at.strftime('%m/%d/%Y'),
-           conversation.created_at.strftime('%I:%M:%S %p'), nil, '[N] "Hello there"', '[P] "Hello?"', '[N] "Welcome"']
+          [intervention.name, conversation.participant_location_history, participant.id,
+           conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
+           conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'),
+           nil, '[N] "Hello there"', '[P] "Hello?"', '[N] "Welcome"']
         ]
       end
 
@@ -59,8 +61,9 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
       let!(:expected) do
         [
           ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
-          [intervention.name, conversation.participant_location_history, guest.id, conversation.created_at.strftime('%m/%d/%Y'),
-           conversation.created_at.strftime('%I:%M:%S %p'), nil,
+          [intervention.name, conversation.participant_location_history, guest.id,
+           conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
+           conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'), nil,
            *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }]
         ]
       end
@@ -95,8 +98,9 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
         ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
         *conversations.zip(participants).map do |(conversation, participant)|
           [
-            intervention.name, conversation.participant_location_history, participant.id, conversation.created_at.strftime('%m/%d/%Y'),
-            conversation.created_at.strftime('%I:%M:%S %p'), nil,
+            intervention.name, conversation.participant_location_history, participant.id,
+            conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
+            conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'), nil,
             *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }
           ]
         end
@@ -129,7 +133,8 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
            *(0...message_count).map { |i| "Message #{i + 1}" }],
           *conversations.map do |conversation|
             array = [intervention.name, conversation.participant_location_history, conversation.other_user.id,
-                     conversation.created_at.strftime('%m/%d/%Y'), conversation.created_at.strftime('%I:%M:%S %p'), nil,
+                     conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
+                     conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'), nil,
                      *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }]
             array << [nil] * (message_count - conversation.messages.size) if array.size < message_count
             array

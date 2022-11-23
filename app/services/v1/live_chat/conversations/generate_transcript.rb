@@ -4,6 +4,7 @@ require 'csv'
 
 class V1::LiveChat::Conversations::GenerateTranscript
   include DateTimeInterface
+  include CsvHelper
   attr_reader :csv_content
 
   def self.call(record)
@@ -37,9 +38,10 @@ class V1::LiveChat::Conversations::GenerateTranscript
   end
 
   def process_conversation(conversation)
+    timestamp = to_csv_timestamp(conversation.created_at)
     [
       conversation.intervention.name, conversation.participant_location_history, conversation.other_user.id,
-      conversation.created_at.strftime('%m/%d/%Y'), conversation.created_at.strftime('%I:%M:%S %p'), conversation_duration(conversation),
+      timestamp.strftime('%m/%d/%Y'), timestamp.strftime('%I:%M:%S %p'), conversation_duration(conversation),
       *conversation.messages.map { |message| process_message(message) }
     ]
   end
