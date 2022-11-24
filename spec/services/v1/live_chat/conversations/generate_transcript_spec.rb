@@ -30,7 +30,7 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
       end
       let!(:expected) do
         [
-          ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
+          ['Intervention name', 'Location history', 'Participant ID', 'Date EST', 'Inititation time EST', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
           [intervention.name, conversation.participant_location_history, participant.id,
            conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
            conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'),
@@ -60,7 +60,7 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
 
       let!(:expected) do
         [
-          ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
+          ['Intervention name', 'Location history', 'Participant ID', 'Date EST', 'Inititation time EST', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
           [intervention.name, conversation.participant_location_history, guest.id,
            conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
            conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'), nil,
@@ -95,7 +95,7 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
 
     let(:expected) do
       [
-        ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
+        ['Intervention name', 'Location history', 'Participant ID', 'Date EST', 'Inititation time EST', 'Duration', 'Message 1', 'Message 2', 'Message 3'],
         *conversations.zip(participants).map do |(conversation, participant)|
           [
             intervention.name, conversation.participant_location_history, participant.id,
@@ -129,7 +129,7 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
       let(:expected) do
         message_count = conversations.map { |c| c.messages.size }.max
         [
-          ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration',
+          ['Intervention name', 'Location history', 'Participant ID', 'Date EST', 'Inititation time EST', 'Duration',
            *(0...message_count).map { |i| "Message #{i + 1}" }],
           *conversations.map do |conversation|
             array = [intervention.name, conversation.participant_location_history, conversation.other_user.id,

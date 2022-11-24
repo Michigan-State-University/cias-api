@@ -49,7 +49,7 @@ class V1::LiveChat::Conversations::GenerateTranscript
   def base_headers
     # headers are: intervention name, location history (ids), participant id, conversation date, initiation time, duration, and messages
     # (pad all of the shorter arrays to max)
-    ['Intervention name', 'Location history', 'Participant ID', 'Date', 'Inititation time', 'Duration']
+    ['Intervention name', 'Location history', 'Participant ID', 'Date EST', 'Inititation time EST', 'Duration']
   end
 
   def process_message(message)
