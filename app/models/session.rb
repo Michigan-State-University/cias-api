@@ -58,7 +58,7 @@ class Session < ApplicationRecord
   end
 
   def next_session
-    intervention.sessions.find_by(position: position + 1)
+    intervention.sessions.order(position: :asc).find_by('position > ?', position)
   end
 
   def integral_update
