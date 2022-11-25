@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_17_153608) do
+ActiveRecord::Schema.define(version: 2022_11_23_125204) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
