@@ -39,7 +39,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'attaches avatar to the current user' do
-        expect(current_user.avatar.attachment.attributes).to include(
+        expect(current_user.reload.avatar.attachment.attributes).to include(
           'record_type' => 'User',
           'record_id' => current_user.id,
           'name' => 'avatar'
@@ -70,7 +70,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
         end
 
         it 'attaches avatar to the current user' do
-          expect(other_user.avatar.attachment.attributes).to include(
+          expect(other_user.reload.avatar.attachment.attributes).to include(
             'record_type' => 'User',
             'record_id' => other_user.id,
             'name' => 'avatar'
@@ -112,6 +112,36 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
         it 'response contains proper error message' do
           expect(json_response['message']).to eq 'You are not authorized to access this page.'
         end
+      end
+    end
+  end
+
+  context 'when file is incorrect' do
+    context 'when file size is too big (more than 10 megabytes)' do
+      let(:params) do
+        {
+          avatar: {
+            file: FactoryHelpers.upload_file('spec/factories/images/big-image.png', 'image/png', true)
+          }
+        }
+      end
+
+      it 'Returns correct status code (Unprocessable entity)' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    context 'when file is not an image' do
+      let(:params) do
+        {
+          avatar: {
+            file: FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', false)
+          }
+        }
+      end
+
+      it 'returns correct status code (Unprocessable entity)' do
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

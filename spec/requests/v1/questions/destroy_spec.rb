@@ -136,4 +136,45 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
       end
     end
   end
+
+  context 'when duplicated question was moved' do
+    let(:new_question_group) { create(:question_group, title: 'New Question Group', session: session) }
+    let(:other_new_question_group) { create(:question_group, title: 'Other New Question Group', session: session) }
+    let(:new_question) { create(:question_date, question_group: new_question_group) }
+    let(:duplicate_request) { post v1_clone_question_path(id: new_question.id), headers: headers }
+    let(:duplicated_question) do
+      duplicate_request
+      Question.find(json_response['data']['id'])
+    end
+    let(:move_request) { patch v1_session_move_question_path(session_id: session.id), params: move_params, headers: headers }
+    let(:move_params) do
+      {
+        question: {
+          position: [
+            {
+              id: duplicated_question.id,
+              position: 11,
+              question_group_id: other_new_question_group.id
+            }
+          ]
+        }
+      }
+    end
+
+    let(:params) { { ids: [duplicated_question.id] } }
+
+    before { request }
+
+    it 'returns proper http status' do
+      expect(response).to have_http_status(:no_content)
+    end
+
+    it 'deletes duplicated question' do
+      expect(Question.find_by(id: duplicated_question.id)).to eq(nil)
+    end
+
+    it 'do not delete the original' do
+      expect(Question.find_by(id: new_question.id)).not_to eq(nil)
+    end
+  end
 end

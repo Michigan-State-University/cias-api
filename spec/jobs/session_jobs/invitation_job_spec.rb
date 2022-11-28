@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe SessionJobs::Invitation, type: :job do
-  subject { described_class.perform_now(session.id, emails) }
+  subject { described_class.perform_now(session.id, emails, []) }
 
   let(:user_with_notification) { create(:user, :confirmed) }
   let(:user_without_notification) { create(:user, :confirmed, email_notification: false) }
@@ -19,7 +19,7 @@ RSpec.describe SessionJobs::Invitation, type: :job do
   end
 
   context 'send invitation email from health clinic' do
-    subject { described_class.perform_now(session.id, emails, health_clinic.id) }
+    subject { described_class.perform_now(session.id, emails, [], health_clinic.id) }
 
     let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
     let!(:health_system) { create(:health_system, name: 'Gotham Health System', organization: organization) }
@@ -30,7 +30,7 @@ RSpec.describe SessionJobs::Invitation, type: :job do
 
     it 'return proper body' do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_from_clinic',
+      expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
                                                                                   domain: ENV['WEB_URL'],
                                                                                   intervention_id: intervention.id,
                                                                                   session_id: session.id,

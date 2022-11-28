@@ -13,7 +13,6 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     let(:params) do
       {
         navigator_setup: {
-          is_navigator_notification_on: false,
           contact_email: 'mike.wazowski@monsters-inc.com',
           no_navigator_available_message: 'No navigators available at the moment'
         }
@@ -28,7 +27,6 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     it 'correctly updates setup attributes' do
       request
       setup = intervention.navigator_setup.reload
-      expect(setup.is_navigator_notification_on).to eq false
       expect(setup.contact_email).to eq 'mike.wazowski@monsters-inc.com'
       expect(setup.no_navigator_available_message).to eq 'No navigators available at the moment'
     end

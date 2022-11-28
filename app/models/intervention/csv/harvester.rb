@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Intervention::Csv::Harvester
+  include DateTimeInterface
   DEFAULT_VALUE = 888
   DEFAULT_VALUE_FOR_TLFB_ANSWER = 0
   attr_reader :sessions
@@ -96,17 +97,6 @@ class Intervention::Csv::Harvester
     session_header_index = header.index("#{session_variable}.metadata.quick_exit")
 
     rows[row_index][session_header_index] = boolean_to_int(user_session.quick_exit) if session_header_index.present?
-  end
-
-  def time_diff(start_time, end_time)
-    seconds_diff = end_time - start_time
-    duration = ActiveSupport::Duration.build(seconds_diff.abs)
-    parts = duration.parts
-    total_hours = (parts[:hours] || 0) + (parts[:days] || 0) * 24
-    format('%<hours>02d:%<minutes>02d:%<seconds>02d',
-           hours: total_hours,
-           minutes: parts[:minutes] || 0,
-           seconds: parts[:seconds] || 0)
   end
 
   def users

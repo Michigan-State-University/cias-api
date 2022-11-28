@@ -12,14 +12,12 @@ RSpec.describe V1::LiveChat::Interventions::UpdateNavigatorSetupService do
   context 'correctly updates navigator setup' do
     let(:params) do
       {
-        contact_email: 'john-paul-2nd@test.com',
-        notify_by: 'email'
+        contact_email: 'John-Paul-the-2nd@test.com'
       }
     end
 
     it do
       expect(nav_setup.contact_email).to eq params[:contact_email]
-      expect(nav_setup.notify_by).to eq params[:notify_by]
     end
   end
 

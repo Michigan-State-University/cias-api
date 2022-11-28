@@ -9,7 +9,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/sessions/:session_id/inv
   let!(:health_clinic1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
   let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
   let!(:intervention_status) { :published }
-  let(:intervention) { create(:intervention, status: intervention_status) }
+  let(:intervention) { create(:intervention, status: intervention_status, shared_to: 'registered') }
   let(:session) { create(:session, intervention_id: intervention.id) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do

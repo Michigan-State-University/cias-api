@@ -12,7 +12,9 @@ class LiveChat::Conversation < ApplicationRecord
   has_one_attached :transcript, dependent: :purge_later
 
   scope :user_conversations, lambda { |user, is_archived|
-    LiveChat::Conversation.joins(:live_chat_interlocutors).where(archived: is_archived, live_chat_interlocutors: { user_id: user.id })
+    scope = LiveChat::Conversation.joins(:live_chat_interlocutors)
+    scope = is_archived ? scope.where.not(archived_at: nil) : scope.where(archived_at: nil)
+    scope.where(live_chat_interlocutors: { user_id: user.id })
   }
 
   scope :navigator_conversations, lambda { |user, is_archived = false|
@@ -21,7 +23,15 @@ class LiveChat::Conversation < ApplicationRecord
       where(intervention_navigators: { user_id: user.id })
   }
 
+  def archived
+    !archived_at.nil?
+  end
+
   def navigator
     users.limit_to_roles('navigator').first
+  end
+
+  def other_user
+    (users - [navigator]).first
   end
 end

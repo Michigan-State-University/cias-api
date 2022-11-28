@@ -28,7 +28,7 @@ gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '~> 3.19.6'
 gem 'hiredis'
 gem 'metainspector', '~> 1.15'
-gem 'nokogiri', '>= 1.13.6'
+gem 'nokogiri', '>= 1.13.9'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
@@ -94,6 +94,8 @@ group :test do
   gem 'timecop'
   gem 'database_cleaner-active_record'
   gem 'action-cable-testing', '~> 0.6.1'
+  gem 'rspec-benchmark'
+  gem 'benchmark-ips'
 end
 
 group :production do
