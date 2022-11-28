@@ -18,7 +18,7 @@ RSpec.describe 'GET /v1/live_chat/intervention/:id/navigator_setups', type: :req
     it 'return correct data' do
       expect(json_response['data']['attributes']).to include(
         'contact_email' => '',
-        'no_navigator_available_message' => ''
+        'no_navigator_available_message' => 'Welcome to our in-session support!'
       )
     end
 
