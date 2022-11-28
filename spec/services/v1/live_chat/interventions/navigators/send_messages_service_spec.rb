@@ -21,7 +21,7 @@ RSpec.describe V1::LiveChat::Interventions::Navigators::SendMessages do
 
       it 'with correct subject' do
         subject
-        expect(mails.first.subject).to eq 'Participant requested for assist!'
+        expect(mails.last.subject).to eq 'Participant requested for assist!'
       end
 
       context 'when intervention owner has also navigator role' do
@@ -61,7 +61,7 @@ RSpec.describe V1::LiveChat::Interventions::Navigators::SendMessages do
 
       it 'with correct subject' do
         subject
-        expect(mails.first.subject).to eq 'Participant request for assist - canceled'
+        expect(mails.last.subject).to eq 'Participant request for assist - canceled'
       end
 
       context 'when intervention owner has also navigator role' do
