@@ -36,6 +36,8 @@ Rails.application.routes.draw do
     end
     resources :preview_session_users, only: :create
 
+    post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
+    post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
     resources :interventions, only: %i[index show create update] do
       post 'clone', on: :member
       post 'export', on: :member

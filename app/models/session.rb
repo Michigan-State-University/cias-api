@@ -8,6 +8,8 @@ class Session < ApplicationRecord
   include InvitationInterface
   include Translate
 
+  CURRENT_VERSION = '1'
+
   belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
 

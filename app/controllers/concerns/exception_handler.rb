@@ -55,6 +55,10 @@ module ExceptionHandler
 
       render json: message, status: :bad_request
     end
+
+    rescue_from JSON::ParserError do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
   end
 
   private

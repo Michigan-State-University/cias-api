@@ -150,6 +150,18 @@ en:
       subject: Your CIAS Intervention is ready to download!
       body: Your Intervention is ready to download!
       header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
+  import_mailer:
+    result:
+      subject: CIAS Intervention Import
+      header: CIAS Intervention Import
+      body: 'Intervention %{intervention_name} has been imported successfully. Click the button below to open this intervention.'
+      button: Open intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
+    unsuccessful:
+      subject: CIAS Intervention Import - error
+      header: CIAS Intervention Import - error
+      body: 'There was a problem while importing intervention. Try again or contact support.'
+      notification: There was an issue with importing intervention
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!

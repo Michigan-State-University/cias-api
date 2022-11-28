@@ -2,6 +2,9 @@
 
 class ReportTemplate::Section < ApplicationRecord
   has_paper_trail
+
+  CURRENT_VERSION = '1'
+
   belongs_to :report_template
   has_many :variants, class_name: 'ReportTemplate::Section::Variant', dependent: :destroy,
                       foreign_key: :report_template_section_id, inverse_of: :report_template_section

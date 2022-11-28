@@ -36,6 +36,9 @@
     },
     "archived": {
       "type": "boolean"
+    },
+    "title": {
+      "type": "string"
     }
   },
   "additionalProperties": false
