@@ -97,7 +97,7 @@ class ConversationChannel < ApplicationCable::Channel
       raise LiveChat::CallOutUnavailableException.new('Unavailable to call out navigator', current_channel_id, unlock_time)
     end
 
-    summoning_user.update!(unlock_next_call_out_time: Time.zone.now + 15.minutes, participant_handled: false)
+    summoning_user.update!(unlock_next_call_out_time: Time.zone.now + 1.minute, participant_handled: false)
     V1::LiveChat::Interventions::Navigators::SendMessages.call(intervention, 'call_out')
     response_data = { unlockTime: summoning_user.unlock_next_call_out_time }
     ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'navigators_called_out'))

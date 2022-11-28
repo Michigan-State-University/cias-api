@@ -27,6 +27,6 @@ class V1::LiveChat::ConversationSerializer < V1Serializer
   end
 
   attribute :transcript do |object|
-    map_file_data(object.transcript) if object.transcript.attached?
+    map_file_data(object.transcript, ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')) if object.transcript.attached?
   end
 end
