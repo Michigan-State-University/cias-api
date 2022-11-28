@@ -98,6 +98,10 @@ GEM
     aws-sigv4 (1.2.3)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.16)
+    benchmark-ips (2.10.0)
+    benchmark-malloc (0.2.0)
+    benchmark-perf (0.6.0)
+    benchmark-trend (0.4.0)
     blind_index (2.2.0)
       activesupport (>= 5)
       argon2-kdf (>= 0.1.1)
@@ -431,6 +435,11 @@ GEM
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
       rspec-mocks (~> 3.10.0)
+    rspec-benchmark (0.6.0)
+      benchmark-malloc (~> 0.2)
+      benchmark-perf (~> 0.6)
+      benchmark-trend (~> 0.4)
+      rspec (>= 3.0)
     rspec-core (3.10.1)
       rspec-support (~> 3.10.0)
     rspec-expectations (3.10.1)
@@ -554,6 +563,7 @@ DEPENDENCIES
   activestorage (>= 6.1.4.7)
   airbrake
   aws-sdk-s3
+  benchmark-ips
   blind_index
   bootsnap (>= 1.4)
   brakeman (~> 5.0.2)
@@ -586,7 +596,7 @@ DEPENDENCIES
   lockbox
   logstop
   metainspector (~> 1.15)
-  nokogiri (>= 1.13.6)
+  nokogiri (>= 1.13.9)
   oj
   overcommit
   pagy
@@ -606,6 +616,7 @@ DEPENDENCIES
   rails (~> 6.1.6)
   rails-html-sanitizer (>= 1.4.3)
   redis
+  rspec-benchmark
   rspec-rails
   rubocop
   rubocop-performance
@@ -629,4 +640,4 @@ RUBY VERSION
    ruby 2.7.2p137
 
 BUNDLED WITH
-   2.2.22
+   2.3.22

@@ -16,6 +16,7 @@ class V1::Organizations::Invitations::Confirm
   def call
     user.activate! if user.role?('organization_admin')
 
+    set_pending_e_intervention_admin
     organization_invitation.update!(
       accepted_at: Time.current,
       invitation_token: nil
@@ -25,4 +26,14 @@ class V1::Organizations::Invitations::Confirm
   private
 
   attr_reader :organization, :user, :organization_invitation
+
+  def set_pending_e_intervention_admin
+    return unless user.researcher? && !user.e_intervention_admin?
+
+    user.update!(roles: user.roles << 'e_intervention_admin') if can_be_e_intervention_admin?
+  end
+
+  def can_be_e_intervention_admin?
+    EInterventionAdminOrganization.exists?(user_id: user.id, organization_id: organization.id)
+  end
 end

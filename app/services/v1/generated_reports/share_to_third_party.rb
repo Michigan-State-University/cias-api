@@ -63,6 +63,7 @@ class V1::GeneratedReports::ShareToThirdParty
           next if email.blank?
           next if report_ids.empty?
 
+          email = email.downcase
           user = User.find_by(email: email)
           next if user.present? && user.not_a_third_party?
 
@@ -81,7 +82,12 @@ class V1::GeneratedReports::ShareToThirdParty
                                                   [answer.body_data&.first&.dig('value')&.delete(' ')&.split(','),
                                                    answer.body_data&.first&.dig('report_template_ids')]
                                                 end
-                                                    .each_with_object(Hash.new([])) { |(email, rep_id), hash| hash[email] += rep_id } # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
+                                                    .filter(&:all?)
+                                                    .each_with_object(Hash.new([])) do |(email, rep_id), hash|
+                                                      next unless rep_id.instance_of?(Array)
+
+                                                      hash[email] += rep_id # to get {[email1, email2] => ["report_1_id", "report_2_id"]} from [[[email1, email2], ["report_1_id"]], [[email1, email2], ["report_2_id"]]]
+                                                    end
     # rubocop:enable Layout/LineLength
     # rubocop:enable Style/MultilineBlockChain
   end

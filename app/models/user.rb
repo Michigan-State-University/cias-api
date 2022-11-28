@@ -23,6 +23,11 @@ class User < ApplicationRecord
   APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
                  organization_admin researcher e_intervention_admin team_admin admin navigator].freeze
 
+  FORMATTING_APP_ROLE_EXCEPTIONS = {
+    'e_intervention_admin' => 'E-intervention admin',
+    'third_party' => 'third party user'
+  }.freeze
+
   TIME_ZONES = TZInfo::Timezone.all_identifiers.freeze
 
   enumerate_for :roles,
@@ -70,7 +75,6 @@ class User < ApplicationRecord
   # REPORTS AVAILABLE FOR THIRD PARTY USER
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
                                                  dependent: :destroy
-  has_many :downloaded_reports, dependent: :destroy
 
   # DOWNLOADED REPORTS
   has_many :downloaded_reports, dependent: :destroy
@@ -81,14 +85,15 @@ class User < ApplicationRecord
   # LIVE CHAT
   has_many :interlocutors, class_name: 'LiveChat::Interlocutor', dependent: :restrict_with_exception
   has_many :conversations, class_name: 'LiveChat::Conversation', through: :interlocutors
+  has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
 
   # NOTIFICATIONS
   has_many :notifications, dependent: :destroy
 
   # USER IN GENERAL
   has_many :user_verification_codes, dependent: :destroy
-  attribute :time_zone, :string, default: ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York')
-  attribute :roles, :string, array: true, default: assign_default_values('roles')
+  attribute :time_zone, :string, default: -> { ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York') }
+  attribute :roles, :string, array: true, default: -> { assign_default_values('roles') }
 
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
@@ -117,8 +122,12 @@ class User < ApplicationRecord
     end
   }
 
+  validates :avatar, content_type: %w[image/png image/jpeg image/jpg], size: { less_than: 10.megabytes }
+
   # BEFORE/AFTER ACTIONS
   before_save :invalidate_token_after_changes
+  before_update :set_roles_to_uniq, if: :roles_changed?
+  after_save :send_welcome_email, if: -> { saved_change_to_attribute?(:confirmed_at) && !confirmed_at.nil? }
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
@@ -198,6 +207,10 @@ class User < ApplicationRecord
     save!
   end
 
+  def set_roles_to_uniq
+    self.roles = roles.uniq
+  end
+
   def self.users_for_researcher_or_e_intervention_admin(params, scope)
     if params[:roles]&.include?('researcher') && params[:roles]&.include?('e_intervention_admin')
       scope.with_intervention_creation_access.from_team(params[:team_id])
@@ -224,27 +237,25 @@ class User < ApplicationRecord
     Organization.where(id: organizable_id).or(Organization.where(id: organization_ids))
   end
 
-  def team_admin?
-    roles.include?('team_admin')
+  APP_ROLES.each do |role|
+    define_method :"#{role}?" do
+      roles.include?(role)
+    end
   end
 
-  def e_intervention_admin?
-    roles.include?('e_intervention_admin')
+  def participant?
+    roles.include?('participant')
   end
 
-  def researcher?
-    roles.include?('researcher')
-  end
-
-  def navigator?
-    roles.include?('navigator')
-  end
-
-  def guest?
-    roles.include?('guest')
+  def human_readable_role
+    FORMATTING_APP_ROLE_EXCEPTIONS[roles.first] || roles.first.tr('_', ' ')
   end
 
   private
+
+  def send_welcome_email
+    UserMailer.welcome_email(human_readable_role, email).deliver_later
+  end
 
   def team_is_present?
     return if Team.exists?(team_admin_id: id)

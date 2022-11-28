@@ -19,7 +19,7 @@ class V1::Question::Destroy
         question_group = question.question_group
         question.destroy!
         qg = question.question_group
-        qg.destroy! if question_group.questions.empty?
+        qg.destroy! if question_group.questions.reload.empty?
       end
     end
   end

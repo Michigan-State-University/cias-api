@@ -3,6 +3,7 @@
 class Chart < ApplicationRecord
   has_paper_trail
   extend DefaultValues
+  include FormulaInterface
   include Clone
 
   belongs_to :dashboard_section
