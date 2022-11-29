@@ -39,6 +39,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'in_progress',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -60,6 +61,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'in_progress',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -81,6 +83,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'in_progress',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -102,6 +105,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'completed',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -115,6 +119,33 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
           }
         }
       )
+    end
+
+    context 'with multiple fill session' do
+      let!(:sessions) { create(:session, :multiple_times, intervention_id: intervention.id) }
+
+      it 'inform that intervention contains multiple fill session' do
+        expect(json_response['data'][0]['attributes']).to include(
+          {
+            'blocked' => false,
+            'completed_sessions' => 0,
+            'last_answer_date' => nil,
+            'contain_multiple_fill_session' => true,
+            'sessions_in_intervention' => 1,
+            'status' => 'in_progress',
+            'intervention' => {
+              'additional_text' => '',
+              'files' => [],
+              'id' => intervention.id,
+              'image_alt' => nil,
+              'live_chat_enabled' => false,
+              'logo_url' => nil,
+              'name' => intervention.name,
+              'type' => 'Intervention'
+            }
+          }
+        )
+      end
     end
 
     context 'with pagination params' do

@@ -37,6 +37,8 @@ class Session < ApplicationRecord
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
 
+  scope :multiple_fill, -> { where(multiple_fill: true) }
+
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
   validates :settings, json: { schema: lambda {

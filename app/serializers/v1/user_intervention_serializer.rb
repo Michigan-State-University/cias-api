@@ -2,7 +2,7 @@
 
 class V1::UserInterventionSerializer < V1Serializer
   include FileHelper
-  attributes :completed_sessions, :status, :last_answer_date
+  attributes :completed_sessions, :status, :last_answer_date, :contain_multiple_fill_session
 
   attribute :sessions_in_intervention do |object|
     object.sessions.size

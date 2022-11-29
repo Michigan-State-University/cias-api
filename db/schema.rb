@@ -632,6 +632,7 @@ ActiveRecord::Schema.define(version: 2022_11_28_095650) do
     t.bigint "cat_mh_time_frame_id"
     t.bigint "cat_mh_population_id"
     t.integer "estimated_time"
+    t.boolean "multiple_fill", default: false, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

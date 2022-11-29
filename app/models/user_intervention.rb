@@ -13,4 +13,8 @@ class UserIntervention < ApplicationRecord
   def last_answer_date
     user_sessions.order(last_answer_at: :desc).first
   end
+
+  def contain_multiple_fill_session
+    sessions.multiple_fill.any?
+  end
 end
