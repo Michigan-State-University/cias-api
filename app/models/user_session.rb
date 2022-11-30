@@ -37,7 +37,7 @@ class UserSession < ApplicationRecord
     user_intervention.completed_sessions += 1 if session_is_finished && UserSession.where(user_id: user_id, session_id: session_id).size < 2
 
     if user_intervention_finished?
-      user_intervention.status = 'completed' unless user_intervention.user_sessions.any? { |user_session| user_session.session.multiple_fill }
+      user_intervention.status = 'completed'
       user_intervention.finished_at = DateTime.current
     else
       user_intervention.status = 'in_progress'
