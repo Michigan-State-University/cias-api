@@ -24,9 +24,9 @@ class V1::UserSessions::FetchOrCreateService
     )
     if user_intervention.contain_multiple_fill_session
       unfinished_session = unfinished_session_for(user_intervention)
-      unfinished_session || new_user_session_for(user_intervention)
+      unfinished_session || new_user_session_for(user_intervention, :new)
     else
-      new_user_session_for(user_intervention)
+      new_user_session_for(user_intervention, :find_or_initialize_by)
     end
   end
 
@@ -38,8 +38,9 @@ class V1::UserSessions::FetchOrCreateService
     ).find_by(finished_at: nil)
   end
 
-  def new_user_session_for(user_intervention)
-    UserSession.find_or_initialize_by(
+  def new_user_session_for(user_intervention, create_method)
+    UserSession.send(
+      create_method,
       session_id: session_id,
       user_id: user_id,
       health_clinic_id: health_clinic_id,
