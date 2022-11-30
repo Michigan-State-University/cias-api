@@ -31,4 +31,22 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
       expect(json_response['data']['attributes']['intervention']['type']).to eq intervention.type
     end
   end
+
+  context 'user_intervention with multiple sessions' do
+    let!(:user_session1) do
+      create(:user_session, user_intervention: user_intervention, session: sessions.first, created_at: 1.month.ago, finished_at: 3.weeks.ago)
+    end
+    let!(:user_session2) { create(:user_session, user_intervention: user_intervention, session: sessions.first) }
+    let!(:user_session3) { create(:user_session, user_intervention: user_intervention, session: sessions.second) }
+
+    before { request }
+
+    it {
+      expect(json_response['data']['attributes']['user_sessions']['data'].count).to eq(2)
+    }
+
+    it {
+      expect(json_response['data']['attributes']['user_sessions']['data'].map { |us| us['attributes']['filled_out_count'] }).to include(0, 1)
+    }
+  end
 end

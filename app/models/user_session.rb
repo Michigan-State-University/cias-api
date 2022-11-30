@@ -46,6 +46,10 @@ class UserSession < ApplicationRecord
     user_intervention.save!
   end
 
+  def filled_out_count
+    user_intervention.user_sessions.where(session_id: session_id).where.not(finished_at: nil).count
+  end
+
   private
 
   def user_intervention_finished?
