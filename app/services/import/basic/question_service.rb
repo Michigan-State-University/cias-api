@@ -18,6 +18,7 @@ class Import::Basic::QuestionService
   attr_reader :question_hash, :question_group_id, :image
 
   def call
+    question_hash.delete(:relations_data)
     question = Question.create!(question_hash.merge({ question_group_id: question_group_id, image: import_file(image) }))
     add_description!(question) unless image.nil?
     question
