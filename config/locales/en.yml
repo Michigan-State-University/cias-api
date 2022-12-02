@@ -279,12 +279,12 @@ en:
         body: "You have been invited as navigator to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />Now you can chat with participants to help them with their troubles or concerns in this intervention."
     call_out:
       subject: "Participant requested for assist!"
-      header: "Navigator assist request"
+      header: "Participant request for navigator support"
       body: "Someone from %{intervention_name} needs help right now. Go to the My Conversations tab in CIAS and then Inbox to talk with the participant."
       click_the_link: "Join conversation"
     participant_handled:
       subject: "Participant request for assist - canceled"
-      header: "Participant already doesn’t need help"
+      header: "Participant cancelled request for support"
       body: "Participant canceled a call out or another navigator has just started a conversation with this participant in %{intervention_name}. You don't have to go to the CIAS and you can ignore the previous helping request."
   transcript_mailer:
     open_inbox: "See your inbox"
