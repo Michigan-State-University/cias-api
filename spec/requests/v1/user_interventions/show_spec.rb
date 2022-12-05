@@ -2,7 +2,7 @@
 
 RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
   let!(:user) { create(:user, :admin, :confirmed) }
-  let!(:intervention) { create(:flexible_order_intervention, user: user, shared_to: 'registered') }
+  let!(:intervention) { create(:flexible_order_intervention, user: user, status: 'published', shared_to: 'registered') }
   let!(:sessions) { create_list(:session, 3, intervention_id: intervention.id) }
   let!(:user_intervention) { create(:user_intervention, intervention_id: intervention.id, user: user) }
 

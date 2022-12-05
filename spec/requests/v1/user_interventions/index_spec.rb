@@ -9,7 +9,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
   let(:participant1) { create(:user, :confirmed, :participant) }
   let(:participant2) { create(:user, :confirmed, :participant) }
 
-  let(:intervention) { create(:intervention) }
+  let(:intervention) { create(:intervention, :published) }
   let!(:sessions) { create_list(:session, 5, intervention_id: intervention.id) }
 
   let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'completed') }
@@ -166,6 +166,20 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
 
     it 'return correct data' do
       expect(json_response['data'].size).to be(3)
+    end
+  end
+
+  context 'when intervention is closed or archived' do
+    let(:user) { participant1 }
+
+    let(:intervention_closed) { create(:intervention, :closed) }
+    let(:intervention_archived) { create(:intervention, :archived) }
+    let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'ready_to_start') }
+    let!(:user_interventions2) { create(:user_intervention, intervention: intervention_closed, user: participant1, status: 'ready_to_start') }
+    let!(:user_interventions3) { create(:user_intervention, intervention: intervention_archived, user: participant1, status: 'ready_to_start') }
+
+    it 'return only interventions which have published status' do
+      expect(json_response['data'].size).to be(1)
     end
   end
 end
