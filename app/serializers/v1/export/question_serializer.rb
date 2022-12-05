@@ -2,6 +2,7 @@
 
 class V1::Export::QuestionSerializer < ActiveModel::Serializer
   include FileHelper
+  include ExportHelper
   attributes :type, :settings, :position, :title, :subtitle, :narrator, :video_url, :formulas, :body, :original_text
 
   attribute :duplicated do
@@ -49,14 +50,5 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
       reflection_target_locations << object_location(target_question, :question_group_position, target_question_group_position)
     end
     reflection_target_locations
-  end
-
-  def object_location(object, relation_name = nil, relation_position = nil)
-    location_hash = {
-      id: object.id,
-      object_position: object.position
-    }
-    location_hash[relation_name] = relation_position if relation_position.present?
-    location_hash
   end
 end

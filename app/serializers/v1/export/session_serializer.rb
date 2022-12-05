@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Export::SessionSerializer < ActiveModel::Serializer
+  include ExportHelper
   attributes :settings, :position, :name, :schedule, :schedule_payload, :schedule_at, :formulas, :variable,
              :days_after_date_variable_name, :type, :original_text, :estimated_time, :body
 
@@ -20,7 +21,25 @@ class V1::Export::SessionSerializer < ActiveModel::Serializer
     object.google_tts_voice.language_code
   end
 
+  attribute :relations_data do
+    branching_data(object)
+  end
+
   attribute :version do
     Session::CURRENT_VERSION
+  end
+
+  private
+
+  def branching_data(session)
+    branch_target_locations = []
+    targets = session.formulas.flat_map { |formula| formula['patterns'].flat_map { |pattern| pattern['target'] } }
+    targets.each do |target|
+      next if target['id'].blank?
+
+      target_session = Session.find(target['id'])
+      branch_target_locations << object_location(target_session)
+    end
+    branch_target_locations
   end
 end

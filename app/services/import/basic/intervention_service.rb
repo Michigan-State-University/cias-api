@@ -52,6 +52,11 @@ class Import::Basic::InterventionService
   end
 
   def set_branching_and_reflections!
+    sessions = Session.where(intervention_id: intervention.id)
+    sessions.each do |session|
+      handle_session_branching!(session, sessions)
+    end
+
     questions = Question.joins(question_group: :session).where(question_groups: { sessions: { intervention_id: intervention.id } })
     questions.each do |question|
       handle_branching!(question, questions)
@@ -96,6 +101,19 @@ class Import::Basic::InterventionService
       block['question_id'] = target_id if target_id.present?
       target_question.save!
     end
+  end
+
+  def handle_session_branching!(target_session, sessions)
+    target_session.formulas.each do |formula|
+      formula['patterns'].each do |pattern|
+        pattern['target'].each do |target|
+          target_location = object_location(target)
+          session_id = sessions.find_by!(position: target_location[:object_position])&.id
+          target['id'] = session_id if session_id.present?
+        end
+      end
+    end
+    target_session.save!
   end
 
   def object_location(target, target_key = 'id')

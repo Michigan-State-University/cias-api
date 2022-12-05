@@ -20,6 +20,7 @@ class Import::Basic::SessionService
     question_groups = session_hash.delete(:question_groups)
     report_templates = session_hash.delete(:report_templates)
     sms_plans = session_hash.delete(:sms_plans)
+    session_hash.delete(:relations_data)
     session = Session.create!(session_hash.merge({ intervention_id: intervention_id, google_tts_voice_id: voice_id }))
     session.question_groups.destroy_all
     question_groups&.each do |question_group_hash|
