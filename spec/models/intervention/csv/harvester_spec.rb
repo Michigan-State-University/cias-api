@@ -541,11 +541,13 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           }
         end
 
-        it 'save the values into the one row' do
+        it 'save the values into two rows' do
           subject.collect
-          expect(subject.rows.size).to eq 1
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil,
-                                       '3', answer2.user_session.created_at, nil, nil]]
+          expect(subject.rows.size).to eq 2
+          expect(subject.rows).to eq [
+            [answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil, nil, nil, nil, nil],
+            [answer2.user_session.user_id.to_s, answer2.user_session.user.email.to_s, nil, nil, nil, nil, '3', answer2.user_session.created_at, nil, nil]
+          ]
         end
       end
 
@@ -633,9 +635,11 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
              "#{session1.variable}.metadata.session_duration", "#{session2.variable}.test", "#{session2.variable}.metadata.session_start",
              "#{session2.variable}.metadata.session_end", "#{session2.variable}.metadata.session_duration"]
           end
-          let(:expected_row) do
-            [user.id, user.email, 888, user_session1.created_at, user_session1.finished_at, '05:00:00', 888, user_session2.created_at,
-             user_session2.finished_at, '06:50:40']
+          let(:expected_rows) do
+            [
+              [user.id, user.email, 888, user_session1.created_at, user_session1.finished_at, '05:00:00', nil, nil, nil, nil],
+              [user.id, user.email, nil, nil, nil, nil, 888, user_session2.created_at, user_session2.finished_at, '06:50:40']
+            ]
           end
 
           before do
@@ -646,7 +650,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           it 'correctly shows end dates & durations' do
             subject.collect
             expect(subject.header).to eq(expected_header)
-            expect(subject.rows).to eq([expected_row])
+            expect(subject.rows).to eq(Array(expected_rows))
           end
         end
       end
