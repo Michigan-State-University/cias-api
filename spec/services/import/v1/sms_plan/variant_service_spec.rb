@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Import::V1::SmsPlanVariantService do
+RSpec.describe Import::V1::SmsPlan::VariantService do
   subject { described_class.call(sms_plan_id, sms_plan_variant_hash) }
 
   let(:sms_plan) { create(:sms_plan) }

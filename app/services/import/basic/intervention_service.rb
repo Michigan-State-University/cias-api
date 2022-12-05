@@ -83,7 +83,7 @@ class Import::Basic::InterventionService
             target['id'] = target_id if target_id.present?
           elsif target['type'].start_with?('Session')
             target_location = object_location(target)
-            session_id = sessions.find_by!(position: target_location[:object_position])&.id
+            session_id = sessions.find_by(position: target_location[:object_position])&.id
             target['id'] = session_id if session_id.present?
           end
         end
@@ -108,7 +108,7 @@ class Import::Basic::InterventionService
       formula['patterns'].each do |pattern|
         pattern['target'].each do |target|
           target_location = object_location(target)
-          session_id = sessions.find_by!(position: target_location[:object_position])&.id
+          session_id = sessions.find_by(position: target_location[:object_position])&.id
           target['id'] = session_id if session_id.present?
         end
       end
@@ -118,7 +118,7 @@ class Import::Basic::InterventionService
 
   def object_location(target, target_key = 'id')
     branching_hash = sessions_hash.flat_map { |s| s[:question_groups].flat_map { |qg| qg[:questions].flat_map { |q| q[:relations_data] } } }
-    branching_hash.detect { |branch_location| branch_location[:id] == target[target_key] }
+    branching_hash.detect { |branch_location| branch_location[:id] == target[target_key] } || {}
   end
 
   def find_question_id(scope, question_in_scope, location)
