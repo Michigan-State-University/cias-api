@@ -32,11 +32,12 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
       if target['type'].include?('Question')
         target_question = Question.find(target['id'])
         target_question_group_position = target_question.question_group.position
-        branch_target_locations << object_location(target_question, :question_group_position, target_question_group_position)
+        location = object_location(target_question, :question_group_position, target_question_group_position)
       elsif target['type'].include?('Session')
         target_session = Session.find(target['id'])
-        branch_target_locations << object_location(target_session)
+        location = object_location(target_session)
       end
+      branch_target_locations << location unless branch_target_locations.include?(location)
     end
     branch_target_locations
   end

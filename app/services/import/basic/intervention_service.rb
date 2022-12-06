@@ -117,8 +117,10 @@ class Import::Basic::InterventionService
   end
 
   def object_location(target, target_key = 'id')
-    branching_hash = sessions_hash.flat_map { |s| s[:question_groups].flat_map { |qg| qg[:questions].flat_map { |q| q[:relations_data] } } }
-    branching_hash.detect { |branch_location| branch_location[:id] == target[target_key] } || {}
+    questions_branching = sessions_hash.flat_map { |s| s[:question_groups].flat_map { |qg| qg[:questions].flat_map { |q| q[:relations_data] } } }
+    sessions_branching = sessions_hash.flat_map { |s| s[:relations_data] }
+    branching_locations = questions_branching + sessions_branching
+    branching_locations.detect { |branch_location| branch_location[:id] == target[target_key] } || {}
   end
 
   def find_question_id(scope, question_in_scope, location)

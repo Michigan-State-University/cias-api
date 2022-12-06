@@ -3,7 +3,7 @@
 class V1::Export::SessionSerializer < ActiveModel::Serializer
   include ExportHelper
   attributes :settings, :position, :name, :schedule, :schedule_payload, :schedule_at, :formulas, :variable,
-             :days_after_date_variable_name, :type, :original_text, :estimated_time, :body
+             :days_after_date_variable_name, :type, :original_text, :estimated_time, :multiple_fill, :body
 
   has_many :question_groups, serializer: V1::Export::QuestionGroupSerializer
   has_many :sms_plans, serializer: V1::Export::SmsPlanSerializer
@@ -38,7 +38,8 @@ class V1::Export::SessionSerializer < ActiveModel::Serializer
       next if target['id'].blank?
 
       target_session = Session.find(target['id'])
-      branch_target_locations << object_location(target_session)
+      location = object_location(target_session)
+      branch_target_locations << location unless branch_target_locations.include?(location)
     end
     branch_target_locations
   end
