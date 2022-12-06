@@ -116,5 +116,9 @@ FactoryBot.define do
     trait :navigator do
       roles { %w[navigator] }
     end
+
+    trait :researcher_and_navigator do
+      roles { %w[researcher navigator] }
+    end
   end
 end

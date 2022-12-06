@@ -343,6 +343,9 @@ Rails/EnvironmentVariableAccess:
 Rails/FilePath:
   Enabled: true
 
+Rails/UniqueValidationWithoutIndex:
+  Enabled: false
+
 RSpec/ContextWording:
   Enabled: false
 

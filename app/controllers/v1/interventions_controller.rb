@@ -39,7 +39,17 @@ class V1::InterventionsController < V1Controller
   def export
     authorize! :update, Intervention
 
-    Intervention::ExportJob.perform_later(current_v1_user.id, params[:id])
+    Interventions::ExportJob.perform_later(current_v1_user.id, params[:id])
+
+    render status: :ok
+  end
+
+  def generate_conversations_transcript
+    authorize! :update, Intervention
+
+    LiveChat::GenerateTranscriptJob.perform_later(
+      intervention_load.id, ::Intervention, :conversations_transcript, intervention_load.name, current_v1_user.id
+    )
 
     render status: :ok
   end

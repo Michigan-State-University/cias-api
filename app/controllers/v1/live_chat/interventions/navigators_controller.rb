@@ -19,7 +19,7 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
 
     navigator = intervention_load.intervention_navigators.find_by!(user_id: intervention_navigator_id)
     ActiveRecord::Base.transaction do
-      LiveChat::Conversation.navigator_conversations(navigator.user).update_all(archived: true) # rubocop:disable Rails/SkipsModelValidations
+      LiveChat::Conversation.navigator_conversations(navigator.user).update_all(archived_at: DateTime.now) # rubocop:disable Rails/SkipsModelValidations
       navigator.destroy!
     end
 

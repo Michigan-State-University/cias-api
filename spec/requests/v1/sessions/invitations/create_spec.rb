@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
   let!(:user) { create(:user, :confirmed, :researcher, created_at: 1.day.ago) }
   let!(:participant) { create(:user, :confirmed, :participant) }
-  let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true) }
+  let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true, shared_to: 'registered') }
   let!(:intervention_status) { :published }
   let!(:session) { create(:session, intervention_id: intervention.id) }
   let!(:invitation_email) { 'a@a.com' }
@@ -59,6 +59,24 @@ RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
         it 'returns correct http status' do
           expect(response).to have_http_status(:not_acceptable)
         end
+      end
+    end
+
+    context 'Anyone with the link invitations' do
+      let!(:intervention) { create(:intervention, user: user, status: :published, quick_exit: true, shared_to: :anyone) }
+      let!(:non_existing_emails) { %w[mike-wazowski@gmail.com fred-flinstone@test.pl] }
+      let!(:params) do
+        {
+          session_invitation: {
+            emails: [invitation_email, participant.email, *non_existing_emails]
+          }
+        }
+      end
+
+      before { request }
+
+      it 'correctly creates invitations' do
+        expect(json_response['data'].map { |hash| hash['attributes']['email'] }).to include(*non_existing_emails)
       end
     end
   end

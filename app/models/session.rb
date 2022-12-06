@@ -5,6 +5,7 @@ class Session < ApplicationRecord
   extend DefaultValues
   include Clone
   include FormulaInterface
+  include InvitationInterface
   include Translate
 
   belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
@@ -57,7 +58,7 @@ class Session < ApplicationRecord
   end
 
   def next_session
-    intervention.sessions.find_by(position: position + 1)
+    intervention.sessions.order(position: :asc).find_by('position > ?', position)
   end
 
   def integral_update
@@ -67,13 +68,14 @@ class Session < ApplicationRecord
   end
 
   def invite_by_email(emails, health_clinic_id = nil)
-    users_exists = ::User.where(email: emails)
-    (emails - users_exists.map(&:email)).each do |email|
-      User.invite!(email: email)
+    if intervention.shared_to != 'anyone'
+      existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
+      invite_non_existing_users(non_existing_users_emails, true)
     end
 
     ActiveRecord::Base.transaction do
-      User.where(email: emails).find_each do |user|
+      users = User.where(email: emails)
+      users.find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
         user.update!(quick_exit_enabled: intervention.quick_exit)
 
@@ -88,9 +90,13 @@ class Session < ApplicationRecord
         )
         user_intervention.update!(status: 'in_progress') if user_session.finished_at.blank?
       end
+
+      (emails - users.map(&:email)).each do |email|
+        invitations.create!(email: email, health_clinic_id: health_clinic_id)
+      end
     end
 
-    SessionJobs::Invitation.perform_later(id, emails, health_clinic_id)
+    SendFillInvitationJob.perform_later(::Session, id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
   end
 
   def send_link_to_session(user, health_clinic = nil)

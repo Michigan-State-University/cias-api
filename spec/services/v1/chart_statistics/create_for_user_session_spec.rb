@@ -86,6 +86,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       create(:chart, formula: formula4, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
                      chart_type: Chart.chart_types[:bar_chart])
     end
+
     context 'when user session contains all values of chart formula' do
       before_all do
         RSpec::Mocks.with_temporary_scope do
@@ -162,6 +163,41 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       it "Don't create chart statistic" do
         expect { subject }.not_to change(ChartStatistic, :count)
       end
+    end
+  end
+
+  context 'when formula divides by zero' do
+    let_it_be(:formula5) do
+      { 'payload' => "#{session_var}.color / #{session_var}.sport",
+        'patterns' => [
+          {
+            'match' => '=5',
+            'label' => 'Matched',
+            'color' => '#C766EA'
+          }
+        ],
+        'default_pattern' => {
+          'label' => 'NotMatched',
+          'color' => '#E2B1F4'
+        } }
+    end
+
+    let_it_be(:bar_chart3) do
+      create(:chart, formula: formula5, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
+                     chart_type: Chart.chart_types[:bar_chart])
+    end
+    before_all do
+      RSpec::Mocks.with_temporary_scope do
+        allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+        session = create(:session, intervention: intervention, variable: session_var)
+        @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic, finished_at: filled_at)
+        @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
+        @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '0' }] })
+      end
+    end
+
+    it "Don't create chart statistic" do
+      expect { subject }.not_to change(ChartStatistic, :count)
     end
   end
 
