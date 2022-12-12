@@ -20,6 +20,14 @@ RSpec.describe V1::UserSessions::FetchOrCreateService do
       end
     end
 
+    context 'there is finished user session' do
+      let!(:user_session) { create(:user_session, session: session, user: user, user_intervention: user_intervention, finished_at: 1.day.ago) }
+
+      it 'create a new one and set corrent number of attempts' do
+        expect(subject.number_of_attempts).to be(2)
+      end
+    end
+
     context 'there are no present user sessions' do
       it 'returns new user session' do
         expect(subject).not_to be_nil

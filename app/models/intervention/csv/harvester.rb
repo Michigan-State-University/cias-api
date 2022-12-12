@@ -29,7 +29,7 @@ class Intervention::Csv::Harvester
         question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var) }
       end
 
-      header.concat(session_times_metadata(session))
+      header.concat(session_metadata(session))
       header.concat(quick_exit_header(session))
     end
 
@@ -38,8 +38,9 @@ class Intervention::Csv::Harvester
     header.unshift(:user_id)
   end
 
-  def session_times_metadata(session)
-    %W[#{session.variable}.metadata.session_start #{session.variable}.metadata.session_end #{session.variable}.metadata.session_duration]
+  def session_metadata(session)
+    %W[#{session.variable}.metadata.session_start #{session.variable}.metadata.session_end #{session.variable}.metadata.session_duration
+       #{session.variable}.metadata.number_of_attempts]
   end
 
   def quick_exit_header(session)
@@ -89,6 +90,7 @@ class Intervention::Csv::Harvester
       rows[row_index][session_headers_index + 1] = session_end
     end
     rows[row_index][session_headers_index] = session_start
+    rows[row_index][session_headers_index + 3] = user_session.number_of_attempts
   end
 
   def quick_exit(session_variable, row_index, user_session)

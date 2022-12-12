@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_11_28_095650) do
+ActiveRecord::Schema.define(version: 2022_12_09_114901) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -760,6 +760,7 @@ ActiveRecord::Schema.define(version: 2022_11_28_095650) do
     t.uuid "user_intervention_id", null: false
     t.datetime "scheduled_at"
     t.boolean "quick_exit", default: false
+    t.integer "number_of_attempts"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
