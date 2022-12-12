@@ -33,7 +33,8 @@ RSpec.describe 'POST /v1/henry_ford/new_patient', type: :request do
     let(:params) do
       {
         patientID: '89008709',
-        lastName: 'Flintstone'
+        lastName: 'Flintstone',
+        dob: '19701023'
       }
     end
 

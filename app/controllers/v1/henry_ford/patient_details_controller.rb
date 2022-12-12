@@ -9,7 +9,7 @@ class V1::HenryFord::PatientDetailsController < V1Controller
       patient_id: hfhs_params[:patient_id],
       first_name: hfhs_params[:first_name],
       last_name: hfhs_params[:last_name],
-      dob: hfhs_params[:dob],
+      dob: Date.parse(hfhs_params[:dob]),
       gender: hfhs_params[:gender],
       zip: hfhs_params[:zip]
     )
