@@ -24,7 +24,8 @@ RSpec.describe Import::V1::QuestionService do
         blocks: [],
         settings: {
           voice: true,
-          animation: true
+          animation: true,
+          character: 'peedy'
         }
       },
       video_url: nil,
