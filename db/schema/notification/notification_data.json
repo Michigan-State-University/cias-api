@@ -42,6 +42,9 @@
     },
     "new_narrator": {
       "type": "string"
+    },
+    "name": {
+      "type": "string"
     }
   },
   "additionalProperties": false
