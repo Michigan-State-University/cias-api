@@ -4,7 +4,8 @@ class Question::TlfbConfig < Question::Tlfb
   attribute :narrator, :json, default: {
     'settings' => {
       'voice' => false,
-      'animation' => false
+      'animation' => false,
+      'character' => 'peedy'
     },
     'blocks' => []
   }

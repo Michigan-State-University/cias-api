@@ -56,7 +56,8 @@ RSpec.describe V1::Question::Create do
         blocks: blocks,
         settings: {
           voice: true,
-          animation: true
+          animation: true,
+          character: 'peedy'
         }
       }
     }

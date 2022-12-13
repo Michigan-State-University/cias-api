@@ -392,6 +392,7 @@ ActiveRecord::Schema.define(version: 2022_12_09_114901) do
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
     t.boolean "live_chat_enabled", default: false, null: false
+    t.integer "current_narrator", default: 0
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -633,6 +634,7 @@ ActiveRecord::Schema.define(version: 2022_12_09_114901) do
     t.bigint "cat_mh_population_id"
     t.integer "estimated_time"
     t.boolean "multiple_fill", default: false, null: false
+    t.integer "current_narrator", default: 0
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

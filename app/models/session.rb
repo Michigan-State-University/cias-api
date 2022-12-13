@@ -20,6 +20,7 @@ class Session < ApplicationRecord
 
   has_many :user_sessions, dependent: :destroy, inverse_of: :session
   has_many :users, through: :user_sessions
+  has_many :notifications, as: :notifiable, dependent: :destroy
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 1
@@ -33,6 +34,7 @@ class Session < ApplicationRecord
                    after_fill: 'after_fill',
                    days_after_date: 'days_after_date' },
        _prefix: :schedule
+  enum current_narrator: ::Intervention.current_narrators
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
