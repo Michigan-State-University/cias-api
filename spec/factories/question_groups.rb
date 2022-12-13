@@ -12,9 +12,9 @@ FactoryBot.define do
       title { 'TLFB Study Group' }
 
       after(:build) do |question_group|
-        question_group.questions << create(:question_tlfb_config)
-        question_group.questions << create(:question_tlfb_event)
-        question_group.questions << create(:question_tlfb_question)
+        question_group.questions << create(:question_tlfb_config, position: 1)
+        question_group.questions << create(:question_tlfb_event, position: 2)
+        question_group.questions << create(:question_tlfb_question, position: 3)
       end
     end
   end

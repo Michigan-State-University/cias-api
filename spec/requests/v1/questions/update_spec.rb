@@ -26,6 +26,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
           data: [
             {
               payload: {
+                range_start: 0,
+                range_end: 10,
                 start_value: 'test 1',
                 end_value: 'test 1'
               }
@@ -100,6 +102,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
             data: [
               {
                 payload: {
+                  range_start: 0,
+                  range_end: 10,
                   start_value: 'test 1',
                   end_value: 'test 1'
                 }
@@ -132,6 +136,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
             data: [
               {
                 payload: {
+                  range_start: 0,
+                  range_end: 10,
                   start_value: 'test 1',
                   end_value: 'test 1'
                 }

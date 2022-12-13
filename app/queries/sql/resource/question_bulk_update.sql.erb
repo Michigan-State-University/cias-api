@@ -33,8 +33,16 @@ IN
 UPDATE
   question_groups
 SET
-  updated_at = now()
+  updated_at = now(),
+  questions_count = nv.questions_count
+FROM
+  (
+    VALUES
+      <% @question_counts = @values.map { |value| value[:question_group_id] }.tally %>
+      <% @question_counts.each_with_index do |(id, question_count), index| %>
+        ('<%= id %>', <%= question_count %>)
+        <%= ',' if index != @question_counts.size - 1 %>
+      <% end %>
+  ) AS nv (id, questions_count)
 WHERE
-  id
-IN
-  (<%= @values.map { |item| "'#{item[:question_group_id]}'" }.join(', ') %>)
+  question_groups.id = nv.id::uuid

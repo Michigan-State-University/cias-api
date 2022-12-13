@@ -24,6 +24,8 @@ class V1::FlowService
   def user_session_question(preview_question_id)
     if user_session.type == 'UserSession::CatMh'
       cat_mh_question = @cat_mh_api.get_next_question(user_session)
+      raise_cat_mh_error if cat_mh_question['status'] != 200
+
       user_session.finish if cat_mh_question['body']['questionID'] == -1
       question = prepare_question(user_session, cat_mh_question['body'])
     else
@@ -191,6 +193,14 @@ class V1::FlowService
 
     participant_date = all_var_values[next_session.days_after_date_variable_name]
     (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
+  end
+
+  def raise_cat_mh_error
+    raise CatMh::ConnectionFailedException.new(
+      I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.title'),
+      I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.body'),
+      I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.button')
+    )
   end
 
   def all_var_values

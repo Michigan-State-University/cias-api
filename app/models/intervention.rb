@@ -4,7 +4,10 @@ class Intervention < ApplicationRecord
   has_paper_trail
   include Clone
   include Translate
+  include InvitationInterface
   extend DefaultValues
+
+  CURRENT_VERSION = '1'
 
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
@@ -20,6 +23,7 @@ class Intervention < ApplicationRecord
   has_many :intervention_navigators, class_name: 'LiveChat::Interventions::Navigator', dependent: :destroy
   has_many :navigators, through: :intervention_navigators, source: :user
   has_many :notifications, as: :notifiable, dependent: :destroy
+  has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
 
   has_many_attached :reports
   has_many_attached :files
@@ -80,9 +84,9 @@ class Intervention < ApplicationRecord
   end
 
   def invite_by_email(emails, health_clinic_id = nil)
-    users_exists = ::User.where(email: emails)
-    (emails - users_exists.map(&:email)).each do |email|
-      User.invite!(email: email)
+    if shared_to != 'anyone'
+      existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
+      invite_non_existing_users(non_existing_users_emails, true)
     end
 
     Invitation.transaction do
@@ -91,7 +95,7 @@ class Intervention < ApplicationRecord
       end
     end
 
-    Interventions::InvitationJob.perform_later(id, emails, health_clinic_id)
+    SendFillInvitationJob.perform_later(::Intervention, id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
   end
 
   def give_user_access(emails)

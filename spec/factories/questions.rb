@@ -37,6 +37,8 @@ FactoryBot.define do
         data: [
           {
             payload: {
+              range_start: 0,
+              range_end: 100,
               start_value: 'start',
               end_value: 'end'
             }

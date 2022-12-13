@@ -12,5 +12,9 @@ module CableExceptionHandler
     rescue_from LiveChat::NavigatorUnavailableException do |exc|
       ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 404, 'navigator_unavailable_error'))
     end
+
+    rescue_from LiveChat::CallOutUnavailableException do |exc|
+      ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 422, 'call_out_unavailable_error', unlockTime: exc.unlock_time))
+    end
   end
 end

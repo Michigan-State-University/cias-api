@@ -10,8 +10,17 @@ class V1::SessionService
   attr_reader :user, :intervention_id
   attr_accessor :intervention
 
-  def sessions
-    intervention.sessions.order(:position)
+  def sessions(include_multiple_sessions = true)
+    include_multiple_sessions = ActiveModel::Type::Boolean.new.cast(include_multiple_sessions)
+
+    basic_scope =
+      if include_multiple_sessions || include_multiple_sessions.nil?
+        intervention.sessions
+      else
+        intervention.sessions.where(multiple_fill: false)
+      end
+
+    basic_scope.order(:position)
   end
 
   def session_load(id)

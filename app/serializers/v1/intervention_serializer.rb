@@ -74,6 +74,10 @@ class V1::InterventionSerializer < V1Serializer
     map_file_data(object.conversations_transcript) if object.conversations_transcript.attached?
   end
 
+  attribute :conversations_present do |object|
+    object.conversations.size.positive?
+  end
+
   def self.newest_csv_link(object)
     ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end

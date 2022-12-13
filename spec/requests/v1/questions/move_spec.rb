@@ -34,6 +34,26 @@ describe 'PATCH /v1/sessions/:session_id/questions/move', type: :request do
             id: question3.id,
             position: 33,
             question_group_id: question_group2.id
+          },
+          {
+            id: question4.id,
+            position: 0,
+            question_group_id: question_group2.id
+          },
+          {
+            id: question5.id,
+            position: 1,
+            question_group_id: question_group2.id
+          },
+          {
+            id: question6.id,
+            position: 2,
+            question_group_id: question_group2.id
+          },
+          {
+            id: question7.id,
+            position: 3,
+            question_group_id: question_group2.id
           }
         ]
       }
@@ -56,15 +76,19 @@ describe 'PATCH /v1/sessions/:session_id/questions/move', type: :request do
     let(:headers) { user.create_new_auth_token }
 
     context 'when question group does not have questions' do
-      it 'returns serialized cloned question_group' do
-        request
+      before { request }
 
+      it 'returns serialized cloned question_group' do
         expect(response).to have_http_status(:ok)
         expect(response).to have_http_status(:ok)
         expect(json_response['data'].size).to eq 3
         expect(question1.reload.position).to eq 11
         expect(question2.reload.position).to eq 22
         expect(question3.reload.position).to eq 33
+      end
+
+      it 'changes question groups question count' do
+        expect(question_group2.reload.questions_count).to eq(7)
       end
     end
   end

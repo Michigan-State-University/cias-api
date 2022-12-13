@@ -4,19 +4,7 @@ class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
-    user_intervention = UserIntervention.find_or_create_by(
-      user_id: user_id,
-      intervention_id: intervention_id,
-      health_clinic_id: health_clinic_id
-    )
-
-    user_session = UserSession.find_or_initialize_by(
-      session_id: session_id,
-      user_id: user_id,
-      health_clinic_id: health_clinic_id,
-      type: type,
-      user_intervention_id: user_intervention.id
-    )
+    user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
     @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?

@@ -418,8 +418,9 @@ ActiveRecord::Schema.define(version: 2022_10_18_070738) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "intervention_id", null: false
-    t.boolean "archived", default: false, null: false
     t.string "current_screen_title"
+    t.string "participant_location_history", default: [], null: false, array: true
+    t.datetime "archived_at"
   end
 
   create_table "live_chat_interlocutors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -448,13 +449,22 @@ ActiveRecord::Schema.define(version: 2022_10_18_070738) do
   end
 
   create_table "live_chat_navigator_setups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "no_navigator_available_message", default: "", null: false
+    t.string "no_navigator_available_message", default: "Welcome to our in-session support!", null: false
     t.string "contact_email", default: "", null: false
-    t.integer "notify_by", default: 0, null: false
     t.uuid "intervention_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "is_navigator_notification_on", default: true
+  end
+
+  create_table "live_chat_summoning_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "unlock_next_call_out_time"
+    t.boolean "participant_handled", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["intervention_id"], name: "index_live_chat_summoning_users_on_intervention_id"
+    t.index ["user_id"], name: "index_live_chat_summoning_users_on_user_id"
   end
 
   create_table "messages", force: :cascade do |t|
@@ -624,6 +634,7 @@ ActiveRecord::Schema.define(version: 2022_10_18_070738) do
     t.bigint "cat_mh_population_id"
     t.integer "estimated_time"
     t.integer "current_narrator", default: 0
+    t.boolean "multiple_fill", default: false, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -751,6 +762,7 @@ ActiveRecord::Schema.define(version: 2022_10_18_070738) do
     t.uuid "user_intervention_id", null: false
     t.datetime "scheduled_at"
     t.boolean "quick_exit", default: false
+    t.integer "number_of_attempts"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
@@ -871,6 +883,8 @@ ActiveRecord::Schema.define(version: 2022_10_18_070738) do
   add_foreign_key "live_chat_messages", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_messages", "live_chat_interlocutors"
   add_foreign_key "live_chat_navigator_setups", "interventions"
+  add_foreign_key "live_chat_summoning_users", "interventions"
+  add_foreign_key "live_chat_summoning_users", "users"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"

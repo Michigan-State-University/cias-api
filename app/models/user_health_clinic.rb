@@ -10,6 +10,8 @@ class UserHealthClinic < ApplicationRecord
   private
 
   def deactivate_health_clinic_admin
+    return if user.nil?
+
     user.deactivate! if user.user_health_clinics.size.eql?(1)
   end
 end

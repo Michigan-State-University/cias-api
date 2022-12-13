@@ -35,6 +35,7 @@ module Log::UserRequest
     params[:report_template]&.delete(:logo)
     params[:variant]&.delete(:image)
     params[:intervention]&.delete(:files)
+    params[:imported_file]&.delete(:file)
     params[:navigator_setup]&.delete(:files)
     params[:navigator_setup]&.delete(:filled_script_template)
     params[:logo]&.delete(:file)

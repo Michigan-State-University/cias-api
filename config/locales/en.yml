@@ -5,6 +5,9 @@ en:
       file: '%m_%d_%Y'
       report_file: '%m_%d_%Y_%H_%M'
   question:
+    slider:
+      invalid_range: 'End value must be larger than the start value'
+      range_value_not_a_number: 'Only numbers are permitted on the range endpoint'
     finish:
       subtitle: '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>'
       text_to_speech: 'Enter main text for screen here. This is the last screen participants will see in this session'
@@ -23,8 +26,13 @@ en:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
             cat_mh_setting: 'Intervention should have all cat mh settings before publishing. ERROR_FLAG:CatMhWrongSettings'
+            cat_mh_connection_failed:
+              title: "Oops! You can't fill this session"
+              body: 'Unfortunately, something went wrong while downloading the CAT-MH questions. Please try again or contact the researcher who sent this session to you.'
+              button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
         user:
+          not_using_invitation_link: "If you want to register by this email, please use the registration link received by email from the researcher."
           attributes:
             roles:
               team_admin_must_have_a_team: 'Team Admin must have a team'
@@ -142,6 +150,18 @@ en:
       subject: Your CIAS Intervention is ready to download!
       body: Your Intervention is ready to download!
       header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
+  import_mailer:
+    result:
+      subject: CIAS Intervention Import
+      header: CIAS Intervention Import
+      body: 'Intervention %{intervention_name} has been imported successfully. Click the button below to open this intervention.'
+      button: Open intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
+    unsuccessful:
+      subject: CIAS Intervention Import - error
+      header: CIAS Intervention Import - error
+      body: 'There was a problem while importing intervention. Try again or contact support.'
+      notification: There was an issue with importing intervention
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
@@ -149,21 +169,41 @@ en:
       invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
     inform_to_an_email:
       subject: You have been invited to complete a session.
-      body: You have been invited to complete %{session_name}. Please click in the link to get more information.
-      header: Complete a new session
-      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the link below to start the session'
-      button_text: Start the session
-      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+      body: You have been invited to complete %{session_name}. Please click the link to get more information.
+      header: CIAS Invitation
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the button below to access.'
+      button_text: Go to the session
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+    invite_to_session_and_registration:
+      subject: CIAS Invitation
+      body: You have been invited to complete %{session_name}. Please click the link to get more information.
+      header: CIAS Invitation
+      html_body_invitation_part: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.'
+      html_body_information_part: "To access this session, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the session. If you have questions about this process, please contact the person or group associated with this session that referred you."
+      button_text: "Let's Get Started"
+      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
+      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
   intervention_mailer:
     inform_to_an_email:
       subject: You have been invited to complete an intervention.
-      body: You have been invited to complete %{intervention_name}. Please click in the link to get more information.
-      header: Complete a new intervention
-      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span> intervention.<br /><br />Click the link below to start the intervention'
-      button_text: Start the intervention
-      invitation_link: "%{domain}/interventions/%{intervention_id}/invite"
-      invitation_link_from_clinic: "%{domain}/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
+      body: You have been invited to complete %{intervention_name}. Please click the link to get more information.
+      header: CIAS Invitation
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{intervention_name}</span>.<br /><br />Click the button below to access.'
+      button_text: Go to the intervention
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/invite"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
+    invite_to_intervention_and_registration:
+      subject: CIAS Invitation
+      body: You have been invited to complete %{intervention_name}. Please click the link to get more information.
+      header: CIAS Invitation
+      html_body_information_part: "To access this intervention, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the intervention. If you have questions about this process, please contact the person or group associated with this intervention that referred you."
+      html_body_invitation_part: "You have been invited to complete <span style='color: #c866ea;'>%{intervention_name}</span>."
+      button_text: "Let's Get Started"
+      invitation_link: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}"
+      invitation_link_from_clinic: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}"
   user_mailer:
     send_verification_login_code:
       subject: Verify your Identity in CIAS
@@ -171,6 +211,13 @@ en:
       body_first_paragraph: You recently logged in to CIAS from a browser or app that we don't recognize or your last verification was over 30 days ago.
       body_second_paragraph: To ensure your account's security, we need to verify your identity. Enter the following code where prompted by CIAS.
       verification_code: 'Verification code: %{verification_code}'
+    welcome_email:
+      button_text: Let's get started
+      dashboard_link: "%{web_url}/login"
+      subject: Welcome to CIAS
+      html_body: "You have successfully created a %{role} account!<br /><span style='font-weight: 400'>You can use the link below at any time to access your intervention dashboard.</span>"
+      html_sub_body: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br />A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
+      header: Welcome to CIAS
   clone_mailer:
     intervention:
       subject: 'Copy of %{intervention_name}'
@@ -220,9 +267,12 @@ en:
     intervention_link: '%{web_url}/interventions/%{intervention_id}'
     session_link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
   mailer:
+    subject:
+      generic_invitation: CIAS Invitation
     footnote:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. If you need assistance with this software, please contact the person or group that referred you to this site. Thank you!<br /><br />'
       ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. If you need assistance with this software, please contact the person or group that referred you to this site. Thank you!<br /><br />"
+      not_reply_with_email: "If you didn't request this, please ignore this email.<br />Please do not reply to this email, which does not accept incoming messages.<br />You can reach us directly at <a href=\"mailto:cias@msu.edu\" style=\"color: #107969; font-weight: 700\">cias@msu.edu</a>. Thank you!<br />"
   navigator_mailer:
     invitation:
       subject: "Welcome to the navigator role in CIAS!"
@@ -234,6 +284,15 @@ en:
         subject: 'Welcome as a navigator in new intervention!'
         navigator_invite: "Navigator intervention invite"
         body: "You have been invited as navigator to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />Now you can chat with participants to help them with their troubles or concerns in this intervention."
+    call_out:
+      subject: "Participant requested for assist!"
+      header: "Participant request for navigator support"
+      body: "Someone from %{intervention_name} needs help right now. Go to the My Conversations tab in CIAS and then Inbox to talk with the participant."
+      click_the_link: "Join conversation"
+    participant_handled:
+      subject: "Participant request for assist - canceled"
+      header: "Participant cancelled request for support"
+      body: "Participant canceled a call out or another navigator has just started a conversation with this participant in %{intervention_name}. You don't have to go to the CIAS and you can ignore the previous helping request."
   transcript_mailer:
     open_inbox: "See your inbox"
     conversation_transcript_ready:

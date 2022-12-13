@@ -5,8 +5,10 @@ class NotificationChannel < ApplicationCable::Channel
 
   def subscribed
     stream_from user_channel_id
-    current_user.update!(online: true)
-    update_navigator_availability
+    unless current_user.navigator? && (current_user.researcher? || current_user.admin?)
+      current_user.update!(online: true)
+      update_navigator_availability
+    end
     ensure_confirmation_sent
     return_unread_notifications
   end
@@ -19,6 +21,11 @@ class NotificationChannel < ApplicationCable::Channel
 
   def on_read_notification(data)
     Notification.find(data['notificationId']).mark_as_readed
+  end
+
+  def on_navigator_availability_set(data)
+    current_user.update!(online: data['online'])
+    update_navigator_availability
   end
 
   private
@@ -34,9 +41,23 @@ class NotificationChannel < ApplicationCable::Channel
     intervention_ids = active_channel_intervention_ids
     interventions = Intervention.includes(:intervention_navigators).where(id: intervention_ids, intervention_navigators: { user_id: current_user.id })
     interventions.find_each do |intervention|
-      navigators_count = intervention.navigators.reload.where(online: true).count
-      status, topic = navigator_availability_status(navigators_count)
+      navigators = intervention.navigators.reload.where(online: true)
+      status, topic = navigator_availability_status(navigators.size)
       ActionCable.server.broadcast("intervention_channel_#{intervention.id}", { interventionId: intervention.id, topic: topic, status: status })
+
+      update_navigator_status_in_conversations(intervention)
+    end
+  end
+
+  def update_navigator_status_in_conversations(intervention)
+    conversation_topic, status = current_user.online ? ['current_navigator_available', 200] : ['current_navigator_unavailable', 404]
+    intervention.conversations.user_conversations(current_user, false).find_each do |conversation|
+      other_interlocutor = (conversation.users - [current_user]).first # get the other user in conversation
+      data = {
+        interventionId: intervention.id,
+        conversationId: conversation.id
+      }
+      ActionCable.server.broadcast("user_conversation_channel_#{other_interlocutor.id}", generic_message(data, conversation_topic, status))
     end
   end
 
@@ -49,8 +70,8 @@ class NotificationChannel < ApplicationCable::Channel
     intervention_connections.filter_map { |connection_str| connection_str.match(/.*intervention_channel_(.*?)$/)&.captures&.first }
   end
 
-  def navigator_availability_status(count)
-    count.positive? ? [200, 'navigator_available'] : [404, 'navigator_unavailable']
+  def navigator_availability_status(navigators_count)
+    navigators_count.positive? ? [200, 'navigator_available'] : [404, 'navigator_unavailable']
   end
 
   def user_channel_id

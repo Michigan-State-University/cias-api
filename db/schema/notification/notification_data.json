@@ -20,7 +20,24 @@
     "message": {
       "type": "string"
     },
-    "name": {
+    "intervention_name": {
+      "type": "string"
+    },
+    "intervention_id": {
+      "type": "string"
+    },
+    "transcript": {
+      "type": ["null", "object"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "url": { "type": "string" }
+      }
+    },
+    "archived": {
+      "type": "boolean"
+    },
+    "title": {
       "type": "string"
     },
     "new_narrator": {

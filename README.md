@@ -52,3 +52,20 @@
     - open `.zshrc`
     - add `export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES`
     - call in project terminal `source ~/.zshrc`
+
+
+### FAKE DATA GENERATOR
+
+#### Do not use it on production environment!
+
+- Set environment variables
+  - `GENERATOR_ENABLED` to 1
+  - `CIAS_ADMIN_PASSWORD` to a password of your choice
+- Go to `db/seeds/interventions/cias_seed.rb` and change constant variables values if you want more specific data to be created
+- Type `rake db:seed:interventions` command in server console
+
+
+### BENCHMARK
+
+- To run all implemented benchmarks enter `bundle exec rspec spec/benchmarks/*/*.rb` in server console
+- To run specific benchmark replace asterisk symbols with a file from `spec/benchmarks` location. For example `spec/benchmarks/interventions/intervention_index.rb`
