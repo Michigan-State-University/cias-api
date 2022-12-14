@@ -3,7 +3,7 @@
 class V1::Export::InterventionSerializer < ActiveModel::Serializer
   include FileHelper
 
-  attributes :quick_exit, :type, :shared_to, :additional_text, :original_text
+  attributes :quick_exit, :type, :shared_to, :additional_text, :original_text, :current_narrator
 
   has_many :sessions, serializer: V1::Export::SessionSerializer
   has_many :intervention_accesses, serializer: V1::Export::InterventionAccessSerializer

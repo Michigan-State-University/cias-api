@@ -19,6 +19,10 @@ RSpec.describe V1::Intervention::ExportData do
   let!(:report_template_variant) { report_template_section.variants.first }
   let(:result) { described_class.call(intervention) }
 
+  before do
+    stub_const('::Question::CURRENT_VERSION', '1')
+  end
+
   context 'correctly exports data' do
     it 'returns correct intervention data' do
       expect(result).to include(
