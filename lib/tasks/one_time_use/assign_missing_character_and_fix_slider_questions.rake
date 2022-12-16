@@ -12,7 +12,6 @@ namespace :one_time_use do
         unless payload.key?('range_start') && payload.key?('range_end')
           payload['range_start'] = 0
           payload['range_end'] = 100
-          question.save!
         end
       end
       question.save!
