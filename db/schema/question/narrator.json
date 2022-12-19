@@ -10,11 +10,15 @@
         },
         "animation": {
           "type": "boolean"
+        },
+        "character": {
+          "type": "string"
         }
       },
       "required": [
         "voice",
-        "animation"
+        "animation",
+        "character"
       ]
     },
     "blocks": {

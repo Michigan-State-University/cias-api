@@ -71,7 +71,7 @@ class V1::SessionsController < V1Controller
   end
 
   def sessions_scope
-    session_service.sessions
+    session_service.sessions(params[:include_multiple_sessions])
   end
 
   def session_id
@@ -92,7 +92,7 @@ class V1::SessionsController < V1Controller
 
   def session_params
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
-                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id,
+                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
                                     :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, narrator: {}, settings: {},
                                                                                                                         formulas: [
                                                                                                                           :payload, { patterns: [:match, {

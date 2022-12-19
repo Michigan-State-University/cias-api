@@ -16,6 +16,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
     let(:status) { 'draft' }
     let(:user) { participant }
+    let(:default_narrator_settings) { { voice: true, animation: true, character: 'peedy' } }
 
     context 'tlfb logic' do
       let!(:tlfb_session) { create(:session, intervention_id: intervention.id) }
@@ -468,10 +469,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                 }
               }
             ],
-            settings: {
-              voice: true,
-              animation: true
-            }
+            settings: default_narrator_settings
           }
           question_single.save
           question_single
@@ -530,10 +528,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                            }
                                          }
                                        ],
-                                       settings: {
-                                         voice: true,
-                                         animation: true
-                                       }
+                                       settings: default_narrator_settings
                                      })
           end
           let!(:question) { create(:question_single, question_group: question_group, position: 2) }
@@ -593,10 +588,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                            }
                                          }
                                        ],
-                                       settings: {
-                                         voice: true,
-                                         animation: true
-                                       }
+                                       settings: default_narrator_settings
                                      })
           end
 
@@ -649,10 +641,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                                            }
                                          }
                                        ],
-                                       settings: {
-                                         voice: true,
-                                         animation: true
-                                       }
+                                       settings: default_narrator_settings
                                      })
           end
 
@@ -781,10 +770,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                   }
                 ]
               }],
-              settings: {
-                voice: true,
-                animation: true
-              }
+              settings: default_narrator_settings
             }
             question.save!
           end
@@ -838,10 +824,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                   }
                 ]
               }],
-              settings: {
-                voice: true,
-                animation: true
-              }
+              settings: default_narrator_settings
             }
             question.save!
           end
@@ -903,10 +886,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                   }
                 ]
               }],
-              settings: {
-                voice: true,
-                animation: true
-              }
+              settings: default_narrator_settings
             }
             question.save!
           end
@@ -952,10 +932,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
                   }
                 ]
               }],
-              settings: {
-                voice: true,
-                animation: true
-              }
+              settings: default_narrator_settings
             }
             question.save!
           end
@@ -1016,7 +993,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         'animation' => 'rest',
         'endPosition' => {
           'x' => 600,
-          'y' => 550
+          'y' => 100
         }
       )
       expect(json_response['data']['attributes']['narrator']['blocks'].first['sha256']).not_to be_empty
