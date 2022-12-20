@@ -4,7 +4,7 @@ namespace :one_time_use do
   desc 'Fix missing character and slider questions'
   task assign_missing_character_and_fix_slider_questions: :environment do
     question_count = Question.count
-    Question.all.find_each.with_index do |question, index|
+    Question.find_each.with_index do |question, index|
       unless question.narrator['settings'].key?('character')
         question.narrator['settings']['character'] = 'peedy'
       end
