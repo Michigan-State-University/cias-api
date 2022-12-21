@@ -5,7 +5,7 @@ namespace :one_time_use do
   task assign_missing_character_and_fix_slider_questions: :environment do
     question_count = Question.count
     Question.find_each.with_index do |question, index|
-      if question.narrator['settings'].key?('character') or not question.is_a?(Question::Slider)
+      if question.narrator['settings'].key?('character') and not question.is_a?(Question::Slider)
         p "Skipping migration for #{index}/#{question_count}"
         next
       end
