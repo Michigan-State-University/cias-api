@@ -3,7 +3,13 @@
 namespace :one_time_use do
   desc 'Fix missing character and slider questions'
   task assign_missing_character_and_fix_slider_questions: :environment do
-    Question.all.find_each do |question|
+    question_count = Question.count
+    Question.find_each.with_index do |question, index|
+      if question.narrator['settings'].key?('character') and not question.is_a?(Question::Slider)
+        p "Skipping migration for #{index}/#{question_count}"
+        next
+      end
+
       unless question.narrator['settings'].key?('character')
         question.narrator['settings']['character'] = 'peedy'
       end
@@ -14,6 +20,7 @@ namespace :one_time_use do
           payload['range_end'] = 100
         end
       end
+      p "Migrating question #{index}/#{question_count}"
       question.save!
     end
   end
