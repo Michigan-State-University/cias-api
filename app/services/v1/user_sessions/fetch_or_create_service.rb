@@ -43,10 +43,10 @@ class V1::UserSessions::FetchOrCreateService
   end
 
   def number_of_attempts
-    started_sessions.count + 1 if session.multiple_fill?
+    started_sessions.count + 1
   end
 
-  def new_user_session_for(create_method, counter = nil)
+  def new_user_session_for(create_method, counter = 1)
     UserSession.send(
       create_method,
       session_id: session_id,

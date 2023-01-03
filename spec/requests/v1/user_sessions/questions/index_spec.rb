@@ -788,6 +788,69 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           end
         end
 
+        context 'refection from another session' do
+          let(:session2) { create(:session, intervention: intervention, name: 'dwa') }
+          let!(:user_session2) { create(:user_session, session: session2, user_intervention: user_int) }
+          let!(:question_group2) { create(:question_group, session: session2) }
+          let!(:question2) { create(:question_single, question_group: question_group2) }
+          let!(:answer2) { create(:answer_single, question_id: question2.id, user_session_id: user_session2.id) }
+          let!(:questions) { create_list(:question_single, 4, question_group: question_group) }
+
+          let!(:question_second) do
+            question = questions.second
+            question.narrator = {
+              blocks: [{
+                type: 'Reflection',
+                action: 'NO_ACTION',
+                animation: 'rest',
+                endPosition: {
+                  x: 600,
+                  y: 600
+                },
+                question_id: question2.id,
+                session_id: session2.id,
+                question_group_id: question_group2.id,
+                reflections: [
+                  {
+                    text: [
+                      'test'
+                    ],
+                    value: '1',
+                    sha256: [],
+                    payload: '1',
+                    variable: 'test',
+                    audio_urls: []
+                  },
+                  {
+                    text: [
+                      'test2'
+                    ],
+                    value: '2',
+                    sha256: [],
+                    payload: '2',
+                    variable: 'test',
+                    audio_urls: []
+                  }
+                ]
+              }],
+              settings: default_narrator_settings
+            }
+            question.save!
+          end
+
+          before do
+            get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+          end
+
+          it 'returns correct target value size' do
+            expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value'].size).to eq(1)
+          end
+
+          it 'has correct reflection text' do
+            expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value'].first['text'].first).to eq('test')
+          end
+        end
+
         context 'incorrectly setup' do
           let!(:question_second) do
             question = questions.second

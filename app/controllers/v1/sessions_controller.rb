@@ -54,10 +54,17 @@ class V1::SessionsController < V1Controller
   def session_variables
     authorize! :read, Session
 
-    session = Session.find(session_id)
-    variable_names = session.fetch_variables(variable_filter_options)
+    variable_names = session_obj.fetch_variables(variable_filter_options)
 
-    render json: { session_variable: session.variable, variable_names: variable_names }
+    render json: { session_variable: session_obj.variable, variable_names: variable_names }
+  end
+
+  def reflectable_questions
+    authorize! :read, Session
+
+    questions = session_obj.questions.where(type: %w[Question::Grid Question::Multiple Question::Single])
+
+    render json: serialized_response(questions, 'ReflectableQuestion')
   end
 
   private

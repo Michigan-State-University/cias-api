@@ -77,6 +77,7 @@ Rails.application.routes.draw do
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     get 'sessions/:id/variables/(:question_id)', to: 'sessions#session_variables', as: :fetch_variables
+    get 'sessions/:id/reflectable_questions', to: 'sessions#reflectable_questions', as: :fetch_reflectable_questions
     scope 'sessions/:session_id', as: 'session' do
       post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
