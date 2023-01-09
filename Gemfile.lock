@@ -494,14 +494,11 @@ GEM
       sexp_processor (~> 4.9)
     rubyzip (2.3.0)
     secure_headers (6.3.2)
-    sentry-rails (5.1.1)
+    sentry-rails (5.7.0)
       railties (>= 5.0)
-      sentry-ruby-core (~> 5.1.1)
-    sentry-ruby (5.1.1)
+      sentry-ruby (~> 5.7.0)
+    sentry-ruby (5.7.0)
       concurrent-ruby (~> 1.0, >= 1.0.2)
-      sentry-ruby-core (= 5.1.1)
-    sentry-ruby-core (5.1.1)
-      concurrent-ruby
     sexp_processor (4.15.2)
     shellany (0.0.1)
     shoulda-matchers (4.5.1)
@@ -634,8 +631,8 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-thread_safety
   secure_headers
-  sentry-rails
-  sentry-ruby
+  sentry-rails (~> 5.7)
+  sentry-ruby (~> 5.5)
   shoulda-matchers
   sidekiq (>= 6.4.0)
   simplecov

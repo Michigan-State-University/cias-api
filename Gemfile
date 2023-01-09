@@ -59,8 +59,8 @@ gem 'paper_trail'
 # for soft delete
 gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
-gem 'sentry-ruby'
-gem 'sentry-rails'
+gem 'sentry-ruby', '~> 5.5'
+gem 'sentry-rails', '~> 5.7'
 
 group :development, :test do
   gem 'bundler-audit'
