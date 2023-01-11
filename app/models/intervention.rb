@@ -7,6 +7,8 @@ class Intervention < ApplicationRecord
   include InvitationInterface
   extend DefaultValues
 
+  CURRENT_VERSION = '1'
+
   belongs_to :user, inverse_of: :interventions
   belongs_to :organization, optional: true
   belongs_to :google_language
@@ -20,6 +22,7 @@ class Intervention < ApplicationRecord
   has_many :live_chat_navigator_invitations, class_name: 'LiveChat::Interventions::NavigatorInvitation', dependent: :destroy
   has_many :intervention_navigators, class_name: 'LiveChat::Interventions::Navigator', dependent: :destroy
   has_many :navigators, through: :intervention_navigators, source: :user
+  has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
 
   has_many_attached :reports
@@ -53,6 +56,7 @@ class Intervention < ApplicationRecord
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
+  enum current_narrator: { peedy: 0, emmi: 1 }
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }

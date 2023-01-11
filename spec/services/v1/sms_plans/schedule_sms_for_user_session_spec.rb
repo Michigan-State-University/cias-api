@@ -5,13 +5,14 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   subject { described_class.call(user_session) }
 
   let(:intervention) { create(:intervention, :published) }
+  let(:user_intervention) { create(:user_intervention, intervention: intervention) }
   let(:session) { create(:session, intervention: intervention) }
   let(:session2) { create(:session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session, no_formula_text: 'test') }
   let(:user) { create(:user, :confirmed) }
   let!(:phone) { create(:phone, :confirmed, user: user) }
-  let(:user_session) { create(:user_session, session: session, user: user) }
-  let(:user_session2) { create(:user_session, session: session2, user: user) }
+  let(:user_session) { create(:user_session, session: session, user: user, user_intervention: user_intervention) }
+  let(:user_session2) { create(:user_session, session: session2, user: user, user_intervention: user_intervention) }
   let(:current_time) { Time.zone.parse('2021-07-20 20:02') }
 
   before do
