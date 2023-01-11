@@ -61,10 +61,7 @@ RSpec.describe CloneJobs::Session, type: :job do
                                      }
                                    }
                                  ],
-                                 settings: {
-                                   voice: true,
-                                   animation: true
-                                 }
+                                 settings: default_narrator_settings
                                })
     end
     let!(:question6) do
@@ -77,6 +74,13 @@ RSpec.describe CloneJobs::Session, type: :job do
     let!(:question7) do
       create(:question_third_party, question_group: question_group2, subtitle: 'Question Subtitle 7', position: 4,
                                     body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }] })
+    end
+    let(:default_narrator_settings) do
+      {
+        'voice' => true,
+        'animation' => true,
+        'character' => 'peedy'
+      }
     end
 
     before do
@@ -235,10 +239,7 @@ RSpec.describe CloneJobs::Session, type: :job do
                   'animation' => 'pointUp', 'endPosition' => { 'x' => 0, 'y' => 600 }
                 }
               ],
-              'settings' => {
-                'voice' => true,
-                'animation' => true
-              }
+              'settings' => default_narrator_settings
             }
           ),
           include(

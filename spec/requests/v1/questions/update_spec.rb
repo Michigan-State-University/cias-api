@@ -42,7 +42,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
   end
   let(:request) do
     patch v1_question_group_question_path(question_group_id: question_group.id, id: question.id), params: params,
-                                                                                                  headers: headers
+                                                                                                  headers: headers, as: :json
   end
 
   context 'when auth' do
@@ -159,6 +159,68 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
 
     it 'respond with correct error message' do
       expect(json_response['message']).to eq 'Validation failed: Variable name is in invalid format'
+    end
+  end
+
+  context 'add params require to allow to reflection from other sessions' do
+    let(:params) do
+      {
+        question: {
+          narrator: {
+            blocks: [
+              {
+                text: [
+                  'Enter main text/question for screen here'
+                ],
+                type: 'ReadQuestion',
+                action: 'NO_ACTION',
+                sha256: [
+                  '20165f236db0d64f2e00a4300b56734a6216f03b12e0b44b90f9b7a38bf7c1af'
+                ],
+                animation: 'rest',
+                audio_urls: [],
+                endPosition: {
+                  x: 600,
+                  y: 550
+                }
+              },
+              {
+                action: 'NO_ACTION',
+                question_id: '536dfa63-68d6-440c-a96e-96b123f5a96f',
+                reflections: [
+                  {
+                    variable: 'v1',
+                    value: '1',
+                    payload: '',
+                    text: [],
+                    sha256: [],
+                    audio_urls: []
+                  }
+                ],
+                animation: 'rest',
+                type: 'Reflection',
+                endPosition: {
+                  x: 600,
+                  y: 550
+                }
+              }
+            ],
+            settings: {
+              voice: true,
+              animation: true,
+              character: 'peedy'
+            }
+          }
+        }
+      }
+    end
+
+    before do
+      request
+    end
+
+    it 'returns correct HTTP status code (OK)' do
+      expect(response).to have_http_status(:ok)
     end
   end
 end

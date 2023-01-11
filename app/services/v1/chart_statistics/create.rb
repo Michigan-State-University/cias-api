@@ -53,7 +53,7 @@ class V1::ChartStatistics::Create
 
   def all_var_values
     V1::UserInterventionService.new(
-      user_session.user.id, user_session.session.intervention_id, nil
+      user_session.user_intervention_id, nil
     ).var_values
   end
 

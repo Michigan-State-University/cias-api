@@ -46,7 +46,7 @@ class DBSeed
                          QUESTION_GROUPS_PER_SESSION * QUESTIONS_PER_QUESTION_GROUP
 
   User.limit_to_roles('researcher').ids.each do |researcher_id|
-    create_list(:intervention, INTERVENTIONS_PER_RESEARCHER, user_id: researcher_id) do |intervention|
+    create_list(:intervention_with_logo, INTERVENTIONS_PER_RESEARCHER, user_id: researcher_id) do |intervention|
       intervention.status = INTERVENTION_STATUS.sample
       intervention.name = "#{INTERVENTION_NAMES.sample} for #{INTERVENTION_NAMES_DIRECTED.sample}"
       intervention.type = INTERVENTION_TYPES.sample

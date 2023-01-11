@@ -34,7 +34,7 @@ class UserSession < ApplicationRecord
   end
 
   def update_user_intervention(session_is_finished: false)
-    user_intervention.completed_sessions += 1 if session_is_finished
+    user_intervention.completed_sessions += 1 if session_is_finished && UserSession.where(user_id: user_id, session_id: session_id).size < 2
 
     if user_intervention_finished?
       user_intervention.status = 'completed'
@@ -44,6 +44,10 @@ class UserSession < ApplicationRecord
     end
 
     user_intervention.save!
+  end
+
+  def filled_out_count
+    user_intervention.user_sessions.where(session_id: session_id).where.not(finished_at: nil).count
   end
 
   private

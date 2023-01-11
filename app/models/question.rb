@@ -9,6 +9,8 @@ class Question < ApplicationRecord
   include BlockHelper
   include Translate
 
+  CURRENT_VERSION = '2'
+
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
 

@@ -3,7 +3,7 @@
 class V1::UserSessionScheduleService
   def initialize(user_session)
     @user_session = user_session
-    @user_intervention_service = V1::UserInterventionService.new(user_session.user.id, user_session.session.intervention_id, user_session.id)
+    @user_intervention_service = V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id)
     @all_var_values = @user_intervention_service.var_values
     @all_var_values_with_session_variables = @user_intervention_service.var_values(true)
     @health_clinic = user_session.health_clinic

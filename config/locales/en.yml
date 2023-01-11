@@ -150,6 +150,18 @@ en:
       subject: Your CIAS Intervention is ready to download!
       body: Your Intervention is ready to download!
       header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
+  import_mailer:
+    result:
+      subject: CIAS Intervention Import
+      header: CIAS Intervention Import
+      body: 'Intervention %{intervention_name} has been imported successfully. Click the button below to open this intervention.'
+      button: Open intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
+    unsuccessful:
+      subject: CIAS Intervention Import - error
+      header: CIAS Intervention Import - error
+      body: 'There was a problem while importing intervention. Try again or contact support.'
+      notification: There was an issue with importing intervention
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
@@ -170,7 +182,7 @@ en:
       body: You have been invited to complete %{session_name}. Please click the link to get more information.
       header: CIAS Invitation
       html_body_invitation_part: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.'
-      html_body_information_part: "To access this session, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the session. If you have questions about this process, please contact the research team associated with this session."
+      html_body_information_part: "To access this session, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the session. If you have questions about this process, please contact the person or group associated with this session that referred you."
       button_text: "Let's Get Started"
       invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
       invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
@@ -187,7 +199,7 @@ en:
       subject: CIAS Invitation
       body: You have been invited to complete %{intervention_name}. Please click the link to get more information.
       header: CIAS Invitation
-      html_body_information_part: "To access this intervention, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the intervention. If you have questions about this process, please contact the research team associated with this intervention."
+      html_body_information_part: "To access this intervention, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the intervention. If you have questions about this process, please contact the person or group associated with this intervention that referred you."
       html_body_invitation_part: "You have been invited to complete <span style='color: #c866ea;'>%{intervention_name}</span>."
       button_text: "Let's Get Started"
       invitation_link: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}"
@@ -200,11 +212,11 @@ en:
       body_second_paragraph: To ensure your account's security, we need to verify your identity. Enter the following code where prompted by CIAS.
       verification_code: 'Verification code: %{verification_code}'
     welcome_email:
-      button_text: Go to the app
+      button_text: Let's get started
       dashboard_link: "%{web_url}/login"
       subject: Welcome to CIAS
       html_body: "You have successfully created a %{role} account!<br /><span style='font-weight: 400'>You can use the link below at any time to access your intervention dashboard.</span>"
-      html_sub_body: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact your research study team.<br /><br />A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
+      html_sub_body: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br />A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
       header: Welcome to CIAS
   clone_mailer:
     intervention:
@@ -247,6 +259,13 @@ en:
       subject: 'Error during translation'
       header: 'An error has occurred during translation.'
       body: 'Something goes wrong while translating your intervention. Please try again.'
+  multiple_narrators_mailer:
+    subject: 'CIAS narrator change'
+    header: 'CIAS Narrator Change'
+    body: 'The narrator change in <span style="color: #c866ea;">%{object_name}</span> went successfully.<br /><br />Click the button below to go back to the app'
+    button_text: 'Go to the app'
+    intervention_link: '%{web_url}/interventions/%{intervention_id}'
+    session_link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
   mailer:
     subject:
       generic_invitation: CIAS Invitation
