@@ -93,7 +93,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def matched_variant(plan)
-    all_var_values = V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
+    all_var_values = V1::UserInterventionService.new(user.id, session.intervention_id, user_session.id).var_values
     V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, all_var_values)
   end
 
@@ -117,7 +117,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def user_intervention_service
-    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id)
+    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_id, user_session.session.intervention_id, user_session.id)
   end
 
   def user_intervention_answer_vars

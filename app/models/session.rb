@@ -8,8 +8,6 @@ class Session < ApplicationRecord
   include InvitationInterface
   include Translate
 
-  CURRENT_VERSION = '1'
-
   belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
 
@@ -20,7 +18,6 @@ class Session < ApplicationRecord
 
   has_many :user_sessions, dependent: :destroy, inverse_of: :session
   has_many :users, through: :user_sessions
-  has_many :notifications, as: :notifiable, dependent: :destroy
 
   attribute :settings, :json, default: assign_default_values('settings')
   attribute :position, :integer, default: 1
@@ -34,12 +31,9 @@ class Session < ApplicationRecord
                    after_fill: 'after_fill',
                    days_after_date: 'days_after_date' },
        _prefix: :schedule
-  enum current_narrator: ::Intervention.current_narrators
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
-
-  scope :multiple_fill, -> { where(multiple_fill: true) }
 
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true

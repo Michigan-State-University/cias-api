@@ -38,10 +38,7 @@ class V1::UserInterventionsController < V1Controller
   end
 
   def user_intervention_scope
-    UserIntervention.joins(:intervention)
-                    .accessible_by(current_ability)
-                    .order(created_at: :desc)
-                    .where(intervention: { status: 'published' })
+    UserIntervention.accessible_by(current_ability).order(created_at: :desc)
   end
 
   def user_intervention_params

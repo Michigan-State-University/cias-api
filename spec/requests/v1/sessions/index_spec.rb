@@ -14,8 +14,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions', type: :request
   end
   let(:intervention) { create(:intervention) }
   let(:headers) { user.create_new_auth_token }
-  let(:request) { get v1_intervention_sessions_path(intervention.id), headers: headers, params: params }
-  let(:params) { {} }
+  let(:request) { get v1_intervention_sessions_path(intervention.id), headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
@@ -43,32 +42,6 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions', type: :request
 
           it 'success to Hash' do
             expect(json_response.class).to be(Hash)
-          end
-        end
-
-        context 'filter by multiple sessions' do
-          let(:params) do
-            {
-              include_multiple_sessions: false
-            }
-          end
-
-          let(:intervention) { create(:intervention, user: user) }
-          let!(:sessions) { create_list(:session, 3, intervention: intervention) }
-          let!(:multiple_sessions) { create_list(:session, 3, :multiple_times, intervention: intervention) }
-
-          it {
-            request
-            expect(json_response['data'].size).to(be(3))
-          }
-
-          context 'turn off - default behavior' do
-            let(:params) { {} }
-
-            it {
-              request
-              expect(json_response['data'].size).to(be(6))
-            }
           end
         end
       end

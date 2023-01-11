@@ -53,6 +53,6 @@ class V1::GeneratedReports::GenerateUserSessionReports
   end
 
   def all_var_values
-    V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
+    V1::UserInterventionService.new(user.id, user_session.session.intervention_id, user_session.id).var_values
   end
 end

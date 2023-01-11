@@ -172,8 +172,8 @@ class V1::FlowService
         self.warning = REFLECTION_MISS_MATCH
         return []
       end
-      current_variable = reflection_variable(block, reflection['variable'])
-      matched_reflections.push(reflection) if all_var_values.key?(current_variable) && all_var_values[current_variable].eql?(reflection['value'])
+
+      matched_reflections.push(reflection) if all_var_values.key?(reflection['variable']) && all_var_values[reflection['variable']].eql?(reflection['value'])
     end
     matched_reflections
   end
@@ -204,7 +204,9 @@ class V1::FlowService
   end
 
   def all_var_values
-    @all_var_values ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
+    @all_var_values ||= V1::UserInterventionService.new(
+      user.id, user_session.session.intervention_id, user_session.id
+    ).var_values
   end
 
   def name_audio
@@ -217,9 +219,5 @@ class V1::FlowService
 
   def preview?
     user_session.session.intervention.draft?
-  end
-
-  def reflection_variable(block, variable)
-    block['session_id'].present? ? "#{Session.find(block['session_id']).variable}.#{variable}" : variable
   end
 end

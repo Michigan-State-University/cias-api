@@ -1,16 +1,15 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::UserInterventionService do
-  subject { described_class.new(user_intervention.id, user_session2.id) }
+  subject { described_class.new(user.id, intervention.id, user_session2.id) }
 
   describe '#var_values' do
     let(:user) { create(:user) }
     let(:intervention) { create(:intervention) }
-    let(:user_intervention) { create(:user_intervention, intervention: intervention) }
     let!(:session1) { create(:session, intervention: intervention, variable: 's1234') }
     let!(:session2) { create(:session, intervention: intervention) }
-    let(:user_session1) { create(:user_session, user: user, session: session1, user_intervention: user_intervention) }
-    let!(:user_session2) { create(:user_session, user: user, session: session2, user_intervention: user_intervention) }
+    let(:user_session1) { create(:user_session, user: user, session: session1) }
+    let!(:user_session2) { create(:user_session, user: user, session: session2) }
     let!(:question_group1) { create(:question_group, session: session1) }
     let!(:question_group2) { create(:question_group, session: session2) }
     let!(:question_body1) do

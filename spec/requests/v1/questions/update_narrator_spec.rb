@@ -20,7 +20,6 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
   let(:qg_narrator_blocks_with_speech_empty) { q_narrator_blocks_with_speech_empty.question_group }
 
   let(:headers) { user.create_new_auth_token }
-  let(:default_narrator_settings) { { voice: true, animation: true, character: 'peedy' } }
 
   let(:params_turn_off) do
     {
@@ -46,8 +45,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
           ],
           settings: {
             voice: false,
-            animation: true,
-            character: 'peedy'
+            animation: true
           }
         }
       }
@@ -59,7 +57,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       question: {
         narrator: {
           blocks: [],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -70,7 +71,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       question: {
         narrator: {
           blocks: [],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -89,7 +93,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               audio_urls: ['/rails/active_storage/blobs/eyJfcmFpbHMiOnsibWVzc2FnZSI6IkJBaEpJaWsxTmpKbE5UZ3dOaTFqTXprM0xUUm1PRGd0T0dGaE1TMDNZV1V6WXpoaE9UTTFZVGdHT2daRlZBPT0iLCJleHAiOm51bGwsInB1ciI6ImJsb2JfaWQifX0=--7e7f58df7135dc8738895a6aab5373c2595cdddf/52ea67359dfa70ce35169fd2493590d8371919161a7fb2e28e322863448b9a87.mp3']
             }
           ],
-          settings: default_narrator_settings
+          settings: { voice: true, animation: true }
         }
       }
     }
@@ -106,7 +110,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               animation: '',
               audio_urls: [] }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -135,7 +142,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               audio_urls: []
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -161,7 +171,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               audio_urls: []
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -187,7 +200,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               audio_urls: []
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -223,7 +239,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               audio_urls: []
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -286,7 +305,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               audio_urls: []
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -330,7 +352,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               ]
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }
@@ -392,7 +417,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
               }
             }
           ],
-          settings: default_narrator_settings
+          settings: {
+            voice: true,
+            animation: true
+          }
         }
       }
     }

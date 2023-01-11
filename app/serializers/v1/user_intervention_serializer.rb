@@ -2,7 +2,7 @@
 
 class V1::UserInterventionSerializer < V1Serializer
   include FileHelper
-  attributes :completed_sessions, :status, :last_answer_date, :contain_multiple_fill_session
+  attributes :completed_sessions, :status, :last_answer_date
 
   attribute :sessions_in_intervention do |object|
     object.sessions.size
@@ -13,7 +13,7 @@ class V1::UserInterventionSerializer < V1Serializer
   end
 
   attribute :user_sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object|
-    V1::UserSessionSerializer.new(object.latest_user_sessions)
+    V1::UserSessionSerializer.new(object.user_sessions)
   end
 
   attribute :blocked do |object|

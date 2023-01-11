@@ -9,7 +9,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
   let(:participant1) { create(:user, :confirmed, :participant) }
   let(:participant2) { create(:user, :confirmed, :participant) }
 
-  let(:intervention) { create(:intervention, :published) }
+  let(:intervention) { create(:intervention) }
   let!(:sessions) { create_list(:session, 5, intervention_id: intervention.id) }
 
   let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'completed') }
@@ -39,7 +39,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'in_progress',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
-            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -61,7 +60,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'in_progress',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
-            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -83,7 +81,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'in_progress',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
-            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -105,7 +102,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'status' => 'completed',
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
-            'contain_multiple_fill_session' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -119,33 +115,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
           }
         }
       )
-    end
-
-    context 'with multiple fill session' do
-      let!(:sessions) { create(:session, :multiple_times, intervention_id: intervention.id) }
-
-      it 'inform that intervention contains multiple fill session' do
-        expect(json_response['data'][0]['attributes']).to include(
-          {
-            'blocked' => false,
-            'completed_sessions' => 0,
-            'last_answer_date' => nil,
-            'contain_multiple_fill_session' => true,
-            'sessions_in_intervention' => 1,
-            'status' => 'in_progress',
-            'intervention' => {
-              'additional_text' => '',
-              'files' => [],
-              'id' => intervention.id,
-              'image_alt' => nil,
-              'live_chat_enabled' => false,
-              'logo_url' => nil,
-              'name' => intervention.name,
-              'type' => 'Intervention'
-            }
-          }
-        )
-      end
     end
 
     context 'with pagination params' do
@@ -166,20 +135,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
 
     it 'return correct data' do
       expect(json_response['data'].size).to be(3)
-    end
-  end
-
-  context 'when intervention is closed or archived' do
-    let(:user) { participant1 }
-
-    let(:intervention_closed) { create(:intervention, :closed) }
-    let(:intervention_archived) { create(:intervention, :archived) }
-    let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'ready_to_start') }
-    let!(:user_interventions2) { create(:user_intervention, intervention: intervention_closed, user: participant1, status: 'ready_to_start') }
-    let!(:user_interventions3) { create(:user_intervention, intervention: intervention_archived, user: participant1, status: 'ready_to_start') }
-
-    it 'return only interventions which have published status' do
-      expect(json_response['data'].size).to be(1)
     end
   end
 end

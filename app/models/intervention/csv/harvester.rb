@@ -29,7 +29,7 @@ class Intervention::Csv::Harvester
         question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var) }
       end
 
-      header.concat(session_metadata(session))
+      header.concat(session_times_metadata(session))
       header.concat(quick_exit_header(session))
     end
 
@@ -38,9 +38,8 @@ class Intervention::Csv::Harvester
     header.unshift(:user_id)
   end
 
-  def session_metadata(session)
-    %W[#{session.variable}.metadata.session_start #{session.variable}.metadata.session_end #{session.variable}.metadata.session_duration
-       #{session.variable}.metadata.number_of_attempts]
+  def session_times_metadata(session)
+    %W[#{session.variable}.metadata.session_start #{session.variable}.metadata.session_end #{session.variable}.metadata.session_duration]
   end
 
   def quick_exit_header(session)
@@ -58,26 +57,28 @@ class Intervention::Csv::Harvester
   end
 
   def set_rows
-    UserSession.where(session_id: session_ids).includes(:user).each_with_index do |user_session, row_index|
+    users.each_with_index do |user, row_index|
       initialize_row
-      set_user_data(row_index, user_session)
-      session_variable = user_session.session.variable
-      user_session.answers.each do |answer|
-        set_default_value(user_session, answer, row_index)
-        next if answer.skipped
+      user.user_sessions.where(session_id: session_ids).each_with_index do |user_session, index|
+        set_user_data(row_index, user_session) if index.zero?
+        session_variable = user_session.session.variable
+        user_session.answers.each do |answer|
+          set_default_value(user_session, answer, row_index)
+          next if answer.skipped
 
-        answer.body_data&.each do |data|
-          var_index = header.index("#{session_variable}.#{answer.csv_header_name(data)}")
-          next if var_index.blank?
+          answer.body_data&.each do |data|
+            var_index = header.index("#{session_variable}.#{answer.csv_header_name(data)}")
+            next if var_index.blank?
 
-          var_value = answer.csv_row_value(data)
-          rows[row_index][var_index] = var_value
+            var_value = answer.csv_row_value(data)
+            rows[row_index][var_index] = var_value
+          end
         end
-      end
 
-      fill_by_tlfb_research(row_index, user_session)
-      metadata(session_variable, user_session, row_index)
-      quick_exit(session_variable, row_index, user_session)
+        fill_by_tlfb_research(row_index, user_session)
+        metadata(session_variable, user_session, row_index)
+        quick_exit(session_variable, row_index, user_session)
+      end
     end
   end
 
@@ -90,7 +91,6 @@ class Intervention::Csv::Harvester
       rows[row_index][session_headers_index + 1] = session_end
     end
     rows[row_index][session_headers_index] = session_start
-    rows[row_index][session_headers_index + 3] = user_session.number_of_attempts
   end
 
   def quick_exit(session_variable, row_index, user_session)

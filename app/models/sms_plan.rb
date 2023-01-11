@@ -6,8 +6,6 @@ class SmsPlan < ApplicationRecord
   include Translate
   extend DefaultValues
 
-  CURRENT_VERSION = '1'
-
   has_many :alert_phones, dependent: :destroy
   has_many :phones, through: :alert_phones
   belongs_to :session, counter_cache: true

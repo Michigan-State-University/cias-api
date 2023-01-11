@@ -54,17 +54,10 @@ class V1::SessionsController < V1Controller
   def session_variables
     authorize! :read, Session
 
-    variable_names = session_obj.fetch_variables(variable_filter_options)
+    session = Session.find(session_id)
+    variable_names = session.fetch_variables(variable_filter_options)
 
-    render json: { session_variable: session_obj.variable, variable_names: variable_names }
-  end
-
-  def reflectable_questions
-    authorize! :read, Session
-
-    questions = session_obj.questions.where(type: %w[Question::Grid Question::Multiple Question::Single])
-
-    render json: serialized_response(questions, 'ReflectableQuestion')
+    render json: { session_variable: session.variable, variable_names: variable_names }
   end
 
   private
@@ -78,7 +71,7 @@ class V1::SessionsController < V1Controller
   end
 
   def sessions_scope
-    session_service.sessions(params[:include_multiple_sessions])
+    session_service.sessions
   end
 
   def session_id
@@ -99,7 +92,7 @@ class V1::SessionsController < V1Controller
 
   def session_params
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
-                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
+                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id,
                                     :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, narrator: {}, settings: {},
                                                                                                                         formulas: [
                                                                                                                           :payload, { patterns: [:match, {

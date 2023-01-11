@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_19_153942) do
+ActiveRecord::Schema.define(version: 2022_11_28_095650) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -392,7 +392,6 @@ ActiveRecord::Schema.define(version: 2022_12_19_153942) do
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
     t.boolean "live_chat_enabled", default: false, null: false
-    t.integer "current_narrator", default: 0
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -633,8 +632,6 @@ ActiveRecord::Schema.define(version: 2022_12_19_153942) do
     t.bigint "cat_mh_time_frame_id"
     t.bigint "cat_mh_population_id"
     t.integer "estimated_time"
-    t.integer "current_narrator", default: 0
-    t.boolean "multiple_fill", default: false, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -762,7 +759,6 @@ ActiveRecord::Schema.define(version: 2022_12_19_153942) do
     t.uuid "user_intervention_id", null: false
     t.datetime "scheduled_at"
     t.boolean "quick_exit", default: false
-    t.integer "number_of_attempts", default: 1
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"

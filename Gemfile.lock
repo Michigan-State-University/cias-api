@@ -41,11 +41,6 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    active_model_serializers (0.10.13)
-      actionpack (>= 4.1, < 7.1)
-      activemodel (>= 4.1, < 7.1)
-      case_transform (>= 0.2)
-      jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
     active_storage_validations (0.9.3)
       rails (>= 5.2.0)
     activejob (6.1.6.1)
@@ -123,8 +118,6 @@ GEM
       thor (~> 1.0)
     byebug (11.1.3)
     cancancan (3.2.1)
-    case_transform (0.2)
-      activesupport
     childprocess (4.0.0)
     coderay (1.1.3)
     colorize (0.8.1)
@@ -302,7 +295,6 @@ GEM
     jmespath (1.6.1)
     json-schema (2.8.1)
       addressable (>= 2.4)
-    jsonapi-renderer (0.2.2)
     jsonapi-serializer (2.2.0)
       activesupport (>= 4.2)
     jwt (2.2.3)
@@ -326,7 +318,7 @@ GEM
       rb-inotify (~> 0.9, >= 0.9.10)
     lockbox (0.6.4)
     logstop (0.2.7)
-    loofah (2.19.1)
+    loofah (2.18.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     lumberjack (1.2.8)
@@ -347,7 +339,7 @@ GEM
     multipart-post (2.1.1)
     nenv (0.3.0)
     nio4r (2.5.8)
-    nokogiri (1.13.10)
+    nokogiri (1.13.9)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     notiffany (0.1.3)
@@ -389,7 +381,7 @@ GEM
     public_suffix (4.0.6)
     puma (5.6.4)
       nio4r (~> 2.0)
-    racc (1.6.1)
+    racc (1.6.0)
     rack (2.2.4)
     rack-attack (6.5.0)
       rack (>= 1.0, < 3)
@@ -415,8 +407,8 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.4.4)
-      loofah (~> 2.19, >= 2.19.1)
+    rails-html-sanitizer (1.4.3)
+      loofah (~> 2.3)
     railties (6.1.6.1)
       actionpack (= 6.1.6.1)
       activesupport (= 6.1.6.1)
@@ -565,7 +557,6 @@ PLATFORMS
 
 DEPENDENCIES
   action-cable-testing (~> 0.6.1)
-  active_model_serializers (~> 0.10.0)
   active_storage_validations
   activejob-cancel
   activerecord_json_validator
@@ -604,9 +595,8 @@ DEPENDENCIES
   license_finder
   lockbox
   logstop
-  loofah (>= 2.19.1)
   metainspector (~> 1.15)
-  nokogiri (>= 1.13.10)
+  nokogiri (>= 1.13.9)
   oj
   overcommit
   pagy
@@ -624,7 +614,7 @@ DEPENDENCIES
   rack-cors
   rack-test
   rails (~> 6.1.6)
-  rails-html-sanitizer (>= 1.4.4)
+  rails-html-sanitizer (>= 1.4.3)
   redis
   rspec-benchmark
   rspec-rails

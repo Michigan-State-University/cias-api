@@ -13,16 +13,4 @@ module FileHelper
       }
     end
   end
-
-  def export_file(file)
-    return unless file.attached?
-
-    blob = file.blob
-    {
-      extension: blob.filename.extension,
-      content_type: blob.content_type,
-      description: blob.description,
-      file: Base64.encode64(blob.download)
-    }
-  end
 end

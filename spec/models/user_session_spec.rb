@@ -121,25 +121,5 @@ RSpec.describe UserSession, type: :model do
         expect(user_intervention.finished_at).not_to eq(nil)
       end
     end
-
-    context 'multiple fill sessions' do
-      let(:user) { create(:user, :confirmed, :participant) }
-      let(:intervention) { create(:intervention) }
-      let(:user_intervention) { create(:user_intervention, intervention: intervention, status: :in_progress) }
-      let(:session) { create(:session, :multiple_times, intervention: intervention) }
-      let(:user_session) { create(:user_session, user_intervention: user_intervention, session: session, user: user) }
-      let(:user_session2) { create(:user_session, user_intervention: user_intervention, session: session, user: user) }
-
-      it 'does not change status to completed when having multiple fill sessions' do
-        user_session.finish(send_email: false)
-        expect(user_intervention.status).to eq('in_progress')
-      end
-
-      it 'updates completed_sessions field only once' do
-        user_session.finish(send_email: false)
-        user_session2.finish(send_email: false)
-        expect(user_intervention.reload.completed_sessions).to eq 1
-      end
-    end
   end
 end

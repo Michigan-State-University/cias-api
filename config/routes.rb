@@ -18,17 +18,6 @@ Rails.application.routes.draw do
       sessions: 'v1/auth/sessions'
     }
 
-    concern :narrator_changeable do |options|
-      member do
-        resources :change_narrator,
-                  only: %i[create],
-                  param: :object_id,
-                  defaults: options,
-                  as: "#{options[:_as] || options[:_model].tableize}_narrator",
-                  controller: 'narrator'
-      end
-    end
-
     scope :users do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
@@ -47,10 +36,7 @@ Rails.application.routes.draw do
     end
     resources :preview_session_users, only: :create
 
-    post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
-    post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
     resources :interventions, only: %i[index show create update] do
-      concerns :narrator_changeable, { _model: 'Intervention' }
       post 'clone', on: :member
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
@@ -63,9 +49,7 @@ Rails.application.routes.draw do
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
-      resources :sessions, only: %i[index show create update destroy] do
-        concerns :narrator_changeable, { _model: 'Session' }
-      end
+      resources :sessions, only: %i[index show create update destroy]
       resources :navigator_invitations, only: %i[index destroy create], controller: '/v1/live_chat/navigators/invitations'
     end
 
@@ -77,7 +61,6 @@ Rails.application.routes.draw do
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     get 'sessions/:id/variables/(:question_id)', to: 'sessions#session_variables', as: :fetch_variables
-    get 'sessions/:id/reflectable_questions', to: 'sessions#reflectable_questions', as: :fetch_reflectable_questions
     scope 'sessions/:session_id', as: 'session' do
       post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions

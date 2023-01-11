@@ -15,17 +15,19 @@ class Interventions::ExportJob < ApplicationJob
   private
 
   def generate_file_and_send
-    file = Tempfile.new([@intervention.id, '.json'])
-    file.write(intervention_data(@intervention))
-    file.rewind
+      file = Tempfile.new([@intervention.id, '.json'])
+      file.write(intervention_data(@intervention))
+      file.rewind
 
-    ExportMailer.result(@user, @intervention.name, file.path).deliver_now
+      ExportMailer.result(@user, @intervention.name, file.path).deliver_now
   ensure
     file.close
     file.unlink
   end
 
   def intervention_data(intervention)
-    V1::Intervention::ExportData.call(intervention).to_json
+    {
+      name: intervention.name
+    }.to_json
   end
 end
