@@ -143,6 +143,7 @@ Metrics/ClassLength:
     - 'app/models/user.rb'
     - 'app/services/v1/flow_service.rb'
     - 'app/models/intervention/csv/harvester.rb'
+    - 'app/models/concerns/clone/session.rb'
 
 Performance/AncestorsInclude:
   Enabled: true
