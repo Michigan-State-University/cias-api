@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.6'
+gem 'rails', '~> 6.1.7'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.4'
 
@@ -29,7 +29,7 @@ gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '~> 3.19.6'
 gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
-gem 'metainspector', '~> 1.15'
+gem 'metainspector', '~> 5.5'
 gem 'nokogiri', '>= 1.13.10'
 gem 'oj'
 gem 'pagy'
