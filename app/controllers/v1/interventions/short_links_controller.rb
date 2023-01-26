@@ -36,7 +36,7 @@ class V1::Interventions::ShortLinksController < V1Controller
   end
 
   def health_clinics
-    intervention_load.organization.health_clinics
+    intervention_load.organization.health_clinics.active
   end
 
   def serialized_health_clinics

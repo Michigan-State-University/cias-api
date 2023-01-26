@@ -15,11 +15,11 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/short_links', type: :requ
     get v1_intervention_short_links_path(intervention_id), headers: current_user.create_new_auth_token
   end
 
-  before do
-    request
-  end
-
   context 'when current_user is researcher' do
+    before do
+      request
+    end
+
     it { expect(response).to have_http_status(:ok) }
 
     it 'JSON response contains proper attributes' do
@@ -37,6 +37,10 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/short_links', type: :requ
   end
 
   context 'when current_user is participant' do
+    before do
+      request
+    end
+
     let(:current_user) { create(:user, :confirmed, :participant) }
 
     it { expect(response).to have_http_status(:forbidden) }
@@ -46,6 +50,11 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/short_links', type: :requ
     let(:organization) { create(:organization, :with_health_clinics) }
     let(:intervention) { create(:intervention, user: researcher, organization: organization) }
 
+    before do
+      organization.health_clinics.last.destroy!
+      request
+    end
+
     it { expect(response).to have_http_status(:ok) }
 
     it {
@@ -53,7 +62,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/short_links', type: :requ
     }
 
     it {
-      expect(json_response['health_clinics'].size).to eq 3
+      expect(json_response['health_clinics'].size).to eq 2
     }
   end
 end
