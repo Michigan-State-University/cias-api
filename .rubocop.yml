@@ -192,6 +192,11 @@ Style/ClassAndModuleChildren:
     - 'config/application.rb'
     - 'app/channels/application_cable/connection.rb'
 
+Style/GuardClause:
+  Enabled: true
+  Exclude:
+    - 'app/services/v1/short_links/manager_service.rb'
+
 Style/CombinableLoops:
   Enabled: true
 
