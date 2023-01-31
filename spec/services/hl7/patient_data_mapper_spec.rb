@@ -19,7 +19,7 @@ describe Hl7::PatientDataMapper do
   context 'return correct data' do
     it {
       expect(subject).to include(
-        "MSH|^~\\&|LogicSoln|HFHS||HFH|#{DateTime.now.strftime('%Y%m%d%H%M')}||ORU^R01|2|T|2.3|||",
+        "MSH|^~\\&|HTD|HFHS||HFH|#{DateTime.now.strftime('%Y%m%d%H%M')}||ORU^R01|2|T|2.3|||",
         "PID|||#{patient.hfhs_patient_detail.patient_id}||#{patient.last_name}^#{patient.first_name}||#{patient.hfhs_patient_detail.dob.to_datetime.strftime('%Y%m%d')}|F"
       )
     }

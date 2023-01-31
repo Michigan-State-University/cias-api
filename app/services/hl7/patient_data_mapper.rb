@@ -3,7 +3,7 @@
 class Hl7::PatientDataMapper
   FIRST_SEGMENT_TYPE = 'MSH' # Message Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/MSH
   ENCODING_CHARACTERS = '^~\\&' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.2
-  MSH_SENDING_APPLICATION = 'LogicSoln' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.3
+  MSH_SENDING_APPLICATION = 'HTD' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.3
   MSH_SENDING_FACILITY = 'HFHS'
   MSH_RECEIVING_FACILITY = 'HFH'
   MSH_VERSION_ID = '2.3' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.12

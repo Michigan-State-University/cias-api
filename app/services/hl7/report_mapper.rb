@@ -6,6 +6,7 @@ class Hl7::ReportMapper
 
   SECOND_SEGMENT_TYPE = 'TXA' # Transcription Document Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/TXA
   DOCUMENT_COMPLETION_STATUS = 'AU' #	Authenticated -> https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0271
+  REPORT_TYPE = 'TURP-D' # provided by HFHS
   DOCUMENT_AVAILABILITY_STATUS = 'AV' # Available for patient care ->https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0273
 
   THIRD_SEGMENT_TYPE = 'OBX' # Observation/Result -> https://hl7-definition.caristix.com/v2/HL7v2.6/Segments/OBX
@@ -24,7 +25,7 @@ class Hl7::ReportMapper
   def call
     %W[
       #{FIRST_SEGMENT_TYPE}||#{PATIENT_CLASS}|||||||||||||||||#{visit_id}
-      #{SECOND_SEGMENT_TYPE}||#{report_type}||#{finish_date}||||||||#{hfhs_patient_id}|||||#{DOCUMENT_COMPLETION_STATUS}||#{DOCUMENT_AVAILABILITY_STATUS}
+      #{SECOND_SEGMENT_TYPE}||#{REPORT_TYPE}||#{finish_date}||||||||#{hfhs_patient_id}|||||#{DOCUMENT_COMPLETION_STATUS}||#{DOCUMENT_AVAILABILITY_STATUS}
       #{THIRD_SEGMENT_TYPE}|1|#{OBX_VALUE_TYPE}|||#{OBSERVATION_VALUE}^#{file_base64}
     ]
   end
@@ -35,12 +36,6 @@ class Hl7::ReportMapper
 
   def visit_id
     user_session.user.hfhs_patient_detail.visit_id
-  end
-
-  def report_type
-    # 'HFHS Participant Report Type'
-    # 'HFHS_report_type_summary'
-    'HFHSReportTypeSummary'
   end
 
   def finish_date
