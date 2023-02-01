@@ -256,20 +256,6 @@ class User < ApplicationRecord
     UserMailer.welcome_email(human_readable_role, email).deliver_later
   end
 
-  def admin?
-    roles.include?('admin')
-  end
-
-  def guest?
-    roles.include?('guest')
-  end
-
-  def preview_session?
-    roles.include?('preview_session')
-  end
-
-  private
-
   def team_is_present?
     return if Team.exists?(team_admin_id: id)
 
