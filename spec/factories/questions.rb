@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
+  narrator_default_settings = {
+    voice: true,
+    animation: true,
+    character: 'peedy'
+  }
+
   factory :question do
     body do
       {
@@ -31,6 +37,8 @@ FactoryBot.define do
         data: [
           {
             payload: {
+              range_start: 0,
+              range_end: 100,
               start_value: 'start',
               end_value: 'end'
             }
@@ -280,7 +288,8 @@ FactoryBot.define do
         {
           settings: {
             voice: false,
-            animation: true
+            animation: true,
+            character: 'peedy'
           },
           blocks: []
         }
@@ -359,10 +368,7 @@ FactoryBot.define do
     trait :narrator_blocks_empty do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: []
         }
       end
@@ -371,10 +377,7 @@ FactoryBot.define do
     trait :narrator_block_one do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: ['Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.'],
@@ -390,10 +393,7 @@ FactoryBot.define do
     trait :narrator_block_one_another_type do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: [],
@@ -409,10 +409,7 @@ FactoryBot.define do
     trait :narrator_blocks_types do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: [
@@ -439,10 +436,7 @@ FactoryBot.define do
     trait :narrator_blocks_types_with_name_variable do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               # rubocop:disable Layout/LineLength
@@ -466,10 +460,7 @@ FactoryBot.define do
     trait :narrator_blocks_with_speech_empty do
       narrator do
         {
-          settings: {
-            voice: true,
-            animation: true
-          },
+          settings: narrator_default_settings,
           blocks: [
             {
               text: ['Working together as an interdisciplinary team, many highly trained health professionals'],
@@ -698,8 +689,8 @@ FactoryBot.define do
           {
             payload:
               {
-                screen_title: '',
-                screen_question: ''
+                screen_title: 'Hello',
+                screen_question: 'Did you drink alcohol today?'
               }
           }
         ]
@@ -718,9 +709,9 @@ FactoryBot.define do
           {
             payload:
               {
-                question_title: '',
-                head_question: '',
-                substance_question: '',
+                question_title: 'Questions',
+                head_question: 'Test question',
+                substance_question: 'Test substance question',
                 substances_with_group: true,
                 substances: []
               }
@@ -730,6 +721,53 @@ FactoryBot.define do
     end
     sequence(:position) { |s| s }
     association :question_group
+
+    trait :with_substances do
+      body do
+        {
+          data: [
+            {
+              payload:
+                {
+                  question_title: 'Questions',
+                  head_question: 'Test question',
+                  substance_question: 'Test substance question',
+                  substances_with_group: false,
+                  substances: [{ 'name' => 'Gin', 'variable' => 'gin' }, { 'name' => 'Wine', 'variable' => 'wine' }]
+                }
+            }
+          ]
+        }
+      end
+    end
+
+    trait :with_substance_groups do
+      body do
+        {
+          data: [
+            {
+              payload:
+                {
+                  question_title: 'Questions',
+                  head_question: 'Test question',
+                  substance_question: 'Test substance question',
+                  substances_with_group: true,
+                  substance_groups: [
+                    { 'name' => 'Smokers group', 'substances' => [
+                      { 'name' => 'cigarettes', 'unit' => 'cigs', 'variable' => 'cigarettes' },
+                      { 'name' => 'cannabis', 'unit' => 'grams', 'variable' => 'cannabis' }
+                    ] },
+                    { 'name' => 'Alcohol group', 'substances' => [
+                      { 'name' => 'Vodka', 'unit' => 'shots', 'variable' => 'vodka' },
+                      { 'name' => 'Beer', 'unit' => 'cups', 'variable' => 'beer' }
+                    ] }
+                  ]
+                }
+            }
+          ]
+        }
+      end
+    end
   end
 
   factory :question_henry_ford, class: Question::HenryFord do

@@ -22,6 +22,17 @@ Rails.application.routes.draw do
       sessions: 'v1/auth/sessions'
     }
 
+    concern :narrator_changeable do |options|
+      member do
+        resources :change_narrator,
+                  only: %i[create],
+                  param: :object_id,
+                  defaults: options,
+                  as: "#{options[:_as] || options[:_model].tableize}_narrator",
+                  controller: 'narrator'
+      end
+    end
+
     scope :users do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
@@ -45,19 +56,27 @@ Rails.application.routes.draw do
 
     resources :preview_session_users, only: :create
 
+    post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
+    post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
     resources :interventions, only: %i[index show create update] do
+      concerns :narrator_changeable, { _model: 'Intervention' }
       post 'clone', on: :member
       post 'export', on: :member
+      post 'generate_conversations_transcript', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
         resources :accesses, only: %i[index create destroy]
         resources :files, only: %i[create destroy]
+        resources :short_links, only: %i[create index]
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
-      resources :sessions, only: %i[index show create update destroy]
+      resources :sessions, only: %i[index show create update destroy] do
+        concerns :narrator_changeable, { _model: 'Session' }
+      end
+      resources :navigator_invitations, only: %i[index destroy create], controller: '/v1/live_chat/navigators/invitations'
     end
 
     scope 'interventions/:interventions_id', as: 'intervention' do
@@ -68,6 +87,7 @@ Rails.application.routes.draw do
 
     post 'sessions/:id/clone', to: 'sessions#clone', as: :clone_session
     get 'sessions/:id/variables/(:question_id)', to: 'sessions#session_variables', as: :fetch_variables
+    get 'sessions/:id/reflectable_questions', to: 'sessions#reflectable_questions', as: :fetch_reflectable_questions
     scope 'sessions/:session_id', as: 'session' do
       post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
       post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
@@ -149,7 +169,7 @@ Rails.application.routes.draw do
     end
 
     resources :teams, only: %i[index show create update destroy] do
-      delete :remove_researcher
+      delete :remove_team_member
       scope module: 'teams' do
         resources :invitations, only: :create
       end
@@ -241,7 +261,33 @@ Rails.application.routes.draw do
       get 'available_test_types', to: 'test_types#available_tests'
     end
 
+    namespace :live_chat do
+      resources :conversations, only: %i[index create] do
+        post 'generate_transcript', controller: '/v1/live_chat/conversations'
+        resources :messages, only: %i[index], controller: 'conversations/messages'
+      end
+
+      scope '/intervention/:id', as: :intervention do
+        resources :navigators, controller: 'interventions/navigators', only: %i[index destroy create], param: :navigator_id
+        resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'
+        resource :navigator_tab, only: %i[show], controller: 'navigators/tabs'
+        resource :navigator_helping_materials, only: %i[show], controller: 'navigators/helping_materials'
+        namespace :navigator_setups do
+          resources :links, only: %i[create update destroy], param: :link_id,
+                            controller: '/v1/live_chat/interventions/links'
+          resources :files, only: %i[create destroy], controller: '/v1/live_chat/interventions/files', param: :file_id
+        end
+      end
+
+      namespace :navigators do
+        scope :invitations do
+          get 'confirm', to: 'invitations#confirm'
+        end
+      end
+    end
+
     get 'me', to: 'users#me', as: :get_user_details
+    get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
   end
 
   if Rails.env.development?

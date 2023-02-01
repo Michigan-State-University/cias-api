@@ -31,8 +31,8 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
     audio.url
   rescue ActionController::UrlGenerationError
     audio.destroy
-    audio = V1::AudioService.new(text, language_code: question.session.google_tts_voice.language_code,
-                                       voice_type: question.session.google_tts_voice.voice_type).execute
+    audio = V1::AudioService.call(text, language_code: question.session.google_tts_voice.language_code,
+                                        voice_type: question.session.google_tts_voice.voice_type)
     audio.url
   end
 end

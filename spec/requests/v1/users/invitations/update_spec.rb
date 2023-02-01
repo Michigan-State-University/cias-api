@@ -61,5 +61,33 @@ describe 'PATCH /v1/users/invitations', type: :request do
         expect(json_response['error']).to eq 'Invitation token is invalid'
       end
     end
+
+    context 'new onboarding process' do
+      let(:params) do
+        {
+          invitation: {
+            invitation_token: invitation_token,
+            password: 'kytdhdn#@!',
+            password_confirmation: 'kytdhdn#@!',
+            first_name: 'Jhon',
+            last_name: 'Doe'
+          }
+        }
+      end
+
+      before do
+        user_with_pending_invitation.user_verification_codes << UserVerificationCode.new(code: SecureRandom.base64(8))
+        request
+      end
+
+      it 'returns access token in headers' do
+        expect(response.headers.keys).to include('Access-Token', 'Expiry', 'Uid', 'Client', 'Token-Type')
+      end
+
+      it 'returns verification code in response' do
+        expect(json_response['verification_code']).not_to be nil
+        expect(json_response['verification_code']).to eq user_with_pending_invitation.user_verification_codes.order(created_at: :desc).first.code
+      end
+    end
   end
 end

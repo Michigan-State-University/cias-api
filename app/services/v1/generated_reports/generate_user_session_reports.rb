@@ -49,10 +49,10 @@ class V1::GeneratedReports::GenerateUserSessionReports
   end
 
   def report_templates
-    session.report_templates.includes(sections: [variants: [image_attachment: :blob]])
+    session.report_templates.includes(:variants, sections: [variants: [image_attachment: :blob]])
   end
 
   def all_var_values
-    V1::UserInterventionService.new(user.id, user_session.session.intervention_id, user_session.id).var_values
+    V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
   end
 end

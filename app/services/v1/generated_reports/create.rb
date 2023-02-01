@@ -73,7 +73,7 @@ class V1::GeneratedReports::Create
   end
 
   def user_intervention_service
-    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_id, user_session.session.intervention_id, user_session.id)
+    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id)
   end
 
   def user_intervention_answer_vars

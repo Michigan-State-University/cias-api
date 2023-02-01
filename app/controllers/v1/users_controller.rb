@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::UsersController < V1Controller
+  include BlankParams
   skip_before_action :authenticate_user!, only: %i[confirm_logging_code]
 
   def index
@@ -25,6 +26,7 @@ class V1::UsersController < V1Controller
 
   def update
     authorize_update_abilities
+    check_for_blank_params
 
     user = V1::Users::Update.call(user_load, user_params)
 
@@ -85,6 +87,10 @@ class V1::UsersController < V1Controller
     params[:id]
   end
 
+  def user_data
+    params[:user]
+  end
+
   def verification_code_params
     params[:verification_code]
   end
@@ -118,6 +124,10 @@ class V1::UsersController < V1Controller
         phone_attributes: %i[iso prefix number]
       )
     end
+  end
+
+  def check_for_blank_params
+    error_message_on_blank_param(user_data, %w[first_name last_name])
   end
 
   def authorize_update_abilities

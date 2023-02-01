@@ -39,7 +39,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'attaches avatar to the current user' do
-        expect(current_user.avatar.attachment.attributes).to include(
+        expect(current_user.reload.avatar.attachment.attributes).to include(
           'record_type' => 'User',
           'record_id' => current_user.id,
           'name' => 'avatar'
@@ -70,7 +70,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
         end
 
         it 'attaches avatar to the current user' do
-          expect(other_user.avatar.attachment.attributes).to include(
+          expect(other_user.reload.avatar.attachment.attributes).to include(
             'record_type' => 'User',
             'record_id' => other_user.id,
             'name' => 'avatar'
@@ -80,7 +80,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
     end
   end
 
-  %w[guest participant e_intervention_admin team_admin organization_admin health_system_admin health_clinic_admin third_party].each do |role|
+  %w[guest participant organization_admin health_system_admin health_clinic_admin third_party].each do |role|
     context "when current_user is #{role}" do
       let(:current_user) { create(:user, :confirmed, role) }
 
@@ -96,20 +96,52 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
     end
   end
 
-  context 'when user is researcher' do
-    let(:current_user) { create(:user, :confirmed, :researcher) }
+  %w[team_admin e_intervention_admin researcher].each do |role|
+    context "when current_user is #{role}" do
+      let(:current_user) { create(:user, :confirmed, :researcher) }
 
-    context 'when current_user updates itself' do
-      it_behaves_like 'permitted user'
+      context 'when current_user updates itself' do
+        it_behaves_like 'permitted user'
+      end
+
+      context 'when current_user updates other user' do
+        let(:user_id) { other_user.id }
+
+        it { expect(response).to have_http_status(:forbidden) }
+
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'You are not authorized to access this page.'
+        end
+      end
+    end
+  end
+
+  context 'when file is incorrect' do
+    context 'when file size is too big (more than 10 megabytes)' do
+      let(:params) do
+        {
+          avatar: {
+            file: FactoryHelpers.upload_file('spec/factories/images/big-image.png', 'image/png', true)
+          }
+        }
+      end
+
+      it 'Returns correct status code (Unprocessable entity)' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
     end
 
-    context 'when current_user updates other user' do
-      let(:user_id) { other_user.id }
+    context 'when file is not an image' do
+      let(:params) do
+        {
+          avatar: {
+            file: FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', false)
+          }
+        }
+      end
 
-      it { expect(response).to have_http_status(:forbidden) }
-
-      it 'response contains proper error message' do
-        expect(json_response['message']).to eq 'You are not authorized to access this page.'
+      it 'returns correct status code (Unprocessable entity)' do
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

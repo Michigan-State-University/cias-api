@@ -13,7 +13,7 @@ class UserFinder
 
   def available_researchers
     return User.with_intervention_creation_access if admin?
-    return User.none unless permitted_roles?
+    return User.none unless permitted_role?
 
     scope.with_intervention_creation_access.from_team_or_organization(team_ids, organization_ids)
   end
@@ -34,8 +34,8 @@ class UserFinder
     end
   end
 
-  def permitted_roles?
-    researcher? || team_admin? || e_intervention_admin?
+  def permitted_role?
+    researcher?
   end
 
   def researcher_without_team?

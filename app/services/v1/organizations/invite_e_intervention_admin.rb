@@ -12,13 +12,13 @@ class V1::Organizations::InviteEInterventionAdmin
 
   def call
     return if already_in_the_organization?
-    return if user_is_not_e_intervention_admin_or_researcher?
+    return if user_is_not_researcher?
 
     if user.blank?
-      new_user = User.invite!(email: email, roles: ['e_intervention_admin'], organizable_id: organization.id, organizable_type: 'Organization', active: false)
+      new_user = User.invite!(email: email, roles: %w[researcher e_intervention_admin], organizable_id: organization.id, organizable_type: 'Organization',
+                              active: false)
       organization.e_intervention_admins << new_user
     else
-      set_researcher_as_e_intervention_admin
       organization.e_intervention_admin_organizations << EInterventionAdminOrganization.new(user: user, organization: organization)
       V1::Organizations::Invitations::Create.call(organization, user)
     end
@@ -32,12 +32,8 @@ class V1::Organizations::InviteEInterventionAdmin
     organization.e_intervention_admins.exists?(email: email)
   end
 
-  def user_is_not_e_intervention_admin_or_researcher?
-    user&.roles&.exclude?('researcher') && user&.roles&.exclude?('e_intervention_admin')
-  end
-
-  def set_researcher_as_e_intervention_admin
-    user.update!(roles: ['e_intervention_admin']) if user.roles.include?('researcher')
+  def user_is_not_researcher?
+    user&.roles&.exclude?('researcher')
   end
 
   def user

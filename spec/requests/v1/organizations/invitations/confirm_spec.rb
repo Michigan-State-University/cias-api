@@ -8,6 +8,7 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
                                                                                       headers: headers
   end
   let!(:organization) { create(:organization) }
+  let!(:researcher) { create(:user, :confirmed, :researcher, active: true) }
   let!(:intervention_admin) { create(:user, :confirmed, :e_intervention_admin, active: false) }
   let!(:organization_admin) { create(:user, :confirmed, :organization_admin, active: false) }
 
@@ -60,6 +61,37 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
 
       it 'redirects to the web app with success message' do
         expect(request).to redirect_to(success_path)
+      end
+    end
+  end
+
+  context 'when user already exists as researcher' do
+    let!(:headers) { researcher.create_new_auth_token }
+
+    context 'when invitation_token is valid' do
+      let!(:organization_invitation) do
+        create(:organization_invitation, user_id: researcher.id, organization_id: organization.id)
+      end
+      let(:invitation_token) { organization_invitation.invitation_token }
+
+      it 'confirms organization invitation and assign user to the organization' do
+        expect { request }.to change { organization_invitation.reload.accepted_at }.and \
+          change(organization_invitation, :invitation_token).to(nil)
+      end
+
+      it 'redirects to the web app with success message' do
+        expect(request).to redirect_to(success_path)
+      end
+
+      it 'gives e-intervention admin role to user when assigned as one' do
+        organization.e_intervention_admins << researcher
+        request
+        expect(researcher.reload.roles).to include 'e_intervention_admin'
+      end
+
+      it 'do not give e-intervention admin role to user when not assigned as one' do
+        request
+        expect(researcher.reload.roles).not_to include 'e_intervention_admin'
       end
     end
   end

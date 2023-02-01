@@ -83,7 +83,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
       result << ("#{user.first_name.presence || I18n.t('sessions.sms_alerts.no_first_name_provided')}\n") if plan.include_first_name
       result << ("#{user.last_name.presence || I18n.t('sessions.sms_alerts.no_last_name_provided')}\n") if plan.include_last_name
     end
-    result << ("#{user.email.presence || I18n.t('sessions.sms_alerts.no_email_provided')}\n") if plan.include_email
+    result << ("#{user_email(user) || I18n.t('sessions.sms_alerts.no_email_provided')}\n") if plan.include_email
     result << ("#{user.phone.present? ? user.phone.full_number : I18n.t('sessions.sms_alerts.no_phone_number_provided')}\n") if plan.include_phone_number
     result + current_content
   end
@@ -93,7 +93,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def matched_variant(plan)
-    all_var_values = V1::UserInterventionService.new(user.id, session.intervention_id, user_session.id).var_values
+    all_var_values = V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
     V1::SmsPlans::CalculateMatchedVariant.call(plan.formula, plan.variants, all_var_values)
   end
 
@@ -117,7 +117,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def user_intervention_service
-    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_id, user_session.session.intervention_id, user_session.id)
+    @user_intervention_service ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id)
   end
 
   def user_intervention_answer_vars
@@ -138,6 +138,10 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def send_alert(start_time, content, phone)
     SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, phone.user&.id, true)
+  end
+
+  def user_email(user)
+    user.email.presence unless user.role?('guest')
   end
 
   def phone
