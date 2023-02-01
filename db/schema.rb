@@ -411,8 +411,8 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.boolean "is_hidden", default: false
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
-    t.boolean "hfhs_access", default: false
     t.boolean "live_chat_enabled", default: false, null: false
+    t.boolean "hfhs_access", default: false
     t.integer "current_narrator", default: 0
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -497,6 +497,30 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.text "phone_ciphertext"
   end
 
+  create_table "navigator_invitations", force: :cascade do |t|
+    t.text "email_ciphertext"
+    t.string "email_bidx"
+    t.uuid "intervention_id"
+    t.datetime "accepted_at"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["email_bidx"], name: "index_navigator_invitations_on_email_bidx"
+    t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
+  end
+
+  create_table "notifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "notifiable_type", null: false
+    t.uuid "notifiable_id", null: false
+    t.boolean "is_read", default: false
+    t.jsonb "data"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "event", default: 0, null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "oauth_access_grants", force: :cascade do |t|
     t.bigint "resource_owner_id"
     t.bigint "application_id", null: false
@@ -540,29 +564,6 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.string "owner_type"
     t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
-  
-    create_table "navigator_invitations", force: :cascade do |t|
-    t.text "email_ciphertext"
-    t.string "email_bidx"
-    t.uuid "intervention_id"
-    t.datetime "accepted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["email_bidx"], name: "index_navigator_invitations_on_email_bidx"
-    t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
-  end
-
-  create_table "notifications", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "notifiable_type", null: false
-    t.uuid "notifiable_id", null: false
-    t.boolean "is_read", default: false
-    t.jsonb "data"
-    t.uuid "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.integer "event", default: 0, null: false
-    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
-    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -902,8 +903,8 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.boolean "terms", default: false, null: false
     t.datetime "terms_confirmed_at"
     t.boolean "quick_exit_enabled", default: false, null: false
-    t.uuid "hfhs_patient_detail_id"
     t.boolean "online", default: false, null: false
+    t.uuid "hfhs_patient_detail_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["hfhs_patient_detail_id"], name: "index_users_on_hfhs_patient_detail_id"
@@ -953,8 +954,6 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
   add_foreign_key "invitations", "health_clinics"
-  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
-  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "live_chat_conversations", "interventions"
   add_foreign_key "live_chat_interlocutors", "live_chat_conversations", column: "conversation_id"
   add_foreign_key "live_chat_interlocutors", "users"
@@ -964,6 +963,8 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
   add_foreign_key "live_chat_navigator_setups", "interventions"
   add_foreign_key "live_chat_summoning_users", "interventions"
   add_foreign_key "live_chat_summoning_users", "users"
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
