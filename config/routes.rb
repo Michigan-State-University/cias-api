@@ -153,6 +153,8 @@ Rails.application.routes.draw do
       resources :answers, only: %i[index show create], module: 'user_sessions'
       patch 'quick_exit', to: 'user_sessions#quick_exit'
     end
+    get 'user_sessions', to: 'user_sessions#show'
+    post 'fetch_or_create_user_sessions', to: 'user_sessions#show_or_create'
 
     namespace :tlfb do
       resources :events, only: %i[destroy create update]

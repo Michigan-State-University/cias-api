@@ -67,6 +67,10 @@ class Session < ApplicationRecord
     intervention.sessions.order(position: :asc).find_by('position > ?', position)
   end
 
+  def last_session?
+    next_session.blank?
+  end
+
   def integral_update
     return if published?
 

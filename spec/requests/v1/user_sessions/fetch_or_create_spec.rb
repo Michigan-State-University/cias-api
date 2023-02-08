@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
 RSpec.describe 'POST /v1/user_sessions', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
@@ -27,11 +26,11 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
       }
     }
   end
-  let(:request) { post v1_user_sessions_path, params: params, headers: headers }
+  let(:request) { post v1_fetch_or_create_user_sessions_path, params: params, headers: headers }
 
   context 'when auth' do
     context 'is invalid' do
-      before { post v1_user_sessions_path, params: params }
+      before { post v1_fetch_or_create_user_sessions_path, params: params }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -41,7 +40,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
     end
 
     context 'is valid' do
-      before { post v1_user_sessions_path, params: params, headers: headers }
+      before { post v1_fetch_or_create_user_sessions_path, params: params, headers: headers }
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
@@ -52,4 +51,23 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   end
 
   it_behaves_like 'create user session'
+
+  context 'exists' do
+    let!(:user_int) { create(:user_intervention, intervention: intervention, user: user, status: 'in_progress') }
+    let!(:user_session) { create(:user_session, user: user, session: session, user_intervention: user_int) }
+
+    it 'returns correct status' do
+      request
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'does not create user session' do
+      expect { request }.to change(UserSession, :count).by(0)
+    end
+
+    it 'returns correct user_session_id' do
+      request
+      expect(json_response['data']['id']).to eq(user_session.id)
+    end
+  end
 end
