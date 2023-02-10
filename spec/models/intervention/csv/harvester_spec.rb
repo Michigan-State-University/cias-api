@@ -924,7 +924,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
           it 'save every variables and scores to csv' do
             subject.collect
-            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.henry_ford_health.test_hf", "#{session.variable}.metadata.session_start",
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_hf", "#{session.variable}.metadata.session_start",
                                           "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
             expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
           end
