@@ -148,8 +148,8 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 11, %w[var1 im_a_variable dep rivia is_with_x x y what number a b],
-                        %w[bar currency grid multi number single var]
+        it_behaves_like 'correct classic session', 12, %w[var1 im_a_variable dep rivia is_with_x x y what number a b AUDIT_1],
+                        %w[bar currency grid multi number single var henry_ford]
       end
     end
   end
