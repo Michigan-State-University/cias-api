@@ -75,7 +75,10 @@ class Session::Classic < Session
     target_question = questions.find_by(id: filter_options[:question_id])
     if target_question
       comparator = to_boolean(filter_options[:include_current_question]) ? '<=' : '<'
-      filtered = filtered.where(question_group: target_question.question_group).where("questions.position #{comparator} ?", target_question.position)
+      question_group_position = target_question.question_group.position
+      filtered = filtered.joins(:question_group).where("question_groups.position < ? OR
+                                                        question_groups.position = ? AND questions.position #{comparator} ?",
+                                                       question_group_position, question_group_position, target_question.position)
     end
 
     filtered = filtered.where(type: digit_variable_questions) if filter_options[:only_digit_variables]

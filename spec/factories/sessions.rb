@@ -45,6 +45,10 @@ FactoryBot.define do
       schedule { 'days_after_date' }
       schedule_payload { 7 }
     end
+
+    trait :multiple_times do
+      multiple_fill { true }
+    end
   end
 
   factory :cat_mh_session, class: Session::CatMh do

@@ -14,4 +14,15 @@ class SessionMailer < ApplicationMailer
 
     mail(to: @email, subject: I18n.t('session_mailer.inform_to_an_email.subject'))
   end
+
+  def invite_to_session_and_registration(session, email, health_clinic = nil)
+    @email = email
+    @session = session
+    @health_clinic = health_clinic
+    @user = User.find_by(email: email)
+    @user.send(:generate_invitation_token!) # needed because for some reason the raw token is empty
+    @invitation_token = @user.raw_invitation_token
+
+    mail(to: @email, subject: I18n.t('session_mailer.invite_to_session_and_registration.subject'))
+  end
 end

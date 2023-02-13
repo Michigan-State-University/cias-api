@@ -4,6 +4,8 @@ class SmsPlan::Variant < ApplicationRecord
   has_paper_trail
   belongs_to :sms_plan
 
+  CURRENT_VERSION = '1'
+
   attribute :original_text, :json, default: { 'content' => '' }
 
   before_create :assign_position

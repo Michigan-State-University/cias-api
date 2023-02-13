@@ -5,13 +5,14 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   subject { described_class.call(user_session) }
 
   let(:intervention) { create(:intervention, :published) }
+  let(:user_intervention) { create(:user_intervention, intervention: intervention) }
   let(:session) { create(:session, intervention: intervention) }
   let(:session2) { create(:session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session, no_formula_text: 'test') }
   let(:user) { create(:user, :confirmed) }
   let!(:phone) { create(:phone, :confirmed, user: user) }
-  let(:user_session) { create(:user_session, session: session, user: user) }
-  let(:user_session2) { create(:user_session, session: session2, user: user) }
+  let(:user_session) { create(:user_session, session: session, user: user, user_intervention: user_intervention) }
+  let(:user_session2) { create(:user_session, session: session2, user: user, user_intervention: user_intervention) }
   let(:current_time) { Time.zone.parse('2021-07-20 20:02') }
 
   before do
@@ -449,6 +450,15 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
           let!(:participant) { create(:user, :participant, :confirmed, first_name: 'Randall', last_name: 'Pitt', email: 'not.black.sabbath1@gmail.com') }
           let!(:user_session) { create(:user_session, user: participant, session: session) }
           let!(:content) { "#{participant.full_name}\n#{participant.email}\nPhone number not provided\n#{sms_plan.no_formula_text}" }
+
+          it_behaves_like 'correct sms job queue'
+        end
+
+        context 'when guest user' do
+          let!(:user) { create(:user, :guest, first_name: nil, last_name: nil) }
+          let!(:content) do
+            "First name not provided\nLast name not provided\nE-mail not provided\n#{phone.full_number}\n#{sms_plan.no_formula_text}"
+          end
 
           it_behaves_like 'correct sms job queue'
         end

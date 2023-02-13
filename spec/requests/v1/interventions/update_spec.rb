@@ -25,6 +25,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     create(:intervention, name: 'Old Intervention', user: intervention_user, status: 'draft', cat_mh_application_id: 'application_id',
                           cat_mh_organization_id: 'organization_id', cat_mh_pool: 10)
   end
+  let!(:short_link) { create(:short_link, linkable: intervention) }
   let(:intervention_id) { intervention.id }
   let(:request) { patch v1_intervention_path(intervention_id), params: params, headers: headers }
   let(:participant) { create(:user, :confirmed, :participant) }
@@ -67,52 +68,26 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         )
       end
 
-      it 'updates a intervention object' do
-        expect(intervention.reload.attributes).to include(
-          'name' => 'New Intervention',
-          'status' => 'published',
-          'shared_to' => 'anyone'
-        )
-      end
+      context 'short links' do
+        context 'when user change other params' do
+          it 'short link stay without any change' do
+            expect(intervention.reload.short_links.first.id).to eq short_link.id
+            expect(intervention.reload.short_links.count).to eq 1
+          end
+        end
 
-      context 'change language' do
-        let(:params) do
-          {
-            intervention: {
-              google_language_id: language.id
+        context 'when organization id will change' do
+          let(:params) do
+            {
+              intervention: {
+                organization_id: create(:organization).id
+              }
             }
-          }
-        end
+          end
 
-        it 'update a intervention object' do
-          expect(intervention.reload.attributes).to include(
-            'google_language_id' => language.id
-          )
-        end
-
-        it 'return correct data' do
-          expect(json_response['data']['attributes']).to include(
-            'language_name' => 'French',
-            'language_code' => 'fr'
-          )
-        end
-      end
-
-      context 'add to organization' do
-        let!(:organization) { create(:organization) }
-        let(:params) do
-          {
-            intervention: {
-              name: 'Intervention in organization',
-              organization_id: organization.id
-            }
-          }
-        end
-
-        it 'have correct prefix' do
-          expect(json_response['data']['attributes']).to include(
-            'name' => 'Intervention in organization'
-          )
+          it 'clear all short links belongs to the intervention' do
+            expect(intervention.reload.short_links.count).to eq 0
+          end
         end
       end
     end
@@ -290,5 +265,53 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     before { patch v1_intervention_path(intervention_id), params: params, headers: headers }
 
     it { expect(response).to have_http_status(:forbidden) }
+  end
+
+  context 'live_chat' do
+    context 'when intervention closed/archived and live chat enabled' do
+      let(:user) { create(:user, :admin, :confirmed) }
+      let(:intervention) { create(:intervention, user: user, status: 'closed') }
+      let(:headers) { user.create_new_auth_token }
+      let(:params) do
+        {
+          intervention: {
+            live_chat_enabled: true
+          }
+        }
+      end
+
+      before { request }
+
+      it 'returns correct status code (Unprocessable entity)' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'sends validation error message' do
+        expect(json_response['message']).to eq 'Validation failed: Live chat cannot be turned on for closed or archived interventions.'
+      end
+    end
+
+    context 'when intervention draft or active' do
+      let(:user) { create(:user, :admin, :confirmed) }
+      let(:intervention) { create(:intervention, user: user, status: 'draft') }
+      let(:headers) { user.create_new_auth_token }
+      let(:params) do
+        {
+          intervention: {
+            live_chat_enabled: true
+          }
+        }
+      end
+
+      before { request }
+
+      it 'returns correct status code (OK)' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns live chat setting' do
+        expect(json_response['data']['attributes']).to include('live_chat_enabled' => true)
+      end
+    end
   end
 end

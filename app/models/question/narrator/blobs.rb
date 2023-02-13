@@ -33,8 +33,14 @@ class Question::Narrator::Blobs
   def purge
     return if cloned
 
-    counts = ids.tally
-    Audio.where(sha256: ids).find_each { |audio| audio.decrement!(:usage_counter, counts[audio.sha256]) }
+    count_hash = Hash.new([])
+    ids.tally.each do |id, count|
+      count_hash[count] += [id]
+    end
+
+    count_hash.each do |count, audio_ids|
+      Audio.where(sha256: audio_ids).update_counters(usage_counter: -count)
+    end
   end
 
   private

@@ -41,6 +41,32 @@
                 "substances_with_group"
               ],
               "additionalProperties": false
+            },
+            "original_text": {
+              "type": "object",
+              "properties": {
+                "question_title": {
+                  "type": "string"
+                },
+                "head_question": {
+                  "type": "string"
+                },
+                "substance_question": {
+                  "type": "string"
+                },
+                "substance_groups": {
+                  "type": "array",
+                  "items": {}
+                },
+                "substances_with_group": {
+                  "type": "boolean"
+                },
+                "substances": {
+                  "type": "array",
+                  "items": {}
+                }
+              },
+              "additionalProperties": false
             }
           },
           "required": [

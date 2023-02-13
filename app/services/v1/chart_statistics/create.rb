@@ -14,6 +14,7 @@ class V1::ChartStatistics::Create
   def call
     return if health_clinic.nil?
     return if dentaku_service.exist_missing_variables?
+    return if zero_division_error?
 
     ChartStatistic.find_or_create_by!(
       label: label,
@@ -31,15 +32,19 @@ class V1::ChartStatistics::Create
   attr_reader :chart, :user_session, :organization
 
   def label
-    result = dentaku_service.calculate
+    result = calculated_formula
 
     result ? result['label'] : chart.formula['default_pattern']['label']
   end
 
   def dentaku_service
-    @dentaku_service ||= Calculations::DentakuService.new(
-      all_var_values, formula['payload'], formula['patterns'], true
+    @dentaku_service ||= chart.dentaku_service(
+      all_var_values, formula['payload'], formula['patterns']
     )
+  end
+
+  def calculated_formula
+    @calculated_formula ||= chart.calculate(dentaku_service)
   end
 
   def formula
@@ -48,7 +53,7 @@ class V1::ChartStatistics::Create
 
   def all_var_values
     V1::UserInterventionService.new(
-      user_session.user.id, user_session.session.intervention_id, nil
+      user_session.user_intervention_id, nil
     ).var_values
   end
 
@@ -58,5 +63,9 @@ class V1::ChartStatistics::Create
 
   def health_clinic
     user_session.health_clinic
+  end
+
+  def zero_division_error?
+    calculated_formula == Chart::ZERO_DIVISION_ERROR
   end
 end

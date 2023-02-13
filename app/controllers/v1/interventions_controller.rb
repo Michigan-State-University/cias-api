@@ -39,7 +39,17 @@ class V1::InterventionsController < V1Controller
   def export
     authorize! :update, Intervention
 
-    Intervention::ExportJob.perform_later(current_v1_user.id, params[:id])
+    Interventions::ExportJob.perform_later(current_v1_user.id, params[:id])
+
+    render status: :ok
+  end
+
+  def generate_conversations_transcript
+    authorize! :update, Intervention
+
+    LiveChat::GenerateTranscriptJob.perform_later(
+      intervention_load.id, ::Intervention, :conversations_transcript, intervention_load.name, current_v1_user.id
+    )
 
     render status: :ok
   end
@@ -62,13 +72,14 @@ class V1::InterventionsController < V1Controller
 
   def intervention_params
     if params[:id].present? && intervention_load.published?
-      params.require(:intervention).permit(:status, :cat_mh_pool, :is_access_revoked)
+      params.require(:intervention).permit(:status, :cat_mh_pool, :is_access_revoked, :live_chat_enabled)
     elsif current_v1_user.admin?
       params.require(:intervention).permit(:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id, :cat_mh_application_id,
-                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit, :hfhs_access)
+                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit, :hfhs_access,
+                                           :live_chat_enabled)
     else
       params.require(:intervention).permit(:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id, :cat_mh_application_id,
-                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit)
+                                           :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :live_chat_enabled, :quick_exit)
     end
   end
 

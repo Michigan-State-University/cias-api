@@ -3,7 +3,7 @@
 class Question::Feedback < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
-  def prepare_to_display(answers_var_values)
+  def prepare_to_display(answers_var_values = nil)
     apply_formula(answers_var_values)
     self
   end

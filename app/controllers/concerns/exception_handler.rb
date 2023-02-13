@@ -53,6 +53,22 @@ module ExceptionHandler
     rescue_from ArgumentError do |exc|
       render json: msg(exc), status: :unprocessable_entity
     end
+
+    rescue_from CatMh::ConnectionFailedException do |exc|
+      message = { title: exc.title_text, body: exc.body_text, button: exc.button_text }
+
+      render json: message, status: :bad_request
+    end
+
+    rescue_from JSON::ParserError do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
+
+    rescue_from ComplexException do |exc|
+      message = { message: exc.message, details: exc.additional_information }
+
+      render json: message, status: :unprocessable_entity
+    end
   end
 
   private

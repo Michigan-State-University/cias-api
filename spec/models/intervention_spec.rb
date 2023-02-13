@@ -11,8 +11,11 @@ RSpec.describe Intervention, type: :model do
     it { should belong_to(:user) }
     it { should have_many(:sessions) }
     it { should have_many(:user_interventions) }
+    it { should have_many(:conversations) }
+    it { should have_many(:notifications) }
     it { should belong_to(:google_language).optional }
     it { should be_valid }
+    it { should have_many(:short_links).dependent(:destroy) }
     it { expect(initial_status.draft?).to be true }
   end
 
@@ -94,7 +97,7 @@ RSpec.describe Intervention, type: :model do
 
   context 'clone' do
     let(:user) { create(:user, :confirmed, :researcher) }
-    let(:intervention) { create(:intervention) }
+    let(:intervention) { create(:intervention, :with_short_link) }
     let!(:session) { create(:session, intervention: intervention, position: 1) }
     let!(:other_session) do
       create(:session, intervention: intervention, position: 2,
@@ -150,6 +153,11 @@ RSpec.describe Intervention, type: :model do
                                             'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
+    end
+
+    it 'remove short links' do
+      cloned_intervention = intervention.clone
+      expect(cloned_intervention.short_links.any?).to be false
     end
 
     it 'correct clone questions to cloned session' do

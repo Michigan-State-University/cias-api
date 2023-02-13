@@ -18,6 +18,7 @@ describe User, type: :model do
   it { should have_one(:phone).dependent(:destroy) }
   it { should have_one_attached(:avatar) }
   it { should have_many(:generated_reports_third_party_users).dependent(:destroy) }
+  it { should have_many(:notifications).dependent(:destroy) }
 
   it { should belong_to(:team).optional(true) }
   it { should belong_to(:organizable).optional(true) }
@@ -99,20 +100,20 @@ describe User, type: :model do
     context 'roles changed' do
       it 'removes current user tokens' do
         expect { user.update(roles: ['researcher']) }.to change { user.reload.tokens }
-          .from(user.tokens).to({})
+                                                           .from(user.tokens).to({})
       end
     end
 
     context 'roles have not changed' do
       it 'does not remove user tokens' do
-        expect { user.update(roles: ['team_admin']) }.not_to change { user.reload.tokens }
+        expect { user.update(roles: %w[researcher team_admin]) }.not_to change { user.reload.tokens }
       end
     end
 
     context 'active changed to inactive' do
       it 'removes current user tokens' do
         expect { user.update(active: false) }.to change { user.reload.tokens }
-          .from(user.tokens).to({})
+                                                   .from(user.tokens).to({})
       end
     end
 
@@ -180,5 +181,21 @@ describe User, type: :model do
     let(:user) { build_stubbed(:user, :participant) }
 
     include_examples 'without team admin validations'
+  end
+
+  describe 'navigator' do
+    subject { create(:user, :confirmed, :navigator) }
+
+    it { should be_valid }
+  end
+
+  describe 'sends welcoming email for participants after confirming the account' do
+    let(:user) { create(:user, :participant, confirmed_at: nil) }
+
+    before { ActiveJob::Base.queue_adapter = :test }
+
+    it do
+      expect { user.confirm }.to have_enqueued_job(ActionMailer::MailDeliveryJob).once
+    end
   end
 end

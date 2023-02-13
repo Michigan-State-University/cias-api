@@ -24,6 +24,8 @@ class V1::FlowService
   def user_session_question(preview_question_id)
     if user_session.type == 'UserSession::CatMh'
       cat_mh_question = @cat_mh_api.get_next_question(user_session)
+      raise_cat_mh_error if cat_mh_question['status'] != 200
+
       user_session.finish if cat_mh_question['body']['questionID'] == -1
       question = prepare_question(user_session, cat_mh_question['body'])
     else
@@ -170,8 +172,8 @@ class V1::FlowService
         self.warning = REFLECTION_MISS_MATCH
         return []
       end
-
-      matched_reflections.push(reflection) if all_var_values.key?(reflection['variable']) && all_var_values[reflection['variable']].eql?(reflection['value'])
+      current_variable = reflection_variable(block, reflection['variable'])
+      matched_reflections.push(reflection) if all_var_values.key?(current_variable) && all_var_values[current_variable].eql?(reflection['value'])
     end
     matched_reflections
   end
@@ -193,10 +195,16 @@ class V1::FlowService
     (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
   end
 
+  def raise_cat_mh_error
+    raise CatMh::ConnectionFailedException.new(
+      I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.title'),
+      I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.body'),
+      I18n.t('activerecord.errors.models.intervention.attributes.cat_mh_connection_failed.button')
+    )
+  end
+
   def all_var_values
-    @all_var_values ||= V1::UserInterventionService.new(
-      user.id, user_session.session.intervention_id, user_session.id
-    ).var_values
+    @all_var_values ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
   end
 
   def name_audio
@@ -209,5 +217,9 @@ class V1::FlowService
 
   def preview?
     user_session.session.intervention.draft?
+  end
+
+  def reflection_variable(block, variable)
+    block['session_id'].present? ? "#{Session.find(block['session_id']).variable}.#{variable}" : variable
   end
 end

@@ -71,6 +71,14 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
       let(:user) { organization.e_intervention_admins.first }
 
       it_behaves_like 'permitted user'
+
+      context 'when the clinic has a short link' do
+        let!(:short_link) { create(:short_link, linkable: create(:intervention), health_clinic: health_clinic) }
+
+        it 'delete assigned short_link' do
+          expect { request }.to change(ShortLink, :count).by(-1)
+        end
+      end
     end
   end
 

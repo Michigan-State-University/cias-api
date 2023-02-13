@@ -6,9 +6,10 @@ class V1::Teams::InvitationsController < V1Controller
   def create
     authorize! :invite_researcher, team
 
-    V1::Teams::InviteResearcher.call(
+    V1::Teams::Invite.call(
       team,
-      params.require(:email)
+      params.require(:email),
+      params.require(:roles)
     )
 
     render status: :created

@@ -4,6 +4,8 @@ class ReportTemplate::Section::Variant < ApplicationRecord
   has_paper_trail
   extend DefaultValues
 
+  CURRENT_VERSION = '1'
+
   belongs_to :report_template_section, class_name: 'ReportTemplate::Section'
   has_one_attached :image
 
