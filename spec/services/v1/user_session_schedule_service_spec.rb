@@ -303,4 +303,12 @@ RSpec.describe V1::UserSessionScheduleService do
       end
     end
   end
+
+  context 'when user is guest' do
+    let!(:user) { create(:user, :guest) }
+
+    it 'crate next user_session' do
+      expect { described_class.new(user_session_not_belongs_to_organization).schedule }.not_to change(UserSession, :count)
+    end
+  end
 end
