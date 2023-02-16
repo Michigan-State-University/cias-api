@@ -130,7 +130,7 @@ class V1::FlowService
 
     if session_available_now
       next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id,
-                                                            type: question_or_session.user_session_type)
+                                                            type: question_or_session.user_session_type, user_intervention: user_session.user_intervention)
       next_user_session.save!
       user_session.answers.last.update!(next_session_id: question_or_session.id)
       self.next_user_session_id = next_user_session.id
@@ -147,6 +147,7 @@ class V1::FlowService
     next_user_session.save!
     user_session.answers.last.update!(next_session_id: session.id)
     self.next_user_session_id = next_user_session.id
+    self.next_session_id = next_user_session.session_id
 
     next_user_session.first_question
   end

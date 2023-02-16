@@ -35,7 +35,7 @@ class Organization < ApplicationRecord
   end
 
   def update_interventions_from_deleted_organization
-    Intervention.where(organization_id: id).update_all(organization_id: nil, from_deleted_organization: true) # rubocop:disable Rails/SkipsModelValidations:
+    Intervention.where(organization_id: id).find_each { |intervention| intervention.update!(organization_id: nil, from_deleted_organization: true) }
   end
 
   def really_destroy_all_children

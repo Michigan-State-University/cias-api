@@ -11,8 +11,10 @@ class HealthClinic < ApplicationRecord
   has_many :chart_statistics, dependent: nil
   has_many :user_sessions, dependent: :destroy
   has_many :invitations, dependent: :destroy
+  has_many :short_links, dependent: :destroy
 
   validates :name, presence: true, uniqueness: { scope: :health_system }
 
   default_scope { order(created_at: :desc) }
+  scope :active, -> { where(deleted_at: nil) }
 end
