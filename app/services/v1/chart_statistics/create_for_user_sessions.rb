@@ -10,9 +10,9 @@ class V1::ChartStatistics::CreateForUserSessions
   end
 
   def call
-    # service should be run when the chart is published
+    # service should be run when the chart is published/data_collection
     user_sessions.each do |user_session|
-      next unless user_session.session.intervention.published?
+      next if user_session.session.intervention.draft?
 
       V1::ChartStatistics::Create.call(chart, user_session, organization)
     end
@@ -25,7 +25,7 @@ class V1::ChartStatistics::CreateForUserSessions
   def user_sessions
     UserSession.joins(session: [intervention: :organization]).where(
       sessions: { interventions: { organization: organization } }
-    )
+    ).where.not(finished_at: nil)
   end
 
   def organization

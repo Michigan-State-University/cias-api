@@ -70,6 +70,10 @@ en:
             not_researcher: 'User cannot become a navigator'
           navigator_setup:
             file_too_big: 'One of the files is too big. Limit: 5 Mb'
+        short_link:
+          attributes:
+            name:
+              already_exists: 'This intervention link has already been taken'
       messages:
         undestroyable: Forbidden operation
   interventions:
