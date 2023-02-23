@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_19_153942) do
+ActiveRecord::Schema.define(version: 2023_01_09_063749) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -644,6 +644,16 @@ ActiveRecord::Schema.define(version: 2022_12_19_153942) do
     t.index ["name"], name: "index_sessions_on_name"
     t.index ["schedule"], name: "index_sessions_on_schedule"
     t.index ["schedule_at"], name: "index_sessions_on_schedule_at"
+  end
+
+  create_table "short_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "linkable_type", null: false
+    t.uuid "linkable_id", null: false
+    t.uuid "health_clinic_id"
+    t.string "name", null: false
+    t.index ["health_clinic_id"], name: "index_short_links_on_health_clinic_id"
+    t.index ["linkable_type", "linkable_id"], name: "index_short_links_on_linkable"
+    t.index ["name"], name: "index_short_links_on_name", unique: true
   end
 
   create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

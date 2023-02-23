@@ -28,7 +28,7 @@ class V1::Users::InvitationsController < V1Controller
     user = User.invite!(email: user.email, roles: user.roles)
 
     if user.valid?
-      render json: serialized_response(user, controller_name.classify, { only_email: true })
+      render json: serialized_response(user, controller_name.classify, { params: { only_email: true } })
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end

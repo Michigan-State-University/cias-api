@@ -28,6 +28,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_short_link do
+      after(:create) do |intervention|
+        intervention.update(short_links: [create(:short_link, linkable: intervention)])
+      end
+    end
+
     trait :with_navigator_setup_and_phone do
       after(:build) do |intervention|
         intervention.live_chat_enabled = true

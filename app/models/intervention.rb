@@ -29,6 +29,8 @@ class Intervention < ApplicationRecord
   has_many_attached :files
   has_one_attached :logo, dependent: :purge_later
 
+  has_many :short_links, as: :linkable, dependent: :destroy
+
   has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
   has_one_attached :conversations_transcript, dependent: :purge_later
@@ -60,6 +62,7 @@ class Intervention < ApplicationRecord
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
+  before_save :remove_short_links, if: :will_save_change_to_organization_id?
   after_update_commit :status_change
 
   def assign_default_google_language
@@ -179,5 +182,9 @@ class Intervention < ApplicationRecord
 
   def ability_to_clone?
     true
+  end
+
+  def remove_short_links
+    short_links.destroy_all
   end
 end

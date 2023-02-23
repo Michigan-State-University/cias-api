@@ -6,31 +6,30 @@ class V1::ExternalLinksController < V1Controller
   def show_website_metadata
     head :expectation_failed and return unless url
 
-    page = MetaInspector.new(url)
-    head :not_found and return if page.document[0].eql?(NOT_EXISTING_URL_ERROR)
-
-    is_scraping_exception = page.document[0].eql?(SCRAPING_EXCEPTION)
-
-    metadata =
-      {
-        url: page.url,
-        title: page.title,
-        description: is_scraping_exception ? '' : page.description,
-        image: is_scraping_exception ? '' : page.image,
-        images: is_scraping_exception ? [] : page.images,
-        hash_metadata: is_scraping_exception ? '' : page.to_hash,
-        parsed_document: is_scraping_exception ? '' : page.parsed_document
-      }
-
-    render json: metadata
+    begin
+      metadata =
+        {
+          url: page.url,
+          title: page.title,
+          description: page.description,
+          image: page.images.best,
+          images: page.images,
+          hash_metadata: page.to_hash
+        }
+    rescue MetaInspector::ParserError, MetaInspector::RequestError
+      head :unprocessable_entity
+    else
+      render json: metadata
+    end
   end
 
   private
 
-  NOT_EXISTING_URL_ERROR = 'Socket error: The url provided does not exist or is temporarily unavailable'
-  SCRAPING_EXCEPTION = 'Scraping exception: 503 Service Unavailable'
-
   def url
     params[:url]
+  end
+
+  def page
+    @page ||= MetaInspector.new(url)
   end
 end
