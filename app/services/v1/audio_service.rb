@@ -26,15 +26,18 @@ class V1::AudioService
   end
 
   def create_audio(digest)
-    audio = Audio.create!(sha256: digest, language: language_code, voice_type: voice_type)
-    audio.usage_counter = 0 if preview_audio
-    Audio::TextToSpeech.new(
-      audio,
-      text: text,
-      language: language_code,
-      voice_type: voice_type
-    ).execute
-    audio.save
+    audio = nil
+    Audio.transaction do
+      audio = Audio.create!(sha256: digest, language: language_code, voice_type: voice_type)
+      audio.usage_counter = 0 if preview_audio
+      Audio::TextToSpeech.new(
+        audio,
+        text: text,
+        language: language_code,
+        voice_type: voice_type
+      ).execute
+      audio.save
+    end
     audio.reload
   end
 

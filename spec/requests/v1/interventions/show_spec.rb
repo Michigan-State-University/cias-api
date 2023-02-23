@@ -15,9 +15,9 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
   let(:sessions) { create_list(:session, 2) }
   let(:organization) { create(:organization) }
   let!(:intervention) do
-    create(:intervention, :published, name: 'Some intervention',
-                                      user: intervention_user, sessions: sessions, shared_to: shared_to,
-                                      organization: organization, reports: reports)
+    create(:intervention, :published, :with_short_link, name: 'Some intervention',
+                                                        user: intervention_user, sessions: sessions, shared_to: shared_to,
+                                                        organization: organization, reports: reports)
   end
   let(:reports) { [] }
   let(:csv_attachment) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }

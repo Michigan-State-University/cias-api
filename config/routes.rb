@@ -59,6 +59,7 @@ Rails.application.routes.draw do
         resources :invitations, only: %i[index create destroy]
         resources :accesses, only: %i[index create destroy]
         resources :files, only: %i[create destroy]
+        resources :short_links, only: %i[create index]
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
@@ -152,6 +153,8 @@ Rails.application.routes.draw do
       resources :answers, only: %i[index show create], module: 'user_sessions'
       patch 'quick_exit', to: 'user_sessions#quick_exit'
     end
+    get 'user_sessions', to: 'user_sessions#show'
+    post 'fetch_or_create_user_sessions', to: 'user_sessions#show_or_create'
 
     namespace :tlfb do
       resources :events, only: %i[destroy create update]
@@ -277,6 +280,7 @@ Rails.application.routes.draw do
     end
 
     get 'me', to: 'users#me', as: :get_user_details
+    get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
   end
 
   if Rails.env.development?

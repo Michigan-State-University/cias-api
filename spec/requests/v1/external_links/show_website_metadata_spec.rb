@@ -23,8 +23,10 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
   let(:description) do
     'Active Record MigrationsMigrations are a feature of Active Record that allows you to evolve your database schema over time. Rather than write schema modifications in pure SQL, migrations allow you to use a Ruby DSL to describe changes to your tables.After reading this guide, you will know: The generators you can use to create them. The methods Active Record provides to manipulate your database. The rails commands that manipulate migrations and your schema. How migrations relate to schema.rb.' # rubocop:disable Layout/LineLength
   end
-  let(:image) { 'https://avatars.githubusercontent.com/u/4223' }
-
+  let(:title2) { 'Amazon.com. Spend less. Smile more.' }
+  let(:description2) do
+    'Free shipping on millions of items. Get the best of Shopping and Entertainment with Prime. Enjoy low prices and great deals on the largest selection of everyday essentials and other products, including fashion, home, beauty, electronics, Alexa Devices, sporting goods, toys, automotive, pets, baby, books, video games, musical instruments, office supplies, and more.' # rubocop:disable Layout/LineLength
+  end
   let(:headers) { current_user.create_new_auth_token }
   let!(:params) do
     {
@@ -71,12 +73,11 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
             expect(json_response['url']).to eql(url)
             expect(json_response['title']).to eql(title)
             expect(json_response['description']).to eql(description)
-            expect(json_response['image']).to eql(image)
             expect(json_response['images'].size).to be(1)
           end
         end
 
-        context 'when url is valid but website throws 503 error' do
+        context 'when url is valid but in short form' do
           let!(:params) do
             {
               url: url2
@@ -88,7 +89,9 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
           end
 
           it 'JSON contains proper attributes' do
-            expect(json_response['url']).to eql("http://#{url2}")
+            expect(json_response['url']).to eql("https://www.#{url2}/")
+            expect(json_response['title']).to eql(title2)
+            expect(json_response['description']).to eql(description2)
           end
         end
 
@@ -96,7 +99,30 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
           let(:url) { 'invalid path' }
 
           it 'json response ' do
-            expect(response).to have_http_status(:not_found)
+            expect(response).to have_http_status(:unprocessable_entity)
+          end
+
+          context 'when page exist but doesn\'t exist subpage' do
+            let(:url) { 'https://edgeguides.rubyonrails.org/wrong_path' }
+
+            it 'returns correct http status' do
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'JSON contains proper attributes' do
+              expect(json_response['url']).to eql(url)
+              expect(json_response['title']).to eql('404 Not Found')
+              expect(json_response['description']).to be(nil)
+              expect(json_response['image']).to be(nil)
+            end
+          end
+
+          context 'when url has correct structure' do
+            let(:url) { 'https://pl.test.org/test1234' }
+
+            it 'returns correct http status' do
+              expect(response).to have_http_status(:unprocessable_entity)
+            end
           end
         end
       end
