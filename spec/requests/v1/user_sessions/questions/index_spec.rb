@@ -32,6 +32,26 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       it 'skip tlfbConfig and return tlfbEvent' do
         expect(json_response['data']['attributes']['type']).to eq('Question::TlfbEvents')
       end
+
+      it 'return information that tlfbEvent is a first question instead of tlfbConfig' do
+        expect(json_response['data']['attributes']['first_question']).to be(true)
+      end
+    end
+
+    context 'user session has draft answer' do
+      let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id, draft: true) }
+
+      before do
+        get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+      end
+
+      it 'returns first question of session' do
+        expect(json_response['data']['id']).to eq(question.id)
+      end
+
+      it 'return also draft answer in response' do
+        expect(json_response['answer']['id']).to eq(answer.id)
+      end
     end
 
     context 'branching logic' do
@@ -63,6 +83,27 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
         it 'returns branched question id' do
           expect([questions[2].id, questions[3].id]).to include(json_response['data']['id'])
+        end
+
+        context 'when target questions have draft answers' do
+          let!(:answer2) { create(:answer_single, question_id: questions[2].id, user_session_id: user_session.id, draft: true) }
+          let!(:answer3) { create(:answer_single, question_id: questions[3].id, user_session_id: user_session.id, draft: true) }
+
+          it 'returns branched question id' do
+            expect([questions[2].id, questions[3].id]).to include(json_response['data']['id'])
+          end
+        end
+
+        context 'when participant discover new branch' do
+          let!(:answer_question1) { create(:answer_single, question_id: questions[1].id, user_session_id: user_session.id, draft: true) }
+
+          before do
+            get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
+          end
+
+          it 'mark the answer that it belongs to alternative branch' do
+            expect(answer_question1.reload.alternative_branch).to be(true)
+          end
         end
       end
 
@@ -714,6 +755,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         it 'returns correct question id' do
           expect(json_response['data']['id']).to eq questions[2].id
         end
+
+        it 'return information that isn\'t first question' do
+          expect(json_response['data']['attributes']['first_question']).to be(false)
+        end
       end
 
       context 'intervention is published' do
@@ -1091,6 +1136,10 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           'name' => 'variable'
         }
       )
+    end
+
+    it 'return information that isn\'t first question' do
+      expect(json_response['data']['attributes']['first_question']).to be(false)
     end
   end
 end

@@ -99,6 +99,9 @@ en:
       not_active: "Invitation has been cancelled or was already used"
     preview:
       cat_mh: "User preview is unavailable for CAT-MH sessions"
+  user_sessions:
+    errors:
+      previous_question: 'Previous question is unavailable for this type of session'
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."

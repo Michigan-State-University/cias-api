@@ -28,6 +28,7 @@ module CatMh::QuestionMapping
         'type' => 'question',
         'attributes' => {
           'type' => question_type(cat_mh_question_hash),
+          'first_question' => false,
           'settings' => {
             'image' => false,
             'title' => true,
@@ -54,10 +55,7 @@ module CatMh::QuestionMapping
                 'audio_urls' => [
                   audio&.url || ''
                 ],
-                endPosition: {
-                  x: 600,
-                  y: 100
-                }
+                endPosition: { x: 600, y: 100 }
               }
             ],
             settings: {

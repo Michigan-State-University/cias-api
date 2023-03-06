@@ -17,16 +17,18 @@ class V1::Question::Response
       response[:warning] = next_question[:warning] if next_question[:warning].present?
       response[:next_user_session_id] = next_question[:next_user_session_id]
       response[:next_session_id] = next_question[:next_session_id] if next_question.key?(:next_session_id)
-      response
     else
       response = serialized_hash(
         next_question[:question],
         next_question[:question]&.de_constantize_modulize_name || NilClass
       )
       response = add_information(response, :warning, next_question) if next_question[:question].session.intervention.draft?
-      response = add_information(response, :next_user_session_id, next_question)
-      add_information(response, :next_session_id, next_question)
+      %i[next_user_session_id next_session_id].each do |key|
+        response = add_information(response, key, next_question)
+      end
+      response = response.merge(answer: serialized_hash(next_question[:answer], Answer)[:data])
     end
+    response
   end
 
   private

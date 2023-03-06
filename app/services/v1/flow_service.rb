@@ -39,7 +39,7 @@ class V1::FlowService
       end
     end
 
-    { question: question, warning: warning, next_user_session_id: next_user_session_id, next_session_id: next_session_id }
+    { question: question, warning: warning, next_user_session_id: next_user_session_id, next_session_id: next_session_id, answer: answer(question) }
   end
 
   private
@@ -64,7 +64,6 @@ class V1::FlowService
     end
 
     last_answered_question = user_session.last_answer&.question
-
     return user_session.first_question.prepare_to_display if last_answered_question.nil?
 
     perform_branching_to_next_question(last_answered_question)
@@ -84,7 +83,10 @@ class V1::FlowService
       unless obj_src.nil?
         branching_question = nil
         branching_question = branching_source_to_question(obj_src) if obj_src.is_a?(Hash)
-        next_question = branching_question unless branching_question.nil?
+        unless branching_question.nil?
+          next_question = branching_question
+          mark_answers_as_alternative(next_question)
+        end
       end
     end
 
@@ -132,7 +134,7 @@ class V1::FlowService
       next_user_session = UserSession.find_or_initialize_by(session_id: question_or_session.id, user_id: user.id, health_clinic_id: health_clinic_id,
                                                             type: question_or_session.user_session_type, user_intervention: user_session.user_intervention)
       next_user_session.save!
-      user_session.answers.last.update!(next_session_id: question_or_session.id)
+      user_session.answers.confirmed.last.update!(next_session_id: question_or_session.id)
       self.next_user_session_id = next_user_session.id
 
       return next_user_session.first_question
@@ -145,7 +147,7 @@ class V1::FlowService
     next_user_session = UserSession.find_or_initialize_by(session_id: session.id, user_id: user.id, health_clinic_id: health_clinic_id,
                                                           type: session.user_session_type, user_intervention: user_session.user_intervention)
     next_user_session.save!
-    user_session.answers.last.update!(next_session_id: session.id)
+    user_session.answers.confirmed.last.update!(next_session_id: session.id)
     self.next_user_session_id = next_user_session.id
     self.next_session_id = next_user_session.session_id
 
@@ -222,5 +224,20 @@ class V1::FlowService
 
   def reflection_variable(block, variable)
     block['session_id'].present? ? "#{Session.find(block['session_id']).variable}.#{variable}" : variable
+  end
+
+  def answer(question)
+    return if question.is_a?(Hash)
+
+    user_session.answers.find_by(question_id: question.id)
+  end
+
+  def mark_answers_as_alternative(next_question)
+    return if next_question.is_a? Hash
+
+    question_ids = next_question.position_lower.pluck(:id)
+    user_session.answers.where(draft: true, question_id: question_ids).each do |answer|
+      answer.update!(alternative_branch: true)
+    end
   end
 end
