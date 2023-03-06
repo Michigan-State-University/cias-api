@@ -21,6 +21,7 @@ class Question::Finish < Question
 
   def set_default_narrator
     narrator['settings']['character'] = session.current_narrator
+    narrator['settings']['extra_space_for_narrator'] = false
     save!
   end
 end
