@@ -17,8 +17,8 @@ class V1::UserSessions::PreviousQuestionService
   def call
     raise CatMh::ActionNotAvailable, I18n.t('user_sessions.errors.previous_question') if user_session.type == 'UserSession::CatMh'
 
-    answer&.update!(draft: true)
     @previous_answer = user_session.answers.where('created_at < ?', (answer&.created_at || DateTime.now))&.last
+    previous_answer&.update!(draft: true)
 
     {
       question: previous_question,

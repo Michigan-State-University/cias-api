@@ -56,7 +56,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
 
       it 'change answer to draft' do
         request
-        expect(answer2.reload.draft).to be(true)
+        expect(answer1.reload.draft).to be(true)
       end
     end
 
