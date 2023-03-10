@@ -60,6 +60,20 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       end
     end
 
+    context 'user will see last final answer' do
+      let!(:question3) { create(:question_single, question_group: question_group) }
+      let!(:question4) { create(:question_single, question_group: question_group) }
+      let!(:answer1) { create(:answer_single, question: question1, user_session: user_session, created_at: 6.hours.ago) }
+      let!(:answer2) { create(:answer_single, question: question2, user_session: user_session, draft: true, created_at: 4.hours.ago) }
+      let!(:answer3) { create(:answer_single, question: question3, user_session: user_session, draft: true, alternative_branch: true, created_at: 2.hours.ago) }
+      let!(:answer4) { create(:answer_single, question: question4, user_session: user_session, created_at: 5.hours.ago) }
+
+      it 'return correct question id' do
+        request
+        expect(json_response['data']['id']).to eq(question4.id)
+      end
+    end
+
     context 'when the intervention is draft - researcher wants to back to question without answer' do
       let!(:intervention) { create(:intervention, user_id: researcher.id, status: 'draft') }
       let(:params) { { current_question_id: question2.id } }
