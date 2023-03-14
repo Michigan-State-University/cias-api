@@ -22,7 +22,7 @@ class UserSession::Classic < UserSession
   end
 
   def last_answer
-    answers.confirmed.order(:created_at).last
+    answers.confirmed.unscope(:order).order(:updated_at).last
   end
 
   def finish(send_email: true)
