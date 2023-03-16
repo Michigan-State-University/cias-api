@@ -2,7 +2,7 @@
 
 class V1::LiveChat::Interventions::LiveChatSetupSerializer < V1Serializer
   include FileHelper
-  attributes :id, :contact_email, :no_navigator_available_message
+  attributes :id, :contact_email, :no_navigator_available_message, :contact_message
 
   has_many :participant_links, serializer: V1::LiveChat::Interventions::LinkSerializer
   has_one :phone, serializer: V1::PhoneSerializer

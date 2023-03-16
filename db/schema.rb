@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_01_132022) do
+ActiveRecord::Schema.define(version: 2023_03_16_111351) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -456,7 +456,7 @@ ActiveRecord::Schema.define(version: 2023_03_01_132022) do
     t.uuid "intervention_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "contact_message"
+    t.string "contact_message", default: "You can contact us directly by using details below"
   end
 
   create_table "live_chat_summoning_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
