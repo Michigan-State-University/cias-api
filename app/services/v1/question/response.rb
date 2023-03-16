@@ -15,7 +15,7 @@ class V1::Question::Response
     if next_question[:question].is_a?(Hash)
       response = next_question[:question]
       response[:warning] = next_question[:warning] if next_question[:warning].present?
-      response[:next_user_session_id] = next_question[:next_user_session_id]
+      response[:next_user_session_id] = next_question[:next_user_session_id] if next_question[:next_user_session_id].present?
       response[:next_session_id] = next_question[:next_session_id] if next_question.key?(:next_session_id)
     else
       response = serialized_hash(

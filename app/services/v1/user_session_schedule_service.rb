@@ -17,6 +17,7 @@ class V1::UserSessionScheduleService
   def schedule
     next_session = branch_to_session
     return if next_session.nil?
+    return if next_session.schedule_immediately?
 
     return if next_session.intervention.type.eql?('Intervention::FlexibleOrder') || user_session.user.guest?
 

@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 6.1.7.3'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.4'
 
@@ -104,7 +104,11 @@ group :production do
   gem 'aws-sdk-s3'
 end
 
-group :development, :production do
+group :production do
   # only version that is working on AWS
   gem 'wkhtmltopdf-heroku', '2.12.6.0'
+end
+
+group :development do
+  gem 'wkhtmltopdf-binary'
 end
