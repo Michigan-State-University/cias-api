@@ -150,6 +150,7 @@ Rails.application.routes.draw do
 
     resources :user_sessions, only: %i[create] do
       resources :questions, only: %i[index], module: 'user_sessions'
+      get 'previous_question', to: 'user_sessions/questions#previous'
       resources :answers, only: %i[index show create], module: 'user_sessions'
       patch 'quick_exit', to: 'user_sessions#quick_exit'
     end

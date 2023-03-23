@@ -11,27 +11,13 @@ class V1::LiveChat::Interventions::UpdateNavigatorSetupService
   end
 
   def call
-    if setup.phone.nil?
-      setup.update!(params.merge({ phone: new_phone }))
-    else
-      setup.update!(params.except(:phone))
-      if params.key?(:phone)
-        if params[:phone].nil?
-          setup.phone.destroy!
-          setup.phone = nil
-          setup.save!
-        else
-          setup.phone.update!(params[:phone])
-        end
-      end
+    params[:phone_attributes] = { id: setup.phone.id, _destroy: true } if !setup.phone.nil? && params[:phone_attributes].nil?
+    if !setup.message_phone.nil? && params[:message_phone_attributes].nil?
+      params[:message_phone_attributes] = { id: setup.message_phone.id,
+                                            _destroy: true }
     end
+    setup.update!(params)
   end
 
   attr_reader :setup, :params
-
-  private
-
-  def new_phone
-    Phone.create!(params[:phone]) if params[:phone].present?
-  end
 end
