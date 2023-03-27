@@ -6,11 +6,13 @@ namespace :one_time_use do
     ActiveRecord::Base.transaction do
       scope = Question.all.where.not(type: %w[Question::TlfbConfig Question::TlfbEvents Question::TlfbQuestion])
       question_count = scope.size
+      current_question = 0
 
-      scope.each_with_index do |question, index|
+      scope.find_each do |question|
         question.narrator['settings']['extra_space_for_narrator'] = false
         question.save!
-        p "question #{index + 1}/#{question_count}"
+        p "question #{current_question + 1}/#{question_count}"
+        current_question = current_question + 1
       end
 
       p 'DONE!'
