@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 6.1.7.3'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.4'
 
@@ -42,7 +42,7 @@ gem 'sidekiq', '>= 6.4.0'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
-gem 'rack', '>= 2.2.3.1'
+gem 'rack', '>= 2.2.6.3'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'secure_headers'
@@ -106,4 +106,8 @@ group :production do
   gem 'aws-sdk-s3'
   # only version that is working on AWS
   gem 'wkhtmltopdf-heroku', '2.12.6.0'
+end
+
+group :development do
+  gem 'wkhtmltopdf-binary'
 end

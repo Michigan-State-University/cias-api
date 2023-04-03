@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_01_09_063749) do
+ActiveRecord::Schema.define(version: 2023_03_16_111351) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -62,6 +62,8 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.text "body_ciphertext"
     t.boolean "skipped", default: false
     t.uuid "next_session_id"
+    t.boolean "draft", default: false
+    t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
@@ -475,6 +477,7 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.uuid "intervention_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "contact_message", default: "You can contact us directly by using details below"
   end
 
   create_table "live_chat_summoning_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -596,6 +599,7 @@ ActiveRecord::Schema.define(version: 2023_01_09_063749) do
     t.datetime "updated_at", precision: 6, null: false
     t.text "number_ciphertext"
     t.uuid "navigator_setup_id"
+    t.string "communication_way"
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
