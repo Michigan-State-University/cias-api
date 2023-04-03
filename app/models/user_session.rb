@@ -39,7 +39,7 @@ class UserSession < ApplicationRecord
     if user_intervention_finished?
       user_intervention.status = 'completed'
       user_intervention.finished_at = DateTime.current
-    else
+    elsif user_intervention.ready_to_start?
       user_intervention.status = 'in_progress'
     end
 
