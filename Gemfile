@@ -107,7 +107,3 @@ group :production do
   # only version that is working on AWS
   gem 'wkhtmltopdf-heroku', '2.12.6.0'
 end
-
-group :development do
-  gem 'wkhtmltopdf-binary'
-end
