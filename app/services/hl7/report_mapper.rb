@@ -6,7 +6,7 @@ class Hl7::ReportMapper
 
   SECOND_SEGMENT_TYPE = 'TXA' # Transcription Document Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/TXA
   DOCUMENT_COMPLETION_STATUS = 'AU' #	Authenticated -> https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0271
-  REPORT_TYPE = 'TURP-D' # provided by HFHS
+  REPORT_TYPE = 'DASST-D' # provided by HFHS
   DOCUMENT_AVAILABILITY_STATUS = 'AV' # Available for patient care ->https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0273
 
   THIRD_SEGMENT_TYPE = 'OBX' # Observation/Result -> https://hl7-definition.caristix.com/v2/HL7v2.6/Segments/OBX
