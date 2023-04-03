@@ -17,7 +17,7 @@ class Hl7::AnswersMapper
 
   def call
     user_session.answers.hfhs.map.with_index do |answer, index|
-      "#{SEGMENT_TYPE}|#{index + 1}|#{VALUE_TYPE}|#{code_desc(answer)}||#{answer_data(answer)}||||||#{OBSERVATION_RESULT_STATUS}|||#{date_of_answer(answer)}"
+      "#{SEGMENT_TYPE}|#{index + 1}|#{VALUE_TYPE}|#{code_desc(answer)}||#{answer_data(answer)}||||||#{OBSERVATION_RESULT_STATUS}|||#{date_of_answer}"
     end
   end
 
@@ -33,7 +33,7 @@ class Hl7::AnswersMapper
     answer.decrypted_body.dig('data', 0, 'hfh_value')
   end
 
-  def date_of_answer(answer)
-    answer.created_at.strftime('%Y%m%d%H%M')
+  def date_of_answer
+    @date_of_answer ||= user_session.finished_at.strftime('%Y%m%d%H%M')
   end
 end
