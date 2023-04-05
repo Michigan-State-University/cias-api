@@ -62,6 +62,20 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
     it 'create answer' do
       expect { request }.to change(Answer, :count).by(1)
     end
+
+    context 'override existing answer' do
+      let!(:answer) { create(:answer_single, user_session: user_session, question: question, draft: true, alternative_branch: true) }
+
+      it 'update answer' do
+        expect { request }.to change(Answer, :count).by(0)
+      end
+
+      it 'update a flags' do
+        request
+        expect(answer.reload.draft).to be(false)
+        expect(answer.reload.alternative_branch).to be(false)
+      end
+    end
   end
 
   context 'UserSession::CatMh' do

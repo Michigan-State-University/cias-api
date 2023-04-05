@@ -1,9 +1,26 @@
 # frozen_string_literal: true
 
 class V1::UserSessionsController < V1Controller
-  skip_before_action :authenticate_user!
+  skip_before_action :authenticate_user!, only: %i[create show_or_create]
 
   def create
+    user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
+    authorize! :create, user_session
+    user_session.save!
+    @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
+
+    render json: serialized_response(user_session), status: :ok
+  end
+
+  def show
+    authorize! :read, UserSession
+
+    user_session = V1::UserSessions::FetchService.call(params[:session_id], current_v1_user.id, params[:health_clinic_id])
+
+    render json: serialized_response(user_session), status: :ok
+  end
+
+  def show_or_create
     user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!

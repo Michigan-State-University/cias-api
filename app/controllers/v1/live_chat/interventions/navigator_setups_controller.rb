@@ -30,11 +30,12 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
   end
 
   def setup_response(data)
-    V1::LiveChat::Interventions::NavigatorSetupSerializer.new(data, { include: %i[participant_links navigator_links phone] })
+    V1::LiveChat::Interventions::NavigatorSetupSerializer.new(data, { include: %i[participant_links navigator_links phone message_phone] })
   end
 
   def navigator_setup_params
-    params.require(:navigator_setup).permit(:contact_email, :no_navigator_available_message, :phone,
-                                            :filled_script_template, phone: %i[iso number prefix])
+    params.require(:navigator_setup).permit(:contact_email, :no_navigator_available_message,
+                                            :filled_script_template, :contact_message, phone_attributes: %i[iso number prefix],
+                                                                                       message_phone_attributes: %i[iso number prefix])
   end
 end

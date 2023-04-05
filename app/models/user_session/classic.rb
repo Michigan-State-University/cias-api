@@ -22,7 +22,7 @@ class UserSession::Classic < UserSession
   end
 
   def last_answer
-    answers.order(:created_at).last
+    answers.confirmed.unscope(:order).order(:updated_at).last
   end
 
   def finish(send_email: true)
@@ -30,6 +30,7 @@ class UserSession::Classic < UserSession
 
     cancel_timeout_job
     update(finished_at: DateTime.current)
+    delete_alternative_answers
     reload
 
     decrement_audio_usage
@@ -49,5 +50,9 @@ class UserSession::Classic < UserSession
 
     name_audio.decrement(:usage_counter)
     name_audio.save!
+  end
+
+  def delete_alternative_answers
+    answers.where(draft: true, alternative_branch: true).destroy_all
   end
 end

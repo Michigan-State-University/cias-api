@@ -15,7 +15,7 @@ class UserSession < ApplicationRecord
   end
 
   def all_var_values(include_session_var: true)
-    answers.each_with_object({}) do |answer, var_values|
+    answers.confirmed.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|
         key = include_session_var ? "#{session.variable}.#{obj['var']}" : obj['var']
         var_values[key] = obj['value']
@@ -53,7 +53,7 @@ class UserSession < ApplicationRecord
   private
 
   def user_intervention_finished?
-    return user_intervention.completed_sessions == user_intervention.user_sessions.size unless user_intervention.intervention.module_intervention?
+    return session.last_session? unless user_intervention.intervention.module_intervention?
 
     user_intervention.completed_sessions == user_intervention.sessions.size
   end

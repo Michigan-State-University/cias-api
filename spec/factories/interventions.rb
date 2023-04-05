@@ -40,7 +40,17 @@ FactoryBot.define do
       end
 
       after(:create) do |intervention|
-        intervention.navigator_setup.update!(phone: Phone.new(number: '111111111', prefix: '+48', iso: 'PL'))
+        intervention.navigator_setup.update!(phone: Phone.new(number: '111111111', prefix: '+48', iso: 'PL', communication_way: 'call'))
+      end
+    end
+
+    trait :with_navigator_setup_and_message_phone do
+      after(:build) do |intervention|
+        intervention.live_chat_enabled = true
+      end
+
+      after(:create) do |intervention|
+        intervention.navigator_setup.update!(message_phone: Phone.new(number: '222222222', prefix: '+48', iso: 'PL', communication_way: 'message'))
       end
     end
   end

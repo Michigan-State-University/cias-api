@@ -83,7 +83,7 @@ class ConversationChannel < ApplicationCable::Channel
   def on_fetch_live_chat_setup(data)
     intervention = fetch_intervention(data)
     setup = intervention.navigator_setup
-    response_data = V1::LiveChat::Interventions::LiveChatSetupSerializer.new(setup, { include: %i[participant_links phone] })
+    response_data = V1::LiveChat::Interventions::LiveChatSetupSerializer.new(setup, { include: %i[participant_links phone message_phone] })
     ActionCable.server.broadcast(current_channel_id, generic_message(response_data, 'live_chat_setup_fetched'))
   end
 
