@@ -53,7 +53,7 @@ class UserSession < ApplicationRecord
   private
 
   def user_intervention_finished?
-    return session.last_session? unless user_intervention.intervention.module_intervention?
+    return session.last_session? && finished_at.present? unless user_intervention.intervention.module_intervention?
 
     user_intervention.completed_sessions == user_intervention.sessions.size
   end
