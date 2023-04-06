@@ -63,6 +63,11 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
       expect { request }.to change(Answer, :count).by(1)
     end
 
+    it 'user intervention has correct status' do
+      request
+      expect(user_session.user_intervention.reload.status).to eql('in_progress')
+    end
+
     context 'override existing answer' do
       let!(:answer) { create(:answer_single, user_session: user_session, question: question, draft: true, alternative_branch: true) }
 
