@@ -10,4 +10,8 @@ class V1::SmsPlanSerializer < V1Serializer
   attribute :end_at do |object|
     object.end_at.strftime('%d/%m/%Y') if object.end_at.present?
   end
+
+  attribute :no_formula_image_url do |object|
+    url_for(object.no_formula_image) if object.no_formula_image.attached?
+  end
 end

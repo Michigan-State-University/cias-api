@@ -5,5 +5,9 @@ FactoryBot.define do
     sequence(:content) { |n| "some_content#{n}" }
     sequence(:formula_match) { |n| "#{%w[= < > <= >=].sample}#{n}" }
     association(:sms_plan)
+
+    trait :with_image do
+      image { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
+    end
   end
 end

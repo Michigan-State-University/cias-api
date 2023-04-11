@@ -3,6 +3,7 @@
 class SmsPlan::Variant < ApplicationRecord
   has_paper_trail
   belongs_to :sms_plan
+  has_one_attached :image, dependent: :purge_later
 
   CURRENT_VERSION = '1'
 

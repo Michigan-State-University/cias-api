@@ -73,6 +73,26 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
           expect(response).to have_http_status(:method_not_allowed)
         end
       end
+
+      context 'pass a image to the variant' do
+        let(:params) do
+          {
+            variant: {
+              image: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+            }
+          }
+        end
+
+        it 'returns :ok status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'attach image to the variant' do
+          request
+          expect(variant.reload.image.attached?).to be(true)
+        end
+      end
     end
 
     %w[admin admin_with_multiple_roles].each do |role|

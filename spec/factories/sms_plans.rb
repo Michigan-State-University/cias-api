@@ -6,6 +6,10 @@ FactoryBot.define do
     sequence(:name) { |s| "sms_plan#{s}" }
     schedule { SmsPlan.schedules[:after_session_end] }
     frequency { SmsPlan.frequencies[:once] }
+
+    trait :with_no_formula_image do
+      no_formula_image { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
+    end
   end
 
   factory :sms_plan_with_text, class: SmsPlan::Normal do
