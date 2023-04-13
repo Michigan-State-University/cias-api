@@ -16,7 +16,7 @@ class Communication::Sms
         from: ENV['TWILIO_FROM'],
         to: sms.phone,
         body: sms.body,
-        media_url: [image_url]
+        media_url: [sms.image_url]
       )
     else
       client.messages.create(
