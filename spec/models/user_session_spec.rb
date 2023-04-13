@@ -106,6 +106,30 @@ RSpec.describe UserSession, type: :model do
             user_session.on_answer
           end
         end
+
+        context 'when timeout is disable' do
+          before do
+            user_session.session.update!(autofinish_enabled: false)
+          end
+
+          it 'doesn\'t schedule session timeout' do
+            expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+          end
+        end
+
+        context 'when delay is not default' do
+          let(:expected_timestamp) { Time.current + 72.hours }
+
+          before do
+            user_session.session.update!(autofinish_delay: 72)
+          end
+
+          it 'schedules session timeout correctly' do
+            expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
+                                                   .with(user_session.id)
+                                                   .at(a_value_within(1.second).of(expected_timestamp))
+          end
+        end
       end
     end
 

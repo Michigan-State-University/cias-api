@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_04_06_132910) do
+ActiveRecord::Schema.define(version: 2023_04_11_135103) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -640,6 +640,8 @@ ActiveRecord::Schema.define(version: 2023_04_06_132910) do
     t.integer "estimated_time"
     t.integer "current_narrator", default: 0
     t.boolean "multiple_fill", default: false, null: false
+    t.boolean "autofinish_enabled", default: true, null: false
+    t.integer "autofinish_delay", default: 24, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

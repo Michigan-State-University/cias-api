@@ -5,10 +5,12 @@ class UserSession::Classic < UserSession
 
   before_destroy :decrement_audio_usage
 
-  delegate :first_question, to: :session
+  delegate :first_question, :autofinish_enabled, :autofinish_delay, to: :session
 
   def on_answer
-    timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
+    return unless autofinish_enabled
+
+    timeout_job = UserSessionTimeoutJob.set(wait: autofinish_delay.minutes).perform_later(id)
     cancel_timeout_job
     update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.provider_job_id)
   end

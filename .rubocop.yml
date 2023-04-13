@@ -34,6 +34,7 @@ Layout/LineLength:
   Max: 160
   Exclude:
     - 'spec/requests/v1/questions/update_narrator_spec.rb'
+    - 'app/controllers/v1/sessions_controller.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
