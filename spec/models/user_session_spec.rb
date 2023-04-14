@@ -98,6 +98,25 @@ RSpec.describe UserSession, type: :model do
           end
         end
 
+        context 'when session contains question which run timeout' do
+          let(:question_group) { create(:question_group, session: user_session.session) }
+          let!(:question) { create(:question_single, :start_autofinish_timer_on, question_group: question_group) }
+
+          context 'when answer does\'t exist for question which trigger timeout' do
+            it 'doesn\'t schedule session timeout' do
+              expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+            end
+          end
+
+          context 'when answer exists for question which trigger timeout' do
+            let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+
+            it 'schedule session timeout' do
+              expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
+            end
+          end
+        end
+
         context 'when timeout_job_id is set' do
           let(:timeout_job_id) { 'test_timeout_job' }
 
