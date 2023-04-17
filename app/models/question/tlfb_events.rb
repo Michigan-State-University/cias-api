@@ -11,4 +11,9 @@ class Question::TlfbEvents < Question::Tlfb
       end
     end
   end
+
+  def first_question?
+    first_question = session.first_question
+    first_question.type.eql?('Question::TlfbConfig') && first_question.question_group.id == question_group.id
+  end
 end

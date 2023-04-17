@@ -15,4 +15,8 @@ class Question::TlfbConfig < Question::Tlfb
     question_to_display.apply_config(body)
     question_to_display
   end
+
+  def first_question?
+    false
+  end
 end

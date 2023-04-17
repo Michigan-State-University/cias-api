@@ -17,15 +17,33 @@ class V1::Translations::NarratorBlocks
   end
 
   def call
-    narrator_blocks.each do |block|
+    @narrator_blocks.each do |block|
       block['original_text'] = block['text']
-      block['text'] = translate_text(block['text'], translator)
+      if block['type'].eql?('ReadQuestion')
+        block['text'] = clear_and_split_text
+      else
+        translate_block(block, translator)
+      end
     end
-
-    question.save!
+    question.execute_narrator
   end
 
   private
+
+  def translate_block(block, translator)
+    if block['type'].in?(%w[ReflectionFormula Reflection])
+      translate_cases(block['reflections'], translator)
+    else
+      block['text'] = translate_text(block['text'], translator)
+    end
+  end
+
+  def translate_cases(cases, translator)
+    cases.each do |block|
+      block['original_text'] = block['text']
+      block['text'] = translate_text(block['text'], translator)
+    end
+  end
 
   def translate_text(texts, translator)
     texts&.map do |text|
@@ -35,5 +53,10 @@ class V1::Translations::NarratorBlocks
 
   def variable?(text)
     /:[a-zA-Z0-9_]+:./.match(text).present?
+  end
+
+  def clear_and_split_text
+    sanitized_subtitle = ActionView::Base.full_sanitizer.sanitize(question.subtitle)
+    sanitized_subtitle&.split(/(?<=[[:punct:]])/)
   end
 end

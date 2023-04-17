@@ -13,6 +13,9 @@
         },
         "character": {
           "type": "string"
+        },
+        "extra_space_for_narrator": {
+          "type": "boolean"
         }
       },
       "required": [

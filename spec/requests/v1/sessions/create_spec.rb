@@ -58,7 +58,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
 
           context 'when finish screen has default narrator settings' do
             it 'assign default values' do
-              expect(Session.last.questions.last.narrator['settings']).to include({ 'character' => 'peedy' })
+              expect(Session.last.questions.last.narrator['settings']).to include({ 'character' => 'peedy', 'extra_space_for_narrator' => false })
             end
           end
 

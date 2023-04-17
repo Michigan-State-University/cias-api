@@ -70,6 +70,14 @@ RSpec.describe UserSession, type: :model do
             )
           end
         end
+
+        context 'back button' do
+          let!(:answers) { create(:answer_single, user_session: user_session, alternative_branch: true, draft: true) }
+
+          it 'remove all alternative branches' do
+            expect { user_session.finish(send_email: false) }.to change(Answer, :count).by(-1)
+          end
+        end
       end
 
       context 'user session on answer' do

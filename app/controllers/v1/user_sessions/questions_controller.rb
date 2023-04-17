@@ -10,6 +10,14 @@ class V1::UserSessions::QuestionsController < V1Controller
     render json: response
   end
 
+  def previous
+    authorize! :read, user_session
+
+    response = V1::UserSessions::PreviousQuestionService.call(user_session, current_question_id)
+
+    render json: response_with_answer(response)
+  end
+
   private
 
   def flow_service
@@ -22,5 +30,13 @@ class V1::UserSessions::QuestionsController < V1Controller
 
   def preview_question_id
     params[:preview_question_id]
+  end
+
+  def current_question_id
+    params[:current_question_id]
+  end
+
+  def response_with_answer(data)
+    serialized_hash(data[:question]).merge({ answer: serialized_hash(data[:answer], Answer)[:data] })
   end
 end

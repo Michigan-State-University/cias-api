@@ -14,6 +14,8 @@ class Answer < ApplicationRecord
 
   validate :type_integrity_validator
 
+  scope :confirmed, -> { where(draft: false) }
+  scope :final, -> { where(alternative_branch: false) }
   scope :user_answers, lambda { |user_id, session_ids|
     relation = joins(:user_session).where(user_sessions: { user_id: user_id })
     relation = relation.where('user_sessions.session_id IN(?)', session_ids) if session_ids.any?
