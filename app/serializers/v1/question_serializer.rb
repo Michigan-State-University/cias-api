@@ -10,4 +10,6 @@ class V1::QuestionSerializer < V1Serializer
   attribute :image_alt do |object|
     object.image_blob.description if object.image_blob.present?
   end
+
+  attribute :first_question, &:first_question?
 end

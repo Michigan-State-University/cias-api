@@ -32,7 +32,8 @@ class Session < ApplicationRecord
                    days_after_fill: 'days_after_fill',
                    exact_date: 'exact_date',
                    after_fill: 'after_fill',
-                   days_after_date: 'days_after_date' },
+                   days_after_date: 'days_after_date',
+                   immediately: 'immediately' },
        _prefix: :schedule
   enum current_narrator: ::Intervention.current_narrators
 

@@ -390,6 +390,22 @@ FactoryBot.define do
       end
     end
 
+    trait :read_question_block do
+      narrator do
+        {
+          settings: narrator_default_settings,
+          blocks: [
+            {
+              type: 'ReadQuestion',
+              text: ['Medicine is the science and practice of establishing the diagnosis, prognosis, treatment, and prevention of disease.'],
+              sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
+              audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3']
+            }
+          ]
+        }
+      end
+    end
+
     trait :narrator_block_one_another_type do
       narrator do
         {
@@ -451,6 +467,32 @@ FactoryBot.define do
               type: 'BodyAnimation',
               sha256: [],
               audio_urls: []
+            }
+          ]
+        }
+      end
+    end
+
+    trait :narrator_blocks_with_cases do
+      narrator do
+        {
+          settings: narrator_default_settings,
+          blocks: [
+            {
+              type: 'Speech',
+              text: ['Working together as an interdisciplinary team, many highly trained health professionals'],
+              sha256: ['cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046'],
+              audio_urls: ['spec/factories/audio/cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046.mp3']
+            },
+            {
+              type: 'ReflectionFormula',
+              payload: '1',
+              reflections: [
+                match: '=1',
+                sha256: ['cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046'],
+                audio_urls: ['spec/factories/audio/cff0c9ce9f8394e5a6797002a2150c9ce6b7b2b072ece4f6a67b93be25aa0046.mp3'],
+                text: ['Working together as an interdisciplinary team, many highly trained health professionals']
+              ]
             }
           ]
         }
