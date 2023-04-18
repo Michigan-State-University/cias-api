@@ -53,7 +53,7 @@ class UserSession::Classic < UserSession
   end
 
   def set_timeout_job
-    timeout_job = UserSessionTimeoutJob.set(wait: autofinish_delay.minutes).perform_later(id)
+    timeout_job = UserSessionTimeoutJob.set(wait: autofinish_delay.hours).perform_later(id)
     cancel_timeout_job
     update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.provider_job_id)
   end
