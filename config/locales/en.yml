@@ -12,6 +12,8 @@ en:
       subtitle: '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>'
       text_to_speech: 'Enter main text for screen here. This is the last screen participants will see in this session'
       title: '<h2>Enter title here</h2>'
+    error:
+      published_intervention: 'Cannot update question in the published intervention'
   question_group:
     finish:
       title: Finish Group

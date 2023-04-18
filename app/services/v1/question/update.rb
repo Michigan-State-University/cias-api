@@ -11,6 +11,8 @@ class V1::Question::Update
   end
 
   def call
+    raise ActiveRecord::RecordNotSaved, I18n.t('question.error.published_intervention') if question.session.published?
+
     question.assign_attributes(question_params.except(:type))
     question.execute_narrator
     question.save!

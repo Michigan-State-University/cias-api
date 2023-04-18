@@ -27,7 +27,7 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::RecordNotSaved do |exc|
-      render json: msg(exc), status: :not_found
+      render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ActiveRecord::Rollback do |exc|
