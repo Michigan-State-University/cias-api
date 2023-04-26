@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-
-
 namespace :cat_mh do
   desc 'Set up CAT-MH resources in the database'
 

@@ -37,7 +37,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   def days_after_session_end_schedule(plan)
     return after_session_end_schedule(plan) if plan.schedule_payload.zero?
 
-    start_time = now_in_timezone.next_day(plan.schedule_payload).change({ hour: 13 }).utc
+    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time).utc
     set_frequency(start_time, plan)
   end
 
@@ -68,7 +68,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     else
       date = start_time
       while date.to_date <= finish_date.to_date
-        send_sms(date.change({ hour: 13 }).utc, content, image_url)
+        send_sms(date.change(random_time).utc, content, image_url)
         date = date.next_day(number_days[frequency])
       end
     end
@@ -165,10 +165,34 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def now_in_timezone
-    @now_in_timezone ||=
-      begin
-        timezone = Phonelib.parse(phone.full_number).timezone
-        Time.use_zone(timezone) { Time.current }
-      end
+    @now_in_timezone ||= Time.use_zone(timezone) { Time.current }
+  end
+
+  def timezone
+    timezone_defined_by_user = phone_answer&.migrated_body&.dig('data', 0, 'value', 'timezone').to_s
+    ActiveSupport::TimeZone[timezone_defined_by_user].present? ? timezone_defined_by_user : Phonelib.parse(phone.full_number).timezone
+  end
+
+  def phone_answer
+    @phone_answer ||= user_session.answers.find_by(type: 'Answer::Phone')
+  end
+
+  def time_ranges_defined_by_user
+    @time_ranges_defined_by_user = phone_answer&.migrated_body&.dig('data', 0, 'value', 'time_ranges')
+  end
+
+  def random_time
+    time_range = if time_ranges_defined_by_user.blank?
+                   TimeRange.default_range
+                 else
+                   time_ranges_defined_by_user.sample
+                 end
+
+    minutes_in_range = (time_range['to'].to_f - time_range['from'].to_f) * 60
+    random_minutes = rand(minutes_in_range)
+    {
+      hour: time_range['from'].to_i + (random_minutes / 60).to_i,
+      min: random_minutes % 60
+    }
   end
 end

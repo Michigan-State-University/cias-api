@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_04_13_104935) do
+ActiveRecord::Schema.define(version: 2023_04_19_100020) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -723,6 +723,16 @@ ActiveRecord::Schema.define(version: 2023_04_13_104935) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cat_mh_test_type_id"], name: "index_tests_on_cat_mh_test_type_id"
     t.index ["session_id"], name: "index_tests_on_session_id"
+  end
+
+  create_table "time_ranges", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.integer "from", null: false
+    t.integer "to", null: false
+    t.integer "position", default: 0, null: false
+    t.string "label", null: false
+    t.boolean "default", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
