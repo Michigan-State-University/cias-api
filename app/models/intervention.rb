@@ -92,6 +92,11 @@ class Intervention < ApplicationRecord
       invite_non_existing_users(non_existing_users_emails, true)
     end
 
+    if shared_to_invited?
+      emails_without_access = emails - intervention_accesses.map(&:email)
+      give_user_access(emails_without_access)
+    end
+
     Invitation.transaction do
       User.where(email: emails).find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
