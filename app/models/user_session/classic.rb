@@ -20,7 +20,7 @@ class UserSession::Classic < UserSession
   def cancel_timeout_job
     return if timeout_job_id.nil?
 
-    UserSessionTimeoutJob.cancel(timeout_job_id)
+    UserSessionTimeoutJob.cancel_by(provider_job_id: timeout_job_id)
 
     update(timeout_job_id: nil)
   end
