@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe SmsPlans::SendSmsJob, type: :job do
-  subject { described_class.perform_now('+48123123123', 'some content', nil, user.id) }
+  subject { described_class.perform_now('+48123123123', 'some content', user.id) }
 
   let(:message) { create(:message, :with_code) }
   let(:service) { Communication::Sms.new(message.id) }
