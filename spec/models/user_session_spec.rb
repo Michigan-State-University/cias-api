@@ -82,7 +82,7 @@ RSpec.describe UserSession, type: :model do
 
       context 'user session on answer' do
         let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id) }
-        let(:expected_timestamp) { Time.current + 1.day }
+        let(:expected_timestamp) { Time.current + 24.minutes }
         let(:timeout_job_id) { nil }
 
         context 'timeout_job_id is nil' do
@@ -121,7 +121,7 @@ RSpec.describe UserSession, type: :model do
           let(:timeout_job_id) { 'test_timeout_job' }
 
           it 'triggers #cancel on UserSessionTimeoutJob with timeout_job_id' do
-            expect(UserSessionTimeoutJob).to receive(:cancel).with(timeout_job_id)
+            expect(UserSessionTimeoutJob).to receive(:cancel_by).with({ provider_job_id: timeout_job_id })
             user_session.on_answer
           end
         end
@@ -137,7 +137,7 @@ RSpec.describe UserSession, type: :model do
         end
 
         context 'when delay is not default' do
-          let(:expected_timestamp) { Time.current + 72.hours }
+          let(:expected_timestamp) { Time.current + 72.minutes }
 
           before do
             user_session.session.update!(autofinish_delay: 72)
