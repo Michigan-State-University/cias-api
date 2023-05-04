@@ -23,6 +23,7 @@ require 'active_storage_validations/matchers'
 require 'rake'
 require 'rspec-benchmark'
 require 'benchmark/ips'
+require 'webmock/rspec'
 
 class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   def audio_content
@@ -231,6 +232,15 @@ RSpec.configure do |config|
             }
           ]
         }
+      }
+    )
+
+    allow_any_instance_of(Api::EpicOnFhir::Authentication).to receive(:call).and_return(
+      {
+        access_token: 'example_access_token',
+        token_type: 'Bearer',
+        expires_in: '3600',
+        scope: 'system/Patient.read'
       }
     )
   end

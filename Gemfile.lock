@@ -137,6 +137,8 @@ GEM
       i18n_data (~> 0.11.0)
       sixarm_ruby_unaccent (~> 1.1)
       unicode_utils (~> 1.4)
+    crack (0.4.5)
+      rexml
     crass (1.0.6)
     database_cleaner-active_record (2.0.1)
       activerecord (>= 5.a)
@@ -308,6 +310,7 @@ GEM
       guard (~> 2.1)
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
+    hashdiff (1.0.1)
     hiredis (0.6.3)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
@@ -583,6 +586,10 @@ GEM
     uniform_notifier (1.14.2)
     warden (1.2.9)
       rack (>= 2.0.9)
+    webmock (3.18.1)
+      addressable (>= 2.8.0)
+      crack (>= 0.3.2)
+      hashdiff (>= 0.4.0, < 2.0.0)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -678,6 +685,7 @@ DEPENDENCIES
   test-prof
   timecop
   twilio-ruby (~> 5.45.0)
+  webmock
   wicked_pdf
   wkhtmltopdf-binary
   wkhtmltopdf-heroku (= 2.12.6.0)
