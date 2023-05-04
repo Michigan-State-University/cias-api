@@ -51,6 +51,18 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       end
     end
 
+    context 'when intervention has access for only invitated participants' do
+      let!(:intervention) { create(:flexible_order_intervention, status: intervention_status, user_id: user.id, shared_to: 'invited') }
+
+      before do
+        request
+      end
+
+      it 'invited emails should be on the list with granted access to intervention' do
+        expect(intervention.reload.intervention_accesses.map(&:email)).to match_array([invitation_email, participant.email])
+      end
+    end
+
     context 'when it is a non-module intervention' do
       let!(:intervention) { create(:intervention, user: user, status: 'published') }
 
