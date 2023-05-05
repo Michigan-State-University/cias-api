@@ -348,6 +348,15 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         it 'returns next question' do
           expect(json_response['data']['id']).to eq questions[1].id
         end
+
+        context 'with flexible order' do
+          let!(:intervention) { create(:flexible_order_intervention, user_id: researcher.id, status: status) }
+          let(:questions) { create_list(:question_single, 1, question_group: question_group) }
+
+          it 'returns next question' do
+            expect(json_response['data']['attributes']['type']).to eq 'Question::Finish'
+          end
+        end
       end
     end
 
