@@ -147,6 +147,7 @@ Metrics/ClassLength:
     - 'app/models/concerns/clone/session.rb'
     - 'app/models/question.rb'
     - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
+    - 'app/models/intervention.rb'
 
 Performance/AncestorsInclude:
   Enabled: true
