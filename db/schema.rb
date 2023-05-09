@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_03_16_111351) do
+ActiveRecord::Schema.define(version: 2023_04_25_075305) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -498,6 +498,7 @@ ActiveRecord::Schema.define(version: 2023_03_16_111351) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "phone_ciphertext"
+    t.string "attachment_url"
   end
 
   create_table "navigator_invitations", force: :cascade do |t|
@@ -705,6 +706,8 @@ ActiveRecord::Schema.define(version: 2023_03_16_111351) do
     t.integer "estimated_time"
     t.integer "current_narrator", default: 0
     t.boolean "multiple_fill", default: false, null: false
+    t.boolean "autofinish_enabled", default: true, null: false
+    t.integer "autofinish_delay", default: 24, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -786,6 +789,16 @@ ActiveRecord::Schema.define(version: 2023_03_16_111351) do
     t.datetime "updated_at", precision: 6, null: false
     t.index ["cat_mh_test_type_id"], name: "index_tests_on_cat_mh_test_type_id"
     t.index ["session_id"], name: "index_tests_on_session_id"
+  end
+
+  create_table "time_ranges", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.integer "from", null: false
+    t.integer "to", null: false
+    t.integer "position", default: 0, null: false
+    t.string "label", null: false
+    t.boolean "default", default: false, null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
