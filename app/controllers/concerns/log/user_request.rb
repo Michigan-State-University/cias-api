@@ -54,8 +54,8 @@ module Log::UserRequest
     params[:session_invitation]&.delete(:emails)
     params[:invitation]&.delete(:email)
     params.delete(:current_password)
-    params[:sms_plan]&.delete(:no_formula_image)
-    params[:variant]&.delete(:image)
+    params[:sms_plan]&.delete(:no_formula_attachment)
+    params[:variant]&.delete(:attachment)
   end
   # rubocop:enable all
 end

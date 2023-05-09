@@ -106,10 +106,10 @@ Rails.application.routes.draw do
 
     scope module: 'sms_plans' do
       scope 'sms_plans/:sms_plan_id', as: :sms_plan do
-        delete 'no_formula_image', to: 'no_formula_images#delete'
+        delete 'no_formula_attachment', to: 'no_formula_attachments#delete'
         resources :variants do
           member do
-            delete 'image', to: 'variants/images#delete'
+            delete 'attachment', to: 'variants/attachments#delete'
           end
         end
         patch 'move_variants', to: 'variants#move'

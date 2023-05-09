@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/no_formula_image', type: :request do
-  let(:request) { delete v1_sms_plan_no_formula_image_path(sms_plan_id), headers: headers }
+RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/no_formula_attachment', type: :request do
+  let(:request) { delete v1_sms_plan_no_formula_attachment_path(sms_plan_id), headers: headers }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
   let(:session) { create(:session, intervention: intervention) }
-  let!(:sms_plan) { create(:sms_plan, :with_no_formula_image, session: session) }
+  let!(:sms_plan) { create(:sms_plan, :with_no_formula_attachment, session: session) }
   let(:sms_plan_id) { sms_plan.id }
 
   context 'when everything was processed correctly' do
@@ -20,7 +20,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/no_formula_image', type: :requ
 
     it 'purge image' do
       request
-      expect(sms_plan.reload.no_formula_image.attached?).to be(false)
+      expect(sms_plan.reload.no_formula_attachment.attached?).to be(false)
     end
   end
 

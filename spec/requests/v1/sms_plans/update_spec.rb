@@ -70,7 +70,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
         let(:params) do
           {
             sms_plan: {
-              no_formula_image: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+              no_formula_attachment: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
             }
           }
         end
@@ -82,7 +82,12 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
 
         it 'attach image to the sms_plan' do
           request
-          expect(sms_plan.no_formula_image.present?).to be(true)
+          expect(sms_plan.no_formula_attachment.attached?).to be(true)
+        end
+
+        it 'returned data have correct format' do
+          request
+          expect(json_response['data']['attributes']['no_formula_attachment'].keys).to match_array(%w[id name url created_at])
         end
       end
     end

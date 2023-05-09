@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id/image', type: :request do
-  let(:request) { delete image_v1_sms_plan_variant_path(sms_plan_id: sms_plan_id, id: variant_id), headers: headers }
+RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id/attachment', type: :request do
+  let(:request) { delete attachment_v1_sms_plan_variant_path(sms_plan_id: sms_plan_id, id: variant_id), headers: headers }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
@@ -11,7 +11,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id/image', type: :re
   let(:session) { create(:session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let(:sms_plan_id) { sms_plan.id }
-  let!(:variant) { create(:sms_plan_variant, :with_image, sms_plan: sms_plan) }
+  let!(:variant) { create(:sms_plan_variant, :with_attachment, sms_plan: sms_plan) }
   let!(:variant_id) { variant.id }
 
   context 'when everything was processed correctly' do
@@ -22,7 +22,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id/image', type: :re
 
     it 'purge image' do
       request
-      expect(variant.reload.image.attached?).to be(false)
+      expect(variant.reload.attachment.attached?).to be(false)
     end
   end
 

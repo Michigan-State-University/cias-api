@@ -39,13 +39,13 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
           end
 
           context 'when sms plan has an attached image' do
-            let!(:sms_plan) { create(:sms_plan, :with_no_formula_image, session: session, no_formula_text: 'test') }
+            let!(:sms_plan) { create(:sms_plan, :with_no_formula_attachment, session: session, no_formula_text: 'test') }
 
             it 'send sms immediately after session end of America/New_York timezone' do
               subject
 
               expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(
-                phone.prefix + phone.number, 'test', url_for(sms_plan.no_formula_image), user.id
+                phone.prefix + phone.number, 'test', url_for(sms_plan.no_formula_attachment), user.id
               )
             end
           end
@@ -480,14 +480,14 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
       context 'with attached image to the variant' do
         let!(:variant1) do
-          create(:sms_plan_variant, :with_image, sms_plan: sms_plan, formula_match: '=2',
-                                                 content: "variant 1 content, value: .:var1:., prev_value: .:#{session2.variable}.number:.")
+          create(:sms_plan_variant, :with_attachment, sms_plan: sms_plan, formula_match: '=2',
+                                                      content: "variant 1 content, value: .:var1:., prev_value: .:#{session2.variable}.number:.")
         end
 
         it 'send sms with content of first variant' do
           subject
           expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
-            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', url_for(variant1.image), user.id
+            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', url_for(variant1.attachment), user.id
           )
         end
       end

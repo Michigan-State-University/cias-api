@@ -7,8 +7,8 @@ FactoryBot.define do
     schedule { SmsPlan.schedules[:after_session_end] }
     frequency { SmsPlan.frequencies[:once] }
 
-    trait :with_no_formula_image do
-      no_formula_image { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
+    trait :with_no_formula_attachment do
+      no_formula_attachment { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
     end
   end
 

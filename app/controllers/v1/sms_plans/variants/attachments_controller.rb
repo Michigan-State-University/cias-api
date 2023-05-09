@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-class V1::SmsPlans::Variants::ImagesController < V1Controller
+class V1::SmsPlans::Variants::AttachmentsController < V1Controller
   def delete
     authorize! :update, variant
 
     return render status: :method_not_allowed if intervention_published?
 
-    variant.image.purge_later
+    variant.attachment.purge_later
     invalidate_cache(variant)
     head :no_content
   end

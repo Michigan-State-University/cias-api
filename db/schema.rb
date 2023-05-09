@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_04_19_100020) do
+ActiveRecord::Schema.define(version: 2023_04_25_075305) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -477,7 +477,7 @@ ActiveRecord::Schema.define(version: 2023_04_19_100020) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "phone_ciphertext"
-    t.string "image_url"
+    t.string "attachment_url"
   end
 
   create_table "navigator_invitations", force: :cascade do |t|

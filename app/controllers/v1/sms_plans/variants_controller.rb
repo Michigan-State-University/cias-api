@@ -63,6 +63,6 @@ class V1::SmsPlans::VariantsController < V1Controller
   end
 
   def variant_params
-    params.require(:variant).permit(:formula_match, :content, :image)
+    params.require(:variant).permit(:formula_match, :content, :attachment)
   end
 end

@@ -53,22 +53,22 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     content = sms_content(plan)
     return if content.blank?
 
-    image_url = image_url(plan)
+    attachment_url = attachment_url(plan)
     content = insert_variables_into_variant(content)
     finish_date = plan.end_at
 
     if plan.alert?
       content = prepend_alert_content(content, plan)
-      plan.phones.each { |phone| send_alert(start_time, content, phone, image_url) }
+      plan.phones.each { |phone| send_alert(start_time, content, phone, attachment_url) }
       return
     end
 
     if frequency == SmsPlan.frequencies[:once]
-      send_sms(start_time, content, image_url)
+      send_sms(start_time, content, attachment_url)
     else
       date = start_time
       while date.to_date <= finish_date.to_date
-        send_sms(date.change(random_time).utc, content, image_url)
+        send_sms(date.change(random_time).utc, content, attachment_url)
         date = date.next_day(number_days[frequency])
       end
     end
@@ -95,13 +95,13 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     plan.is_used_formula ? matched_variant(plan)&.content : plan.no_formula_text
   end
 
-  def image_url(plan)
-    image = if plan.is_used_formula
-              matched_variant(plan).image
-            else
-              plan.no_formula_image
-            end
-    url_for(image) if image.attached?
+  def attachment_url(plan)
+    attachment = if plan.is_used_formula
+                   matched_variant(plan).attachment
+                 else
+                   plan.no_formula_attachment
+                 end
+    url_for(attachment) if attachment.attached?
   end
 
   def matched_variant(plan)
@@ -144,12 +144,12 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     }
   end
 
-  def send_sms(start_time, content, image_url = nil)
-    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(user.phone.full_number, content, image_url, user.id)
+  def send_sms(start_time, content, attachment_url = nil)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(user.phone.full_number, content, attachment_url, user.id)
   end
 
-  def send_alert(start_time, content, phone, image_url = nil)
-    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, image_url, phone.user&.id, true)
+  def send_alert(start_time, content, phone, attachment_url = nil)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, attachment_url, phone.user&.id, true)
   end
 
   def user_email(user)

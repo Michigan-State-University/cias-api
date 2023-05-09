@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class V1::SmsPlans::NoFormulaImagesController < V1Controller
+class V1::SmsPlans::NoFormulaAttachmentsController < V1Controller
   def delete
     authorize! :update, sms_plan
     return render status: :method_not_allowed if intervention_published?
 
-    sms_plan.no_formula_image.purge_later
+    sms_plan.no_formula_attachment.purge_later
     invalidate_cache(sms_plan)
     head :no_content
   end

@@ -11,12 +11,12 @@ class Communication::Sms
   end
 
   def send_message
-    if sms.image_url.present?
+    if sms.attachment_url.present?
       client.messages.create(
         from: ENV['TWILIO_FROM'],
         to: sms.phone,
         body: sms.body,
-        media_url: [sms.image_url]
+        media_url: [sms.attachment_url]
       )
     else
       client.messages.create(

@@ -78,7 +78,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
         let(:params) do
           {
             variant: {
-              image: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+              attachment: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
             }
           }
         end
@@ -90,7 +90,12 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
 
         it 'attach image to the variant' do
           request
-          expect(variant.reload.image.attached?).to be(true)
+          expect(variant.reload.attachment.attached?).to be(true)
+        end
+
+        it 'returned data have correct format' do
+          request
+          expect(json_response['data']['attributes']['attachment'].keys).to match_array(%w[id name url created_at])
         end
       end
     end

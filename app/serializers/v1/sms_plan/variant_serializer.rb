@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class V1::SmsPlan::VariantSerializer < V1Serializer
+  include FileHelper
+
   attributes :formula_match, :content, :original_text, :position
 
-  attribute :image_url do |object|
-    url_for(object.image) if object.image.attached?
+  attribute :attachment do |object|
+    map_file_data(object.attachment) if object.attachment.attached?
   end
 end
