@@ -12,6 +12,8 @@ en:
       subtitle: '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>'
       text_to_speech: 'Enter main text for screen here. This is the last screen participants will see in this session'
       title: '<h2>Enter title here</h2>'
+    error:
+      published_intervention: 'Cannot update question in the published intervention'
   question_group:
     finish:
       title: Finish Group
@@ -102,6 +104,7 @@ en:
   user_sessions:
     errors:
       previous_question: 'Previous question is unavailable for this type of session'
+      scheduled_session: 'You cannot fill scheduled session before the set time'
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."

@@ -40,6 +40,14 @@ RSpec.describe 'POST /v1/sessions/:session_id/invitations', type: :request do
         expect(participant.reload.quick_exit_enabled).to be true
         expect(User.find_by(email: invitation_email).reload.quick_exit_enabled).to be true
       end
+
+      context 'when session has access for only invitated participants' do
+        let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true, shared_to: 'invited') }
+
+        it 'invited emails should be on the list with granted access to intervention' do
+          expect(intervention.reload.intervention_accesses.map(&:email)).to match_array([invitation_email, participant.email])
+        end
+      end
     end
 
     context 'UserIntervention' do
