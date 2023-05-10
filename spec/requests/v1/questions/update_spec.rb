@@ -12,7 +12,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       'admin_with_multiple_roles' => admin_with_multiple_roles
     }
   end
-  let(:question_group) { create(:question_group) }
+  let(:session) { create(:session) }
+  let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_slider, question_group: question_group) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -79,6 +80,15 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
           it 'key question' do
             expect(json_response['data']['type']).to eq('question')
           end
+        end
+      end
+
+      context 'when intervention is published' do
+        let(:session) { create(:session, intervention: create(:intervention, :published)) }
+
+        it 'return correct status' do
+          request
+          expect(response).to have_http_status(:unprocessable_entity)
         end
       end
     end

@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-
-
 namespace :cat_mh do
-  desc 'Set up CAT-MH resources in the database'
+  desc 'Set up CAT-MH attachments in the database'
 
   def set_up_time_frames
     timeframe_details = [

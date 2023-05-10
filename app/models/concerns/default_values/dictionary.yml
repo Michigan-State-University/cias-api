@@ -18,6 +18,7 @@ question:
     title: true
     subtitle: true
     narrator_skippable: false
+    start_autofinish_timer: false
   narrator:
     settings:
       voice: true

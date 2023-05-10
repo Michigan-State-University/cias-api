@@ -82,7 +82,7 @@ RSpec.describe UserSession, type: :model do
 
       context 'user session on answer' do
         let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id) }
-        let(:expected_timestamp) { Time.current + 1.day }
+        let(:expected_timestamp) { Time.current + 24.minutes }
         let(:timeout_job_id) { nil }
 
         context 'timeout_job_id is nil' do
@@ -98,12 +98,55 @@ RSpec.describe UserSession, type: :model do
           end
         end
 
+        context 'when session contains question which run timeout' do
+          let(:question_group) { create(:question_group, session: user_session.session) }
+          let!(:question) { create(:question_single, :start_autofinish_timer_on, question_group: question_group) }
+
+          context 'when answer does\'t exist for question which trigger timeout' do
+            it 'doesn\'t schedule session timeout' do
+              expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+            end
+          end
+
+          context 'when answer exists for question which trigger timeout' do
+            let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+
+            it 'schedule session timeout' do
+              expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
+            end
+          end
+        end
+
         context 'when timeout_job_id is set' do
           let(:timeout_job_id) { 'test_timeout_job' }
 
           it 'triggers #cancel on UserSessionTimeoutJob with timeout_job_id' do
-            expect(UserSessionTimeoutJob).to receive(:cancel).with(timeout_job_id)
+            expect(UserSessionTimeoutJob).to receive(:cancel_by).with({ provider_job_id: timeout_job_id })
             user_session.on_answer
+          end
+        end
+
+        context 'when timeout is disable' do
+          before do
+            user_session.session.update!(autofinish_enabled: false)
+          end
+
+          it 'doesn\'t schedule session timeout' do
+            expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+          end
+        end
+
+        context 'when delay is not default' do
+          let(:expected_timestamp) { Time.current + 72.minutes }
+
+          before do
+            user_session.session.update!(autofinish_delay: 72)
+          end
+
+          it 'schedules session timeout correctly' do
+            expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
+                                                   .with(user_session.id)
+                                                   .at(a_value_within(1.second).of(expected_timestamp))
           end
         end
       end
