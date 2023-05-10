@@ -12,4 +12,8 @@ class V1::QuestionSerializer < V1Serializer
   end
 
   attribute :first_question, &:first_question?
+
+  attribute :time_ranges, if: proc { |record| record.is_a?(Question::Phone) } do |_object|
+    TimeRange.all.order(:position).map { |time_range| { from: time_range.from, to: time_range.to, label: time_range.label } }
+  end
 end
