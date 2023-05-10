@@ -169,6 +169,32 @@ describe User, type: :model do
     let(:user) { build_stubbed(:user, :guest) }
 
     include_examples 'without team admin validations'
+
+    context 'after create don\'t send a welcome email' do
+      it {
+        expect do
+          described_class.new.tap do |u|
+            u.roles = %w[guest]
+            u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@guest.true"
+            u.skip_confirmation!
+            u.save(validate: false)
+          end
+        end.not_to change { ActionMailer::Base.deliveries.size }
+      }
+    end
+  end
+
+  context 'user has role review session' do
+    it 'after create don\'t send a welcome email' do
+      expect do
+        described_class.new.tap do |u|
+          u.roles = %w[guest]
+          u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@preview.session"
+          u.skip_confirmation!
+          u.save(validate: false)
+        end
+      end.not_to change { ActionMailer::Base.deliveries.size }
+    end
   end
 
   context 'user has role admin' do

@@ -100,7 +100,6 @@ group :test do
   gem 'action-cable-testing', '~> 0.6.1'
   gem 'rspec-benchmark'
   gem 'benchmark-ips'
-  gem 'webmock'
 end
 
 group :production do

@@ -39,7 +39,7 @@ class UserSession < ApplicationRecord
     if user_intervention_finished?
       user_intervention.status = 'completed'
       user_intervention.finished_at = DateTime.current
-    else
+    elsif user_intervention.ready_to_start?
       user_intervention.status = 'in_progress'
     end
 
@@ -53,7 +53,7 @@ class UserSession < ApplicationRecord
   private
 
   def user_intervention_finished?
-    return session.last_session? unless user_intervention.intervention.module_intervention?
+    return session.last_session? && finished_at.present? unless user_intervention.intervention.module_intervention?
 
     user_intervention.completed_sessions == user_intervention.sessions.size
   end

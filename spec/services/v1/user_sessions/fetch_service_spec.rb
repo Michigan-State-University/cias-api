@@ -34,4 +34,14 @@ RSpec.describe V1::UserSessions::FetchService do
       expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  context 'when user wants to fetch scheduled session' do
+    before do
+      UserSession.create(session_id: session_id, user_intervention_id: user_intervention.id, user: user, scheduled_at: 10.days.from_now)
+    end
+
+    it 'return exception' do
+      expect { subject }.to raise_error(CanCan::AccessDenied)
+    end
+  end
 end
