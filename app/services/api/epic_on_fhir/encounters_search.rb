@@ -26,7 +26,6 @@ class Api::EpicOnFhir::EncountersSearch
   private
 
   def authentication
-    #todo: do refactor
     @authentication ||= Api::EpicOnFhir::Authentication.call
   end
 end

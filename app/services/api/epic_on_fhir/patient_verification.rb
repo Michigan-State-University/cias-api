@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
-class Api::EpicOnFhir::PatientVerification
-  ENDPOINT = 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4/Patient/$match?_format=json'
+class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
+  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}?_format=json"
 
   def self.call(first_name, last_name, birth_date, phone_number, postal_code)
     new(first_name, last_name, birth_date, phone_number, postal_code).call
   end
 
   def initialize(first_name, last_name, birth_date, phone_number, postal_code)
+    super()
     @first_name = first_name
     @last_name = last_name
     @birth_date = birth_date
@@ -22,7 +23,13 @@ class Api::EpicOnFhir::PatientVerification
       request.body = body
     end
 
-    JSON.parse(response.body).deep_symbolize_keys
+    raise EpicOnFhir::UnexpectedError, I18n.t('epic_on_fhir.error.unexpected_error') if response.status != 200
+
+    parsed_response = JSON.parse(response.body).deep_symbolize_keys
+
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.not_found') if parsed_response[:total] != 1
+
+    parsed_response
   end
 
   attr_reader :first_name, :last_name, :birth_date, :phone_number, :postal_code
@@ -64,15 +71,5 @@ class Api::EpicOnFhir::PatientVerification
         }
       ]
     }.to_json
-  end
-
-  # def date_of_birth_in_correct_format
-  #   # YYYY-MM-DD -> https://www.hl7.org/fhir/datatypes.html#date
-  #   birth_date.strftime('%Y-%m-%d')
-  # end
-
-  def authentication
-    # todo: add error handling
-    @authentication ||= Api::EpicOnFhir::Authentication.call
   end
 end

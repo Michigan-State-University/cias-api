@@ -316,3 +316,8 @@ en:
     intervention_conversation_transcripts_ready:
       subject: "Your transcripts are ready"
       body: "Your conversation transcripts from intervention <span style='color:#C866EA;'>%{intervention_name}</span> are ready."
+  epic_on_fhir:
+    error:
+      authentication: "Authorization process failed. Please contact our support team so that we can assist you in resolving this matter"
+      unexpected_error: "Third party tool return unexpected response. Please contact our support team"
+      not_found: "We could not clearly identify you in out third party tool. Please contact our support team"
