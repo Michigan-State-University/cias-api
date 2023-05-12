@@ -14,8 +14,8 @@ class V1::HenryFord::VerifyService
 
   def call
     @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, zip_code)
-    appointements = Api::EpicOnFhir::Appointments.call(patient_id)
-    # todo: define way to get one needed visit_id from collection of appointments
+    Api::EpicOnFhir::Appointments.call(patient_id)
+    # TODO: define way to get one needed visit_id from collection of appointments
   end
 
   private
