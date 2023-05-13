@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_04_25_075305) do
+ActiveRecord::Schema.define(version: 2023_05_12_083506) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -351,26 +351,6 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
     t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
     t.index ["name", "organization_id"], name: "index_health_systems_on_name_and_organization_id", unique: true
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
-  end
-
-  create_table "hfhs_patient_details", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.string "patient_id_ciphertext"
-    t.string "first_name_ciphertext", null: false
-    t.string "last_name_ciphertext", null: false
-    t.string "dob_ciphertext", null: false
-    t.string "sex_ciphertext", null: false
-    t.string "visit_id_ciphertext", default: ""
-    t.string "zip_code_ciphertext", default: "", null: false
-    t.string "patient_id_bidx"
-    t.string "first_name_bidx"
-    t.string "last_name_bidx"
-    t.string "dob_bidx"
-    t.string "sex_bidx"
-    t.string "zip_code_bidx"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
-    t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end
 
   create_table "intervention_accesses", force: :cascade do |t|
@@ -921,10 +901,8 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
     t.datetime "terms_confirmed_at"
     t.boolean "quick_exit_enabled", default: false, null: false
     t.boolean "online", default: false, null: false
-    t.uuid "hfhs_patient_detail_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
-    t.index ["hfhs_patient_detail_id"], name: "index_users_on_hfhs_patient_detail_id"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invitations_count"], name: "index_users_on_invitations_count"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
@@ -996,5 +974,4 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "user_interventions"
   add_foreign_key "user_sessions", "users"
-  add_foreign_key "users", "hfhs_patient_details"
 end

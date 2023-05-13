@@ -61,7 +61,6 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
-gem 'doorkeeper'
 
 group :development, :test do
   gem 'bundler-audit'

@@ -44,7 +44,7 @@ class Api::Hfhs::UserSession
   end
 
   def patient_id
-    user_session.user.hfhs_patient_detail.patient_id
+    # TODO: get patient_id from EPIC on FHIR
   end
 
   def hl7_data

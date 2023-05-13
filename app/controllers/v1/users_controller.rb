@@ -69,10 +69,7 @@ class V1::UsersController < V1Controller
   private
 
   def me_response
-    V1::UserSerializer.new(
-      current_v1_user,
-      { include: %i[hfhs_patient_detail] }
-    )
+    V1::UserSerializer.new(current_v1_user)
   end
 
   def users_scope

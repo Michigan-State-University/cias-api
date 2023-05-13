@@ -51,6 +51,6 @@ class Api::Hfhs::Reports
   end
 
   def patient_id
-    user_session.user.hfhs_patient_detail.patient_id
+    # TODO: get patient_id from API
   end
 end
