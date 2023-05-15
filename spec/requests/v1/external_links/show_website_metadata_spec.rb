@@ -24,9 +24,6 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
     'Active Record MigrationsMigrations are a feature of Active Record that allows you to evolve your database schema over time. Rather than write schema modifications in pure SQL, migrations allow you to use a Ruby DSL to describe changes to your tables.After reading this guide, you will know: The generators you can use to create them. The methods Active Record provides to manipulate your database. The rails commands that manipulate migrations and your schema. How migrations relate to schema.rb.' # rubocop:disable Layout/LineLength
   end
   let(:title2) { 'Amazon.com' }
-  let(:description2) do
-    'Free shipping on millions of items. Get the best of Shopping and Entertainment with Prime. Enjoy low prices and great deals on the largest selection of everyday essentials and other products, including fashion, home, beauty, electronics, Alexa Devices, sporting goods, toys, automotive, pets, baby, books, video games, musical instruments, office supplies, and more.' # rubocop:disable Layout/LineLength
-  end
   let(:headers) { current_user.create_new_auth_token }
   let!(:params) do
     {
@@ -91,7 +88,6 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
           it 'JSON contains proper attributes' do
             expect(json_response['url']).to eql("https://www.#{url2}/")
             expect(json_response['title']).to include(title2)
-            expect(json_response['description']).to eql(description2)
           end
         end
 

@@ -1,7 +1,3 @@
-## cias-api
-
-## METADATA
-
 Copyright (C) 2023 Michigan State University
 
 This package is part of CIAS 3.0.
@@ -14,6 +10,43 @@ of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Publ
 
 You should have received a copy of the GNU General Public License along with CIAS 3.0. If not,
 see <https://www.gnu.org/licenses/gpl-3.0.html>.
+
+# [CIAS 3.0](https://www.cias.app/)
+
+### Digital Behavioral Health Interventions Made Easy
+
+CIAS stands for Computerized Intervention Authoring System. CIAS gives you the ability to create and manage
+multi-session interventions without writing a single line of code. With this robust platform, you can develop and
+deliver interventions, collect data, and collaborate with colleagues all in one place.
+
+### User-Friendly Features
+
+The CIAS platform has a variety of features to support a broad range of interventions and approaches, including:
+
+- Variety of **question types** to choose from
+- An **animated narrator** to act as a guide
+- Automatic **translation** into over 100 languages
+- **Tailored reports** for participants and clinicians
+- Custom **SMS messaging**
+- **Branching** and **Randomization**
+- **Scheduled** session sending
+- Custom **charts** for data visualisation
+- Timeline Followback Method Assessment (**TLFB**)
+- **Live chat** for participants
+- Integrations with 3rd party systems:
+  - **CAT-MH<sup>TM</sup>**
+  - **Henry Ford Hospital** by Epic on FIHR
+
+For more information about CIAS 3.0 features please see https://www.cias.app/resources.
+
+### Full Version Available for Free*
+
+Our goal is for cost to never be a barrier. All features are available for non-commercial use by researchers at
+universities or non-profit research institutions
+
+*A small annual fee will be requested for funded projects.
+
+### For more information, or to request access please see https://www.cias.app/ or contact [CIAS@msu.edu](cias@msu.edu)
 
 ## DEVELOPMENT
 
@@ -45,13 +78,33 @@ see <https://www.gnu.org/licenses/gpl-3.0.html>.
 - Set database environment variables:
   - `CIAS_DATABASE_USER` with login of database user
   - `CIAS_DATABASE_PASSWORD` with password of database user
-- Set environment variables from `.env.template` file with values from heroku.
+  - `DATABASE_URL` with url to the specific database
+- Set environment variables from `.env.template` file with correct values.
 
-### HELPERS
+### HELPERS (development environment)
 
-- `localhost:3000/rails/browse_emails`
-- `localhost:3000/rails/info/routes`
-- `localhost:3000/good_job - if GOOD_JOB_WEB_INTERFACE=1`
+- Interface for browsing sent emails:  `localhost:3000/rails/browse_emails`
+- All available paths: `localhost:3000/rails/info/routes`
+- Web UI for sidekiq: `localhost:3000/rails/workers`
+- to reset database run `./db_reset.sh` in the console
+
+
+### File structure 
+
+#### /app
+It organizes this application components. It's got subdirectories that hold the channels, exceptions, controllers, finders, jobs, mailers, models, queries, serializers, services and views.
+
+#### /config
+This directory contains configuration code that this application need, among other things, database configuration, Rails environment structure, and routing of incoming web requests (routes.rb).
+
+#### /db
+This application has model objects that access relational database tables. You can manage the relational database with scripts you create and place in this directory.
+
+#### /spec
+This is a place in this app when you can find all automatic tests. Here, too, there is a division into directories depending on what is being tested. Tests for services you can find in `spec/services`, for controllers in `spec/requests` and soo on. 
+
+#### /lib/tasks
+This is the place when you can find all our custom rake tasks. If you want to see all list run in the console `rake -T`.
 
 ### COMMON ISSUES
 
