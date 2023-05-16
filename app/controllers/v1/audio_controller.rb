@@ -15,6 +15,12 @@ class V1::AudioController < V1Controller
     render status: :ok
   end
 
+  def regenerate
+    V1::Audio::Regenerate.call(question_id, block_index, audio_index,reflection_index,
+                               current_language_code, current_voice_type)
+  end
+
+
   private
 
   def current_language_code
@@ -33,6 +39,10 @@ class V1::AudioController < V1Controller
     params.require(:audio).permit(:text, :user_session_id, :google_tts_voice_id)
   end
 
+  def regenerate_audio_params
+    params.require(:audio).permit(:question_id, :user_session_id, :block_index, :reflection_index, :audio_index)
+  end
+
   def text
     audio_params[:text]
   end
@@ -43,5 +53,17 @@ class V1::AudioController < V1Controller
 
   def google_tts_voice_id
     audio_params[:google_tts_voice_id]
+  end
+
+  def block_index
+    regenerate_audio_params[:block_index]
+  end
+
+  def reflection_index
+    regenerate_audio_params[:reflection_index]
+  end
+
+  def audio_index
+    regenerate_audio_params[:audio_index]
   end
 end
