@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'webmock/rspec'
 
 describe Api::EpicOnFhir::PatientVerification do
+  include WebMock::API
+  WebMock.enable!
+
   subject { described_class.call(first_name, last_name, birth_date, phone_number, postal_code) }
 
   let(:first_name) { 'Camila' }

@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/show_website_metadata', type: :request do
+  WebMock.disable!
+
   let!(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let!(:researcher) { create(:user, :confirmed, :researcher) }
   let!(:participant) { create(:user, :confirmed, :participant) }

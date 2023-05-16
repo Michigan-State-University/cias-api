@@ -23,7 +23,6 @@ require 'active_storage_validations/matchers'
 require 'rake'
 require 'rspec-benchmark'
 require 'benchmark/ips'
-require 'webmock/rspec'
 
 class Google::Cloud::TextToSpeech::V1::SynthesizeSpeechResponse::Fake
   def audio_content
