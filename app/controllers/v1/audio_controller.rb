@@ -16,10 +16,9 @@ class V1::AudioController < V1Controller
   end
 
   def regenerate
-    V1::Audio::Regenerate.call(question_id, block_index, audio_index,reflection_index,
+    V1::Audio::Regenerate.call(question_id, block_index, audio_index, reflection_index,
                                current_language_code, current_voice_type)
   end
-
 
   private
 
