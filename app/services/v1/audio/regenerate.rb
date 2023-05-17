@@ -39,7 +39,7 @@ class V1::Audio::Regenerate
   end
 
   def text
-    correct_block['text'][audio_index]&.tr(',!.', '').strip.downcase
+    correct_block['text'][audio_index].tr(',!.', '').strip.downcase
   end
 
   def digest
