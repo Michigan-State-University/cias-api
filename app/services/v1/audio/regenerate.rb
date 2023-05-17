@@ -33,13 +33,13 @@ class V1::Audio::Regenerate
   end
 
   def correct_block
-    return block['reflections']['reflection_index'] if reflection_index
+    return block['reflections'][reflection_index] if reflection_index
 
     block
   end
 
   def text
-    correct_block['text'][audio_index].tr(',!.', '').strip.downcase
+    correct_block['text'][audio_index]&.tr(',!.', '').strip.downcase
   end
 
   def digest
@@ -47,7 +47,7 @@ class V1::Audio::Regenerate
   end
 
   def swap_url_to_block(block, url)
-    block['reflections']['reflection_index']['audio_urls'][audio_index] = url if reflection_index
+    block['reflections'][reflection_index]['audio_urls'][audio_index] = url if reflection_index
     block['audio_urls'][audio_index] = url unless reflection_index
     block
   end
