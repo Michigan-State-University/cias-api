@@ -112,7 +112,6 @@ GEM
       argon2-kdf (>= 0.1.1)
     bootsnap (1.7.5)
       msgpack (~> 1.0)
-    brakeman (5.0.4)
     builder (3.2.4)
     bullet (6.1.4)
       activesupport (>= 3.0.0)
@@ -607,7 +606,6 @@ DEPENDENCIES
   benchmark-ips
   blind_index
   bootsnap (>= 1.4)
-  brakeman (~> 5.0.2)
   bullet
   bump
   bundler-audit

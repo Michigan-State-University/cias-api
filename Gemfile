@@ -64,7 +64,6 @@ gem 'sentry-rails', '~> 5.7'
 
 group :development, :test do
   gem 'bundler-audit'
-  gem 'brakeman', '~> 5.0.2', require: false
   gem 'bullet'
   gem 'dotenv-rails'
   gem 'fasterer', require: false
