@@ -2,6 +2,7 @@
 
 RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   include ActiveJob::TestHelper
+  include Rails.application.routes.url_helpers
   subject { described_class.call(user_session) }
 
   let(:intervention) { create(:intervention, :published) }
@@ -14,6 +15,8 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   let(:user_session) { create(:user_session, session: session, user: user, user_intervention: user_intervention) }
   let(:user_session2) { create(:user_session, session: session2, user: user, user_intervention: user_intervention) }
   let(:current_time) { Time.zone.parse('2021-07-20 20:02') }
+
+  let_it_be(:time_range) { create(:time_range) }
 
   before do
     ActiveJob::Base.queue_adapter = :test
@@ -31,8 +34,20 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
             subject
 
             expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(
-              phone.prefix + phone.number, 'test', user.id
+              phone.prefix + phone.number, 'test', nil, user.id
             )
+          end
+
+          context 'when sms plan has an attached image' do
+            let!(:sms_plan) { create(:sms_plan, :with_no_formula_attachment, session: session, no_formula_text: 'test') }
+
+            it 'send sms immediately after session end of America/New_York timezone' do
+              subject
+
+              expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(
+                phone.prefix + phone.number, 'test', url_for(sms_plan.no_formula_attachment), user.id
+              )
+            end
           end
         end
       end
@@ -47,27 +62,96 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         end
 
         context 'for Europe/Warsaw timezone' do
-          let!(:expected_start_time) do
-            Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 13 }).utc }
+          let(:start_of_time_range) do
+            Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 12 }).to_i }
+          end
+          let(:end_of_time_range) do
+            Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 17 }).to_i }
           end
 
-          it 'send sms for 5 days at 13 after the session ends' do
+          it 'send sms for 5 days between 12 and 17 after the session ends' do
             subject
+            scheduled_at = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:at]
 
-            expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time)
+            expect(SmsPlans::SendSmsJob).to have_been_enqueued
+            expect(scheduled_at).to be_between(start_of_time_range, end_of_time_range)
+          end
+
+          context 'when the user selects a different time zone than indicated by the phone number' do
+            let!(:phone_answer) do
+              create(:answer_phone, user_session: user_session,
+                                    body: {
+                                      'data' => [
+                                        {
+                                          'var' => 'phone',
+                                          'value' => { 'iso' => 'PL', 'number' => '123123123', 'prefix' => '+48', 'confirmed' => true,
+                                                       'time_ranges' => [{ 'from' => '9', 'to' => '13' }], 'time_zone' => 'Asia/Baku' }
+                                        }
+                                      ]
+                                    })
+            end
+
+            let(:start_of_time_range) do
+              Time.use_zone('Asia/Baku') { Time.current.next_day(5).change({ hour: 9 }).to_i }
+            end
+            let(:end_of_time_range) do
+              Time.use_zone('Asia/Baku') { Time.current.next_day(5).change({ hour: 13 }).to_i }
+            end
+
+            it 'send sms for 5 days between 9 and 13 after the session ends' do
+              clear_enqueued_jobs
+              subject
+              scheduled_at = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:at]
+
+              expect(SmsPlans::SendSmsJob).to have_been_enqueued
+              expect(scheduled_at).to be_between(start_of_time_range, end_of_time_range)
+            end
+          end
+
+          context 'when user defined preferable time ranges' do
+            let!(:phone_answer) do
+              create(:answer_phone, user_session: user_session,
+                                    body: {
+                                      'data' => [
+                                        {
+                                          'var' => 'phone',
+                                          'value' => { 'iso' => 'PL', 'number' => '123123123', 'prefix' => '+48', 'confirmed' => true,
+                                                       'time_ranges' => [{ 'from' => '11', 'to' => '12' }] }
+                                        }
+                                      ]
+                                    })
+            end
+            let(:start_of_range) do
+              Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 11 }).utc }
+            end
+            let(:end_of_range) do
+              Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 12 }).utc }
+            end
+
+            it 'send sms for 5 days at 13 after the session ends' do
+              subject
+              scheduled_time = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:at].to_d
+              scheduled_datetime = Time.zone.at(scheduled_time)
+              expect(scheduled_datetime).to be_between(start_of_range, end_of_range)
+            end
           end
         end
 
         context 'for America/New_York timezone' do
           let!(:phone) { create(:phone, :confirmed, user: user, number: '202-555-0173', prefix: '+1') }
-          let!(:expected_start_time) do
-            Time.use_zone('America/New_York') { Time.current.next_day(5).change({ hour: 13 }).utc }
+          let(:start_of_range) do
+            Time.use_zone('America/New_York') { Time.current.next_day(5).change({ hour: 12 }).to_i }
+          end
+          let(:end_of_range) do
+            Time.use_zone('America/New_York') { Time.current.next_day(5).change({ hour: 17 }).to_i }
           end
 
           it 'send sms for 5 days at 13 after the session ends' do
             subject
+            scheduled_at = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:at]
 
-            expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time)
+            expect(SmsPlans::SendSmsJob).to have_been_enqueued
+            expect(scheduled_at).to be_between(start_of_range, end_of_range)
           end
         end
 
@@ -97,25 +181,39 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                        frequency: SmsPlan.frequencies[:once_a_day], end_at: end_time
           )
         end
-        # 2021-07-20 13:00
-        let!(:expected_start_time_1_day) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 13 }).utc }
+        # 2021-07-20 12:00-17:00
+        let(:start_of_first_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 12 }).to_i }
         end
-        # 2021-07-21 13:00
-        let!(:expected_start_time_2_day) do
-          Time.use_zone('Europe/Warsaw') { Time.current.next_day.change({ hour: 13 }).utc }
+        let(:end_of_first_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 17 }).to_i }
         end
-        # 2021-07-22 13:00
-        let!(:expected_start_time_3_day) do
-          Time.use_zone('Europe/Warsaw') { Time.current.next_day(2).change({ hour: 13 }).utc }
+        # 2021-07-21 12:00-17:00
+        let(:start_of_second_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day.change({ hour: 12 }).to_i }
+        end
+        let(:end_of_second_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day.change({ hour: 17 }).to_i }
+        end
+        # 2021-07-22 12:00-17:00
+        let(:start_of_third_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(2).change({ hour: 12 }).to_i }
+        end
+        let(:end_of_third_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(2).change({ hour: 17 }).to_i }
         end
 
         it 'send sms for 5 days at 13 after the session ends' do
+          expect { subject }.to have_enqueued_job(SmsPlans::SendSmsJob).at_least(3).times
+        end
+
+        it 'each sms will be send in default time range' do
           subject
 
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_1_day)
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_2_day)
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_3_day)
+          scheduled_at_tab = ActiveJob::Base.queue_adapter.enqueued_jobs.pluck(:at).sort
+          expect(scheduled_at_tab[0]).to be_between(start_of_first_range, end_of_first_range)
+          expect(scheduled_at_tab[1]).to be_between(start_of_second_range, end_of_second_range)
+          expect(scheduled_at_tab[2]).to be_between(start_of_third_range, end_of_third_range)
         end
       end
 
@@ -127,25 +225,39 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                        frequency: SmsPlan.frequencies[:once_a_week], end_at: end_time
           )
         end
-        # 2021-07-20 13:00
-        let!(:expected_start_time_1_week) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 13 }).utc }
+        # 2021-07-20 12:00-17:00
+        let(:start_of_first_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 12 }).to_i }
         end
-        # 2021-07-27 13:00
-        let!(:expected_start_time_2_week) do
-          Time.use_zone('Europe/Warsaw') { Time.current.next_day(7).change({ hour: 13 }).utc }
+        let(:end_of_first_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 17 }).to_i }
         end
-        # 2021-08-03 13:00
-        let!(:expected_start_time_3_week) do
-          Time.use_zone('Europe/Warsaw') { Time.current.next_day(14).change({ hour: 13 }).utc }
+        # 2021-07-27 12:00-17:00
+        let(:start_of_second_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(7).change({ hour: 12 }).to_i }
+        end
+        let(:end_of_second_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(7).change({ hour: 17 }).to_i }
+        end
+        # 2021-08-03 12:00-17:00
+        let(:start_of_third_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(14).change({ hour: 12 }).to_i }
+        end
+        let(:end_of_third_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(14).change({ hour: 17 }).to_i }
         end
 
         it 'send sms every day by 3 days until the end of the date' do
+          expect { subject }.to have_enqueued_job(SmsPlans::SendSmsJob).at_least(3).times
+        end
+
+        it 'each sms will be send in default time range' do
           subject
 
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_1_week)
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_2_week)
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_3_week)
+          scheduled_at_tab = ActiveJob::Base.queue_adapter.enqueued_jobs.pluck(:at).sort
+          expect(scheduled_at_tab[0]).to be_between(start_of_first_range, end_of_first_range)
+          expect(scheduled_at_tab[1]).to be_between(start_of_second_range, end_of_second_range)
+          expect(scheduled_at_tab[2]).to be_between(start_of_third_range, end_of_third_range)
         end
       end
 
@@ -157,25 +269,39 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                        frequency: SmsPlan.frequencies[:once_a_month], end_at: end_time
           )
         end
-        # 2021-07-20 13:00
-        let!(:expected_start_time_1_month) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 13 }).utc }
+        # 2021-07-20 12:00 - 17:00
+        let(:start_of_first_time_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 12 }).to_i }
         end
-        # 2021-08-20 13:00
-        let!(:expected_start_time_2_month) do
-          Time.use_zone('Europe/Warsaw') { Time.current.next_day(30).change({ hour: 13 }).utc }
+        let(:end_of_first_time_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 17 }).to_i }
         end
-        # 2021-09-20 13:00
-        let!(:expected_start_time_3_month) do
-          Time.use_zone('Europe/Warsaw') { Time.current.next_day(60).change({ hour: 13 }).utc }
+        # 2021-08-20 12:00 - 17:00
+        let(:start_of_second_time_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(30).change({ hour: 12 }).to_i }
+        end
+        let(:end_of_second_time_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(30).change({ hour: 17 }).to_i }
+        end
+        # 2021-09-20 12:00 - 17:00
+        let(:start_of_third_time_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(60).change({ hour: 12 }).to_i }
+        end
+        let(:end_of_third_time_range) do
+          Time.use_zone('Europe/Warsaw') { Time.current.next_day(60).change({ hour: 17 }).to_i }
         end
 
         it 'send sms every day by 3 days until the end of the date' do
+          expect { subject }.to have_enqueued_job(SmsPlans::SendSmsJob).at_least(3).times
+        end
+
+        it 'each sms will be send in default time range' do
           subject
 
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_1_month)
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_2_month)
-          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(expected_start_time_3_month)
+          scheduled_at_tab = ActiveJob::Base.queue_adapter.enqueued_jobs.pluck(:at).sort
+          expect(scheduled_at_tab[0]).to be_between(start_of_first_time_range, end_of_first_time_range)
+          expect(scheduled_at_tab[1]).to be_between(start_of_second_time_range, end_of_second_time_range)
+          expect(scheduled_at_tab[2]).to be_between(start_of_third_time_range, end_of_third_time_range)
         end
       end
     end
@@ -321,7 +447,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         it 'send sms with content of first variant' do
           subject
           expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
-            phone.prefix + phone.number, 'Hello John!', user.id
+            phone.prefix + phone.number, 'Hello John!', nil, user.id
           )
         end
       end
@@ -347,7 +473,21 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         it 'send sms with content of first variant' do
           subject
           expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
-            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', user.id
+            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', nil, user.id
+          )
+        end
+      end
+
+      context 'with attached image to the variant' do
+        let!(:variant1) do
+          create(:sms_plan_variant, :with_attachment, sms_plan: sms_plan, formula_match: '=2',
+                                                      content: "variant 1 content, value: .:var1:., prev_value: .:#{session2.variable}.number:.")
+        end
+
+        it 'send sms with content of first variant' do
+          subject
+          expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
+            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', url_for(variant1.attachment), user.id
           )
         end
       end
@@ -368,7 +508,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
     shared_examples 'correct sms job queue' do
       it do
         subject
-        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(number, content, user.id, true)
+        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(number, content, nil, user.id, true)
       end
     end
 

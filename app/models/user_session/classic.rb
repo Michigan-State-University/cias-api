@@ -5,18 +5,22 @@ class UserSession::Classic < UserSession
 
   before_destroy :decrement_audio_usage
 
-  delegate :first_question, to: :session
+  delegate :first_question, :autofinish_enabled, :autofinish_delay, :questions, to: :session
 
   def on_answer
-    timeout_job = UserSessionTimeoutJob.set(wait: 1.day).perform_later(id)
-    cancel_timeout_job
-    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.provider_job_id)
+    return unless autofinish_enabled
+
+    if any_question_run_timeout?
+      set_timeout_job if timeout_job_id.present? || last_answer&.question&.settings&.dig('start_autofinish_timer')
+    else
+      set_timeout_job
+    end
   end
 
   def cancel_timeout_job
     return if timeout_job_id.nil?
 
-    UserSessionTimeoutJob.cancel(timeout_job_id)
+    UserSessionTimeoutJob.cancel_by(provider_job_id: timeout_job_id)
 
     update(timeout_job_id: nil)
   end
@@ -43,6 +47,16 @@ class UserSession::Classic < UserSession
   end
 
   private
+
+  def any_question_run_timeout?
+    questions.where("settings @> '{\"start_autofinish_timer\": true}'").any?
+  end
+
+  def set_timeout_job
+    timeout_job = UserSessionTimeoutJob.set(wait: autofinish_delay.minutes).perform_later(id)
+    cancel_timeout_job
+    update(last_answer_at: DateTime.current, timeout_job_id: timeout_job.provider_job_id)
+  end
 
   def decrement_audio_usage
     return if name_audio.nil?

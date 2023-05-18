@@ -56,6 +56,8 @@ class Session < ApplicationRecord
                                                    } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
+  validates :autofinish_delay, presence: true, if: :autofinish_enabled
+  validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
 
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
