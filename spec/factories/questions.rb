@@ -25,6 +25,18 @@ FactoryBot.define do
         }
       }
     end
+    settings do
+      {
+        image: false,
+        narrator_skippable: false,
+        proceed_button: true,
+        required: true,
+        start_autofinish_timer: false,
+        subtitle: true,
+        title: true,
+        video: false
+      }
+    end
     sequence(:position) { |s| s }
     association :question_group
   end
@@ -278,6 +290,33 @@ FactoryBot.define do
     end
     sequence(:position) { |s| s }
     association :question_group
+    settings do
+      {
+        image: false,
+        narrator_skippable: false,
+        proceed_button: true,
+        required: true,
+        start_autofinish_timer: false,
+        subtitle: true,
+        title: true,
+        video: false
+      }
+    end
+
+    trait :start_autofinish_timer_on do
+      settings do
+        {
+          image: false,
+          narrator_skippable: false,
+          proceed_button: true,
+          required: true,
+          start_autofinish_timer: true,
+          subtitle: true,
+          title: true,
+          video: false
+        }
+      end
+    end
 
     trait :body_data_empty do
       body { { data: [] } }
