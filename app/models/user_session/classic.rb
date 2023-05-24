@@ -8,7 +8,7 @@ class UserSession::Classic < UserSession
   delegate :first_question, :autofinish_enabled, :autofinish_delay, :questions, to: :session
 
   def on_answer
-    return unless autofinish_enabled
+    return if !autofinish_enabled && timeout_job_id.nil?
 
     if any_question_run_timeout?
       set_timeout_job if timeout_job_id.present? || last_answer&.question&.settings&.dig('start_autofinish_timer')

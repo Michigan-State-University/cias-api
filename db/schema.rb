@@ -640,7 +640,7 @@ ActiveRecord::Schema.define(version: 2023_05_24_163505) do
     t.integer "estimated_time"
     t.integer "current_narrator", default: 0
     t.boolean "multiple_fill", default: false, null: false
-    t.boolean "autofinish_enabled", default: true, null: false
+    t.boolean "autofinish_enabled", default: false, null: false
     t.integer "autofinish_delay", default: 1440, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
