@@ -47,6 +47,16 @@ describe ReportTemplate do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:resource) { create(:report_template, session: create(:session, intervention: intervention)) }
+      let(:user) { collaborator }
+
+      it_behaves_like 'collaborator has expected access to resource'
+    end
+
     context 'team admin' do
       let(:user) { team1.team_admin }
 
@@ -99,6 +109,20 @@ describe ReportTemplate do
 
       it 'can access all report templates' do
         expect(subject).to include(
+          team1_report_template1, team1_report_template2, team2_report_template1, team2_report_template2
+        )
+      end
+    end
+
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:report_template) { create(:report_template, session: create(:session, intervention: intervention)) }
+      let(:user) { collaborator }
+
+      it do
+        expect(subject).to include(report_template).and not_include(
           team1_report_template1, team1_report_template2, team2_report_template1, team2_report_template2
         )
       end

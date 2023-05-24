@@ -5,12 +5,14 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
   def index
     authorize! :read, Intervention
+    authorize! :read, intervention_load
 
     render json: serialized_response(not_accepted_invitations, 'LiveChat::Interventions::NavigatorInvitation')
   end
 
   def create
     authorize! :update, Intervention
+    authorize! :update, intervention_load
 
     created_invitations = V1::LiveChat::InviteNavigators.call(
       navigator_invitation_params[:emails].map(&:downcase),
@@ -22,6 +24,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
 
   def destroy
     authorize! :update, Intervention
+    authorize! :update, intervention_load
 
     not_accepted_invitations.find(invitation_id).destroy
     render status: :ok
@@ -55,7 +58,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
   end
 
   def intervention_load
-    Intervention.accessible_by(current_ability).find(intervention_id)
+    @intervention_load ||= Intervention.accessible_by(current_ability).find(intervention_id)
   end
 
   def invitation_id

@@ -5,18 +5,21 @@ class V1::QuestionsController < V1Controller
 
   def index
     authorize! :read, Question
+    authorize! :read, questions_scope
 
     render json: serialized_response(questions_scope)
   end
 
   def show
     authorize! :read, Question
+    authorize! :read, question_load
 
     render json: serialized_response(question_load)
   end
 
   def create
     authorize! :create, Question
+    authorize! :update, question_group_load
 
     question = V1::Question::Create.call(question_group_load, question_params)
 
@@ -25,6 +28,7 @@ class V1::QuestionsController < V1Controller
 
   def update
     authorize! :update, Question
+    authorize! :update, question_load
 
     question = V1::Question::Update.call(question_load, question_params)
     invalidate_cache(question)
@@ -34,6 +38,7 @@ class V1::QuestionsController < V1Controller
 
   def destroy
     authorize! :delete, Question
+    authorize! :delete, chosen_questions
 
     V1::Question::Destroy.call(chosen_questions, question_ids)
 
@@ -42,6 +47,7 @@ class V1::QuestionsController < V1Controller
 
   def move
     authorize! :update, Question
+    authorize! :update, session_load
 
     SqlQuery.new(
       'resource/question_bulk_update',
@@ -60,6 +66,7 @@ class V1::QuestionsController < V1Controller
 
   def clone_multiple
     authorize! :create, Question
+    authorize! :create, chosen_questions
 
     cloned_questions = V1::Question::CloneMultiple.call(question_ids, chosen_questions)
 
@@ -76,19 +83,23 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_group_load
-    QuestionGroup.includes(:questions).accessible_by(current_ability).find(question_group_id)
+    @question_group_load ||= QuestionGroup.includes(:questions).find(question_group_id)
   end
 
   def questions_scope
-    question_group_load.questions.order(:position)
+    @questions_scope ||= question_group_load.questions.order(:position)
   end
 
   def question_load
-    questions_scope.find(question_id)
+    @question_load ||= questions_scope.find(question_id)
   end
 
   def chosen_questions
-    Question.accessible_by(current_ability).where(id: question_ids)
+    @chosen_questions ||= Question.accessible_by(current_ability).where(id: question_ids)
+  end
+
+  def session_load
+    @session_load = Session.find(session_id)
   end
 
   def questions_scope_by_session

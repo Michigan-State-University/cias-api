@@ -19,6 +19,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
                                                         user: intervention_user, sessions: sessions, shared_to: shared_to,
                                                         organization: organization, reports: reports)
   end
+  let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher), view: true, edit: false).user }
   let(:reports) { [] }
   let(:csv_attachment) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }
 
@@ -76,6 +77,12 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
     end
 
     context 'user is admin' do
+      it_behaves_like 'permitted user'
+    end
+
+    context 'user is a collaborator with view access' do
+      let(:user) { collaborator }
+
       it_behaves_like 'permitted user'
     end
 

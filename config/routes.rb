@@ -60,6 +60,7 @@ Rails.application.routes.draw do
         resources :accesses, only: %i[index create destroy]
         resources :files, only: %i[create destroy]
         resources :short_links, only: %i[create index]
+        resources :collaborators
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'

@@ -21,6 +21,7 @@ class V1::InterventionsController < V1Controller
 
   def update
     authorize! :update, Intervention
+    authorize! :update, intervention_load
 
     intervention = intervention_load
     intervention.assign_attributes(intervention_params)
@@ -46,6 +47,7 @@ class V1::InterventionsController < V1Controller
 
   def generate_conversations_transcript
     authorize! :update, Intervention
+    authorize! :update, intervention_load
 
     LiveChat::GenerateTranscriptJob.perform_later(
       intervention_load.id, ::Intervention, :conversations_transcript, intervention_load.name, current_v1_user.id
@@ -64,7 +66,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_load
-    Intervention.accessible_by(current_ability)
+    @intervention_load ||= Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
                 .includes(%i[reports_attachments logo_attachment])
                 .find(params[:id])

@@ -3,6 +3,7 @@
 class V1::Interventions::LogosController < V1Controller
   def create
     authorize! :add_logo, Intervention
+    authorize! :add_logo, intervention_load
     return render status: :method_not_allowed if intervention_published?
 
     intervention_load.update!(logo: intervention_params[:file])
@@ -12,6 +13,7 @@ class V1::Interventions::LogosController < V1Controller
 
   def update
     authorize! :add_logo, Intervention
+    authorize! :add_logo, intervention_load
     return render status: :method_not_allowed if intervention_published?
 
     intervention_load.logo_blob&.update!(description: intervention_params[:image_alt])
@@ -20,6 +22,7 @@ class V1::Interventions::LogosController < V1Controller
 
   def destroy
     authorize! :add_logo, Intervention
+    authorize! :add_logo, intervention_load
     return render status: :method_not_allowed if intervention_published?
 
     intervention_load.logo.purge_later

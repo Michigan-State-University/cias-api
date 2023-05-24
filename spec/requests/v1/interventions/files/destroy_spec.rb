@@ -56,4 +56,19 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/files/:id', type: :req
       it_behaves_like 'unpermitted user'
     end
   end
+
+  context 'when current user is collaborator' do
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+    let(:headers) { collaborator.user.create_new_auth_token }
+
+    before { request }
+
+    it_behaves_like 'unpermitted user'
+
+    context 'when has edit access' do
+      let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: true) }
+
+      it_behaves_like 'permitted user'
+    end
+  end
 end

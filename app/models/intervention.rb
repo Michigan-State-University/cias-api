@@ -5,11 +5,13 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
+  include ::Intervention::TranslationAuxiliaryMethods
   extend DefaultValues
 
   CURRENT_VERSION = '1'
 
   belongs_to :user, inverse_of: :interventions
+  has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :organization, optional: true
   belongs_to :google_language
   has_many :user_interventions, dependent: :restrict_with_exception, inverse_of: :intervention
@@ -118,23 +120,6 @@ class Intervention < ApplicationRecord
 
   def newest_report
     reports.attachments.order(created_at: :desc).first
-  end
-
-  def translation_prefix(destination_language_name_short)
-    update!(name: "(#{destination_language_name_short.upcase}) #{name}")
-  end
-
-  def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
-    original_text['additional_text'] = additional_text
-    new_additional_text = translator.translate(additional_text, source_language_name_short, destination_language_name_short)
-
-    update!(additional_text: new_additional_text)
-  end
-
-  def translate_sessions(translator, source_language_name_short, destination_language_name_short)
-    sessions.each do |session|
-      session.translate(translator, source_language_name_short, destination_language_name_short)
-    end
   end
 
   def cache_key

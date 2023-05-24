@@ -11,12 +11,14 @@ class V1::SessionsController < V1Controller
 
   def show
     authorize! :read, Session
+    authorize! :read, session_load
 
-    render json: serialized_response(session_service.session_load(session_id))
+    render json: serialized_response(session_load)
   end
 
   def create
     authorize! :create, Session
+    authorize! :create, intervention
 
     session = session_service.create(session_params_for_create)
     render json: serialized_response(session), status: :created
@@ -24,6 +26,7 @@ class V1::SessionsController < V1Controller
 
   def update
     authorize! :update, Session
+    authorize! :update, session_load
 
     session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
@@ -77,6 +80,10 @@ class V1::SessionsController < V1Controller
     @session_service ||= V1::SessionService.new(current_v1_user, intervention_id)
   end
 
+  def session_load
+    @session_load ||= session_service.session_load(session_id)
+  end
+
   def sessions_scope
     session_service.sessions(params[:include_multiple_sessions])
   end
@@ -106,6 +113,10 @@ class V1::SessionsController < V1Controller
                                                                                                                                                                     target: %i[type probability id]
                                                                                                                                                                   }] }
                                                                                                                                                                 ], cat_tests: [])
+  end
+
+  def intervention
+    @intervention ||= Intervention.find(params[:intervention_id])
   end
 
   def session_params_for_create

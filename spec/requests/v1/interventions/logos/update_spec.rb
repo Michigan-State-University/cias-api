@@ -53,4 +53,16 @@ RSpec.describe 'PATCH  /v1/interventions/:interventions_id/logo', type: :request
 
     it { expect(response).to have_http_status(:method_not_allowed) }
   end
+
+  context 'when current user is collaborator' do
+    let(:intervention) { create(:intervention) }
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+    let(:current_user) { collaborator.user }
+
+    before { request }
+
+    it {
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
 end

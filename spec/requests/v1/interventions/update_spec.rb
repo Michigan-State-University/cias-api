@@ -251,6 +251,15 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     end
   end
 
+  context 'researcher who is a collaborator' do
+    let(:user) { create(:user, :researcher, :confirmed) }
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: user, view: true, edit: false) }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:forbidden) }
+  end
+
   context 'when user has role participant' do
     let(:user) { participant }
 

@@ -41,6 +41,16 @@ describe Session do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:resource) { create(:session, intervention: intervention) }
+      let(:user) { collaborator }
+
+      it_behaves_like 'collaborator has expected access to resource'
+    end
+
     context 'team admin' do
       let(:user) { team1.team_admin }
 
@@ -69,6 +79,20 @@ describe Session do
 
       it 'can access all interventions' do
         expect(subject).to include(
+          team1_session1, team1_session2, team2_session1, team2_session2
+        )
+      end
+    end
+
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:session) { create(:session, intervention: intervention) }
+      let(:user) { collaborator }
+
+      it do
+        expect(subject).to include(session).and not_include(
           team1_session1, team1_session2, team2_session1, team2_session2
         )
       end

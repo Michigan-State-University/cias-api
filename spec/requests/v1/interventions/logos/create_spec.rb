@@ -61,4 +61,18 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
 
     it { expect(response).to have_http_status(:method_not_allowed) }
   end
+
+  context 'when current user is collaborator' do
+    let(:intervention) { create(:intervention) }
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+    let(:current_user) { collaborator.user }
+
+    before do
+      post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token
+    end
+
+    it {
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
 end
