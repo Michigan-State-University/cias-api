@@ -3,14 +3,7 @@
 class CollaboratorChannel < ApplicationCable::Channel
   def subscribed
     stream_from current_channel_id
-    if intervention_id.present? # rubocop:disable Style/GuardClause
-      if no_navigator_available?(intervention_id)
-        ensure_confirmation_sent
-        ActionCable.server.broadcast(current_channel_id,
-                                     generic_message({}, 'navigator_unavailable', 404))
-      end
-      stream_from collaborator_channel_id
-    end
+    ensure_confirmation_sent
   end
 
   def unsubscribed
