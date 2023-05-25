@@ -81,8 +81,8 @@ RSpec.describe UserSession, type: :model do
       end
 
       context 'user session on answer' do
-        let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id) }
-        let(:expected_timestamp) { Time.current + 24.minutes }
+        let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id, session: create(:session, autofinish_enabled: true)) }
+        let(:expected_timestamp) { Time.current + 24.hours }
         let(:timeout_job_id) { nil }
 
         context 'timeout_job_id is nil' do
