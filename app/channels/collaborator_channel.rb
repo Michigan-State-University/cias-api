@@ -14,6 +14,6 @@ class CollaboratorChannel < ApplicationCable::Channel
   private
 
   def collaborator_channel_id
-    "collaborator_in_#{params[:id]}_channel"
+    "collaborating_on_#{params[:id]}_channel"
   end
 end
