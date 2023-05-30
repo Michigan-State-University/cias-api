@@ -16,8 +16,7 @@ class V1::AudioController < V1Controller
   end
 
   def regenerate
-    V1::Audio::Regenerate.call(question_id, block_index, audio_index, reflection_index,
-                               current_language_code, current_voice_type)
+    V1::Audio::Regenerate.call(regenerate_audio_params, current_language_code, current_voice_type)
 
     render status: :ok
   end
@@ -60,23 +59,7 @@ class V1::AudioController < V1Controller
     audio_params[:google_tts_voice_id]
   end
 
-  def block_index
-    regenerate_audio_params[:block_index]
-  end
-
-  def reflection_index
-    regenerate_audio_params[:reflection_index]
-  end
-
-  def audio_index
-    regenerate_audio_params[:audio_index]
-  end
-
   def session_id
     regenerate_audio_params[:session_id]
-  end
-
-  def question_id
-    regenerate_audio_params[:question_id]
   end
 end
