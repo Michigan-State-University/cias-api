@@ -21,6 +21,10 @@ en:
       title: Next Group
     tlfb:
       title: TLFB Study Group
+  channels:
+    collaboration:
+      intervention:
+        forbidden_action: "We cannot perform this action. Intervention is in editing/published mode or you don't have permission to correctly processed this action"
   activerecord:
     errors:
       models:
