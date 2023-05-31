@@ -28,6 +28,8 @@ class V1::SessionsController < V1Controller
     authorize! :update, Session
     authorize! :update, session_load
 
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
+
     session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
   end

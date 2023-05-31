@@ -19,6 +19,8 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :create, QuestionGroup
     authorize! :update, session_load
 
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
+
     question_group = V1::QuestionGroup::CreateService.call(question_group_params, questions_scope, new_questions_params, session_load)
     SqlQuery.new('question_group/question_group_pure_empty').execute
 
@@ -30,6 +32,8 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :update, QuestionGroup
     authorize! :update, question_group_load
 
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
+
     question_group = V1::QuestionGroup::UpdateService.call(question_group_load, question_group_params)
 
     render json: question_group_response(question_group), action: :show
@@ -38,6 +42,8 @@ class V1::QuestionGroupsController < V1Controller
   def destroy
     authorize! :destroy, QuestionGroup
     authorize! :destroy, question_group_load
+
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
 
     question_group = question_group_load
     question_group.destroy! unless question_group.finish?
@@ -49,6 +55,8 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :update, QuestionGroup
     authorize! :update, question_group_load
 
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
+
     question_group = V1::QuestionGroup::QuestionsChangeService.call(question_group_load, questions_scope)
 
     render json: question_group_response(question_group), action: :show
@@ -57,6 +65,8 @@ class V1::QuestionGroupsController < V1Controller
   def remove_questions
     authorize! :update, QuestionGroup
     authorize! :update, questions_scope
+
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
 
     questions_scope.destroy_all
 
@@ -83,6 +93,8 @@ class V1::QuestionGroupsController < V1Controller
   def duplicate_here
     authorize! :create, QuestionGroup
     authorize! :update, load_session
+
+    return head :forbidden if session_load.ability_to_update_for?(current_v1_user)
 
     duplicated_groups = V1::QuestionGroup::DuplicateWithStructureService.call(load_session, duplicate_here_params[:question_groups])
 
