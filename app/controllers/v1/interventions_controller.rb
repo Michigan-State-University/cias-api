@@ -61,14 +61,14 @@ class V1::InterventionsController < V1Controller
   def interventions_scope
     Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
-                .includes(%i[user reports_attachments logo_attachment])
+                .includes(%i[user reports_attachments logo_attachment collaborators])
                 .only_visible
   end
 
   def intervention_load
     @intervention_load ||= Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
-                .includes(%i[reports_attachments logo_attachment])
+                .includes(%i[reports_attachments logo_attachment collaborators])
                 .find(params[:id])
   end
 
