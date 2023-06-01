@@ -7,7 +7,6 @@ class V1::InterventionSerializer < V1Serializer
              :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled
 
   has_many :sessions, serializer: V1::SessionSerializer
-  has_many :collaborators
 
   cache_options(store: Rails.cache, expires_in: 24.hours)  # temporary length, might be a subject to change
 
@@ -77,6 +76,10 @@ class V1::InterventionSerializer < V1Serializer
 
   attribute :conversations_present do |object|
     object.conversations.size.positive?
+  end
+
+  attribute :collaborating_users_ids do |object|
+    object.collaborators.map(&:user_id)
   end
 
   def self.newest_csv_link(object)

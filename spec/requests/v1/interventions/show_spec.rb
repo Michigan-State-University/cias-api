@@ -155,6 +155,12 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           end
         end
 
+        it 'contains information about collaborators' do
+          expect(attrs).to include(
+            'collaborating_users_ids' => [intervention.collaborators.first.user_id]
+          )
+        end
+
         context 'when intervention contains some report' do
           let!(:reports) { [csv_attachment] }
 
