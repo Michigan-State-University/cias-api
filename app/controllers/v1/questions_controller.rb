@@ -21,6 +21,8 @@ class V1::QuestionsController < V1Controller
     authorize! :create, Question
     authorize! :update, question_group_load
 
+    return head :forbidden unless question_group_load.ability_to_update_for?(current_v1_user)
+
     question = V1::Question::Create.call(question_group_load, question_params)
 
     render json: serialized_response(question), status: :created
@@ -29,6 +31,8 @@ class V1::QuestionsController < V1Controller
   def update
     authorize! :update, Question
     authorize! :update, question_load
+
+    return head :forbidden unless question_group_load.ability_to_update_for?(current_v1_user)
 
     question = V1::Question::Update.call(question_load, question_params)
     invalidate_cache(question)
@@ -40,6 +44,8 @@ class V1::QuestionsController < V1Controller
     authorize! :delete, Question
     authorize! :delete, chosen_questions
 
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+
     V1::Question::Destroy.call(chosen_questions, question_ids)
 
     head :no_content
@@ -48,6 +54,8 @@ class V1::QuestionsController < V1Controller
   def move
     authorize! :update, Question
     authorize! :update, session_load
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     SqlQuery.new(
       'resource/question_bulk_update',

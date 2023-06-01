@@ -9,6 +9,7 @@ module Resource::Clone
       resource = model_constant.find(params[:id])
 
       return head :forbidden unless resource.ability_to_clone?
+      return head :forbidden unless resource.ability_to_update_for?(current_v1_user)
 
       cloned_resource = resource.
         clone(params: clone_params)

@@ -25,7 +25,7 @@ class V1::InterventionsController < V1Controller
 
     intervention = intervention_load
 
-    return head :forbidden if intervention.ability_to_update_for?(current_v1_user)
+    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
 
     intervention.assign_attributes(intervention_params)
     intervention.save!
