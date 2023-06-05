@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Audio::Regenerate do
+  subject { described_class.new(regenerate_params, language_code, voice_type) }
+
   let(:question) do
     create(:question_single, narrator: { blocks: blocks, settings: { voice: true, character: 'peedy', animation: true, extra_space_for_narrator: false } })
   end
-  let(:regenerate_params) { { question_id: 1, block_index: 0, audio_index: 0, reflection_index: nil } }
+  let(:regenerate_params) { { question_id: question.id, block_index: 0, audio_index: 0, reflection_index: nil } }
   let(:language_code) { GoogleTtsLanguage.first }
   let(:voice_type) { GoogleTtsVoice.first }
   let(:audio) { create(:audio) }
@@ -19,7 +21,7 @@ RSpec.describe V1::Audio::Regenerate do
   end
 
   before do
-    allow(Question).to receive(:find).with(regenerate_params[:question_id]).and_return(question)
+    allow(Question).to receive(:find).with(question.id).and_return(question)
     allow(Audio).to receive(:find_by).and_return(audio)
     allow(Audio::TextToSpeech).to receive(:new).and_return(text_to_speech)
     allow(text_to_speech).to receive(:execute).and_return('test_url')
@@ -37,15 +39,14 @@ RSpec.describe V1::Audio::Regenerate do
 
   describe '#initialize' do
     it 'assigns the correct instance variables' do
-      instance = described_class.new(regenerate_params, language_code, voice_type)
 
-      expect(instance.question).to eq(question)
-      expect(instance.block_index).to eq(regenerate_params[:block_index])
-      expect(instance.block).to eq(question.narrator['blocks'][instance.block_index])
-      expect(instance.audio_index).to eq(regenerate_params[:audio_index])
-      expect(instance.reflection_index).to eq(regenerate_params[:reflection_index])
-      expect(instance.language_code).to eq(language_code)
-      expect(instance.voice_type).to eq(voice_type)
+      expect(subject.question).to eq(question)
+      expect(subject.block_index).to eq(regenerate_params[:block_index])
+      expect(subject.block).to eq(question.narrator['blocks'][subject.block_index])
+      expect(subject.audio_index).to eq(regenerate_params[:audio_index])
+      expect(subject.reflection_index).to eq(regenerate_params[:reflection_index])
+      expect(subject.language_code).to eq(language_code)
+      expect(subject.voice_type).to eq(voice_type)
     end
   end
 
@@ -56,12 +57,11 @@ RSpec.describe V1::Audio::Regenerate do
       end
 
       it 'calls the TextToSpeech service and updates the question' do
-        instance = described_class.new(regenerate_params, language_code, voice_type)
         expect(text_to_speech).to receive(:execute)
         expect(audio).to receive(:save!)
         expect(question).to receive(:save!)
 
-        instance.call
+        subject.call
       end
     end
 
@@ -71,13 +71,12 @@ RSpec.describe V1::Audio::Regenerate do
       end
 
       it 'does not call the TextToSpeech service and does not update the question' do
-        instance = described_class.new(regenerate_params, language_code, voice_type)
 
         expect(Audio::TextToSpeech).not_to receive(:new)
         expect(text_to_speech).not_to receive(:execute)
         expect(audio).not_to receive(:save!)
 
-        instance.call
+        subject.call
       end
     end
   end
@@ -98,18 +97,16 @@ RSpec.describe V1::Audio::Regenerate do
 
     describe '#correct_block' do
       it 'returns the correct block and changes audio url based on the reflection index' do
-        instance = described_class.new(regenerate_params, language_code, voice_type)
-        instance.instance_variable_set(:@reflection_index, 1)
+        subject.instance_variable_set(:@reflection_index, 1)
 
-        expect(instance.correct_block['audio_urls'][0]).not_to eq(blocks[0][:reflections][1][:text])
+        expect(subject.correct_block['audio_urls'][0]).not_to eq(blocks[0][:reflections][1][:text])
       end
     end
   end
 
   context 'speech' do
     it 'returns the block and change url if reflection index is nil' do
-      instance = described_class.new(regenerate_params, language_code, voice_type)
-      expect(instance.correct_block['audio_urls'][0]).not_to eq(blocks[0][:audio_urls][0])
+      expect(subject.correct_block['audio_urls'][0]).not_to eq(blocks[0][:audio_urls][0])
     end
   end
 end
