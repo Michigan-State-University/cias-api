@@ -189,6 +189,7 @@ ActiveRecord::Schema.define(version: 2023_06_05_101854) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["intervention_id"], name: "index_collaborators_on_intervention_id"
+    t.index ["user_id", "intervention_id"], name: "index_collaborators_on_user_id_and_intervention_id", unique: true
     t.index ["user_id"], name: "index_collaborators_on_user_id"
   end
 

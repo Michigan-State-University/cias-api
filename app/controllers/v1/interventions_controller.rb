@@ -2,7 +2,7 @@
 
 class V1::InterventionsController < V1Controller
   def index
-    collection = interventions_scope.detailed_search(params)
+    collection = interventions_scope.detailed_search(params, current_v1_user)
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
     render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json

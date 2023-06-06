@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe V1::Intervention::Collaborators::CreateService do
+  RSpec::Matchers.define_negated_matcher :not_change, :change
+
   subject { described_class.call(intervention, emails) }
 
   let!(:intervention) { create(:intervention) }
@@ -29,5 +31,13 @@ RSpec.describe V1::Intervention::Collaborators::CreateService do
   it 'new account has correct role' do
     subject
     expect(User.find_by(email: 'new_researcher@example.com').roles).to include('researcher')
+  end
+
+  context 'collaborator already exist' do
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: researcher) }
+
+    it 'raise exception and not create a new one' do
+      expect { subject }.to raise_error(ActiveRecord::RecordInvalid).and not_change(Collaborator, :count)
+    end
   end
 end
