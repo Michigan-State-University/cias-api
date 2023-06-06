@@ -33,7 +33,11 @@ class V1::Interventions::CollaboratorsController < V1Controller
   private
 
   def intervention_load
-    @intervention_load ||= Intervention.accessible_by(current_ability).find_by!(id: params[:intervention_id], user_id: current_v1_user.id)
+    @intervention_load ||= if current_v1_user.role?('admin')
+                             Intervention.accessible_by(current_ability).find(params[:intervention_id])
+                           else
+                             Intervention.accessible_by(current_ability).find_by!(id: params[:intervention_id], user_id: current_v1_user.id)
+                           end
   end
 
   def collaborators_scope
