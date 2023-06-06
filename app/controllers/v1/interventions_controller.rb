@@ -2,14 +2,15 @@
 
 class V1::InterventionsController < V1Controller
   def index
-    collection = interventions_scope.detailed_search(params)
+    collection = interventions_scope.detailed_search(params, current_v1_user)
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
-    render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json
+    render json: serialized_hash(paginated_collection, controller_name.classify,
+                                 params: { current_user_id: current_v1_user.id }).merge({ interventions_size: collection.size }).to_json
   end
 
   def show
-    render json: serialized_response(intervention_load)
+    render json: serialized_response(intervention_load, controller_name.classify, params: { current_user_id: current_v1_user.id })
   end
 
   def create
@@ -62,17 +63,15 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.accessible_by(current_ability)
+    @interventions_scope ||= Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
-                .includes(%i[user reports_attachments logo_attachment collaborators])
+                .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
+                             conversations_transcript_attachment])
                 .only_visible
   end
 
   def intervention_load
-    @intervention_load ||= Intervention.accessible_by(current_ability)
-                .order(created_at: :desc)
-                .includes(%i[reports_attachments logo_attachment collaborators])
-                .find(params[:id])
+    interventions_scope.find(params[:id])
   end
 
   def intervention_params
