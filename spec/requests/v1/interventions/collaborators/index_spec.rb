@@ -50,4 +50,16 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/collaborators', type: :re
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  context 'when user has super admin permissions' do
+    let(:current_user) { create(:user, :admin, :confirmed) }
+
+    it 'return correct status' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'return not empty collection' do
+      expect(json_response['data'].any?).to be true
+    end
+  end
 end

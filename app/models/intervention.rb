@@ -58,6 +58,9 @@ class Intervention < ApplicationRecord
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
   scope :filter_by_name, ->(name) { where('lower(name) like ?', "%#{name.downcase}%") if name.present? }
   scope :filter_by_organization, ->(organization_id) { where(organization_id: organization_id) }
+  scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
+  scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
+  scope :only_not_shared_with_anyone, -> { left_joins(:collaborators).where(collaborators: { id: nil }) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -128,8 +131,8 @@ class Intervention < ApplicationRecord
     "intervention/#{id}-#{updated_at&.to_s(:number)}"
   end
 
-  def self.detailed_search(params)
-    scope = all
+  def self.detailed_search(params, user)
+    scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
     scope.filter_by_name(params[:name])
@@ -180,5 +183,13 @@ class Intervention < ApplicationRecord
 
   def remove_short_links
     short_links.destroy_all
+  end
+
+  def self.filter_by_collaboration_type(params, user)
+    scope = all
+    scope = scope.only_shared_with_me(user.id) if params[:only_shared_with_me].present?
+    scope = scope.only_shared_by_me(user.id) if params[:only_shared_by_me].present?
+    scope = scope.only_not_shared_with_anyone if params[:only_not_shared_with_anyone].present?
+    scope
   end
 end
