@@ -13,7 +13,7 @@ class InterventionChannel < ApplicationCable::Channel
 
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
-    purge_editor_and_create_notifications!(Intervention.find(params[:id]))
+    purge_editor_and_create_notifications!(Intervention.find(params[:id])) if intervention.current_editor_id == current_user.id
     stop_all_streams
   end
 
@@ -27,8 +27,8 @@ class InterventionChannel < ApplicationCable::Channel
 
     ActionCable.server.broadcast(
       intervention_channel_id, generic_message(
-                                 { editor_id: current_user.id, email: current_user.email, first_name: current_user.first_name,
-                                   last_name: current_user.last_name },
+                                 { current_editor: { id: current_user.id, email: current_user.email, first_name: current_user.first_name,
+                                                     last_name: current_user.last_name } },
                                  'editing_started'
                                )
     )
@@ -40,13 +40,12 @@ class InterventionChannel < ApplicationCable::Channel
     raise_exception if intervention.user_id != current_user.id || intervention.published?
     raise_exception unless intervention.in?(accessible_interventions)
 
-    previous_editor = intervention.current_editor
     assign_current_editor!(intervention)
 
     ActionCable.server.broadcast(
       intervention_channel_id, generic_message(
-                                 { editor_id: current_user.id, email: current_user.email, first_name: current_user.first_name,
-                                   last_name: current_user.last_name, previous_editor_id: previous_editor.id },
+                                 { current_editor: { id: current_user.id, email: current_user.email, first_name: current_user.first_name,
+                                                     last_name: current_user.last_name } },
                                  'force_editing_started'
                                )
     )
