@@ -18,7 +18,7 @@ class V1::Interventions::CollaboratorsController < V1Controller
   def destroy
     authorize! :manage_collaborators, Intervention
 
-    collaborator_load.destroy
+    V1::Intervention::Collaborators::DestroyService.call(collaborator_load)
 
     head :no_content
   end
