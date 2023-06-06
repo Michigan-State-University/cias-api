@@ -56,7 +56,7 @@ class V1::SessionsController < V1Controller
     authorize! :clone, Session
     authorize! :update, session_obj
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    return head :forbidden unless session_obj.ability_to_update_for?(current_v1_user)
 
     CloneJobs::Session.perform_later(current_v1_user, session_obj)
 
