@@ -39,7 +39,6 @@ RSpec.describe V1::Audio::Regenerate do
 
   describe '#initialize' do
     it 'assigns the correct instance variables' do
-
       expect(subject.question).to eq(question)
       expect(subject.block_index).to eq(regenerate_params[:block_index])
       expect(subject.block).to eq(question.narrator['blocks'][subject.block_index])
@@ -71,7 +70,6 @@ RSpec.describe V1::Audio::Regenerate do
       end
 
       it 'does not call the TextToSpeech service and does not update the question' do
-
         expect(Audio::TextToSpeech).not_to receive(:new)
         expect(text_to_speech).not_to receive(:execute)
         expect(audio).not_to receive(:save!)
