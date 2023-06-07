@@ -25,6 +25,9 @@ class V1::InterventionsController < V1Controller
     authorize! :update, intervention_load
 
     intervention = intervention_load
+
+    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
+
     intervention.assign_attributes(intervention_params)
     intervention.save!
     render json: serialized_response(intervention)

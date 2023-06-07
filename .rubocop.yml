@@ -145,6 +145,7 @@ Metrics/ClassLength:
     - 'app/models/intervention/csv/harvester.rb'
     - 'app/models/question.rb'
     - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
+    - 'app/models/intervention.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

@@ -20,6 +20,8 @@ class V1::SessionsController < V1Controller
     authorize! :create, Session
     authorize! :create, intervention
 
+    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
+
     session = session_service.create(session_params_for_create)
     render json: serialized_response(session), status: :created
   end
@@ -28,12 +30,16 @@ class V1::SessionsController < V1Controller
     authorize! :update, Session
     authorize! :update, session_load
 
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+
     session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
   end
 
   def destroy
     authorize! :destroy, Session
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     session_service.destroy(session_id)
     head :no_content
@@ -48,6 +54,9 @@ class V1::SessionsController < V1Controller
 
   def clone
     authorize! :clone, Session
+    authorize! :update, session_obj
+
+    return head :forbidden unless session_obj.ability_to_update_for?(current_v1_user)
 
     CloneJobs::Session.perform_later(current_v1_user, session_obj)
 
