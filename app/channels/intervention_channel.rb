@@ -13,7 +13,8 @@ class InterventionChannel < ApplicationCable::Channel
 
   def unsubscribed
     # Any cleanup needed when channel is unsubscribed
-    purge_editor_and_create_notifications!(Intervention.find(params[:id])) if intervention.current_editor_id == current_user.id
+    intervention = Intervention.find(params[:id])
+    purge_editor_and_create_notifications!(intervention) if intervention.current_editor_id == current_user.id
     stop_all_streams
   end
 

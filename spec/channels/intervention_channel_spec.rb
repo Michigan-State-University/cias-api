@@ -38,8 +38,8 @@ RSpec.describe InterventionChannel, type: :channel do
         expect { perform :on_editing_started, interventionId: intervention.id }
           .to have_broadcasted_to("intervention_channel_#{intervention.id}")
                 .with({
-                        data: { editor_id: current_user.id, email: current_user.email, first_name: current_user.first_name,
-                                last_name: current_user.last_name }, topic: 'editing_started', status: 200
+                        data: { current_editor: { id: current_user.id, email: current_user.email, first_name: current_user.first_name,
+                                                  last_name: current_user.last_name } }, topic: 'editing_started', status: 200
                       })
       end
 
@@ -104,8 +104,8 @@ RSpec.describe InterventionChannel, type: :channel do
       it 'brodcast message' do
         expect { perform :on_force_editing_started, interventionId: intervention.id }
           .to have_broadcasted_to("intervention_channel_#{intervention.id}")
-                .with({ data: { editor_id: current_user.id, email: current_user.email, first_name: current_user.first_name,
-                                last_name: current_user.last_name, previous_editor_id: researcher.id }, topic: 'force_editing_started', status: 200 })
+                .with({ data: { current_editor: { id: current_user.id, email: current_user.email, first_name: current_user.first_name,
+                                                  last_name: current_user.last_name }, topic: 'force_editing_started', status: 200 } })
       end
 
       context 'when current user isn\'t the owner' do
