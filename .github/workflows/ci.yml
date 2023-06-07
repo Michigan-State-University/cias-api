@@ -37,11 +37,11 @@ jobs:
       - id: set-test-chunks
         name: Set Chunks
         #the test_setup.sh script returns a list of all spec files and passes that to jq, which groups them up in batches (amount of batches specified by GitHub secret TEST_BATCH_COUNT)
-        run: echo "::set-output name=test-chunks::$(./.github/workflows/test_setup.sh ./spec | jq -cM '[to_entries | group_by(.key % ${{ secrets.TEST_BATCH_COUNT }}) | .[] | map(.value)]')"
+        run: echo "test-chunks=$(./.github/workflows/test_setup.sh ./spec | jq -cM '[to_entries | group_by(.key % ${{ secrets.TEST_BATCH_COUNT }}) | .[] | map(.value)]')" >> $GITHUB_OUTPUT
 
       - id: set-test-chunk-ids
         name: Set Chunk IDs
-        run: echo "::set-output name=test-chunk-ids::$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')"
+        run: echo "test-chunk-ids=$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')" >> $GITHUB_OUTPUT
         env:
           CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
 
