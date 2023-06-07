@@ -6,8 +6,8 @@ jobs:
     name: Prepare environment & split tests
     runs-on: ubuntu-20.04
     outputs:
-      test-chunks: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
-      test-chunk-ids: ${{ steps['set-test-chunk-ids'].outputs['test-chunk-ids'] }}
+      test-chunks: ${{ steps.set-test-chunks.outputs.test-chunks }}
+      test-chunk-ids: ${{ steps.set-test-chunk-ids.outputs.test-chunk-ids }}
 
     steps:
       - name: Checkout code
@@ -43,7 +43,7 @@ jobs:
         name: Set Chunk IDs
         run: echo "test-chunk-ids=$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')" >> $GITHUB_OUTPUT
         env:
-          CHUNKS: ${{ steps['set-test-chunks'].outputs['test-chunks'] }}
+          CHUNKS: ${{ steps.set-test-chunks.outputs.test-chunks }}
 
   test:
     name: Test batch no. ${{ matrix.chunk }}
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        chunk: ${{ fromJson(needs.setup_environment.outputs['test-chunk-ids']) }}
+        chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
     services:
       database:
         image: postgres:13.0-alpine
@@ -100,7 +100,7 @@ jobs:
           bundle exec rails db:create db:schema:load --trace
       - name: Run test batch
         env:
-          CHUNKS: ${{ needs.setup_environment.outputs['test-chunks'] }}
+          CHUNKS: ${{ needs.setup_environment.outputs.test-chunks }}
           #sed is needed because rspec prepends './' to file paths which contain '"' character and this jq command returns them in such format
         run: bundle exec rspec $(echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | sed 's/\"//g')
       - name: Analyze with bundler audit
