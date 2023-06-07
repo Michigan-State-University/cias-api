@@ -59,13 +59,6 @@ class InterventionChannel < ApplicationCable::Channel
     raise_exception unless intervention.in?(accessible_interventions)
 
     purge_editor_and_create_notifications!(intervention)
-
-    ActionCable.server.broadcast(
-      intervention_channel_id, generic_message(
-                                 {},
-                                 'editing_stopped'
-                               )
-    )
   end
 
   private
@@ -81,6 +74,8 @@ class InterventionChannel < ApplicationCable::Channel
   def purge_editor_and_create_notifications!(intervention)
     intervention.update!(current_editor: nil)
     notifications!(intervention, :stop_editing_intervention)
+
+    broadcast_stop_editing
   end
 
   def notifications!(intervention, type)
@@ -94,7 +89,7 @@ class InterventionChannel < ApplicationCable::Channel
     User.left_joins(:collaborations, :interventions).where.not(id: current_user.id).and(
       User.left_joins(:collaborations, :interventions).where(interventions: { user_id: intervention.user_id })
           .or(User.left_joins(:collaborations, :interventions).where(collaborations: { intervention_id: intervention.id }))
-    )
+    ).distinct
   end
 
   def generate_notification_body(intervention, user)
@@ -111,6 +106,15 @@ class InterventionChannel < ApplicationCable::Channel
   def assign_current_editor!(intervention)
     intervention.update(current_editor: current_user)
     notifications!(intervention, :start_editing_intervention)
+  end
+
+  def broadcast_stop_editing
+    ActionCable.server.broadcast(
+      intervention_channel_id, generic_message(
+                                 {},
+                                 'editing_stopped'
+                               )
+    )
   end
 
   def raise_exception
