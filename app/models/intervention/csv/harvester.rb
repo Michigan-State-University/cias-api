@@ -63,12 +63,10 @@ class Intervention::Csv::Harvester
       set_user_data(row_index, user_session)
       session_variable = user_session.session.variable
       user_session.answers.each do |answer|
-        # require 'pry'; binding.pry
         set_default_value(user_session, answer, row_index)
         next if answer.skipped
 
         answer.body_data&.each do |data|
-          # require 'pry'; binding.pry
           var_index = header.index("#{session_variable}.#{answer.csv_header_name(data)}")
           next if var_index.blank?
 
