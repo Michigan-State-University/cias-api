@@ -35,6 +35,7 @@ Layout/LineLength:
   Exclude:
     - 'spec/requests/v1/questions/update_narrator_spec.rb'
     - 'app/controllers/v1/sessions_controller.rb'
+    - 'app/models/answer/phone.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
