@@ -48,7 +48,7 @@ class V1::InterventionsController < V1Controller
 
   def generate_conversations_transcript
     authorize! :update, Intervention
-    authorize! :update, intervention_load
+    authorize! :get_protected_attachment, intervention_load
 
     LiveChat::GenerateTranscriptJob.perform_later(
       intervention_load.id, ::Intervention, :conversations_transcript, intervention_load.name, current_v1_user.id
