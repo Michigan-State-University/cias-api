@@ -4,6 +4,7 @@ class V1::LiveChat::Interventions::LinksController < V1Controller
   def update
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     link = link_load
     link.update!(link_params)
@@ -13,6 +14,7 @@ class V1::LiveChat::Interventions::LinksController < V1Controller
   def create
     authorize! :update, Intervention
     authorize! :create, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     navigator_setup = setup_load
     LiveChat::Interventions::Link.create!(link_params.merge(navigator_setup_id: navigator_setup.id))
@@ -23,6 +25,7 @@ class V1::LiveChat::Interventions::LinksController < V1Controller
   def destroy
     authorize! :delete, LiveChat::Interventions::Link
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     link_load&.destroy
     head :ok
