@@ -43,6 +43,15 @@ RSpec.describe InterventionChannel, type: :channel do
                       })
       end
 
+      context 'when the intervention is published' do
+        let(:intervention) { create(:intervention, :with_collaborators, :published, user: researcher) }
+
+        it 'update current editor' do
+          perform :on_editing_started, interventionId: intervention.id
+          expect(intervention.reload.current_editor_id).to eql(current_user.id)
+        end
+      end
+
       context 'when sb editing the intervention' do
         it 'reject action' do
           intervention.update(current_editor_id: intervention.collaborators.first.user_id)
@@ -76,6 +85,16 @@ RSpec.describe InterventionChannel, type: :channel do
         expect { perform :on_editing_stopped, interventionId: intervention.id }
           .to have_broadcasted_to("intervention_channel_#{intervention.id}")
                 .with({ data: {}, topic: 'editing_stopped', status: 200 })
+      end
+
+      context 'when the intervention is published' do
+        let(:intervention) { create(:intervention, :with_collaborators, :published, user: researcher, current_editor: current_user) }
+
+        it 'update current editor' do
+          subscribe id: intervention.id
+          perform :on_editing_stopped, interventionId: intervention.id
+          expect(intervention.reload.current_editor_id).to be_nil
+        end
       end
 
       context 'when sb editing the intervention' do
