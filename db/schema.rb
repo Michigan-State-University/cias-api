@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_01_123537) do
+ActiveRecord::Schema.define(version: 2023_06_05_063845) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -408,6 +408,9 @@ ActiveRecord::Schema.define(version: 2023_06_01_123537) do
     t.boolean "quick_exit", default: false
     t.boolean "live_chat_enabled", default: false, null: false
     t.integer "current_narrator", default: 0
+    t.uuid "current_editor_id"
+    t.integer "conversations_count"
+    t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -917,6 +920,7 @@ ActiveRecord::Schema.define(version: 2023_06_01_123537) do
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
+  add_foreign_key "interventions", "users", column: "current_editor_id"
   add_foreign_key "invitations", "health_clinics"
   add_foreign_key "live_chat_conversations", "interventions"
   add_foreign_key "live_chat_interlocutors", "live_chat_conversations", column: "conversation_id"

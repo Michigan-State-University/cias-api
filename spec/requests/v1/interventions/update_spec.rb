@@ -260,6 +260,8 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     it { expect(response).to have_http_status(:forbidden) }
   end
 
+  it_behaves_like 'collaboration mode - only one editor at the same time'
+
   context 'when user has role participant' do
     let(:user) { participant }
 

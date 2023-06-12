@@ -5,11 +5,12 @@ class V1::InterventionsController < V1Controller
     collection = interventions_scope.detailed_search(params, current_v1_user)
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
-    render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json
+    render json: serialized_hash(paginated_collection, controller_name.classify,
+                                 params: { current_user_id: current_v1_user.id }).merge({ interventions_size: collection.size }).to_json
   end
 
   def show
-    render json: serialized_response(intervention_load)
+    render json: serialized_response(intervention_load, controller_name.classify, params: { current_user_id: current_v1_user.id })
   end
 
   def create
@@ -22,11 +23,11 @@ class V1::InterventionsController < V1Controller
   def update
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    intervention = intervention_load
-    intervention.assign_attributes(intervention_params)
-    intervention.save!
-    render json: serialized_response(intervention)
+    intervention_load.assign_attributes(intervention_params)
+    intervention_load.save!
+    render json: serialized_response(intervention_load)
   end
 
   def clone
@@ -47,7 +48,7 @@ class V1::InterventionsController < V1Controller
 
   def generate_conversations_transcript
     authorize! :update, Intervention
-    authorize! :update, intervention_load
+    authorize! :get_protected_attachment, intervention_load
 
     LiveChat::GenerateTranscriptJob.perform_later(
       intervention_load.id, ::Intervention, :conversations_transcript, intervention_load.name, current_v1_user.id
@@ -59,17 +60,15 @@ class V1::InterventionsController < V1Controller
   private
 
   def interventions_scope
-    Intervention.accessible_by(current_ability)
+    @interventions_scope ||= Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
-                .includes(%i[user reports_attachments logo_attachment collaborators])
+                .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
+                             conversations_transcript_attachment])
                 .only_visible
   end
 
   def intervention_load
-    @intervention_load ||= Intervention.accessible_by(current_ability)
-                .order(created_at: :desc)
-                .includes(%i[reports_attachments logo_attachment collaborators])
-                .find(params[:id])
+    @intervention_load ||= interventions_scope.find(params[:id])
   end
 
   def intervention_params

@@ -16,5 +16,10 @@ module CableExceptionHandler
     rescue_from LiveChat::CallOutUnavailableException do |exc|
       ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 422, 'call_out_unavailable_error', unlockTime: exc.unlock_time))
     end
+
+    rescue_from Cable::OperationalInvalidException do |exc|
+      ActionCable.server.broadcast(exc.channel_id, format_error_message(exc, 400, 'unexpected_error'))
+      reject
+    end
   end
 end

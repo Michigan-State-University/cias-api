@@ -129,4 +129,6 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
       it_behaves_like 'permitted user'
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

@@ -4,6 +4,7 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   def create
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     return render status: :payload_too_large if files_too_big?
 
@@ -14,6 +15,7 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   def destroy
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     selected_files(params[:files_for]).find(file_id).purge_later
 

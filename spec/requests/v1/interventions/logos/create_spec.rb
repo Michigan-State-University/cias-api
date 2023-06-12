@@ -75,4 +75,29 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
       expect(response).to have_http_status(:forbidden)
     }
   end
+
+  context 'when collaborator has edit access' do
+    let(:intervention) { create(:intervention, :with_collaborators) }
+    let(:current_user) { intervention.collaborators.first.user }
+
+    before do
+      intervention.update(current_editor: current_user)
+      post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token
+    end
+
+    it {
+      expect(response).to have_http_status(:created)
+    }
+
+    context 'when current editor is empty' do
+      before do
+        intervention.update(current_editor: nil)
+        post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token
+      end
+
+      it {
+        expect(response).to have_http_status(:forbidden)
+      }
+    end
+  end
 end

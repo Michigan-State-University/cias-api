@@ -66,6 +66,12 @@ RSpec.describe 'POST /v1/live_chat/intervention/:id/navigators', type: :request 
         )
       end
     end
+
+    context 'but isn\'t the current editor' do
+      let(:intervention) { create(:intervention, :with_collaborators, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+
+      it { expect(response).to have_http_status(:forbidden) }
+    end
   end
 
   context 'other researcher' do

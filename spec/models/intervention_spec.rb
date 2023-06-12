@@ -9,6 +9,7 @@ RSpec.describe Intervention, type: :model do
     let(:initial_status) { subject }
 
     it { should belong_to(:user) }
+    it { should belong_to(:current_editor).optional }
     it { should have_many(:sessions) }
     it { should have_many(:user_interventions) }
     it { should have_many(:conversations) }
