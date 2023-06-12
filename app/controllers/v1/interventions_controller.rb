@@ -96,7 +96,7 @@ class V1::InterventionsController < V1Controller
 
   def to_permit
     @to_permit ||= {
-      intervention: [{ user_ids: [] }],
+      intervention: [{ emails: [] }],
       session: [],
       question: [],
       sms_plan: []

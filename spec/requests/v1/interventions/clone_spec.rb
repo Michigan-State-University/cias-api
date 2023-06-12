@@ -64,10 +64,6 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
         intervention.attributes.except('id', 'created_at', 'updated_at')
       end
 
-      let(:intervention_cloned) do
-        json_response['data']['attributes'].except('id', 'created_at', 'updated_at', 'sessions')
-      end
-
       it { expect(response).to have_http_status(:ok) }
     end
   end
