@@ -58,7 +58,7 @@ describe Intervention do
       let(:user) { collaborator }
 
       it 'can only view intervention' do
-        expect(subject).to have_abilities({ view: true }, intervention)
+        expect(subject).to have_abilities({ read: true }, intervention)
       end
 
       it 'cannot other action' do
@@ -71,7 +71,7 @@ describe Intervention do
       let(:user) { collaborator }
 
       it 'can only view intervention' do
-        expect(subject).to have_abilities({ manage: true }, intervention)
+        expect(subject).to have_abilities(%i[read create update delete add_logo], intervention)
       end
     end
   end
