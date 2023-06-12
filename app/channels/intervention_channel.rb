@@ -21,7 +21,7 @@ class InterventionChannel < ApplicationCable::Channel
   def on_editing_started
     intervention = Intervention.find(params[:id])
 
-    raise_exception if intervention.current_editor_id.present? || intervention.published?
+    raise_exception if intervention.current_editor_id.present?
     raise_exception unless intervention.in?(accessible_interventions)
 
     assign_current_editor!(intervention)
@@ -38,7 +38,7 @@ class InterventionChannel < ApplicationCable::Channel
   def on_force_editing_started
     intervention = Intervention.find(params[:id])
 
-    raise_exception if intervention.user_id != current_user.id || intervention.published?
+    raise_exception if intervention.user_id != current_user.id
     raise_exception unless intervention.in?(accessible_interventions)
 
     assign_current_editor!(intervention)
@@ -55,7 +55,7 @@ class InterventionChannel < ApplicationCable::Channel
   def on_editing_stopped
     intervention = Intervention.find(params[:id])
 
-    raise_exception if intervention.current_editor_id != current_user.id || intervention.published?
+    raise_exception if intervention.current_editor_id != current_user.id
     raise_exception unless intervention.in?(accessible_interventions)
 
     purge_editor_and_create_notifications!(intervention)

@@ -23,14 +23,11 @@ class V1::InterventionsController < V1Controller
   def update
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    intervention = intervention_load
-
-    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
-
-    intervention.assign_attributes(intervention_params)
-    intervention.save!
-    render json: serialized_response(intervention)
+    intervention_load.assign_attributes(intervention_params)
+    intervention_load.save!
+    render json: serialized_response(intervention_load)
   end
 
   def clone
@@ -71,7 +68,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def intervention_load
-    interventions_scope.find(params[:id])
+    @intervention_load ||= interventions_scope.find(params[:id])
   end
 
   def intervention_params
