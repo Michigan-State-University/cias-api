@@ -11,6 +11,7 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
   def update
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     setup = navigator_setup_load
     V1::LiveChat::Interventions::UpdateNavigatorSetupService.call(setup, navigator_setup_params)

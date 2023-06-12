@@ -55,6 +55,23 @@ RSpec.describe 'POST /v1/live_chat/intervention/:id/navigator_setups/links', typ
     end
   end
 
+  context 'only current editor can create invitations in the intervention with collaborators' do
+    let(:params) do
+      {
+        link: {
+          url: 'https://google.com',
+          display_name: 'University of Google'
+        }
+      }
+    end
+    let(:intervention) { create(:intervention, :with_collaborators, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'invalid params' do
     context 'missing link data' do
       let(:params) { {} }
