@@ -11,19 +11,17 @@ RSpec.describe 'GET v1/interventions/:id/generated_conversations_transcript', ty
   let(:request) { get generated_conversations_transcript_v1_intervention_path(intervention.id), headers: headers }
   let(:intervention_owner) { admin }
   let(:user) { researcher }
+  let(:action_path) { ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention.conversations_transcript, only_path: true) }
 
   context 'when owner of the intervention wants to fetch the intervention csv' do
     before { request }
 
     it 'returns OK' do
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:found)
     end
 
     it 'return correct body' do
-      expect(json_response['data']['attributes']['id'].present?).to be true
-      expect(json_response['data']['attributes']['url'].present?).to be true
-      expect(json_response['data']['attributes']['name'].present?).to be true
-      expect(json_response['data']['attributes']['created_at'].present?).to be true
+      expect(response).to redirect_to(action_path)
     end
   end
 
@@ -46,7 +44,7 @@ RSpec.describe 'GET v1/interventions/:id/generated_conversations_transcript', ty
     end
 
     it 'returns OK' do
-      expect(response).to have_http_status(:ok)
+      expect(response).to have_http_status(:found)
     end
   end
 end

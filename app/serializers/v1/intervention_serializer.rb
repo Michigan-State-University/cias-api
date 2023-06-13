@@ -24,6 +24,10 @@ class V1::InterventionSerializer < V1Serializer
     object.newest_report.created_at if object.reports.attached?
   end
 
+  attribute :csv_filename do |object|
+    object.newest_report.blob.filename if object.reports.attached?
+  end
+
   attribute :language_name do |object|
     object.google_language.language_name
   end
@@ -54,6 +58,10 @@ class V1::InterventionSerializer < V1Serializer
 
   attribute :conversations_transcript_generated_at do |object|
     object.conversations_transcript.blob.created_at.in_time_zone('UTC') if object.conversations_transcript.attached?
+  end
+
+  attribute :conversations_transcript_filename do |object|
+    object.conversations_transcript.blob.filename if object.conversations_transcript.attached?
   end
 
   attribute :conversations_present do |object|

@@ -61,7 +61,9 @@ class V1::InterventionsController < V1Controller
     authorize! :read, Intervention
     authorize! :get_protected_attachment, intervention_load
 
-    render json: serialized_response(intervention_load.conversations_transcript, 'GeneratedTranscript')
+    head :no_content unless intervention_load.conversations_transcript.attached?
+
+    redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention_load.conversations_transcript, only_path: true))
   end
 
   private

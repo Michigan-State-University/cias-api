@@ -41,7 +41,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           expect(attrs).to include(
             'name' => 'Some intervention',
             'shared_to' => shared_to,
-            'csv_link' => nil,
             'csv_generated_at' => nil,
             'organization_id' => organization.id,
             'google_language_id' => intervention.google_language_id
@@ -56,7 +55,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           expect(attrs).to include(
             'name' => 'Some intervention',
             'shared_to' => shared_to,
-            'csv_link' => include('test_empty.csv'),
             'csv_generated_at' => be_present
           )
         end
@@ -170,7 +168,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
             expect(attrs).to include(
               'name' => 'Some intervention',
               'shared_to' => shared_to,
-              'csv_link' => nil,
               'csv_generated_at' => nil
             )
           end
@@ -201,7 +198,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
             expect(attrs).to include(
               'name' => 'Some intervention',
               'shared_to' => shared_to,
-              'csv_link' => include('test_empty.csv'),
               'csv_generated_at' => be_present
             )
           end

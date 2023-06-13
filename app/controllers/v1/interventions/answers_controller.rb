@@ -14,7 +14,9 @@ class V1::Interventions::AnswersController < V1Controller
   def csv_attachment
     authorize! :get_protected_attachment, intervention
 
-    render json: serialized_response(intervention, 'Csv')
+    head :no_content unless intervention.reports.attached?
+
+    redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention.newest_report, only_path: true))
   end
 
   private
