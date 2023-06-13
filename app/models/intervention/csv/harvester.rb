@@ -128,10 +128,6 @@ class Intervention::Csv::Harvester
     end
   end
 
-  def boolean_to_int(value)
-    value ? 1 : 0
-  end
-
   def fill_by_tlfb_research(row_index, user_session)
     session = user_session.session
 

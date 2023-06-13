@@ -395,8 +395,39 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.phone", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration",
                                         "#{session.variable}.metadata.number_of_attempts"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '+48123123123', answer.user_session.created_at,
-                                       nil, nil, 1]]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '{provided_number => +48123123123}',
+                                       answer.user_session.created_at, nil, nil, 1]]
+        end
+
+        context 'with selected time ranges' do
+          let!(:answer_body) do
+            {
+              'data' => [
+                {
+                  'var' => 'phone',
+                  'value' => { 'iso' => 'PL',
+                               'number' => '123123123',
+                               'prefix' => '+48',
+                               'confirmed' => true,
+                               'time_ranges' => [{ 'from' => 7, 'to' => 9, 'label' => 'early_morning' }],
+                               'timezone' => 'Europe/Warsaw' }
+                }
+              ]
+            }
+          end
+          let!(:answer) { create(:answer_phone, question: question, body: answer_body, user_session: user_session) }
+
+          # rubocop:disable Layout/LineLength
+          it 'save variable and the value to csv' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.phone", "#{session.variable}.metadata.session_start",
+                                          "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration",
+                                          "#{session.variable}.metadata.number_of_attempts"]
+            expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s,
+                                         '{provided_number => +48123123123, selected_time_ranges => [{"from"=>7, "to"=>9, "label"=>"early_morning"}], timezone => Europe/Warsaw}',
+                                         answer.user_session.created_at, nil, nil, 1]]
+          end
+          # rubocop:enable Layout/LineLength
         end
       end
 

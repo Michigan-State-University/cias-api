@@ -178,6 +178,7 @@ Rails.application.routes.draw do
 
     post :phonetic_preview, to: 'audio#create'
     post :recreate_audio, to: 'audio#recreate'
+    post :regenerate_audio, to: 'audio#regenerate'
     resources :sms_plans do
       post 'clone', on: :member
     end

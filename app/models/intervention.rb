@@ -11,7 +11,6 @@ class Intervention < ApplicationRecord
   CURRENT_VERSION = '1'
 
   belongs_to :user, inverse_of: :interventions
-  has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :organization, optional: true
   belongs_to :google_language
   has_many :user_interventions, dependent: :restrict_with_exception, inverse_of: :intervention
@@ -26,6 +25,9 @@ class Intervention < ApplicationRecord
   has_many :navigators, through: :intervention_navigators, source: :user
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
+
+  has_many :collaborators, dependent: :destroy, inverse_of: :intervention
+  belongs_to :current_editor, class_name: 'User', optional: true
 
   has_many_attached :reports
   has_many_attached :files
@@ -177,6 +179,12 @@ class Intervention < ApplicationRecord
 
   def ability_to_clone?
     true
+  end
+
+  def ability_to_update_for?(user)
+    return true unless collaborators.any?
+
+    current_editor_id == user.id
   end
 
   def remove_short_links

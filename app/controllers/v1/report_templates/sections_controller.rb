@@ -17,6 +17,8 @@ class V1::ReportTemplates::SectionsController < V1Controller
   end
 
   def create
+    return head :forbidden unless @report_template.ability_to_update_for?(current_v1_user)
+
     new_section = ReportTemplate::Section.new(report_template_id: @report_template.id)
 
     authorize! :create, new_section
@@ -29,6 +31,8 @@ class V1::ReportTemplates::SectionsController < V1Controller
 
   def update
     authorize! :update, section
+
+    return head :forbidden unless @report_template.ability_to_update_for?(current_v1_user)
 
     section.update!(formula: section_params[:formula])
 

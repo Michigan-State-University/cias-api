@@ -18,7 +18,7 @@ module Ability::Generic::CollaboratorsAccess
   end
 
   def enable_edit_access(user)
-    can :manage, Intervention, collaborators: { user_id: user.id, edit: true }
+    can %i[read create update delete add_logo], Intervention, collaborators: { user_id: user.id, edit: true }
     can :manage, Session, intervention: { collaborators: { user_id: user.id, edit: true } }
     can :manage, InterventionAccess, intervention: { collaborators: { user_id: user.id, edit: true } }
     can :manage, QuestionGroup, session: { intervention: { collaborators: { user_id: user.id, edit: true } } }
@@ -40,6 +40,7 @@ module Ability::Generic::CollaboratorsAccess
     can :create, DownloadedReport, generated_report: { user_session: { session: { intervention: { collaborators: { user_id: user.id, data_access: true } } } } }
     can %i[read get_protected_attachment], GeneratedReport,
         user_session: { session: { intervention: { collaborators: { user_id: user.id, data_access: true } } } }
+    can :get_protected_attachment, Intervention, collaborators: { user_id: user.id, data_access: true }
     can :manage, Answer, question: { question_group: { session: { intervention: { collaborators: { user_id: user.id, data_access: true } } } } }
   end
 end

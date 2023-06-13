@@ -5,7 +5,9 @@ class Question::Number < Question
 
   def self.assign_default_values(attr)
     super(attr).merge(
-      { 'required' => true }
+      { 'required' => true,
+        'max_length' => nil,
+        'min_length' => nil }
     )
   end
 

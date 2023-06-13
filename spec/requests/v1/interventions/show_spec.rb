@@ -19,7 +19,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
                                                         user: intervention_user, sessions: sessions, shared_to: shared_to,
                                                         organization: organization, reports: reports)
   end
-  let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher), view: true, edit: false).user }
+  let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher), view: true, edit: false) }
+  let!(:collaborator_user) { collaborator.user }
   let(:reports) { [] }
   let(:csv_attachment) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }
 
@@ -81,9 +82,29 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
     end
 
     context 'user is a collaborator with view access' do
-      let(:user) { collaborator }
+      let(:user) { collaborator_user }
 
       it_behaves_like 'permitted user'
+
+      context 'when intervention has current editor' do
+        before do
+          intervention.update(current_editor: collaborator_user)
+          get v1_intervention_path(intervention.id), headers: user.create_new_auth_token
+        end
+
+        it { expect(attrs['has_collaborators']).to be true }
+
+        it { expect(attrs['is_current_user_collaborator']).to be true }
+
+        it {
+          expect(attrs['current_user_collaborator_data']).to include('id' => collaborator.id, 'view' => true, 'edit' => false, 'data_access' => false)
+        }
+
+        it {
+          expect(attrs['current_editor']).to include('id' => collaborator_user.id, 'first_name' => collaborator_user.first_name,
+                                                     'last_name' => collaborator_user.last_name, 'email' => collaborator_user.email)
+        }
+      end
     end
 
     context 'user has multiple roles' do
@@ -155,9 +176,21 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           end
         end
 
+        context 'attribiutes related with collaboration' do
+          it 'contains information if this intervention has collaborators' do
+            expect(attrs).to include(
+              'has_collaborators' => true
+            )
+          end
+
+          it 'contain expected keys' do
+            expect(attrs.keys).to include('is_current_user_collaborator', 'current_user_collaborator_data', 'current_editor')
+          end
+        end
+
         it 'contains information about collaborators' do
           expect(attrs).to include(
-            'collaborating_users_ids' => [intervention.collaborators.first.user_id]
+            'has_collaborators' => true
           )
         end
 

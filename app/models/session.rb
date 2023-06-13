@@ -39,6 +39,7 @@ class Session < ApplicationRecord
 
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
+  delegate :ability_to_update_for?, to: :intervention
 
   scope :multiple_fill, -> { where(multiple_fill: true) }
 
