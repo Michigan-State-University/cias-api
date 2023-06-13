@@ -57,6 +57,13 @@ class V1::InterventionsController < V1Controller
     render status: :ok
   end
 
+  def generated_conversations_transcript
+    authorize! :read, Intervention
+    authorize! :get_protected_attachment, intervention_load
+
+    render json: serialized_response(intervention_load.conversations_transcript, 'GeneratedTranscript')
+  end
+
   private
 
   def interventions_scope

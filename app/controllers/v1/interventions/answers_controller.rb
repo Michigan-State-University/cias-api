@@ -11,10 +11,16 @@ class V1::Interventions::AnswersController < V1Controller
     render json: { message: I18n.t('interventions.answers.index.csv') }
   end
 
+  def csv_attachment
+    authorize! :get_protected_attachment, intervention
+
+    render json: serialized_response(intervention, 'Csv')
+  end
+
   private
 
   def intervention
-    Intervention.accessible_by(current_v1_user.ability).find(intervention_id)
+    @intervention ||= Intervention.accessible_by(current_v1_user.ability).find(intervention_id)
   end
 
   def intervention_id

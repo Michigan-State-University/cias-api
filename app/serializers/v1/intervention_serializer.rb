@@ -20,10 +20,6 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
   end
 
-  attribute :csv_link do |object|
-    newest_csv_link(object) if object.reports.attached?
-  end
-
   attribute :csv_generated_at do |object|
     object.newest_report.created_at if object.reports.attached?
   end
@@ -56,16 +52,12 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions.exists?(type: 'Session::CatMh')
   end
 
-  attribute :conversations_transcript do |object|
-    map_file_data(object.conversations_transcript) if object.conversations_transcript.attached?
+  attribute :conversations_transcript_generated_at do |object|
+    object.conversations_transcript.blob.created_at.in_time_zone('UTC') if object.conversations_transcript.attached?
   end
 
   attribute :conversations_present do |object|
     object.conversations.size.positive?
-  end
-
-  def self.newest_csv_link(object)
-    ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end
 
   def self.files_info(object)
