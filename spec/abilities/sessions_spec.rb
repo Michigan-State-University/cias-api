@@ -67,6 +67,16 @@ describe Session do
         expect(subject).to have_abilities({ manage: false }, team2_session1)
       end
     end
+
+    context 'e-intervention admin' do
+      let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+      let!(:session) { create(:session, intervention: create(:intervention, organization: organization)) }
+      let(:user) { organization.e_intervention_admins.first }
+
+      it 'can read his session' do
+        expect(subject).to have_abilities({ read: true }, session)
+      end
+    end
   end
 
   describe '#accessible_by' do

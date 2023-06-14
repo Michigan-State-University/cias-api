@@ -47,6 +47,12 @@ describe ReportTemplate do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'e-intervention admin' do
+      let(:user) { build_stubbed(:user, :confirmed, :e_intervention_admin) }
+
+      it { should have_abilities(:read, described_class) }
+    end
+
     context 'collaborator' do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }

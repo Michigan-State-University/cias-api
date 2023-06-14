@@ -58,6 +58,12 @@ describe SmsPlan do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'e-intervention admin' do
+      let(:user) { build_stubbed(:user, :confirmed, :e_intervention_admin) }
+
+      it { should have_abilities(:read, described_class) }
+    end
+
     context 'participant' do
       let(:user) { build_stubbed(:user, :confirmed, :participant) }
 
