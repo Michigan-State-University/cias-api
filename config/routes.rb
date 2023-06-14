@@ -49,11 +49,13 @@ Rails.application.routes.draw do
 
     post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
+    get 'interventions/:intervention_id/csv_attachment', to: 'interventions/answers#csv_attachment', as: :fetch_protected_csv
     resources :interventions, only: %i[index show create update] do
       concerns :narrator_changeable, { _model: 'Intervention' }
       post 'clone', on: :member
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
+      get 'generated_conversations_transcript', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
