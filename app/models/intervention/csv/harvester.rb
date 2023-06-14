@@ -164,7 +164,7 @@ class Intervention::Csv::Harvester
     end
   end
 
-  def patient_details(user_session, attrs)
+  def patient_details(_user_session, attrs)
     details&.fetch_values(*attrs)
   end
 
