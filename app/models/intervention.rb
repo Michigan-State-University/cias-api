@@ -184,7 +184,7 @@ class Intervention < ApplicationRecord
   def ability_to_update_for?(user)
     return true unless collaborators.any?
 
-    current_editor_id == user.id
+    current_editor_id == user.id && collaborators.find_by(user_id: user.id).edit
   end
 
   def remove_short_links
