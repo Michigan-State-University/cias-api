@@ -46,6 +46,6 @@ class V1::Intervention::Collaborators::CreateService
   end
 
   def new_collaborators
-    @new_collaborators ||= User.where(email: emails).limit_to_roles(:researcher)
+    @new_collaborators ||= User.where(email: emails).limit_to_roles(%i[researcher admin])
   end
 end

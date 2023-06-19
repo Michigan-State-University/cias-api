@@ -10,18 +10,19 @@ RSpec.describe V1::Intervention::Collaborators::CreateService do
   let!(:intervention) { create(:intervention) }
   let!(:researcher) { create(:user, :confirmed, :researcher) }
   let!(:health_clinic_admin) { create(:user, :confirmed, :health_clinic_admin) }
-  let(:emails) { ['new_researcher@example.com', researcher.email, health_clinic_admin.email] }
+  let!(:super_admin) { create(:user, :confirmed, :admin) }
+  let(:emails) { ['new_researcher@example.com', researcher.email, health_clinic_admin.email, super_admin.email] }
 
   it 'create only 2 collaborators records' do
-    expect { subject }.to change(Collaborator, :count).by(2)
+    expect { subject }.to change(Collaborator, :count).by(3)
   end
 
   it 'send two emails' do
-    expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(2)
+    expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(3)
   end
 
   it 'create notifications' do
-    expect { subject }.to change(Notification, :count).by(2)
+    expect { subject }.to change(Notification, :count).by(3)
   end
 
   it 'create new user' do
