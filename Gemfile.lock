@@ -77,10 +77,6 @@ GEM
       zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
-    airbrake (11.0.2)
-      airbrake-ruby (~> 5.1)
-    airbrake-ruby (5.2.0)
-      rbtree3 (~> 0.5)
     argon2 (2.0.3)
       ffi (~> 1.14)
       ffi-compiler (~> 1.0)
@@ -459,7 +455,6 @@ GEM
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rbtree3 (0.6.0)
     redis (4.5.1)
     regexp_parser (2.1.1)
     request_store (1.5.0)
@@ -601,7 +596,6 @@ DEPENDENCIES
   activejob-cancel
   activerecord_json_validator
   activestorage (>= 6.1.4.7)
-  airbrake
   aws-sdk-s3
   benchmark-ips
   blind_index

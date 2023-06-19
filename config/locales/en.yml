@@ -37,6 +37,8 @@ en:
               body: 'Unfortunately, something went wrong while downloading the CAT-MH questions. Please try again or contact the researcher who sent this session to you.'
               button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
+            collaborators:
+              data_access: "Only owner can change 'data_access' parameter"
         user:
           not_using_invitation_link: "If you want to register by this email, please use the registration link received by email from the researcher."
           attributes:

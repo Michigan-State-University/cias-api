@@ -50,4 +50,12 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/collaborators/:id', typ
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  context 'when the user is an admin' do
+    let(:current_user) { create(:user, :confirmed, :admin) }
+
+    it 'return correct status' do
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end
