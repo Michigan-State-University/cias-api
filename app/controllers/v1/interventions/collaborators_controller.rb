@@ -25,6 +25,7 @@ class V1::Interventions::CollaboratorsController < V1Controller
 
   def update
     authorize! :manage_collaborators, Intervention
+    block_admin_to_give_data_access!
 
     collaborator_load.update(collaborator_params)
     render json: serialized_response(collaborator_load)
@@ -58,5 +59,12 @@ class V1::Interventions::CollaboratorsController < V1Controller
 
   def collaborator_id
     params[:id]
+  end
+
+  def block_admin_to_give_data_access!
+    return if current_v1_user.id == intervention_load.user_id
+    return unless collaborator_params.key?(:data_access)
+
+    raise ActiveModel::ForbiddenAttributesError, I18n.t('activerecord.errors.models.intervention.attributes.collaborators.data_access')
   end
 end

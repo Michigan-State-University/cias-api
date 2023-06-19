@@ -46,7 +46,6 @@ gem 'rack', '>= 2.2.6.3'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'secure_headers'
-gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
 # for search on encrypted data
