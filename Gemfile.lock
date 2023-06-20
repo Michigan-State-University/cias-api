@@ -168,6 +168,8 @@ GEM
     docile (1.4.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    doorkeeper (5.6.4)
+      railties (>= 5)
     dotenv (2.7.6)
     dotenv-rails (2.7.6)
       dotenv (= 2.7.6)
@@ -620,6 +622,7 @@ DEPENDENCIES
   devise-argon2
   devise_invitable
   devise_token_auth
+  doorkeeper
   dotenv-rails
   factory_bot_rails
   faker
@@ -676,7 +679,6 @@ DEPENDENCIES
   test-prof
   timecop
   twilio-ruby (~> 6.0.1)
-  webmock
   wicked_pdf
   wkhtmltopdf-binary
   wkhtmltopdf-heroku (= 2.12.6.0)
