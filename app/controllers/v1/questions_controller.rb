@@ -71,15 +71,6 @@ class V1::QuestionsController < V1Controller
     head :created
   end
 
-  def clone_multiple
-    authorize! :create, Question
-    authorize! :create, chosen_questions
-
-    cloned_questions = V1::Question::CloneMultiple.call(question_ids, chosen_questions)
-
-    render json: cloned_questions_response(cloned_questions), status: :created
-  end
-
   private
 
   def cloned_questions_response(questions)
