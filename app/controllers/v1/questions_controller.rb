@@ -42,7 +42,6 @@ class V1::QuestionsController < V1Controller
 
   def destroy
     authorize! :delete, Question
-    authorize! :delete, chosen_questions
 
     return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
@@ -70,15 +69,6 @@ class V1::QuestionsController < V1Controller
     V1::Question::ShareService.call(current_v1_user, question_ids, chosen_questions, researcher_ids)
 
     head :created
-  end
-
-  def clone_multiple
-    authorize! :create, Question
-    authorize! :create, chosen_questions
-
-    cloned_questions = V1::Question::CloneMultiple.call(question_ids, chosen_questions)
-
-    render json: cloned_questions_response(cloned_questions), status: :created
   end
 
   private

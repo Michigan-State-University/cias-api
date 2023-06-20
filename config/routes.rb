@@ -84,7 +84,6 @@ Rails.application.routes.draw do
     get 'sessions/:id/reflectable_questions', to: 'sessions#reflectable_questions', as: :fetch_reflectable_questions
     scope 'sessions/:session_id', as: 'session' do
       post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
-      post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
@@ -99,7 +98,6 @@ Rails.application.routes.draw do
       resources :question_groups, only: %i[index show create update destroy] do
         member do
           patch :questions_change
-          delete :remove_questions
           post :clone
           post :share
         end

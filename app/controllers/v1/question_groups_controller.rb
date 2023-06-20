@@ -62,17 +62,6 @@ class V1::QuestionGroupsController < V1Controller
     render json: question_group_response(question_group), action: :show
   end
 
-  def remove_questions
-    authorize! :update, QuestionGroup
-    authorize! :update, questions_scope
-
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
-
-    questions_scope.destroy_all
-
-    head :no_content
-  end
-
   def clone
     authorize! :create, QuestionGroup
     authorize! :create, question_group_load
