@@ -115,7 +115,12 @@ Rails.application.routes.draw do
 
     scope module: 'sms_plans' do
       scope 'sms_plans/:sms_plan_id', as: :sms_plan do
-        resources :variants
+        delete 'no_formula_attachment', to: 'no_formula_attachments#delete'
+        resources :variants do
+          member do
+            delete 'attachment', to: 'variants/attachments#delete'
+          end
+        end
         patch 'move_variants', to: 'variants#move'
         scope module: 'alert_phones' do
           resources :phones, only: %i[create update destroy], path: '/alert_phones/'

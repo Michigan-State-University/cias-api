@@ -1,15 +1,7 @@
 # frozen_string_literal: true
 
 class Question::TlfbQuestion < Question::Tlfb
-  attribute :settings, :json, default: -> { assign_default_values('settings') }
-
-  def self.assign_default_values(attr)
-    super(attr).merge(
-      {
-        'required' => true
-      }
-    )
-  end
+  attribute :settings, :json, default: -> { { start_autofinish_timer: false } }
 
   def translate_body(translator, source_language_name_short, destination_language_name_short)
     body['data'].each do |record|

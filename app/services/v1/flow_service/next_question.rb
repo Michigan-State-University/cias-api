@@ -68,4 +68,14 @@ class V1::FlowService::NextQuestion
     participant_date = all_var_values[next_session.days_after_date_variable_name]
     (participant_date.to_datetime + next_session.schedule_payload&.days) if participant_date
   end
+
+  def reassign_next_session_for_flexible_intervention(session, intervention)
+    return session unless session.nil? || UserSession.exists?(user_id: user_session.user.id, session_id: session.id)
+
+    intervention.sessions.each do |intervention_session|
+      return intervention_session unless UserSession.exists?(user_id: user_session.user.id, session_id: intervention_session.id)
+    end
+
+    nil
+  end
 end

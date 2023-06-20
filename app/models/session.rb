@@ -56,6 +56,8 @@ class Session < ApplicationRecord
                                                    } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
+  validates :autofinish_delay, presence: true, if: :autofinish_enabled
+  validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
 
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
@@ -79,9 +81,16 @@ class Session < ApplicationRecord
   end
 
   def invite_by_email(emails, health_clinic_id = nil)
+    emails.map!(&:downcase)
+
     if intervention.shared_to != 'anyone'
       existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
       invite_non_existing_users(non_existing_users_emails, true)
+    end
+
+    if intervention.shared_to_invited?
+      emails_without_access = emails - intervention.intervention_accesses.map(&:email).map(&:downcase)
+      intervention.give_user_access(emails_without_access)
     end
 
     ActiveRecord::Base.transaction do

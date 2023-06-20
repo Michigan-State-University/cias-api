@@ -17,7 +17,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
              days_after_date_variable_name: 'var1')
     end
     let!(:sms_plan) { create(:sms_plan, session: session) }
-    let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
+    let!(:variant) { create(:sms_plan_variant, :with_attachment, sms_plan: sms_plan) }
     let!(:other_session) { create(:session, intervention: intervention) }
     let!(:question_group1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
     let!(:question_group2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
@@ -121,6 +121,13 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
 
     context 'when user is researcher' do
       it_behaves_like 'permitted user'
+
+      context 'attachments also are copies' do
+        it {
+          request
+          expect(outcome_sms_plans.last.variants.first.attachment.attached?).to be true
+        }
+      end
     end
 
     context 'when user is researcher and have multiple roles' do
