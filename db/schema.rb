@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_04_25_075305) do
+ActiveRecord::Schema.define(version: 2023_06_05_101854) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -178,6 +178,19 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
+  end
+
+  create_table "collaborators", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.boolean "view", default: true, null: false
+    t.boolean "edit", default: false, null: false
+    t.boolean "data_access", default: false, null: false
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["intervention_id"], name: "index_collaborators_on_intervention_id"
+    t.index ["user_id", "intervention_id"], name: "index_collaborators_on_user_id_and_intervention_id", unique: true
+    t.index ["user_id"], name: "index_collaborators_on_user_id"
   end
 
   create_table "consumption_results", force: :cascade do |t|
@@ -414,8 +427,11 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
     t.integer "sessions_count"
     t.boolean "quick_exit", default: false
     t.boolean "live_chat_enabled", default: false, null: false
-    t.boolean "hfhs_access", default: false
     t.integer "current_narrator", default: 0
+    t.uuid "current_editor_id"
+    t.integer "conversations_count"
+    t.boolean "hfhs_access", default: false
+    t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -959,6 +975,8 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "collaborators", "interventions"
+  add_foreign_key "collaborators", "users"
   add_foreign_key "consumption_results", "days"
   add_foreign_key "days", "question_groups"
   add_foreign_key "days", "user_sessions"
@@ -970,6 +988,7 @@ ActiveRecord::Schema.define(version: 2023_04_25_075305) do
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
+  add_foreign_key "interventions", "users", column: "current_editor_id"
   add_foreign_key "invitations", "health_clinics"
   add_foreign_key "live_chat_conversations", "interventions"
   add_foreign_key "live_chat_interlocutors", "live_chat_conversations", column: "conversation_id"
