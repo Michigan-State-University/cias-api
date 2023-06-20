@@ -29,10 +29,8 @@ class Ability::Researcher < Ability::Base
     can %i[index create generate_transcript], LiveChat::Conversation, intervention: { user_id: user.id }
     can :read, LiveChat::Interventions::NavigatorSetup, intervention: { user_id: user.id }
     can :delete, LiveChat::Interventions::Link, navigator_setup: { intervention: { user_id: user.id } }
-    can :manage, Question
-    can :manage, QuestionGroup, session: { intervention: { user_id: user.id } }
-    can :manage, Answer, question: { question_group: { session: { intervention: { user_id: user.id } } } }
-    # enable_questions_access(user.id)
+
+    enable_questions_access(user.id)
     enable_report_template_access(user.id)
     enable_sms_plan_access(logged_user_sessions(user))
     enable_cat_mh_access
