@@ -42,7 +42,6 @@ class V1::QuestionsController < V1Controller
 
   def destroy
     authorize! :delete, Question
-    authorize! :delete, chosen_questions
 
     return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
