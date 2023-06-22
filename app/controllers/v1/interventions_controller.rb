@@ -5,7 +5,7 @@ class V1::InterventionsController < V1Controller
     collection = interventions_scope.detailed_search(params, current_v1_user)
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
-    render json: serialized_hash(paginated_collection, controller_name.classify,
+    render json: serialized_hash(paginated_collection, 'SimpleIntervention',
                                  params: { current_user_id: current_v1_user.id }).merge({ interventions_size: collection.size }).to_json
   end
 
