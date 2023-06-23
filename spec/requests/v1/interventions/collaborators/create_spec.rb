@@ -31,6 +31,10 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/collaborators', type: :r
       user_ids = intervention.reload.collaborators.pluck(:user_id)
       expect(User.where(id: user_ids).map(&:email)).to match_array(params[:emails])
     end
+
+    it 'have correct keys' do
+      expect(json_response['data'].first['attributes'].keys).to match_array(%w[id view edit data_access user])
+    end
   end
 
   context 'when collaborator wants to add another collaborator' do
