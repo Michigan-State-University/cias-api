@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/interventions/:intervention_id/collaborators/:id', type: :request do
+RSpec.describe 'GET /v1/interventions/:intervention_id/permission', type: :request do
   let(:user) { create(:user, :researcher, :confirmed) }
   let(:intervention) { create(:intervention, :with_collaborators, user: user) }
   let(:collaborator) { intervention.collaborators.first }
