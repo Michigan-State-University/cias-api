@@ -1,16 +1,26 @@
 # frozen_string_literal: true
 
 class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
-  after_action :verify_login_code, only: :create
+  before_action :verify_account_integrity, only: :create
 
+  include ExceptionHandler
   include Resource
   prepend Auth::Default
   include Log
 
-  def verify_login_code
+  def verify_account_integrity
+    @resource = User.find_by(email: params[:email])
+
     return unless @resource&.valid_password?(resource_params[:password])
 
-    head :forbidden if V1::Users::Verifications::Create.call(@resource, request.headers['Verification-Code'])
+    if @resource&.missing_require_fields?
+      raise ComplexException.new(I18n.t('activerecord.errors.models.user.terms_not_accepted'),
+                                 { reason: 'TERMS_NOT_ACCEPTED', require_fields: @resource.slice(:first_name, :last_name, :terms) }, :forbidden)
+    end
+
+    return unless V1::Users::Verifications::Create.call(@resource, request.headers['Verification-Code'])
+
+    raise ComplexException.new(I18n.t('activerecord.errors.models.user.2fa_code_needed'), { reason: '2FA_NEEDED' }, :forbidden)
   end
 
   private
