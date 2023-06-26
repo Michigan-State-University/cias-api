@@ -22,7 +22,7 @@ RSpec.describe InterventionChannel, type: :channel do
       end
     end
 
-    context 'handle message from clinet -> #start_editing' do
+    context 'handle message from client -> #start_editing' do
       it 'update current editor' do
         perform :on_editing_started, interventionId: intervention.id
         expect(intervention.reload.current_editor_id).to eql(current_user.id)
@@ -169,6 +169,41 @@ RSpec.describe InterventionChannel, type: :channel do
             subscription.unsubscribe_from_channel
           end.to change(Notification, :count).by(1)
         end
+      end
+    end
+  end
+
+  context 'collaborator with only view access' do
+    let(:current_user) do
+      intervention.collaborators.first.update!(edit: false)
+      intervention.collaborators.first.reload.user
+    end
+
+    context 'subscribe' do
+      it 'successfully subscribes' do
+        expect(subscription).to(be_confirmed)
+      end
+
+      it 'successfully stream from' do
+        expect(subscription).to(have_stream_from("intervention_channel_#{intervention.id}"))
+      end
+    end
+
+    context 'handle action #start_editing' do
+      it 'reject action' do
+        perform :on_editing_started, interventionId: intervention.id
+        expect(subscription).to(be_rejected)
+      end
+    end
+  end
+
+  context 'collaborator with only edit access' do
+    let(:current_user) { intervention.collaborators.first.reload.user }
+
+    context 'handle action #start_editing' do
+      it 'reject action' do
+        perform :on_editing_started, interventionId: intervention.id
+        expect(subscription).to(be_confirmed)
       end
     end
   end
