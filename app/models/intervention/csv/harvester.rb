@@ -62,19 +62,18 @@ class Intervention::Csv::Harvester
   end
 
   def set_rows
-    user_sessions.group_by { |us| [us.session_id, us.user_id] }.each_with_index do |grouped_user_sessions, row_index|
+    user_sessions.group_by(&:user_id).each_with_index do |grouped_user_sessions, row_index|
       initialize_row
-      first_user_session = grouped_user_sessions.second.first
-      set_user_data(row_index, first_user_session)
-      session = first_user_session.session
+      set_user_data(row_index, grouped_user_sessions.second.first)
 
-      grouped_user_sessions.second.sort_by(&:number_of_attempts).each_with_index do |user_session, index|
+      grouped_user_sessions.second.each do |user_session|
         user_session.answers.each do |answer|
-          set_default_value(user_session, answer, row_index, index + 1, user_session.session.multiple_fill)
+          set_default_value(user_session, answer, row_index, user_session.number_of_attempts, user_session.session.multiple_fill)
           next if answer.skipped
 
           answer.body_data&.each do |data|
-            var_index = header.index(column_name(user_session.session.multiple_fill, session, answer.csv_header_name(data), index + 1))
+            var_index = header.index(column_name(user_session.session.multiple_fill, user_session.session, answer.csv_header_name(data),
+                                                 user_session.number_of_attempts))
 
             next if var_index.blank?
 
@@ -82,9 +81,9 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
           end
         end
-        fill_by_tlfb_research(row_index, user_session, index + 1, user_session.session.multiple_fill)
-        metadata(session, user_session, row_index, index + 1, user_session.session.multiple_fill)
-        quick_exit(session, row_index, user_session, index + 1, user_session.session.multiple_fill)
+        fill_by_tlfb_research(row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
+        metadata(user_session.session, user_session, row_index, user_session.number_of_attempts, user_session.session.multiple_fill)
+        quick_exit(user_session.session, row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
       end
     end
   end
@@ -101,7 +100,7 @@ class Intervention::Csv::Harvester
   end
 
   def quick_exit(session, row_index, user_session, approach_number, multiple_fill)
-    session_header_index = header.index(column_name(multiple_fill, session, 'metadata.quick_exit', approach_number ))
+    session_header_index = header.index(column_name(multiple_fill, session, 'metadata.quick_exit', approach_number))
 
     rows[row_index][session_header_index] = boolean_to_int(user_session.quick_exit) if session_header_index.present?
   end

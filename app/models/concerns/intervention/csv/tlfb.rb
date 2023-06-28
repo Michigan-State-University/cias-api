@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Intervention::Csv::Tlfb
-
   DEFAULT_VALUE_FOR_TLFB_ANSWER = 0
 
   def fill_by_tlfb_research(row_index, user_session, index, multiple_fill)
