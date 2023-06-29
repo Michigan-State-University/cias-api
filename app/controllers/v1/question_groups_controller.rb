@@ -93,7 +93,7 @@ class V1::QuestionGroupsController < V1Controller
   def share_externally
     authorize! :create, QuestionGroup
 
-    V1::QuestionGroup::ShareExternallyService.call(share_externally_params[:user_ids], session_id, share_externally_params[:question_groups], current_v1_user)
+    V1::QuestionGroup::ShareExternallyService.call(share_externally_params[:emails], session_id, share_externally_params[:question_groups], current_v1_user)
     head :created
   end
 
@@ -110,7 +110,7 @@ class V1::QuestionGroupsController < V1Controller
   private
 
   def share_externally_params
-    params.permit(user_ids: [], question_groups: [:id, { question_ids: [] }])
+    params.permit(emails: [], question_groups: [:id, { question_ids: [] }])
   end
 
   def duplicate_internally_params
