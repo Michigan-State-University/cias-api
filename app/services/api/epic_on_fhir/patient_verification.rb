@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
-  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}?_format=json"
+  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match?_format=json"
 
   def self.call(first_name, last_name, birth_date, phone_number, postal_code)
     new(first_name, last_name, birth_date, phone_number, postal_code).call
@@ -17,6 +17,7 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
   end
 
   def call
+    require 'pry'; binding.pry
     response = Faraday.post(ENDPOINT) do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/json'
