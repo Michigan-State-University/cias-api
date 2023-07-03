@@ -10,40 +10,28 @@ class V1::HenryFord::VerifyService
     @patient_params = patient_params
   end
 
-  attr_reader :user, :patient_params
-  attr_accessor :patient_details
+  attr_reader :user, :patient_params, :patient
 
   def call
-    if mrn.present?
-      @patient_details = HfhsPatientDetail.find_by!(patient_id: mrn)
-    else
-      details = HfhsPatientDetail.where(first_name: first_name, last_name: last_name, sex: sex, dob: parsed_dob, zip_code: zip_code)
-      verify_found_details(details)
-
-      @patient_details = details.first
-    end
-
-    assign_patient_details!
-
-    @patient_details
+    @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, zip_code)
+    Api::EpicOnFhir::Appointments.call(patient_id)
+    # TODO: define way to get one needed visit_id from collection of appointments
   end
 
   private
 
-  %w[first_name last_name sex dob zip_code find_by mrn].each do |param|
+  %w[first_name last_name sex dob zip_code phone_number].each do |param|
     define_method :"#{param}" do
       patient_params[param]
     end
   end
 
   def parsed_dob
-    Date.parse(dob)
+    Date.parse(dob).strftime('%Y%m%d')
   end
 
-  def assign_patient_details!
-    return if user.preview_session?
-
-    user.update(hfhs_patient_detail: @patient_details)
+  def patient_id
+    patient.dig(:entry, 0, :resource, :id)
   end
 
   def verify_found_details(details)

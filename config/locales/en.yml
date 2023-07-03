@@ -323,4 +323,7 @@ en:
     error:
       authentication: "Authorization process failed. Please contact our support team so that we can assist you in resolving this matter"
       unexpected_error: "Third party tool return unexpected response. Please contact our support team"
-      not_found: "We could not clearly identify you in out third party tool. Please contact our support team"
+      patient:
+        not_found: "We could not clearly identify you in out third party tool. Please contact our support team"
+      appointments:
+        not_found: "We could not find all the necessary information for further processing"

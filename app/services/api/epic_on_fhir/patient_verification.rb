@@ -20,14 +20,13 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
     response = Faraday.post(ENDPOINT) do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/json'
-      request.body = body
     end
 
-    raise EpicOnFhir::UnexpectedError, I18n.t('epic_on_fhir.error.unexpected_error') if response.status != 200
+    check_status(response)
 
     parsed_response = JSON.parse(response.body).deep_symbolize_keys
 
-    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.not_found') if parsed_response[:total] != 1
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.patient.not_found') if parsed_response[:total] != 1
 
     parsed_response
   end
