@@ -296,6 +296,7 @@ Rails.application.routes.draw do
 
     get 'me', to: 'users#me', as: :get_user_details
     get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
+    get 'jwk-set-1', as: :jwk_set, to: 'epic_on_fhir/jwk_sets#index'
   end
 
   if Rails.env.development?

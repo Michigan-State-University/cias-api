@@ -3,6 +3,7 @@
 class Api::EpicOnFhir::Authentication
   ENDPOINT = ENV.fetch('EPIC_ON_FHIR_AUTHENTICATION_ENDPOINT')
   AUTHENTICATION_ALGORITHM = ENV.fetch('EPIC_ON_FHIR_AUTHENTICATION_ALGORITHM')
+  KID = ENV.fetch('EPIC_ON_FHIR_KID')
   CLIENT_ID = ENV.fetch('EPIC_ON_FHIR_CLIENT_ID')
   GRANT_TYPE = 'client_credentials'
   CLIENT_ASSERTION_TYPE = 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
@@ -39,7 +40,8 @@ class Api::EpicOnFhir::Authentication
   def jwt_header
     {
       alg: AUTHENTICATION_ALGORITHM,
-      typ: 'JWT'
+      typ: 'JWT',
+      kid: KID
     }
   end
 
