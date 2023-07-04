@@ -73,6 +73,18 @@ module ExceptionHandler
 
       render json: message, status: :unprocessable_entity
     end
+
+    rescue_from EpicOnFhir::NotFound do |exc|
+      render json: msg(exc), status: :bad_request
+    end
+
+    rescue_from EpicOnFhir::UnexpectedError do |exc|
+      render json: msg(exc), status: :bad_request
+    end
+
+    rescue_from EpicOnFhir::AuthenticationError do |exc|
+      render json: msg(exc), status: :bad_request
+    end
   end
 
   private
