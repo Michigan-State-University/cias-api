@@ -9,5 +9,7 @@ FactoryBot.define do
     visit_id { 'AttendingProvider_EpicDepartmentID_VisitNumber' }
     zip_code { Faker::Address.zip }
     patient_id { '89008709' }
+    phone_number { Faker::PhoneNumber.cell_phone }
+    phone_type { 'work' }
   end
 end

@@ -366,4 +366,14 @@ describe Api::EpicOnFhir::Appointments do
 
     expect { subject }.to raise_error(EpicOnFhir::NotFound)
   end
+
+  it 'when access token is wrong' do
+    it 'when third party tool return empty collection' do
+      stub_request(:post, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
+        .with(query: { '_format' => 'json', 'patient' => patient_id })
+        .to_return(status: 401, body: '')
+
+      expect { subject }.to raise_error(EpicOnFhir::UnexpectedError)
+    end
+  end
 end
