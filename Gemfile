@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.7.3'
+gem 'rails', '~> 6.1.7.4'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.4'
 
@@ -61,7 +61,7 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
-gem 'doorkeeper'
+gem 'doorkeeper', '>=5.6.6'
 gem 'jwt', '~> 2.6'
 
 group :development, :test do
