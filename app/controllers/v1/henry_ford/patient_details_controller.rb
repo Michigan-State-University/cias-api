@@ -27,7 +27,7 @@ class V1::HenryFord::PatientDetailsController < V1Controller
   private
 
   def patient_detail_params
-    params.require(:hfhs_patient_data).permit(:mrn, :first_name, :last_name, :dob, :sex, :zip_code)
+    params.require(:hfhs_patient_data).permit(:mrn, :first_name, :last_name, :dob, :sex, :zip_code, :phone_number, :phone_type)
   end
 
   def hfhs_params

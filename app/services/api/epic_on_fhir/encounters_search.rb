@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::EpicOnFhir::EncountersSearch
-  ENDPOINT = 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4/Encounter'
+  ENDPOINT = ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT')
 
   def self.call(patient_id)
     new(patient_id).call

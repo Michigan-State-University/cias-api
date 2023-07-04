@@ -150,6 +150,11 @@ Metrics/ClassLength:
     - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
     - 'app/models/intervention.rb'
 
+Metrics/ParameterLists:
+  Enabled: true
+  Exclude:
+    - 'app/services/api/epic_on_fhir/patient_verification.rb'
+
 Performance/AncestorsInclude:
   Enabled: true
 

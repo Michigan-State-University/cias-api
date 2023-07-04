@@ -1,18 +1,19 @@
 # frozen_string_literal: true
 
 class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
-  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match?_format=json"
+  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match"
 
-  def self.call(first_name, last_name, birth_date, phone_number, postal_code)
-    new(first_name, last_name, birth_date, phone_number, postal_code).call
+  def self.call(first_name, last_name, birth_date, phone_number, phone_type, postal_code)
+    new(first_name, last_name, birth_date, phone_number, phone_type, postal_code).call
   end
 
-  def initialize(first_name, last_name, birth_date, phone_number, postal_code)
+  def initialize(first_name, last_name, birth_date, phone_number, phone_type, postal_code)
     super()
     @first_name = first_name
     @last_name = last_name
     @birth_date = birth_date
     @phone_number = phone_number
+    @phone_type = phone_type
     @postal_code = postal_code
   end
 
@@ -20,6 +21,8 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
     response = Faraday.post(ENDPOINT) do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/json'
+      request.params['_format'] = 'json'
+      request.body = body
     end
 
     check_status(response)
@@ -31,7 +34,7 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
     parsed_response
   end
 
-  attr_reader :first_name, :last_name, :birth_date, :phone_number, :postal_code
+  attr_reader :first_name, :last_name, :birth_date, :phone_number, :phone_type, :postal_code
 
   private
 
@@ -54,7 +57,7 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
               {
                 system: 'phone',
                 value: phone_number,
-                use: 'home'
+                use: phone_type
               }
             ],
             address: [

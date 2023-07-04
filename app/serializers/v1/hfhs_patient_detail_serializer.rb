@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 class V1::HfhsPatientDetailSerializer < V1Serializer
-  attributes :patient_id, :first_name, :last_name, :dob, :sex, :zip_code
+  attributes :patient_id, :first_name, :last_name, :dob, :sex, :zip_code, :phone, :phone_type
 end
