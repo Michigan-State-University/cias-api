@@ -17,26 +17,18 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
     @postal_code = postal_code
   end
 
-  def call
-    response = Faraday.post(ENDPOINT) do |request|
+  attr_reader :first_name, :last_name, :birth_date, :phone_number, :phone_type, :postal_code
+
+  private
+
+  def request
+    Faraday.post(ENDPOINT) do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/json'
       request.params['_format'] = 'json'
       request.body = body
     end
-
-    check_status(response)
-
-    parsed_response = JSON.parse(response.body).deep_symbolize_keys
-
-    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.patient.not_found') if parsed_response[:total] != 1
-
-    parsed_response
   end
-
-  attr_reader :first_name, :last_name, :birth_date, :phone_number, :phone_type, :postal_code
-
-  private
 
   def body
     {
@@ -73,5 +65,9 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
         }
       ]
     }.to_json
+  end
+
+  def not_found_condition(response)
+    response[:total] != 1
   end
 end
