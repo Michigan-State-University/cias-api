@@ -51,8 +51,6 @@ Our goal is for cost to never be a barrier. This code is available to anyone at 
 
 ### For more information, or to request access to the MSU instance of CIAS, please see https://www.cias.app/ or contact [CIAS@msu.edu](cias@msu.edu)
 
-### For more information, or to request access please see https://www.cias.app/ or contact [CIAS@msu.edu](cias@msu.edu)
-
 ## DEVELOPMENT
 
 ### LAUNCH
