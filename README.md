@@ -56,7 +56,7 @@ Our goal is for cost to never be a barrier. This code is available to anyone at 
 ### LAUNCH
 
 - Install `git` on server:
-- `$ git clone git@github.com:htdevelopers/cias-api.git`
+- `$ git clone git@github.com:Michigan-State-University/cias-api.git`
 - `$ cd cias-api`
 - `$ cp .env.template .env`
 - Install `ruby 2.7.2`
