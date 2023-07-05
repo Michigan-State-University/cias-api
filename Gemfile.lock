@@ -591,6 +591,7 @@ PLATFORMS
 
 DEPENDENCIES
   action-cable-testing (~> 0.6.1)
+  actionpack (>= 6.1.7.3)
   active_model_serializers (~> 0.10.0)
   active_storage_validations
   activejob-cancel
@@ -675,4 +676,4 @@ RUBY VERSION
    ruby 2.7.2p137
 
 BUNDLED WITH
-   2.3.22
+   2.3.21
