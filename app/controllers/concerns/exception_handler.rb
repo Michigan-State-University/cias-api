@@ -75,7 +75,7 @@ module ExceptionHandler
     end
 
     rescue_from EpicOnFhir::NotFound do |exc|
-      render json: msg(exc), status: :bad_request
+      render json: msg(exc), status: :not_found
     end
 
     rescue_from EpicOnFhir::UnexpectedError do |exc|

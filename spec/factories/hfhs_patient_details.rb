@@ -8,7 +8,7 @@ FactoryBot.define do
     sex { 'M' }
     visit_id { 'AttendingProvider_EpicDepartmentID_VisitNumber' }
     zip_code { Faker::Address.zip }
-    patient_id { '89008709' }
+    patient_id { '89010892' }
     phone_number { Faker::PhoneNumber.cell_phone }
     phone_type { 'work' }
   end

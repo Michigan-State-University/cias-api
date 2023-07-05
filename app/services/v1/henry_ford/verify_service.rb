@@ -13,11 +13,16 @@ class V1::HenryFord::VerifyService
   end
 
   attr_reader :user, :patient_params, :patient, :appointments
+  attr_accessor :resource
 
   def call
     @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code)
     @appointments = Api::EpicOnFhir::Appointments.call(epic_patient_id)
+
     create_or_find_resource!
+    assign_patient_details!
+
+    resource
   end
 
   private
@@ -52,21 +57,27 @@ class V1::HenryFord::VerifyService
   def hfhs_visit_id
     # TODO: implement logic provided by Rajesh
     @appointments[:entry]
-                 .find { |appointment| appointment.dig(:resource, :identifier, 0, :system) == system_id }
-                 .dig(:resource, :identifier, :value)
+                 .find { |appointment| appointment.dig(:resource, :identifier, 0, :system) == system_identifier }
+      &.dig(:resource, :identifier, :value)
   end
 
   def create_or_find_resource!
-    result = HfhsPatientDetail.find_or_create_by!(
-      patient_id: patient_id,
+    @resource = HfhsPatientDetail.find_or_create_by!(
+      patient_id: hfhs_patient_id,
       first_name: first_name,
       last_name: last_name,
       dob: Date.parse(dob),
       gender: sex,
       zip: zip_code,
-      phone: phone_number,
-      phone_type: phone_type
+      phone_type: phone_type,
+      phone_number: phone_number
     )
-    result.update!(visit_id: hfhs_visit_id)
+    resource.update!(visit_id: hfhs_visit_id)
+  end
+
+  def assign_patient_details!
+    return if user.preview_session?
+
+    user.update(hfhs_patient_detail: @resource)
   end
 end
