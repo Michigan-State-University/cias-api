@@ -690,7 +690,7 @@ DEPENDENCIES
   rack-attack
   rack-cors
   rack-test
-  rails (~> 6.1.7.3)
+  rails (~> 6.1.7.4)
   rails-html-sanitizer (>= 1.4.4)
   redis
   rspec-benchmark

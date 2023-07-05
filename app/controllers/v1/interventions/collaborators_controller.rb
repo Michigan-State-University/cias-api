@@ -31,10 +31,16 @@ class V1::Interventions::CollaboratorsController < V1Controller
     render json: serialized_response(collaborator_load)
   end
 
+  def show
+    authorize! :read, Intervention
+
+    render json: serialized_response(collaborators_scope.find_by!(user_id: current_v1_user.id), controller_name.classify, params: { skip_user_data: true })
+  end
+
   private
 
   def intervention_load
-    @intervention_load ||= if current_v1_user.role?('admin')
+    @intervention_load ||= if current_v1_user.role?('admin') || action_name.eql?('show')
                              Intervention.accessible_by(current_ability).find(params[:intervention_id])
                            else
                              Intervention.accessible_by(current_ability).find_by!(id: params[:intervention_id], user_id: current_v1_user.id)

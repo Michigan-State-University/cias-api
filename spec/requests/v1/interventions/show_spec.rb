@@ -92,12 +92,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
         it { expect(attrs['has_collaborators']).to be true }
 
-        it { expect(attrs['is_current_user_collaborator']).to be true }
-
-        it {
-          expect(attrs['current_user_collaborator_data']).to include('id' => collaborator.id, 'view' => true, 'edit' => false, 'data_access' => false)
-        }
-
         it {
           expect(attrs['current_editor']).to include('id' => collaborator_user.id, 'first_name' => collaborator_user.first_name,
                                                      'last_name' => collaborator_user.last_name, 'email' => collaborator_user.email)
@@ -181,7 +175,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           end
 
           it 'contain expected keys' do
-            expect(attrs.keys).to include('is_current_user_collaborator', 'current_user_collaborator_data', 'current_editor')
+            expect(attrs.keys).to include('current_editor')
           end
         end
 
