@@ -51,6 +51,7 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
     end
 
     it 'return correct result' do
+      require 'pry'; binding.pry
       expect(json_response['data']['id']).to eq(hfhs_data.id)
     end
 

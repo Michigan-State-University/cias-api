@@ -1,22 +1,6 @@
 # frozen_string_literal: true
 
 class V1::HenryFord::PatientDetailsController < V1Controller
-  before_action :doorkeeper_authorize!, except: :verify
-  before_action :authenticate_user!, except: [:create]
-
-  def create
-    result = HfhsPatientDetail.find_or_create_by!(
-      patient_id: hfhs_params[:patient_id],
-      first_name: hfhs_params[:first_name],
-      last_name: hfhs_params[:last_name],
-      dob: Date.parse(hfhs_params[:dob]),
-      gender: hfhs_params[:gender],
-      zip: hfhs_params[:zip]
-    )
-    result.update!(visit_id: hfhs_visit_id)
-    head(:ok)
-  end
-
   def verify
     authorize! :read, UserSession
 

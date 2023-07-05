@@ -9,10 +9,6 @@ end
 Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
-  use_doorkeeper do
-    skip_controllers :authorizations, :applications, :authorized_applications
-  end
-
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
       confirmations: 'v1/auth/confirmations',
@@ -50,7 +46,6 @@ Rails.application.routes.draw do
       end
     end
     namespace :henry_ford do
-      post 'new_patient', to: 'patient_details#create'
       post 'verify', to: 'patient_details#verify'
     end
 
