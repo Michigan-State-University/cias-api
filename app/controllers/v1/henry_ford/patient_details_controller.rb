@@ -13,12 +13,4 @@ class V1::HenryFord::PatientDetailsController < V1Controller
   def patient_detail_params
     params.require(:hfhs_patient_data).permit(:first_name, :last_name, :dob, :sex, :zip_code, :phone_number, :phone_type)
   end
-
-  def hfhs_params
-    @hfhs_params ||= params.permit(:patientID, :lastName, :firstName, :dob, :gender, :zip).deep_transform_keys!(&:underscore)
-  end
-
-  def hfhs_visit_id
-    params[:visitID]
-  end
 end
