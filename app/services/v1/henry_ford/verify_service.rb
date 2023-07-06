@@ -46,7 +46,7 @@ class V1::HenryFord::VerifyService
   end
 
   def system_identifier_details
-    @system_identifier = patient.dig(:entry, 0, :resource, :identifier)
+    @system_identifier_details ||= patient.dig(:entry, 0, :resource, :identifier)
                       .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
   end
 
