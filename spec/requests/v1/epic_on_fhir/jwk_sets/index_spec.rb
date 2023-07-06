@@ -12,6 +12,6 @@ RSpec.describe 'GET /v1/jwk-set', type: :request do
   end
 
   it 'has correct keys' do
-    expect(json_response['keys'].first.keys).to match_array(%w[kty n e kid])
+    expect(json_response['keys'].first.keys).to match_array(%w[kty n e kid alg])
   end
 end
