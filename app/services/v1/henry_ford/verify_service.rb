@@ -62,6 +62,13 @@ class V1::HenryFord::VerifyService
   end
 
   def create_or_find_resource!
+    # rubocop:disable Rails/Output
+    p '======TEST========'
+    p hfhs_patient_id
+    p '=================='
+    p patient
+    p '=======END========'
+    # rubocop:enable Rails/Output
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,
       first_name: first_name,
