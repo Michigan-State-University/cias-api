@@ -37,6 +37,7 @@ Layout/LineLength:
     - 'spec/services/hl7/patient_data_mapper_spec.rb'
     - 'app/controllers/v1/sessions_controller.rb'
     - 'spec/services/api/epic_on_fhir/appointments_spec.rb'
+    - 'app/models/answer/phone.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false

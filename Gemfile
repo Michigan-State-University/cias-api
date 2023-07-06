@@ -46,7 +46,6 @@ gem 'rack', '>= 2.2.6.3'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'secure_headers'
-gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
 # for search on encrypted data
@@ -65,7 +64,6 @@ gem 'jwt', '~> 2.6'
 
 group :development, :test do
   gem 'bundler-audit'
-  gem 'brakeman', '~> 5.0.2', require: false
   gem 'bullet'
   gem 'dotenv-rails'
   gem 'fasterer', require: false

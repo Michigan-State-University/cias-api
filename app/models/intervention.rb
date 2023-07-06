@@ -5,6 +5,7 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
+  include ::Intervention::TranslationAuxiliaryMethods
   extend DefaultValues
 
   CURRENT_VERSION = '1'
@@ -24,6 +25,9 @@ class Intervention < ApplicationRecord
   has_many :navigators, through: :intervention_navigators, source: :user
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
+
+  has_many :collaborators, dependent: :destroy, inverse_of: :intervention
+  belongs_to :current_editor, class_name: 'User', optional: true
 
   has_many_attached :reports
   has_many_attached :files
@@ -54,6 +58,9 @@ class Intervention < ApplicationRecord
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
   scope :filter_by_name, ->(name) { where('lower(name) like ?', "%#{name.downcase}%") if name.present? }
   scope :filter_by_organization, ->(organization_id) { where(organization_id: organization_id) }
+  scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
+  scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
+  scope :only_not_shared_with_anyone, -> { left_joins(:collaborators).where(collaborators: { id: nil }) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -127,29 +134,12 @@ class Intervention < ApplicationRecord
     reports.attachments.order(created_at: :desc).first
   end
 
-  def translation_prefix(destination_language_name_short)
-    update!(name: "(#{destination_language_name_short.upcase}) #{name}")
-  end
-
-  def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
-    original_text['additional_text'] = additional_text
-    new_additional_text = translator.translate(additional_text, source_language_name_short, destination_language_name_short)
-
-    update!(additional_text: new_additional_text)
-  end
-
-  def translate_sessions(translator, source_language_name_short, destination_language_name_short)
-    sessions.each do |session|
-      session.translate(translator, source_language_name_short, destination_language_name_short)
-    end
-  end
-
   def cache_key
     "intervention/#{id}-#{updated_at&.to_s(:number)}"
   end
 
-  def self.detailed_search(params)
-    scope = all
+  def self.detailed_search(params, user)
+    scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
     scope.filter_by_name(params[:name])
@@ -198,7 +188,23 @@ class Intervention < ApplicationRecord
     true
   end
 
+  def ability_to_update_for?(user)
+    return true unless collaborators.any?
+
+    collaborator = collaborators.find_by(user_id: user.id)
+
+    current_editor_id == user.id && (collaborator.present? ? collaborator.edit : true)
+  end
+
   def remove_short_links
     short_links.destroy_all
+  end
+
+  def self.filter_by_collaboration_type(params, user)
+    scope = all
+    scope = scope.only_shared_with_me(user.id) if params[:only_shared_with_me].present?
+    scope = scope.only_shared_by_me(user.id) if params[:only_shared_by_me].present?
+    scope = scope.only_not_shared_with_anyone if params[:only_not_shared_with_anyone].present?
+    scope
   end
 end

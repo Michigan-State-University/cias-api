@@ -20,6 +20,8 @@ class ReportTemplate < ApplicationRecord
   validates :name, :report_for, presence: true
   validates :name, uniqueness: { scope: :session_id }
 
+  delegate :ability_to_update_for?, to: :session
+
   after_destroy :remove_template_from_third_party_questions
 
   enum report_for: {
