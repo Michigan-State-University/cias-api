@@ -8,7 +8,6 @@ gem 'rails', '~> 6.1.7.4'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.4'
 
-gem 'actionpack', '~> 6.1.7.4'
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
 gem 'activestorage', '>= 6.1.4.7'

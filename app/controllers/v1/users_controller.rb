@@ -63,7 +63,7 @@ class V1::UsersController < V1Controller
   end
 
   def confirm_terms
-    result = V1::Users::Terms::Confirm.call(terms_confirm_params, email_params)
+    result = V1::Users::Terms::Confirm.call(terms_confirmation_params, email_params)
     head result ? :ok : :expectation_failed
   end
 
@@ -101,8 +101,8 @@ class V1::UsersController < V1Controller
     params.permit(:phone_number, :iso, :prefix)
   end
 
-  def terms_confirm_params
-    params.permit(:email, :first_name, :last_name, :terms)
+  def terms_confirmation_params
+    params.permit(:first_name, :last_name, :terms)
   end
 
   def user_params

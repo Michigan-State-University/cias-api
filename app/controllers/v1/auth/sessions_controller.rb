@@ -15,7 +15,7 @@ class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
 
     if @resource&.missing_require_fields?
       raise ComplexException.new(I18n.t('activerecord.errors.models.user.terms_not_accepted'),
-                                 { reason: 'TERMS_NOT_ACCEPTED', require_fields: @resource.slice(:first_name, :last_name, :terms, :role) }, :forbidden)
+                                 { reason: 'TERMS_NOT_ACCEPTED', require_fields: @resource.slice(:first_name, :last_name, :terms, :roles  ) }, :forbidden)
     end
 
     return unless V1::Users::Verifications::Create.call(@resource, request.headers['Verification-Code'])
