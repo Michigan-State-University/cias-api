@@ -128,7 +128,7 @@
           {
             "use": "usual",
             "type": {
-              "text": "HFHMRN"
+              "text": "KEY_TO_IDENTIFYING_SPECIFIC_SYSTEM"
             },
             "system": "urn:oid:1.2.840.114350.1.13.338.3.7.5.737384.48",
             "value": "89010892"
