@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/users/confirm_terms', type: :request do
   let!(:user) { create(:user) }
-  let(:params) { { terms: true, email: user.email } }
+  let(:params) { { terms: true, email: user.email, password: user.password } }
   let(:request) { patch v1_confirm_terms_path, params: params }
 
   context 'when email is correct' do
