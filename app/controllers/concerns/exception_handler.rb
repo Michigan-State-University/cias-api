@@ -61,7 +61,7 @@ module ExceptionHandler
     rescue_from ComplexException do |exc|
       message = { message: exc.message, details: exc.additional_information }
 
-      render json: message, status: :unprocessable_entity
+      render json: message, status: exc.status_code || :unprocessable_entity
     end
 
     rescue_from ActiveModel::ForbiddenAttributesError do |exc|

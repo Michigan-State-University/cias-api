@@ -254,6 +254,10 @@ class User < ApplicationRecord
     FORMATTING_APP_ROLE_EXCEPTIONS[roles.first] || roles.first.tr('_', ' ')
   end
 
+  def missing_require_fields?
+    first_name.blank? || last_name.blank? || !terms
+  end
+
   private
 
   def send_welcome_email
