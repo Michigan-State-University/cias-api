@@ -63,7 +63,7 @@ class V1::UsersController < V1Controller
   end
 
   def confirm_terms
-    result = V1::Users::Terms::Confirm.call(terms_confirmation_params, email_params)
+    result = V1::Users::Terms::Confirm.call(terms_confirmation_params, email_params, password_params)
     head result ? :ok : :expectation_failed
   end
 
@@ -95,6 +95,10 @@ class V1::UsersController < V1Controller
 
   def email_params
     params[:email].downcase
+  end
+
+  def password_params
+    params[:password]
   end
 
   def phone_params
