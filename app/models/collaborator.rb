@@ -5,5 +5,5 @@ class Collaborator < ApplicationRecord
   belongs_to :intervention, touch: true
   belongs_to :user
 
-  validates :user_id, uniqueness: { scope: :intervention_id }
+  validates :user_id, uniqueness: { scope: :intervention_id, message: I18n.t('activerecord.errors.models.collaborator.attributes.user.already_exist') }
 end

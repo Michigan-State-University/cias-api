@@ -28,6 +28,10 @@ en:
   activerecord:
     errors:
       models:
+        collaborator:
+          attributes:
+            user:
+              already_exist: 'is already a collaborator in this intervention'
         intervention:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
