@@ -26,7 +26,7 @@ gem 'jsonapi-serializer'
 gem 'jmespath', '>= 1.6.1'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
-gem 'google-protobuf', '~> 3.19.6'
+gem 'google-protobuf', '>= 3.23.4'
 gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
 gem 'metainspector', '~> 5.5'
@@ -60,6 +60,7 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
+gem 'grpc', '>= 1.53.0'
 
 group :development, :test do
   gem 'bundler-audit'
