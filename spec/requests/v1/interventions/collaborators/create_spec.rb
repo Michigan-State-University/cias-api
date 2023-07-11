@@ -37,6 +37,24 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/collaborators', type: :r
     end
   end
 
+  context 'when the collaborator is already in this intervention' do
+    let(:intervention) { create(:intervention, :with_collaborators, user: user) }
+
+    let(:params) do
+      {
+        emails: [intervention.collaborators.first.user.email]
+      }
+    end
+
+    it 'return correct status' do
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'has correct error msg' do
+      expect(json_response['message']).to include I18n.t('activerecord.errors.models.collaborator.attributes.user.already_exist')
+    end
+  end
+
   context 'when collaborator wants to add another collaborator' do
     let(:intervention) { create(:intervention, :with_collaborators, user: user) }
     let(:current_user) { intervention.collaborators.first.user }
