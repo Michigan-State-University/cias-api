@@ -82,11 +82,12 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
           end
         end
-        fill_hf_initial_screen(row_index, user_session)
         fill_by_tlfb_research(row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
         metadata(user_session.session, user_session, row_index, user_session.number_of_attempts, user_session.session.multiple_fill)
         quick_exit(user_session.session, row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
       end
+
+      fill_hf_initial_screen(row_index, grouped_user_sessions.second.first)
     end
   end
 
@@ -105,6 +106,37 @@ class Intervention::Csv::Harvester
     session_header_index = header.index(column_name(multiple_fill, session, 'metadata.quick_exit', approach_number))
 
     rows[row_index][session_header_index] = boolean_to_int(user_session.quick_exit) if session_header_index.present?
+  end
+
+  def hf_headers(sessions)
+    return [] unless sessions.first&.intervention&.hfhs_access
+
+    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: sessions })
+    return [] if hf_initial_question.nil?
+
+    hf_initial_question.csv_header_names
+  end
+
+  def fill_hf_initial_screen(row_index, user_session)
+    return unless user_session.session.intervention.hfhs_access
+
+    question = ::Question::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
+    attrs = question&.csv_decoded_attrs
+    patient_details = patient_details(user_session, attrs)
+    return if patient_details.blank?
+
+    attrs = question.rename_attrs(attrs)
+    attrs.each_with_index do |column, index|
+      var_index = header.index("henry_ford_health.#{column}")
+      next if var_index.nil?
+
+      rows[row_index][var_index] = patient_details[index]
+    end
+  end
+
+  def patient_details(user_session, attrs)
+    details = user_session.user.hfhs_patient_detail&.attributes
+    details&.fetch_values(*attrs)
   end
 
   def users
