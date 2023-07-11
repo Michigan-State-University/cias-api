@@ -19,4 +19,14 @@ class InterventionMailer < ApplicationMailer
 
     mail(to: @email, subject: I18n.t('intervention_mailer.invite_to_intervention_and_registration.subject'))
   end
+
+  def share_externally_and_registration(intervention, email)
+    @intervention = intervention
+    @email = email
+    @user = User.find_by(email: email)
+    @user.send(:generate_invitation_token!) # same as in session mailer
+    @invitation_token = @user.raw_invitation_token
+
+    mail(to: @email, subject: I18n.t('intervention_mailer.share_externally_and_registration.subject'))
+  end
 end
