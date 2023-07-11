@@ -212,7 +212,7 @@ RSpec.describe Intervention, type: :model do
 
     context 'when researcher want to assign the intervention to other resarcher' do
       let(:other_user) { create(:user, :confirmed, :researcher) }
-      let(:params) { { emails: [other_user.email] } }
+      let(:params) { { emails: [other_user.email.upcase] } }
 
       it 'create a new intervention with correct user_id' do
         cloned_intervention = intervention.clone(params: params)
