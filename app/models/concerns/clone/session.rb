@@ -38,7 +38,7 @@ class Clone::Session < Clone::Base
     @outcome_questions ||= Question.unscoped
             .includes(:question_group)
             .where(question_groups: { session_id: outcome.id })
-            .order('question_groups.position ASC', 'questions.position ASC')
+            .order('question_groups.position ASC', 'question.position ASC')
   end
 
   def outcome_questions_reassignment
