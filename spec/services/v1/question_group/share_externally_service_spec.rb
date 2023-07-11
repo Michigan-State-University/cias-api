@@ -21,7 +21,7 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
   end
   let!(:researcher_emails) do
     [
-      researcher.email
+      researcher.email.upcase
     ]
   end
   let!(:source_session_id) { session1.id }

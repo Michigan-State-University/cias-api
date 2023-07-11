@@ -6,7 +6,7 @@ class V1::QuestionGroup::ShareExternallyService
   end
 
   def initialize(researcher_emails, source_session_id, selected_groups_with_questions, current_user)
-    @researchers = User.where(email: researcher_emails)
+    @researchers = User.where(email: researcher_emails.map(&:downcase))
     @source_session = Session.accessible_by(current_user.ability).find(source_session_id)
     @selected_groups_with_questions = selected_groups_with_questions
     @current_user = current_user

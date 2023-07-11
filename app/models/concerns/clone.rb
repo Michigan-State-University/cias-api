@@ -27,8 +27,6 @@ module Clone
             )
         end
       end
-      logger.debug 'INTERVENTIONS'
-      logger.debug interventions.to_s
       interventions
     else
       "Clone::#{de_constantize_modulize_name.classify}".
