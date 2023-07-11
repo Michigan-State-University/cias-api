@@ -224,10 +224,10 @@ en:
       invitation_link_from_clinic: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}"
     share_externally_and_registration:
       subject: CIAS Invitation
-      body: You have been invited to edit a copy of %{intervention_name}. Please click the link to get more information.
+      body: You have been invited to edit %{intervention_name}. Please click the link to get more information.
       header: CIAS Invitation
       html_body_information_part: "To access this intervention, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the intervention. If you have questions about this process, please contact the person or group associated with this intervention that referred you."
-      html_body_invitation_part: "You have been invited to edit a copy of <span style='color: #c866ea;'>%{intervention_name}</span>."
+      html_body_invitation_part: "You have been invited to edit <span style='color: #c866ea;'>%{intervention_name}</span>."
       button_text: "Let's Get Started"
       invitation_link: "%{domain}/register?role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}"
   user_mailer:
