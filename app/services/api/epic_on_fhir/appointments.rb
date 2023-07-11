@@ -17,7 +17,7 @@ class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
   private
 
   def request
-    Faraday.post(ENDPOINT) do |request|
+    Faraday.get(ENDPOINT) do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/json'
       request.params['_format'] = 'json'
