@@ -145,7 +145,7 @@ class Intervention::Csv::Harvester
 
   def column_name(multiple_fill, session, suffix, approach_number = nil)
     if multiple_fill
-      "#{session.variable}.approach_number_#{approach_number}.#{suffix}"
+      "#{session.variable}.approach_number_#{approach_number || 1}.#{suffix}"
     else
       "#{session.variable}.#{suffix}"
     end
