@@ -3,7 +3,9 @@
 class V1::Interventions::LogosController < V1Controller
   def create
     authorize! :add_logo, Intervention
+    authorize! :add_logo, intervention_load
     return render status: :method_not_allowed if intervention_published?
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     intervention_load.update!(logo: intervention_params[:file])
     invalidate_cache(intervention_load)
@@ -12,7 +14,9 @@ class V1::Interventions::LogosController < V1Controller
 
   def update
     authorize! :add_logo, Intervention
+    authorize! :add_logo, intervention_load
     return render status: :method_not_allowed if intervention_published?
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     intervention_load.logo_blob&.update!(description: intervention_params[:image_alt])
     render json: serialized_response(intervention_load, 'Intervention')
@@ -20,7 +24,9 @@ class V1::Interventions::LogosController < V1Controller
 
   def destroy
     authorize! :add_logo, Intervention
+    authorize! :add_logo, intervention_load
     return render status: :method_not_allowed if intervention_published?
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     intervention_load.logo.purge_later
     invalidate_cache(intervention_load)

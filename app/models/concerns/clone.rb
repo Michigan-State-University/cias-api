@@ -4,9 +4,9 @@ module Clone
   include MetaOperations
 
   def clone(params: {}, clean_formulas: true, position: nil, hidden: false)
-    if params[:user_ids].present?
+    if params[:emails].present?
       interventions = []
-      user_ids = User.where(id: params[:user_ids]).limit_to_roles(%w[e_intervention_admin researcher]).pluck(:id)
+      user_ids = User.where(email: params[:emails]).limit_to_roles(%w[e_intervention_admin researcher]).pluck(:id)
       user_ids.each do |id|
         interventions.push(
           "Clone::#{de_constantize_modulize_name.classify}".

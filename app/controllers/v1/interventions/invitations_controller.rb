@@ -9,6 +9,7 @@ class V1::Interventions::InvitationsController < V1Controller
 
   def create
     intervention = intervention_load
+    authorize! :update, intervention
     return head :not_acceptable unless intervention.published?
 
     if intervention.type.eql? 'Intervention'

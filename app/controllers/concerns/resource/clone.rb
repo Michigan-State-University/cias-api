@@ -10,6 +10,8 @@ module Resource::Clone
 
       return head :forbidden unless resource.ability_to_clone?
 
+      return head :forbidden if resource.respond_to?(:ability_to_update_for?) && !resource.ability_to_update_for?(current_v1_user)
+
       cloned_resource = resource.
         clone(params: clone_params)
       render json: serialized_response(cloned_resource), status: :created

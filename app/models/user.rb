@@ -98,6 +98,9 @@ class User < ApplicationRecord
   # HENRY FORDS
   belongs_to :hfhs_patient_detail, optional: true
 
+  # COLLABORATIONS
+  has_many :collaborations, class_name: 'Collaborator', dependent: :destroy
+
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }

@@ -7,8 +7,9 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
     patch v1_session_report_template_path(session_id: session.id, id: report_template.id),
           params: params, headers: headers
   end
-  let!(:report_template) { create(:report_template) }
-  let(:session) { report_template.session }
+  let(:intervention) { create(:intervention) }
+  let(:session) { create(:session, intervention: intervention) }
+  let!(:report_template) { create(:report_template, session: session) }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
@@ -106,5 +107,17 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
       expect { request }.not_to change { report_template.reload.attributes }
       expect(response).to have_http_status(:forbidden)
     end
+  end
+
+  context 'collaboration mode' do
+    let(:params) do
+      {
+        report_template: {
+          name: 'New Report Template'
+        }
+      }
+    end
+
+    it_behaves_like 'collaboration mode - only one editor at the same time'
   end
 end

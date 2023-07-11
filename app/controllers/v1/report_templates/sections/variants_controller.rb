@@ -17,6 +17,8 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
   end
 
   def create
+    return head :forbidden unless @report_template_section.ability_to_update_for?(current_v1_user)
+
     new_variant = ReportTemplate::Section::Variant.
       new(report_template_section_id: @report_template_section.id)
 
@@ -31,6 +33,8 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
   def update
     authorize! :update, variant
 
+    return head :forbidden unless @report_template_section.ability_to_update_for?(current_v1_user)
+
     V1::ReportTemplates::Variants::Update.call(
       variant,
       variant_params
@@ -41,6 +45,7 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
 
   def destroy
     authorize! :destroy, variant
+    return head :forbidden unless @report_template_section.ability_to_update_for?(current_v1_user)
 
     variant.destroy!
 
@@ -49,6 +54,7 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
 
   def remove_image
     authorize! :remove_logo, variant
+    return head :forbidden unless @report_template_section.ability_to_update_for?(current_v1_user)
 
     variant.image.purge
 

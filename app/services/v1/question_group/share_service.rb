@@ -17,8 +17,9 @@ class V1::QuestionGroup::ShareService
     question_groups.find(qg_id)
   end
 
-  def share(shared_question_group_id, question_group_ids, question_ids)
+  def share(shared_question_group_id, question_group_ids, question_ids, current_user)
     raise CanCan::AccessDenied if question_group_intervention_published?
+    raise CanCan::AccessDenied unless intervention.ability_to_update_for?(current_user)
 
     shared_question_group = question_group_load(shared_question_group_id)
 

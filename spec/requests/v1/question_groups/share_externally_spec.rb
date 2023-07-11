@@ -27,7 +27,7 @@ RSpec.describe 'v1/question_groups/share_externally', type: :request do
           question_ids: question_groups[0].questions.map(&:id)
         }
       ],
-      user_ids: [target_user.id],
+      emails: [target_user.email],
       session_id: session.id
     }
   end

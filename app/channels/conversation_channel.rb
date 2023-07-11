@@ -119,7 +119,7 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def intervention_channel_id(intervention_id)
-    "intervention_channel_#{intervention_id}"
+    "navigators_in_intervention_channel_#{intervention_id}"
   end
 
   def user_channel_id(user)

@@ -116,4 +116,6 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
       it_behaves_like 'permitted user'
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

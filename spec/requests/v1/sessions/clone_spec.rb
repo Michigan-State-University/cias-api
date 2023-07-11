@@ -135,6 +135,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
 
       it_behaves_like 'permitted user'
     end
+
+    it_behaves_like 'collaboration mode - only one editor at the same time'
   end
 
   context 'Session::CatMh' do

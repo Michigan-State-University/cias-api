@@ -118,4 +118,6 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

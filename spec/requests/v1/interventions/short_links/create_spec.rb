@@ -62,4 +62,16 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/short_links', type: :req
       expect(json_response).to match({ 'message' => 'This intervention link has already been taken', 'details' => { 'taken_names' => ['example2'] } })
     }
   end
+
+  context 'when current user is collaborator' do
+    let(:intervention) { create(:intervention) }
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+    let(:current_user) { collaborator.user }
+
+    before { request }
+
+    it {
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
 end

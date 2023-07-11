@@ -65,6 +65,23 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/files', type: :request d
     end
   end
 
+  context 'when current user is collaborator' do
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+    let(:headers) { collaborator.user.create_new_auth_token }
+
+    before { request }
+
+    it {
+      expect(response).to have_http_status(:forbidden)
+    }
+
+    context 'when has edit access' do
+      let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: true) }
+
+      it { expect(response).to have_http_status(:created) }
+    end
+  end
+
   context 'file is too big' do
     let(:user) { create(:user, :confirmed, :admin) }
     let(:headers) { user.create_new_auth_token }

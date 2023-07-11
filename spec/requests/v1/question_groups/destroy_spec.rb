@@ -7,7 +7,8 @@ describe 'DELETE /v1/sessions/:session_id/question_groups/:id', type: :request d
     delete v1_session_question_group_path(session_id: session.id, id: question_group.id), headers: headers
   end
 
-  let!(:session) { create(:session, intervention: create(:intervention, :published)) }
+  let(:intervention) { create(:intervention, :published) }
+  let!(:session) { create(:session, intervention: intervention) }
   let!(:question_group) { create(:question_group, session: session, title: 'QuestionGroup Title') }
   let!(:questions) { create_list(:question_free_response, 3, title: 'Question Title', question_group: question_group) }
 
@@ -43,5 +44,12 @@ describe 'DELETE /v1/sessions/:session_id/question_groups/:id', type: :request d
         end
       end
     end
+  end
+
+  context 'collaboration mode' do
+    let(:user) { create(:user, :researcher) }
+    let(:headers) { user.create_new_auth_token }
+
+    it_behaves_like 'collaboration mode - only one editor at the same time'
   end
 end

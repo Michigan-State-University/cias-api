@@ -12,6 +12,16 @@ describe SmsPlan do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:resource) { create(:sms_plan, session: create(:session, intervention: intervention)) }
+      let(:user) { collaborator }
+
+      it_behaves_like 'collaborator has expected access to resource'
+    end
+
     context 'team admin' do
       let!(:user) { create(:user, :confirmed, :team_admin) }
       let!(:team) { create(:team, team_admin: user) }
@@ -46,6 +56,12 @@ describe SmsPlan do
       let(:user) { build_stubbed(:user, :confirmed, :researcher) }
 
       it { should have_abilities(:manage, described_class) }
+    end
+
+    context 'e-intervention admin' do
+      let(:user) { build_stubbed(:user, :confirmed, :e_intervention_admin) }
+
+      it { should have_abilities(:read, described_class) }
     end
 
     context 'participant' do
@@ -86,6 +102,18 @@ describe SmsPlan do
 
       it 'can access all sms plans' do
         expect(subject).to include(sms_plan1, sms_plan2)
+      end
+    end
+
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:sms_plan) { create(:sms_plan, session: create(:session, intervention: intervention)) }
+      let(:user) { collaborator }
+
+      it 'can access all sms plans' do
+        expect(subject).to include(sms_plan).and not_include(sms_plan1, sms_plan2)
       end
     end
 

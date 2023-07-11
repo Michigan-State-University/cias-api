@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Ability::EInterventionAdmin < Ability::Base
+  include Ability::Generic::SmsPlanAccess
+
   def definition
     super
     e_intervention_admin if role?(class_name)
@@ -11,8 +13,15 @@ class Ability::EInterventionAdmin < Ability::Base
   def e_intervention_admin
     can %i[read list_researchers], User, id: participants_and_researchers(user)
     can %i[read update], User, id: users_in_organization(user)
-    can :manage, Intervention, id: Intervention.with_any_organization.where(organization_id: user.accepted_organization_ids)
-    can :manage, UserSession, session: { intervention: { user_id: user.id } }
+    can :read, Intervention, id: interventions_in_organization_ids(user)
+    can :read, Session, intervention: { id: interventions_in_organization_ids(user) }
+    can :read, ReportTemplate, session: { intervention: { id: interventions_in_organization_ids(user) } }
+    can :read, ReportTemplate::Section, report_template: { session: { intervention: { id: interventions_in_organization_ids(user) } } }
+    can :read, ReportTemplate::Section::Variant,
+        report_template_section: { report_template: { session: { intervention: { id: interventions_in_organization_ids(user) } } } }
+    can :read, QuestionGroup, session: { intervention: { id: interventions_in_organization_ids(user) } }
+    can :read, Question, question_group: { session: { intervention: { id: interventions_in_organization_ids(user) } } }
+    can :read, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, UserIntervention, intervention: { user_id: user.id }
     can %i[read update], Organization, id: user.accepted_organization_ids
     can :invite_organization_admin, Organization, id: user.accepted_organization_ids
@@ -24,6 +33,8 @@ class Ability::EInterventionAdmin < Ability::Base
     can :manage, DashboardSection, reporting_dashboard: { organization: { id: user.accepted_organization_ids } }
     can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } }
     can :read, ChartStatistic, organization_id: user.accepted_organization_ids
+
+    enable_sms_plan_access(session_path(user))
   end
 
   def users_in_organization(user)
@@ -48,5 +59,13 @@ class Ability::EInterventionAdmin < Ability::Base
 
   def e_intervention_admin_ids(organization_ids)
     EInterventionAdminOrganization.where(organization_id: organization_ids).pluck(:user_id) if organization_ids.present?
+  end
+
+  def interventions_in_organization_ids(user)
+    Intervention.with_any_organization.where(organization_id: user.accepted_organization_ids).pluck(:id)
+  end
+
+  def session_path(user)
+    { intervention: { id: interventions_in_organization_ids(user) } }
   end
 end

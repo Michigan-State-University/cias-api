@@ -14,6 +14,8 @@ class QuestionGroup < ApplicationRecord
   validates :title, :position, presence: true
   default_scope { order(:position) }
 
+  delegate :ability_to_update_for?, to: :session
+
   def finish?
     type == 'QuestionGroup::Finish'
   end

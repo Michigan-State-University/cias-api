@@ -5,7 +5,6 @@ class Ability::TeamAdmin < Ability::Base
   include Ability::Generic::ReportTemplateAccess
   include Ability::Generic::SmsPlanAccess
   include Ability::Generic::QuestionAccess
-  include Ability::Generic::CatMhAccess
 
   def definition
     super
@@ -33,7 +32,6 @@ class Ability::TeamAdmin < Ability::Base
     enable_questions_access(team_members_ids)
     enable_report_template_access(team_members_ids)
     enable_sms_plan_access({ intervention: { user_id: team_members_ids } })
-    enable_cat_mh_access
 
     can :read, GeneratedReport,
         user_session: { session: { intervention: { user_id: team_members_ids } } }

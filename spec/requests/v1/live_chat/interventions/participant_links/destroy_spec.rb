@@ -25,6 +25,15 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participa
     end
   end
 
+  context 'only current editor can create invitations in the intervention with collaborators' do
+    let(:intervention) { create(:intervention, :with_collaborators, :with_navigator_setup, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'when researcher want to destroy the link from other researcher intervention' do
     let(:researcher) { create(:user, :researcher, :confirmed) }
     let(:headers) { researcher.create_new_auth_token }

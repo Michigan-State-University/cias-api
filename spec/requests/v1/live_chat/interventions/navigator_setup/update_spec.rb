@@ -186,6 +186,22 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     end
   end
 
+  context 'intervention with collaborators and current editor isn\'t current editor' do
+    let(:intervention) { create(:intervention, :with_collaborators, :with_navigator_setup, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+    let(:params) do
+      {
+        navigator_setup: {
+          no_navigator_available_message: 'No navigators available at the moment'
+        }
+      }
+    end
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'sets phone to nil when phone sent as nil and phone is present' do
     let!(:intervention) { create(:intervention, :with_navigator_setup_and_phone, user: user) }
 

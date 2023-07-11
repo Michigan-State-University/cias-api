@@ -15,7 +15,8 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
     }
   end
 
-  let!(:session) { create(:session, intervention: create(:intervention, :published)) }
+  let(:intervention) { create(:intervention, :published) }
+  let!(:session) { create(:session, intervention: intervention) }
   let!(:question_group) { create(:question_group_plain, title: 'Old Title', session: session) }
 
   context 'when authenticated as guest user' do
@@ -75,5 +76,12 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
         it_behaves_like 'permitted user'
       end
     end
+  end
+
+  context 'collaboration mode' do
+    let(:user) { create(:user, :researcher) }
+    let(:headers) { user.create_new_auth_token }
+
+    it_behaves_like 'collaboration mode - only one editor at the same time'
   end
 end

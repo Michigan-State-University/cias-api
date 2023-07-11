@@ -33,6 +33,15 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/navigator_invitations/
     end
   end
 
+  context 'not current editor' do
+    let(:intervention) { create(:intervention, :with_collaborators, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'other researcher' do
     let(:other_researcher) { create(:user, :researcher, :confirmed) }
     let(:headers) { other_researcher.create_new_auth_token }

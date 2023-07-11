@@ -11,6 +11,8 @@ class ReportTemplate::Section < ApplicationRecord
 
   before_create :assign_position
 
+  delegate :ability_to_update_for?, to: :report_template
+
   default_scope { order(:position) }
 
   ATTR_NAMES_TO_COPY = %w[

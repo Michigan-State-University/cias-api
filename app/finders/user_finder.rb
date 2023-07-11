@@ -8,7 +8,7 @@ class UserFinder
   def initialize(current_user, filter_params)
     @filter_params = filter_params
     @current_user = current_user
-    @scope = User.all
+    @scope = User.where.not(id: current_user.id)
   end
 
   def available_researchers

@@ -9,10 +9,12 @@ RSpec.describe Intervention, type: :model do
     let(:initial_status) { subject }
 
     it { should belong_to(:user) }
+    it { should belong_to(:current_editor).optional }
     it { should have_many(:sessions) }
     it { should have_many(:user_interventions) }
     it { should have_many(:conversations) }
     it { should have_many(:notifications) }
+    it { should have_many(:collaborators) }
     it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { should have_many(:short_links).dependent(:destroy) }
@@ -241,7 +243,7 @@ RSpec.describe Intervention, type: :model do
 
     context 'when researcher want to assign the intervention to other resarcher' do
       let(:other_user) { create(:user, :confirmed, :researcher) }
-      let(:params) { { user_ids: [other_user.id] } }
+      let(:params) { { emails: [other_user.email] } }
 
       it 'create a new intervention with correct user_id' do
         cloned_intervention = intervention.clone(params: params)

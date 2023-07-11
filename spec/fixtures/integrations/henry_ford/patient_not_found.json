@@ -1,0 +1,38 @@
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 0,
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://fhirdev.hfhs.org/FHIRProxy/api/FHIR/R4/Patient/$match?_format=json"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:00000000-015e-3fd2-6822-81371a00afcc",
+      "resource": {
+        "resourceType": "OperationOutcome",
+        "issue": [
+          {
+            "severity": "warning",
+            "code": "processing",
+            "details": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.840.114350.1.13.338.3.7.2.657369",
+                  "code": "4101",
+                  "display": "Resource request returns no results."
+                }
+              ],
+              "text": "Resource request returns no results."
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "outcome"
+      }
+    }
+  ]
+}

@@ -66,6 +66,31 @@ describe DownloadedReport do
       end
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
+      let!(:generated_report) do
+        create(:generated_report, user_session:
+          create(:user_session, session:
+            create(:session, intervention: intervention)))
+      end
+      let!(:downloaded_report) { create(:downloaded_report, generated_report: generated_report, user_id: user.id) }
+
+      let(:user) { collaborator }
+
+      it 'can\'t mark generated report for the user\'s session, when has only view access' do
+        expect(subject).to have_abilities({ create: false }, downloaded_report)
+      end
+
+      context 'with data access' do
+        let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator, data_access: true)]) }
+
+        it 'can mark generated report for the user\'s session, when has only view access' do
+          expect(subject).to have_abilities({ create: true }, downloaded_report)
+        end
+      end
+    end
+
     context 'researcher' do
       let(:user) { team1_researcher }
 

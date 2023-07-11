@@ -179,4 +179,6 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       expect(json_response['data']['attributes']['formulas']).to eq []
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

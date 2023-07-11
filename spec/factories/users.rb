@@ -61,6 +61,8 @@ FactoryBot.define do
                                                   dob: (DateTime.now - 20.years).to_s,
                                                   sex: 'F',
                                                   visit_id: '',
+                                                  phone_number: Faker::PhoneNumber.cell_phone,
+                                                  phone_type: 'home',
                                                   zip_code: '48127').id
         user.update(hfhs_patient_detail_id: hfhs_detail_id)
       end

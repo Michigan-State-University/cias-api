@@ -34,9 +34,9 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     let(:researcher1) { create(:user, :confirmed, :researcher) }
     let(:researcher2) { create(:user, :confirmed, :researcher) }
     let!(:clone_params) do
-      { user_ids: [
-        researcher1.id,
-        researcher2.id
+      { emails: [
+        researcher1.email,
+        researcher2.email
       ] }
     end
 

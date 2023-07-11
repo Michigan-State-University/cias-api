@@ -125,6 +125,32 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
                                                                                     'variable' => { 'value' => '1',
                                                                                                     'name' => 'test1' })
         end
+
+        context 'number question' do
+          let(:params) do
+            {
+              title: '<h2>Enter title here</h2>', subtitle: '<p>Enter main text/question for screen here</p>', type: 'Question::Number', body: {
+                variable: { name: '' }, data: [{ payload: '' }]
+              }, narrator: { blocks: [{ action: 'NO_ACTION', animation: 'rest', text: ['Enter main text/question for screen here'],
+                                        audio_urls: [], sha256: [],
+                                        type: 'ReadQuestion',
+                                        endPosition: { x: 600, y: 550 } }],
+                             settings: { voice: true, animation: true, extra_space_for_narrator: false, character: 'peedy' } }
+            }
+          end
+
+          it 'has correct body data attributes' do
+            expect(json_response['data']['attributes']['settings']).to include({ 'image' => false,
+                                                                                 'max_length' => nil,
+                                                                                 'min_length' => nil,
+                                                                                 'narrator_skippable' => false,
+                                                                                 'required' => true,
+                                                                                 'start_autofinish_timer' => false,
+                                                                                 'subtitle' => true,
+                                                                                 'title' => true,
+                                                                                 'video' => false })
+          end
+        end
       end
 
       context 'when blocks' do

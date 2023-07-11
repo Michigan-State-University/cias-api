@@ -37,6 +37,23 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups/participan
     end
   end
 
+  context 'only current editor can create invitations in the intervention with collaborators' do
+    let(:params) do
+      {
+        link: {
+          url: 'https://bing.com',
+          display_name: 'That\'s a much better search engine'
+        }
+      }
+    end
+    let(:intervention) { create(:intervention, :with_collaborators, :with_navigator_setup, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'invalid params' do
     context 'missing link data' do
       let(:params) { {} }

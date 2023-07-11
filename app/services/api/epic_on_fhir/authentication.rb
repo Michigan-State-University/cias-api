@@ -18,7 +18,9 @@ class Api::EpicOnFhir::Authentication
       request.body = URI.encode_www_form(params)
     end
 
-    JSON.parse(response.body).symbolize_keys if response.status == 200
+    raise EpicOnFhir::AuthenticationError, I18n.t('epic_on_fhir.error.authentication') if response.status != 200
+
+    JSON.parse(response.body).symbolize_keys
   end
 
   private
@@ -28,7 +30,6 @@ class Api::EpicOnFhir::Authentication
       grant_type: GRANT_TYPE,
       client_assertion_type: CLIENT_ASSERTION_TYPE,
       client_assertion: client_assertion
-
     }
   end
 

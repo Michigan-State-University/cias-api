@@ -2,7 +2,7 @@
 
 class V1::NarratorController < V1Controller
   def create
-    authorize! :update, model.safe_constantize
+    authorize! :update, object_load
 
     MultipleCharacters::ChangeNarratorJob.perform_later(current_v1_user, model, object_id, new_narrator, replaced_animation)
 
@@ -17,6 +17,10 @@ class V1::NarratorController < V1Controller
 
   def object_id
     params[:id]
+  end
+
+  def object_load
+    model.safe_constantize.find(object_id)
   end
 
   def narrator_params

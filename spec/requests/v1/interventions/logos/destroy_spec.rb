@@ -38,4 +38,30 @@ RSpec.describe 'DELETE /v1/interventions/:interventions_id/logo', type: :request
 
     it { expect(response).to have_http_status(:method_not_allowed) }
   end
+
+  context 'when collaborator has edit access' do
+    let(:intervention) { create(:intervention, :with_collaborators) }
+    let(:current_user) { intervention.collaborators.first.user }
+
+    before do
+      intervention.update(current_editor: current_user)
+      delete v1_intervention_logo_path(intervention_id), headers: current_user.create_new_auth_token
+    end
+
+    it {
+      expect(response).to have_http_status(:no_content)
+    }
+
+    context 'when current editor is empty' do
+      before do
+        intervention.update(current_editor: nil)
+
+        delete v1_intervention_logo_path(intervention.id), headers: current_user.create_new_auth_token
+      end
+
+      it {
+        expect(response).to have_http_status(:forbidden)
+      }
+    end
+  end
 end

@@ -12,7 +12,8 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       'admin_with_multiple_roles' => admin_with_multiple_roles
     }
   end
-  let(:session) { create(:session) }
+  let(:intervention) { create(:intervention) }
+  let(:session) { create(:session, intervention: intervention) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_slider, question_group: question_group) }
   let(:headers) { user.create_new_auth_token }
@@ -132,6 +133,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       request
       expect(json_response['data']['attributes']['formulas']).to eq []
     end
+  end
+
+  context 'collaboration mode' do
+    it_behaves_like 'collaboration mode - only one editor at the same time'
   end
 
   context 'invalid body data' do

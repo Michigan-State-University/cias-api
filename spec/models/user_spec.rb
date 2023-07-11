@@ -19,6 +19,7 @@ describe User, type: :model do
   it { should have_one_attached(:avatar) }
   it { should have_many(:generated_reports_third_party_users).dependent(:destroy) }
   it { should have_many(:notifications).dependent(:destroy) }
+  it { should have_many(:collaborations).dependent(:destroy) }
 
   it { should belong_to(:team).optional(true) }
   it { should belong_to(:organizable).optional(true) }

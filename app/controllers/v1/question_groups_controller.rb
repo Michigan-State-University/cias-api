@@ -10,11 +10,16 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def show
+    authorize! :read, question_group_load
+
     render json: question_group_response(question_group_load)
   end
 
   def create
     authorize! :create, QuestionGroup
+    authorize! :update, session_load
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::CreateService.call(question_group_params, questions_scope, new_questions_params, session_load)
     SqlQuery.new('question_group/question_group_pure_empty').execute
@@ -25,6 +30,9 @@ class V1::QuestionGroupsController < V1Controller
 
   def update
     authorize! :update, QuestionGroup
+    authorize! :update, question_group_load
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::UpdateService.call(question_group_load, question_group_params)
 
@@ -33,6 +41,9 @@ class V1::QuestionGroupsController < V1Controller
 
   def destroy
     authorize! :destroy, QuestionGroup
+    authorize! :destroy, question_group_load
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = question_group_load
     question_group.destroy! unless question_group.finish?
@@ -42,22 +53,18 @@ class V1::QuestionGroupsController < V1Controller
 
   def questions_change
     authorize! :update, QuestionGroup
+    authorize! :update, question_group_load
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::QuestionsChangeService.call(question_group_load, questions_scope)
 
     render json: question_group_response(question_group), action: :show
   end
 
-  def remove_questions
-    authorize! :update, QuestionGroup
-
-    questions_scope.destroy_all
-
-    head :no_content
-  end
-
   def clone
     authorize! :create, QuestionGroup
+    authorize! :create, question_group_load
 
     cloned_question_group = question_group_load.clone(clean_formulas: true)
 
@@ -67,13 +74,16 @@ class V1::QuestionGroupsController < V1Controller
   def share
     authorize! :create, QuestionGroup
 
-    shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids)
+    shared_question_group = question_group_share_service.share(question_group_id, question_group_ids, question_ids, current_v1_user)
 
     render json: question_group_response(shared_question_group), action: :show, status: :ok
   end
 
   def duplicate_here
-    authorize! :update, QuestionGroup
+    authorize! :create, QuestionGroup
+    authorize! :update, load_session
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     duplicated_groups = V1::QuestionGroup::DuplicateWithStructureService.call(load_session, duplicate_here_params[:question_groups])
 
@@ -83,21 +93,24 @@ class V1::QuestionGroupsController < V1Controller
   def share_externally
     authorize! :create, QuestionGroup
 
-    V1::QuestionGroup::ShareExternallyService.call(share_externally_params[:user_ids], session_id, share_externally_params[:question_groups], current_v1_user)
+    V1::QuestionGroup::ShareExternallyService.call(share_externally_params[:emails], session_id, share_externally_params[:question_groups], current_v1_user)
     head :created
   end
 
   def duplicate_internally
-    authorize! :create, QuestionGroup
+    session = Session.find(session_id)
+    authorize! :update, session
 
-    V1::QuestionGroup::ShareInternallyService.call([Session.find(session_id)], duplicate_internally_params[:question_groups])
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+
+    V1::QuestionGroup::ShareInternallyService.call([session], duplicate_internally_params[:question_groups])
     head :created
   end
 
   private
 
   def share_externally_params
-    params.permit(user_ids: [], question_groups: [:id, { question_ids: [] }])
+    params.permit(emails: [], question_groups: [:id, { question_ids: [] }])
   end
 
   def duplicate_internally_params
@@ -118,15 +131,15 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_load
-    question_groups_scope.find(question_group_id)
+    @question_group_load ||= question_groups_scope.find(question_group_id)
   end
 
   def questions_scope
-    Question.accessible_by(current_ability).where(id: question_ids)
+    @questions_scope ||= Question.accessible_by(current_ability).where(id: question_ids)
   end
 
   def session_load
-    Session.accessible_by(current_ability).find(session_id)
+    @session_load ||= Session.accessible_by(current_ability).find(session_id)
   end
 
   def new_questions_params

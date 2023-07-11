@@ -7,6 +7,7 @@ describe Answer do
   let_it_be(:team2) { create(:team) }
   let_it_be(:team1_researcher) { create(:user, :confirmed, :researcher, team_id: team1.id) }
   let_it_be(:team2_researcher) { create(:user, :confirmed, :researcher, team_id: team2.id) }
+  let_it_be(:collaborator) { create(:user, :confirmed, :researcher) }
   let_it_be(:team1_intervention1) { create(:intervention, user_id: team1_researcher.id) }
   let_it_be(:team1_intervention2) { create(:intervention, user_id: team1.team_admin.id) }
   let_it_be(:team2_intervention1) { create(:intervention, user_id: team2_researcher.id) }
@@ -50,6 +51,27 @@ describe Answer do
       let(:user) { build_stubbed(:user, :confirmed, :admin) }
 
       it { should have_abilities(:manage, described_class) }
+    end
+
+    context 'collaborator' do
+      let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
+      let!(:answer) do
+        create(:answer_multiple,
+               question: create(:question_multiple, question_group: create(:question_group, session: create(:session, intervention: intervention))))
+      end
+      let(:user) { collaborator }
+
+      it 'can manage answer of the session belonging to shared with him intervention' do
+        expect(subject).not_to have_abilities({ manage: true }, answer)
+      end
+
+      context 'with access data access' do
+        let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator, data_access: true)]) }
+
+        it 'can manage answer of the session belonging to shared with him intervention' do
+          expect(subject).to have_abilities({ manage: true }, answer)
+        end
+      end
     end
 
     context 'team admin' do

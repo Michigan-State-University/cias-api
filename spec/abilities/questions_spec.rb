@@ -54,6 +54,16 @@ describe Question do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:resource) { create(:question_multiple, question_group: create(:question_group, session: create(:session, intervention: intervention))) }
+      let(:user) { collaborator }
+
+      it_behaves_like 'collaborator has expected access to resource'
+    end
+
     context 'team admin' do
       let(:user) { team1.team_admin }
 
@@ -82,6 +92,20 @@ describe Question do
 
       it 'can access all questions' do
         expect(subject).to include(
+          team1_question1, team1_question2, team2_question1, team2_question2
+        )
+      end
+    end
+
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:question) { create(:question_multiple, question_group: create(:question_group, session: create(:session, intervention: intervention))) }
+      let(:user) { collaborator }
+
+      it 'can access all questions' do
+        expect(subject).to include(question).and not_include(
           team1_question1, team1_question2, team2_question1, team2_question2
         )
       end

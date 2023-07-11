@@ -18,6 +18,8 @@ class SmsPlan < ApplicationRecord
 
   validates :name, :schedule, :frequency, presence: true
 
+  delegate :ability_to_update_for?, to: :session
+
   scope :limit_to_types, ->(types) { where(type: types) if types.present? }
 
   ATTR_NAMES_TO_COPY = %w[

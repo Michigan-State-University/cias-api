@@ -58,7 +58,10 @@ class Ability::Base
   end
 
   def logged_user_intervention(user)
-    user.interventions.select(:id)
+    user.interventions
+        .left_joins(:collaborators)
+        .or(Intervention.left_joins(:collaborators).where(collaborators: { user_id: user.id, data_access: true }))
+        .select(:id)
   end
 
   def accepted_health_clinic_ids

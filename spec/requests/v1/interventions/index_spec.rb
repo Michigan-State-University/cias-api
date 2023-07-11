@@ -166,4 +166,37 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       expect(json_response['data'].pluck('id')).to not_include(intervention_being_cloned.id)
     end
   end
+
+  context 'return only intervention being shared with current_user' do
+    let!(:shared_intervention) { create(:intervention, collaborators: [create(:collaborator, user: user)]) }
+    let(:params) { { only_shared_with_me: true } }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct intervention' do
+      expect(json_response['data'].pluck('id')).to include(shared_intervention.id)
+    end
+  end
+
+  context 'return only intervention being shared with others' do
+    let!(:shared_intervention) { create(:intervention, :with_collaborators, user: user) }
+    let(:params) { { only_shared_by_me: true } }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct intervention' do
+      expect(json_response['data'].pluck('id')).to include(shared_intervention.id)
+    end
+  end
+
+  context 'return only intervention not shared with onyone' do
+    let!(:shared_intervention) { create(:intervention, :with_collaborators) }
+    let(:params) { { only_not_shared_with_anyone: true } }
+
+    before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
+
+    it 'return correct intervention' do
+      expect(json_response['data'].pluck('id')).to not_include(shared_intervention.id)
+    end
+  end
 end
