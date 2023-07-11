@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::ShareExternallyService
+  include InvitationInterface
+
   def self.call(researcher_emails, source_session_id, selected_groups_with_questions, current_user)
     new(researcher_emails, source_session_id, selected_groups_with_questions, current_user).call
   end
 
   def initialize(researcher_emails, source_session_id, selected_groups_with_questions, current_user)
+    _existing_emails, non_existing_emails = split_emails_exist(researcher_emails)
+    invite_non_existing_users(non_existing_emails, true, [:researcher])
     @researchers = User.where(email: researcher_emails.map(&:downcase))
     @source_session = Session.accessible_by(current_user.ability).find(source_session_id)
     @selected_groups_with_questions = selected_groups_with_questions
@@ -20,6 +24,8 @@ class V1::QuestionGroup::ShareExternallyService
         new_intervention = researcher.interventions.create!(name: title_for_intervention)
         new_session = Session.create!(name: I18n.t('duplication_with_structure.session_name'), intervention: new_intervention)
         V1::QuestionGroup::DuplicateWithStructureService.call(new_session, selected_groups_with_questions)
+
+        InterventionMailer.share_question_group_and_registration(source_session.intervention, researcher.email).deliver_now unless researcher.confirmed?
       end
     end
   end
