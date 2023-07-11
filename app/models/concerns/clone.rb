@@ -5,7 +5,7 @@ module Clone
   include InvitationInterface
 
   def clone(params: {}, clean_formulas: true, position: nil, hidden: false)
-    emails = params[:emails]
+    emails = params[:emails].map(&:downcase)
     if emails.present?
       interventions = []
 
