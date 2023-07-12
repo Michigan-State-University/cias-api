@@ -8,15 +8,15 @@ class V1::QuestionGroup::ShareExternallyService
   end
 
   def initialize(researcher_emails, source_session_id, selected_groups_with_questions, current_user)
-    _existing_emails, non_existing_emails = split_emails_exist(researcher_emails)
-    invite_non_existing_users(non_existing_emails, true, [:researcher])
-    @researchers = User.where(email: researcher_emails.map(&:downcase))
+    @researcher_emails = researcher_emails
+    @researchers = []
     @source_session = Session.accessible_by(current_user.ability).find(source_session_id)
     @selected_groups_with_questions = selected_groups_with_questions
     @current_user = current_user
   end
 
   def call
+    init_researchers
     ActiveRecord::Base.transaction do
       researchers.each do |researcher|
         check_if_user_has_correct_ability(researcher)
@@ -33,6 +33,12 @@ class V1::QuestionGroup::ShareExternallyService
   attr_reader :researchers, :current_user, :selected_groups_with_questions, :source_session
 
   private
+
+  def init_researchers
+    _existing_emails, non_existing_emails = split_emails_exist(researcher_emails)
+    invite_non_existing_users(non_existing_emails, true, [:researcher])
+    @researchers = User.where(email: researcher_emails.map(&:downcase))
+  end
 
   def title_for_intervention
     I18n.t('duplication_with_structure.intervention_name', source_intervention_name: source_session.intervention.name,
