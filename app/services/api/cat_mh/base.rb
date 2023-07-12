@@ -26,7 +26,7 @@ class Api::CatMh::Base
   end
 
   def client
-    @client = Faraday.new(ENDPOINT) do |client|
+    @client = Faraday.new(self.class::ENDPOINT) do |client|
       client.request :url_encoded
       client.adapter Faraday.default_adapter
       client.headers['Cookie'] = cookie
