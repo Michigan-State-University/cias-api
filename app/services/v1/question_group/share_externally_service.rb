@@ -35,9 +35,9 @@ class V1::QuestionGroup::ShareExternallyService
   private
 
   def init_researchers
-    _existing_emails, non_existing_emails = split_emails_exist(researcher_emails)
+    _existing_emails, non_existing_emails = split_emails_exist(@researcher_emails)
     invite_non_existing_users(non_existing_emails, true, [:researcher])
-    @researchers = User.where(email: researcher_emails.map(&:downcase))
+    @researchers = User.where(email: @researcher_emails.map(&:downcase))
   end
 
   def title_for_intervention
