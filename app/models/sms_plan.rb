@@ -4,6 +4,7 @@ class SmsPlan < ApplicationRecord
   has_paper_trail
   include Clone
   include Translate
+  include ::TranslationAuxiliaryMethods
   extend DefaultValues
 
   CURRENT_VERSION = '1'
@@ -40,10 +41,7 @@ class SmsPlan < ApplicationRecord
   }, _suffix: true
 
   def translate_no_formula_text(translator, source_language_name_short, destination_language_name_short)
-    original_text['no_formula_text'] = no_formula_text
-    new_no_formula_text = translator.translate(no_formula_text, source_language_name_short, destination_language_name_short)
-
-    update!(no_formula_text: new_no_formula_text)
+    translate_attribute('no_formula_text', no_formula_text, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_variants(translator, src_language_name_short, dest_language_name_short)

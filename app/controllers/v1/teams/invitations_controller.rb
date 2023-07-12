@@ -37,10 +37,4 @@ class V1::Teams::InvitationsController < V1Controller
     @team_invitation ||= TeamInvitation.not_accepted.
         find_by!(invitation_token: params.require(:invitation_token))
   end
-
-  def redirect_to_web_app(**message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
-  end
 end

@@ -56,4 +56,10 @@ class V1Controller < ApplicationController
 
     render json: serializer.new(params.except(:path, :action, :status)).render, status: params[:status]
   end
+
+  def redirect_to_web_app(**message)
+    message.transform_values! { |v| Base64.encode64(v) }
+
+    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
+  end
 end

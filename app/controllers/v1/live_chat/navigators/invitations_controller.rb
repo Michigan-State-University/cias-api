@@ -67,12 +67,6 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
     params[:id]
   end
 
-  def redirect_to_web_app(**message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
-  end
-
   def not_accepted_invitations
     intervention_load.live_chat_navigator_invitations.not_accepted
   end

@@ -45,12 +45,6 @@ class V1::Organizations::InvitationsController < V1Controller
         find_by!(invitation_token: invitation_token_params)
   end
 
-  def redirect_to_web_app(**message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
-  end
-
   def organization
     @organization ||= Organization.accessible_by(current_ability).find(params[:organization_id])
   end

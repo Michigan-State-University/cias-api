@@ -5,7 +5,7 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
-  include ::Intervention::TranslationAuxiliaryMethods
+  include ::TranslationAuxiliaryMethods
   extend DefaultValues
 
   CURRENT_VERSION = '1'
@@ -170,6 +170,20 @@ class Intervention < ApplicationRecord
 
   def intervention_have_cat_mh_sessions?
     sessions.where(type: 'Session::CatMh').any?
+  end
+
+  def translation_prefix(destination_language_name_short)
+    update!(name: "(#{destination_language_name_short.upcase}) #{name}")
+  end
+
+  def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
+    translate_attribute('additional_text', additional_text, translator, source_language_name_short, destination_language_name_short)
+  end
+
+  def translate_sessions(translator, source_language_name_short, destination_language_name_short)
+    sessions.each do |session|
+      session.translate(translator, source_language_name_short, destination_language_name_short)
+    end
   end
 
   def navigators_from_team
