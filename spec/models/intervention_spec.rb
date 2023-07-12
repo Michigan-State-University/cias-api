@@ -213,11 +213,37 @@ RSpec.describe Intervention, type: :model do
     context 'when researcher want to assign the intervention to other resarcher' do
       let(:other_user) { create(:user, :confirmed, :researcher) }
       let(:params) { { emails: [other_user.email.upcase] } }
+      let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+
+      before do
+        allow(message_delivery).to receive(:deliver_now)
+        ActiveJob::Base.queue_adapter = :test
+      end
 
       it 'create a new intervention with correct user_id' do
         cloned_intervention = intervention.clone(params: params)
 
         expect(cloned_intervention.first.user_id).to eq(other_user.id)
+      end
+
+
+      context 'when sharing an intervention to a researcher which has an activated account' do
+        let(:params) { { emails: [other_user.email] } }
+
+        it 'sends an email that invites only to check up the copy' do
+          allow(CloneMailer).to receive(:cloned_intervention).with(other_user, intervention.name, instance_of(String)).and_return(message_delivery)
+          CloneJobs::Intervention.perform_now(:user, intervention.id, params)
+        end
+      end
+
+      context 'when sharing an intervention to a researcher which hasn\'t yet activated an account' do
+        let(:unconfirmed_user) { create(:user, :researcher) }
+        let(:params) { { emails: [unconfirmed_user.email] } }
+
+        it 'sends an email that invites to make an account' do
+          allow(InterventionMailer).to receive(:share_externally_and_registration).with(instance_of(Intervention), unconfirmed_user.email).and_return(message_delivery)
+          CloneJobs::Intervention.perform_now(:user, intervention.id, params)
+        end
       end
     end
   end
