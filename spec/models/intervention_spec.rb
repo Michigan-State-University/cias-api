@@ -226,7 +226,6 @@ RSpec.describe Intervention, type: :model do
         expect(cloned_intervention.first.user_id).to eq(other_user.id)
       end
 
-
       context 'when sharing an intervention to a researcher which has an activated account' do
         let(:params) { { emails: [other_user.email] } }
 
@@ -237,11 +236,12 @@ RSpec.describe Intervention, type: :model do
       end
 
       context 'when sharing an intervention to a researcher which hasn\'t yet activated an account' do
-        let(:unconfirmed_user) { create(:user, :researcher) }
+        let(:unconfirmed_user) { create(:user, :researcher, :unconfirmed) }
         let(:params) { { emails: [unconfirmed_user.email] } }
 
         it 'sends an email that invites to make an account' do
-          allow(InterventionMailer).to receive(:share_externally_and_registration).with(instance_of(Intervention), unconfirmed_user.email).and_return(message_delivery)
+          allow(InterventionMailer).to receive(:share_externally_and_registrationfix)
+                                         .with(instance_of(described_class), unconfirmed_user.email).and_return(message_delivery)
           CloneJobs::Intervention.perform_now(:user, intervention.id, params)
         end
       end
