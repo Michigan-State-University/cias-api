@@ -37,6 +37,15 @@ class V1::ChartsController < V1Controller
     head :no_content
   end
 
+  def clone
+    authorize! :clone, Chart
+
+    chart = Chart.find_by(id: params[:id]).clone
+    chart.update(position: (Chart.where(dashboard_section_id: chart.dashboard_section_id).maximum(:position) || 0) + 1)
+
+    render json: serialized_response(chart), status: :created
+  end
+
   private
 
   def charts_scope
