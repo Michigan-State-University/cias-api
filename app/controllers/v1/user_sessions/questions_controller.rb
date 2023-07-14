@@ -15,7 +15,7 @@ class V1::UserSessions::QuestionsController < V1Controller
 
     response = V1::UserSessions::PreviousQuestionService.call(user_session, current_question_id)
 
-    render json: response_with_answer(response)
+    render json: response_with_additional_details(response)
   end
 
   private
@@ -36,7 +36,9 @@ class V1::UserSessions::QuestionsController < V1Controller
     params[:current_question_id]
   end
 
-  def response_with_answer(data)
-    serialized_hash(data[:question]).merge({ answer: serialized_hash(data[:answer], Answer)[:data] })
+  def response_with_additional_details(data)
+    response = serialized_hash(data[:question]).merge({ answer: serialized_hash(data[:answer], Answer)[:data] })
+    response = response.merge({hfhs_patient_detail: serialized_hash(current_v1_user.hfhs_patient_detail, HfhsPatientDetail)[:data][:attributes] }) if current_v1_user.hfhs_patient_detail_id?
+    response
   end
 end
