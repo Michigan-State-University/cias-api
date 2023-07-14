@@ -5,7 +5,7 @@ class V1::UserSessions::QuestionsController < V1Controller
     authorize! :read, user_session
 
     next_question = flow_service.user_session_question(preview_question_id)
-    response = V1::Question::Response.call(next_question)
+    response = V1::Question::Response.call(next_question, current_v1_user)
 
     render json: response
   end

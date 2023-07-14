@@ -3,12 +3,13 @@
 class V1::Question::Response
   include Resource
 
-  def self.call(next_question)
-    new(next_question).call
+  def self.call(next_question, current_user)
+    new(next_question, current_user).call
   end
 
-  def initialize(next_question)
+  def initialize(next_question, current_user)
     @next_question = next_question
+    @current_user = current_user
   end
 
   def call
@@ -26,7 +27,9 @@ class V1::Question::Response
       %i[next_user_session_id next_session_id].each do |key|
         response = add_information(response, key, next_question)
       end
+      require 'pry'; binding.pry
       response = response.merge(answer: serialized_hash(next_question[:answer], Answer)[:data])
+      response = response.merge(hfhs_patient_detail: {}) if next_question[:question].is_a? Question::HenryFordInitial
     end
     response
   end
@@ -39,4 +42,5 @@ class V1::Question::Response
   end
 
   attr_accessor :next_question
+  attr_reader :current_user
 end
