@@ -17,7 +17,7 @@ class V1::Charts::Create
   private
 
   def next_position
-    (Chart.where(dashboard_section_id: @chart_params[:dashboard_section_id]).maximum(:position) || 0) + 1
+    Chart.where(dashboard_section_id: @chart_params[:dashboard_section_id]).maximum(:position)&.next || 1
   end
 
   attr_reader :chart_params
