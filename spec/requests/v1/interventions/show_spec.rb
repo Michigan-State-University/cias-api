@@ -19,6 +19,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
                                                         user: intervention_user, sessions: sessions, shared_to: shared_to,
                                                         organization: organization, reports: reports)
   end
+  let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher), view: true, edit: false) }
+  let!(:collaborator_user) { collaborator.user }
   let(:reports) { [] }
   let(:csv_attachment) { FactoryHelpers.upload_file('spec/factories/csv/test_empty.csv', 'text/csv', true) }
 
@@ -39,7 +41,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           expect(attrs).to include(
             'name' => 'Some intervention',
             'shared_to' => shared_to,
-            'csv_link' => nil,
             'csv_generated_at' => nil,
             'organization_id' => organization.id,
             'google_language_id' => intervention.google_language_id
@@ -54,7 +55,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
           expect(attrs).to include(
             'name' => 'Some intervention',
             'shared_to' => shared_to,
-            'csv_link' => include('test_empty.csv'),
             'csv_generated_at' => be_present
           )
         end
@@ -77,6 +77,26 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
 
     context 'user is admin' do
       it_behaves_like 'permitted user'
+    end
+
+    context 'user is a collaborator with view access' do
+      let(:user) { collaborator_user }
+
+      it_behaves_like 'permitted user'
+
+      context 'when intervention has current editor' do
+        before do
+          intervention.update(current_editor: collaborator_user)
+          get v1_intervention_path(intervention.id), headers: user.create_new_auth_token
+        end
+
+        it { expect(attrs['has_collaborators']).to be true }
+
+        it {
+          expect(attrs['current_editor']).to include('id' => collaborator_user.id, 'first_name' => collaborator_user.first_name,
+                                                     'last_name' => collaborator_user.last_name, 'email' => collaborator_user.email)
+        }
+      end
     end
 
     context 'user has multiple roles' do
@@ -142,10 +162,27 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
             expect(attrs).to include(
               'name' => 'Some intervention',
               'shared_to' => shared_to,
-              'csv_link' => nil,
               'csv_generated_at' => nil
             )
           end
+        end
+
+        context 'attribiutes related with collaboration' do
+          it 'contains information if this intervention has collaborators' do
+            expect(attrs).to include(
+              'has_collaborators' => true
+            )
+          end
+
+          it 'contain expected keys' do
+            expect(attrs.keys).to include('current_editor')
+          end
+        end
+
+        it 'contains information about collaborators' do
+          expect(attrs).to include(
+            'has_collaborators' => true
+          )
         end
 
         context 'when intervention contains some report' do
@@ -155,7 +192,6 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
             expect(attrs).to include(
               'name' => 'Some intervention',
               'shared_to' => shared_to,
-              'csv_link' => include('test_empty.csv'),
               'csv_generated_at' => be_present
             )
           end

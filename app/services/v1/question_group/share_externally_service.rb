@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::ShareExternallyService
-  def self.call(researcher_ids, source_session_id, selected_groups_with_questions, current_user)
-    new(researcher_ids, source_session_id, selected_groups_with_questions, current_user).call
+  def self.call(researcher_emails, source_session_id, selected_groups_with_questions, current_user)
+    new(researcher_emails, source_session_id, selected_groups_with_questions, current_user).call
   end
 
-  def initialize(researcher_ids, source_session_id, selected_groups_with_questions, current_user)
-    @researchers = User.where(id: researcher_ids)
+  def initialize(researcher_emails, source_session_id, selected_groups_with_questions, current_user)
+    @researchers = User.where(email: researcher_emails.map(&:downcase))
     @source_session = Session.accessible_by(current_user.ability).find(source_session_id)
     @selected_groups_with_questions = selected_groups_with_questions
     @current_user = current_user

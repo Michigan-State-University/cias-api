@@ -26,6 +26,19 @@ describe User do
       end
     end
 
+    context 'collaborator' do
+      let(:intervention1) { create(:intervention, :with_collaborators_with_data_access) }
+      let(:intervention2) { create(:intervention, user: user) }
+      let!(:user_intervention1) { create(:user_intervention, user: participant, intervention: intervention1) }
+      let!(:user_intervention2) { create(:user_intervention, user: participant2, intervention: intervention2) }
+      let(:participant2) { create(:user, :participant, :confirmed) }
+      let!(:user) { intervention1.collaborators.first.user }
+
+      it 'return all participants who answered on his own intervention or shared with him with data access' do
+        expect(subject).to include(participant, participant2).and not_include(team_1_user, team_2_user, researcher, guest)
+      end
+    end
+
     context 'team_admin' do
       let(:user) { team1.team_admin }
       let!(:team3) { create(:team, team_admin: user) }

@@ -25,4 +25,23 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/accesses/:id', type: :
       expect(intervention.reload.intervention_accesses.size).to eq(accesses.size - 1)
     end
   end
+
+  context 'when current user is collaborator' do
+    let(:request) { delete v1_intervention_access_path(intervention_id: intervention.id, id: accesses[0].id), headers: user.create_new_auth_token }
+    let(:intervention) { create(:intervention) }
+    let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+    let(:user) { collaborator.user }
+
+    before { request }
+
+    it {
+      expect(response).to have_http_status(:forbidden)
+    }
+
+    context 'when has edit access' do
+      let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: true) }
+
+      it { expect(response).to have_http_status(:no_content) }
+    end
+  end
 end

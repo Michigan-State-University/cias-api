@@ -14,12 +14,14 @@ describe Intervention do
   let_it_be(:team2_intervention1) { create(:intervention, user_id: team2.team_admin.id) }
   let_it_be(:team2_intervention2) { create(:intervention, user_id: team2_researcher.id) }
   let_it_be(:team3_intervention1) { create(:intervention, user_id: team3_researcher.id) }
+  let_it_be(:collaborator) { create(:user, :researcher, :confirmed) }
 
   let_it_be(:organization1) { create(:organization) }
   let_it_be(:organization2) { create(:organization) }
 
   let_it_be(:intervention_with_organization1) { create(:intervention, organization_id: organization1.id) }
   let_it_be(:intervention_with_organization2) { create(:intervention, organization_id: organization2.id) }
+  let(:intervention) { create(:intervention) }
 
   describe 'abilities' do
     subject(:ability) { Ability.new(user) }
@@ -50,6 +52,28 @@ describe Intervention do
         expect(subject).to have_abilities({ manage: false }, described_class.new)
       end
     end
+
+    context 'collaborator with view access' do
+      let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
+      let(:user) { collaborator }
+
+      it 'can only view intervention' do
+        expect(subject).to have_abilities({ read: true }, intervention)
+      end
+
+      it 'cannot other action' do
+        expect(subject).to not_have_abilities(%i[update destroy], intervention)
+      end
+    end
+
+    context 'collaborator with edit access' do
+      let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator, edit: true)]) }
+      let(:user) { collaborator }
+
+      it 'can only view intervention' do
+        expect(subject).to have_abilities(%i[read create update delete add_logo], intervention)
+      end
+    end
   end
 
   describe '#accessible_by' do
@@ -65,6 +89,15 @@ describe Intervention do
           team1_intervention1, team1_intervention2, team2_intervention1, team2_intervention2,
           intervention_with_organization1, intervention_with_organization2
         )
+      end
+    end
+
+    context 'collaborator' do
+      let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
+      let(:user) { collaborator }
+
+      it 'can access interventions when is a collaborator' do
+        expect(subject).to include(intervention)
       end
     end
 

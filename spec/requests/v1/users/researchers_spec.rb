@@ -70,7 +70,7 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     let!(:e_intervention_admin) { create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id, organizable_type: 'Organization') }
     let!(:other_e_int_admin) { create(:user, :confirmed, :e_intervention_admin) }
     let!(:organization_invitation) { OrganizationInvitation.create(user_id: other_e_int_admin.id, organization_id: organization.id, accepted_at: DateTime.now) }
-    let(:researchers) { [other_e_int_admin, e_intervention_admin] }
+    let(:researchers) { [other_e_int_admin] }
     let(:headers) { e_intervention_admin.create_new_auth_token }
 
     before { request }
@@ -94,7 +94,7 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
         create(:user, :confirmed, :e_intervention_admin, organizable_id: organization.id, organizable_type: 'Organization', team_id: team.id)
       end
 
-      let(:researchers) { [other_e_int_admin, e_intervention_admin, researcher, other_researcher] }
+      let(:researchers) { [other_e_int_admin, researcher, other_researcher] }
 
       before { request }
 
@@ -112,23 +112,22 @@ RSpec.describe 'GET /v1/users/researchers', type: :request do
     end
   end
 
-  %w[researcher].each do |role|
-    context "when current_user is #{role}" do
-      let!(:user) { researcher }
+  context 'when current_user is researcher' do
+    let!(:user) { researcher }
+    let(:researchers) { [other_researcher] }
 
-      before { request }
+    before { request }
 
-      it 'returns correct http status' do
-        expect(response).to have_http_status(:ok)
-      end
+    it 'returns correct http status' do
+      expect(response).to have_http_status(:ok)
+    end
 
-      it 'returns correct user ids' do
-        expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
-      end
+    it 'returns correct user ids' do
+      expect(json_response['data'].pluck('id')).to match_array(researchers.pluck(:id))
+    end
 
-      it 'returns correct users list size' do
-        expect(json_response['data'].size).to eq researchers.size
-      end
+    it 'returns correct users list size' do
+      expect(json_response['data'].size).to eq researchers.size
     end
   end
 
