@@ -46,5 +46,13 @@ RSpec.describe 'POST /v1/charts/:id/clone', type: :request do
     it 'sets correct status' do
       expect(chart_cloned['status']).to eq('draft')
     end
+
+    it 'gets a new position value greater than the original one' do
+      expect(chart_cloned['position']).to be > chart_to_clone['position']
+    end
+
+    it 'gets a new position value unique in its section' do
+      expect(Chart.where(dashboard_section_id: chart['dashboard_section_id'], position: chart_cloned['position']).count).to eq(1)
+    end
   end
 end

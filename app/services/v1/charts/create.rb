@@ -7,6 +7,7 @@ class V1::Charts::Create
 
   def initialize(chart_params)
     @chart_params = chart_params
+    @chart_params[:position] = next_position
   end
 
   def call
@@ -14,6 +15,10 @@ class V1::Charts::Create
   end
 
   private
+
+  def next_position
+    Chart.where(dashboard_section_id: @chart_params[:dashboard_section_id]).maximum(:position)&.next || 1
+  end
 
   attr_reader :chart_params
 end
