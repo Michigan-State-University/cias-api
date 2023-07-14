@@ -41,6 +41,16 @@ describe Session do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:resource) { create(:session, intervention: intervention) }
+      let(:user) { collaborator }
+
+      it_behaves_like 'collaborator has expected access to resource'
+    end
+
     context 'team admin' do
       let(:user) { team1.team_admin }
 
@@ -57,6 +67,16 @@ describe Session do
         expect(subject).to have_abilities({ manage: false }, team2_session1)
       end
     end
+
+    context 'e-intervention admin' do
+      let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+      let!(:session) { create(:session, intervention: create(:intervention, organization: organization)) }
+      let(:user) { organization.e_intervention_admins.first }
+
+      it 'can read his session' do
+        expect(subject).to have_abilities({ read: true }, session)
+      end
+    end
   end
 
   describe '#accessible_by' do
@@ -69,6 +89,20 @@ describe Session do
 
       it 'can access all interventions' do
         expect(subject).to include(
+          team1_session1, team1_session2, team2_session1, team2_session2
+        )
+      end
+    end
+
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:session) { create(:session, intervention: intervention) }
+      let(:user) { collaborator }
+
+      it do
+        expect(subject).to include(session).and not_include(
           team1_session1, team1_session2, team2_session1, team2_session2
         )
       end
