@@ -114,7 +114,8 @@ RSpec.describe CloneJobs::Intervention, type: :job do
 
     it 'sends a proper email to the researcher' do
       allow(CloneMailer).to receive(:cloned_intervention_activate)
-                              .with(instance_of(User), intervention.name, /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
+                              .with(instance_of(User), intervention.name,
+                                    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
                               .and_return(message_delivery)
       subject
     end
