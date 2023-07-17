@@ -29,13 +29,13 @@ class CloneJobs::Intervention < CloneJob
       if cloned_intervention.user.confirmed?
         CloneMailer.cloned_intervention(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
       else
-        InterventionMailer.share_externally_and_registration(cloned_intervention, cloned_intervention.user.email).deliver_now
+        CloneMailer.cloned_intervention_activate(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
       end
     end
   end
 
   def clear_invalid_interventions(cloned_interventions)
-    cloned_interventions&.each { |_type, intervention| clear_invalid_intervention(intervention) }
+    cloned_interventions&.each { |intervention| clear_invalid_intervention(intervention) }
   end
 
   def clear_invalid_intervention(cloned_intervention)

@@ -16,12 +16,35 @@ class CloneMailer < ApplicationMailer
     mail(to: @user.email, subject: I18n.t('clone_mailer.intervention.subject', intervention_name: @intervention_name))
   end
 
+  def cloned_intervention_activate(user, intervention_name, cloned_intervention_id)
+    @user = user
+    @intervention_name = intervention_name
+    @cloned_intervention_id = cloned_intervention_id
+    @email = @user.email
+
+    @user.send(:generate_invitation_token!)
+    @invitation_token = @user.raw_invitation_token
+
+    mail(to: @email, subject: I18n.t('clone_mailer.intervention_activate.subject', intervention_name: @intervention_name))
+  end
+
   def cloned_session(user, session_name, cloned_session)
     @user = user
     @session_name = session_name
     @cloned_session = cloned_session
 
     mail(to: @user.email, subject: I18n.t('clone_mailer.session.subject', session_name: @session_name))
+  end
+
+  def cloned_question_group_activate(user, intervention_name)
+    @user = user
+    @intervention_name = intervention_name
+    @email = @user.email
+
+    @user.send(:generate_invitation_token!)
+    @invitation_token = @user.raw_invitation_token
+
+    mail(to: @email, subject: I18n.t('clone_mailer.question_group_activate.subject'), intervention_name: @intervention_name)
   end
 
   def error(user)
