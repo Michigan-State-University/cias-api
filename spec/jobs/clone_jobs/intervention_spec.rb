@@ -81,7 +81,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
 
     it 'sends a proper email to the user' do
       allow(CloneMailer).to receive(:cloned_intervention)
-                              .with(user, intervention.name, /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
+                              .with(user, intervention.name, /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
                               .and_return(message_delivery)
       subject
     end
@@ -97,7 +97,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
 
     it 'sends a proper email to the user' do
       allow(CloneMailer).to receive(:cloned_intervention_activate)
-                              .with(new_researcher, intervention.name, /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
+                              .with(new_researcher, intervention.name, /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/)
                               .and_return(message_delivery)
       subject
     end
