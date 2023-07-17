@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::QuestionGroup::ShareExternallyService do
+  require 'faker'
+
   subject { described_class.new(researcher_emails, source_session_id, selected_groups_with_questions, current_user) }
 
   let!(:current_user) { create(:user, :researcher) }
@@ -43,10 +45,16 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
     end
   end
 
-  context 'when the invited researcher does not have an activated account' do
-    subject { described_class.new(researcher_emails, source_session_id, selected_groups_with_questions, current_user) }
+  context 'when the invited reseacher has an activated account' do
+    let!(:invited_researcher) { create(:user, :researcher, :confirmed) }
 
-    let(:new_researcher) { create(:user, :researcher, :unconfirmed) }
+    it 'does not create a new user account' do
+      expect { subject.call }.to change(User, :count).by(0)
+    end
+  end
+
+  context 'when the invited researcher has an account that\'s not been activated' do
+    let!(:new_researcher) { create(:user, :researcher, :unconfirmed) }
     let!(:researcher_emails) { [new_researcher.email] }
 
     let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
@@ -56,13 +64,32 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
       ActiveJob::Base.queue_adapter = :test
     end
 
-    it 'creates a new account for the researcher' do
-      subject.call
-      expect(User.exists?(id: new_researcher.id)).to eq(true)
+    it 'does not create a new user account' do
+      expect { subject.call }.to change(User, :count).by(0)
     end
 
     it 'sends an email to the researcher' do
-      allow(InterventionMailer).to receive(:share_question_group_and_registration).with(intervention, new_researcher.email).and_return(message_delivery)
+      allow(CloneMailer).to receive(:cloned_question_group_activate).with(new_researcher, instance_of(Intervention)).and_return(message_delivery)
+      subject.call
+    end
+  end
+
+  context 'when the invited researcher doesn\'t have an account' do
+    let!(:researcher_emails) { [Faker::Internet.unique.email] }
+
+    let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+
+    before do
+      allow(message_delivery).to receive(:deliver_now)
+      ActiveJob::Base.queue_adapter = :test
+    end
+
+    it 'creates a new researcher account' do
+      expect { subject.call }.to change(User, :count).by(1)
+    end
+
+    it 'sends an email to the researcher' do
+      allow(CloneMailer).to receive(:cloned_question_group_activate).with(instance_of(User), instance_of(String)).and_return(message_delivery)
       subject.call
     end
   end
