@@ -36,15 +36,15 @@ class CloneMailer < ApplicationMailer
     mail(to: @user.email, subject: I18n.t('clone_mailer.session.subject', session_name: @session_name))
   end
 
-  def cloned_question_group_activate(user, intervention_name)
+  def cloned_question_group_activate(user, new_intervention_name)
     @user = user
-    @intervention_name = intervention_name
+    @intervention_name = new_intervention_name
     @email = @user.email
 
     @user.send(:generate_invitation_token!)
     @invitation_token = @user.raw_invitation_token
 
-    mail(to: @email, subject: I18n.t('clone_mailer.question_group_activate.subject'), intervention_name: @intervention_name)
+    mail(to: @email, subject: I18n.t('clone_mailer.question_group_activate.subject'), intervention_name: @intervention_name) # TODO: remove intervention name from this line
   end
 
   def error(user)
