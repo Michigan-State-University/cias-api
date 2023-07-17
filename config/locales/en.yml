@@ -248,11 +248,14 @@ en:
       button_text: Open the e-intervention
       link: '%{web_url}/interventions/%{intervention_id}'
     intervention_activate:
-      subject: 'Copy of %{intervention_name} - ACTIVATE ACCOUNT'
-      header: 'You have been invited to edit Copy of %{intervention_name}'
-      body: 'Your intervention has been copied successfully. Before you can use it, please create a reseacher account.'
-      button_text: "Let's get started"
+      subject: 'CIAS invitation'
+      header: 'Welcome to CIAS'
+      main_text: "You now have access to <span style='color:#C866EA;'>Copy of %{intervention_name}</span>.<br /><br />"
+      new_user: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;">To begin, use link below to set up you account.</div>'
+      button: 'Go to the app'
       link: "%{domain}/v1/users/invitations/edit?role=researcher&invitation_token=%{invitation_token}&email=%{email}"
+      html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
     session:
       subject: 'Copy of %{session_name}'
       header: 'Your copy of %{session_name} is ready'
@@ -260,11 +263,14 @@ en:
       button_text: Open the session
       link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
     question_group_activate:
-      subject: 'Copy of %{intervention_name} - QUESTION GROUP'
-      header: 'You have been invited to edit Copy of %{intervention_name}'
-      body: 'Your intervention has been copied successfully. Before you can use it, please create a reseacher account.'
-      button_text: "Let's get started"
+      subject: 'CIAS invitation'
+      header: 'Welcome to CIAS'
+      main_text: "You now have access to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />"
+      new_user: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;">To begin, use link below to set up you account.</div>'
+      button: 'Go to the app'
       link: "%{domain}/v1/users/invitations/edit?role=researcher&invitation_token=%{invitation_token}&email=%{email}"
+      html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
     error:
       subject: 'Error during copying'
       header: 'An error has occurred during copying.'
