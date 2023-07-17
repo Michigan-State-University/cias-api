@@ -38,7 +38,10 @@ class V1::UserSessions::QuestionsController < V1Controller
 
   def response_with_additional_details(data)
     response = serialized_hash(data[:question]).merge({ answer: serialized_hash(data[:answer], Answer)[:data] })
-    response = response.merge({hfhs_patient_detail: serialized_hash(current_v1_user.hfhs_patient_detail, HfhsPatientDetail)[:data][:attributes] }) if current_v1_user.hfhs_patient_detail_id?
+    if current_v1_user.hfhs_patient_detail_id?
+      response = response.merge({ hfhs_patient_detail: serialized_hash(current_v1_user.hfhs_patient_detail,
+                                                                       HfhsPatientDetail)[:data][:attributes] })
+    end
     response
   end
 end
