@@ -27,15 +27,7 @@ class V1::Question::Response
       %i[next_user_session_id next_session_id].each do |key|
         response = add_information(response, key, next_question)
       end
-      # require 'pry'; binding.pry
-      # dob
-      # first_name
-      # last_name
-      # patient_id
-      # phone_number
-      # phone_type
-      # sex
-      # zip_code
+
       response = response.merge(answer: serialized_hash(next_question[:answer], Answer)[:data])
       if next_question[:question].is_a?(Question::HenryFordInitial) && current_user.hfhs_patient_detail_id?
         response = response.merge(hfhs_patient_detail: serialized_hash(current_user.hfhs_patient_detail,
