@@ -37,14 +37,6 @@ class V1::ChartsController < V1Controller
     head :no_content
   end
 
-  # def clone
-  #   authorize! :clone, Chart
-  #
-  #   chart = Chart.find_by(id: params[:id]).clone
-  #
-  #   render json: serialized_response(chart), status: :created
-  # end
-
   private
 
   def charts_scope
