@@ -12,7 +12,7 @@ module Clone
         safe_constantize.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
     end
 
-    interventions = []
+    cloned_elements = []
 
     _existing_emails, non_existing_emails = split_emails_exist(emails)
     invite_non_existing_users(non_existing_emails, true, [:researcher])
@@ -20,7 +20,7 @@ module Clone
     user_ids = User.where(email: emails).limit_to_roles(%w[e_intervention_admin researcher]).pluck(:id)
 
     user_ids.each do |user_id|
-      interventions
+      cloned_elements
         .push(
           "Clone::#{de_constantize_modulize_name.classify}".
             safe_constantize.
@@ -28,6 +28,6 @@ module Clone
             execute
         )
     end
-    interventions
+    cloned_elements
   end
 end
