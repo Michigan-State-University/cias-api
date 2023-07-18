@@ -56,8 +56,8 @@ class V1::HenryFord::VerifyService
 
   def hfhs_visit_id
     # TODO: implement logic provided by Rajesh
+    # .find_all { |appointment| appointment.dig(:resource, :participant).any? }
     @appointments[:entry]
-                 .find_all { |appointment| appointment.dig(:resource, :participant).any? }
                  .find { |appointment| appointment.dig(:resource, :identifier, 0, :system) == system_identifier }
       &.dig(:resource, :identifier, :value)
   end
