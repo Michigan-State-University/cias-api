@@ -76,7 +76,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     let!(:clone_params) { { email: [user.email] } }
 
     it 'does not create a new user account' do
-      expect { subject }.to change(User, :count).by(0)
+      expect { subject }.not_to change(User, :count)
     end
 
     it 'sends a proper email to the user' do
@@ -93,7 +93,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     let!(:clone_params) { { emails: [new_researcher.email] } }
 
     it 'does not create a new user account' do
-      expect { subject }.to change(User, :count).by(0)
+      expect { subject }.not_to change(User, :count)
     end
 
     it 'sends a proper email to the user' do

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::QuestionGroup::ShareExternallyService do
-  require 'faker'
+  require 'rails_helper'
 
   subject { described_class.new(researcher_emails, source_session_id, selected_groups_with_questions, current_user) }
 
