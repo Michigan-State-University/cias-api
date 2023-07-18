@@ -57,8 +57,14 @@ class V1::HenryFord::VerifyService
   def hfhs_visit_id
     # TODO: implement logic provided by Rajesh
     @appointments[:entry]
+                 .find_all { |appointment| appointment.dig(:resource, :participant).any? }
                  .find { |appointment| appointment.dig(:resource, :identifier, 0, :system) == system_identifier }
       &.dig(:resource, :identifier, :value)
+  end
+
+  def location_id
+    # TODO: after define a way to define a list of location for specyfic intervention
+    'Location/eahnL1gZAue7EtE7rhzzoPJD-4qrnWT-72TkjhqiLOGA3'
   end
 
   def create_or_find_resource!

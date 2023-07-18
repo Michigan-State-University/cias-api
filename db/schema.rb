@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_07_03_101810) do
+ActiveRecord::Schema.define(version: 2023_07_18_065226) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -178,6 +178,13 @@ ActiveRecord::Schema.define(version: 2023_07_03_101810) do
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
+  end
+
+  create_table "clinic_locations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "department", null: false
+    t.string "name", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "collaborators", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -396,6 +403,15 @@ ActiveRecord::Schema.define(version: 2023_07_03_101810) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["intervention_id"], name: "index_intervention_accesses_on_intervention_id"
+  end
+
+  create_table "intervention_locations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "intervention_id"
+    t.uuid "clinic_location_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["clinic_location_id"], name: "index_intervention_locations_on_clinic_location_id"
+    t.index ["intervention_id"], name: "index_intervention_locations_on_intervention_id"
   end
 
   create_table "intervention_navigators", force: :cascade do |t|

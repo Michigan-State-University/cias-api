@@ -18,6 +18,8 @@ RSpec.describe Intervention, type: :model do
     it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { should have_many(:short_links).dependent(:destroy) }
+    it { should have_many(:intervention_locations).dependent(:destroy) }
+    it { should have_many(:clinic_locations) }
     it { expect(initial_status.draft?).to be true }
   end
 

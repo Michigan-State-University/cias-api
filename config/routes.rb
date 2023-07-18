@@ -48,6 +48,7 @@ Rails.application.routes.draw do
     end
     namespace :henry_ford do
       post 'verify', to: 'patient_details#verify'
+      resources :clinic_locations, only: :index
     end
 
     resources :preview_session_users, only: :create

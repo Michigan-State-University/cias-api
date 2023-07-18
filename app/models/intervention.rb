@@ -39,6 +39,10 @@ class Intervention < ApplicationRecord
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
   has_one_attached :conversations_transcript, dependent: :purge_later
 
+  # Henry Ford integration
+  has_many :intervention_locations, dependent: :destroy
+  has_many :clinic_locations, through: :intervention_locations
+
   attribute :shared_to, :string, default: 'anyone'
   attribute :original_text, :json, default: { additional_text: '' }
 
