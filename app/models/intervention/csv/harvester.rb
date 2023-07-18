@@ -161,4 +161,26 @@ class Intervention::Csv::Harvester
 
     hf_initial_question.csv_header_names
   end
+
+  def fill_hf_initial_screen(row_index, user_session)
+    return unless user_session.session.intervention.hfhs_access
+
+    question = ::Question::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
+    attrs = question&.csv_decoded_attrs
+    patient_details = patient_details(user_session, attrs)
+    return if patient_details.blank?
+
+    attrs = question.rename_attrs(attrs)
+    attrs.each_with_index do |column, index|
+      var_index = header.index("henry_ford_health.#{column}")
+      next if var_index.nil?
+
+      rows[row_index][var_index] = patient_details[index]
+    end
+  end
+
+  def patient_details(user_session, attrs)
+    details = user_session.user.hfhs_patient_detail&.attributes
+    details&.fetch_values(*attrs)
+  end
 end
