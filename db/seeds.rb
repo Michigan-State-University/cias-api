@@ -7,6 +7,7 @@ class SummonUsers
     def onboarding
       summon_many
       create_example_hfhs_data
+      example_locations
     end
 
     private
@@ -47,6 +48,12 @@ class SummonUsers
           zip_code: '49201-1653',
           patient_id: mrn
         )
+      end
+    end
+
+    def example_locations
+      5.times do
+        ClinicLocation.create!(name: Faker::Company.name, department: 'HTD')
       end
     end
 
