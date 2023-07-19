@@ -82,11 +82,12 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
           end
         end
-        fill_hf_initial_screen(row_index, user_session)
         fill_by_tlfb_research(row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
         metadata(user_session.session, user_session, row_index, user_session.number_of_attempts, user_session.session.multiple_fill)
         quick_exit(user_session.session, row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
       end
+
+      fill_hf_initial_screen(row_index, grouped_user_sessions.second.first)
     end
   end
 
