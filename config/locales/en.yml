@@ -338,9 +338,9 @@ en:
       body: "Your conversation transcripts from intervention <span style='color:#C866EA;'>%{intervention_name}</span> are ready."
   epic_on_fhir:
     error:
-      authentication: "Authorization process failed. Please contact our support team so that we can assist you in resolving this matter"
-      unexpected_error: "Third party tool return unexpected response. Please contact our support team"
+      authentication: "Authorization process failed. Try again or contact our support team."
+      unexpected_error: "Unexpected response from third-party tool. Please contact our support team."
       patient:
-        not_found: "We could not clearly identify you or associated data in third party tool. Please contact our support team"
+        not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
-        not_found: "We could not find all the necessary information for further processing"
+        not_found: "Insufficient information for further processing."
