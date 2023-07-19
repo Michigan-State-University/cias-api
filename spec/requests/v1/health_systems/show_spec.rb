@@ -100,7 +100,6 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
           {
             'id' => health_system_admin.id,
             'type' => 'user',
-            'relationships' => { 'hfhs_patient_detail' => { 'data' => nil } },
             'attributes' =>
               include(
                 'email' => health_system_admin.email,
