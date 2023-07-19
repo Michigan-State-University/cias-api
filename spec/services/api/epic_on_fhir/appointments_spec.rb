@@ -9,7 +9,7 @@ describe Api::EpicOnFhir::Appointments do
   let(:patient_id) { 'example_patient_id' }
 
   it 'when API return correct data' do
-    stub_request(:post, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
+    stub_request(:get, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
       .with(query: { '_format' => 'json', 'patient' => patient_id })
       .to_return(status: 200, body: File.read('spec/fixtures/integrations/henry_ford/appointments.json'))
 
@@ -17,7 +17,7 @@ describe Api::EpicOnFhir::Appointments do
   end
 
   it 'when third party tool return empty collection' do
-    stub_request(:post, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
+    stub_request(:get, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
       .with(query: { '_format' => 'json', 'patient' => patient_id })
       .to_return(status: 200, body: {
         resourceType: 'Bundle',
@@ -36,7 +36,7 @@ describe Api::EpicOnFhir::Appointments do
   end
 
   it 'when third party tool return unexpected status' do
-    stub_request(:post, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
+    stub_request(:get, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
       .with(query: { '_format' => 'json', 'patient' => patient_id })
       .to_return(status: 400, body: '')
 
