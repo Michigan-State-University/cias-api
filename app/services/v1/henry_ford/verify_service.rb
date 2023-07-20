@@ -91,6 +91,7 @@ class V1::HenryFord::VerifyService
                    &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }&.dig(:actor, :display)
 
       available_location?(location) && (parsed_date&.today? || parsed_date&.future?)
+      # available_location?(location)
     end
   end
 
