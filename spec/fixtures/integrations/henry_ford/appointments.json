@@ -92,7 +92,7 @@
           {
             "actor": {
               "reference": "Location/eahnL1gZAue7EtE7rhzzoPJD-4qrnWT-72TkjhqiLOGA3",
-              "display": "HFMC Ford Rd Pediatrics"
+              "display": "HTD brukowa"
             },
             "required": "required",
             "status": "accepted",
@@ -190,7 +190,7 @@
           {
             "actor": {
               "reference": "Location/eahnL1gZAue7EtE7rhzzoPJD-4qrnWT-72TkjhqiLOGA3",
-              "display": "HFMC Ford Rd Pediatrics"
+              "display": "HTD brukowa"
             },
             "required": "required",
             "status": "declined",
