@@ -102,7 +102,7 @@ class InterventionChannel < ApplicationCable::Channel
       user_id: user.id,
       first_name: user.first_name,
       last_name: user.last_name,
-      avatar_url: user.avatar.attached? ? polymorphic_url(object.avatar) : ''
+      avatar_url: user.avatar.attached? ? polymorphic_url(user.avatar) : ''
     }
   end
 
