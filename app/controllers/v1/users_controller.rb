@@ -2,7 +2,7 @@
 
 class V1::UsersController < V1Controller
   include BlankParams
-  skip_before_action :authenticate_user!, only: %i[confirm_logging_code]
+  skip_before_action :authenticate_user!, only: %i[confirm_logging_code confirm_terms]
 
   def index
     authorize! :index, current_v1_user
@@ -62,6 +62,11 @@ class V1::UsersController < V1Controller
     end
   end
 
+  def confirm_terms
+    result = V1::Users::Terms::Confirm.call(terms_confirmation_params, email_params, password_params)
+    head result ? :ok : :expectation_failed
+  end
+
   def me
     render json: me_response
   end
@@ -70,8 +75,7 @@ class V1::UsersController < V1Controller
 
   def me_response
     V1::UserSerializer.new(
-      current_v1_user,
-      { include: %i[hfhs_patient_detail] }
+      current_v1_user
     )
   end
 
@@ -99,8 +103,16 @@ class V1::UsersController < V1Controller
     params[:email].downcase
   end
 
+  def password_params
+    params[:password]
+  end
+
   def phone_params
     params.permit(:phone_number, :iso, :prefix)
+  end
+
+  def terms_confirmation_params
+    params.permit(:first_name, :last_name, :terms)
   end
 
   def user_params

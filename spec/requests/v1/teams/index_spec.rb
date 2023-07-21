@@ -72,12 +72,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
               'roles' => %w[researcher team_admin],
               'team_id' => nil,
               'admins_team_ids' => [team2.id]
-            ),
-            'relationships' => {
-              'hfhs_patient_detail' => {
-                'data' => nil
-              }
-            }
+            )
           ).and include(
             'id' => team_1_admin.id,
             'type' => 'user',
@@ -87,12 +82,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
               'roles' => %w[researcher team_admin],
               'team_id' => nil,
               'admins_team_ids' => [team1.id]
-            ),
-            'relationships' => {
-              'hfhs_patient_detail' => {
-                'data' => nil
-              }
-            }
+            )
           )
         end
 
@@ -184,12 +174,7 @@ RSpec.describe 'GET /v1/teams', type: :request do
             'roles' => %w[researcher team_admin],
             'team_id' => nil,
             'admins_team_ids' => [team1.id]
-          ),
-          'relationships' => {
-            'hfhs_patient_detail' => {
-              'data' => nil
-            }
-          }
+          )
         )
       end
 

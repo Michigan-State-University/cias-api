@@ -28,6 +28,10 @@ en:
   activerecord:
     errors:
       models:
+        collaborator:
+          attributes:
+            user:
+              already_exist: 'is already a collaborator in this intervention'
         intervention:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
@@ -40,6 +44,8 @@ en:
             collaborators:
               data_access: "Only owner can change 'data_access' parameter"
         user:
+          terms_not_accepted: 'If you want to login, you need to enter your first and last name, as well as accept terms and conditions & Privacy Policy first. Please find your invitation email or contact support'
+          2fa_code_needed: 'You need to provide 2fa code to verify you.'
           not_using_invitation_link: "If you want to register by this email, please use the registration link received by email from the researcher."
           attributes:
             roles:
@@ -332,9 +338,9 @@ en:
       body: "Your conversation transcripts from intervention <span style='color:#C866EA;'>%{intervention_name}</span> are ready."
   epic_on_fhir:
     error:
-      authentication: "Authorization process failed. Please contact our support team so that we can assist you in resolving this matter"
-      unexpected_error: "Third party tool return unexpected response. Please contact our support team"
+      authentication: "Authorization process failed. Try again or contact our support team."
+      unexpected_error: "Unexpected response from third-party tool. Please contact our support team."
       patient:
-        not_found: "We could not clearly identify you or associated data in third party tool. Please contact our support team"
+        not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
-        not_found: "We could not find all the necessary information for further processing"
+        not_found: "Insufficient information for further processing."

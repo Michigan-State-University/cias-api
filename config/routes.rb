@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
       patch 'confirm_logging_code', to: 'users#confirm_logging_code'
+      patch 'confirm_terms', to: 'users#confirm_terms'
       get 'researchers', to: 'users#researchers'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
@@ -47,6 +48,7 @@ Rails.application.routes.draw do
     end
     namespace :henry_ford do
       post 'verify', to: 'patient_details#verify'
+      resources :clinic_locations, only: :index
     end
 
     resources :preview_session_users, only: :create

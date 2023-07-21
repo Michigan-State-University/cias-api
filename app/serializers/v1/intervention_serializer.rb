@@ -9,6 +9,7 @@ class V1::InterventionSerializer < V1Serializer
              :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled, :hfhs_access
 
   has_many :sessions, serializer: V1::SessionSerializer
+  has_many :clinic_locations, serializer: V1::ClinicLocationSerializer
 
   cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours)  # temporary length, might be a subject to change
 

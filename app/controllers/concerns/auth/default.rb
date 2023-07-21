@@ -13,8 +13,7 @@ module Auth::Default
 
   def render_create_success
     render json: V1::UserSerializer.new(
-      @resource,
-      { include: %i[hfhs_patient_detail] }
+      @resource
     ), status: :created
   end
 

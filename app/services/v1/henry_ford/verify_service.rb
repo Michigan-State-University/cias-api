@@ -3,16 +3,17 @@
 class V1::HenryFord::VerifyService
   SYSTEM_IDENTIFIER = ENV.fetch('EPIC_ON_FHIR_SYSTEM_IDENTIFIER')
 
-  def self.call(user, patient_params)
-    new(user, patient_params).call
+  def self.call(user, patient_params, session_id)
+    new(user, patient_params, session_id).call
   end
 
-  def initialize(user, patient_params)
+  def initialize(user, patient_params, session_id)
     @user = user
     @patient_params = patient_params
+    @session_id = session_id
   end
 
-  attr_reader :user, :patient_params, :patient, :appointments
+  attr_reader :user, :patient_params, :patient, :appointments, :session_id
   attr_accessor :resource
 
   def call
@@ -50,15 +51,14 @@ class V1::HenryFord::VerifyService
                       .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
   end
 
-  def system_identifier
-    system_identifier_details[:system]
-  end
-
   def hfhs_visit_id
-    # TODO: implement logic provided by Rajesh
-    @appointments[:entry]
-                 .find { |appointment| appointment.dig(:resource, :identifier, 0, :system) == system_identifier }
-      &.dig(:resource, :identifier, :value)
+    visit_id = filtered_appointments
+      .sort_by! { |appointment| DateTime.parse(appointment.dig(:resource, :start)) }
+      .first&.dig(:resource, :identifier, 0, :value)
+
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if visit_id.blank?
+
+    visit_id
   end
 
   def create_or_find_resource!
@@ -79,5 +79,29 @@ class V1::HenryFord::VerifyService
     return if user.preview_session?
 
     user.update(hfhs_patient_detail: @resource)
+  end
+
+  def filtered_appointments
+    @appointments[:entry].find_all do |appointment|
+      start = appointment.dig(:resource, :start)
+      parsed_date = Date.parse(start) if start.present?
+
+      location = appointment
+                   &.dig(:resource, :participant)
+                   &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }&.dig(:actor, :display)
+
+      available_location?(location) && (parsed_date&.today? || parsed_date&.future?)
+      # available_location?(location)
+    end
+  end
+
+  def available_location?(location)
+    return false if location.blank?
+
+    location.downcase.in?(intervention_locations)
+  end
+
+  def intervention_locations
+    @intervention_locations ||= Session.find(session_id).intervention.clinic_locations.map { |location| "#{location.department} #{location.name}".downcase }
   end
 end

@@ -927,6 +927,19 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                         "#{session.variable}.approach_number_1.metadata.session_duration"]
           expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
         end
+
+        context 'when number of attempts is empty' do
+          let!(:user_session) { create(:user_session, user: user, session: session, number_of_attempts: nil) }
+
+          it 'save every variables and scores to csv with the additional prefix' do
+            subject.collect
+            expect(subject.header).to eq [:user_id, :email, "#{session.variable}.approach_number_1.test",
+                                          "#{session.variable}.approach_number_1.metadata.session_start",
+                                          "#{session.variable}.approach_number_1.metadata.session_end",
+                                          "#{session.variable}.approach_number_1.metadata.session_duration"]
+            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+          end
+        end
       end
 
       context 'when henry ford' do
