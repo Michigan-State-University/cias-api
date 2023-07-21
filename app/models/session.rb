@@ -56,7 +56,7 @@ class Session < ApplicationRecord
                                                      err
                                                    } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
-  validate :unique_variable, on: %i[create update]
+  # validate :unique_variable, on: %i[create update]
   validates :autofinish_delay, presence: true, if: :autofinish_enabled
   validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
 

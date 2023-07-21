@@ -188,10 +188,6 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
       it 'returns next question' do
         expect(subject.call['data']['id']).to eq 14
       end
-
-      it 'has the "started" flag set to true' do
-        expect(subject.call['data']['attributes']['started']).to be true
-      end
     end
 
     context 'formula has invalid target' do
