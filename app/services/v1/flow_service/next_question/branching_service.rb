@@ -89,6 +89,7 @@ class V1::FlowService::NextQuestion::BranchingService
 
   def first_question_in_next_session(session)
     next_user_session = next_user_session!(session)
+    next_user_session.update!(started: true)
     additional_information[:next_user_session_id] = next_user_session.id
     additional_information[:next_session_id] = session.id
 
