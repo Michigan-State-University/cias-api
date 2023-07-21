@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::QuestionGroup::ShareExternallyService do
-  subject { described_class.new(researcher_ids, source_session_id, selected_groups_with_questions, current_user) }
+  subject { described_class.new(researcher_emails, source_session_id, selected_groups_with_questions, current_user) }
 
   let!(:current_user) { create(:user, :researcher) }
   let!(:intervention) { create(:intervention, user_id: current_user.id) }
@@ -19,9 +19,9 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
       { 'id' => question_group.id, 'question_ids' => [question1.id, question3.id] }
     ]
   end
-  let!(:researcher_ids) do
+  let!(:researcher_emails) do
     [
-      researcher.id
+      researcher.email.upcase
     ]
   end
   let!(:source_session_id) { session1.id }
@@ -32,9 +32,9 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
 
   context 'when user hasn\'t correct ability' do
     let!(:participant) { create(:user, :participant) }
-    let!(:researcher_ids) do
+    let!(:researcher_emails) do
       [
-        researcher.id, participant.id
+        researcher.email, participant.email
       ]
     end
 

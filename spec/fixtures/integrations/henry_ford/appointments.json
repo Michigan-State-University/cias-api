@@ -1,0 +1,235 @@
+{
+  "resourceType": "Bundle",
+  "type": "searchset",
+  "total": 2,
+  "link": [
+    {
+      "relation": "self",
+      "url": "https://fhirdev.hfhs.org/FHIRProxy/api/FHIR/R4/Appointment?_format=json&patient=ew3HKCxhuuaLq2opA.HJWOg3"
+    }
+  ],
+  "entry": [
+    {
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://fhirdev.hfhs.org/FHIRProxy/api/FHIR/R4/Appointment/eq3suoj4T7jd2aIZBD7QCgj3WrdcUlgobWG-xJRutxzU3"
+        }
+      ],
+      "fullUrl": "https://fhirdev.hfhs.org/FHIRProxy/api/FHIR/R4/Appointment/eq3suoj4T7jd2aIZBD7QCgj3WrdcUlgobWG-xJRutxzU3",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "eq3suoj4T7jd2aIZBD7QCgj3WrdcUlgobWG-xJRutxzU3",
+        "identifier": [
+          {
+            "system": "urn:oid:1.2.840.114350.1.13.338.3.7.3.698084.8",
+            "value": "10022118420"
+          }
+        ],
+        "status": "fulfilled",
+        "serviceCategory": [
+          {
+            "coding": [
+              {
+                "system": "http://open.epic.com/FHIR/StructureDefinition/appointment-service-category",
+                "code": "appointment",
+                "display": "Appointment"
+              }
+            ],
+            "text": "appointment"
+          }
+        ],
+        "serviceType": [
+          {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.338.3.7.2.808267",
+                "code": "42308",
+                "display": "NEW SICK/INJURED"
+              }
+            ]
+          }
+        ],
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+              "code": "AMB",
+              "display": "Ambulatory"
+            }
+          ]
+        },
+        "start": "2023-06-29T18:00:00Z",
+        "end": "2023-06-29T18:20:00Z",
+        "minutesDuration": 20,
+        "created": "2023-06-29",
+        "patientInstruction": "Please arrive 10 minutes prior to your scheduled time.\r\n\r\n",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/ew3HKCxhuuaLq2opA.HJWOg3",
+              "display": "Korody, Medicaid"
+            },
+            "required": "required",
+            "status": "accepted",
+            "period": {
+              "start": "2023-06-29T18:00:00Z",
+              "end": "2023-06-29T18:20:00Z"
+            }
+          },
+          {
+            "actor": {
+              "reference": "Practitioner/ejNRz2EawirzBCjtwE9sUWw3",
+              "display": "Jasmine Cherian, MD"
+            },
+            "required": "required",
+            "status": "accepted",
+            "period": {
+              "start": "2023-06-29T18:00:00Z",
+              "end": "2023-06-29T18:20:00Z"
+            }
+          },
+          {
+            "actor": {
+              "reference": "Location/eahnL1gZAue7EtE7rhzzoPJD-4qrnWT-72TkjhqiLOGA3",
+              "display": "HTD brukowa"
+            },
+            "required": "required",
+            "status": "accepted",
+            "period": {
+              "start": "2023-06-29T18:00:00Z",
+              "end": "2023-06-29T18:20:00Z"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "link": [
+        {
+          "relation": "self",
+          "url": "https://fhirdev.hfhs.org/FHIRProxy/api/FHIR/R4/Appointment/eq3suoj4T7jd2aIZBD7QCgh9yBY5.VBrCW.XBjsz8dkA3"
+        }
+      ],
+      "fullUrl": "https://fhirdev.hfhs.org/FHIRProxy/api/FHIR/R4/Appointment/eq3suoj4T7jd2aIZBD7QCgh9yBY5.VBrCW.XBjsz8dkA3",
+      "resource": {
+        "resourceType": "Appointment",
+        "id": "eq3suoj4T7jd2aIZBD7QCgh9yBY5.VBrCW.XBjsz8dkA3",
+        "identifier": [
+          {
+            "system": "urn:oid:1.2.840.114350.1.13.338.3.7.3.698084.8",
+            "value": "10022118421"
+          }
+        ],
+        "status": "noshow",
+        "serviceCategory": [
+          {
+            "coding": [
+              {
+                "system": "http://open.epic.com/FHIR/StructureDefinition/appointment-service-category",
+                "code": "appointment",
+                "display": "Appointment"
+              }
+            ],
+            "text": "appointment"
+          }
+        ],
+        "serviceType": [
+          {
+            "coding": [
+              {
+                "system": "urn:oid:1.2.840.114350.1.13.338.3.7.2.808267",
+                "code": "42307",
+                "display": "SICK/INJURED"
+              }
+            ]
+          }
+        ],
+        "appointmentType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+              "code": "AMB",
+              "display": "Ambulatory"
+            }
+          ]
+        },
+        "start": "2023-06-30T13:20:00Z",
+        "end": "2023-06-30T13:40:00Z",
+        "minutesDuration": 20,
+        "created": "2023-06-29",
+        "patientInstruction": "Please arrive 10 minutes prior to your scheduled time.\r\n",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/ew3HKCxhuuaLq2opA.HJWOg3",
+              "display": "Korody, Medicaid"
+            },
+            "required": "required",
+            "status": "declined",
+            "period": {
+              "start": "2023-06-30T13:20:00Z",
+              "end": "2023-06-30T13:40:00Z"
+            }
+          },
+          {
+            "actor": {
+              "reference": "Practitioner/ejNRz2EawirzBCjtwE9sUWw3",
+              "display": "Jasmine Cherian, MD"
+            },
+            "required": "required",
+            "status": "declined",
+            "period": {
+              "start": "2023-06-30T13:20:00Z",
+              "end": "2023-06-30T13:40:00Z"
+            }
+          },
+          {
+            "actor": {
+              "reference": "Location/eahnL1gZAue7EtE7rhzzoPJD-4qrnWT-72TkjhqiLOGA3",
+              "display": "HTD brukowa"
+            },
+            "required": "required",
+            "status": "declined",
+            "period": {
+              "start": "2023-06-30T13:20:00Z",
+              "end": "2023-06-30T13:40:00Z"
+            }
+          }
+        ]
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:00000000-015e-3fd3-6822-81371a00afcc",
+      "resource": {
+        "resourceType": "OperationOutcome",
+        "issue": [
+          {
+            "severity": "warning",
+            "code": "suppressed",
+            "details": {
+              "coding": [
+                {
+                  "system": "urn:oid:1.2.840.114350.1.13.338.3.7.2.657369",
+                  "code": "59204",
+                  "display": "The authenticated client's search request applies to a sub-resource that the client is not authorized for. Results of this sub-type will not be returned."
+                }
+              ],
+              "text": "The authenticated client's search request applies to a sub-resource that the client is not authorized for. Results of this sub-type will not be returned."
+            },
+            "diagnostics": "Client not authorized for Appointment - Scheduled Surgeries. Search results of this type have not been included."
+          }
+        ]
+      },
+      "search": {
+        "mode": "outcome"
+      }
+    }
+  ]
+}

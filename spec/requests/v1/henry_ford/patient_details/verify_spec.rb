@@ -5,6 +5,12 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
   let(:user) { create(:user, :confirmed, :participant) }
   let!(:hfhs_data) { create(:hfhs_patient_detail) }
+  let!(:session) do
+    create(:session,
+           intervention: create(:intervention,
+                                intervention_locations: [create(:intervention_location,
+                                                                clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD'))]))
+  end
 
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -14,13 +20,27 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
         last_name: hfhs_data.last_name,
         dob: hfhs_data.dob,
         sex: hfhs_data.sex,
-        zip_code: hfhs_data.zip_code
-      }
+        zip_code: hfhs_data.zip_code,
+        phone_number: hfhs_data.phone_number,
+        phone_type: hfhs_data.phone_type
+      },
+      session_id: session.id
     }
   end
   let(:request) { post v1_henry_ford_verify_path, params: params, headers: headers }
 
-  before { request }
+  before do
+    allow_any_instance_of(Date).to receive(:future?).and_return(true)
+
+    allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
+      JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+    )
+    allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
+      JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+    )
+
+    request
+  end
 
   context 'when auth' do
     context 'is invalid' do
@@ -44,26 +64,8 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
     end
 
     it 'correctly assigned data to user' do
+      # require 'pry'; binding.pry
       expect(user.reload.hfhs_patient_detail).to eq(hfhs_data)
-    end
-
-    context 'when mrn is provided ignore rest of params' do
-      let(:params) do
-        {
-          hfhs_patient_data: {
-            first_name: 'FakeFirstName',
-            mrn: hfhs_data.patient_id
-          }
-        }
-      end
-
-      it 'returns correct status' do
-        expect(response).to have_http_status(:ok)
-      end
-
-      it 'correctly assigned data to user' do
-        expect(user.reload.hfhs_patient_detail).to eq(hfhs_data)
-      end
     end
   end
 
@@ -76,24 +78,6 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
 
     it 'patient data doesn\'t assign ' do
       expect(user.reload.hfhs_patient_detail).to eq(hfhs_data)
-    end
-  end
-
-  context 'when params are incorrect' do
-    let(:params) do
-      {
-        hfhs_patient_data: {
-          first_name: 'FakeFirstName',
-          last_name: 'FakeLastName',
-          dob: hfhs_data.dob,
-          sex: hfhs_data.sex,
-          zip_code: hfhs_data.zip_code
-        }
-      }
-    end
-
-    it 'return correct status' do
-      expect(response).to have_http_status(:not_found)
     end
   end
 end

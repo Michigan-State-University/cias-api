@@ -1,53 +1,107 @@
 # frozen_string_literal: true
 
 class V1::HenryFord::VerifyService
-  def self.call(user, patient_params)
-    new(user, patient_params).call
+  SYSTEM_IDENTIFIER = ENV.fetch('EPIC_ON_FHIR_SYSTEM_IDENTIFIER')
+
+  def self.call(user, patient_params, session_id)
+    new(user, patient_params, session_id).call
   end
 
-  def initialize(user, patient_params)
+  def initialize(user, patient_params, session_id)
     @user = user
     @patient_params = patient_params
+    @session_id = session_id
   end
 
-  attr_reader :user, :patient_params
-  attr_accessor :patient_details
+  attr_reader :user, :patient_params, :patient, :appointments, :session_id
+  attr_accessor :resource
 
   def call
-    if mrn.present?
-      @patient_details = HfhsPatientDetail.find_by!(patient_id: mrn)
-    else
-      details = HfhsPatientDetail.where(first_name: first_name, last_name: last_name, sex: sex, dob: parsed_dob, zip_code: zip_code)
-      verify_found_details(details)
+    @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code)
+    @appointments = Api::EpicOnFhir::Appointments.call(epic_patient_id)
 
-      @patient_details = details.first
-    end
-
+    create_or_find_resource!
     assign_patient_details!
 
-    @patient_details
+    resource
   end
 
   private
 
-  %w[first_name last_name sex dob zip_code find_by mrn].each do |param|
+  %w[first_name last_name sex dob zip_code phone_number phone_type].each do |param|
     define_method :"#{param}" do
       patient_params[param]
     end
   end
 
   def parsed_dob
-    Date.parse(dob)
+    Date.parse(dob).strftime('%Y-%m-%d')
+  end
+
+  def epic_patient_id
+    patient.dig(:entry, 0, :resource, :id)
+  end
+
+  def hfhs_patient_id
+    system_identifier_details&.dig(:value)
+  end
+
+  def system_identifier_details
+    @system_identifier_details ||= patient.dig(:entry, 0, :resource, :identifier)
+                      .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
+  end
+
+  def hfhs_visit_id
+    visit_id = filtered_appointments
+      .sort_by! { |appointment| DateTime.parse(appointment.dig(:resource, :start)) }
+      .first&.dig(:resource, :identifier, 0, :value)
+
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if visit_id.blank?
+
+    visit_id
+  end
+
+  def create_or_find_resource!
+    @resource = HfhsPatientDetail.find_or_create_by!(
+      patient_id: hfhs_patient_id,
+      first_name: first_name,
+      last_name: last_name,
+      dob: Date.parse(dob),
+      gender: sex,
+      zip: zip_code,
+      phone_type: phone_type,
+      phone_number: phone_number
+    )
+    resource.update!(visit_id: hfhs_visit_id)
   end
 
   def assign_patient_details!
     return if user.preview_session?
 
-    user.update(hfhs_patient_detail: @patient_details)
+    user.update(hfhs_patient_detail: @resource)
   end
 
-  def verify_found_details(details)
-    raise ActiveRecord::RecordNotFound, I18n.t('hfhs_patient_detail.not_found') if details.empty?
-    raise ActiveRecord::RecordNotUnique, I18n.t('hfhs_patient_detail.not_unique') if details.size > 1
+  def filtered_appointments
+    @appointments[:entry].find_all do |appointment|
+      start = appointment.dig(:resource, :start)
+      parsed_date = Date.parse(start) if start.present?
+
+      location = appointment
+                   &.dig(:resource, :participant)
+                   &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }&.dig(:actor, :display)
+
+      available_location?(location) && (parsed_date&.today? || parsed_date&.future?)
+      # available_location?(location)
+    end
+  end
+
+  def available_location?(location)
+    return false if location.blank?
+
+    location.downcase.in?(intervention_locations)
+  end
+
+  def intervention_locations
+    @intervention_locations ||= Session.find(session_id).intervention.clinic_locations.map { |location| "#{location.department} #{location.name}".downcase }
   end
 end

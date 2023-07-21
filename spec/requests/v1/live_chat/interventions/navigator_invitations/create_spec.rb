@@ -44,6 +44,22 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/navigator_invitations', 
     end
   end
 
+  context 'Only current editor can create invitations in the intervention with collaborators' do
+    let(:params) do
+      {
+        navigator_invitation: {
+          emails: emails
+        }
+      }
+    end
+    let(:intervention) { create(:intervention, :with_collaborators, user: admin, current_editor: create(:user, :researcher, :confirmed)) }
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'Existed user cannot become a navigator' do
     let(:participant) { create(:user, :confirmed, :participant) }
     let(:params) do

@@ -9,7 +9,6 @@ module ExceptionHandler
     end
 
     rescue_from ActionController::ParameterMissing do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :bad_request
     end
 
@@ -18,7 +17,6 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::RecordNotFound do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :not_found
     end
 
@@ -31,22 +29,18 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::Rollback do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ActiveRecord::SubclassNotFound do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :bad_request
     end
 
     rescue_from CanCan::AccessDenied do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :forbidden
     end
 
     rescue_from Dentaku::Error do |exc|
-      notify_airbrake(exc, params.permit!)
       render json: msg(exc), status: :unprocessable_entity
     end
 
@@ -71,7 +65,23 @@ module ExceptionHandler
     rescue_from ComplexException do |exc|
       message = { message: exc.message, details: exc.additional_information }
 
-      render json: message, status: :unprocessable_entity
+      render json: message, status: exc.status_code || :unprocessable_entity
+    end
+
+    rescue_from EpicOnFhir::NotFound do |exc|
+      render json: msg(exc), status: :not_found
+    end
+
+    rescue_from EpicOnFhir::UnexpectedError do |exc|
+      render json: msg(exc), status: :bad_request
+    end
+
+    rescue_from EpicOnFhir::AuthenticationError do |exc|
+      render json: msg(exc), status: :bad_request
+    end
+
+    rescue_from ActiveModel::ForbiddenAttributesError do |exc|
+      render json: msg(exc), status: :forbidden
     end
   end
 

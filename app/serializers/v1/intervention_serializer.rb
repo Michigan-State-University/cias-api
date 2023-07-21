@@ -2,17 +2,16 @@
 
 class V1::InterventionSerializer < V1Serializer
   include FileHelper
+  include TeamCollaboratorsHelper
+
   attributes :id, :user_id, :type, :name, :status, :shared_to, :organization_id, :google_language_id, :created_at, :updated_at, :published_at,
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
              :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled, :hfhs_access
 
   has_many :sessions, serializer: V1::SessionSerializer
+  has_many :clinic_locations, serializer: V1::ClinicLocationSerializer
 
-  cache_options(store: Rails.cache, expires_in: 24.hours)  # temporary length, might be a subject to change
-
-  attribute :first_session_language do |object|
-    object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
-  end
+  cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours)  # temporary length, might be a subject to change
 
   attribute :files do |object|
     files_info(object) if object.files.attached?
@@ -22,24 +21,12 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
   end
 
-  attribute :first_session_language do |object|
-    object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
-  end
-
-  attribute :first_session_language do |object|
-    object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
-  end
-
-  attribute :first_session_language do |object|
-    object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
-  end
-
-  attribute :csv_link do |object|
-    newest_csv_link(object) if object.reports.attached?
-  end
-
   attribute :csv_generated_at do |object|
     object.newest_report.created_at if object.reports.attached?
+  end
+
+  attribute :csv_filename do |object|
+    object.newest_report.blob.filename if object.reports.attached?
   end
 
   attribute :language_name do |object|
@@ -70,16 +57,16 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions.exists?(type: 'Session::CatMh')
   end
 
-  attribute :conversations_transcript do |object|
-    map_file_data(object.conversations_transcript) if object.conversations_transcript.attached?
+  attribute :conversations_transcript_generated_at do |object|
+    object.conversations_transcript.blob.created_at.in_time_zone('UTC') if object.conversations_transcript.attached?
+  end
+
+  attribute :conversations_transcript_filename do |object|
+    object.conversations_transcript.blob.filename if object.conversations_transcript.attached?
   end
 
   attribute :conversations_present do |object|
     object.conversations.size.positive?
-  end
-
-  def self.newest_csv_link(object)
-    ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(object.newest_report, only_path: true)
   end
 
   def self.files_info(object)

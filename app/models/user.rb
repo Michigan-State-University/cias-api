@@ -98,6 +98,9 @@ class User < ApplicationRecord
   # HENRY FORDS
   belongs_to :hfhs_patient_detail, optional: true
 
+  # COLLABORATIONS
+  has_many :collaborations, class_name: 'Collaborator', dependent: :destroy
+
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
@@ -248,6 +251,10 @@ class User < ApplicationRecord
 
   def human_readable_role
     FORMATTING_APP_ROLE_EXCEPTIONS[roles.first] || roles.first.tr('_', ' ')
+  end
+
+  def missing_require_fields?
+    first_name.blank? || last_name.blank? || !terms
   end
 
   private

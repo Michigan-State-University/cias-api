@@ -28,6 +28,18 @@ FactoryBot.define do
       end
     end
 
+    trait :with_collaborators do
+      after(:build) do |intervention|
+        intervention.collaborators << create(:collaborator, user: create(:user, :researcher, :confirmed))
+      end
+    end
+
+    trait :with_collaborators_with_data_access do
+      after(:build) do |intervention|
+        intervention.collaborators << create(:collaborator, user: create(:user, :researcher, :confirmed), edit: true, view: true, data_access: true)
+      end
+    end
+
     trait :with_short_link do
       after(:create) do |intervention|
         intervention.update(short_links: [create(:short_link, linkable: intervention)])

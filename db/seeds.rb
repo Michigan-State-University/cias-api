@@ -18,7 +18,8 @@ class SummonUsers
           last_name: Faker::GreekPhilosophers.name,
           email: "#{role}@#{ENV['DOMAIN_NAME']}",
           password: 'Password1!',
-          roles: [role]
+          roles: [role],
+          terms: true
         )
         u.confirm
         u.save

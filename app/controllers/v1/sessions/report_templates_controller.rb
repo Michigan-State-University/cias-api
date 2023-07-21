@@ -20,6 +20,9 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def create
     authorize! :create, ReportTemplate
+    authorize! :update, @session
+
+    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
 
     new_report_template = V1::ReportTemplates::Create.call(
       report_template_params,
@@ -31,6 +34,8 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def update
     authorize! :update, report_template
+
+    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
 
     V1::ReportTemplates::Update.call(
       report_template,
@@ -46,12 +51,16 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def destroy
     authorize! :destroy, report_template
 
+    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+
     report_template.destroy!
     head :no_content
   end
 
   def remove_logo
     authorize! :remove_logo, report_template
+
+    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
 
     report_template.logo.purge
 
