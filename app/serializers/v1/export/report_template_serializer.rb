@@ -11,6 +11,10 @@ class V1::Export::ReportTemplateSerializer < ActiveModel::Serializer
     export_file(object.logo)
   end
 
+  attribute :cover_letter_custom_logo do
+    export_file(object.cover_letter_custom_logo)
+  end
+
   attribute :version do
     ReportTemplate::CURRENT_VERSION
   end
