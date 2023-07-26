@@ -13,6 +13,9 @@ class ReportTemplate < ApplicationRecord
   has_many :generated_reports, dependent: :destroy
 
   attribute :original_text, :json, default: assign_default_values('original_text')
+  attribute :has_cover_letter, :boolean, default: false
+  attribute :cover_letter_description, :string
+  attribute :cover_letter_sender, :string
 
   has_one_attached :logo
   has_one_attached :cover_letter_custom_logo
@@ -29,6 +32,12 @@ class ReportTemplate < ApplicationRecord
     third_party: 'third_party',
     participant: 'participant'
   }
+
+  enum cover_letter_logo_type: {
+    no_logo: 'no_logo',
+    report_logo: 'report_logo',
+    custom: 'custom'
+  }, _default: 'report_logo'
 
   ATTR_NAMES_TO_COPY = %w[
     name report_for summary
