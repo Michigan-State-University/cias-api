@@ -15,6 +15,7 @@ class ReportTemplate < ApplicationRecord
   attribute :original_text, :json, default: assign_default_values('original_text')
 
   has_one_attached :logo
+  has_one_attached :cover_letter_custom_logo
   has_one_attached :pdf_preview
 
   validates :name, :report_for, presence: true
