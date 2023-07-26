@@ -37,6 +37,8 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
     return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
 
+    Rails.logger.debug ">>> [#{self.class}>params] > #{params}"
+
     V1::ReportTemplates::Update.call(
       report_template,
       report_template_params
@@ -67,6 +69,16 @@ class V1::Sessions::ReportTemplatesController < V1Controller
     render status: :ok
   end
 
+  def remove_cover_letter_custom_logo
+    authorize! :remove_cover_letter_custom_logo, report_template
+
+    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+
+    report_template.cover_letter_custom_logo.purge
+
+    render status: :ok
+  end
+
   private
 
   def report_template
@@ -89,6 +101,6 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def report_template_params
     params.require(:report_template).
-      permit(:name, :report_for, :logo, :summary)
+      permit(:name, :report_for, :logo, :cover_letter_custom_logo, :summary)
   end
 end
