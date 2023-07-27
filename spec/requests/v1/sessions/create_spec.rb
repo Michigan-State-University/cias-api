@@ -58,7 +58,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
 
           context 'when finish screen has default narrator settings' do
             it 'assign default values' do
-              expect(Session.last.questions.last.narrator['settings']).to include({ 'character' => 'peedy' })
+              expect(Session.last.questions.last.narrator['settings']).to include({ 'character' => 'peedy', 'extra_space_for_narrator' => false })
             end
           end
 
@@ -129,4 +129,6 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
       it_behaves_like 'permitted user'
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

@@ -10,4 +10,10 @@ class V1::QuestionSerializer < V1Serializer
   attribute :image_alt do |object|
     object.image_blob.description if object.image_blob.present?
   end
+
+  attribute :first_question, &:first_question?
+
+  attribute :time_ranges, if: proc { |record| record.is_a?(Question::Phone) } do |_object|
+    TimeRange.all.order(:position).map { |time_range| { from: time_range.from, to: time_range.to, label: time_range.label } }
+  end
 end

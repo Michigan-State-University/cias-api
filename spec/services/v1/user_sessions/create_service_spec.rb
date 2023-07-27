@@ -10,9 +10,9 @@ RSpec.describe V1::UserSessions::CreateService do
   let(:user_id) { user.id }
   let(:session_id) { session.id }
 
-  before do
-    allow(UserSession).to receive(:new).and_return(true)
-  end
+  # before do
+  #   allow(UserSession).to receive(:new).and_return(true)
+  # end
 
   context 'when user session and user intervention do not exist' do
     it 'create user intervention' do
@@ -20,7 +20,7 @@ RSpec.describe V1::UserSessions::CreateService do
     end
 
     it 'instantiate user session' do
-      expect(subject).to eq true
+      expect(subject).to be_instance_of(UserSession::Classic)
     end
   end
 
@@ -32,7 +32,7 @@ RSpec.describe V1::UserSessions::CreateService do
     end
 
     it 'instantiate user session' do
-      expect(subject).to eq true
+      expect(subject).to be_instance_of(UserSession::Classic)
     end
   end
 end

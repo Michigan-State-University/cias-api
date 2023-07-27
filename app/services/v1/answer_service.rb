@@ -11,7 +11,7 @@ class V1::AnswerService
     @user = user
     @user_session_id = user_session_id
     @question_id = question_id
-    @answer_params = answer_params
+    @answer_params = answer_params.merge({ draft: false, alternative_branch: false })
     @cat_mh_api = Api::CatMh.new
   end
 

@@ -55,6 +55,7 @@ class Question < ApplicationRecord
   validate :correct_variable_format
 
   delegate :session, to: :question_group
+  delegate :ability_to_update_for?, to: :question_group
 
   after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
@@ -68,9 +69,11 @@ class Question < ApplicationRecord
   end
 
   def position_equal_or_higher
-    questionnaire = session.question_groups.includes([:questions], questions: %i[image_blob image_attachment]).map(&:questions).flatten
-    current_position = questionnaire.map(&:id).find_index id
     @position_equal_or_higher ||= questionnaire.drop(current_position)
+  end
+
+  def position_lower
+    @position_lower ||= questionnaire.slice(0...current_position)
   end
 
   def swap_name_mp3(name_audio, name_answer)
@@ -162,7 +165,19 @@ class Question < ApplicationRecord
     []
   end
 
+  def first_question?
+    session.first_question == self
+  end
+
   private
+
+  def questionnaire
+    @questionnaire = session.question_groups.includes([:questions], questions: %i[image_blob image_attachment]).map(&:questions).flatten
+  end
+
+  def current_position
+    @current_position = questionnaire.map(&:id).find_index id
+  end
 
   def initialize_narrator
     narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish' && narrator['blocks'].empty?

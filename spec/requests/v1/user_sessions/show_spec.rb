@@ -70,5 +70,9 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
     it 'return correct error message' do
       expect(json_response['data']['id']).to eq user_session.id
     end
+
+    it 'has the "started" flag set to true' do
+      expect(json_response['data']['attributes']['started']).to be true
+    end
   end
 end

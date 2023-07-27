@@ -12,10 +12,13 @@ class SmsPlan < ApplicationRecord
   has_many :phones, through: :alert_phones
   belongs_to :session, counter_cache: true
   has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
+  has_one_attached :no_formula_attachment, dependent: :purge_later
 
   attribute :original_text, :json, default: assign_default_values('original_text')
 
   validates :name, :schedule, :frequency, presence: true
+
+  delegate :ability_to_update_for?, to: :session
 
   scope :limit_to_types, ->(types) { where(type: types) if types.present? }
 

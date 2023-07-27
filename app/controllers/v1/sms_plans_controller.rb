@@ -22,6 +22,7 @@ class V1::SmsPlansController < V1Controller
     authorize! :create, sms_plan_session
 
     return render status: :method_not_allowed if sms_plan_session.intervention.published?
+    return head :forbidden unless sms_plan_session.ability_to_update_for?(current_v1_user)
 
     sms_plan = SmsPlan.create!(sms_plan_params)
     render json: serialized_response(sms_plan), status: :created
@@ -32,6 +33,7 @@ class V1::SmsPlansController < V1Controller
     authorize! :update, sms_plan_session if sms_plan_params[:session_id].present?
 
     return render status: :method_not_allowed if intervention_published?
+    return head :forbidden unless sms_plan.session.ability_to_update_for?(current_v1_user)
 
     sms_plan.update!(sms_plan_params)
     render json: serialized_response(sms_plan)
@@ -41,6 +43,7 @@ class V1::SmsPlansController < V1Controller
     authorize! :destroy, sms_plan
 
     return render status: :method_not_allowed if intervention_published?
+    return head :forbidden unless sms_plan.session.ability_to_update_for?(current_v1_user)
 
     sms_plan.destroy
     head :no_content
@@ -53,7 +56,7 @@ class V1::SmsPlansController < V1Controller
   end
 
   def sms_plan_session
-    Session.find(sms_plan_params[:session_id])
+    @sms_plan_session ||= Session.find(sms_plan_params[:session_id])
   end
 
   def sms_plans_scope
@@ -68,7 +71,7 @@ class V1::SmsPlansController < V1Controller
     params.require(:sms_plan).permit(
       :name, :schedule, :schedule_payload, :frequency, :session_id, :end_at, :formula, :no_formula_text,
       :is_used_formula, :type, :include_first_name, :include_last_name, :include_email,
-      :include_phone_number
+      :include_phone_number, :no_formula_attachment
     )
   end
 end

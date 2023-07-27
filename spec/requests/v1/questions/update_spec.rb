@@ -12,7 +12,9 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       'admin_with_multiple_roles' => admin_with_multiple_roles
     }
   end
-  let(:question_group) { create(:question_group) }
+  let(:intervention) { create(:intervention) }
+  let(:session) { create(:session, intervention: intervention) }
+  let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_slider, question_group: question_group) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
@@ -81,6 +83,15 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
           end
         end
       end
+
+      context 'when intervention is published' do
+        let(:session) { create(:session, intervention: create(:intervention, :published)) }
+
+        it 'return correct status' do
+          request
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
     end
 
     %w[admin admin_with_multiple_roles].each do |role|
@@ -122,6 +133,10 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       request
       expect(json_response['data']['attributes']['formulas']).to eq []
     end
+  end
+
+  context 'collaboration mode' do
+    it_behaves_like 'collaboration mode - only one editor at the same time'
   end
 
   context 'invalid body data' do

@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.7'
+gem 'rails', '~> 6.1.7.4'
 gem 'pg', '~> 1.2'
 gem 'puma', '>= 5.6.4'
 
@@ -26,11 +26,11 @@ gem 'jsonapi-serializer'
 gem 'jmespath', '>= 1.6.1'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
-gem 'google-protobuf', '~> 3.19.6'
+gem 'google-protobuf', '>= 3.23.4'
 gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
 gem 'metainspector', '~> 5.5'
-gem 'nokogiri', '>= 1.13.10'
+gem 'nokogiri', '>= 1.14.3'
 gem 'oj'
 gem 'pagy'
 gem 'phonelib'
@@ -42,11 +42,10 @@ gem 'sidekiq', '>= 6.4.0'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 5.45.0'
 gem 'wicked_pdf'
-gem 'rack', '>= 2.2.3.1'
+gem 'rack', '>= 2.2.6.3'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'secure_headers'
-gem 'airbrake'
 # for encrypt data
 gem 'lockbox'
 # for search on encrypted data
@@ -61,10 +60,10 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
+gem 'grpc', '>= 1.53.0'
 
 group :development, :test do
   gem 'bundler-audit'
-  gem 'brakeman', '~> 5.0.2', require: false
   gem 'bullet'
   gem 'dotenv-rails'
   gem 'fasterer', require: false
@@ -104,7 +103,11 @@ group :production do
   gem 'aws-sdk-s3'
 end
 
-group :development, :production do
+group :production do
   # only version that is working on AWS
   gem 'wkhtmltopdf-heroku', '2.12.6.0'
+end
+
+group :development do
+  gem 'wkhtmltopdf-binary'
 end

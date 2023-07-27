@@ -95,6 +95,9 @@ class User < ApplicationRecord
   attribute :time_zone, :string, default: -> { ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York') }
   attribute :roles, :string, array: true, default: -> { assign_default_values('roles') }
 
+  # COLLABORATIONS
+  has_many :collaborations, class_name: 'Collaborator', dependent: :destroy
+
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }
@@ -251,9 +254,15 @@ class User < ApplicationRecord
     FORMATTING_APP_ROLE_EXCEPTIONS[roles.first] || roles.first.tr('_', ' ')
   end
 
+  def missing_require_fields?
+    first_name.blank? || last_name.blank? || !terms
+  end
+
   private
 
   def send_welcome_email
+    return if role?('guest') || role?('preview_session')
+
     UserMailer.welcome_email(human_readable_role, email).deliver_later
   end
 

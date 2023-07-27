@@ -65,6 +65,31 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
           expect(response).to have_http_status(:method_not_allowed)
         end
       end
+
+      context 'when user wants to add image' do
+        let(:params) do
+          {
+            sms_plan: {
+              no_formula_attachment: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true)
+            }
+          }
+        end
+
+        it 'returns :ok status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'attach image to the sms_plan' do
+          request
+          expect(sms_plan.no_formula_attachment.attached?).to be(true)
+        end
+
+        it 'returned data have correct format' do
+          request
+          expect(json_response['data']['attributes']['no_formula_attachment'].keys).to match_array(%w[id name url created_at])
+        end
+      end
     end
 
     %w[admin admin_with_multiple_roles].each do |role|
@@ -93,4 +118,6 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

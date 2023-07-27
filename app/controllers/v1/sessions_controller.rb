@@ -11,12 +11,16 @@ class V1::SessionsController < V1Controller
 
   def show
     authorize! :read, Session
+    authorize! :read, session_load
 
-    render json: serialized_response(session_service.session_load(session_id))
+    render json: serialized_response(session_load)
   end
 
   def create
     authorize! :create, Session
+    authorize! :create, intervention
+
+    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
 
     session = session_service.create(session_params_for_create)
     render json: serialized_response(session), status: :created
@@ -24,6 +28,9 @@ class V1::SessionsController < V1Controller
 
   def update
     authorize! :update, Session
+    authorize! :update, session_load
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     session = session_service.update(session_id, session_params)
     render json: serialized_response(session)
@@ -31,6 +38,8 @@ class V1::SessionsController < V1Controller
 
   def destroy
     authorize! :destroy, Session
+
+    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     session_service.destroy(session_id)
     head :no_content
@@ -45,6 +54,9 @@ class V1::SessionsController < V1Controller
 
   def clone
     authorize! :clone, Session
+    authorize! :update, session_obj
+
+    return head :forbidden unless session_obj.ability_to_update_for?(current_v1_user)
 
     CloneJobs::Session.perform_later(current_v1_user, session_obj)
 
@@ -77,6 +89,10 @@ class V1::SessionsController < V1Controller
     @session_service ||= V1::SessionService.new(current_v1_user, intervention_id)
   end
 
+  def session_load
+    @session_load ||= session_service.session_load(session_id)
+  end
+
   def sessions_scope
     session_service.sessions(params[:include_multiple_sessions])
   end
@@ -100,12 +116,16 @@ class V1::SessionsController < V1Controller
   def session_params
     params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
                                     :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
-                                    :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, narrator: {}, settings: {},
-                                                                                                                        formulas: [
-                                                                                                                          :payload, { patterns: [:match, {
-                                                                                                                            target: %i[type probability id]
-                                                                                                                          }] }
-                                                                                                                        ], cat_tests: [])
+                                    :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time, :autofinish_enabled, :autofinish_delay, narrator: {}, settings: {},
+                                                                                                                                                                formulas: [
+                                                                                                                                                                  :payload, { patterns: [:match, {
+                                                                                                                                                                    target: %i[type probability id]
+                                                                                                                                                                  }] }
+                                                                                                                                                                ], cat_tests: [])
+  end
+
+  def intervention
+    @intervention ||= Intervention.find(params[:intervention_id])
   end
 
   def session_params_for_create

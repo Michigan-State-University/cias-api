@@ -42,6 +42,26 @@ describe UserSession do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator' do
+      let(:collaborator) { create(:user, :confirmed, :researcher) }
+      let(:intervention) { create(:intervention) }
+      let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
+      let!(:user_session) { create(:user_session, session: create(:session, intervention: intervention)) }
+      let(:user) { collaborator }
+
+      it do
+        expect(subject).to have_abilities({ read: false }, user_session)
+      end
+
+      context 'with edit access' do
+        let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, data_access: true) }
+
+        it do
+          expect(subject).to have_abilities({ manage: true }, user_session)
+        end
+      end
+    end
+
     context 'team admin' do
       let(:user) { team1.team_admin }
 

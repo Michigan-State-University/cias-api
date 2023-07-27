@@ -4,7 +4,7 @@ class Clone::Session < Clone::Base
   def execute
     outcome.position = position || outcome.intervention.sessions.size
     outcome.clear_formulas if clean_formulas
-    outcome.days_after_date_variable_name = nil
+    outcome.days_after_date_variable_name = nil if clean_formulas
     ActiveRecord::Base.transaction do
       create_question_groups
       outcome.save!
@@ -118,11 +118,10 @@ class Clone::Session < Clone::Base
     outcome.sms_plans_count = 0
     source.sms_plans.each do |plan|
       new_sms_plan = SmsPlan.new(plan.slice(*SmsPlan::ATTR_NAMES_TO_COPY))
+      new_sms_plan.no_formula_attachment.attach(plan.no_formula_attachment.blob) if plan.no_formula_attachment.attached?
       outcome.sms_plans << new_sms_plan
 
-      plan.variants.each do |variant|
-        new_sms_plan.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
-      end
+      plan.variants.each { |variant| create_and_assign_variant(variant, new_sms_plan) }
 
       plan.alert_phones.each do |alert_phone|
         new_sms_plan.alert_phones << AlertPhone.new(sms_plan: new_sms_plan, phone: alert_phone.phone)
@@ -177,5 +176,11 @@ class Clone::Session < Clone::Base
     source.cat_mh_test_types.each do |test_type|
       outcome.cat_mh_test_types << test_type
     end
+  end
+
+  def create_and_assign_variant(variant, new_sms_plan)
+    new_variant = SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
+    new_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
+    new_sms_plan.variants << new_variant
   end
 end

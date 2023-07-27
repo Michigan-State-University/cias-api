@@ -19,6 +19,7 @@ describe User, type: :model do
   it { should have_one_attached(:avatar) }
   it { should have_many(:generated_reports_third_party_users).dependent(:destroy) }
   it { should have_many(:notifications).dependent(:destroy) }
+  it { should have_many(:collaborations).dependent(:destroy) }
 
   it { should belong_to(:team).optional(true) }
   it { should belong_to(:organizable).optional(true) }
@@ -169,6 +170,32 @@ describe User, type: :model do
     let(:user) { build_stubbed(:user, :guest) }
 
     include_examples 'without team admin validations'
+
+    context 'after create don\'t send a welcome email' do
+      it {
+        expect do
+          described_class.new.tap do |u|
+            u.roles = %w[guest]
+            u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@guest.true"
+            u.skip_confirmation!
+            u.save(validate: false)
+          end
+        end.not_to change { ActionMailer::Base.deliveries.size }
+      }
+    end
+  end
+
+  context 'user has role review session' do
+    it 'after create don\'t send a welcome email' do
+      expect do
+        described_class.new.tap do |u|
+          u.roles = %w[guest]
+          u.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@preview.session"
+          u.skip_confirmation!
+          u.save(validate: false)
+        end
+      end.not_to change { ActionMailer::Base.deliveries.size }
+    end
   end
 
   context 'user has role admin' do

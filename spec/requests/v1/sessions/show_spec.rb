@@ -54,6 +54,11 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions/:id', type: :req
           it 'key sms_plans_count' do
             expect(json_response['data']['attributes']['sms_plans_count']).to eq 1
           end
+
+          it 'keys responsible for autofinish with default value' do
+            expect(json_response['data']['attributes']['autofinish_enabled']).to eq false
+            expect(json_response['data']['attributes']['autofinish_delay']).to eq 1440
+          end
         end
       end
     end

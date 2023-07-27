@@ -37,6 +37,19 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       end
     end
 
+    context 'when current user is collaborator' do
+      let!(:intervention) { create(:flexible_order_intervention) }
+      let!(:intervention_status) { :draft }
+      let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: false) }
+      let(:user) { collaborator.user }
+
+      before { request }
+
+      it {
+        expect(response).to have_http_status(:forbidden)
+      }
+    end
+
     %w[draft closed archived].each do |status|
       context "when intervention is #{status}" do
         let!(:intervention_status) { status.to_sym }
@@ -48,6 +61,18 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
         it 'returns correct http status' do
           expect(response).to have_http_status(:not_acceptable)
         end
+      end
+    end
+
+    context 'when intervention has access for only invitated participants' do
+      let!(:intervention) { create(:flexible_order_intervention, status: intervention_status, user_id: user.id, shared_to: 'invited') }
+
+      before do
+        request
+      end
+
+      it 'invited emails should be on the list with granted access to intervention' do
+        expect(intervention.reload.intervention_accesses.map(&:email)).to match_array([invitation_email, participant.email])
       end
     end
 

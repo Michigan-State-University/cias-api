@@ -34,6 +34,8 @@ Layout/LineLength:
   Max: 160
   Exclude:
     - 'spec/requests/v1/questions/update_narrator_spec.rb'
+    - 'app/controllers/v1/sessions_controller.rb'
+    - 'app/models/answer/phone.rb'
 
 Layout/MultilineMethodCallIndentation:
   Enabled: false
@@ -142,6 +144,9 @@ Metrics/ClassLength:
     - 'app/models/user.rb'
     - 'app/services/v1/flow_service.rb'
     - 'app/models/intervention/csv/harvester.rb'
+    - 'app/models/question.rb'
+    - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
+    - 'app/models/intervention.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

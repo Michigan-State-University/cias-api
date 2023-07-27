@@ -25,6 +25,15 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigators/:navigator_id',
     end
   end
 
+  context 'not current editor' do
+    let(:intervention) { create(:intervention, :with_collaborators, user: admin, current_editor: create(:user, :researcher, :confirmed)) }
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'Incorrect params or intervention' do
     context 'Incorrect IDs' do
       let(:request) do

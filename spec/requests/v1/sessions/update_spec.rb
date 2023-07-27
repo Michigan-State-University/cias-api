@@ -44,6 +44,19 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
                                                                    'days_after_date_variable_name' => 'var1',
                                                                    'estimated_time' => 10, 'multiple_fill' => true)
           end
+
+          context 'when user wants to set timout preferences' do
+            let(:params) do
+              {
+                session: {
+                  autofinish_enabled: true,
+                  autofinish_delay: 10
+                }
+              }
+            end
+
+            it { expect(response).to have_http_status(:success) }
+          end
         end
 
         context 'invalid' do
@@ -56,6 +69,38 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             end
 
             it { expect(response).to have_http_status(:bad_request) }
+          end
+
+          context 'when user wants to set timout preferences' do
+            let(:params) do
+              {
+                session: {
+                  autofinish_enabled: true,
+                  autofinish_delay: 'ten'
+                }
+              }
+            end
+
+            it {
+              request
+              expect(response).to have_http_status(:unprocessable_entity)
+            }
+          end
+
+          context 'when user wants to set timeout but without pass a delay' do
+            let(:params) do
+              {
+                session: {
+                  autofinish_enabled: true,
+                  autofinish_delay: nil
+                }
+              }
+            end
+
+            it {
+              request
+              expect(response).to have_http_status(:unprocessable_entity)
+            }
           end
         end
 
@@ -134,4 +179,6 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
       expect(json_response['data']['attributes']['formulas']).to eq []
     end
   end
+
+  it_behaves_like 'collaboration mode - only one editor at the same time'
 end

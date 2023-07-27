@@ -35,7 +35,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       let(:params) do
         {
           navigator_setup: {
-            phone: {
+            phone_attributes: {
               number: 111_111_111,
               iso: 'US',
               prefix: '+1'
@@ -54,13 +54,36 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       end
     end
 
+    context 'correctly assigns message phone object' do
+      let(:params) do
+        {
+          navigator_setup: {
+            message_phone_attributes: {
+              number: 222_222_222,
+              iso: 'US',
+              prefix: '+1'
+            }
+          }
+        }
+      end
+
+      it do
+        request
+        phone = intervention.navigator_setup.message_phone
+        expect(phone).not_to be nil
+        expect(phone.number).to eq 222_222_222.to_s
+        expect(phone.iso).to eq 'US'
+        expect(phone.prefix).to eq '+1'
+      end
+    end
+
     context 'correctly updates phone object' do
       let!(:intervention) { create(:intervention, :with_navigator_setup_and_phone, user: user) }
 
       let(:params) do
         {
           navigator_setup: {
-            phone: {
+            phone_attributes: {
               number: 111_222_333,
               iso: 'PL',
               prefix: '+43'
@@ -72,6 +95,30 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       it do
         request
         phone = intervention.navigator_setup.reload.phone
+        expect(phone.number).to eq 111_222_333.to_s
+        expect(phone.iso).to eq 'PL'
+        expect(phone.prefix).to eq '+43'
+      end
+    end
+
+    context 'correctly updates message phone object' do
+      let!(:intervention) { create(:intervention, :with_navigator_setup_and_message_phone, user: user) }
+
+      let(:params) do
+        {
+          navigator_setup: {
+            message_phone_attributes: {
+              number: 111_222_333,
+              iso: 'PL',
+              prefix: '+43'
+            }
+          }
+        }
+      end
+
+      it do
+        request
+        phone = intervention.navigator_setup.reload.message_phone
         expect(phone.number).to eq 111_222_333.to_s
         expect(phone.iso).to eq 'PL'
         expect(phone.prefix).to eq '+43'
@@ -139,13 +186,29 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     end
   end
 
+  context 'intervention with collaborators and current editor isn\'t current editor' do
+    let(:intervention) { create(:intervention, :with_collaborators, :with_navigator_setup, user: user, current_editor: create(:user, :researcher, :confirmed)) }
+    let(:params) do
+      {
+        navigator_setup: {
+          no_navigator_available_message: 'No navigators available at the moment'
+        }
+      }
+    end
+
+    it {
+      request
+      expect(response).to have_http_status(:forbidden)
+    }
+  end
+
   context 'sets phone to nil when phone sent as nil and phone is present' do
     let!(:intervention) { create(:intervention, :with_navigator_setup_and_phone, user: user) }
 
     let(:params) do
       {
         navigator_setup: {
-          phone: nil
+          phone_attributes: nil
         }
       }
     end
@@ -153,6 +216,24 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
     it do
       request
       expect(intervention.navigator_setup.reload.phone).to be nil
+      expect(Phone.count).to eq 0
+    end
+  end
+
+  context 'sets message phone to nil when message phone sent as nil and message phone is present' do
+    let!(:intervention) { create(:intervention, :with_navigator_setup_and_message_phone, user: user) }
+
+    let(:params) do
+      {
+        navigator_setup: {
+          message_phone_attributes: nil
+        }
+      }
+    end
+
+    it do
+      request
+      expect(intervention.navigator_setup.reload.message_phone).to be nil
       expect(Phone.count).to eq 0
     end
   end
