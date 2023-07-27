@@ -10,12 +10,15 @@ class V1::Interventions::AccessesController < V1Controller
     return head :not_acceptable if intervention.closed? || intervention.archived?
 
     authorize! :create, InterventionAccess
+    authorize! :update, intervention
 
     intervention.give_user_access(user_session_params[:emails])
     render json: serialized_response(intervention.reload.intervention_accesses, 'InterventionAccess'), status: :created
   end
 
   def destroy
+    authorize! :update, intervention_load
+
     access_load.destroy!
 
     head :no_content
@@ -44,6 +47,6 @@ class V1::Interventions::AccessesController < V1Controller
   end
 
   def intervention_load
-    Intervention.find(intervention_id)
+    @intervention_load ||= Intervention.find(intervention_id)
   end
 end

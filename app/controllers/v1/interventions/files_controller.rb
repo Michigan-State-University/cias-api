@@ -3,6 +3,7 @@
 class V1::Interventions::FilesController < V1Controller
   def create
     authorize! :update, Intervention
+    authorize! :update, intervention_load
     return render status: :method_not_allowed unless intervention_load.can_have_files?
     return render status: :payload_too_large if file_sizes_too_big?
 
@@ -12,6 +13,7 @@ class V1::Interventions::FilesController < V1Controller
 
   def destroy
     authorize! :update, Intervention
+    authorize! :update, intervention_load
     return render status: :method_not_allowed unless intervention_load.can_have_files?
 
     @file = ActiveStorage::Attachment.find(file_id)
@@ -29,7 +31,7 @@ class V1::Interventions::FilesController < V1Controller
   end
 
   def intervention_load
-    Intervention.accessible_by(current_ability).find(params[:intervention_id])
+    @intervention_load ||= Intervention.accessible_by(current_ability).find(params[:intervention_id])
   end
 
   def intervention_params

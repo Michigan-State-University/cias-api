@@ -15,6 +15,8 @@ class V1::FlowService::ScheduleService
     return question unless next_session.present? && next_session.schedule_immediately?
 
     next_user_session = next_user_session!(next_session)
+    next_user_session.update!(started: true)
+
     user_session.finish(send_email: false)
     additional_information[:next_user_session_id] = next_user_session.id
     additional_information[:next_session_id] = next_user_session.session.id

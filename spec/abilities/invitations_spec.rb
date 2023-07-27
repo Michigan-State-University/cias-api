@@ -42,6 +42,25 @@ describe Invitation do
       it { should have_abilities(:manage, described_class) }
     end
 
+    context 'collaborator with view access' do
+      let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: researcher)]) }
+      let!(:invitation) { create(:session_invitation, invitable: create(:session, intervention: intervention)) }
+      let(:researcher) { create(:user, :researcher, :confirmed) }
+      let(:user) { researcher }
+
+      it { should have_abilities(:manage, invitation) }
+      it { should not_have_abilities(:manage, team1_session_invitation1) }
+    end
+
+    context 'collaborator with edit access' do
+      let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: researcher, edit: true)]) }
+      let!(:invitation) { create(:session_invitation, invitable: create(:session, intervention: intervention)) }
+      let(:researcher) { create(:user, :researcher, :confirmed) }
+      let(:user) { researcher }
+
+      it { should have_abilities(:manage, invitation) }
+    end
+
     context 'team admin' do
       let(:user) { team1.team_admin }
 

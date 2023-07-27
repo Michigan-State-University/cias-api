@@ -55,6 +55,7 @@ class Question < ApplicationRecord
   validate :correct_variable_format
 
   delegate :session, to: :question_group
+  delegate :ability_to_update_for?, to: :question_group
 
   after_create_commit :initialize_narrator
   before_destroy :decrement_usage_counters
