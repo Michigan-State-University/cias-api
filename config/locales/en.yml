@@ -21,9 +21,17 @@ en:
       title: Next Group
     tlfb:
       title: TLFB Study Group
+  channels:
+    collaboration:
+      intervention:
+        forbidden_action: "We cannot perform this action. Intervention is in editing/published mode or you don't have permission to correctly processed this action"
   activerecord:
     errors:
       models:
+        collaborator:
+          attributes:
+            user:
+              already_exist: 'is already a collaborator in this intervention'
         intervention:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
@@ -33,7 +41,11 @@ en:
               body: 'Unfortunately, something went wrong while downloading the CAT-MH questions. Please try again or contact the researcher who sent this session to you.'
               button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
+            collaborators:
+              data_access: "Only owner can change 'data_access' parameter"
         user:
+          terms_not_accepted: 'If you want to login, you need to enter your first and last name, as well as accept terms and conditions & Privacy Policy first. Please find your invitation email or contact support'
+          2fa_code_needed: 'You need to provide 2fa code to verify you.'
           not_using_invitation_link: "If you want to register by this email, please use the registration link received by email from the researcher."
           attributes:
             roles:
@@ -234,13 +246,31 @@ en:
       header: 'Your copy of %{intervention_name} is ready'
       body: 'Your intervention has been copied successfully. Now you can use it in CIAS.'
       button_text: Open the e-intervention
-      link: '%{web_url}/interventions/%{intervention_id}'
+      link: '%{web_url}/login?redirect_to=/interventions/%{intervention_id}'
+    intervention_activate:
+      subject: 'CIAS invitation'
+      header: 'Welcome to CIAS'
+      main_text: "You now have access to <span style='color:#C866EA;'>Copy of %{intervention_name}</span>.<br /><br />"
+      new_user: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;">To begin, use link below to set up you account.</div>'
+      button: 'Go to the app'
+      link: "%{domain}/v1/users/invitations/edit?role=researcher&invitation_token=%{invitation_token}&email=%{email}"
+      html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
     session:
       subject: 'Copy of %{session_name}'
       header: 'Your copy of %{session_name} is ready'
       body: 'Your session has been copied successfully. Now you can use it in CIAS.'
       button_text: Open the session
       link: '%{web_url}/interventions/%{intervention_id}/sessions/%{session_id}/edit'
+    question_group_activate:
+      subject: 'CIAS invitation'
+      header: 'Welcome to CIAS'
+      main_text: "You now have access to <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />"
+      new_user: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;">To begin, use link below to set up you account.</div>'
+      button: 'Go to the app'
+      link: "%{domain}/v1/users/invitations/edit?role=researcher&invitation_token=%{invitation_token}&email=%{email}"
+      html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
     error:
       subject: 'Error during copying'
       header: 'An error has occurred during copying.'
@@ -283,6 +313,14 @@ en:
       not_reply: 'Please do not reply to this email, which does not accept incoming messages. If you need assistance with this software, please contact the person or group that referred you to this site. Thank you!<br /><br />'
       ignore_mail_msg: "If you didn't request this, please ignore this email.<br /><br /> Please do not reply to this email, which does not accept incoming messages. If you need assistance with this software, please contact the person or group that referred you to this site. Thank you!<br /><br />"
       not_reply_with_email: "If you didn't request this, please ignore this email.<br />Please do not reply to this email, which does not accept incoming messages.<br />You can reach us directly at <a href=\"mailto:cias@msu.edu\" style=\"color: #107969; font-weight: 700\">cias@msu.edu</a>. Thank you!<br />"
+    collaborators:
+      subject: 'CIAS invitation'
+      button: 'Go to the app'
+      main_text: "You have been invited to collaborate on <span style='color:#C866EA;'>%{intervention_name}</span>.<br /><br />"
+      new_user: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;">To begin, use link below to set up you account.</div>'
+      header: 'Welcome to CIAS'
+      html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
   navigator_mailer:
     invitation:
       subject: "Welcome to the navigator role in CIAS!"

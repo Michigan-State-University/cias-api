@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       put 'send_sms_token', to: 'users#send_sms_token'
       patch 'verify_sms_token', to: 'users#verify_sms_token'
       patch 'confirm_logging_code', to: 'users#confirm_logging_code'
+      patch 'confirm_terms', to: 'users#confirm_terms'
       get 'researchers', to: 'users#researchers'
       scope module: 'users' do
         resource :invitations, only: %i[edit update]
@@ -49,17 +50,21 @@ Rails.application.routes.draw do
 
     post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
+    get 'interventions/:intervention_id/csv_attachment', to: 'interventions/answers#csv_attachment', as: :fetch_protected_csv
     resources :interventions, only: %i[index show create update] do
       concerns :narrator_changeable, { _model: 'Intervention' }
       post 'clone', on: :member
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
+      get 'generated_conversations_transcript', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
         resources :accesses, only: %i[index create destroy]
         resources :files, only: %i[create destroy]
         resources :short_links, only: %i[create index]
+        resources :collaborators, only: %i[create index destroy update]
+        get 'permission', to: 'collaborators#show'
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
@@ -81,7 +86,6 @@ Rails.application.routes.draw do
     get 'sessions/:id/reflectable_questions', to: 'sessions#reflectable_questions', as: :fetch_reflectable_questions
     scope 'sessions/:session_id', as: 'session' do
       post 'question_group/duplicate_here', to: 'question_groups#duplicate_here', as: :duplicate_question_groups_with_structure
-      post 'questions/clone_multiple', to: 'questions#clone_multiple', as: :clone_multiple_questions
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
@@ -96,7 +100,6 @@ Rails.application.routes.draw do
       resources :question_groups, only: %i[index show create update destroy] do
         member do
           patch :questions_change
-          delete :remove_questions
           post :clone
           post :share
         end
@@ -177,6 +180,7 @@ Rails.application.routes.draw do
 
     post :phonetic_preview, to: 'audio#create'
     post :recreate_audio, to: 'audio#recreate'
+    post :regenerate_audio, to: 'audio#regenerate'
     resources :sms_plans do
       post 'clone', on: :member
     end

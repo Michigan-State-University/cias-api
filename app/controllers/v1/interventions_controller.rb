@@ -2,14 +2,15 @@
 
 class V1::InterventionsController < V1Controller
   def index
-    collection = interventions_scope.detailed_search(params)
+    collection = interventions_scope.detailed_search(params, current_v1_user)
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
-    render json: serialized_hash(paginated_collection).merge({ interventions_size: collection.size }).to_json
+    render json: serialized_hash(paginated_collection, 'SimpleIntervention',
+                                 params: { current_user_id: current_v1_user.id }).merge({ interventions_size: collection.size }).to_json
   end
 
   def show
-    render json: serialized_response(intervention_load)
+    render json: serialized_response(intervention_load, controller_name.classify, params: { current_user_id: current_v1_user.id })
   end
 
   def create
@@ -21,11 +22,12 @@ class V1::InterventionsController < V1Controller
 
   def update
     authorize! :update, Intervention
+    authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    intervention = intervention_load
-    intervention.assign_attributes(intervention_params)
-    intervention.save!
-    render json: serialized_response(intervention)
+    intervention_load.assign_attributes(intervention_params)
+    intervention_load.save!
+    render json: serialized_response(intervention_load)
   end
 
   def clone
@@ -46,6 +48,7 @@ class V1::InterventionsController < V1Controller
 
   def generate_conversations_transcript
     authorize! :update, Intervention
+    authorize! :get_protected_attachment, intervention_load
 
     LiveChat::GenerateTranscriptJob.perform_later(
       intervention_load.id, ::Intervention, :conversations_transcript, intervention_load.name, current_v1_user.id
@@ -54,20 +57,27 @@ class V1::InterventionsController < V1Controller
     render status: :ok
   end
 
+  def generated_conversations_transcript
+    authorize! :read, Intervention
+    authorize! :get_protected_attachment, intervention_load
+
+    head :no_content unless intervention_load.conversations_transcript.attached?
+
+    redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention_load.conversations_transcript, only_path: true))
+  end
+
   private
 
   def interventions_scope
-    Intervention.accessible_by(current_ability)
+    @interventions_scope ||= Intervention.accessible_by(current_ability)
                 .order(created_at: :desc)
-                .includes(%i[user reports_attachments logo_attachment])
+                .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
+                             conversations_transcript_attachment])
                 .only_visible
   end
 
   def intervention_load
-    Intervention.accessible_by(current_ability)
-                .order(created_at: :desc)
-                .includes(%i[reports_attachments logo_attachment])
-                .find(params[:id])
+    @intervention_load ||= interventions_scope.find(params[:id])
   end
 
   def intervention_params
@@ -94,7 +104,7 @@ class V1::InterventionsController < V1Controller
 
   def to_permit
     @to_permit ||= {
-      intervention: [{ user_ids: [] }],
+      intervention: [{ emails: [] }],
       session: [],
       question: [],
       sms_plan: []
