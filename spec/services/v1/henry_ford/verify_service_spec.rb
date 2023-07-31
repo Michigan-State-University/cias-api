@@ -4,7 +4,10 @@ RSpec.describe V1::HenryFord::VerifyService do
   let(:subject) { described_class.new(user, params, session.id).call }
   let(:user) { create(:user, :participant, :confirmed) }
   let(:intervention) { create(:intervention) }
-  let!(:location) { create(:intervention_location, intervention: intervention, clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD')) }
+  let!(:location) do
+    create(:intervention_location, intervention: intervention,
+                                   clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD', external_id: 'externalID'))
+  end
   let!(:session) { create(:session, intervention: intervention) }
   let(:params) do
     {
@@ -40,7 +43,7 @@ RSpec.describe V1::HenryFord::VerifyService do
 
     it 'assign expected appointment id and patient_id' do
       subject
-      expect(user.hfhs_patient_detail.visit_id).to eql('10022118420')
+      expect(user.hfhs_patient_detail.visit_id).to eql('_externalID_10022118420')
       expect(user.hfhs_patient_detail.patient_id).to eql('89010892')
     end
   end
