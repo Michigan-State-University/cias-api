@@ -13,7 +13,6 @@ class ReportTemplate < ApplicationRecord
   has_many :generated_reports, dependent: :destroy
 
   attribute :original_text, :json, default: assign_default_values('original_text')
-  attribute :has_cover_letter, :boolean, default: false
 
   has_one_attached :logo
   has_one_attached :cover_letter_custom_logo
