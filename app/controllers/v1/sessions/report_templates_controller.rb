@@ -37,8 +37,6 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
     return head :forbidden unless correct_ability?
 
-    Rails.logger.debug ">>> [#{self.class}>params] > #{params}"
-
     V1::ReportTemplates::Update.call(
       report_template,
       report_template_params

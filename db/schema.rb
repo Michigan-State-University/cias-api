@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_06_29_094119) do
+ActiveRecord::Schema.define(version: 2023_07_26_110444) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -619,6 +619,10 @@ ActiveRecord::Schema.define(version: 2023_06_29_094119) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.boolean "has_cover_letter", default: false, null: false
+    t.string "cover_letter_logo_type", default: "report_logo", null: false
+    t.string "cover_letter_description"
+    t.string "cover_letter_sender"
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"

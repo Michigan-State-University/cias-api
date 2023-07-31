@@ -30,6 +30,12 @@ class ReportTemplate < ApplicationRecord
     participant: 'participant'
   }
 
+  enum cover_letter_logo_type: {
+    no_logo: 'no_logo',
+    report_logo: 'report_logo',
+    custom: 'custom'
+  }, _default: 'report_logo'
+
   ATTR_NAMES_TO_COPY = %w[
     name report_for summary
   ].freeze
