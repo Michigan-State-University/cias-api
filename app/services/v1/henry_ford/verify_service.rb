@@ -56,9 +56,9 @@ class V1::HenryFord::VerifyService
                     .sort_by! { |encounter| DateTime.parse(encounter.dig(:resource, :start)) }
                     .first
 
-    visit_id = appointment&.dig(:resource, :identifier, 0, :value)
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if appointment.blank?
 
-    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if visit_id.blank?
+    visit_id = appointment&.dig(:resource, :identifier, 0, :value)
 
     location_id = available_locations.where("LOWER(CONCAT(department, ' ', name)) LIKE ?",
                                             appointment
