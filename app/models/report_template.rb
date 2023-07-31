@@ -14,8 +14,6 @@ class ReportTemplate < ApplicationRecord
 
   attribute :original_text, :json, default: assign_default_values('original_text')
   attribute :has_cover_letter, :boolean, default: false
-  attribute :cover_letter_description, :string
-  attribute :cover_letter_sender, :string
 
   has_one_attached :logo
   has_one_attached :cover_letter_custom_logo
