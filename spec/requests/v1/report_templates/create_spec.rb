@@ -81,7 +81,8 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_template', type: :request d
               name: 'New Report 1',
               report_for: 'participant',
               summary: 'Your session summary',
-              session_id: session.id
+              session_id: session.id,
+              cover_letter_logo_type: 'report_logo'
             )
           end
 
