@@ -52,13 +52,22 @@ class V1::HenryFord::VerifyService
   end
 
   def hfhs_visit_id
-    visit_id = filtered_appointments
-      .sort_by! { |appointment| DateTime.parse(appointment.dig(:resource, :start)) }
-      .first&.dig(:resource, :identifier, 0, :value)
+    appointment = filtered_appointments
+                    .sort_by! { |encounter| DateTime.parse(encounter.dig(:resource, :start)) }
+                    .first
 
-    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if visit_id.blank?
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if appointment.blank?
 
-    visit_id
+    visit_id = appointment&.dig(:resource, :identifier, 0, :value)
+
+    location_id = available_locations.where("LOWER(CONCAT(department, ' ', name)) LIKE ?",
+                                            appointment
+                                              .dig(:resource, :participant)
+                                              .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                                              &.dig(:actor, :display)
+                                              &.downcase.to_s).first.external_id
+
+    "_#{location_id}_#{visit_id}"
   end
 
   def create_or_find_resource!
@@ -91,7 +100,6 @@ class V1::HenryFord::VerifyService
                    &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }&.dig(:actor, :display)
 
       available_location?(location) && (parsed_date&.today? || parsed_date&.future?)
-      # available_location?(location)
     end
   end
 
@@ -102,6 +110,10 @@ class V1::HenryFord::VerifyService
   end
 
   def intervention_locations
-    @intervention_locations ||= Session.find(session_id).intervention.clinic_locations.map { |location| "#{location.department} #{location.name}".downcase }
+    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.name}".downcase }
+  end
+
+  def available_locations
+    @available_locations ||= Session.find(session_id).intervention.clinic_locations
   end
 end
