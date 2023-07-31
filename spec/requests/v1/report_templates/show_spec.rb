@@ -15,7 +15,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
   let(:headers) { user.create_new_auth_token }
   let!(:session) { create :session }
 
-  let!(:report_template) { create(:report_template, :with_logo, session: session) }
+  let!(:report_template) { create(:report_template, :with_logo, :with_custom_cover_letter_logo, session: session) }
   let!(:section) { create(:report_template_section, report_template: report_template) }
   let!(:variant1) do
     create(:report_template_section_variant, report_template_section: section)
@@ -37,6 +37,8 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
         end
 
         it 'returns report template' do
+          puts ">>> [#{report_template.cover_letter_custom_logo.name}] [#{report_template.logo.name}]"
+          puts ">>> #{json_response['data']['attributes']}"
           expect(json_response['data']).to include(
             'id' => report_template.id.to_s,
             'type' => 'report_template',
@@ -45,6 +47,11 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
               'report_for' => report_template.report_for,
               'summary' => report_template.summary,
               'logo_url' => include(report_template.logo.name),
+              'cover_letter_custom_logo_url' => include(report_template.cover_letter_custom_logo.name),
+              'has_cover_letter' => report_template.has_cover_letter,
+              'cover_letter_logo_type' => report_template.cover_letter_logo_type,
+              'cover_letter_description' => report_template.cover_letter_description,
+              'cover_letter_sender' => report_template.cover_letter_sender,
               'session_id' => session.id
             ),
             'relationships' => {
