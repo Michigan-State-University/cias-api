@@ -2,12 +2,13 @@
 
 class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
   ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match"
+  SYSTEM_ID = ENV.fetch('EPIC_ON_FHIR_SYSTEM')
 
-  def self.call(first_name, last_name, birth_date, phone_number, phone_type, postal_code)
-    new(first_name, last_name, birth_date, phone_number, phone_type, postal_code).call
+  def self.call(first_name, last_name, birth_date, phone_number, phone_type, postal_code, mrn = nil)
+    new(first_name, last_name, birth_date, phone_number, phone_type, postal_code, mrn).call
   end
 
-  def initialize(first_name, last_name, birth_date, phone_number, phone_type, postal_code)
+  def initialize(first_name, last_name, birth_date, phone_number, phone_type, postal_code, mrn = nil)
     super()
     @first_name = first_name
     @last_name = last_name
@@ -15,9 +16,10 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
     @phone_number = phone_number
     @phone_type = phone_type
     @postal_code = postal_code
+    @mrn = mrn
   end
 
-  attr_reader :first_name, :last_name, :birth_date, :phone_number, :phone_type, :postal_code
+  attr_reader :first_name, :last_name, :birth_date, :phone_number, :phone_type, :postal_code, :mrn
 
   private
 
@@ -31,7 +33,7 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
   end
 
   def body
-    {
+    parameters = {
       resourceType: 'Parameters',
       parameter: [
         {
@@ -64,7 +66,19 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
           valueBoolean: 'true'
         }
       ]
-    }.to_json
+    }
+
+    if mrn.present?
+      parameters[:parameter][0][:resource][:identifier] = [
+        {
+          use: 'usual',
+          system: SYSTEM_ID,
+          value: mrn
+        }
+      ]
+    end
+
+    parameters.to_json
   end
 
   def not_found_condition(response)

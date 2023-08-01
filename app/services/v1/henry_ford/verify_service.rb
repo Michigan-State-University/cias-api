@@ -28,7 +28,7 @@ class V1::HenryFord::VerifyService
 
   private
 
-  %w[first_name last_name sex dob zip_code phone_number phone_type].each do |param|
+  %w[first_name last_name sex dob zip_code phone_number phone_type mrn].each do |param|
     define_method :"#{param}" do
       patient_params[param]
     end
