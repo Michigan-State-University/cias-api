@@ -64,7 +64,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
     report_template.logo.purge
 
-    render status: :ok
+    render status: :no_content
   end
 
   def remove_cover_letter_custom_logo
@@ -74,7 +74,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
     report_template.cover_letter_custom_logo.purge
 
-    render status: :ok
+    render status: :no_content
   end
 
   private
