@@ -37,8 +37,6 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
         end
 
         it 'returns report template' do
-          puts ">>> [#{report_template.cover_letter_custom_logo.name}] [#{report_template.logo.name}]"
-          puts ">>> #{json_response['data']['attributes']}"
           expect(json_response['data']).to include(
             'id' => report_template.id.to_s,
             'type' => 'report_template',
