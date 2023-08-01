@@ -108,4 +108,22 @@ RSpec.describe 'POST /v1/charts', type: :request do
       it_behaves_like 'preview user'
     end
   end
+
+  context 'when a chart is created in a dashboard section in which there are already charts' do
+    let(:new_chart) { create(:chart, dashboard_section: dashboard_section) }
+
+    it 'has a position value greater than any other chart in the section' do
+      expect(new_chart.position).to eq(Chart.where(dashboard_section_id: dashboard_section.id).maximum(:position))
+      expect(Chart.where(dashboard_section_id: dashboard_section.id, position: new_chart.position).count).to eq(1)
+    end
+  end
+
+  context 'when a chart is created in an empty dashboard section' do
+    let(:new_dashboard_section) { create(:dashboard_section) }
+    let(:new_chart) { create(:chart, dashboard_section: new_dashboard_section) }
+
+    it 'has its position value equal to 1' do
+      expect(new_chart.position).to eq(1)
+    end
+  end
 end

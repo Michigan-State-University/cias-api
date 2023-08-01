@@ -10,7 +10,6 @@ class Chart < ApplicationRecord
   has_many :chart_statistics, dependent: :destroy
 
   attribute :formula, :json, default: assign_default_values('formula')
-  attribute :position, :integer, default: 1
 
   validates :formula, presence: true, json: { schema: lambda {
                                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
