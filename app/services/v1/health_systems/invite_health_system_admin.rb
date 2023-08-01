@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-class V1::HealthSystems::InviteHealthSystemAdmin
-  def self.call(health_system, email)
-    new(health_system, email).call
-  end
-
+class V1::HealthSystems::InviteHealthSystemAdmin < V1::BaseOrganizationInvitation
   def initialize(health_system, email)
+    super
     @health_system = health_system
     @email = email
   end
@@ -20,7 +17,7 @@ class V1::HealthSystems::InviteHealthSystemAdmin
       health_system.health_system_admins << new_user
     else
       health_system.health_system_admins << user
-      V1::HealthSystems::Invitations::Create.call(health_system, user)
+      V1::Organizations::Invitations::Create.call(health_system, user)
     end
   end
 
@@ -28,19 +25,7 @@ class V1::HealthSystems::InviteHealthSystemAdmin
 
   attr_reader :health_system, :email
 
-  def already_in_any_organization?
-    user&.organizable.present?
-  end
-
   def user_is_not_health_system_admin?
     user&.roles&.exclude?('health_system_admin')
-  end
-
-  def active_user?
-    user&.active?
-  end
-
-  def user
-    @user ||= User.find_by(email: email)
   end
 end
