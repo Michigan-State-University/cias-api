@@ -5,10 +5,6 @@ class V1::BaseOrganizationInvitation
     new(organizable, email).call
   end
 
-  def initialize(_organizable, _email)
-    raise NotImplementedError, "Including class did not implement #{__method__} method"
-  end
-
   protected
 
   def already_in_any_organization?

@@ -2,7 +2,6 @@
 
 class V1::HealthSystems::InviteHealthSystemAdmin < V1::BaseOrganizationInvitation
   def initialize(health_system, email)
-    super
     @health_system = health_system
     @email = email
   end

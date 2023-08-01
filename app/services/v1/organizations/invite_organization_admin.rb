@@ -2,7 +2,6 @@
 
 class V1::Organizations::InviteOrganizationAdmin < V1::BaseOrganizationInvitation
   def initialize(organization, email)
-    super
     @organization = organization
     @email = email
   end
