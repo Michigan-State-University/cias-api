@@ -21,5 +21,7 @@ class V1::UserSessions::FetchService < V1::UserSessions::BaseService
                       else
                         find_user_session(:find_by!)
                       end
+
+    @user_session
   end
 end

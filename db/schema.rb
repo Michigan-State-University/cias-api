@@ -810,6 +810,7 @@ ActiveRecord::Schema.define(version: 2023_07_26_110444) do
     t.datetime "scheduled_at"
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
+    t.boolean "started", default: false, null: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
