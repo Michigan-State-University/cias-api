@@ -8,6 +8,8 @@ class V1::UserSessions::CreateService < V1::UserSessions::BaseService
       health_clinic_id: health_clinic_id
     )
 
+    @user_intervention.in_progress!
+
     new_user_session_for(:new, number_of_attempts)
   end
 end
