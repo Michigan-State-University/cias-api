@@ -3,9 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe 'DELETE v1/sessions/:session_id/report_templates/:id/remove_cover_letter_custom_logo', type: :request do
-  let!(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
   let(:session) { create(:session, intervention: intervention) }
+  let(:user) { create(:user, :researcher, :confirmed) }
+
+  let(:headers) { user.create_new_auth_token }
 
   let(:request) do
     delete v1_session_report_template_remove_cover_letter_custom_logo_path(
@@ -37,16 +39,20 @@ RSpec.describe 'DELETE v1/sessions/:session_id/report_templates/:id/remove_cover
     end
   end
 
-  context 'when deleting the custom cover letter logo' do
-    let!(:user) { create(:user, :confirmed, :admin) }
+  context 'when an admin deletes the custom cover letter logo' do
+    let!(:user) { create(:user, :admin, :confirmed) }
 
     it_behaves_like 'can delete the custom cover page logo'
   end
 
-  context 'when a user that\'s not the owner tries to delete the custom cover letter logo' do
-    let!(:user) { create(:user, :participant, :confirmed) }
-
+  context 'when a researcher tries to delete the custom logo of a session which is not theirs' do
     it_behaves_like 'cannot delete the custom cover page logo'
+  end
+
+  context 'when a participant tries to delete the custom cover letter logo of their session' do
+    let!(:intervention) { create(:intervention, user: user) }
+
+    it_behaves_like 'can delete the custom cover page logo'
   end
 
   context 'when the report is for a collaborative session' do
