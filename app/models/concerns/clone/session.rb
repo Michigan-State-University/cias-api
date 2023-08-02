@@ -130,25 +130,9 @@ class Clone::Session < Clone::Base
   end
 
   def create_report_templates
-    outcome.report_templates_count = 0
+    outcome.update!(report_templates_count: 0)
     source.report_templates.each do |report_template|
-      new_report_template = ReportTemplate.new(report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY))
-      outcome.report_templates << new_report_template
-
-      new_report_template.logo.attach(report_template.logo.blob) if report_template.logo.attachment
-      new_report_template.pdf_preview.attach(report_template.pdf_preview.blob) if report_template.pdf_preview.attachment
-
-      report_template.sections.each do |section|
-        new_section = ReportTemplate::Section.new(section.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY))
-        new_report_template.sections << new_section
-
-        section.variants.each do |variant|
-          new_variant = ReportTemplate::Section::Variant.new(variant.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
-          new_section.variants << new_variant
-
-          new_variant.image.attach(variant.image.blob) if variant.image.attachment
-        end
-      end
+      outcome.report_templates << Clone::ReportTemplate.new(report_template, { session_id: outcome.id }).execute
     end
   end
 

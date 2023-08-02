@@ -69,4 +69,40 @@ RSpec.describe ReportTemplate, type: :model do
       expect(translation_test_report_template.name).to include('from=>en to=>pl text=>Test report template name')
     end
   end
+
+  describe 'clone' do
+    subject { report_template.clone }
+
+    let!(:report_template) { create(:report_template, :with_logo, :with_sections) }
+
+    it 'create a copy in the exising session' do
+      expect(subject.name).to eq("Copy of #{report_template.name}")
+    end
+
+    it 'has attached logo' do
+      expect(subject.logo.attached?).to be true
+    end
+
+    it 'has sections' do
+      expect(subject.sections.any?).to be true
+    end
+
+    it 'create successfully new record' do
+      expect { subject }.to change(described_class, :count).by(1)
+    end
+
+    context 'when we duplicate template to other session' do
+      subject { Clone::ReportTemplate.new(report_template, session_id: session.id).execute }
+
+      let(:session) { create(:session) }
+
+      it 'create a template' do
+        expect { subject }.to change(described_class, :count).by(1)
+      end
+
+      it 'new template belongs to the specified session' do
+        expect(subject.session.id).to eq(session.id)
+      end
+    end
+  end
 end

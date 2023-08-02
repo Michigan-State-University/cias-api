@@ -2,6 +2,7 @@
 
 class ReportTemplate < ApplicationRecord
   include Translate
+  include Clone
   has_paper_trail
   extend DefaultValues
 
