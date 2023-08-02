@@ -15,6 +15,7 @@ class ReportTemplate < ApplicationRecord
   attribute :original_text, :json, default: assign_default_values('original_text')
 
   has_one_attached :logo
+  has_one_attached :cover_letter_custom_logo
   has_one_attached :pdf_preview
 
   validates :name, :report_for, presence: true
@@ -28,6 +29,12 @@ class ReportTemplate < ApplicationRecord
     third_party: 'third_party',
     participant: 'participant'
   }
+
+  enum cover_letter_logo_type: {
+    no_logo: 'no_logo',
+    report_logo: 'report_logo',
+    custom: 'custom'
+  }, _default: 'report_logo'
 
   ATTR_NAMES_TO_COPY = %w[
     name report_for summary
