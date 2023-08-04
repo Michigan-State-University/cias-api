@@ -16,6 +16,10 @@ FactoryBot.define do
     end
     shared_to { 'anyone' }
 
+    trait :cleared do
+      cleared { true }
+    end
+
     trait :with_navigator_setup do
       after(:build) do |intervention|
         intervention.live_chat_enabled = true
