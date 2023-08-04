@@ -99,7 +99,8 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def report_template_params
     params.require(:report_template).
-      permit(:name, :report_for, :logo, :cover_letter_custom_logo, :summary)
+      permit(:name, :report_for, :logo, :cover_letter_custom_logo, :summary,
+             :has_cover_letter, :cover_letter_logo_type, :cover_letter_description, :cover_letter_sender)
   end
 
   def correct_ability?
