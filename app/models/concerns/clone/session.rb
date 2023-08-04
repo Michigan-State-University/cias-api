@@ -130,10 +130,10 @@ class Clone::Session < Clone::Base
   end
 
   def create_report_templates
-    outcome.update!(report_templates_count: 0)
     source.report_templates.each do |report_template|
       outcome.report_templates << Clone::ReportTemplate.new(report_template, { session_id: outcome.id }).execute
     end
+    Session.reset_counters(outcome.id, :report_templates)
   end
 
   def reassign_report_templates_to_third_party_screens
