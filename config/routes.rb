@@ -95,6 +95,7 @@ Rails.application.routes.draw do
         resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
+          post :duplicate
         end
       end
       resources :question_groups, only: %i[index show create update destroy] do

@@ -11,8 +11,8 @@ class Clone::ReportTemplate
     options.delete(:clean_formulas)
     options.delete(:hidden)
     options.delete(:position)
-    options.delete(:params)
-    @outcome.assign_attributes(options)
+    require 'pry'; binding.pry
+    @outcome.assign_attributes(options[:params])
     @outcome.save!
   end
 
@@ -40,9 +40,9 @@ class Clone::ReportTemplate
     number_of_copies = outcome.session.report_templates.where('name like ?', "%#{outcome.name}").count
 
     case number_of_copies
-    when 1
+    when 0
       outcome.name
-    when 2
+    when 1
       "Copy of #{outcome.name}"
     else
       "#{number_of_copies.ordinalize} copy of #{outcome.name}"
