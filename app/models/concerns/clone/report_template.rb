@@ -11,7 +11,6 @@ class Clone::ReportTemplate
     options.delete(:clean_formulas)
     options.delete(:hidden)
     options.delete(:position)
-    require 'pry'; binding.pry
     @outcome.assign_attributes(options[:params])
     @outcome.save!
   end

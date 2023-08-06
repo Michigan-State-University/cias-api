@@ -69,7 +69,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def duplicate
     authorize! :update, session
-    # TODO: sprawdzic czy jest to dzialanie w obrebie jednej intervencji
+    # TODO: add restriction -> only in the same intervention this action is allowed
     return head :forbidden unless target_session.ability_to_update_for?(current_v1_user)
 
     duplicated_report = report_template.clone(params: duplicate_params )
