@@ -69,10 +69,10 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def duplicate
     authorize! :update, session
-    # TODO: add restriction -> only in the same intervention this action is allowed
+    return head :forbidden unless operation_in_current_intervention?
     return head :forbidden unless target_session.ability_to_update_for?(current_v1_user)
 
-    duplicated_report = report_template.clone(params: duplicate_params )
+    duplicated_report = report_template.clone(params: duplicate_params)
     Session.reset_counters(duplicated_report.session.id, :report_templates)
 
     render json: serialized_response(duplicated_report), status: :created
@@ -104,10 +104,20 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   end
 
   def target_session
-    @target_session ||= Session.find(params.require(:report_template).permit(:session_id)[:session_id])
+    @target_session ||= if params.dig(:report_template, :session_id).present?
+                          Session.find(params[:report_template][:session_id])
+                        else
+                          @session
+                        end
   end
 
   def duplicate_params
     target_session.present? ? { session_id: target_session.id } : {}
+  end
+
+  def operation_in_current_intervention?
+    return true if params.dig(:report_template, :session_id).blank?
+
+    target_session.intervention_id == @session.intervention_id
   end
 end

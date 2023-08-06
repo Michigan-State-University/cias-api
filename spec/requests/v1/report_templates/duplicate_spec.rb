@@ -23,7 +23,7 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
     end
 
     it 'created a new report' do
-      expect{ request }.to change(ReportTemplate, :count).by(1)
+      expect { request }.to change(ReportTemplate, :count).by(1)
     end
 
     it 'selected session has 3 attachments' do
@@ -31,8 +31,36 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
       expect(session.report_templates.count).to be(3)
     end
 
+    context 'session is outside the intervention' do
+      let!(:other_session) { create(:session) }
+      let(:params) { { report_template: { session_id: other_session.id } } }
+
+      it 'return forbidden' do
+        request
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context 'when intervention has collaborators and current user isn\'t current editor' do
+      let(:intervention) { create(:intervention, :with_collaborators, current_editor: create(:user, :researcher, :confirmed)) }
+
+      it 'return forbidden' do
+        request
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context 'when passed session_id is wrong' do
+      let(:params) { { report_template: { session_id: 'not_existing_id' } } }
+
+      it 'return not found' do
+        request
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     context 'duplicate report to other session in the same intervention' do
-      let(:params) { { report_template: {session_id: session2.id} } }
+      let(:params) { { report_template: { session_id: session2.id } } }
 
       it 'session should have a report' do
         request
@@ -41,4 +69,3 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
     end
   end
 end
-
