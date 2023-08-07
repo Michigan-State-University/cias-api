@@ -92,7 +92,7 @@ RSpec.describe ReportTemplate, type: :model do
     end
 
     context 'when we duplicate template to other session' do
-      subject { Clone::ReportTemplate.new(report_template, session_id: session.id).execute }
+      subject { Clone::ReportTemplate.new(report_template, params: { session_id: session.id }).execute }
 
       let(:session) { create(:session) }
 
