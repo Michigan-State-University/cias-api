@@ -3,6 +3,7 @@
 class V1::ReportTemplates::Sections::VariantsController < V1Controller
   load_and_authorize_resource :report_template_section, class: 'ReportTemplate::Section',
                                                         id_param: :section_id
+  include Reorder
 
   def index
     authorize! :read, ReportTemplate::Section::Variant
@@ -72,10 +73,22 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
   end
 
   def variants_scope
-    @variants_scope ||= @report_template_section.variants
+    @variants_scope ||= @report_template_section.variants.order(:position)
   end
 
   def variant_params
     params.require(:variant).permit(:preview, :formula_match, :title, :content, :image)
+  end
+
+  def reorder_data_scope
+    variants_scope
+  end
+
+  def reorder_response
+    serialized_variant_response(variants_scope.order(:position))
+  end
+
+  def ability_to_update?
+    @report_template_section.ability_to_update_for?(current_v1_user)
   end
 end
