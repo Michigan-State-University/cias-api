@@ -16,6 +16,9 @@ class Ability::Admin < Ability::Base
     cannot :get_protected_attachment, GeneratedReport do |report|
       report.user_session.session.intervention.user_id != user.id
     end
+    cannot :clear_protected_intervention, Intervention do |intervention|
+      intervention.user_id != user.id
+    end
     cannot :manage, GeneratedReport
     can :manage, GeneratedReport, user_session: { session: { intervention: { user_id: user.id } } }
   end
