@@ -6,12 +6,12 @@ class Clone::ReportTemplate
   def initialize(source, **options)
     @source = source
     @outcome = @source.dup
-    @outcome.name = uniq_name
     options.delete(:session_variables)
     options.delete(:clean_formulas)
     options.delete(:hidden)
     options.delete(:position)
     @outcome.assign_attributes(options[:params])
+    @outcome.name = uniq_name
     @outcome.save!
   end
 
