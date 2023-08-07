@@ -131,7 +131,7 @@ class Clone::Session < Clone::Base
 
   def create_report_templates
     source.report_templates.each do |report_template|
-      outcome.report_templates << Clone::ReportTemplate.new(report_template, { session_id: outcome.id }).execute
+      outcome.report_templates << Clone::ReportTemplate.new(report_template, params: { session_id: outcome.id }).execute
     end
     Session.reset_counters(outcome.id, :report_templates)
   end
