@@ -79,6 +79,10 @@ RSpec.describe ReportTemplate, type: :model do
       expect(subject.name).to eq("Copy of #{report_template.name}")
     end
 
+    it 'belongs to correct session' do
+      expect(subject.session_id).to eq(report_template.session_id)
+    end
+
     it 'has attached logo' do
       expect(subject.logo.attached?).to be true
     end
