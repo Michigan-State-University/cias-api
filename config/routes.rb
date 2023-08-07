@@ -51,6 +51,7 @@ Rails.application.routes.draw do
     post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
     get 'interventions/:intervention_id/csv_attachment', to: 'interventions/answers#csv_attachment', as: :fetch_protected_csv
+    delete 'interventions/:id/user_data', to: 'interventions#clear_user_data'
     resources :interventions, only: %i[index show create update] do
       concerns :narrator_changeable, { _model: 'Intervention' }
       post 'clone', on: :member
