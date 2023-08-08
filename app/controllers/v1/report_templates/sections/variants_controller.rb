@@ -73,7 +73,7 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
   end
 
   def variants_scope
-    @variants_scope ||= @report_template_section.variants.order(:position)
+    @variants_scope ||= @report_template_section.variants
   end
 
   def variant_params
