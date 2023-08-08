@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_02_073205) do
+ActiveRecord::Schema.define(version: 2023_08_08_084201) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -619,7 +619,7 @@ ActiveRecord::Schema.define(version: 2023_08_02_073205) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
-    t.boolean "is_duplicated", default: false, null: false
+    t.boolean "is_duplicated_from_other_session", default: false, null: false
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"
