@@ -3,7 +3,8 @@
 class Clone::Intervention < Clone::Base
   def execute
     outcome.status = :draft
-    outcome.cleared = false
+    outcome.reports_deleted = false
+    outcome.data_cleared = false
     outcome.name = "Copy of #{outcome.name}"
     outcome.is_hidden = true
     clear_organization!
