@@ -91,7 +91,7 @@ RSpec.describe ReportTemplate, type: :model do
       expect { subject }.to change(described_class, :count).by(1)
     end
 
-    it 'has "is_duplicated_from_other_session" flag on' do
+    it 'has "is_duplicated_from_other_session" flag off' do
       expect(subject.is_duplicated_from_other_session).to eq(false)
     end
 
