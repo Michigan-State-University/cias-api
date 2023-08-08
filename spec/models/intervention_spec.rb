@@ -140,18 +140,22 @@ RSpec.describe Intervention, type: :model do
       expect(cloned_intervention.name).to include('Copy of')
     end
 
-    context 'when the intervention is cleared' do
-      let!(:intervention) { create(:intervention, :cleared) }
-
-      it 'sets the cleared flag to false' do
-        cloned_intervention = intervention.clone
-        expect(cloned_intervention.cleared).to eq(false)
-      end
-    end
-
     it 'remove short links' do
       cloned_intervention = intervention.clone
       expect(cloned_intervention.short_links.any?).to be false
+    end
+
+    context 'when the intervention is cleared' do
+      let(:intervention) { create(:intervention, :with_reports_deleted, :with_data_cleared) }
+      let(:cloned_intervention) { intervention.clone }
+
+      it 'sets the reports_deleted flag to false' do
+        expect(cloned_intervention.reports_deleted).to eq(false)
+      end
+
+      it 'sets the data_cleared flag to false' do
+        expect(cloned_intervention.data_cleared).to eq(false)
+      end
     end
 
     it 'correct clone questions to cloned session' do

@@ -16,8 +16,12 @@ FactoryBot.define do
     end
     shared_to { 'anyone' }
 
-    trait :cleared do
-      cleared { true }
+    trait :with_reports_deleted do
+      reports_deleted { true }
+    end
+
+    trait :with_data_cleared do
+      data_cleared { true }
     end
 
     trait :with_navigator_setup do
