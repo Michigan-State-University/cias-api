@@ -140,6 +140,15 @@ RSpec.describe Intervention, type: :model do
       expect(cloned_intervention.name).to include('Copy of')
     end
 
+    context 'when the intervention is cleared' do
+      let!(:intervention) { create(:intervention, :cleared) }
+
+      it 'sets the cleared flag to false' do
+        cloned_intervention = intervention.clone
+        expect(cloned_intervention.cleared).to eq(false)
+      end
+    end
+
     it 'remove short links' do
       cloned_intervention = intervention.clone
       expect(cloned_intervention.short_links.any?).to be false
