@@ -20,6 +20,6 @@ class AddNewParametersToExistingThirdPartyQuestions < ActiveRecord::Migration[6.
   end
 
   def down
-    # raise(ActiveRecord::IrreversibleMigration)
+    raise(ActiveRecord::IrreversibleMigration)
   end
 end
