@@ -35,7 +35,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
       expect(intervention.reload.user_interventions).to be_empty
     end
 
-    it 'removes all the generated csv and report files' do
+    it 'removes all the generated csv files' do
       request
       expect(intervention.reload.files).to be_empty
     end
