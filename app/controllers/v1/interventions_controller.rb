@@ -67,16 +67,27 @@ class V1::InterventionsController < V1Controller
   end
 
   def clear_user_data
-    authorize! :clear_user_data, intervention_load
+    authorize! :clear_protected_intervention, intervention_load
 
-    return head :forbidden if intervention_load.cleared?
-    return head :forbidden unless intervention_load.status.in? %w[closed archived]
-    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
+    return head :forbidden if intervention_load.data_cleared?
+    return head :forbidden unless clear_data_ability?
 
     intervention_load.user_interventions.destroy_all
     intervention_load.files.destroy_all
-    intervention_load.reports.destroy_all
-    intervention_load.update!({ cleared: true })
+    intervention_load.conversations_transcript.destroy
+    intervention_load.update!(data_cleared: true)
+
+    render status: :no_content
+  end
+
+  def delete_user_reports
+    authorize! :clear_protected_intervention, intervention_load
+
+    return head :forbidden if intervention_load.reports_deleted?
+    return head :forbidden unless clear_data_ability?
+
+    intervention_load.reports.destroy_all  # TODO: delay with an email
+    intervention_load.update!(reports_deleted: true)
 
     render status: :no_content
   end
@@ -124,5 +135,9 @@ class V1::InterventionsController < V1Controller
       question: [],
       sms_plan: []
     }
+  end
+
+  def clear_data_ability?
+    intervention_load.ability_to_update_for?(current_v1_user) && intervention_load.status.in?(%w[closed archived])
   end
 end
