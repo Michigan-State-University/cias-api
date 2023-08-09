@@ -29,8 +29,8 @@ class Intervention < ApplicationRecord
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true
 
-  has_many_attached :reports
-  has_many_attached :files
+  has_many_attached :reports, dependent: :purge_later
+  has_many_attached :files, dependent: :purge_later
   has_one_attached :logo, dependent: :purge_later
 
   has_many :short_links, as: :linkable, dependent: :destroy
