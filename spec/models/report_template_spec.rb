@@ -95,8 +95,12 @@ RSpec.describe ReportTemplate, type: :model do
       expect { subject }.to change(described_class, :count).by(1)
     end
 
+    it 'has "is_duplicated_from_other_session" flag off' do
+      expect(subject.is_duplicated_from_other_session).to eq(false)
+    end
+
     context 'when we duplicate template to other session' do
-      subject { Clone::ReportTemplate.new(report_template, session_id: session.id).execute }
+      subject { Clone::ReportTemplate.new(report_template, params: { session_id: session.id }).execute }
 
       let(:session) { create(:session) }
 
@@ -106,6 +110,18 @@ RSpec.describe ReportTemplate, type: :model do
 
       it 'new template belongs to the specified session' do
         expect(subject.session.id).to eq(session.id)
+      end
+
+      it 'has "is_duplicated_from_other_session" flag on' do
+        expect(subject.is_duplicated_from_other_session).to eq(true)
+      end
+
+      context 'when the option to set flag is off' do
+        subject { Clone::ReportTemplate.new(report_template, params: { session_id: session.id }, set_flag: false).execute }
+
+        it 'has "is_duplicated_from_other_session" flag on' do
+          expect(subject.is_duplicated_from_other_session).to eq(false)
+        end
       end
     end
   end
