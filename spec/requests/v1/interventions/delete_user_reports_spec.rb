@@ -10,39 +10,28 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   let(:user) { admin }
   let(:owner) { admin }
   let(:status) { :closed }
-  let(:data_cleared) { false }
+  let(:reports_deleted) { false }
 
-  let(:intervention) { create(:intervention, :with_csv_file, status: status, user: owner, data_cleared: data_cleared) }
-  let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
+  let(:intervention) { create(:intervention, :with_pdf_report, status: status, user: owner, reports_deleted: reports_deleted) }
 
   let(:request) do
-    delete user_data_v1_intervention_path(id: intervention.id), headers: user.create_new_auth_token
+    delete user_reports_v1_intervention_path(id: intervention.id), headers: user.create_new_auth_token
   end
 
-  shared_examples 'can clear user data' do
+  shared_examples 'can clear user reports' do
     it 'returns the status no_content' do
       request
       expect(response).to have_http_status(:no_content)
     end
 
-    it 'sets the "data_cleared" flag to true' do
+    it 'sets the "reports_deleted" flag to true' do
       request
-      expect(intervention.reload.data_cleared?).to eq(true)
+      expect(intervention.reload.reports_deleted?).to eq(true)
     end
 
-    it 'clears all user sessions for the intervention' do
+    it 'removes all the generated reports' do
       request
-      expect(intervention.reload.user_interventions).to be_empty
-    end
-
-    it 'removes all the generated csv files' do
-      request
-      expect(intervention.reload.files).to be_empty
-    end
-
-    it 'removes all the user interventions related to the intervention' do
-      request
-      expect(intervention.reload.user_interventions.count).to eq(0)
+      expect(intervention.reload.reports).to be_empty
     end
 
     it 'removes attachments' do
@@ -50,22 +39,18 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     end
   end
 
-  shared_examples 'cannot clear user data' do
+  shared_examples 'cannot clear user reports' do
     it 'returns the status forbidden' do
       request
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'leaves the cleared flag unchanged' do
-      expect { request }.not_to change { intervention.reload.data_cleared? }
+    it 'leaves the reports_deleted flag unchanged' do
+      expect { request }.not_to change { intervention.reload.reports_deleted? }
     end
 
-    it 'doesnt clear any user sessions for the intervention' do
-      expect { request }.not_to change { intervention.reload.user_interventions.count }
-    end
-
-    it 'does not delete generated csv files' do
-      expect { request }.not_to change { intervention.reload.files.count }
+    it 'does not remove any generated reports' do
+      expect { request }.not_to change { intervention.reload.reports.count }
     end
 
     it 'does not delete any attachments' do
@@ -73,22 +58,18 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     end
   end
 
-  shared_examples 'cannot access user data' do
+  shared_examples 'cannot access user reports' do
     it 'returns the status forbidden' do
       request
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'leaves the cleared flag unchanged' do
-      expect { request }.not_to change { intervention.reload.data_cleared? }
+    it 'leaves the reports_deleted flag unchanged' do
+      expect { request }.not_to change { intervention.reload.reports_deleted? }
     end
 
-    it 'doesnt clear any user sessions for the intervention' do
-      expect { request }.not_to change { intervention.reload.user_interventions.count }
-    end
-
-    it 'does not delete generated csv files' do
-      expect { request }.not_to change { intervention.reload.files.count }
+    it 'does not remove any generated reports' do
+      expect { request }.not_to change { intervention.reload.reports.count }
     end
 
     it 'does not delete any attachments' do
@@ -97,10 +78,15 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   end
 
   context 'when all conditions are valid' do
-    let(:intervention) { create(:intervention, :with_pdf_report, status: :closed, user: owner) }
+    let(:intervention) { create(:intervention, :with_csv_file, status: :closed, user: owner) }
+    let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
 
-    it 'does not delete reports' do
-      expect { request }.not_to change { intervention.reload.reports.count }
+    it 'doesnt clear any user sessions for the intervention' do
+      expect { request }.not_to change { intervention.reload.user_interventions.count }
+    end
+
+    it 'does not delete generated csv files' do
+      expect { request }.not_to change { intervention.reload.files.count }
     end
   end
 
@@ -108,7 +94,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     context "when intervention is #{status}" do
       let!(:status) { status }
 
-      it_behaves_like 'can clear user data'
+      it_behaves_like 'can clear user reports'
     end
   end
 
@@ -116,35 +102,35 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     context "when intervention is #{status}" do
       let!(:status) { status }
 
-      it_behaves_like 'cannot clear user data'
+      it_behaves_like 'cannot clear user reports'
     end
   end
 
   context 'when the intervention was already cleared' do
-    let!(:data_cleared) { true }
+    let!(:reports_deleted) { true }
 
-    it_behaves_like 'cannot clear user data'
+    it_behaves_like 'cannot clear user reports'
   end
 
   context 'when researcher tries to clear data in their own intervention' do
     let!(:user) { researcher }
     let!(:owner) { researcher }
 
-    it_behaves_like 'can clear user data'
+    it_behaves_like 'can clear user reports'
   end
 
   context 'when researcher tries to clear data in other researcher\'s intervention' do
     let!(:user) { researcher }
     let!(:owner) { other_researcher }
 
-    it_behaves_like 'cannot access user data'
+    it_behaves_like 'cannot access user reports'
   end
 
   context 'when admin tries to clear data not in their intervention' do
     let!(:user) { admin }
     let!(:owner) { other_researcher }
 
-    it_behaves_like 'cannot clear user data'
+    it_behaves_like 'cannot clear user reports'
   end
 
   context 'when the intervention is collaborative' do
@@ -161,21 +147,21 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
       let!(:user) { researcher }
       let!(:editor) { researcher }
 
-      it_behaves_like 'can clear user data'
+      it_behaves_like 'can clear user reports'
     end
 
     context 'when the owner is not the current editor' do
       let!(:user) { researcher }
       let!(:editor) { other_researcher }
 
-      it_behaves_like 'cannot clear user data'
+      it_behaves_like 'cannot clear user reports'
     end
 
     context 'when admin is the current editor but not an owner' do
       let!(:user) { admin }
       let!(:editor) { admin }
 
-      it_behaves_like 'cannot clear user data'
+      it_behaves_like 'cannot clear user reports'
     end
   end
 end
