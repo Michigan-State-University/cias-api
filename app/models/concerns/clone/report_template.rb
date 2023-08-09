@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class Clone::ReportTemplate
-  attr_accessor :source, :outcome
+  attr_accessor :source, :outcome, :set_flag
 
   def initialize(source, **options)
     @source = source
     @outcome = @source.dup
+    @set_flag = options[:set_flag].nil? ? true : options.delete(:set_flag)
     options.delete(:session_variables)
     options.delete(:clean_formulas)
     options.delete(:hidden)
@@ -16,7 +17,7 @@ class Clone::ReportTemplate
   end
 
   def execute
-    outcome.is_duplicated = true
+    outcome.is_duplicated_from_other_session = true if different_session? && set_flag
     clone_attachments
 
     source.sections.each do |section|
@@ -51,5 +52,9 @@ class Clone::ReportTemplate
   def clone_attachments
     outcome.logo.attach(source.logo.blob) if source.logo.attachment
     outcome.pdf_preview.attach(source.pdf_preview.blob) if source.pdf_preview.attachment
+  end
+
+  def different_session?
+    outcome.session_id != source.session_id
   end
 end
