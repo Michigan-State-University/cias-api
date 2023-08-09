@@ -31,16 +31,6 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
       expect(session.report_templates.count).to be(3)
     end
 
-    context 'session is outside the intervention' do
-      let!(:other_session) { create(:session) }
-      let(:params) { { report_template: { session_id: other_session.id } } }
-
-      it 'return forbidden' do
-        request
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-
     context 'when intervention has collaborators and current user isn\'t current editor' do
       let(:intervention) { create(:intervention, :with_collaborators, current_editor: create(:user, :researcher, :confirmed)) }
 

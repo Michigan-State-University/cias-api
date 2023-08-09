@@ -69,7 +69,6 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def duplicate
     authorize! :update, session
-    return head :forbidden unless operation_in_current_intervention?
     return head :forbidden unless target_session.ability_to_update_for?(current_v1_user)
 
     duplicated_report = report_template.clone(params: duplicate_params)
@@ -113,11 +112,5 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def duplicate_params
     target_session.present? ? { session_id: target_session.id } : {}
-  end
-
-  def operation_in_current_intervention?
-    return true if params.dig(:report_template, :session_id).blank?
-
-    target_session.intervention_id == @session.intervention_id
   end
 end
