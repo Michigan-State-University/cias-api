@@ -16,14 +16,6 @@ FactoryBot.define do
     end
     shared_to { 'anyone' }
 
-    trait :with_reports_deleted do
-      reports_deleted { true }
-    end
-
-    trait :with_data_cleared do
-      data_cleared { true }
-    end
-
     trait :with_navigator_setup do
       after(:build) do |intervention|
         intervention.live_chat_enabled = true
@@ -72,6 +64,14 @@ FactoryBot.define do
       after(:create) do |intervention|
         intervention.navigator_setup.update!(message_phone: Phone.new(number: '222222222', prefix: '+48', iso: 'PL', communication_way: 'message'))
       end
+    end
+
+    trait :with_csv_file do
+      files { [FactoryHelpers.upload_file('spec/fixtures/csv/example.csv', binary: true)] }
+    end
+
+    trait :with_pdf_report do
+      reports { [FactoryHelpers.upload_file('spec/fixtures/pdf/example_report.pdf', binary: true)] }
     end
   end
 
