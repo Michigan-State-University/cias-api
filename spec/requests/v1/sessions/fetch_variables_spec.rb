@@ -92,12 +92,17 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
       end
 
       context 'digit only' do
+        let!(:participant_report_question) do
+          create(:question_participant_report, question_group: question_group, subtitle: 'participant_report',
+                                               body: { data: [{ payload: '' }], variable: { name: 'participant_report_var' } })
+        end
         let(:params) { { only_digit_variables: true } }
         let(:request) do
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 8, %w[var1 im_a_variable dep number rivia is_with_x x y], %w[single multi grid number]
+        it_behaves_like 'correct classic session', 9, %w[var1 im_a_variable dep number rivia is_with_x x y participant_report_var],
+                        %w[single multi grid number participant_report]
       end
 
       context 'include current question' do
