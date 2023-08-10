@@ -99,7 +99,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def report_template_params
     params.require(:report_template).
-      permit(:name, :report_for, :logo, :summary)
+      permit(:name, :report_for, :logo, :summary, :duplicated_from_other_session_warning_dismissed)
   end
 
   def target_session
