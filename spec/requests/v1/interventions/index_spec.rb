@@ -189,14 +189,15 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     end
   end
 
-  context 'return only intervention not shared with onyone' do
+  context 'return only intervention not shared with anyone' do
     let!(:shared_intervention) { create(:intervention, :with_collaborators) }
+    let!(:intervention_another_researcher) { create(:intervention) }
     let(:params) { { only_not_shared_with_anyone: true } }
 
     before { get v1_interventions_path, params: params, headers: user.create_new_auth_token }
 
     it 'return correct intervention' do
-      expect(json_response['data'].pluck('id')).to not_include(shared_intervention.id)
+      expect(json_response['data'].pluck('id')).to not_include(shared_intervention.id).and not_include(intervention_another_researcher.id)
     end
   end
 end
