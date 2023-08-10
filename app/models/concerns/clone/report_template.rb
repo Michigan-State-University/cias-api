@@ -17,7 +17,7 @@ class Clone::ReportTemplate
   end
 
   def execute
-    outcome.is_duplicated_from_other_session = true if different_session? && set_flag
+    outcome.update!(is_duplicated_from_other_session: true) if different_session? && set_flag
     clone_attachments
 
     source.sections.each do |section|
