@@ -57,5 +57,24 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
         expect(session2.report_templates.count).to be(1)
       end
     end
+
+    context 'duplicate report to other session in the another intervention' do
+      let(:another_session) { create(:session) }
+      let(:params) { { report_template: { session_id: another_session.id } } }
+
+      it 'return created' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+
+      context 'when session belongs to intervention with collaborators' do
+        let(:another_session) { create(:session, intervention: create(:intervention, :with_collaborators)) }
+
+        it 'return created' do
+          request
+          expect(response).to have_http_status(:created)
+        end
+      end
+    end
   end
 end

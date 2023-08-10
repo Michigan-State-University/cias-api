@@ -113,7 +113,7 @@ RSpec.describe ReportTemplate, type: :model do
       end
 
       it 'has "is_duplicated_from_other_session" flag on' do
-        expect(subject.is_duplicated_from_other_session).to eq(true)
+        expect(subject.reload.is_duplicated_from_other_session).to eq(true)
       end
 
       context 'when the option to set flag is off' do
