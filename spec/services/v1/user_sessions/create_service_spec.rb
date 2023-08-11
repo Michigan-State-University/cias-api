@@ -10,13 +10,13 @@ RSpec.describe V1::UserSessions::CreateService do
   let(:user_id) { user.id }
   let(:session_id) { session.id }
 
-  # before do
-  #   allow(UserSession).to receive(:new).and_return(true)
-  # end
-
   context 'when user session and user intervention do not exist' do
     it 'create user intervention' do
       expect { subject }.to change(UserIntervention, :count).by(1)
+    end
+
+    it 'new user intervention has correct status' do
+      expect(subject.user_intervention.reload.status).to eql('in_progress')
     end
 
     it 'instantiate user session' do

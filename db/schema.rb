@@ -598,6 +598,7 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.integer "position", default: 0, null: false
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
     t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end

@@ -18,6 +18,8 @@ class V1::UserSessionsController < V1Controller
     user_session = V1::UserSessions::FetchService.call(params[:session_id], current_v1_user.id, params[:health_clinic_id])
 
     render json: serialized_response(user_session), status: :ok
+
+    user_session.update!(started: true)
   end
 
   def show_or_create
