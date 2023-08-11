@@ -4,14 +4,14 @@ class Api::Documo::SendFax
   include Api::Request
   include Rails.application.routes.url_helpers
 
-  ENDPOINT = "#{ENV['BASE_DOCUMO_URL']}/v1/faxes"
+  ENDPOINT = "#{ENV['BASE_DOCUMO_URL']}/v1/faxes/multiple"
 
   def self.call(fax_number, attachments, include_cover_page, fields, logo)
     new(fax_number, attachments, include_cover_page, fields, logo).call
   end
 
-  def initialize(fax_number, attachments, include_cover_page, fields, logo)
-    @fax_number = fax_number
+  def initialize(fax_numbers, attachments, include_cover_page, fields, logo)
+    @fax_numbers = fax_numbers
     @attachments = attachments
     @include_cover_page = include_cover_page
     @fields = fields
@@ -39,19 +39,21 @@ class Api::Documo::SendFax
 
   def form_data
     data = [
-      [:faxNumber, @fax_number],
       [:coverPage, @include_cover_page],
       [:coverPageId, '9998d00d-d8d6-4d60-90c5-a022051087e0']
     ]
 
-    unless @logo.nil?
-      cf = [:cf, { logo: "<img src=\"#{polymorphic_url(@logo)}\"></img>" }.to_json]
-      data.append(cf)
+    @fax_numbers.each do |fax_number|
+      data.append([:recipientFax, fax_number])
     end
 
     @attachments.each do |attachment|
       data.append([:attachmentUrls, polymorphic_url(attachment)])
     end
+
+    fields[:logo] = "<img src=\"#{polymorphic_url(@logo)}\"></img>" unless @logo.nil?
+
+    data.append(fields)
     data
   end
 
