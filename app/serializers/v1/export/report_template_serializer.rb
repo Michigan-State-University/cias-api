@@ -3,7 +3,7 @@
 class V1::Export::ReportTemplateSerializer < ActiveModel::Serializer
   include FileHelper
 
-  attributes :name, :report_for, :summary, :original_text
+  attributes :name, :report_for, :summary, :original_text, :is_duplicated_from_other_session, :duplicated_from_other_session_warning_dismissed
 
   has_many :sections, serializer: V1::Export::ReportTemplateSectionSerializer
 
