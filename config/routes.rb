@@ -134,6 +134,7 @@ Rails.application.routes.draw do
           resources :variants, only: %i[index show create update destroy] do
             delete :remove_image
           end
+          patch 'move_variants', to: 'variants#move', as: :move_variants
         end
       end
     end
