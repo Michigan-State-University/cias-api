@@ -728,7 +728,8 @@ FactoryBot.define do
             value: '',
             report_template_ids: []
           }
-        ]
+        ],
+        variable: { name: '' }
       }
     end
     sequence(:position) { |s| s }
