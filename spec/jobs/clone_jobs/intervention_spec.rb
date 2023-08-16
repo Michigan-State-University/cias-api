@@ -80,7 +80,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
       expect(Intervention.order(:created_at).last.attributes['hfhs_access']).not_to eq true
     end
   end
-  
+
   context 'when the invited reseacher has an activated account' do
     let!(:clone_params) { { email: [user.email] } }
 
