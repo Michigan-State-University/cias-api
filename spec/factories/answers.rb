@@ -99,5 +99,13 @@ FactoryBot.define do
       type { Answer::TlfbQuestion }
       association :question, factory: :question_tlfb_question
     end
+    factory :answer_henry_ford, class: Answer::HenryFord do
+      type { Answer::HenryFord }
+      association :question, factory: :question_henry_ford
+    end
+    factory :answer_henry_ford_initial, class: Answer::HenryFordInitial do
+      type { Answer::HenryFordInitial }
+      association :question, factory: :question_henry_ford_initial_screen
+    end
   end
 end

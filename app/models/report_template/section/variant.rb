@@ -15,6 +15,7 @@ class ReportTemplate::Section::Variant < ApplicationRecord
                     size: { less_than: 5.megabytes }
 
   scope :to_preview, -> { where(preview: true) }
+  default_scope { order(:position) }
 
   ATTR_NAMES_TO_COPY = %w[
     preview formula_match title content
