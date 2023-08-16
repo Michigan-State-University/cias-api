@@ -140,6 +140,15 @@ class Intervention::Csv::Harvester
     end
   end
 
+  def hf_headers(sessions)
+    return [] unless sessions.first&.intervention&.hfhs_access
+
+    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: sessions })
+    return [] if hf_initial_question.nil?
+
+    hf_initial_question.csv_header_names
+  end
+
   def number_of_attempts(session)
     user_sessions.where(session_id: session.id).maximum(:number_of_attempts) || 1
   end
