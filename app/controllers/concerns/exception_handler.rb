@@ -44,6 +44,10 @@ module ExceptionHandler
       render json: msg(exc), status: :unprocessable_entity
     end
 
+    rescue_from ArgumentError do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
+
     rescue_from CatMh::ConnectionFailedException do |exc|
       message = { title: exc.title_text, body: exc.body_text, button: exc.button_text }
 
@@ -62,6 +66,18 @@ module ExceptionHandler
       message = { message: exc.message, details: exc.additional_information }
 
       render json: message, status: exc.status_code || :unprocessable_entity
+    end
+
+    rescue_from EpicOnFhir::NotFound do |exc|
+      render json: msg(exc), status: :not_found
+    end
+
+    rescue_from EpicOnFhir::UnexpectedError do |exc|
+      render json: msg(exc), status: :bad_request
+    end
+
+    rescue_from EpicOnFhir::AuthenticationError do |exc|
+      render json: msg(exc), status: :bad_request
     end
 
     rescue_from ActiveModel::ForbiddenAttributesError do |exc|
