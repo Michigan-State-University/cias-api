@@ -17,6 +17,10 @@ class Question::Name < Question
     ['.:name:.']
   end
 
+  def ability_to_clone?
+    false
+  end
+
   private
 
   def special_variable?(_var)

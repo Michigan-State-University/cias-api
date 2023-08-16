@@ -18,3 +18,4 @@ coverage/
 .generators
 .DS_Store
 credentials_google.json
+certificates/

@@ -26,7 +26,9 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
         create(:question_currency, subtitle: 'currency', body: { variable: { name: 'what' }, data: [{ payload: '' }] }, question_group: question_group,
                                    position: 4),
         create(:question_number, subtitle: 'number', body: { variable: { name: 'number' }, data: [{ payload: '' }] }, question_group: question_group,
-                                 position: 5)
+                                 position: 5),
+        create(:question_henry_ford, subtitle: 'henry_ford', body: { data: [{ payload: '', value: '12', hfh_value: 'monthly' }],
+                                                                     variable: { name: 'AUDIT_1' } }, question_group: question_group, position: 1)
       ]
     end
 
@@ -57,9 +59,8 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
         get v1_fetch_variables_path(id: session.id), headers: headers
       end
 
-      it_behaves_like 'correct classic session', 9, %w[var1 im_a_variable dep number rivia is_with_x x y what],
-                      ['single', 'multi', 'grid', 'currency', 'number',
-                       '<p>Enter main text for screen here</p><p><br></p><p><em>Note: this is the last screen participants will see in this session</em></p>']
+      it_behaves_like 'correct classic session', 10, %w[var1 im_a_variable dep number rivia is_with_x x y what AUDIT_1],
+                      %w[single multi grid currency number henry_ford]
     end
 
     context 'with question filters' do
@@ -87,7 +88,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
             get v1_fetch_variables_path(id: session.id, question_id: questions[1].id), headers: headers
           end
 
-          it_behaves_like 'correct classic session', 1, %w[var1], %w[single]
+          it_behaves_like 'correct classic session', 2, %w[var1 AUDIT_1], %w[single henry_ford]
         end
       end
 
@@ -97,7 +98,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 8, %w[var1 im_a_variable dep number rivia is_with_x x y], %w[single multi grid number]
+        it_behaves_like 'correct classic session', 9, %w[var1 im_a_variable dep number rivia is_with_x x y AUDIT_1], %w[single multi grid number henry_ford]
       end
 
       context 'include current question' do
@@ -106,7 +107,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 7, %w[var1 im_a_variable dep rivia is_with_x x y], %w[single multi grid]
+        it_behaves_like 'correct classic session', 8, %w[var1 im_a_variable dep rivia is_with_x x y AUDIT_1], %w[single multi grid henry_ford]
       end
 
       context 'does not include current question' do
@@ -115,7 +116,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 4, %w[var1 im_a_variable dep rivia], %w[single multi]
+        it_behaves_like 'correct classic session', 5, %w[var1 im_a_variable dep rivia AUDIT_1], %w[single multi henry_ford]
       end
 
       context 'with questions outside target target question group' do
@@ -147,8 +148,8 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
         end
 
-        it_behaves_like 'correct classic session', 11, %w[var1 im_a_variable dep rivia is_with_x x y what number a b],
-                        %w[bar currency grid multi number single var]
+        it_behaves_like 'correct classic session', 12, %w[var1 im_a_variable dep rivia is_with_x x y what number a b AUDIT_1],
+                        %w[bar currency grid multi number single var henry_ford]
       end
     end
   end

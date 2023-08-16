@@ -27,7 +27,8 @@ class ReportTemplate < ApplicationRecord
 
   enum report_for: {
     third_party: 'third_party',
-    participant: 'participant'
+    participant: 'participant',
+    henry_ford_health: 'henry_ford_health'
   }
 
   ATTR_NAMES_TO_COPY = %w[

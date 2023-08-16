@@ -54,11 +54,18 @@ class Clone::Session < Clone::Base
       formula['patterns'] = formula['patterns'].map do |pattern|
         index = 0
         pattern['target'].each do |current_target|
-          current_target['id'] = matching_outcome_target_id(pattern, index)
+          current_target['id'] =
+            if current_target['type'].eql?('Question::HenryFordInitial')
+              nil
+            else
+              matching_outcome_target_id(pattern, index)
+            end
           index += 1
         end
+        pattern['target'].delete_if { |branch| branch['id'].nil? }
         pattern
       end
+      formula['patterns'].delete_if { |pattern| pattern['target'].empty? }
     end
     question
   end
