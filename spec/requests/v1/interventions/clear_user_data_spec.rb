@@ -10,9 +10,9 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   let(:user) { admin }
   let(:owner) { admin }
   let(:status) { :closed }
-  let(:data_cleared) { false }
+  let(:sensitive_data_state) { 'collected' }
 
-  let(:intervention) { create(:intervention, :with_csv_file, status: status, user: owner, data_cleared: data_cleared) }
+  let(:intervention) { create(:intervention, :with_csv_file, status: status, user: owner, sensitive_data_state: sensitive_data_state) }
   let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
 
   let(:request) do
@@ -25,28 +25,14 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
       expect(response).to have_http_status(:no_content)
     end
 
-    it 'sets the "data_cleared" flag to true' do
+    it 'sets the "sensitive_data_state" flag to "prepared_to_remove"' do
       request
-      expect(intervention.reload.data_cleared?).to eq(true)
+      expect(intervention.reload.sensitive_data_prepared_to_remove?).to eq(true)
     end
 
-    it 'clears all user sessions for the intervention' do
+    it 'does enqueued job' do
       request
-      expect(intervention.reload.user_interventions).to be_empty
-    end
-
-    it 'removes all the generated csv files' do
-      request
-      expect(intervention.reload.files).to be_empty
-    end
-
-    it 'removes all the user interventions related to the intervention' do
-      request
-      expect(intervention.reload.user_interventions.count).to eq(0)
-    end
-
-    it 'removes attachments' do
-      expect { request }.to change { ActiveStorage::Attachment.count }.by_at_most(-1)
+      expect(DataClearJobs::ClearUserData).to have_been_enqueued.with(intervention.id)
     end
   end
 
@@ -57,19 +43,12 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     end
 
     it 'leaves the cleared flag unchanged' do
-      expect { request }.not_to change { intervention.reload.data_cleared? }
+      expect { request }.not_to change { intervention.reload.sensitive_data_state }
     end
 
-    it 'doesnt clear any user sessions for the intervention' do
-      expect { request }.not_to change { intervention.reload.user_interventions.count }
-    end
-
-    it 'does not delete generated csv files' do
-      expect { request }.not_to change { intervention.reload.files.count }
-    end
-
-    it 'does not delete any attachments' do
-      expect { request }.not_to change { ActiveStorage::Attachment.count }
+    it 'does not enqueued job' do
+      request
+      expect(DataClearJobs::ClearUserData).not_to have_been_enqueued.with(intervention.id)
     end
   end
 
@@ -80,19 +59,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     end
 
     it 'leaves the cleared flag unchanged' do
-      expect { request }.not_to change { intervention.reload.data_cleared? }
-    end
-
-    it 'doesnt clear any user sessions for the intervention' do
-      expect { request }.not_to change { intervention.reload.user_interventions.count }
-    end
-
-    it 'does not delete generated csv files' do
-      expect { request }.not_to change { intervention.reload.files.count }
-    end
-
-    it 'does not delete any attachments' do
-      expect { request }.not_to change { ActiveStorage::Attachment.count }
+      expect { request }.not_to change { intervention.reload.sensitive_data_state }
     end
   end
 
@@ -121,7 +88,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   end
 
   context 'when the intervention was already cleared' do
-    let!(:data_cleared) { true }
+    let!(:sensitive_data_state) { 'removed' }
 
     it_behaves_like 'cannot clear user data'
   end

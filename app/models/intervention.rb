@@ -29,8 +29,8 @@ class Intervention < ApplicationRecord
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true
 
-  has_many_attached :reports, dependent: :purge_later # these are actually csv files not pdf reports
-  has_many_attached :files # these are the files for the participant added in modular intervention
+  has_many_attached :reports, dependent: :purge_later # generated csv files for the researcher
+  has_many_attached :files # files for the participant added in modular intervention
   has_one_attached :logo, dependent: :purge_later
 
   has_many :short_links, as: :linkable, dependent: :destroy
@@ -66,6 +66,8 @@ class Intervention < ApplicationRecord
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
   enum current_narrator: { peedy: 0, emmi: 1 }
+  enum generated_reports_state: { stored: 'stored', prepared_to_remove: 'prepared_to_remove', removed: 'removed' }, _prefix: :generated_reports
+  enum sensitive_data_state: { collected: 'collected', prepared_to_remove: 'prepared_to_remove', removed: 'removed' }, _prefix: :sensitive_data
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }

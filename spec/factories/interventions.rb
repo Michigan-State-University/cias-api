@@ -28,6 +28,10 @@ FactoryBot.define do
       end
     end
 
+    trait :with_conversations_transcript do
+      conversations_transcript { FactoryHelpers.upload_file('spec/fixtures/csv/example.csv', binary: true) }
+    end
+
     trait :with_collaborators do
       after(:build) do |intervention|
         intervention.collaborators << create(:collaborator, user: create(:user, :researcher, :confirmed))

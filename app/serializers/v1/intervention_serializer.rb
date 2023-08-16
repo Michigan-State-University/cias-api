@@ -5,7 +5,7 @@ class V1::InterventionSerializer < V1Serializer
   include TeamCollaboratorsHelper
 
   attributes :id, :user_id, :type, :name, :status, :shared_to, :organization_id, :google_language_id,
-             :created_at, :updated_at, :published_at, :reports_deleted, :data_cleared,
+             :created_at, :updated_at, :published_at, :generated_reports_state, :sensitive_data_state,
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
              :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled
 

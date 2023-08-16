@@ -10,9 +10,9 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   let(:user) { admin }
   let(:owner) { admin }
   let(:status) { :closed }
-  let(:reports_deleted) { false }
+  let(:generated_reports_state) { 'stored' }
 
-  let(:intervention) { create(:intervention, :with_pdf_report, status: status, user: owner, reports_deleted: reports_deleted) }
+  let(:intervention) { create(:intervention, :with_pdf_report, status: status, user: owner, generated_reports_state: generated_reports_state) }
 
   let(:request) do
     delete user_reports_v1_intervention_path(id: intervention.id), headers: user.create_new_auth_token
@@ -26,16 +26,12 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
     it 'sets the "reports_deleted" flag to true' do
       request
-      expect(intervention.reload.reports_deleted?).to eq(true)
+      expect(intervention.reload.generated_reports_state).to eq('prepared_to_remove')
     end
 
-    it 'removes all the generated reports' do
+    it 'does enqueued job' do
       request
-      expect(intervention.reload.reports).to be_empty
-    end
-
-    it 'removes attachments' do
-      expect { request }.to change { ActiveStorage::Attachment.count }.by_at_most(-1)
+      expect(DataClearJobs::DeleteUserReports).to have_been_enqueued.with(intervention.id)
     end
   end
 
@@ -45,16 +41,13 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'leaves the reports_deleted flag unchanged' do
-      expect { request }.not_to change { intervention.reload.reports_deleted? }
+    it 'leaves the generated_reports_state unchanged' do
+      expect { request }.not_to change { intervention.reload.generated_reports_state }
     end
 
-    it 'does not remove any generated reports' do
-      expect { request }.not_to change { intervention.reload.reports.count }
-    end
-
-    it 'does not delete any attachments' do
-      expect { request }.not_to change { ActiveStorage::Attachment.count }
+    it 'does not enqueued job' do
+      request
+      expect(DataClearJobs::DeleteUserReports).not_to have_been_enqueued.with(intervention.id)
     end
   end
 
@@ -64,16 +57,13 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'leaves the reports_deleted flag unchanged' do
-      expect { request }.not_to change { intervention.reload.reports_deleted? }
+    it 'leaves the generated_reports_state unchanged' do
+      expect { request }.not_to change { intervention.reload.generated_reports_state }
     end
 
-    it 'does not remove any generated reports' do
-      expect { request }.not_to change { intervention.reload.reports.count }
-    end
-
-    it 'does not delete any attachments' do
-      expect { request }.not_to change { ActiveStorage::Attachment.count }
+    it 'does not enqueued job' do
+      request
+      expect(DataClearJobs::DeleteUserReports).not_to have_been_enqueued.with(intervention.id)
     end
   end
 
@@ -107,7 +97,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   end
 
   context 'when the intervention was already cleared' do
-    let!(:reports_deleted) { true }
+    let!(:generated_reports_state) { 'removed' }
 
     it_behaves_like 'cannot clear user reports'
   end

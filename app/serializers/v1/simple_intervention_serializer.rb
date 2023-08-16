@@ -2,7 +2,7 @@
 
 class V1::SimpleInterventionSerializer < V1Serializer
   include TeamCollaboratorsHelper
-  attributes :id, :user_id, :name, :status, :reports_deleted, :data_cleared, :created_at, :updated_at, :organization_id, :google_language_id
+  attributes :id, :user_id, :name, :status, :generated_reports_state, :sensitive_data_state, :created_at, :updated_at, :organization_id, :google_language_id
 
   cache_options(store: Rails.cache, namespace: 'simple-intervention-serializer', expires_in: 24.hours)  # temporary length, might be a subject to change
 
