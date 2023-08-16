@@ -147,16 +147,13 @@ RSpec.describe CloneJobs::Session, type: :job do
         expect(cloned_session.position).to be(3)
       end
 
-      it 'has cleared formula' do
-        expect(cloned_session.attributes['formulas']).to include(
-          'payload' => '',
-          'patterns' => []
-        )
-        expect(cloned_session.attributes['settings']['formula']).to eq(false)
+      it 'has kept the formula' do
+        expect(cloned_session.attributes['formulas']).to eq(session.attributes['formulas'])
+        expect(cloned_session.attributes['settings']['formula']).to eq(session.attributes['settings']['formula'])
       end
 
-      it 'has cleared days_after_variable_name value' do
-        expect(cloned_session.attributes['days_after_date_variable_name']).to eq(nil)
+      it 'has not cleared days_after_variable_name value' do
+        expect(cloned_session.attributes['days_after_date_variable_name']).to eq(session.attributes['days_after_date_variable_name'])
       end
 
       it 'has correct number of question groups' do

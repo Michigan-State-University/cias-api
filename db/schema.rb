@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_07_31_090909) do
+ActiveRecord::Schema.define(version: 2023_08_10_121137) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -686,6 +686,7 @@ ActiveRecord::Schema.define(version: 2023_07_31_090909) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.integer "position", default: 0, null: false
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
     t.index ["report_template_section_id"], name: "index_variants_on_section_id"
   end
@@ -707,6 +708,8 @@ ActiveRecord::Schema.define(version: 2023_07_31_090909) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.boolean "is_duplicated_from_other_session", default: false, null: false
+    t.boolean "duplicated_from_other_session_warning_dismissed", default: false, null: false
     t.index ["report_for"], name: "index_report_templates_on_report_for"
     t.index ["session_id", "name"], name: "index_report_templates_on_session_id_and_name", unique: true
     t.index ["session_id"], name: "index_report_templates_on_session_id"
@@ -894,6 +897,7 @@ ActiveRecord::Schema.define(version: 2023_07_31_090909) do
     t.datetime "scheduled_at"
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
+    t.boolean "started", default: false, null: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"

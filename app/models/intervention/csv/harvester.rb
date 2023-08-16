@@ -142,18 +142,6 @@ class Intervention::Csv::Harvester
     end
   end
 
-  def number_of_attempts(session)
-    user_sessions.where(session_id: session.id).maximum(:number_of_attempts) || 1
-  end
-
-  def column_name(multiple_fill, session, suffix, approach_number = nil)
-    if multiple_fill
-      "#{session.variable}.approach_number_#{approach_number || 1}.#{suffix}"
-    else
-      "#{session.variable}.#{suffix}"
-    end
-  end
-
   def hf_headers(sessions)
     return [] unless sessions.first&.intervention&.hfhs_access
 
@@ -183,5 +171,17 @@ class Intervention::Csv::Harvester
   def patient_details(user_session, attrs)
     details = user_session.user.hfhs_patient_detail&.attributes
     details&.fetch_values(*attrs)
+  end
+
+  def number_of_attempts(session)
+    user_sessions.where(session_id: session.id).maximum(:number_of_attempts) || 1
+  end
+
+  def column_name(multiple_fill, session, suffix, approach_number = nil)
+    if multiple_fill
+      "#{session.variable}.approach_number_#{approach_number || 1}.#{suffix}"
+    else
+      "#{session.variable}.#{suffix}"
+    end
   end
 end
