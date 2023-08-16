@@ -73,19 +73,7 @@ class V1::InterventionsController < V1Controller
     return head :forbidden unless clear_data_ability?
 
     DataClearJobs::ClearUserData.perform_later(intervention_load.id)
-    intervention_load.sensitive_data_prepared_to_remove!
-
-    render status: :no_content
-  end
-
-  def delete_user_reports
-    authorize! :clear_protected_intervention, intervention_load
-
-    return head :forbidden unless intervention_load.generated_reports_stored?
-    return head :forbidden unless clear_data_ability?
-
-    DataClearJobs::DeleteUserReports.perform_later(intervention_load.id)
-    intervention_load.generated_reports_prepared_to_remove!
+    intervention_load.sensitive_data_marked_to_remove!
 
     render status: :no_content
   end

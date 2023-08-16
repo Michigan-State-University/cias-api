@@ -58,7 +58,6 @@ Rails.application.routes.draw do
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
       delete 'user_reports', to: 'interventions#delete_user_reports', on: :member
-      delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]

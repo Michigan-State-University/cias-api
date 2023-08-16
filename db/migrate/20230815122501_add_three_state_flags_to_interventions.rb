@@ -2,7 +2,6 @@ class AddThreeStateFlagsToInterventions < ActiveRecord::Migration[6.1]
   def change
     remove_column(:interventions, :reports_deleted)
     remove_column(:interventions, :data_cleared)
-    add_column(:interventions, :generated_reports_state, :string, null: false, default: 'stored' )
     add_column(:interventions, :sensitive_data_state, :string, null: false, default: 'collected' )
   end
 end

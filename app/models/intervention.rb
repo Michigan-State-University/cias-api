@@ -66,8 +66,7 @@ class Intervention < ApplicationRecord
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
   enum current_narrator: { peedy: 0, emmi: 1 }
-  enum generated_reports_state: { stored: 'stored', prepared_to_remove: 'prepared_to_remove', removed: 'removed' }, _prefix: :generated_reports
-  enum sensitive_data_state: { collected: 'collected', prepared_to_remove: 'prepared_to_remove', removed: 'removed' }, _prefix: :sensitive_data
+  enum sensitive_data_state: { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, _prefix: :sensitive_data
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
