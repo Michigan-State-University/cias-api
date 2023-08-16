@@ -62,6 +62,10 @@ RSpec.describe DuplicateJobs::Session, type: :job do
         'patterns' => []
       )
     end
+
+    it 'clears the days_after_variable_name value' do
+      expect(new_intervention.reload.sessions.first['days_after_date_variable_name']).to eq(nil)
+    end
   end
 
   context 'when new intervention does\'t exist' do

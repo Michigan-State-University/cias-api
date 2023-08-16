@@ -24,7 +24,7 @@ class V1::UserSessions::BaseService
   protected
 
   def new_user_session_for(create_method, counter = 1)
-    UserSession.send(
+    user_session = UserSession.send(
       create_method,
       session_id: session_id,
       user_id: user_id,
@@ -33,6 +33,8 @@ class V1::UserSessions::BaseService
       user_intervention_id: user_intervention.id,
       number_of_attempts: counter
     )
+    user_session.started = true
+    user_session
   end
 
   def find_user_session(find_method)

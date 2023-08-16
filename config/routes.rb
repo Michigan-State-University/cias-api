@@ -100,6 +100,7 @@ Rails.application.routes.draw do
         resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
+          post :duplicate
         end
       end
       resources :question_groups, only: %i[index show create update destroy] do
@@ -139,6 +140,7 @@ Rails.application.routes.draw do
           resources :variants, only: %i[index show create update destroy] do
             delete :remove_image
           end
+          patch 'move_variants', to: 'variants#move', as: :move_variants
         end
       end
     end

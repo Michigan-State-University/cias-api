@@ -38,6 +38,11 @@ RSpec.shared_examples 'create user session' do
         expect(json_response['data']['attributes']['type']).to eql('UserSession::Classic')
       end
 
+      it 'has the "started" flag set to true' do
+        request
+        expect(json_response['data']['attributes']['started']).to be true
+      end
+
       context 'create UserSession::CatMh' do
         let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
 
@@ -49,6 +54,11 @@ RSpec.shared_examples 'create user session' do
         it 'created_cat_mh_session_counter in intervention should be incremented' do
           request
           expect(intervention.reload.created_cat_mh_session_count).to be(1)
+        end
+
+        it 'has the "started" flag set to true' do
+          request
+          expect(json_response['data']['attributes']['started']).to be true
         end
       end
     end

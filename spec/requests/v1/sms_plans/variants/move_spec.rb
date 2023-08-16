@@ -31,6 +31,8 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/move_variants', type: :request 
     end
   end
 
+  it_behaves_like 'correct behavior for the intervention with collaborators'
+
   context 'when params invalid (wrong ID)' do
     let(:params) do
       {

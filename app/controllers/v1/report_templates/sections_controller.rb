@@ -83,4 +83,8 @@ class V1::ReportTemplates::SectionsController < V1Controller
   def position_params
     params.require(:section).permit(position: %i[id position])
   end
+
+  def ability_to_update?
+    @report_template.ability_to_update_for?(current_v1_user)
+  end
 end

@@ -7,7 +7,10 @@ RSpec.describe CloneJobs::Intervention, type: :job do
   let!(:intervention) { create(:intervention, user: user, status: 'published') }
   let!(:clone_params) { {} }
 
+  let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
+
   before do
+    allow(message_delivery).to receive(:deliver_now)
     ActiveJob::Base.queue_adapter = :test
     allow(Intervention).to receive(:clone)
   end
@@ -75,6 +78,55 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     it 'does not copy over the HFH access setting' do
       subject
       expect(Intervention.order(:created_at).last.attributes['hfhs_access']).not_to eq true
+    end
+  end
+  
+  context 'when the invited reseacher has an activated account' do
+    let!(:clone_params) { { email: [user.email] } }
+
+    it 'does not create a new user account' do
+      expect { subject }.not_to change(User, :count)
+    end
+
+    it 'sends a proper email to the user' do
+      allow(CloneMailer).to receive(:cloned_intervention)
+                              .with(user, intervention.name,
+                                    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
+                              .and_return(message_delivery)
+      subject
+    end
+  end
+
+  context 'when the invited researcher has an account that\'s not been activated' do
+    let!(:new_researcher) { create(:user, :researcher, :unconfirmed) }
+    let!(:clone_params) { { emails: [new_researcher.email] } }
+
+    it 'does not create a new user account' do
+      expect { subject }.not_to change(User, :count)
+    end
+
+    it 'sends a proper email to the user' do
+      allow(CloneMailer).to receive(:cloned_intervention_activate)
+                              .with(new_researcher, intervention.name,
+                                    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
+                              .and_return(message_delivery)
+      subject
+    end
+  end
+
+  context 'when the invited researcher doesn\'t have an account' do
+    let!(:clone_params) { { emails: [Faker::Internet.unique.email] } }
+
+    it 'creates a new researcher account' do
+      expect { subject }.to change(User, :count).by(1)
+    end
+
+    it 'sends a proper email to the researcher' do
+      allow(CloneMailer).to receive(:cloned_intervention_activate)
+                              .with(instance_of(User), intervention.name,
+                                    /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
+                              .and_return(message_delivery)
+      subject
     end
   end
 end
