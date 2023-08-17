@@ -16,6 +16,10 @@ RSpec.describe DataClearJobs::ClearUserData, type: :job do
     expect { subject }.to change(ActiveStorage::Attachment, :count).by(-2)
   end
 
+  it 'create a notification' do
+    expect { subject }.to change(Notification, :count).by(1)
+  end
+
   it 'interventions return information that hasn\'t have attachments' do
     subject
     expect(intervention.reload.reports.any?).to be false
