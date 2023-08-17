@@ -73,9 +73,9 @@ class V1::InterventionsController < V1Controller
     return head :forbidden unless clear_data_ability?
 
     DataClearJobs::ClearUserData.perform_later(intervention_load.id)
-    intervention_load.sensitive_data_marked_to_remove!
+    intervention_load.update!(sensitive_data_state: 'marked_to_remove', clear_sensitive_data_scheduled_at: DateTime.now + 5.days)
 
-    render status: :no_content
+    render json: serialized_response(intervention_load)
   end
 
   private
@@ -124,6 +124,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def clear_data_ability?
-    intervention_load.ability_to_update_for?(current_v1_user) && intervention_load.status.in?(%w[closed archived])
+    intervention_load.ability_to_update_for?(current_v1_user) && intervention_load.user_id == current_v1_user.id && intervention_load.status.in?(%w[closed
+                                                                                                                                                    archived])
   end
 end

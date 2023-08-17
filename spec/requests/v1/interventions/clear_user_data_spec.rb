@@ -22,12 +22,17 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
   shared_examples 'can clear user data' do
     it 'returns the status no_content' do
       request
-      expect(response).to have_http_status(:no_content)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'response has expected information' do
+      request
+      expect(json_response['data']['attributes']['clear_sensitive_data_scheduled_at'].present?).to be true
     end
 
     it 'sets the "sensitive_data_state" flag to "prepared_to_remove"' do
       request
-      expect(intervention.reload.sensitive_data_prepared_to_remove?).to eq(true)
+      expect(intervention.reload.sensitive_data_marked_to_remove?).to eq(true)
     end
 
     it 'does enqueued job' do

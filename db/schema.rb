@@ -410,8 +410,8 @@ ActiveRecord::Schema.define(version: 2023_08_15_122501) do
     t.integer "current_narrator", default: 0
     t.uuid "current_editor_id"
     t.integer "conversations_count"
-    t.string "generated_reports_state", default: "stored", null: false
     t.string "sensitive_data_state", default: "collected", null: false
+    t.datetime "clear_sensitive_data_scheduled_at"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
