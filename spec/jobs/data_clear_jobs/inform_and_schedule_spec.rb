@@ -11,12 +11,11 @@ RSpec.describe DataClearJobs::InformAndSchedule, type: :job do
   end
 
   context 'with user intervention assigned to participant' do
-    let(:participant) { create(:user, :participant, :confirmed) }
+    let!(:participant) { create(:user, :participant, :confirmed) }
     let!(:user_intervention1) { create(:user_intervention, intervention: intervention, user: participant) }
 
     it 'does enqueued job' do
-      subject
-      expect(described_class).to have_been_enqueued.with(intervention.id)
+      expect { subject }.to have_enqueued_job(DataClearJobs::ClearUserData).with(intervention.id)
     end
 
     it 'sends emails only for participants' do
