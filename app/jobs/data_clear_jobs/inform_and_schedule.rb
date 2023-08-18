@@ -6,7 +6,7 @@ class DataClearJobs::InformAndSchedule < ApplicationJob
     send_emails_to_third_party_users!(intervention)
     send_emails_to_participants!(intervention)
 
-    ClearUserData.set(wait: 5.days).perform_later(intervention_id)
+    DataClearJobs::ClearUserData.set(wait: 5.days).perform_later(intervention_id)
   end
 
   private
