@@ -36,12 +36,16 @@ class Clone::ReportTemplate
 
   private
 
-  def uniq_name(occupied_names, suggested_name = "Copy of #{outcome.name}", starting_index = nil)
+  def uniq_name(occupied_names, suggested_name = default_suggested_name, starting_index = nil)
     return suggested_name unless suggested_name.in?(occupied_names)
 
     next_suggested_index = starting_index.present? ? starting_index + 1 : outcome.session.report_templates.where('name like ?', "%#{outcome.name}").count
 
     uniq_name(occupied_names, "#{next_suggested_index.ordinalize} copy of #{outcome.name}", next_suggested_index)
+  end
+
+  def default_suggested_name
+    source.session_id == outcome.session_id ? "Copy of #{outcome.name}" : outcome.name
   end
 
   def clone_attachments
