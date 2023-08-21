@@ -62,6 +62,8 @@ Rails.application.routes.draw do
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
+      put 'star', to: 'interventions#make_starred', on: :member, as: :make_starred
+      delete 'star', to: 'interventions#make_unstarred', on: :member, as: :make_unstarred
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
