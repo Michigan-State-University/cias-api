@@ -36,17 +36,10 @@ class Api::Documo::SendMultipleFaxes
   end
 
   def form_data
-    # files.map{ |file| Faraday::UploadIO.new(file[0], file[1]) }
-
-    # avatar_data = user.avatar.download
-
-    # Create a Faraday::UploadIO object
-    # avatar_upload_io = Faraday::UploadIO.new(StringIO.new(avatar_data), user.avatar.content_type, user.avatar.filename.to_s)
-
     {
       coverPage: @include_cover_page,
       coverPageId: ENV.fetch('DOCUMO_COVER_PAGE_ID'),
-      recipientFax: fax_numbers.first,
+      recipientFax: fax_numbers.join(', '),
       cf: { logo: '<img src="https://picsum.photos/200"></img>' },
       attachments: attachments.map{ |file| Faraday::UploadIO.new(StringIO.new(file.download), file.content_type, file.filename.to_s) },
     }
