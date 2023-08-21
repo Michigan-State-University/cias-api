@@ -246,7 +246,7 @@ en:
       header: 'Your copy of %{intervention_name} is ready'
       body: 'Your intervention has been copied successfully. Now you can use it in CIAS.'
       button_text: Open the e-intervention
-      link: '%{web_url}/interventions/%{intervention_id}'
+      link: '%{web_url}/login?redirect_to=/interventions/%{intervention_id}'
     intervention_activate:
       subject: 'CIAS invitation'
       header: 'Welcome to CIAS'
