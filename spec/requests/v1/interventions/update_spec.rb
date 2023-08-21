@@ -68,6 +68,25 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         )
       end
 
+      context 'clinic locations' do
+        let!(:location_ids) { create_list(:clinic_location, 3).map(&:id) }
+        let(:params) do
+          {
+            intervention: {
+              location_ids: location_ids
+            }
+          }
+        end
+
+        it 'assigns new locations to the intervention' do
+          expect(intervention.reload.intervention_locations.size).to be(3)
+        end
+
+        it 'returns information about locations in the response' do
+          expect(json_response['data']['relationships']['clinic_locations']).not_to be_empty
+        end
+      end
+
       context 'short links' do
         context 'when user change other params' do
           it 'short link stay without any change' do

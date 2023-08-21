@@ -288,6 +288,11 @@ en:
     question_group_title: 'Copy of %{source_group_title}'
     wrong_argument: 'Wrong argument. This service should receive target_session and selected_groups with questions'
     wrong_sessions: "Wrong argument. Can/'t found all passed sessions"
+    wrong_package: "Wrong argument. You passed questions that cannot be duplicated"
+    uniqueness_violation: 'Wrong argument. You cannot duplicate questions which should be unique'
+    hfhs:
+      uniqueness_violation: 'Wrong argument. You cannot duplicate unique questions (e.g. HenryFordInitial)'
+      access_violation: "You can't duplicate Henry Ford Initial Screen to an intervention without access to Henry Ford's system"
     not_researcher: "Access denied. You pass user which can not have intervention"
   translation_mailer:
     subject: 'Translation of %{intervention_name}'
@@ -358,3 +363,11 @@ en:
     intervention_conversation_transcripts_ready:
       subject: "Your transcripts are ready"
       body: "Your conversation transcripts from intervention <span style='color:#C866EA;'>%{intervention_name}</span> are ready."
+  epic_on_fhir:
+    error:
+      authentication: "Authorization process failed. Try again or contact our support team."
+      unexpected_error: "Unexpected response from third-party tool. Please contact our support team."
+      patient:
+        not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
+      appointments:
+        not_found: "Insufficient information for further processing."

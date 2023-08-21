@@ -8,6 +8,7 @@ class Clone::Intervention < Clone::Base
     outcome.is_hidden = true
     clear_organization!
     clear_cat_mh_settings!
+    clear_hfhs_settings!
     outcome.save!
     create_sessions
     reassign_branching
@@ -100,5 +101,9 @@ class Clone::Intervention < Clone::Base
     outcome.cat_mh_organization_id = nil
     outcome.cat_mh_pool = nil
     outcome.created_cat_mh_session_count = 0
+  end
+
+  def clear_hfhs_settings!
+    outcome.hfhs_access = false
   end
 end

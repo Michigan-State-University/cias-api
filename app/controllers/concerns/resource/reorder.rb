@@ -6,6 +6,8 @@ module Resource::Reorder
     def move
       authorize! :update, reorder_scope_class
 
+      return head :forbidden unless ability_to_update?
+
       V1::ReorderService.call(reorder_data_scope, reorder_params[:position])
 
       render json: reorder_response, status: :ok
@@ -23,6 +25,10 @@ module Resource::Reorder
   end
 
   def reorder_data_scope
+    raise NotImplementedError, "Including class did not implement #{__method__} method"
+  end
+
+  def ability_to_update?
     raise NotImplementedError, "Including class did not implement #{__method__} method"
   end
 
