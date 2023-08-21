@@ -18,7 +18,6 @@ class Api::Documo::SendMultipleFaxes
   attr_reader :fax_numbers, :attachments, :include_cover_page, :fields, :logo
 
   def call
-    # boundary = SecureRandom.hex(16)
     response = connection.post do |req|
       req.headers['Authorization'] = "Basic #{ENV.fetch('DOCUMO_API_KEY')}"
       req.headers['Content-Type'] = "multipart/form-data"
@@ -29,34 +28,27 @@ class Api::Documo::SendMultipleFaxes
 
   def connection
     Faraday.new(url: ENDPOINT) do |conn|
-      conn.adapter Faraday.default_adapter
+      conn.adapter :net_http
       conn.ssl.verify = true
+      conn.request :url_encoded
       conn.request :multipart
     end
   end
 
   def form_data
-    # data = [
-    #   [:coverPage, @include_cover_page],
-    #   [:coverPageId, ENV.fetch('DOCUMO_COVER_PAGE_ID')]
-    # ]
-    #
-    # @fax_numbers.each do |fax_number|
-    #   data.append([:recipientFax, fax_number])
-    # end
-    #
-    # @attachments.each do |attachment|
-    #   data.append([:attachments, attachment.download])
-    # end
-    #
-    # data.append([:cf, { logo: '<img src="https://picsum.photos/200"></img>' }.to_json])
-    # data
+    # files.map{ |file| Faraday::UploadIO.new(file[0], file[1]) }
+
+    # avatar_data = user.avatar.download
+
+    # Create a Faraday::UploadIO object
+    # avatar_upload_io = Faraday::UploadIO.new(StringIO.new(avatar_data), user.avatar.content_type, user.avatar.filename.to_s)
+
     {
       coverPage: @include_cover_page,
       coverPageId: ENV.fetch('DOCUMO_COVER_PAGE_ID'),
-      recipientFax: fax_numbers,
-      attachments: attachments.map(&:download),
-      cf: { logo: '<img src="https://picsum.photos/200"></img>' }
+      recipientFax: fax_numbers.first,
+      cf: { logo: '<img src="https://picsum.photos/200"></img>' },
+      attachments: attachments.map{ |file| Faraday::UploadIO.new(StringIO.new(file.download), file.content_type, file.filename.to_s) },
     }
   end
 end
