@@ -18,6 +18,7 @@ class Intervention < ApplicationRecord
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :intervention_accesses, dependent: :destroy
+  has_many :stars, dependent: :destroy
   has_one :navigator_setup, class_name: 'LiveChat::Interventions::NavigatorSetup', dependent: :destroy
   has_many :conversations, class_name: 'LiveChat::Conversation', dependent: :restrict_with_exception
   has_many :live_chat_navigator_invitations, class_name: 'LiveChat::Interventions::NavigatorInvitation', dependent: :destroy
