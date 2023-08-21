@@ -146,15 +146,11 @@ RSpec.describe Intervention, type: :model do
     end
 
     context 'when the intervention is cleared' do
-      let(:intervention) { create(:intervention, :with_reports_deleted, :with_data_cleared) }
+      let(:intervention) { create(:intervention, sensitive_data_state: 'removed') }
       let(:cloned_intervention) { intervention.clone }
 
       it 'sets the reports_deleted flag to false' do
-        expect(cloned_intervention.reports_deleted).to eq(false)
-      end
-
-      it 'sets the data_cleared flag to false' do
-        expect(cloned_intervention.data_cleared).to eq(false)
+        expect(cloned_intervention.sensitive_data_state).to eq('collected')
       end
     end
 
