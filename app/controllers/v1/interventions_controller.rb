@@ -89,7 +89,7 @@ class V1::InterventionsController < V1Controller
     @interventions_scope ||= Intervention.accessible_by(current_ability)
                                          .order(created_at: :desc)
                                          .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
-                             conversations_transcript_attachment])
+                                                      conversations_transcript_attachment])
                                          .only_visible
   end
 
