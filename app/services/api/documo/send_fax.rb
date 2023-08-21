@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 
 class Api::Documo::SendFax
-  include Api::Request
   include Rails.application.routes.url_helpers
 
-  ENDPOINT = "#{ENV['BASE_DOCUMO_URL']}/v1/faxes/multiple"
+  ENDPOINT = "#{ENV.fetch('BASE_DOCUMO_URL')}/v1/faxes/multiple"
 
-  def self.call(fax_number, attachments, include_cover_page, fields, logo)
-    new(fax_number, attachments, include_cover_page, fields, logo).call
+  def self.call(fax_numbers, attachments, include_cover_page, fields, logo)
+    new(fax_numbers, attachments, include_cover_page, fields, logo).call
   end
 
   def initialize(fax_numbers, attachments, include_cover_page, fields, logo)
@@ -18,10 +17,12 @@ class Api::Documo::SendFax
     @logo = logo
   end
 
+  attr_reader :fax_numbers, :attachments, :include_cover_page, :fields, :logo
+
   def call
     boundary = SecureRandom.hex(16)
     response = connection.post do |req|
-      req.headers['Authorization'] = "Basic #{ENV['DOCUMO_API_KEY']}"
+      req.headers['Authorization'] = "Basic #{ENV.fetch('DOCUMO_API_KEY')}"
       req.headers['Content-Type'] = "multipart/form-data; boundary=#{boundary}"
       req.body = build_multipart_data(boundary)
     end
@@ -40,7 +41,7 @@ class Api::Documo::SendFax
   def form_data
     data = [
       [:coverPage, @include_cover_page],
-      [:coverPageId, '9998d00d-d8d6-4d60-90c5-a022051087e0']
+      [:coverPageId, ENV.fetch('DOCUMO_COVER_PAGE_ID')]
     ]
 
     @fax_numbers.each do |fax_number|
@@ -48,21 +49,23 @@ class Api::Documo::SendFax
     end
 
     @attachments.each do |attachment|
-      data.append([:attachmentUrls, polymorphic_url(attachment)])
+      data.append([:attachments, attachment])
     end
 
-    fields[:logo] = "<img src=\"#{polymorphic_url(@logo)}\"></img>" unless @logo.nil?
-
-    data.append(fields)
+    data.append([:cf, { logo: '<img src="https://picsum.photos/200"></img>' }.to_json])
     data
   end
 
   def build_multipart_data(boundary)
     body = form_data.each_with_object([]) do |(key, value), parts|
       parts << "--#{boundary}\r\n"
-      parts << "Content-Disposition: form-data; name=\"#{key}\"\r\n"
+      parts << (if key.eql?(:attachments)
+                  "Content-Disposition: form-data; name=\"#{key}\"; filename=\"#{value.filename}\"\r\n"
+                else
+                  "Content-Disposition: form-data; name=\"#{key}\"\r\n"
+                end)
       parts << "\r\n"
-      parts << "#{value}\r\n"
+      parts << (key.eql?(:attachments) ? "#{value.blob.download}\r\n" : "#{value}\r\n")
     end
 
     body << "--#{boundary}--\r\n"
