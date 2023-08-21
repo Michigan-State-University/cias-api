@@ -124,5 +124,22 @@ RSpec.describe ReportTemplate, type: :model do
         end
       end
     end
+
+    context 'collision with names' do
+      let!(:report_template1) { create(:report_template, session: report_template.session, name: "2nd copy of #{report_template.name}") }
+
+      it 'create a copy in the exising session' do
+        expect(subject.name).to eq("Copy of #{report_template.name}")
+      end
+
+      context 'should get next in order prefix' do
+        let!(:report_template2) { create(:report_template, session: report_template.session, name: "Copy of #{report_template.name}") }
+        let!(:report_template3) { create(:report_template, session: report_template.session, name: "4th copy of #{report_template.name}") }
+
+        it 'create a copy in the exising session' do
+          expect(subject.name).to eq("5th copy of #{report_template.name}")
+        end
+      end
+    end
   end
 end
