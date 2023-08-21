@@ -5,7 +5,6 @@ class Clone::Intervention < Clone::Base
     outcome.status = :draft
     outcome.name = "Copy of #{outcome.name}"
     outcome.is_hidden = true
-    outcome.starred = false
     clear_organization!
     clear_cat_mh_settings!
     clear_hfhs_settings!
