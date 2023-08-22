@@ -8,8 +8,8 @@ class V1::InterventionsController < V1Controller
     starred_interventions_ids = current_v1_user.stars.pluck(:intervention_id)
 
     render json: serialized_hash(paginated_collection, 'SimpleIntervention', params: {
-      starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id
-    }).merge({ interventions_size: collection.size }).to_json
+                                   starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id
+                                 }).merge({ interventions_size: collection.size }).to_json
   end
 
   def show

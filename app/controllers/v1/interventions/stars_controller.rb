@@ -6,7 +6,7 @@ class V1::Interventions::StarsController < V1Controller
 
     current_v1_user.stars.find_or_create_by(intervention_id: intervention_load.id)
 
-    render json: serialized_response(intervention_load, "Intervention", params: { current_user_id: current_v1_user.id })
+    render json: serialized_response(intervention_load, 'Intervention', params: { current_user_id: current_v1_user.id })
   end
 
   def make_unstarred
@@ -14,7 +14,7 @@ class V1::Interventions::StarsController < V1Controller
 
     current_v1_user.stars.delete_by(intervention_id: intervention_load.id)
 
-    render json: serialized_response(intervention_load, "Intervention", params: { current_user_id: current_v1_user.id })
+    render json: serialized_response(intervention_load, 'Intervention', params: { current_user_id: current_v1_user.id })
   end
 
   private
