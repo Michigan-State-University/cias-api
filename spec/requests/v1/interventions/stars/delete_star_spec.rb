@@ -7,7 +7,7 @@ RSpec.describe 'PUT /v1/interventions/:id/star', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
 
   let(:intervention) { create(:intervention, user: researcher) }
-  let(:other_intervention) { create(:intervention, user: researcher )}
+  let(:other_intervention) { create(:intervention, user: researcher) }
 
   let(:headers) { admin.create_new_auth_token }
   let(:request) { delete make_starred_v1_intervention_path(intervention.id), headers: headers }
