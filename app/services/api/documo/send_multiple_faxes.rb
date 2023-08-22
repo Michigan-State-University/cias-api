@@ -42,7 +42,7 @@ class Api::Documo::SendMultipleFaxes
 
   def form_data
     {
-      coverPage: @include_cover_page,
+      coverPage: include_cover_page,
       coverPageId: ENV.fetch('DOCUMO_COVER_PAGE_ID'),
       recipientFax: fax_numbers.join(', '),
       cf: { logo: "<img src=\"#{polymorphic_url(logo)}\"></img>" },
