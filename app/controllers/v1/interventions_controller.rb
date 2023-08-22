@@ -5,26 +5,26 @@ class V1::InterventionsController < V1Controller
     collection = interventions_scope.detailed_search(params, current_v1_user)
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
-    data = serialized_hash(paginated_collection, 'SimpleIntervention',
-                           params: { current_user_id: current_v1_user.id })[:data]
+    starred_interventions_ids = current_v1_user.stars.pluck(:intervention_id)
 
-    paginated_collection.zip(data).each do |intervention, d|
-      d[:attributes][:starred] = starred?(intervention)
-    end
+    render json: serialized_hash(paginated_collection, 'SimpleIntervention', params: {
+      starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id
+    }).merge({ interventions_size: collection.size }).to_json
 
-    render json: { data: data }.merge({ interventions_size: collection.size }).to_json
+    # render json V1::SimpleInterventionSerializer.new(paginated_collection,
+    #                                                  params: { starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id })
+    #                                             .merge({ interventions_size: collection.size }).to_json
   end
 
   def show
-    render json: serialized_hash(intervention_load, controller_name.classify, params: { current_user_id: current_v1_user.id })
-                   .deep_merge(starred_hash(intervention_load)).to_json
+    render json: serialized_response(intervention_load, controller_name.classify, current_user_id: current_v1_user.id)
   end
 
   def create
     authorize! :create, Intervention
 
     intervention = current_v1_user.interventions.create!(intervention_params)
-    render json: serialized_hash(intervention).deep_merge(starred_hash(intervention)).to_json, status: :created
+    render json: serialized_response(intervention, controller_name.classify, params: { current_user_id: current_v1_user.id }), status: :created
   end
 
   def update
@@ -34,7 +34,7 @@ class V1::InterventionsController < V1Controller
 
     intervention = V1::Intervention::Update.new(intervention_load, intervention_params, current_v1_user).execute
 
-    render json: serialized_hash(intervention).deep_merge(starred_hash(intervention)).to_json
+    render json: serialized_hash(intervention, controller_name.classify, params: { current_user_id: current_v1_user.id })
   end
 
   def clone
@@ -71,22 +71,6 @@ class V1::InterventionsController < V1Controller
     head :no_content unless intervention_load.conversations_transcript.attached?
 
     redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention_load.conversations_transcript, only_path: true))
-  end
-
-  def make_starred
-    authorize! :read, Intervention
-
-    current_v1_user.stars.find_or_create_by(intervention_id: intervention_load.id)
-
-    render json: serialized_hash(intervention_load).deep_merge(starred_hash(intervention_load)).to_json
-  end
-
-  def make_unstarred
-    authorize! :read, Intervention
-
-    current_v1_user.stars.delete_by(intervention_id: intervention_load.id)
-
-    render json: serialized_hash(intervention_load).deep_merge(starred_hash(intervention_load)).to_json
   end
 
   private
@@ -137,13 +121,5 @@ class V1::InterventionsController < V1Controller
       question: [],
       sms_plan: []
     }
-  end
-
-  def starred?(intervention)
-    intervention.stars.find_by(user_id: current_v1_user.id).present?
-  end
-
-  def starred_hash(intervention)
-    { data: { attributes: { starred: starred?(intervention) } } }
   end
 end

@@ -62,8 +62,6 @@ Rails.application.routes.draw do
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
-      put 'star', to: 'interventions#make_starred', on: :member, as: :make_starred
-      delete 'star', to: 'interventions#make_unstarred', on: :member, as: :make_unstarred
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
@@ -72,6 +70,8 @@ Rails.application.routes.draw do
         resources :short_links, only: %i[create index]
         resources :collaborators, only: %i[create index destroy update]
         get 'permission', to: 'collaborators#show'
+        put 'star', to: 'stars#make_starred', on: :member, as: :make_starred
+        delete 'star', to: 'stars#make_unstarred', on: :member, as: :make_unstarred
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
