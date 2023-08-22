@@ -55,7 +55,8 @@ class Api::Documo::SendMultipleFaxes
       logo: "<img src=\"#{polymorphic_url(logo)}\"></img>",
       senderName: fields[:cover_letter_sender],
       subject: fields[:name],
-      notes: fields[:cover_letter_description]
+      notes: fields[:cover_letter_description],
+      recipientName: fields[:receiver]
     }
   end
 end
