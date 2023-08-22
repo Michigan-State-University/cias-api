@@ -2,10 +2,12 @@
 
 class V1::InterventionsController < V1Controller
   def index
-    collection = interventions_scope.detailed_search(params, current_v1_user)
-    paginated_collection = V1::Paginate.call(collection, start_index, end_index)
-
     starred_interventions_ids = current_v1_user.stars.pluck(:intervention_id)
+
+    collection = interventions_scope.detailed_search(params, current_v1_user)
+    collection = collection.sort { |a, b| starred_interventions_ids.count(b.id) <=> starred_interventions_ids.count(a.id) }
+
+    paginated_collection = V1::Paginate.call(collection, start_index, end_index)
 
     render json: serialized_hash(paginated_collection, 'SimpleIntervention', params: {
                                    starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id
