@@ -147,6 +147,7 @@ class Intervention < ApplicationRecord
     scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
+    scope = scope.filter_if_starred(params[:starred], user) if params[:starred].present?
     scope.filter_by_name(params[:name])
   end
 
@@ -215,5 +216,14 @@ class Intervention < ApplicationRecord
     scope = scope.only_shared_by_me(user.id) if params[:only_shared_by_me].present?
     scope = scope.only_not_shared_with_anyone(user.id) if params[:only_not_shared_with_anyone].present?
     scope
+  end
+
+  def self.filter_if_starred(starred, user)
+    starred_interventions_ids = user.stars.pluck(:intervention_id)
+    if starred == 'true'
+      all.where(id: starred_interventions_ids)
+    else
+      all.where.not(id: starred_interventions_ids)
+    end
   end
 end
