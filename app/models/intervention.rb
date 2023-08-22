@@ -54,7 +54,7 @@ class Intervention < ApplicationRecord
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:intervention_accesses).published.not_shared_to_invited
-      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
+                                      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
   }
 
   scope :only_visible, -> { where(is_hidden: false) }
@@ -162,6 +162,10 @@ class Intervention < ApplicationRecord
 
   def module_intervention?
     false
+  end
+
+  def starred_by?(user_id)
+    stars.find_by(user_id: user_id).present?
   end
 
   def create_navigator_setup

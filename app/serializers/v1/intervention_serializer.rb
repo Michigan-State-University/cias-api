@@ -14,7 +14,7 @@ class V1::InterventionSerializer < V1Serializer
   cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours) # temporary length, might be a subject to change
 
   attribute :starred do |object, params|
-    object.stars.find_by(user_id: params[:current_user_id]).present?
+    object.starred_by?(params[:current_user_id])
   end
 
   attribute :files do |object|
