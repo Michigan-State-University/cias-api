@@ -10,10 +10,6 @@ class V1::InterventionsController < V1Controller
     render json: serialized_hash(paginated_collection, 'SimpleIntervention', params: {
       starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id
     }).merge({ interventions_size: collection.size }).to_json
-
-    # render json V1::SimpleInterventionSerializer.new(paginated_collection,
-    #                                                  params: { starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id })
-    #                                             .merge({ interventions_size: collection.size }).to_json
   end
 
   def show
@@ -32,7 +28,7 @@ class V1::InterventionsController < V1Controller
     authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    intervention = V1::Intervention::Update.new(intervention_load, intervention_params, current_v1_user).execute
+    intervention = V1::Intervention::Update.new(intervention_load, intervention_params).execute
 
     render json: serialized_hash(intervention, controller_name.classify, params: { current_user_id: current_v1_user.id })
   end

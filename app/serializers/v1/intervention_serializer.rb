@@ -84,5 +84,6 @@ class V1::InterventionSerializer < V1Serializer
 
     options = options.dup
     options[:namespace] += ":#{params[:current_user_id]}"
+    options
   end
 end

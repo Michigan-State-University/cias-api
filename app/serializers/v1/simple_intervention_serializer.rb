@@ -23,5 +23,6 @@ class V1::SimpleInterventionSerializer < V1Serializer
 
     options = options.dup
     options[:namespace] += ":#{params[:current_user_id]}"
+    options
   end
 end
