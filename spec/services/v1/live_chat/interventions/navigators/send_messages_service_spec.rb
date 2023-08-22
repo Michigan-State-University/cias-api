@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::LiveChat::Interventions::Navigators::SendMessages do
+  WebMock.disable!
+  WebMock.allow_net_connect!
+
   let(:subject) { described_class.call(intervention, message_type) }
 
   let!(:user) { create(:user, :admin, :confirmed) }

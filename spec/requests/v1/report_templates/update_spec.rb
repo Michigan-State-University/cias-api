@@ -31,7 +31,8 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
               name: 'New Report Template',
               report_for: 'participant',
               summary: 'Your session summary',
-              logo: logo
+              logo: logo,
+              duplicated_from_other_session_warning_dismissed: true
             }
           }
         end
@@ -49,7 +50,8 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
           expect(ReportTemplate.last).to have_attributes(
             name: 'New Report Template',
             report_for: 'participant',
-            summary: 'Your session summary'
+            summary: 'Your session summary',
+            duplicated_from_other_session_warning_dismissed: true
           )
         end
 

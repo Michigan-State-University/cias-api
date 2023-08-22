@@ -2,6 +2,7 @@
 
 class ReportTemplate < ApplicationRecord
   include Translate
+  include Clone
   has_paper_trail
   extend DefaultValues
 
@@ -27,7 +28,8 @@ class ReportTemplate < ApplicationRecord
 
   enum report_for: {
     third_party: 'third_party',
-    participant: 'participant'
+    participant: 'participant',
+    henry_ford_health: 'henry_ford_health'
   }
 
   enum cover_letter_logo_type: {

@@ -37,6 +37,11 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
         request
         expect(json_response['answer']['id']).to eq(answer.id)
       end
+
+      it 'return only excpected keys' do
+        request
+        expect(json_response.keys).to match_array(%w[data answer])
+      end
     end
 
     context 'when user want to see last question -  second undo' do
@@ -83,6 +88,28 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
         expect(json_response['data']['id']).to eq(question1.id)
         expect(json_response['answer']).to be(nil)
       end
+    end
+  end
+
+  context 'with henry ford integration' do
+    let(:participant) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
+    let!(:intervention) { create(:intervention, user_id: researcher.id, status: 'published', hfhs_access: true) }
+    let!(:session) { create(:session, intervention_id: intervention.id) }
+    let!(:question_group) { create(:question_group, session: session) }
+    let!(:question1) { create(:question_henry_ford_initial_screen, question_group: question_group) }
+    let!(:answer) { create(:answer_henry_ford_initial, question: question1, user_session: user_session) }
+    let(:user_int) { create(:user_intervention, intervention: intervention, user: participant) }
+    let!(:user_session) { create(:user_session, user: participant, session: session, user_intervention: user_int) }
+
+    it 'contain information about patient details' do
+      request
+      expect(json_response['hfhs_patient_detail']).to include(participant.hfhs_patient_detail.slice(:patient_id, :first_name, :last_name, :sex, :zip_code,
+                                                                                                    :phone_number, :phone_type))
+    end
+
+    it 'have all expected kayes in hfh\'s section' do
+      request
+      expect(json_response['hfhs_patient_detail'].keys).to match_array(%w[patient_id first_name last_name dob sex zip_code phone_number phone_type])
     end
   end
 

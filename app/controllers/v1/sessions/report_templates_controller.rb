@@ -77,6 +77,16 @@ class V1::Sessions::ReportTemplatesController < V1Controller
     render status: :no_content
   end
 
+  def duplicate
+    authorize! :update, session
+    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+
+    duplicated_report = report_template.clone(params: duplicate_params)
+    Session.reset_counters(duplicated_report.session.id, :report_templates)
+
+    render json: serialized_response(duplicated_report), status: :created
+  end
+
   private
 
   def report_template
@@ -100,10 +110,23 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def report_template_params
     params.require(:report_template).
       permit(:name, :report_for, :logo, :cover_letter_custom_logo, :summary,
-             :has_cover_letter, :cover_letter_logo_type, :cover_letter_description, :cover_letter_sender)
+             :has_cover_letter, :cover_letter_logo_type, :cover_letter_description, :cover_letter_sender,
+             :duplicated_from_other_session_warning_dismissed)
   end
 
   def correct_ability?
     @session.ability_to_update_for?(current_v1_user)
+  end
+
+  def target_session
+    @target_session ||= if params.dig(:report_template, :session_id).present?
+                          Session.find(params[:report_template][:session_id])
+                        else
+                          @session
+                        end
+  end
+
+  def duplicate_params
+    target_session.present? ? { session_id: target_session.id } : {}
   end
 end
