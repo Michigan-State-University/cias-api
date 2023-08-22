@@ -45,8 +45,17 @@ class Api::Documo::SendMultipleFaxes
       coverPage: include_cover_page,
       coverPageId: ENV.fetch('DOCUMO_COVER_PAGE_ID'),
       recipientFax: fax_numbers.join(', '),
-      cf: { logo: "<img src=\"#{polymorphic_url(logo)}\"></img>" },
+      cf: custom_fields,
       attachments: attachments.map { |file| Faraday::UploadIO.new(StringIO.new(file.download), file.content_type, file.filename.to_s) }
+    }
+  end
+
+  def custom_fields
+    {
+      logo: "<img src=\"#{polymorphic_url(logo)}\"></img>",
+      senderName: fields[:cover_letter_sender],
+      subject: fields[:name],
+      notes: fields[:cover_letter_description]
     }
   end
 end
