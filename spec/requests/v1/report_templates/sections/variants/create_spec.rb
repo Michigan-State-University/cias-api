@@ -45,6 +45,15 @@ RSpec.describe 'POST /v1/report_templates/sections/:section_id/variants', type: 
         report_template_section_id: report_template_section.id
       )
     end
+
+    context 'create with next position' do
+      let!(:first_variant) { create(:report_template_section_variant, report_template_section: report_template_section) }
+
+      it 'return correct values' do
+        request
+        expect(json_response['data']['attributes']['position']).to be 1
+      end
+    end
   end
 
   context 'when params are invalid' do

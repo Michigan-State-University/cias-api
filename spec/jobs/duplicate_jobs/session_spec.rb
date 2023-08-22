@@ -83,4 +83,20 @@ RSpec.describe DuplicateJobs::Session, type: :job do
       expect { subject }.to avoid_changing(Session, :count)
     end
   end
+
+  context 'when copying to the intervention without hf access' do
+    let!(:intervention) { create(:intervention, user: user, status: 'published', hfhs_access: true) }
+    let!(:question_group) { create(:question_group, session: session) }
+    let!(:hf_initial_screen) { create(:question_henry_ford_initial_screen, question_group: question_group) }
+    let!(:question_single) { create(:question_single, question_group: question_group) }
+    let(:cloned_questions) { new_intervention.sessions.last.question_groups.first.questions.map(&:type) }
+
+    before do
+      subject
+    end
+
+    it 'do not duplicate hf initial screen' do
+      expect(cloned_questions).to eq(['Question::Single'])
+    end
+  end
 end

@@ -3,6 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
+  WebMock.disable!
+  WebMock.allow_net_connect!
+
   let(:user) { create(:user, :confirmed, :participant) }
   let(:headers) { user.create_new_auth_token }
   let(:message) { create(:message, :with_code, phone: user.phone.number) }

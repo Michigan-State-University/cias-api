@@ -22,7 +22,8 @@ class GeneratedReport < ApplicationRecord
 
   enum report_for: {
     third_party: 'third_party',
-    participant: 'participant'
+    participant: 'participant',
+    henry_ford_health: 'henry_ford_health'
   }
 
   def downloaded?(user_id)

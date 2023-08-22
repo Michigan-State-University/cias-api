@@ -34,17 +34,17 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   let(:headers) { user.create_new_auth_token }
   let(:request) { post v1_clone_question_path(id: question.id), headers: headers }
 
-  # context 'when auth' do
-  #   context 'is invalid' do
-  #     let(:request) { post v1_clone_question_path(id: question.id) }
-  #
-  #     it_behaves_like 'unauthorized user'
-  #   end
-  #
-  #   context 'is valid' do
-  #     it_behaves_like 'authorized user'
-  #   end
-  # end
+  context 'when auth' do
+    context 'is invalid' do
+      let(:request) { post v1_clone_question_path(id: question.id) }
+
+      it_behaves_like 'unauthorized user'
+    end
+
+    context 'is valid' do
+      it_behaves_like 'authorized user'
+    end
+  end
 
   context 'when user clones a question' do
     context 'there is no cloned variable' do
@@ -133,6 +133,17 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
       it 'return correct status' do
         request
         expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context 'when user wants to clone uniq question' do
+      %i[question_henry_ford_initial_screen question_name].each do |question_type|
+        let(:question) { create(question_type, question_group: question_group, position: 1) }
+
+        it 'return correct status' do
+          request
+          expect(response).to have_http_status(:forbidden)
+        end
       end
     end
   end
