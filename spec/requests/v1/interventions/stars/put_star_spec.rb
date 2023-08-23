@@ -9,7 +9,7 @@ RSpec.describe 'PUT /v1/interventions/:id/star', type: :request do
   let(:intervention) { create(:intervention, user: researcher) }
 
   let(:headers) { admin.create_new_auth_token }
-  let(:request) { put make_starred_v1_intervention_path(intervention.id), headers: headers }
+  let(:request) { post v1_intervention_create_star_path(intervention.id), headers: headers }
 
   context 'admin marks the intervention as starred' do
     before { request }
@@ -20,6 +20,25 @@ RSpec.describe 'PUT /v1/interventions/:id/star', type: :request do
 
     it 'the owner still does not see their intervention as starred' do
       expect(intervention.starred_by?(researcher.id)).to eq(false)
+    end
+  end
+
+  context 'when the id in the request is of an intervention that does not exist' do
+    let(:request) { post v1_intervention_create_star_path(SecureRandom.uuid), headers: headers }
+
+    it 'returns the status not found' do
+      request
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  context 'when the researcher does not have access to the intervention' do
+    let!(:intervention) { create(:intervention) }
+    let(:headers) { researcher.create_new_auth_token }
+
+    it 'returns the status not found' do
+      request
+      expect(response).to have_http_status(:not_found)
     end
   end
 
