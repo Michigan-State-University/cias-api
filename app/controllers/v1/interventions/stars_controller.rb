@@ -6,7 +6,9 @@ class V1::Interventions::StarsController < V1Controller
 
     current_v1_user.stars.find_or_create_by(intervention_id: intervention_load.id)
 
-    render json: serialized_response(intervention_load, 'Intervention', params: { current_user_id: current_v1_user.id })
+    clear_cache
+
+    head :no_content
   end
 
   def destroy
@@ -14,7 +16,9 @@ class V1::Interventions::StarsController < V1Controller
 
     current_v1_user.stars.delete_by(intervention_id: intervention_load.id)
 
-    render json: serialized_response(intervention_load, 'Intervention', params: { current_user_id: current_v1_user.id })
+    clear_cache
+
+    head :no_content
   end
 
   private
@@ -26,5 +30,10 @@ class V1::Interventions::StarsController < V1Controller
 
   def intervention_load
     @intervention_load ||= interventions_scope.find(params[:intervention_id])
+  end
+
+  def clear_cache
+    Rails.cache.delete_matched("intervention-serializer:#{current_v1_user.id}:intervention/#{intervention_load.id}-*")
+    Rails.cache.delete_matched("simple-intervention-serializer:#{current_v1_user.id}:intervention/#{intervention_load.id}-*")
   end
 end
