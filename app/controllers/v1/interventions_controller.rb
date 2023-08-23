@@ -13,7 +13,7 @@ class V1::InterventionsController < V1Controller
   end
 
   def show
-    render json: serialized_response(intervention_load, controller_name.classify, current_user_id: current_v1_user.id)
+    render json: serialized_response(intervention_load, controller_name.classify, params: { current_user_id: current_v1_user.id })
   end
 
   def create
