@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/interventions/:intervention_id/files', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:flexible_order_intervention, user: user) }
-  let(:sample_file) { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true) }
+  let(:sample_file) { Rack::Test::UploadedFile.new('spec/factories/images/test_image_1.jpg', 'image/jpeg', true) }
   let(:params) do
     {
       intervention: {

@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/report_templates/:report_template_id/move_sections', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
-  let!(:session) { create(:session) }
+  let(:intervention) { create(:intervention) }
+  let!(:session) { create(:session, intervention: intervention) }
   let!(:report_template) { create(:report_template, session: session) }
   let!(:report_template_section1) { create(:report_template_section, report_template: report_template, position: 0) }
   let!(:report_template_section2) { create(:report_template_section, report_template: report_template, position: 1) }
@@ -37,6 +38,8 @@ RSpec.describe 'PATCH /v1/report_templates/:report_template_id/move_sections', t
              end).to eql([report_template_section1.id, report_template_section3.id, report_template_section2.id])
     end
   end
+
+  it_behaves_like 'correct behavior for the intervention with collaborators'
 
   context 'user has permission and params are invalid' do
     let!(:params) do
