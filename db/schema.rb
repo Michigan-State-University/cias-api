@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_10_121137) do
+ActiveRecord::Schema.define(version: 2023_08_23_055801) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -266,6 +266,7 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.uuid "participant_id"
+    t.string "receiver"
     t.index ["participant_id"], name: "index_generated_reports_on_participant_id"
     t.index ["report_for"], name: "index_generated_reports_on_report_for"
     t.index ["report_template_id"], name: "index_generated_reports_on_report_template_id"

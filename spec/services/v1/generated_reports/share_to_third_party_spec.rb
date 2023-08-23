@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+shared_examples 'user third_party role invitation, generating report sharing' do |user_number, generated_reports_third_party_user_number, mail_number|
+  it 'invites new users with third party role to the system, shares generated report with the users' do
+    expect { subject }.to change(User, :count).by(user_number).and \
+      change(GeneratedReportsThirdPartyUser, :count).by(generated_reports_third_party_user_number)
+    expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.exactly(mail_number)
+  end
+end
+
 RSpec.describe V1::GeneratedReports::ShareToThirdParty do
   subject { described_class.call(user_session) }
 
@@ -8,7 +16,8 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
   let!(:answer_third_party) do
     create(:answer_third_party, user_session: user_session,
                                 body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                 report_template_ids: [generated_report.report_template.id] }] })
+                                                 report_template_ids: [generated_report.report_template.id],
+                                                 index: 0 }] })
   end
 
   before do
@@ -71,7 +80,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
   context 'when email is not provided in the third party screen' do
     before do
-      answer_third_party.update(body: { data: [{ value: '', report_template_ids: [generated_report.report_template.id] }] })
+      answer_third_party.update(body: { data: [{ value: '', report_template_ids: [generated_report.report_template.id], index: 0 }] })
     end
 
     it_behaves_like "won't share report with third party"
@@ -79,7 +88,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
   context 'when report_template id is not provided in the third party screen' do
     before do
-      answer_third_party.update(body: { data: [{ value: 'johnny@example.com, johnny2@example.com', report_template_ids: [] }] })
+      answer_third_party.update(body: { data: [{ value: 'johnny@example.com, johnny2@example.com', report_template_ids: [], index: 0 }] })
     end
 
     it_behaves_like "won't share report with third party"
@@ -126,19 +135,11 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     let!(:generated_report3) { create(:generated_report, :third_party, user_session: user_session) }
 
     context 'when users don\'t exist in the system' do
-      shared_examples 'user third_party role invitation, generating report sharing' do |user_number, generated_reports_third_party_user_number, mail_number|
-        it 'invites new users with third party role to the system, shares generated report with the users' do
-          expect { subject }.to change(User, :count).by(user_number).and \
-            change(GeneratedReportsThirdPartyUser, :count).by(generated_reports_third_party_user_number)
-          expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.exactly(mail_number)
-        end
-      end
-
       context 'when the same email occurs in two different answers with two different report templates' do
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report2.report_template.id] }] })
+                                                       report_template_ids: [generated_report2.report_template.id], index: 0 }] })
         end
 
         it_behaves_like 'user third_party role invitation, generating report sharing', 2, 4, 2
@@ -148,7 +149,8 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id],
+                                                       index: 0 }] })
         end
 
         it_behaves_like 'user third_party role invitation, generating report sharing', 2, 4, 2
@@ -159,12 +161,13 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id],
+                                                       index: 0 }] })
         end
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny3@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report3.report_template.id] }] })
+                                                       report_template_ids: [generated_report3.report_template.id], index: 0 }] })
         end
 
         it_behaves_like 'user third_party role invitation, generating report sharing', 3, 6, 3
@@ -179,7 +182,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report2.report_template.id] }] })
+                                                       report_template_ids: [generated_report2.report_template.id], index: 0 }] })
         end
 
         it 'sends information about new report to the users, shared the report with the users' do
@@ -198,7 +201,8 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id],
+                                                       index: 0 }] })
         end
 
         it 'sends information about new report to the users, shared the report with the users' do
@@ -210,18 +214,36 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
         end
       end
 
+      context 'when instead of emails is provided fax number' do
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: '+1 202-222-2243',
+                                                       report_template_ids: [generated_report.report_template.id], index: 0 }] })
+        end
+
+        before do
+          allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call).and_return(true)
+        end
+
+        it 'call service' do
+          expect(Api::Documo::SendMultipleFaxes).to receive(:call)
+          subject
+        end
+      end
+
       context 'when many emails have many different report templates' do
         let!(:user3) { create(:user, :confirmed, :third_party, email: 'johnny3@example.com') }
         let!(:generated_report4) { create(:generated_report, :third_party, user_session: user_session) }
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id] }] })
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id],
+                                                       index: 0 }] })
         end
         let!(:answer_third_party2) do
           create(:answer_third_party, user_session: user_session,
                                       body: { data: [{ value: 'johnny3@example.com, johnny2@example.com',
-                                                       report_template_ids: [generated_report3.report_template.id] }] })
+                                                       report_template_ids: [generated_report3.report_template.id], index: 0 }] })
         end
 
         it 'sends information about new report to the users, shared the report with the users' do
