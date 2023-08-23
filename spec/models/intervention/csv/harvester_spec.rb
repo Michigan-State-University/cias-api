@@ -520,6 +520,31 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
 
+      context 'when third party question' do
+        let(:report_template) { create(:report_template, :third_party, name: 'report_name') }
+        let!(:question_body) do
+          { 'data' =>
+             [{ 'value' => 'test@tes.com', 'payload' => '<p>Option A</p>', 'numeric_value' => '1', 'report_template_ids' => [report_template.id] },
+              { 'value' => 'test2@tes.com', 'payload' => '<p>Option B</p>', 'numeric_value' => '2', 'report_template_ids' => [] }],
+            'variable' => { 'name' => 'third_party' } }
+        end
+        let!(:answer_body) do
+          { 'data' => [{ 'value' => 'test@tes.com', 'report_template_ids' => [report_template.id], 'index' => 0, 'var' => 'third_party',
+                         'numeric_value' => '1' }] }
+        end
+        let!(:question) { create(:question_third_party, question_group: question_group, body: question_body, position: 1) }
+        let!(:answer) { create(:answer_third_party, question: question, body: answer_body, user_session: user_session) }
+
+        it 'save every variables and scores to csv' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.third_party", "#{session.variable}.metadata.session_start",
+                                        "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email,
+                                       { 'value' => 'test@tes.com', 'numeric_value' => '1', 'report_template' => ['report_name'] },
+                                       answer.user_session.created_at, nil, nil]]
+        end
+      end
+
       context 'when we have the two sessions of the same intervention' do
         let!(:question) { create(:question_single, question_group: question_group, body: question_body, position: 1) }
         let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
