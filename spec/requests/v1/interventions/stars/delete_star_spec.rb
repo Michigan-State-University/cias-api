@@ -50,6 +50,17 @@ RSpec.describe 'PUT /v1/interventions/:id/star', type: :request do
     end
   end
 
+  context 'when a participant wants to star an intervention' do
+    let!(:intervention) { create(:intervention, shared_to: :anyone) }
+    let(:participant) { create(:user, :participant) }
+    let(:headers) { participant.create_new_auth_token }
+
+    it 'returns the status forbidden' do
+      request
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   it 'deletes only one star' do
     expect { request }.to change(Star, :count).by(-1)
   end
