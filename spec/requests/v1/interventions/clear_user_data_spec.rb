@@ -14,9 +14,10 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
   let(:intervention) { create(:intervention, :with_csv_file, status: status, user: owner, sensitive_data_state: sensitive_data_state) }
   let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
+  let(:params) { { delay: 5 } }
 
   let(:request) do
-    delete user_data_v1_intervention_path(id: intervention.id), headers: user.create_new_auth_token
+    delete user_data_v1_intervention_path(id: intervention.id), params: params, headers: user.create_new_auth_token
   end
 
   shared_examples 'can clear user data' do
@@ -37,7 +38,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
     it 'does enqueued job' do
       request
-      expect(DataClearJobs::InformAndSchedule).to have_been_enqueued.with(intervention.id)
+      expect(DataClearJobs::InformAndSchedule).to have_been_enqueued.with(intervention.id, params[:delay])
     end
   end
 
@@ -53,7 +54,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
     it 'does not enqueued job' do
       request
-      expect(DataClearJobs::InformAndSchedule).not_to have_been_enqueued.with(intervention.id)
+      expect(DataClearJobs::InformAndSchedule).not_to have_been_enqueued.with(intervention.id, params[:delay])
     end
   end
 
