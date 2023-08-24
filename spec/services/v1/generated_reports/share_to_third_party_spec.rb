@@ -217,16 +217,65 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
       context 'when instead of emails is provided fax number' do
         let!(:answer_third_party) do
           create(:answer_third_party, user_session: user_session,
-                                      body: { data: [{ value: '+1 202-222-2243',
+                                      body: { data: [{ value: '+1202-222-2243',
                                                        report_template_ids: [generated_report.report_template.id], index: 0 }] })
         end
 
         before do
-          allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call).and_return(true)
+          allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call)
+                                                                     .and_return(true)
         end
 
         it 'call service' do
-          expect(Api::Documo::SendMultipleFaxes).to receive(:call)
+          receiver_label = ''
+          fields = generated_report.report_template.slice(:cover_letter_description, :cover_letter_sender, :name)
+                                                  .merge({ receiver: ActionView::Base.full_sanitizer.sanitize(receiver_label) })
+
+          expect(Api::Documo::SendMultipleFaxes).to receive(:call).with(['+1202-222-2243'], [kind_of(ActiveStorage::Attached::One)], false, fields,
+                                                                        kind_of(ActiveStorage::Attached::One))
+          subject
+        end
+      end
+
+      context 'multiple fax numbers and one generated report' do
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: '+1202-222-2243,+1202-222-2222',
+                                                       report_template_ids: [generated_report.report_template.id], index: 0 }] })
+        end
+
+        before do
+          allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call)
+                                                                     .and_return(true)
+        end
+
+        it 'call service' do
+          receiver_label = ''
+          fields = generated_report.report_template.slice(:cover_letter_description, :cover_letter_sender, :name)
+                                   .merge({ receiver: ActionView::Base.full_sanitizer.sanitize(receiver_label) })
+
+          expect(Api::Documo::SendMultipleFaxes).to receive(:call).with(%w[+1202-222-2243 +1202-222-2222], [kind_of(ActiveStorage::Attached::One)], false,
+                                                                        fields, kind_of(ActiveStorage::Attached::One))
+          subject
+        end
+      end
+
+      context 'one fax number and multipe generated reports' do
+        let!(:generated_report2) { create(:generated_report, :third_party, user_session: user_session) }
+        let!(:answer_third_party) do
+          create(:answer_third_party, user_session: user_session,
+                                      body: { data: [{ value: '+1202-222-2222',
+                                                       report_template_ids: [generated_report.report_template.id, generated_report2.report_template.id],
+                                                       index: 0 }] })
+        end
+
+        before do
+          allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call)
+                                                                     .and_return(true)
+        end
+
+        it 'call service' do
+          expect(Api::Documo::SendMultipleFaxes).to receive(:call).twice
           subject
         end
       end
