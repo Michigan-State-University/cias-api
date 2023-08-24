@@ -87,7 +87,7 @@ RSpec.describe ReportTemplate, type: :model do
       expect(subject.logo.attached?).to be true
     end
 
-    it 'has attached cover letter custom log' do
+    it 'has attached cover letter custom logo' do
       expect(subject.cover_letter_custom_logo.attached?).to be true
     end
 
