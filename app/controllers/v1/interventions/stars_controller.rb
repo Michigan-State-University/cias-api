@@ -4,8 +4,6 @@ class V1::Interventions::StarsController < V1Controller
   def create
     authorize! :read, Intervention
 
-    return head :not_found if intervention_load.nil?
-
     current_v1_user.stars.find_or_create_by(intervention_id: intervention_load.id)
 
     clear_cache
@@ -15,8 +13,6 @@ class V1::Interventions::StarsController < V1Controller
 
   def destroy
     authorize! :read, Intervention
-
-    return head :not_found if intervention_load.nil?
 
     current_v1_user.stars.delete_by(intervention_id: intervention_load.id)
 
@@ -28,12 +24,11 @@ class V1::Interventions::StarsController < V1Controller
   private
 
   def interventions_scope
-    @interventions_scope ||= Intervention.accessible_by(current_ability)
-                                         .order(created_at: :desc).only_visible
+    @interventions_scope ||= Intervention.accessible_by(current_ability).only_visible
   end
 
   def intervention_load
-    @intervention_load ||= interventions_scope.find_by(id: params[:intervention_id])
+    @intervention_load ||= interventions_scope.find(params[:intervention_id])
   end
 
   def clear_cache
