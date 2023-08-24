@@ -46,6 +46,11 @@ Rails.application.routes.draw do
         resource :avatars, only: %i[create destroy]
       end
     end
+    namespace :henry_ford do
+      post 'verify', to: 'patient_details#verify'
+      resources :clinic_locations, only: :index
+    end
+
     resources :preview_session_users, only: :create
 
     post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
@@ -95,6 +100,7 @@ Rails.application.routes.draw do
         resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
+          post :duplicate
         end
       end
       resources :question_groups, only: %i[index show create update destroy] do
@@ -134,6 +140,7 @@ Rails.application.routes.draw do
           resources :variants, only: %i[index show create update destroy] do
             delete :remove_image
           end
+          patch 'move_variants', to: 'variants#move', as: :move_variants
         end
       end
     end
@@ -291,6 +298,7 @@ Rails.application.routes.draw do
 
     get 'me', to: 'users#me', as: :get_user_details
     get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
+    get 'jwk-set-1', as: :jwk_set, to: 'epic_on_fhir/jwk_sets#index'
   end
 
   if Rails.env.development?

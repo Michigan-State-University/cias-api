@@ -39,6 +39,10 @@ class Intervention < ApplicationRecord
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
   has_one_attached :conversations_transcript, dependent: :purge_later
 
+  # Henry Ford integration
+  has_many :intervention_locations, dependent: :destroy
+  has_many :clinic_locations, through: :intervention_locations
+
   attribute :shared_to, :string, default: 'anyone'
   attribute :original_text, :json, default: { additional_text: '' }
 
@@ -60,7 +64,7 @@ class Intervention < ApplicationRecord
   scope :filter_by_organization, ->(organization_id) { where(organization_id: organization_id) }
   scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
-  scope :only_not_shared_with_anyone, -> { left_joins(:collaborators).where(collaborators: { id: nil }) }
+  scope :only_not_shared_with_anyone, ->(user_id) { left_joins(:collaborators).where(user_id: user_id, collaborators: { id: nil }) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -70,7 +74,7 @@ class Intervention < ApplicationRecord
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   before_save :remove_short_links, if: :will_save_change_to_organization_id?
-  after_update_commit :status_change
+  after_update_commit :status_change, :hf_access_change
 
   def assign_default_google_language
     self.google_language = GoogleLanguage.find_by(language_code: 'en') if google_language.nil?
@@ -80,6 +84,13 @@ class Intervention < ApplicationRecord
     return unless saved_change_to_attribute?(:status)
 
     ::Interventions::PublishJob.perform_later(id) if status == 'published'
+  end
+
+  def hf_access_change
+    return unless saved_change_to_attribute?(:hfhs_access)
+    return if hfhs_access
+
+    ::Question::HenryFordInitial.joins(:question_group).where(question_groups: { session: sessions }).delete_all
   end
 
   def export_answers_as(type:)
@@ -211,7 +222,7 @@ class Intervention < ApplicationRecord
     scope = all
     scope = scope.only_shared_with_me(user.id) if params[:only_shared_with_me].present?
     scope = scope.only_shared_by_me(user.id) if params[:only_shared_by_me].present?
-    scope = scope.only_not_shared_with_anyone if params[:only_not_shared_with_anyone].present?
+    scope = scope.only_not_shared_with_anyone(user.id) if params[:only_not_shared_with_anyone].present?
     scope
   end
 end

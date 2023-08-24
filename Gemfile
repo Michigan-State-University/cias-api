@@ -6,7 +6,7 @@ ruby '2.7.2'
 
 gem 'rails', '~> 6.1.7.4'
 gem 'pg', '~> 1.2'
-gem 'puma', '>= 5.6.4'
+gem 'puma', '~> 5.6.7'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
@@ -40,7 +40,7 @@ gem 'rack-cors'
 gem 'redis'
 gem 'sidekiq', '>= 6.4.0'
 gem 'sql_query'
-gem 'twilio-ruby', '~> 5.45.0'
+gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'
 gem 'rack', '>= 2.2.6.3'
 gem 'rack-attack'
@@ -60,6 +60,7 @@ gem 'paranoia', '~> 2.4', '>= 2.4.3'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
+gem 'jwt', '~> 2.6'
 gem 'grpc', '>= 1.53.0'
 
 group :development, :test do
@@ -84,6 +85,7 @@ group :development do
   gem 'letter_opener_web'
   gem 'license_finder'
   gem 'pgsync'
+  gem 'wkhtmltopdf-binary'
 end
 
 group :test do
@@ -97,17 +99,11 @@ group :test do
   gem 'action-cable-testing', '~> 0.6.1'
   gem 'rspec-benchmark'
   gem 'benchmark-ips'
+  gem 'webmock'
 end
 
 group :production do
   gem 'aws-sdk-s3'
-end
-
-group :production do
   # only version that is working on AWS
   gem 'wkhtmltopdf-heroku', '2.12.6.0'
-end
-
-group :development do
-  gem 'wkhtmltopdf-binary'
 end

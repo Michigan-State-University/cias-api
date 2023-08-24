@@ -22,7 +22,6 @@ class V1::UserSessions::FetchService < V1::UserSessions::BaseService
                         find_user_session(:find_by!)
                       end
 
-    @user_session.update!(started: true)
     @user_session
   end
 end

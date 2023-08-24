@@ -142,6 +142,83 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
       end
     end
 
+    context 'uniq behavior for some type of questions' do
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+      let(:target_question_id) { questions.last.id }
+
+      context 'formula is fully set and uses variable belongs to Question::ParticipantReport' do
+        let!(:question) do
+          question = create(:question_participant_report, question_group: question_group)
+          question.formulas = [{ 'payload' => 'participant_rep',
+                                 'patterns' => [{ 'match' => '=1',
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Single', 'probability' => '100' }] }] }]
+          question.body = { 'data' => [{ 'payload' => '' }], 'variable' => { 'name' => 'participant_rep' } }
+          question.save
+          question
+        end
+        let!(:answer) do
+          create(:answer_participant_report, question_id: question.reload.id, user_session_id: user_session.id,
+                                             migrated_body: { 'data' => [
+                                               { 'var' => 'participant_rep',
+                                                 'value' => { 'email' => 'example@example.com', 'receive_report' => true } }
+                                             ] })
+        end
+
+        it 'returns expected question' do
+          expect(subject.call.id).to eq target_question_id
+        end
+      end
+
+      context 'formula is fully set and uses variable belongs to Question::Phone' do
+        let!(:question) do
+          question = create(:question_phone, question_group: question_group)
+          question.formulas = [{ 'payload' => 'phone',
+                                 'patterns' => [{ 'match' => '=1',
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Single', 'probability' => '100' }] }] }]
+          question.body = { 'data' => [{ 'payload' => '' }], 'variable' => { 'name' => 'phone' } }
+          question.save
+          question
+        end
+        let!(:answer) do
+          create(:answer_phone, question_id: question.reload.id, user_session_id: user_session.id,
+                                migrated_body: { 'data' =>
+                                    [{ 'var' => 'phone',
+                                       'value' => { 'time_ranges' => [{ 'from' => 7, 'to' => 9, 'label' => 'early_morning' }], 'timezone' => 'Europe/Warsaw',
+                                                    'number' => '576982169', 'iso' => 'PL', 'prefix' => '+48', 'confirmed' => true } }] })
+        end
+
+        it 'returns expected question' do
+          expect(subject.call.id).to eq target_question_id
+        end
+      end
+
+      context 'formula is fully set and uses variable belongs to Question::ThirdParty' do
+        let!(:question) do
+          question = create(:question_third_party, question_group: question_group)
+          question.formulas = [{ 'payload' => 'third_party',
+                                 'patterns' => [{ 'match' => '=1',
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Single', 'probability' => '100' }] }] }]
+          question.body = { 'data' => [{ 'value' => 'email@example.com', 'numeric_value' => '1', 'payload' => '', 'report_template_ids' => [] }],
+                            'variable' => { 'name' => 'third_party' } }
+          question.save
+          question
+        end
+        let!(:answer) do
+          create(:answer_third_party, question_id: question.reload.id, user_session_id: user_session.id,
+                                      migrated_body: { 'data' => [
+                                        { 'value' => 'email@example.com',
+                                          'var' => 'third_party',
+                                          'numeric_value' => '1',
+                                          'report_template_ids' => [], 'index' => 0 }
+                                      ] })
+        end
+
+        it 'returns expected question' do
+          expect(subject.call.id).to eq target_question_id
+        end
+      end
+    end
+
     context 'formula is not correctly set' do
       let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let!(:question) do

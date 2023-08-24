@@ -11,8 +11,8 @@ class Question::ThirdParty < Question
     )
   end
 
-  def csv_header_names
-    []
+  def question_variables
+    [body['variable']['name']]
   end
 
   def translate_body(translator, source_language_name_short, destination_language_name_short)
