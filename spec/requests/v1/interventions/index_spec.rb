@@ -204,11 +204,11 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   context 'when some interventions are starred' do
     let(:other_researcher) { create(:user, :confirmed, :researcher) }
     let(:other_admin) { create(:user, :confirmed, :researcher) }
-    let(:random_sample) { (1..30).to_a.sample(15) }
+    let(:random_sample) { (0..30).to_a.sample(15) }
 
-    (1..30).each do |i|
-      let!("intervention#{i}".to_sym) do
-        create(
+    let!(:interventions) do
+      (0..30).each_with_object([]) do |i, a|
+        a << create(
           :intervention,
           created_at: DateTime.now + i.seconds,
           user: other_researcher,
@@ -219,19 +219,19 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
     before do
       random_sample.each do |i|
-        Star.create(user_id: other_researcher.id, intervention_id: eval("intervention#{i}").id)
+        Star.create(user_id: other_researcher.id, intervention_id: interventions[i].id)
       end
 
-      (1..30).to_a.sample(10).each do |i|
-        Star.create(user_id: other_admin.id, intervention_id: eval("intervention#{i}").id)
+      (0..30).to_a.sample(10).each do |i|
+        Star.create(user_id: other_admin.id, intervention_id: interventions[i].id)
       end
       get v1_interventions_path, params: params, headers: other_researcher.create_new_auth_token
     end
 
     it 'lists the starred interventions before the unstarred ones' do
       expect(json_response['data'].pluck('id')).to eq(
-        (1..30).sort_by { |a| [random_sample.count(a), a] }.reverse.each_with_object([]) do |i, a|
-          a << eval("intervention#{i}").id
+        (0..30).sort_by { |a| [random_sample.count(a), a] }.reverse.each_with_object([]) do |i, a|
+          a << interventions[i].id
         end
       )
     end
