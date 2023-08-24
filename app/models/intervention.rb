@@ -66,6 +66,8 @@ class Intervention < ApplicationRecord
   scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
   scope :only_not_shared_with_anyone, ->(user_id) { left_joins(:collaborators).where(user_id: user_id, collaborators: { id: nil }) }
+  scope :only_starred_by_me, ->(user) { where(id: user.stars.pluck(:intervention_id)) }
+  scope :only_not_starred_by_me, ->(user) { where.not(id: user.stars.pluck(:intervention_id)) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -218,12 +220,14 @@ class Intervention < ApplicationRecord
     scope
   end
 
-  def self.filter_if_starred(starred, user)
-    starred_interventions_ids = user.stars.pluck(:intervention_id)
-    if starred == 'true'
-      all.where(id: starred_interventions_ids)
+  def self.filter_if_starred(params, user)
+    case params.fetch(:starred)
+    when 'true'
+      all.only_starred_by_me(user)
+    when 'false'
+      all.only_not_starred_by_me(user)
     else
-      all.where.not(id: starred_interventions_ids)
+      all
     end
   end
 end
