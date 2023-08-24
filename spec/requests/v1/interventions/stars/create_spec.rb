@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PUT /v1/interventions/:id/star', type: :request do
+RSpec.describe 'POST /v1/interventions/:intervention_id/star', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
 
