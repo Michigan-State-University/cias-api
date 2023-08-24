@@ -39,7 +39,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
           it 'returns proper interventions' do
             expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
-                                                                                                 .take(interventions_size_admin).map(&:id)
+                                                                                        .take(interventions_size_admin).map(&:id)
           end
 
           it 'returns correct invitations list size' do
@@ -75,7 +75,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
         it 'returns proper interventions' do
           expect(json_response['data'].pluck('id')).to match_array interventions_scope.sort_by(&:created_at).reverse
-                                                                                               .take(interventions_size_researcher).map(&:id)
+                                                                                      .take(interventions_size_researcher).map(&:id)
         end
 
         it 'returns correct invitations list size' do
@@ -198,6 +198,38 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
     it 'return correct intervention' do
       expect(json_response['data'].pluck('id')).to not_include(shared_intervention.id).and not_include(intervention_another_researcher.id)
+    end
+  end
+
+  context 'when some interventions are starred' do
+    let(:other_researcher) { create(:user, :confirmed, :researcher) }
+    let(:random_sample) { (1..30).to_a.sample(15) }
+
+    (1..30).each do |i|
+      let!("intervention#{i}".to_sym) do
+        create(
+          :intervention,
+          created_at: DateTime.now + i.seconds,
+          user: other_researcher,
+          name: i.to_s,
+          status: %i[draft published closed archived].sample
+        )
+      end
+    end
+
+    before do
+      random_sample.each do |i|
+        Star.create(user_id: other_researcher.id, intervention_id: eval("intervention#{i}").id)
+      end
+      get v1_interventions_path, params: params, headers: other_researcher.create_new_auth_token
+    end
+
+    it 'lists the starred interventions before the unstarred ones' do
+      expect(json_response['data'].pluck('id')).to eq(
+        (1..30).sort_by { |a| [random_sample.count(a), a] }.reverse.each_with_object([]) do |i, a|
+          a << eval("intervention#{i}").id
+        end
+      )
     end
   end
 end
