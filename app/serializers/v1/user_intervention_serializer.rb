@@ -29,7 +29,8 @@ class V1::UserInterventionSerializer < V1Serializer
       image_alt: object.intervention.logo_blob.present? ? object.intervention.logo_blob.description : nil,
       id: object.intervention.id,
       files: object.intervention.files.attached? ? file_data(object) : [],
-      live_chat_enabled: object.intervention.live_chat_enabled
+      live_chat_enabled: object.intervention.live_chat_enabled,
+      has_assigned_navigators: object.intervention.navigators_count.positive?
     }
   end
 

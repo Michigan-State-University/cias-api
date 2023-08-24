@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::Interventions::NavigatorsController < V1Controller
+  include MessageHandler
   def index
     authorize! :read, Intervention
 
@@ -23,6 +24,7 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
     ActiveRecord::Base.transaction do
       LiveChat::Conversation.navigator_conversations(navigator.user).update_all(archived_at: DateTime.now) # rubocop:disable Rails/SkipsModelValidations
       navigator.destroy!
+      broadcast_massage(intervention_load)
     end
 
     head :no_content
@@ -52,5 +54,13 @@ class V1::LiveChat::Interventions::NavigatorsController < V1Controller
 
   def navigator_id
     params['navigator_id']
+  end
+
+  def broadcast_massage(intervention)
+    return unless intervention.navigators_count.zero?
+
+    channel = "navigators_in_intervention_channel_#{intervention.id}"
+
+    ActionCable.server.broadcast(channel, generic_message('', 'intervention_has_no_navigators'))
   end
 end
