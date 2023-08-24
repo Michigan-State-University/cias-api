@@ -149,7 +149,7 @@ class Intervention < ApplicationRecord
     scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
-    scope = scope.filter_if_starred(params[:starred], user) if params[:starred].present?
+    scope = scope.filter_if_starred(params, user)
     scope.filter_by_name(params[:name])
   end
 
