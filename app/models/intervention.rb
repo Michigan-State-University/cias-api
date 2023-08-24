@@ -221,7 +221,7 @@ class Intervention < ApplicationRecord
   end
 
   def self.filter_if_starred(params, user)
-    case params.fetch(:starred)
+    case params[:starred]
     when 'true'
       all.only_starred_by_me(user)
     when 'false'
