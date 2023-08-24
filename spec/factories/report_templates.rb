@@ -23,6 +23,14 @@ FactoryBot.define do
       end
     end
 
+    trait :with_cover_letter_custom_logo do
+      after(:create) do |report_template|
+        report_template.update(
+          cover_letter_custom_logo: FactoryHelpers.upload_file('spec/fixtures/images/logo.png', 'image/png', true)
+        )
+      end
+    end
+
     trait :with_custom_cover_letter_logo do
       after(:create) do |report_template|
         report_template.update(

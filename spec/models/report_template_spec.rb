@@ -73,7 +73,7 @@ RSpec.describe ReportTemplate, type: :model do
   describe 'clone' do
     subject { report_template.clone }
 
-    let!(:report_template) { create(:report_template, :with_logo, :with_sections) }
+    let!(:report_template) { create(:report_template, :with_logo, :with_sections, :with_cover_letter_custom_logo) }
 
     it 'create a copy in the exising session' do
       expect(subject.name).to eq("Copy of #{report_template.name}")
@@ -85,6 +85,10 @@ RSpec.describe ReportTemplate, type: :model do
 
     it 'has attached logo' do
       expect(subject.logo.attached?).to be true
+    end
+
+    it 'has attached cover letter custom log' do
+      expect(subject.cover_letter_custom_logo.attached?).to be true
     end
 
     it 'has sections' do
