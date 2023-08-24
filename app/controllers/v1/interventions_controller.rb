@@ -2,11 +2,11 @@
 
 class V1::InterventionsController < V1Controller
   def index
-    starred_interventions_ids = current_v1_user.stars.pluck(:intervention_id)
-
-    collection = interventions_scope.detailed_search(params, current_v1_user)
+    collection = sorted_interventions_scope.detailed_search(params, current_v1_user)
 
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
+
+    starred_interventions_ids = current_v1_user.stars.pluck(:intervention_id)
 
     render json: serialized_hash(paginated_collection, 'SimpleIntervention', params: {
                                    starred_interventions_ids: starred_interventions_ids, current_user_id: current_v1_user.id
@@ -74,12 +74,17 @@ class V1::InterventionsController < V1Controller
 
   def interventions_scope
     @interventions_scope ||= Intervention.accessible_by(current_ability)
-                                         .joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
-                                                 ON user_stars.intervention_id = interventions.id")
-                                         .order('user_stars.id', 'interventions.created_at DESC')
                                          .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
                                                       conversations_transcript_attachment])
                                          .only_visible
+  end
+
+  def sorted_interventions_scope
+    @sorted_interventions_scope ||= Intervention.accessible_by(current_ability)
+                                                .joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
+                                                        ON user_stars.intervention_id = interventions.id")
+                                                .order('user_stars.user_id', 'interventions.created_at DESC')
+                                                .only_visible
   end
 
   def intervention_load
