@@ -80,11 +80,9 @@ class V1::InterventionsController < V1Controller
   end
 
   def sorted_interventions_scope
-    @sorted_interventions_scope ||= Intervention.accessible_by(current_ability)
-                                                .joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
-                                                        ON user_stars.intervention_id = interventions.id")
-                                                .order('user_stars.user_id', 'interventions.created_at DESC')
-                                                .only_visible
+    @sorted_interventions_scope ||= interventions_scope.joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
+                                                               ON user_stars.intervention_id = interventions.id")
+                                                       .order('user_stars.user_id', 'interventions.created_at DESC')
   end
 
   def intervention_load
