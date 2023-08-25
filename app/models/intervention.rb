@@ -29,8 +29,8 @@ class Intervention < ApplicationRecord
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true
 
-  has_many_attached :reports
-  has_many_attached :files
+  has_many_attached :reports, dependent: :purge_later # generated csv files for the researcher
+  has_many_attached :files # files for the participant added in modular intervention
   has_one_attached :logo, dependent: :purge_later
 
   has_many :short_links, as: :linkable, dependent: :destroy
@@ -53,7 +53,7 @@ class Intervention < ApplicationRecord
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:intervention_accesses).published.not_shared_to_invited
-      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
+                                      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
   }
 
   scope :only_visible, -> { where(is_hidden: false) }
@@ -70,6 +70,7 @@ class Intervention < ApplicationRecord
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
   enum current_narrator: { peedy: 0, emmi: 1 }
+  enum sensitive_data_state: { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, _prefix: :sensitive_data
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
