@@ -211,7 +211,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     let(:request) { get v1_interventions_path, params: params, headers: other_researcher.create_new_auth_token }
 
     let(:random_sample) { (0...30).to_a.sample(15) }
-    let(:correct_index_order) { (0...30).sort_by { |index| [random_sample.count(index),  index] }.reverse }
+    let(:correct_index_order) { (0...30).sort_by { |index| [random_sample.count(index), index] }.reverse }
 
     before do
       random_sample.each do |index|
