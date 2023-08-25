@@ -205,13 +205,13 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     let(:other_researcher) { create(:user, :confirmed, :researcher) }
 
     let!(:interventions) do
-      create_list(:intervention, 30, user: other_researcher) { |intervention, i| intervention.created_at = DateTime.now + i.hours }
+      create_list(:intervention, 30, user: other_researcher) { |intervention, index| intervention.created_at = DateTime.now + index.hours }
     end
 
     let(:request) { get v1_interventions_path, params: params, headers: other_researcher.create_new_auth_token }
 
     let(:random_sample) { (0...30).to_a.sample(15) }
-    let(:correct_index_order) { (0...30).sort_by { |index| [random_sample.count(index), index] }.reverse }
+    let(:correct_index_order) { (0...30).sort_by { |index| [random_sample.count(index),  index] }.reverse }
 
     before do
       random_sample.each do |index|
