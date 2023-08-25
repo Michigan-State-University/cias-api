@@ -12,7 +12,6 @@
 
 ActiveRecord::Schema.define(version: 2023_08_10_121137) do
 
-
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"

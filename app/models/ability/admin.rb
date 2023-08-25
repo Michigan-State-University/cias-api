@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Ability::Admin < Ability::Base
+  include Ability::Generic::CollaboratorsAccess
   def definition
     super
     admin if role?(class_name)
@@ -18,5 +19,6 @@ class Ability::Admin < Ability::Base
     end
     cannot :manage, GeneratedReport
     can :manage, GeneratedReport, user_session: { session: { intervention: { user_id: user.id } } }
+    enable_data_access(user)
   end
 end
