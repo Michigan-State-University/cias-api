@@ -203,30 +203,40 @@ RSpec.describe 'GET /v1/interventions', type: :request do
 
   context 'when some interventions are starred' do
     let(:other_researcher) { create(:user, :confirmed, :researcher) }
-    let(:other_admin) { create(:user, :confirmed, :researcher) }
-    let(:random_sample) { (0...30).to_a.sample(15) }
 
-    let!(:interventions) { create_list(:intervention, 30, user: other_researcher) }
+    let!(:interventions) do
+      create_list(:intervention, 30, user: other_researcher) { |intervention, i| intervention.created_at = DateTime.now + i.hours }
+    end
+
+    let(:request) { get v1_interventions_path, params: params, headers: other_researcher.create_new_auth_token }
+
+    let(:random_sample) { (0...30).to_a.sample(15) }
+    let(:correct_index_order) { (0...30).sort_by { |index| [random_sample.count(index), index] }.reverse }
 
     before do
-      interventions.each_with_index do |intervention, index|
-        intervention.created_at = DateTime.now + index.hours
-      end
-
       random_sample.each do |index|
         Star.create(user_id: other_researcher.id, intervention_id: interventions[index].id)
       end
 
-      (0...30).to_a.sample(10).each do |i|
-        Star.create(user_id: other_admin.id, intervention_id: interventions[i].id)
-      end
-
-      get v1_interventions_path, params: params, headers: other_researcher.create_new_auth_token
+      request
     end
 
     it 'lists the starred interventions before the unstarred ones' do
-      correct_index_order = (0...30).sort_by { |index| [random_sample.count(index), index] }.reverse
       expect(json_response['data'].pluck('id')).to eq(correct_index_order.map { |index| interventions[index].id })
+    end
+
+    context 'when other user with access to the interventions will have other interventions starred' do
+      let(:other_admin) { create(:user, :confirmed, :admin) }
+
+      before do
+        (0...30).to_a.sample(10).each do |index|
+          Star.create(user_id: other_admin.id, intervention_id: interventions[index].id)
+        end
+      end
+
+      it 'lists the starred interventions before the unstarred ones' do
+        expect(json_response['data'].pluck('id')).to eq(correct_index_order.map { |index| interventions[index].id })
+      end
     end
   end
 end
