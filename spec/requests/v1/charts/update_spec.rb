@@ -18,13 +18,15 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
   let!(:e_intervention_admin) { organization.e_intervention_admins.first }
 
   let(:headers) { user.create_new_auth_token }
-  let(:params) do
+  let!(:params) do
     {
       chart: {
         name: 'New name',
         description: 'New description',
         chart_type: 'pie_chart',
-        status: 'published'
+        status: 'published',
+        date_range_start: 2.months.ago,
+        date_range_end: DateTime.now + 2.months
       }
     }
   end
@@ -51,6 +53,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       end
 
       it 'returns proper data' do
+        # require 'pry'; binding.pry
         expect(json_response['data']).to include(
           {
             'id' => chart.id.to_s,
@@ -62,6 +65,9 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
               'trend_line' => false,
               'chart_type' => 'pie_chart',
               'position' => 1,
+              'interval_type' => 'monthly',
+              'date_range_start' => params[:chart][:date_range_start].change(usec: 0).utc.as_json,
+              'date_range_end' => params[:chart][:date_range_end].change(usec: 0).utc.as_json,
               'formula' => {
                 'payload' => '',
                 'patterns' => [{ 'color' => '#C766EA',
