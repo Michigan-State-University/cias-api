@@ -14,7 +14,7 @@ class Api::Documo::SendMultipleFaxes
     @attachments = attachments
     @include_cover_page = include_cover_page
     @fields = fields
-    @logo = logo
+    @logo = logo if logo&.attached?
   end
 
   attr_reader :fax_numbers, :attachments, :include_cover_page, :fields, :logo
@@ -52,7 +52,7 @@ class Api::Documo::SendMultipleFaxes
 
   def custom_fields
     {
-      logo: "<img src=\"#{polymorphic_url(logo)}\"></img>",
+      logo: logo.present? ? "<img src=\"#{polymorphic_url(logo)}\" style=\"max-height: 200px\"></img>" : '',
       senderName: fields[:cover_letter_sender],
       subject: fields[:name],
       notes: fields[:cover_letter_description],

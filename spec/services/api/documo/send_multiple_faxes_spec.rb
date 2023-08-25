@@ -20,4 +20,14 @@ describe Api::Documo::SendMultipleFaxes do
     expect(subject[:status]).to eq 200
     expect(subject[:body]).to match(File.open('spec/fixtures/integrations/documo/send_multiple_faxes.json') { |file| JSON.parse(file) })
   end
+
+  context 'without logo' do
+    subject { described_class.new(fax_numbers, attachments, include_cover_page, fields, logo) }
+
+    let!(:logo) { nil }
+
+    it '#custom_fields returns correct hash' do
+      expect(subject.send(:custom_fields)).to include(logo: '')
+    end
+  end
 end
