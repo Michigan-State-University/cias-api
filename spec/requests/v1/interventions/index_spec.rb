@@ -213,8 +213,8 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         intervention.created_at = DateTime.now + index.hours
       end
 
-      random_sample.each do |i|
-        Star.create(user_id: other_researcher.id, intervention_id: interventions[i].id)
+      random_sample.each do |index|
+        Star.create(user_id: other_researcher.id, intervention_id: interventions[index].id)
       end
 
       (0...30).to_a.sample(10).each do |i|
