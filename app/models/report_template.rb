@@ -24,6 +24,8 @@ class ReportTemplate < ApplicationRecord
 
   delegate :ability_to_update_for?, to: :session
 
+  before_update :remove_template_from_third_party_questions_if_report_is_for_participant
+
   after_destroy :remove_template_from_third_party_questions
 
   enum report_for: {
@@ -61,5 +63,9 @@ class ReportTemplate < ApplicationRecord
       end
       question.update!(body: question.body)
     end
+  end
+
+  def remove_template_from_third_party_questions_if_report_is_for_participant
+    remove_template_from_third_party_questions if report_for_was == 'third_party' && report_for != 'third_party'
   end
 end
