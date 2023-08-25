@@ -261,7 +261,8 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     end
 
     it 'lists the starred interventions before the unstarred ones' do
-      expect(json_response['data'].pluck('id')).to eq(correct_index_order.map { |index| interventions[index].id }) end
+      expect(json_response['data'].pluck('id')).to eq(correct_index_order.map { |index| interventions[index].id })
+    end
 
     context 'when other user with access to the interventions will have other interventions starred' do
       let(:other_admin) { create(:user, :confirmed, :admin) }
