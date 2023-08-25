@@ -8,4 +8,11 @@ class InterventionMailer::ClearDataMailer < ApplicationMailer
 
     mail(to: user.email, subject: I18n.t('mailer.clear_data.subject'))
   end
+
+  def data_deleted(user, intervention)
+    @user = user
+    @intervention = intervention
+
+    mail(to: user.email, subject: I18n.t('mailer.data_removed.subject'))
+  end
 end

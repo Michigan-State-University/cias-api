@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe DataClearJobs::InformAndSchedule, type: :job do
-  subject { described_class.perform_now(intervention.id) }
+  subject { described_class.perform_now(intervention.id, delay) }
 
   let!(:intervention) { create(:intervention, :with_pdf_report, :with_conversations_transcript, user: create(:user, :researcher)) }
   let!(:user_intervention2) { create(:user_intervention, intervention: intervention, user: create(:user, :guest, :confirmed)) }
+  let(:delay) { 5 }
 
   before do
     ActiveJob::Base.queue_adapter = :test
@@ -21,6 +22,20 @@ RSpec.describe DataClearJobs::InformAndSchedule, type: :job do
     it 'sends emails only for participants' do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
       expect(ActionMailer::Base.deliveries.last.to).to eq [participant.email]
+    end
+
+    it 'correct email was called' do
+      expect(InterventionMailer::ClearDataMailer).to receive(:inform)
+      subject
+    end
+
+    context 'when delay is 0' do
+      let(:delay) { 0 }
+
+      it 'correct email was called' do
+        expect(InterventionMailer::ClearDataMailer).to receive(:data_deleted)
+        subject
+      end
     end
   end
 
