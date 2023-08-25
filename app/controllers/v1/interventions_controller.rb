@@ -65,6 +65,18 @@ class V1::InterventionsController < V1Controller
     redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention_load.conversations_transcript, only_path: true))
   end
 
+  def clear_user_data
+    authorize! :clear_protected_intervention, intervention_load
+
+    return head :forbidden unless intervention_load.sensitive_data_collected?
+    return head :forbidden unless clear_data_ability?
+
+    DataClearJobs::InformAndSchedule.perform_later(intervention_load.id, number_of_days_to_remove)
+    intervention_load.update!(sensitive_data_state: 'marked_to_remove', clear_sensitive_data_scheduled_at: DateTime.now + number_of_days_to_remove.days)
+
+    render json: serialized_response(intervention_load)
+  end
+
   private
 
   def interventions_scope
@@ -113,5 +125,14 @@ class V1::InterventionsController < V1Controller
       question: [],
       sms_plan: []
     }
+  end
+
+  def clear_data_ability?
+    intervention_load.ability_to_update_for?(current_v1_user) && intervention_load.user_id == current_v1_user.id && intervention_load.status.in?(%w[closed
+                                                                                                                                                    archived])
+  end
+
+  def number_of_days_to_remove
+    params[:delay].to_i
   end
 end

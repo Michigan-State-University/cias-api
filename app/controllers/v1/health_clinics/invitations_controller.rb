@@ -34,12 +34,6 @@ class V1::HealthClinics::InvitationsController < V1Controller
         find_by!(invitation_token: params.require(:invitation_token))
   end
 
-  def redirect_to_web_app(**message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
-  end
-
   def health_clinic
     @health_clinic ||= HealthClinic.accessible_by(current_ability).find(params[:health_clinic_id])
   end

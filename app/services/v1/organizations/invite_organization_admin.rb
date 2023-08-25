@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
-class V1::Organizations::InviteOrganizationAdmin
-  def self.call(organization, email)
-    new(organization, email).call
-  end
-
+class V1::Organizations::InviteOrganizationAdmin < V1::BaseOrganizationInvitation
   def initialize(organization, email)
     @organization = organization
     @email = email
@@ -28,19 +24,7 @@ class V1::Organizations::InviteOrganizationAdmin
 
   attr_reader :organization, :email
 
-  def already_in_any_organization?
-    user&.organizable.present?
-  end
-
   def user_is_not_organization_admin?
     user&.roles&.exclude?('organization_admin')
-  end
-
-  def active_user?
-    user&.active?
-  end
-
-  def user
-    @user ||= User.find_by(email: email)
   end
 end

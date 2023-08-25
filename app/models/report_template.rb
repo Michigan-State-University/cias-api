@@ -2,6 +2,7 @@
 
 class ReportTemplate < ApplicationRecord
   include Translate
+  include ::TranslationAuxiliaryMethods
   include Clone
   has_paper_trail
   extend DefaultValues
@@ -43,17 +44,11 @@ class ReportTemplate < ApplicationRecord
   ].freeze
 
   def translate_summary(translator, source_language_name_short, destination_language_name_short)
-    original_text['summary'] = summary
-    new_summary = translator.translate(summary, source_language_name_short, destination_language_name_short)
-
-    update!(summary: new_summary)
+    translate_attribute('summary', summary, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_name(translator, source_language_name_short, destination_language_name_short)
-    original_text['name'] = name
-    new_name = translator.translate(name, source_language_name_short, destination_language_name_short)
-
-    update!(name: new_name)
+    translate_attribute('name', name, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_section_variants(translator, source_language_name_short, destination_language_name_short)
