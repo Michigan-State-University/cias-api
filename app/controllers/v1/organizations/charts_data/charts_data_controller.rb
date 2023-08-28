@@ -76,7 +76,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     data_collection = data_collection&.by_health_clinic_ids(clinic_ids) if clinic_ids.present?
     data_collection = data_collection&.where(chart_id: chart_id) if chart_id.present?
     data_collection = data_collection&.filled_between(date_range) if date_offset.present?
-    data_collection = data_collection&.joins(:chart)
+    data_collection = data_collection&.includes(:chart)
     return data_collection if statuses.blank?
 
     data_collection&.where(chart: { status: statuses })

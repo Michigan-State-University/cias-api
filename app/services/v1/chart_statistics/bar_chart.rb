@@ -12,27 +12,27 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
     patterns = chart.formula['patterns']
     default_pattern = chart.formula['default_pattern']
 
-    monthly_statistics(aggregated_data, patterns, default_pattern, chart.id)
+    periodical_statistics(aggregated_data, patterns, default_pattern, chart)
   end
 
   # rubocop:disable Lint/ShadowingOuterLocalVariable
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       charts_data_collection.find_each do |data_statistic|
-        hash[data_statistic.chart_id][data_statistic.filled_at.strftime('%B %Y')][data_statistic.label] += 1
+        hash[data_statistic.chart_id][monthly_or_quarterly_label(data_statistic.chart, data_statistic.filled_at)][data_statistic.label] += 1
       end
     end
   end
   # rubocop:enable Lint/ShadowingOuterLocalVariable
 
-  def monthly_statistics(aggregated_data, patterns, default_pattern, chart_id)
+  def periodical_statistics(aggregated_data, patterns, default_pattern, chart)
     statistics = []
     if data_offset.present?
       current_month = Time.current - data_offset.to_i.days
       current_month = current_month.beginning_of_month
       end_month = Time.current.beginning_of_month
     else
-      ordered_data = charts_data_collection.ordered_data_for_chart(chart_id)
+      ordered_data = charts_data_collection.ordered_data_for_chart(chart.id)
       current_month = first_month(ordered_data)&.beginning_of_month
       end_month = last_month(ordered_data)&.beginning_of_month
     end
@@ -40,13 +40,11 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
     return [] if current_month.nil?
 
     current_month = current_month.to_date
-
     while current_month <= end_month
-      month = current_month.strftime('%B %Y')
-      value = aggregated_data[month]
-      statistics << data_for_chart(month, value, patterns, default_pattern)
-
-      current_month = current_month.next_month
+      label = monthly_or_quarterly_label(chart, current_month)
+      value = aggregated_data[label]
+      statistics << data_for_chart(label, value, patterns, default_pattern)
+      current_month = chart.quarterly? ? current_month.next_quarter.beginning_of_quarter : current_month.next_month
     end
     statistics
   end
@@ -57,5 +55,9 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
 
   def last_month(ordered_data)
     ordered_data&.last&.filled_at
+  end
+
+  def monthly_or_quarterly_label(chart, date)
+    chart.quarterly? ? "Q#{(date.month / 3.0).ceil} #{date.year}" : date.strftime('%B %Y')
   end
 end
