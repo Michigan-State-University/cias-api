@@ -81,6 +81,7 @@ class V1::InterventionsController < V1Controller
 
   def interventions_scope
     @interventions_scope ||= Intervention.accessible_by(current_ability)
+                .with_attached_logo
                 .order(created_at: :desc)
                 .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
                              conversations_transcript_attachment])
