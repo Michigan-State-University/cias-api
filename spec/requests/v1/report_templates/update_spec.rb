@@ -122,4 +122,35 @@ RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :reques
 
     it_behaves_like 'collaboration mode - only one editor at the same time'
   end
+
+  context 'when changing the type from for third party to for participant' do
+    let(:user) { create(:user, :confirmed, :admin) }
+    let(:intervention) { create(:intervention, user: user) }
+    let(:session) { create(:session, intervention: intervention) }
+    let(:report_template) { create(:report_template, session: session, report_for: :third_party) }
+    let(:other_report_template) { create(:report_template, session: session, report_for: :third_party) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:third_party_question) { create(:question_third_party, question_group: question_group) }
+
+    let(:params) do
+      {
+        report_template: {
+          report_for: 'participant'
+        }
+      }
+    end
+
+    before do
+      third_party_question.body_data.each do |data|
+        data['report_template_ids'] << report_template.id
+        data['report_template_ids'] << other_report_template.id
+      end
+      third_party_question.update!(body: third_party_question.body)
+    end
+
+    it 'correctly deletes report template id from third party questions' do
+      request
+      expect(third_party_question.reload.body_data.map { |data| data['report_template_ids'] }).to all(eq [other_report_template.id])
+    end
+  end
 end
