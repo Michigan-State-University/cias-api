@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PUT /v1/sessions/:session_id/report_template/:id', type: :request do
+RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :request do
   let(:request) do
     patch v1_session_report_template_path(session_id: session.id, id: report_template.id),
           params: params, headers: headers

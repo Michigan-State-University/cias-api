@@ -22,7 +22,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
     authorize! :create, ReportTemplate
     authorize! :update, @session
 
-    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+    return head :forbidden unless correct_ability?
 
     new_report_template = V1::ReportTemplates::Create.call(
       report_template_params,
@@ -35,7 +35,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def update
     authorize! :update, report_template
 
-    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+    return head :forbidden unless correct_ability?
 
     V1::ReportTemplates::Update.call(
       report_template,
@@ -51,7 +51,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def destroy
     authorize! :destroy, report_template
 
-    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+    return head :forbidden unless correct_ability?
 
     report_template.destroy!
     head :no_content
@@ -60,11 +60,21 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   def remove_logo
     authorize! :remove_logo, report_template
 
-    return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
+    return head :forbidden unless correct_ability?
 
     report_template.logo.purge
 
-    render status: :ok
+    render status: :no_content
+  end
+
+  def remove_cover_letter_custom_logo
+    authorize! :remove_cover_letter_custom_logo, report_template
+
+    return head :forbidden unless correct_ability?
+
+    report_template.cover_letter_custom_logo.purge
+
+    render status: :no_content
   end
 
   def duplicate
@@ -99,7 +109,13 @@ class V1::Sessions::ReportTemplatesController < V1Controller
 
   def report_template_params
     params.require(:report_template).
-      permit(:name, :report_for, :logo, :summary, :duplicated_from_other_session_warning_dismissed)
+      permit(:name, :report_for, :logo, :cover_letter_custom_logo, :summary,
+             :has_cover_letter, :cover_letter_logo_type, :cover_letter_description, :cover_letter_sender,
+             :duplicated_from_other_session_warning_dismissed)
+  end
+
+  def correct_ability?
+    @session.ability_to_update_for?(current_v1_user)
   end
 
   def target_session

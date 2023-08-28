@@ -28,7 +28,7 @@ class Clone::ReportTemplate
         new_variant = ReportTemplate::Section::Variant.new(variant.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
         new_section.variants << new_variant
 
-        new_variant.image.attach(variant.image.blob) if variant.image.attachment
+        new_variant.image.attach(variant.image.blob) if variant.image.attached?
       end
     end
     outcome
@@ -49,8 +49,9 @@ class Clone::ReportTemplate
   end
 
   def clone_attachments
-    outcome.logo.attach(source.logo.blob) if source.logo.attachment
-    outcome.pdf_preview.attach(source.pdf_preview.blob) if source.pdf_preview.attachment
+    outcome.logo.attach(source.logo.blob) if source.logo.attached?
+    outcome.pdf_preview.attach(source.pdf_preview.blob) if source.pdf_preview.attached?
+    outcome.cover_letter_custom_logo.attach(source.cover_letter_custom_logo.blob) if source.cover_letter_custom_logo.attached?
   end
 
   def different_session?
