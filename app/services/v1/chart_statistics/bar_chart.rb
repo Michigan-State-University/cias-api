@@ -44,6 +44,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
       label = monthly_or_quarterly_label(chart, current_month)
       value = aggregated_data[label]
       statistics << data_for_chart(label, value, patterns, default_pattern)
+
       current_month = chart.quarterly? ? current_month.next_quarter.beginning_of_quarter : current_month.next_month
     end
     statistics
