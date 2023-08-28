@@ -53,7 +53,6 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       end
 
       it 'returns proper data' do
-        # require 'pry'; binding.pry
         expect(json_response['data']).to include(
           {
             'id' => chart.id.to_s,

@@ -64,7 +64,6 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
     end
 
     it 'correctly assigned data to user' do
-      # require 'pry'; binding.pry
       expect(user.reload.hfhs_patient_detail).to eq(hfhs_data)
     end
   end
