@@ -81,7 +81,6 @@ class V1::InterventionsController < V1Controller
 
   def sorted_interventions_scope
     @sorted_interventions_scope ||= Intervention.accessible_by(current_ability)
-                                                .includes(%i[logo_attachment])
                                                 .joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
                                                         ON user_stars.intervention_id = interventions.id")
                                                 .order('user_stars.user_id', 'interventions.created_at DESC')
