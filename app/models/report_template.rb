@@ -24,7 +24,7 @@ class ReportTemplate < ApplicationRecord
 
   delegate :ability_to_update_for?, to: :session
 
-  before_update :remove_template_from_third_party_questions_if_report_is_for_participant
+  before_update :cascade_report_template_type_change
 
   after_destroy :remove_template_from_third_party_questions
 
@@ -65,7 +65,7 @@ class ReportTemplate < ApplicationRecord
     end
   end
 
-  def remove_template_from_third_party_questions_if_report_is_for_participant
+  def cascade_report_template_type_change
     remove_template_from_third_party_questions if report_for_was == 'third_party' && report_for != 'third_party'
   end
 end
