@@ -229,14 +229,6 @@ RSpec.describe 'GET /v1/interventions', type: :request do
           expect(json_response['data'].pluck('id')).to include(starred_intervention.id).and not_include(not_starred_intervention.id)
         end
       end
-
-      context 'return only not starred interventions' do
-        let(:params) { { starred: false } }
-
-        it 'returns correct interventions' do
-          expect(json_response['data'].pluck('id')).to not_include(starred_intervention.id).and include(not_starred_intervention.id)
-        end
-      end
     end
   end
 

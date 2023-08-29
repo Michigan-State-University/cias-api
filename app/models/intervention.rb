@@ -67,7 +67,6 @@ class Intervention < ApplicationRecord
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
   scope :only_not_shared_with_anyone, ->(user_id) { left_joins(:collaborators).where(user_id: user_id, collaborators: { id: nil }) }
   scope :only_starred_by_me, ->(user) { where(id: user.stars.pluck(:intervention_id)) }
-  scope :only_not_starred_by_me, ->(user) { where.not(id: user.stars.pluck(:intervention_id)) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -149,7 +148,7 @@ class Intervention < ApplicationRecord
     scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
-    scope = scope.filter_if_starred(params, user)
+    scope = scope.only_starred_by_me(user) if params[:starred].present?
     scope.filter_by_name(params[:name])
   end
 
@@ -218,16 +217,5 @@ class Intervention < ApplicationRecord
     scope = scope.only_shared_by_me(user.id) if params[:only_shared_by_me].present?
     scope = scope.only_not_shared_with_anyone(user.id) if params[:only_not_shared_with_anyone].present?
     scope
-  end
-
-  def self.filter_if_starred(params, user)
-    case params[:starred]
-    when 'true'
-      all.only_starred_by_me(user)
-    when 'false'
-      all.only_not_starred_by_me(user)
-    else
-      all
-    end
   end
 end
