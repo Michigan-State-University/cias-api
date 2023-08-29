@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_15_122501) do
+ActiveRecord::Schema.define(version: 2023_08_29_180239) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -154,7 +154,7 @@ ActiveRecord::Schema.define(version: 2023_08_15_122501) do
     t.uuid "health_system_id", null: false
     t.uuid "health_clinic_id", null: false
     t.uuid "chart_id", null: false
-    t.uuid "user_id", null: false
+    t.uuid "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "filled_at"
