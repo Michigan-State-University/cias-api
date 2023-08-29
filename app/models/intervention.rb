@@ -5,7 +5,7 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
-  include ::Intervention::TranslationAuxiliaryMethods
+  include TranslationAuxiliaryMethods
   include MessageHandler
   extend DefaultValues
 
