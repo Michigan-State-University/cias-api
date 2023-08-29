@@ -164,6 +164,15 @@ RSpec.describe Intervention, type: :model do
       expect(cloned_intervention.short_links.any?).to be false
     end
 
+    context 'when the intervention is cleared' do
+      let(:intervention) { create(:intervention, sensitive_data_state: 'removed') }
+      let(:cloned_intervention) { intervention.clone }
+
+      it 'sets the reports_deleted flag to false' do
+        expect(cloned_intervention.sensitive_data_state).to eq('collected')
+      end
+    end
+
     it 'correct clone questions to cloned session' do
       cloned_intervention = intervention.clone
       cloned_sessions = cloned_intervention.sessions.order(:position)

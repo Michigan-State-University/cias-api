@@ -19,7 +19,7 @@ class V1::HealthClinics::InviteHealthClinicAdmin
       health_clinic.user_health_clinics << UserHealthClinic.new(user: new_user, health_clinic: health_clinic)
     else
       health_clinic.user_health_clinics << UserHealthClinic.new(user: user, health_clinic: health_clinic)
-      V1::HealthClinics::Invitations::Create.call(health_clinic, user)
+      V1::Organizations::Invitations::Create.call(health_clinic, user)
     end
   end
 

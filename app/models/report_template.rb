@@ -2,6 +2,7 @@
 
 class ReportTemplate < ApplicationRecord
   include Translate
+  include ::TranslationAuxiliaryMethods
   include Clone
   has_paper_trail
   extend DefaultValues
@@ -16,6 +17,7 @@ class ReportTemplate < ApplicationRecord
   attribute :original_text, :json, default: assign_default_values('original_text')
 
   has_one_attached :logo
+  has_one_attached :cover_letter_custom_logo
   has_one_attached :pdf_preview
 
   validates :name, :report_for, presence: true
@@ -31,22 +33,22 @@ class ReportTemplate < ApplicationRecord
     henry_ford_health: 'henry_ford_health'
   }
 
+  enum cover_letter_logo_type: {
+    no_logo: 'no_logo',
+    report_logo: 'report_logo',
+    custom: 'custom'
+  }, _default: 'report_logo'
+
   ATTR_NAMES_TO_COPY = %w[
     name report_for summary
   ].freeze
 
   def translate_summary(translator, source_language_name_short, destination_language_name_short)
-    original_text['summary'] = summary
-    new_summary = translator.translate(summary, source_language_name_short, destination_language_name_short)
-
-    update!(summary: new_summary)
+    translate_attribute('summary', summary, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_name(translator, source_language_name_short, destination_language_name_short)
-    original_text['name'] = name
-    new_name = translator.translate(name, source_language_name_short, destination_language_name_short)
-
-    update!(name: new_name)
+    translate_attribute('name', name, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_section_variants(translator, source_language_name_short, destination_language_name_short)

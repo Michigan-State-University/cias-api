@@ -62,6 +62,7 @@ Rails.application.routes.draw do
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
+      delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
@@ -100,6 +101,7 @@ Rails.application.routes.draw do
         resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
+          delete :remove_cover_letter_custom_logo
           post :duplicate
         end
       end

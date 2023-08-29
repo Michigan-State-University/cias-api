@@ -454,6 +454,8 @@ ActiveRecord::Schema.define(version: 2023_08_24_084009) do
     t.uuid "current_editor_id"
     t.integer "conversations_count"
     t.integer "navigators_count", default: 0
+    t.string "sensitive_data_state", default: "collected", null: false
+    t.datetime "clear_sensitive_data_scheduled_at"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -709,6 +711,10 @@ ActiveRecord::Schema.define(version: 2023_08_24_084009) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.boolean "has_cover_letter", default: false, null: false
+    t.string "cover_letter_logo_type", default: "report_logo", null: false
+    t.string "cover_letter_description"
+    t.string "cover_letter_sender"
     t.boolean "is_duplicated_from_other_session", default: false, null: false
     t.boolean "duplicated_from_other_session_warning_dismissed", default: false, null: false
     t.index ["report_for"], name: "index_report_templates_on_report_for"
