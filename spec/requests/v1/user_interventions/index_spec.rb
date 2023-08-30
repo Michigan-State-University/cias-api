@@ -48,8 +48,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'image_alt' => nil,
               'logo_url' => nil,
               'files' => [],
-              'live_chat_enabled' => false,
-              'has_assigned_navigators' => false
+              'live_chat_enabled' => false
             }
           }
         },
@@ -71,8 +70,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'image_alt' => nil,
               'logo_url' => nil,
               'files' => [],
-              'live_chat_enabled' => false,
-              'has_assigned_navigators' => false
+              'live_chat_enabled' => false
             }
           }
         },
@@ -94,8 +92,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'image_alt' => nil,
               'logo_url' => nil,
               'files' => [],
-              'live_chat_enabled' => false,
-              'has_assigned_navigators' => false
+              'live_chat_enabled' => false
             }
           }
         },
@@ -117,8 +114,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'image_alt' => nil,
               'logo_url' => nil,
               'files' => [],
-              'live_chat_enabled' => false,
-              'has_assigned_navigators' => false
+              'live_chat_enabled' => false
             }
           }
         }
@@ -143,7 +139,6 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'id' => intervention.id,
               'image_alt' => nil,
               'live_chat_enabled' => false,
-              'has_assigned_navigators' => false,
               'logo_url' => nil,
               'name' => intervention.name,
               'type' => 'Intervention'

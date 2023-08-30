@@ -30,18 +30,6 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
     it 'returns correct intervention type' do
       expect(json_response['data']['attributes']['intervention']['type']).to eq intervention.type
     end
-
-    it 'returns correct information about assigned navigators' do
-      expect(json_response['data']['attributes']['intervention']['has_assigned_navigators']).to be false
-    end
-
-    context 'when intervention has navigators' do
-      let!(:intervention) { create(:intervention, :with_navigators, user: user, status: 'published', shared_to: 'registered') }
-
-      it 'returns correct information about assigned navigators' do
-        expect(json_response['data']['attributes']['intervention']['has_assigned_navigators']).to be true
-      end
-    end
   end
 
   context 'user_intervention with multiple sessions' do
