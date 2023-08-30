@@ -19,7 +19,7 @@ class Link < ApplicationRecord
   end
 
   def self.shorten(url, slug = '')
-    link = Link.find_by(url: url, slug: slug)
+    link = slug.blank? ? Link.find_by(url: url) : Link.find_by(url: url, slug: slug)
     return link.short if link
 
     link = Link.new(url: url, slug: slug)
