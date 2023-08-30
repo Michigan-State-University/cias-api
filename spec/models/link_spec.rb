@@ -34,5 +34,13 @@ RSpec.describe Link, type: :model do
       short_url = described_class.shorten(url, slug)
       expect(short_url).to eq(Rails.application.routes.url_helpers.v1_short_url(slug: slug))
     end
+
+    context 'when slug is too long' do
+      let(:slug) { SecureRandom.base58(256) }
+
+      it '#short with custom slug' do
+        expect { described_class.shorten(url, slug) }.to raise_error(ActiveRecord::ActiveRecordError)
+      end
+    end
   end
 end

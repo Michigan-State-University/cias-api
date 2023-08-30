@@ -6,7 +6,7 @@ class Link < ApplicationRecord
   validates :url, presence: true
   validates :url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https])
   validates :slug, uniqueness: true
-  validates :slug, length: { within: 3..255, on: :create, message: 'too long' }
+  validates :slug, length: { within: 3..255, on: :create }
 
   before_validation :generate_slug
 
@@ -15,16 +15,19 @@ class Link < ApplicationRecord
   end
 
   def generate_slug
-    self.slug = SecureRandom.uuid[0..5] if slug.blank?
+    self.slug = SecureRandom.base58(6) if slug.blank?
   end
 
   def self.shorten(url, slug = '')
-    link = slug.blank? ? Link.find_by(url: url) : Link.find_by(url: url, slug: slug)
-    return link.short if link
+    raise ActiveRecord::ActiveRecordError, I18n.t('activerecord.errors.models.link.slug.too_long') if slug.length > 255
 
-    link = Link.new(url: url, slug: slug)
+    link = if slug.blank?
+             Link.find_or_initialize_by(url: url)
+           else
+             Link.find_or_initialize_by(url: url, slug: slug)
+           end
     return link.short if link.save
 
-    Link.shorten(url, slug + SecureRandom.uuid[0..2])
+    Link.shorten(url, slug + SecureRandom.base58(2))
   end
 end

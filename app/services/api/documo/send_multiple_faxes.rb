@@ -52,11 +52,17 @@ class Api::Documo::SendMultipleFaxes
 
   def custom_fields
     {
-      logo: logo.present? ? "<img src=\"#{Link.shorten(polymorphic_url(logo), 'report_logo')}\" style=\"max-height: 200px\"></img>" : '',
+      logo: img_url,
       senderName: fields[:cover_letter_sender],
       subject: fields[:name],
       notes: fields[:cover_letter_description],
       recipientName: fields[:receiver]
     }
+  end
+
+  def img_url
+    return '' if logo.blank?
+
+    "<img src=\"#{Link.shorten(polymorphic_url(logo), 'report_logo')}\" style=\"max-height: 200px\">"
   end
 end
