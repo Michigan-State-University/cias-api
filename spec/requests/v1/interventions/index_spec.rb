@@ -201,6 +201,37 @@ RSpec.describe 'GET /v1/interventions', type: :request do
     end
   end
 
+  # make sure its independent of stars of other users
+  ([false, true]).product([false, true]).each do |flag1, flag2|
+    context 'when filtering by whether an intervention is starred' do
+      let!(:starred_intervention) { create(:intervention, user: user) }
+      let!(:not_starred_intervention) { create(:intervention, user: user) }
+
+      before do
+        Star.create(user_id: user.id, intervention_id: starred_intervention.id)
+        Star.create(user_id: researcher.id, intervention_id: starred_intervention.id) if flag1
+        Star.create(user_id: researcher.id, intervention_id: not_starred_intervention.id) if flag2
+        get v1_interventions_path, params: params, headers: user.create_new_auth_token
+      end
+
+      context 'return all interventions when starred not specified' do
+        let(:params) { {} }
+
+        it 'returns correct interventions' do
+          expect(json_response['data'].pluck('id')).to include(starred_intervention.id).and include(not_starred_intervention.id)
+        end
+      end
+
+      context 'return only starred interventions' do
+        let(:params) { { starred: true } }
+
+        it 'returns correct interventions' do
+          expect(json_response['data'].pluck('id')).to include(starred_intervention.id).and not_include(not_starred_intervention.id)
+        end
+      end
+    end
+  end
+
   context 'when some interventions are starred' do
     let(:other_researcher) { create(:user, :confirmed, :researcher) }
 
