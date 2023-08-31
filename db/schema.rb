@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_21_104043) do
+ActiveRecord::Schema.define(version: 2023_08_29_180239) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -154,7 +154,7 @@ ActiveRecord::Schema.define(version: 2023_08_21_104043) do
     t.uuid "health_system_id", null: false
     t.uuid "health_clinic_id", null: false
     t.uuid "chart_id", null: false
-    t.uuid "user_id", null: false
+    t.uuid "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "filled_at"
@@ -453,6 +453,8 @@ ActiveRecord::Schema.define(version: 2023_08_21_104043) do
     t.integer "current_narrator", default: 0
     t.uuid "current_editor_id"
     t.integer "conversations_count"
+    t.string "sensitive_data_state", default: "collected", null: false
+    t.datetime "clear_sensitive_data_scheduled_at"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -708,6 +710,10 @@ ActiveRecord::Schema.define(version: 2023_08_21_104043) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.boolean "has_cover_letter", default: false, null: false
+    t.string "cover_letter_logo_type", default: "report_logo", null: false
+    t.string "cover_letter_description"
+    t.string "cover_letter_sender"
     t.boolean "is_duplicated_from_other_session", default: false, null: false
     t.boolean "duplicated_from_other_session_warning_dismissed", default: false, null: false
     t.index ["report_for"], name: "index_report_templates_on_report_for"

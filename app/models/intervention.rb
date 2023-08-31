@@ -5,7 +5,7 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
-  include ::Intervention::TranslationAuxiliaryMethods
+  include ::TranslationAuxiliaryMethods
   extend DefaultValues
 
   CURRENT_VERSION = '1'
@@ -30,8 +30,8 @@ class Intervention < ApplicationRecord
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true
 
-  has_many_attached :reports
-  has_many_attached :files
+  has_many_attached :reports, dependent: :purge_later # generated csv files for the researcher
+  has_many_attached :files # files for the participant added in modular intervention
   has_one_attached :logo, dependent: :purge_later
 
   has_many :short_links, as: :linkable, dependent: :destroy
@@ -72,6 +72,7 @@ class Intervention < ApplicationRecord
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
   enum current_narrator: { peedy: 0, emmi: 1 }
+  enum sensitive_data_state: { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, _prefix: :sensitive_data
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
@@ -188,6 +189,20 @@ class Intervention < ApplicationRecord
 
   def intervention_have_cat_mh_sessions?
     sessions.where(type: 'Session::CatMh').any?
+  end
+
+  def translation_prefix(destination_language_name_short)
+    update!(name: "(#{destination_language_name_short.upcase}) #{name}")
+  end
+
+  def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
+    translate_attribute('additional_text', additional_text, translator, source_language_name_short, destination_language_name_short)
+  end
+
+  def translate_sessions(translator, source_language_name_short, destination_language_name_short)
+    sessions.each do |session|
+      session.translate(translator, source_language_name_short, destination_language_name_short)
+    end
   end
 
   def navigators_from_team

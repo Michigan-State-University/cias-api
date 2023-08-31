@@ -78,7 +78,8 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     let!(:last_third_party_report_template) { session.report_templates.third_party.last }
     let!(:question7) do
       create(:question_third_party, question_group: question_group2, subtitle: 'Question Subtitle 7', position: 4,
-                                    body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }] })
+                                    body: { data: [{ payload: '', value: '', report_template_ids: [last_third_party_report_template.id] }],
+                                            variable: { name: '' } })
     end
 
     let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }

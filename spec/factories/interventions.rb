@@ -28,6 +28,10 @@ FactoryBot.define do
       end
     end
 
+    trait :with_conversations_transcript do
+      conversations_transcript { FactoryHelpers.upload_file('spec/fixtures/csv/example.csv', binary: true) }
+    end
+
     trait :with_collaborators do
       after(:build) do |intervention|
         intervention.collaborators << create(:collaborator, user: create(:user, :researcher, :confirmed))
@@ -64,6 +68,14 @@ FactoryBot.define do
       after(:create) do |intervention|
         intervention.navigator_setup.update!(message_phone: Phone.new(number: '222222222', prefix: '+48', iso: 'PL', communication_way: 'message'))
       end
+    end
+
+    trait :with_csv_file do
+      files { [FactoryHelpers.upload_file('spec/fixtures/csv/example.csv', binary: true)] }
+    end
+
+    trait :with_pdf_report do
+      reports { [FactoryHelpers.upload_file('spec/fixtures/pdf/example_report.pdf', binary: true)] }
     end
   end
 

@@ -40,11 +40,24 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/csv_attachment', type: :r
 
     before do
       intervention.collaborators.first.update!(data_access: true)
-      request
     end
 
     it 'returns OK' do
+      request
       expect(response).to have_http_status(:found)
+    end
+
+    context 'when collaborator is also an admin' do
+      let(:user) { create(:user, :admin, :confirmed) }
+
+      before do
+        Collaborator.create!(intervention: intervention, user: user, data_access: true)
+        request
+      end
+
+      it 'returns OK' do
+        expect(response).to have_http_status(:found)
+      end
     end
   end
 end

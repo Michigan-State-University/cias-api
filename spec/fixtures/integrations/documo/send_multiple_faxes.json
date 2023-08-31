@@ -1,0 +1,57 @@
+{
+  "success": [
+    {
+      "errorInfo": null,
+      "resultInfo": "OK",
+      "messageId": "b7e9f6e9-9a3e-4677-b28c-0ef4c4cfe871",
+      "pagesComplete": 0,
+      "resultCode": "0",
+      "isArchived": false,
+      "isFilePurged": false,
+      "status": "processing",
+      "faxNumber": "+12022222242",
+      "faxCsid": "mFax",
+      "faxCallerId": "1203363964",
+      "direction": "outbound",
+      "accountId": "09319e76-897c-4cc1-ad35-ac83d388e3dd",
+      "country": "US",
+      "pagesCount": 2,
+      "channelType": "api",
+      "createdAt": "2023-08-22T06:38:35.801Z",
+      "cf": {
+        "logo": "<img src=\"https://picsum.photos/200\"></img>"
+      }
+    },
+    {
+      "errorInfo": null,
+      "resultInfo": "OK",
+      "messageId": "4982997d-2074-425f-a72d-782827558ce2",
+      "pagesComplete": 0,
+      "resultCode": "0",
+      "isArchived": false,
+      "isFilePurged": false,
+      "status": "processing",
+      "faxNumber": "+12022222243",
+      "faxCsid": "mFax",
+      "faxCallerId": "1203363964",
+      "direction": "outbound",
+      "accountId": "09319e76-897c-4cc1-ad35-ac83d388e3dd",
+      "country": "US",
+      "pagesCount": 2,
+      "channelType": "api",
+      "createdAt": "2023-08-22T06:38:38.607Z",
+      "cf": {
+        "logo": "<img src=\"https://picsum.photos/200\"></img>"
+      }
+    }
+  ],
+  "errors": [],
+  "body": {
+    "coverPage": true,
+    "coverPageId": "9998d00d-d8d6-4d60-90c5-a022051087e0",
+    "cf": {
+      "logo": "<img src=\"https://picsum.photos/200\"></img>"
+    },
+    "isUrgent": false
+  }
+}

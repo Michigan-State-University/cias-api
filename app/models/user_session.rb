@@ -18,8 +18,21 @@ class UserSession < ApplicationRecord
     answers.confirmed.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|
         key = include_session_var ? "#{session.variable}.#{obj['var']}" : obj['var']
-        var_values[key] = obj['value']
+        var_values[key] = map_to_numeric_value(obj, answer)
       end
+    end
+  end
+
+  def map_to_numeric_value(obj, answer)
+    return obj['value'] unless answer.class.in? [Answer::ParticipantReport, Answer::Phone, Answer::ThirdParty]
+
+    case answer.class.name
+    when 'Answer::ParticipantReport'
+      obj['value']['receive_report'] && 1 || 0
+    when 'Answer::Phone'
+      obj['value']['confirmed'] && 1 || 0
+    when 'Answer::ThirdParty'
+      obj['numeric_value']
     end
   end
 

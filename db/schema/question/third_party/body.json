@@ -21,6 +21,9 @@
                 "type": "string"
               }
             },
+            "numeric_value": {
+              "type": "string"
+            },
             "original_text": {
               "type": "string"
             }
@@ -33,6 +36,18 @@
           "additionalProperties": false
         }
       ]
+    },
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
     }
   },
   "required": [
