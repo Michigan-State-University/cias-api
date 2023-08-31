@@ -49,8 +49,4 @@ class V1::UserSessionSerializer < V1Serializer
   attribute :live_chat_enabled do |object|
     object.session.intervention.live_chat_enabled
   end
-
-  attribute :has_assigned_navigators do |object|
-    object.session.intervention.navigators_count.positive?
-  end
 end
