@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 RSpec.describe UserSession, type: :model do
+  WebMock.disable!
+  WebMock.allow_net_connect!
+
   context 'UserSession' do
     subject { create(:user_session) }
 
