@@ -18,6 +18,7 @@ class Intervention < ApplicationRecord
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :intervention_accesses, dependent: :destroy
+  has_many :stars, dependent: :destroy
   has_one :navigator_setup, class_name: 'LiveChat::Interventions::NavigatorSetup', dependent: :destroy
   has_many :conversations, class_name: 'LiveChat::Conversation', dependent: :restrict_with_exception
   has_many :live_chat_navigator_invitations, class_name: 'LiveChat::Interventions::NavigatorInvitation', dependent: :destroy
@@ -65,6 +66,7 @@ class Intervention < ApplicationRecord
   scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
   scope :only_not_shared_with_anyone, ->(user_id) { left_joins(:collaborators).where(user_id: user_id, collaborators: { id: nil }) }
+  scope :only_starred_by_me, ->(user) { where(id: user.stars.pluck(:intervention_id)) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
@@ -147,6 +149,7 @@ class Intervention < ApplicationRecord
     scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
+    scope = scope.only_starred_by_me(user) if params[:starred].present?
     scope.filter_by_name(params[:name])
   end
 
@@ -162,6 +165,10 @@ class Intervention < ApplicationRecord
 
   def module_intervention?
     false
+  end
+
+  def starred_by?(user_id)
+    stars.find_by(user_id: user_id).present?
   end
 
   def create_navigator_setup

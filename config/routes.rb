@@ -71,6 +71,8 @@ Rails.application.routes.draw do
         resources :short_links, only: %i[create index]
         resources :collaborators, only: %i[create index destroy update]
         get 'permission', to: 'collaborators#show'
+        post 'star', to: 'stars#create', as: :create_star
+        delete 'star', to: 'stars#destroy', as: :destroy_star
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'

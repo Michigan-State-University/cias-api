@@ -64,7 +64,8 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         expect(json_response['data']['attributes']).to include(
           'name' => 'New Intervention',
           'status' => 'published',
-          'shared_to' => 'anyone'
+          'shared_to' => 'anyone',
+          'starred' => false
         )
       end
 
