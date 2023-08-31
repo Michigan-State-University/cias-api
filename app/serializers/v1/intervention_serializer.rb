@@ -12,7 +12,11 @@ class V1::InterventionSerializer < V1Serializer
   has_many :sessions, serializer: V1::SessionSerializer
   has_many :clinic_locations, serializer: V1::ClinicLocationSerializer
 
-  cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours)  # temporary length, might be a subject to change
+  cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours) # temporary length, might be a subject to change
+
+  attribute :starred do |object, params|
+    object.starred_by?(params[:current_user_id])
+  end
 
   attribute :files do |object|
     files_info(object) if object.files.attached?
@@ -74,5 +78,13 @@ class V1::InterventionSerializer < V1Serializer
     object.files.map do |file|
       map_file_data(file)
     end
+  end
+
+  def self.record_cache_options(options, fieldset, include_list, params)
+    return super(options, fieldset, include_list, params) if params[:current_user_id].blank?
+
+    options = options.dup
+    options[:namespace] += ":#{params[:current_user_id]}"
+    options
   end
 end

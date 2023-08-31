@@ -808,6 +808,14 @@ ActiveRecord::Schema.define(version: 2023_08_29_180239) do
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
+  create_table "stars", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.index ["intervention_id"], name: "index_stars_on_intervention_id"
+    t.index ["user_id", "intervention_id"], name: "index_stars_on_user_id_and_intervention_id", unique: true
+    t.index ["user_id"], name: "index_stars_on_user_id"
+  end
+
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "team_id"
@@ -1041,6 +1049,8 @@ ActiveRecord::Schema.define(version: 2023_08_29_180239) do
   add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
+  add_foreign_key "stars", "interventions"
+  add_foreign_key "stars", "users"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
