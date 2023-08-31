@@ -4,6 +4,8 @@ class DataClearJobs::ClearUserData < ApplicationJob
   def perform(intervention_id)
     intervention = Intervention.find(intervention_id)
     ActiveRecord::Base.transaction do
+      V1::SmsPlans::CancelScheduledSmses.call(intervention_id)
+
       intervention.reports.destroy_all # remove all csv files
       intervention.user_interventions.destroy_all
       intervention.conversations.destroy_all
