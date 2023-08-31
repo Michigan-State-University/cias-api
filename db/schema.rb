@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_29_180239) do
+ActiveRecord::Schema.define(version: 2023_08_30_041924) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -475,6 +475,14 @@ ActiveRecord::Schema.define(version: 2023_08_29_180239) do
     t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
+  end
+
+  create_table "links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "url"
+    t.string "slug"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["url", "slug"], name: "index_links_on_url_and_slug", unique: true
   end
 
   create_table "live_chat_conversations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
