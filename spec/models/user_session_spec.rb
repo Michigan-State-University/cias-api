@@ -197,12 +197,12 @@ RSpec.describe UserSession, type: :model do
       let!(:user_session) { create(:user_session) }
 
       it '#destroy - calls decrement_audio_usage' do
-        allow_any_instance_of(described_class).to receive(:decrement_audio_usage)
+        expect(user_session).to receive(:decrement_audio_usage)
         user_session.destroy
       end
 
       it '#destroy - calls cancel_timeout_job' do
-        allow_any_instance_of(described_class).to receive(:cancel_timeout_job)
+        expect(user_session).to receive(:cancel_timeout_job)
         user_session.destroy
       end
     end

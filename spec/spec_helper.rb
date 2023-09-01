@@ -242,6 +242,12 @@ RSpec.configure do |config|
         scope: 'system/Patient.read'
       }
     )
+
+    allow_any_instance_of(Api::CatMh::TerminateSession).to receive(:call).and_return(
+      {
+        status: 200
+      }
+    )
   end
 
   config.before :suite do
