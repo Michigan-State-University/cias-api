@@ -15,6 +15,7 @@ class V1::ChartStatistics::Create
     return if health_clinic.nil?
     return if dentaku_service.exist_missing_variables?
     return if zero_division_error?
+    return if inside_date_range?
 
     ChartStatistic.find_or_create_by!(
       label: label,
@@ -67,5 +68,12 @@ class V1::ChartStatistics::Create
 
   def zero_division_error?
     calculated_formula == Chart::ZERO_DIVISION_ERROR
+  end
+
+  def inside_date_range?
+    return false if chart.date_range_start.present? && chart.date_range_start > user_session.finished_at
+    return false if chart.date_range_end.present? && chart.date_range_end < user_session.finished_at
+
+    true
   end
 end
