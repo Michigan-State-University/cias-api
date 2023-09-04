@@ -119,6 +119,9 @@ class User < ApplicationRecord
   scope :participants, -> { limit_to_roles('participant') }
   scope :limit_to_active, -> { where(active: true) }
   scope :limit_to_roles, ->(roles) { where('ARRAY[?]::varchar[] && roles', roles) if roles.present? }
+  scope :predefined_participants_in_intervention, lambda { |intervention_id|
+    limit_to_roles('predefined_participant').joins(:predefined_user_parameter).where(predefined_user_parameter: { intervention_id: intervention_id })
+  }
 
   # rubocop:disable Layout/LineLength
   scope :active_users_invited_to_organizations, ->(organization_ids) { left_joins(:organization_invitations).where('organization_invitations.organization_id IN (?) AND organization_invitations.accepted_at IS NOT NULL', organization_ids) }
