@@ -5,12 +5,12 @@ class Ability::PredefinedParticipant < Ability::Base
 
   def definition
     super
-    guest if role?(class_name)
+    predefined_participant if role?(class_name)
   end
 
   private
 
-  def guest
+  def predefined_participant
     enable_fill_in_access(user.id, { status: 'published', shared_to: 'anyone' })
     can %i[index create], LiveChat::Conversation
   end
