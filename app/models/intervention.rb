@@ -5,7 +5,8 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
-  include ::TranslationAuxiliaryMethods
+  include TranslationAuxiliaryMethods
+  include MessageHandler
   extend DefaultValues
 
   CURRENT_VERSION = '1'
