@@ -43,7 +43,7 @@ class NotificationChannel < ApplicationCable::Channel
     interventions.find_each do |intervention|
       navigators = intervention.navigators.reload.where(online: true)
       status, topic = navigator_availability_status(navigators.size)
-      ActionCable.server.broadcast("intervention_channel_#{intervention.id}", { interventionId: intervention.id, topic: topic, status: status })
+      ActionCable.server.broadcast("navigators_in_intervention_channel_#{intervention.id}", { interventionId: intervention.id, topic: topic, status: status })
 
       update_navigator_status_in_conversations(intervention)
     end

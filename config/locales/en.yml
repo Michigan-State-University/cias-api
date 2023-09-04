@@ -28,6 +28,9 @@ en:
   activerecord:
     errors:
       models:
+        link:
+          slug:
+            too_long: "couldn't generate a unique key for this record"
         collaborator:
           attributes:
             user:
