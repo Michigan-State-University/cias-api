@@ -101,6 +101,9 @@ class User < ApplicationRecord
   # COLLABORATIONS
   has_many :collaborations, class_name: 'Collaborator', dependent: :destroy
 
+  # STARS
+  has_many :stars, dependent: :destroy
+
   # SCOPES
   scope :confirmed, -> { where.not(confirmed_at: nil) }
   scope :researchers, -> { limit_to_roles('researcher') }

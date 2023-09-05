@@ -8,12 +8,15 @@ RSpec.describe V1::UserSessionScheduleService do
   let!(:second_session) do
     create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at)
   end
+  let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Health Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Heath System', organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
-  let!(:user_session_not_belongs_to_organization) { create(:user_session, user: user, session: first_session) }
-  let!(:user_session_belongs_to_organization) { create(:user_session, user: user, session: first_session, health_clinic: health_clinic) }
+  let!(:user_session_not_belongs_to_organization) { create(:user_session, user: user, session: first_session, user_intervention: user_intervention) }
+  let!(:user_session_belongs_to_organization) do
+    create(:user_session, user: user, session: first_session, health_clinic: health_clinic, user_intervention: user_intervention)
+  end
   let!(:user_sessions) do
     {
       'user_session_not_belongs_to_organization' => user_session_not_belongs_to_organization,
@@ -33,8 +36,10 @@ RSpec.describe V1::UserSessionScheduleService do
   end
 
   context 'when user is preview_session' do
-    let!(:user_session_not_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session) }
-    let!(:user_session_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session, health_clinic: health_clinic) }
+    let!(:user_session_not_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session, user_intervention: user_intervention) }
+    let!(:user_session_belongs_to_organization) do
+      create(:user_session, user: preview_user, session: first_session, health_clinic: health_clinic, user_intervention: user_intervention)
+    end
     let!(:user_sessions) do
       {
         'user_session_not_belongs_to_organization' => user_session_not_belongs_to_organization,
@@ -116,7 +121,7 @@ RSpec.describe V1::UserSessionScheduleService do
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
-                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic, user_intervention.id)
                                                                          .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
             end
 
@@ -135,7 +140,7 @@ RSpec.describe V1::UserSessionScheduleService do
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
-                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic, user_intervention.id)
                                                                          .at(a_value_within(1.second).of(Date.parse(schedule_at).noon))
             end
 
@@ -162,7 +167,7 @@ RSpec.describe V1::UserSessionScheduleService do
 
               it 'schedules on correct time' do
                 expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
-                                                                           .with(second_session.id, user.id, user_session.health_clinic)
+                                                                           .with(second_session.id, user.id, user_session.health_clinic, user_intervention.id)
                                                                            .at(a_value_within(1.second).of((tomorrow + schedule_payload.days).noon))
               end
 
