@@ -3,9 +3,19 @@
 # frozen_string_require: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
-  def show; end
+  def show
+    authorize! :read, Intervention
+    authorize! :read, intervention_load
 
-  def index; end
+    render json: serialized_response(predefined_participant)
+  end
+
+  def index
+    authorize! :read, Intervention
+    authorize! :read, intervention_load
+
+    render json: serialized_response(predefined_participants)
+  end
 
   def create
     authorize! :update, Intervention
@@ -40,7 +50,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def predefined_participants
-    @predefined_participants ||= intervention_load.predefined_users
+    @predefined_participants ||= intervention_load.predefined_users.includes(:predefined_user_parameter, :phone)
   end
 
   def predefined_participant

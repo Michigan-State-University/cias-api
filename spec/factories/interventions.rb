@@ -77,6 +77,14 @@ FactoryBot.define do
     trait :with_pdf_report do
       reports { [FactoryHelpers.upload_file('spec/fixtures/pdf/example_report.pdf', binary: true)] }
     end
+
+    trait :with_predefined_participants do
+      after(:create) do |intervention|
+        create_list(:user, 5, :predefined_participant, :confirmed).each do |user|
+          create(:predefined_user_parameter, intervention: intervention, user: user)
+        end
+      end
+    end
   end
 
   factory :intervention_with_logo, class: Intervention do
