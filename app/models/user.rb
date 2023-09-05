@@ -21,7 +21,7 @@ class User < ApplicationRecord
 
   # Order of roles is important because final authorization is the sum of all roles
   APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
-                 organization_admin researcher e_intervention_admin team_admin admin navigator].freeze
+                 organization_admin researcher e_intervention_admin team_admin admin navigator predefined_participant].freeze
 
   FORMATTING_APP_ROLE_EXCEPTIONS = {
     'e_intervention_admin' => 'E-intervention admin',
@@ -43,6 +43,9 @@ class User < ApplicationRecord
   # PHONE NUMBER
   has_one :phone, dependent: :destroy
   accepts_nested_attributes_for :phone, update_only: true
+
+  # ADDITIONAL PARAMETERS FOR PREDEFINED PARTICIPANTS
+  has_one :predefined_user_parameter, dependent: :destroy
 
   # AVATAR
   has_one_attached :avatar
