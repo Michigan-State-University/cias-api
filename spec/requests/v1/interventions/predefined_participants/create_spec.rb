@@ -25,7 +25,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants'
 
   it 'return correct body' do
     request
-    expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id])
+    expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id auto_invitation invitation_sent_at])
   end
 
   it_behaves_like 'users without access'

@@ -11,6 +11,14 @@ class V1::PredefinedParticipantSerializer < V1Serializer
     object.predefined_user_parameter.slug
   end
 
+  attribute :auto_invitation do |object|
+    object.predefined_user_parameter.auto_invitation
+  end
+
+  attribute :invitation_sent_at do |object|
+    object.predefined_user_parameter.auto_invitation
+  end
+
   attribute :health_clinic_id do |object|
     object.predefined_user_parameter.health_clinic_id
   end

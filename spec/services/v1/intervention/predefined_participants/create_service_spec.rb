@@ -9,6 +9,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::CreateService do
       first_name: Faker::Name.first_name,
       last_name: Faker::Name.last_name,
       health_clinic_id: health_clinic_id,
+      auto_invitation: true,
       phone_attributes: {
         iso: 'PL',
         prefix: '+48',
@@ -45,6 +46,10 @@ RSpec.describe V1::Intervention::PredefinedParticipants::CreateService do
 
   it 'user has predefined user parameter' do
     expect(subject.predefined_user_parameter).to be_present
+  end
+
+  it 'predefined user parameters has correct values' do
+    expect(subject.predefined_user_parameter.auto_invitation).to be true
   end
 
   context 'when phone_attributes are skipped' do

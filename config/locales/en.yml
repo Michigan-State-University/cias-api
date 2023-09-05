@@ -21,6 +21,8 @@ en:
       title: Next Group
     tlfb:
       title: TLFB Study Group
+  predefined_participant:
+    invitation: "You have been invited to complete %{intervention_name} intervention. Click the link to access: %{link}"
   channels:
     collaboration:
       intervention:
