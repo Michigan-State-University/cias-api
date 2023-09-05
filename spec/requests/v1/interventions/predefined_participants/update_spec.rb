@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants/:id', type: :request do
   let(:request) do
-    patch v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user.id), params: params, headers: current_user.create_new_auth_token
+    patch v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user.id), params: params,
+                                                                                                      headers: current_user.create_new_auth_token
   end
   let!(:intervention) { create(:intervention, user: researcher) }
   let(:researcher) { create(:user, :researcher, :confirmed) }
@@ -19,6 +20,10 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
     }
   end
 
+  before do
+    PredefinedUserParameter.create(user: user, intervention: intervention)
+  end
+
   it 'return correct status' do
     request
     expect(response).to have_http_status(:ok)
@@ -26,7 +31,6 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
 
   it 'return correct body' do
     request
-    require 'pry'; binding.pry
     expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id])
   end
 
@@ -47,6 +51,28 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
     it 'return correct status' do
       request
       expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  context 'when intervention has collaborators' do
+    let!(:intervention) { create(:intervention, :with_collaborators, user: researcher) }
+
+    it 'no editing mode' do
+      request
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    context 'current editor' do
+      let(:current_user) { intervention.collaborators.first.user }
+
+      before do
+        intervention.update(current_editor: current_user)
+      end
+
+      it 'current editor has access to the action' do
+        request
+        expect(response).to have_http_status(:ok)
+      end
     end
   end
 end

@@ -10,6 +10,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def create
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     predefined_user = V1::Intervention::PredefinedParticipants::CreateService.call(intervention_load, predefined_user_parameters)
 
@@ -19,6 +20,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def update
     authorize! :update, Intervention
     authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     predefined_user = V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, predefined_user_parameters)
 

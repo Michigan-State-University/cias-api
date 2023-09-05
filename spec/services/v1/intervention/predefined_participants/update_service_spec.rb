@@ -4,7 +4,9 @@ RSpec.describe V1::Intervention::PredefinedParticipants::UpdateService do
   let(:subject) { described_class.call(intervention, predefined_participant, params) }
   let!(:intervention) { create(:intervention) }
   let!(:health_clinic_id) { create(:health_clinic).id }
-  let(:predefined_participant) { create(:user, :predefined_participant, :with_phone, predefined_user_parameter: PredefinedUserParameter.new(intervention: intervention)) }
+  let(:predefined_participant) do
+    create(:user, :predefined_participant, :with_phone, predefined_user_parameter: PredefinedUserParameter.new(intervention: intervention))
+  end
   let(:params) do
     {
       first_name: Faker::Name.first_name,
