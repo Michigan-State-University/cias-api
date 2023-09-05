@@ -177,6 +177,9 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
+    t.string "interval_type", default: "monthly"
+    t.datetime "date_range_start"
+    t.datetime "date_range_end"
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
