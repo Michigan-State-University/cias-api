@@ -37,8 +37,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
-  def destroy; end
-
   private
 
   def predefined_user_parameters

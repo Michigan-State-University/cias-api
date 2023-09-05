@@ -25,21 +25,5 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/predefined_participants',
     expect(json_response['data'].first['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id])
   end
 
-  context 'other researcher' do
-    let(:current_user) { create(:user, :researcher, :confirmed) }
-
-    it 'return correct status' do
-      request
-      expect(response).to have_http_status(:not_found)
-    end
-  end
-
-  context 'other role' do
-    let(:current_user) { create(:user, :participant, :confirmed) }
-
-    it 'return correct status' do
-      request
-      expect(response).to have_http_status(:forbidden)
-    end
-  end
+  it_behaves_like 'users without access'
 end

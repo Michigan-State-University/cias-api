@@ -34,25 +34,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
     expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id])
   end
 
-  context 'other researcher' do
-    let(:other_researcher) { create(:user, :researcher, :confirmed) }
-    let(:current_user) { other_researcher }
-
-    it 'return correct status' do
-      request
-      expect(response).to have_http_status(:not_found)
-    end
-  end
-
-  context 'other role' do
-    let(:other_user) { create(:user, :participant, :confirmed) }
-    let(:current_user) { other_user }
-
-    it 'return correct status' do
-      request
-      expect(response).to have_http_status(:forbidden)
-    end
-  end
+  it_behaves_like 'users without access'
 
   context 'when intervention has collaborators' do
     let!(:intervention) { create(:intervention, :with_collaborators, user: researcher) }
