@@ -78,7 +78,7 @@ class Intervention < ApplicationRecord
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   before_save :remove_short_links, if: :will_save_change_to_organization_id?
-  before_save :cascade_access_type_change, if: :will_save_change_to_shared_to?
+  before_update :cascade_access_type_change, if: :shared_to_changed?
   after_update_commit :status_change, :hf_access_change
 
   def assign_default_google_language
