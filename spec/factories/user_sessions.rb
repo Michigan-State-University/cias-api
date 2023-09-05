@@ -2,6 +2,7 @@
 
 FactoryBot.define do
   factory :user_session do
+    type { UserSession::Classic }
     association :user
     association :session
     association :user_intervention
