@@ -8,7 +8,7 @@ class DataClearJobs::ClearUserData < ApplicationJob
       intervention.user_interventions.destroy_all
       intervention.conversations.destroy_all
       intervention.conversations_transcript.destroy
-      delete_quest_users_without_any_intervention!
+      delete_temporary_users_without_any_intervention!
 
       intervention.sensitive_data_removed!
       create_notification!(intervention)
@@ -17,8 +17,9 @@ class DataClearJobs::ClearUserData < ApplicationJob
 
   private
 
-  def delete_quest_users_without_any_intervention!
+  def delete_temporary_users_without_any_intervention!
     User.left_joins(:user_interventions).where(roles: ['guest'], user_interventions: { id: nil }).destroy_all
+    User.left_joins(:user_interventions).where(roles: ['predefined_participant'], user_interventions: { id: nil }).destroy_all
   end
 
   def create_notification!(intervention)
