@@ -234,8 +234,10 @@ class Intervention < ApplicationRecord
     permitted_schedules = %w[after_fill immediately]
 
     sessions.each do |session|
+      next if session.schedule.in(permitted_schedules)
+
       session.update!(
-        schedule: session.schedule.in?(permitted_schedules) ? session.schedule : 'after_fill',
+        schedule: 'after_fill',
         schedule_payload: nil,
         schedule_at: nil
       )
