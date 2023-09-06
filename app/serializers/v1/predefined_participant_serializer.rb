@@ -16,7 +16,7 @@ class V1::PredefinedParticipantSerializer < V1Serializer
   end
 
   attribute :invitation_sent_at do |object|
-    object.predefined_user_parameter.auto_invitation
+    object.predefined_user_parameter.invitation_sent_at
   end
 
   attribute :health_clinic_id do |object|
