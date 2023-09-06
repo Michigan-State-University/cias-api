@@ -14,7 +14,7 @@ class V1::Intervention::PredefinedParticipants::CreateService
     ActiveRecord::Base.transaction do
       user = create_predefined_user!
       Phone.create!(phone_params.merge({ user: user })) if phone_params
-      PredefinedUserParameter.create!(predefined_user_parameter_params.merge({user: user, intervention: intervention}))
+      PredefinedUserParameter.create!(predefined_user_parameter_params.merge({ user: user, intervention: intervention }))
       user
     end
   end
