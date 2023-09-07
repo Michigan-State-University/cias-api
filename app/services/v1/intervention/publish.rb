@@ -64,7 +64,6 @@ class V1::Intervention::Publish
       next unless predefined_user_parameter.auto_invitation
 
       V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_user_parameter.user)
-      predefined_user_parameter.update!(invitation_sent_at: DateTime.now)
     end
   end
 
