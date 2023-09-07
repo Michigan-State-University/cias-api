@@ -2,8 +2,8 @@
 
 RSpec.describe V1::Intervention::PredefinedParticipants::SendInvitation do
   let(:subject) { described_class.call(user) }
-  let!(:intervention) { create(:intervention, :with_predefined_participants) }
-  let(:user) { intervention.predefined_users.first }
+  let(:intervention) { create(:intervention, :with_predefined_participants) }
+  let!(:user) { intervention.predefined_users.first }
 
   it 'when user is without phone' do
     expect { subject }.not_to change(Message, :count)
