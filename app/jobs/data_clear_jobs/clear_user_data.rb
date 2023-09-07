@@ -18,8 +18,9 @@ class DataClearJobs::ClearUserData < ApplicationJob
   private
 
   def delete_temporary_users_without_any_intervention!
-    User.left_joins(:user_interventions).where(roles: ['guest'], user_interventions: { id: nil }).destroy_all
-    User.left_joins(:user_interventions).where(roles: ['predefined_participant'], user_interventions: { id: nil }).destroy_all
+    User.left_joins(:user_interventions)
+        .where("CAST(roles AS TEXT[]) && ARRAY['guest', 'predefined_participant'] AND user_interventions.id IS NULL")
+        .destroy_all
   end
 
   def create_notification!(intervention)
