@@ -12,6 +12,10 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     post send_invitation_v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user_id), headers: current_user.create_new_auth_token
   end
 
+  before do
+    allow_any_instance_of(Communication::Sms).to receive(:send_message).and_return(true)
+  end
+
   it 'return correct body' do
     request
     expect(json_response['invitation_sent_at']).to be_nil
