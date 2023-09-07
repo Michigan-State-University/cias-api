@@ -45,7 +45,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, { active: false })
 
     render status: :no_content
-
   end
 
   private
