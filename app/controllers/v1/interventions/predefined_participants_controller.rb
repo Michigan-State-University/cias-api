@@ -37,10 +37,21 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
+  def destroy
+    authorize! :read, Intervention
+    authorize! :read, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
+
+    V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, { active: false })
+
+    render status: :no_content
+
+  end
+
   private
 
   def predefined_user_parameters
-    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, phone_attributes: %i[iso prefix number])
+    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load
