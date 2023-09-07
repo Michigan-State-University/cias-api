@@ -345,4 +345,66 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       end
     end
   end
+
+  context 'when changing the intervention shared to type' do
+    let(:intervention) { create(:intervention, user: user, shared_to: shared_to_change.first) }
+    let(:session) { create(:session, intervention: intervention, schedule: session_schedule, schedule_payload: schedule_payload, schedule_at: schedule_at) }
+    let(:schedule_payload) { nil }
+    let(:schedule_at) { nil }
+    let(:params) do
+      {
+        intervention: {
+          shared_to: shared_to_change.second
+        }
+      }
+    end
+
+    context "when changing to 'anyone'" do
+      let(:shared_to_change) { %w[registered anyone] }
+      let(:session_schedule) { 'exact_date' }
+      let(:schedule_payload) { 10 }
+      let(:schedule_at) { 2.days.from_now }
+
+      it 'changes the scheduling of all sessions to `after_fill`' do
+        expect { request }.to change { session.reload.schedule }.to('after_fill')
+      end
+
+      it 'clears the schedule_payload and schedule_at fields' do
+        expect { request }.to change { session.reload.schedule_payload || session.reload.schedule_at }.to(nil)
+      end
+    end
+
+    context "when changing to 'anyone' with an already correct schedule type" do
+      let(:shared_to_change) { %w[registered anyone] }
+      let(:session_schedule) { 'immediately' }
+
+      it 'keeps the scheduling on the same value' do
+        expect { request }.not_to change { session.reload.schedule }
+      end
+    end
+
+    context "when changing to not 'anyone'" do
+      let(:shared_to_change) { %w[anyone registered] }
+      let(:session_schedule) { 'immediately' }
+
+      it 'keeps the scheduling on the same value' do
+        expect { request }.not_to change { session.reload.schedule }
+      end
+    end
+
+    context "when changing from 'registered' to 'invited'" do
+      let(:shared_to_change) { %w[registered invited] }
+      let(:session_schedule) { 'exact_date' }
+      let(:schedule_payload) { 10 }
+      let(:schedule_at) { 2.days.from_now }
+
+      it 'keeps the scheduling on the same value' do
+        expect { request }.not_to change { session.reload.schedule }
+      end
+
+      it 'keeps the schedule_payload and schedule_at fields' do
+        expect { request }.not_to change { session.reload.schedule_payload && session.reload.schedule_at }
+      end
+    end
+  end
 end
