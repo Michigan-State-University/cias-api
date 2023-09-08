@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# frozen_string_require: true
-
 class V1::Interventions::PredefinedParticipantsController < V1Controller
   before_action :verify_access
 
