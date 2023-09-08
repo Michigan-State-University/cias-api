@@ -12,6 +12,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::SendInvitation do
   context 'with phone' do
     before do
       user.create_phone(iso: 'PL', prefix: '+48', number: '777777777')
+      allow_any_instance_of(Communication::Sms).to receive(:send_message).and_return(true)
     end
 
     it 'when user is without phone' do
