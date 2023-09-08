@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# frozen_string_require: true
-
 class V1::Interventions::PredefinedParticipantsController < V1Controller
   def show
     authorize! :read, Intervention
@@ -37,6 +35,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
+<<<<<<< HEAD
   def destroy
     authorize! :read, Intervention
     authorize! :read, intervention_load
@@ -51,6 +50,12 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_user_parameters
     params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, phone_attributes: %i[iso prefix number])
+=======
+  private
+
+  def predefined_user_parameters
+    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, phone_attributes: %i[iso prefix number])
+>>>>>>> predefined-users
   end
 
   def intervention_load
