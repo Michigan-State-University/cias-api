@@ -74,6 +74,6 @@ class UserSession < ApplicationRecord
   end
 
   def correct_health_clinic_id?
-    user_intervention.intervention.health_clinic_id == health_clinic_id
+    user_intervention.intervention.organization.blank? == health_clinic_id.blank?
   end
 end
