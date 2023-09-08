@@ -40,7 +40,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     authorize! :read, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, { active: false })
+    predefined_participant.update!(active: false)
 
     render status: :no_content
   end
