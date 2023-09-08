@@ -191,7 +191,7 @@ class User < ApplicationRecord
   end
 
   def with_invalid_email?
-    roles.include?('guest') || roles.include?('preview_session') || roles.include?('predefined_participant')
+    (roles & %w[guest preview_session predefined_participant]).any?
   end
 
   def cache_key
