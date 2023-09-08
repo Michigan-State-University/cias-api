@@ -64,6 +64,7 @@ Rails.application.routes.draw do
       get 'generated_conversations_transcript', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
+        resources :predefined_participants, only: %i[index create update show]
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy]
         resources :accesses, only: %i[index create destroy]

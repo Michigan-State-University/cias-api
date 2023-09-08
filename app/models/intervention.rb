@@ -26,6 +26,8 @@ class Intervention < ApplicationRecord
   has_many :navigators, through: :intervention_navigators, source: :user
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
+  has_many :predefined_user_parameters, dependent: :destroy
+  has_many :predefined_users, through: :predefined_user_parameters, source: :user
 
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true

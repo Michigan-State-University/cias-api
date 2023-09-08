@@ -31,6 +31,13 @@ FactoryBot.define do
       roles { %w[guest] }
     end
 
+    trait :predefined_participant do
+      roles { %w[predefined_participant] }
+      after(:build) do |user|
+        PredefinedUserParameter.create!(user: user, intervention: create(:intervention))
+      end
+    end
+
     trait :participant do
       roles { %w[participant] }
     end
@@ -50,6 +57,12 @@ FactoryBot.define do
           new_team = build(:team, team_admin: team_admin)
           team_admin.admins_teams = [new_team]
         end
+      end
+    end
+
+    trait :with_phone do
+      after(:build) do |user|
+        Phone.create!(user: user, iso: 'PL', prefix: '+48', number: '777888999')
       end
     end
 
