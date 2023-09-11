@@ -12,6 +12,7 @@ module Clone
       if user_id.present?
         return clone_module.new(self, user_id: user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
       end
+
       return clone_module.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
     end
 
@@ -23,12 +24,9 @@ module Clone
     user_ids = User.where(email: emails).limit_to_roles(%w[e_intervention_admin researcher]).pluck(:id)
 
     user_ids.each do |user_id|
-      cloned_elements
-        .push(
-          clone_module.
-            new(self, { user_id: user_id, clean_formulas: clean_formulas, position: position, hidden: hidden }).
-            execute
-        )
+      cloned_elements.push(
+        clone_module.new(self, { user_id: user_id, clean_formulas: clean_formulas, position: position, hidden: hidden }).execute
+      )
     end
     cloned_elements
   end
