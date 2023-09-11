@@ -3,6 +3,8 @@
 # frozen_string_require: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
+  skip_before_action :authenticate_user!, only: %i[verify]
+
   def show
     authorize! :read, Intervention
     authorize! :read, intervention_load
@@ -37,6 +39,13 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
+  def verify
+    # rzycic forbidden jak intervention.draft?
+    #/v1/predefined_participants/verify w body slug
+    slug = params[:slug]
+
+  end
+
   private
 
   def predefined_user_parameters
@@ -57,5 +66,9 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def intervention_id
     params[:intervention_id]
+  end
+
+  def slug
+    params[:slug]
   end
 end
