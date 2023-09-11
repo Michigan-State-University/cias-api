@@ -10,12 +10,9 @@ module Clone
 
     if emails.blank?
       if user_id.present?
-        return "Clone::#{de_constantize_modulize_name.classify}".
-          safe_constantize.new(self, user_id: user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
-      else
-        return "Clone::#{de_constantize_modulize_name.classify}".
-          safe_constantize.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
+        return clone_module.new(self, user_id: user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
       end
+      return clone_module.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
     end
 
     cloned_elements = []
@@ -28,12 +25,17 @@ module Clone
     user_ids.each do |user_id|
       cloned_elements
         .push(
-          "Clone::#{de_constantize_modulize_name.classify}".
-            safe_constantize.
+          clone_module.
             new(self, { user_id: user_id, clean_formulas: clean_formulas, position: position, hidden: hidden }).
             execute
         )
     end
     cloned_elements
+  end
+
+  private
+
+  def clone_module
+    "Clone::#{de_constantize_modulize_name.classify}".safe_constantize
   end
 end
