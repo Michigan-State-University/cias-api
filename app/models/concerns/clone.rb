@@ -9,7 +9,7 @@ module Clone
     current_user_id = params[:user_id]
 
     if emails.blank?
-      if user_id.present?
+      if current_user_id.present?
         return clone_module.new(self, user_id: current_user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
       end
 
