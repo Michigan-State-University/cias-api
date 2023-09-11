@@ -6,11 +6,11 @@ module Clone
 
   def clone(params: {}, clean_formulas: true, position: nil, hidden: false)
     emails = params[:emails]&.map(&:downcase)
-    user_id = params[:user_id]
+    current_user_id = params[:user_id]
 
     if emails.blank?
       if user_id.present?
-        return clone_module.new(self, user_id: user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
+        return clone_module.new(self, user_id: current_user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
       end
 
       return clone_module.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
@@ -33,6 +33,7 @@ module Clone
 
   private
 
+  # returns the corresponding clone module (e.g. Intervention -> Clone::Intervention)
   def clone_module
     "Clone::#{de_constantize_modulize_name.classify}".safe_constantize
   end
