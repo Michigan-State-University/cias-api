@@ -65,9 +65,9 @@ RSpec.describe UserSession, type: :model do
             expect(answers.size).to be(2)
             variables = [answers.first.decrypted_body, answers.last.decrypted_body]
             expect(variables).to include(
-              { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
-              { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
-            )
+                                   { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
+                                   { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
+                                 )
           end
         end
 
@@ -204,6 +204,30 @@ RSpec.describe UserSession, type: :model do
       it '#destroy - calls cancel_timeout_job' do
         expect(user_session).to receive(:cancel_timeout_job)
         user_session.destroy
+      end
+    end
+  end
+
+  context 'validation' do
+    let(:intervention) { create(:intervention, organization: organization) }
+    let!(:sessions) { create_list(:session, 2, intervention: intervention) }
+    let!(:user_intervention) { create(:user_intervention, intervention: intervention, status: 'in_progress', completed_sessions: 1) }
+
+    context 'when in an intervention in an organization' do
+      let(:organization) { create(:organization, :with_health_clinics) }
+      let!(:user_session) { create(:user_session, user_intervention: user_intervention, health_clinic: organization.health_clinics.sample) }
+
+      it 'disallows for health_clinic_id to be nil' do
+        expect { user_session.update!(health_clinic_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    context 'when in an intervention without an organization' do
+      let(:organization) { nil }
+      let!(:user_session) { create(:user_session, user_intervention: user_intervention) }
+
+      it 'allows for health_clinic_id to be nil' do
+        expect(user_session.update!(health_clinic_id: nil)).to eq true
       end
     end
   end
