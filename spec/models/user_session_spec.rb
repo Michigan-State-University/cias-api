@@ -65,9 +65,9 @@ RSpec.describe UserSession, type: :model do
             expect(answers.size).to be(2)
             variables = [answers.first.decrypted_body, answers.last.decrypted_body]
             expect(variables).to include(
-                                   { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
-                                   { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
-                                 )
+              { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
+              { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
+            )
           end
         end
 
