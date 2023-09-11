@@ -6,10 +6,16 @@ module Clone
 
   def clone(params: {}, clean_formulas: true, position: nil, hidden: false)
     emails = params[:emails]&.map(&:downcase)
+    user_id = params[:user_id]
 
     if emails.blank?
-      return "Clone::#{de_constantize_modulize_name.classify}".
-        safe_constantize.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
+      if user_id.present?
+        return "Clone::#{de_constantize_modulize_name.classify}".
+          safe_constantize.new(self, user_id: user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
+      else
+        return "Clone::#{de_constantize_modulize_name.classify}".
+          safe_constantize.new(self, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
+      end
     end
 
     cloned_elements = []
