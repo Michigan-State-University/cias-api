@@ -211,19 +211,21 @@ RSpec.describe UserSession, type: :model do
   context 'validation' do
     let(:intervention) { create(:intervention, organization: organization) }
     let!(:sessions) { create_list(:session, 2, intervention: intervention) }
-    let!(:user_intervention) { create(:user_intervention, intervention: intervention, status: 'in_progress', completed_sessions: 1) }
 
-    context 'when in an intervention in an organization' do
+    context 'when in an user intervention with a health clinic' do
       let(:organization) { create(:organization, :with_health_clinics) }
-      let!(:user_session) { create(:user_session, user_intervention: user_intervention, health_clinic: organization.health_clinics.sample) }
+      let(:health_clinic) { organization.health_clinics.sample }
+      let!(:user_intervention) { create(:user_intervention, intervention: intervention, health_clinic_id: health_clinic.id) }
+      let!(:user_session) { create(:user_session, user_intervention: user_intervention, health_clinic_id: health_clinic.id) }
 
       it 'disallows for health_clinic_id to be nil' do
         expect { user_session.update!(health_clinic_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
 
-    context 'when in an intervention without an organization' do
+    context 'when in an user intervention without a health clinic' do
       let(:organization) { nil }
+      let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
       let!(:user_session) { create(:user_session, user_intervention: user_intervention) }
 
       it 'allows for health_clinic_id to be nil' do
