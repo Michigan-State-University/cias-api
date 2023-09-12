@@ -106,18 +106,15 @@ class Session < ApplicationRecord
           user_id: user.id,
           health_clinic_id: health_clinic_id,
           type: user_session_type,
-          user_intervention_id: user_intervention.id,
-          scheduled_at: DateTime.now
+          user_intervention_id: user_intervention.id
         )
-        user_intervention.update!(status: 'in_progress') if user_session.finished_at.blank?
-      end
-
-      (emails - users.map(&:email)).each do |email|
-        invitations.create!(email: email, health_clinic_id: health_clinic_id)
+        if user_session.finished_at.blank? && (user_session.scheduled_at.blank? || user_session.scheduled_at.past?)
+          user_intervention.update!(status: 'in_progress')
+        end
       end
     end
 
-    SendFillInvitationJob.perform_later(::Session, id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
+    SendFillInvitation::SessionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id, intervention_id)
   end
 
   def send_link_to_session(user, health_clinic = nil)

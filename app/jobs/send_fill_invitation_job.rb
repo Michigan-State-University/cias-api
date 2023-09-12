@@ -11,6 +11,8 @@ class SendFillInvitationJob < ApplicationJob
       user = User.find_by(email: email)
       next if user && !user.email_notification
 
+      # require 'pry'; binding.pry
+      # "User#{model_class.name}".safe_constantize
       mailer_class.inform_to_an_email(object, email, health_clinic).deliver_now
     end
 
@@ -19,4 +21,8 @@ class SendFillInvitationJob < ApplicationJob
       mailer_class.send(method_name, object, email, health_clinic).deliver_now
     end
   end
+
+  # def user_object(user, model_class)
+  #   "User#{model_class.name}".safe_constantize.where("#{model_class.name.downcase}_id": object.id)
+  # end
 end
