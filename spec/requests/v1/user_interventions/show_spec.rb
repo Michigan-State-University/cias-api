@@ -4,7 +4,8 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
   let!(:user) { create(:user, :admin, :confirmed) }
   let!(:intervention) { create(:flexible_order_intervention, user: user, status: 'published', shared_to: 'registered') }
   let!(:sessions) { create_list(:session, 3, intervention_id: intervention.id) }
-  let!(:user_intervention) { create(:user_intervention, intervention_id: intervention.id, user: user) }
+  let!(:health_clinic) { create(:health_clinic) }
+  let!(:user_intervention) { create(:user_intervention, intervention_id: intervention.id, user: user, health_clinic_id: health_clinic.id) }
 
   let(:request) { get v1_user_intervention_path(user_intervention.id), headers: user.create_new_auth_token }
 
@@ -29,6 +30,10 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
 
     it 'returns correct intervention type' do
       expect(json_response['data']['attributes']['intervention']['type']).to eq intervention.type
+    end
+
+    it 'returns correct health clinic id' do
+      expect(json_response['data']['attributes']['health_clinic_id']).to eq health_clinic.id
     end
   end
 
