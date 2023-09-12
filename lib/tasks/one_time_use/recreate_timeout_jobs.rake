@@ -40,7 +40,12 @@ def finish_due_classic_user_session(user_session, timeout_datetime)
   user_session.update(finished_at: timeout_datetime)
   user_session.answers.where(draft: true, alternative_branch: true).destroy_all # user_session.delete_alternative_answers
   user_session.reload
-  user_session.decrement_audio_usage
+
+  # user_session.decrement_audio_usage
+  unless user_session.name_audio.nil?
+    user_session.name_audio.decrement(:usage_counter)
+    user_session.name_audio.save!
+  end
 
   V1::ChartStatistics::CreateForUserSession.call(user_session)
 
@@ -55,7 +60,7 @@ def finish_due_catmh_user_session(user_session, timeout_datetime)
   cat_mh_api = Api::CatMh.new
 
   result = cat_mh_api.get_result(user_session)
-  user_session.result_to_answers(result['body']) if result['status'] == 200
+  result_to_answers(user_session, result['body']) if result['status'] == 200
   cat_mh_api.terminate_intervention(user_session)
 
   GenerateUserSessionReportsJob.perform_later(user_session.id)
@@ -67,4 +72,21 @@ end
 
 def scheduled_set
   @scheduled_set ||= Sidekiq::ScheduledSet.new
+end
+
+def result_to_answers(user_session, result)
+  available_test_types = user_session.session.cat_mh_test_types
+  result['tests'].each do |test|
+    test_type = available_test_types.find_by(short_name: test['type'].downcase)
+    test_type.cat_mh_test_attributes.each do |variable|
+      Answer::CatMh.create!(
+        user_session_id: user_session.id,
+        body: {
+          'data' => [
+            { 'var' => "#{test_type.short_name}_#{variable.name}", 'value' => test[variable.name] }
+          ]
+        }
+      )
+    end
+  end
 end
