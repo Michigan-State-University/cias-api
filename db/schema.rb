@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_01_094411) do
+ActiveRecord::Schema.define(version: 2023_09_12_091140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -177,6 +177,9 @@ ActiveRecord::Schema.define(version: 2023_09_01_094411) do
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
+    t.string "interval_type", default: "monthly"
+    t.datetime "date_range_start"
+    t.datetime "date_range_end"
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
@@ -455,6 +458,7 @@ ActiveRecord::Schema.define(version: 2023_09_01_094411) do
     t.integer "conversations_count"
     t.string "sensitive_data_state", default: "collected", null: false
     t.datetime "clear_sensitive_data_scheduled_at"
+    t.integer "navigators_count", default: 0
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -1064,7 +1068,7 @@ ActiveRecord::Schema.define(version: 2023_09_01_094411) do
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "predefined_user_parameters", "health_clinics"
   add_foreign_key "predefined_user_parameters", "interventions"
-  add_foreign_key "predefined_user_parameters", "users"
+  add_foreign_key "predefined_user_parameters", "users", on_delete: :cascade
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"
