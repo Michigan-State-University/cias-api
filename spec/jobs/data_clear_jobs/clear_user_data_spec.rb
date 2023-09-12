@@ -3,12 +3,13 @@
 RSpec.describe DataClearJobs::ClearUserData, type: :job do
   subject { described_class.perform_now(intervention.id) }
 
-  let!(:intervention) { create(:intervention, :with_pdf_report, :with_conversations_transcript, user: create(:user, :researcher)) }
+  let!(:intervention) do
+    create(:intervention, :with_pdf_report, :with_conversations_transcript, :with_predefined_participants, user: create(:user, :researcher))
+  end
   let!(:conversation) { create(:live_chat_conversation, intervention: intervention) }
   let!(:user_intervention1) { create(:user_intervention, intervention: intervention, user: create(:user, :participant, :confirmed)) }
   let!(:user_intervention2) { create(:user_intervention, intervention: intervention, user: create(:user, :guest, :confirmed)) }
-  let!(:user_intervention3) { create(:user_intervention, intervention: intervention, user: create(:user, :confirmed, roles: ['predefined_participant'])) }
-  let!(:predefined_user_parameter) { PredefinedUserParameter.create!(user_id: user_intervention3.user_id, intervention_id: user_intervention3.intervention_id) }
+  let!(:user_intervention3) { create(:user_intervention, intervention: intervention, user: intervention.predefined_users.sample) }
 
   before do
     ActiveJob::Base.queue_adapter = :test
@@ -45,7 +46,9 @@ RSpec.describe DataClearJobs::ClearUserData, type: :job do
   end
 
   it 'removes associated predefined user parameters' do
-    expect { subject }.to change(PredefinedUserParameter, :count).by(-1)
+    predefined_user_parameter_id = user_intervention3.user.predefined_user_parameter.id
+    subject
+    expect(PredefinedUserParameter.find_by(id: predefined_user_parameter_id)).to be nil
   end
 
   it 'participants are stay intact' do
