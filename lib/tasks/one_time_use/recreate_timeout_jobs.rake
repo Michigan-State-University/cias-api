@@ -5,7 +5,7 @@ namespace :one_time_use do
   task recreate_timeout_jobs: :environment do
     user_sessions_scope.find_each do |user_session|
       estimated_timeout_time = user_session.last_answer_at + user_session.session.autofinish_delay.minutes
-      if estimated_timeout_time > DateTime.now
+      if estimated_timeout_time.future?
         recreate_timeout_job_for_user_session(user_session, estimated_timeout_time)
       elsif user_session.class == UserSession::Classic
         finish_due_classic_user_session(user_session, estimated_timeout_time)
