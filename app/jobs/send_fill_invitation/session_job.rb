@@ -15,7 +15,7 @@ class SendFillInvitation::SessionJob < ApplicationJob
                                          health_clinic_id: health_clinic_id,
                                          type: session.user_session_type,
                                          user_intervention_id: user_intervention.id)
-      SessionMailer.inform_to_an_email(session, email, health_clinic, user_session.scheduled_at).deliver_now
+      SessionMailer.inform_to_an_email(session, email, health_clinic, user_session&.scheduled_at).deliver_now
     end
 
     non_existing_users_emails.each do |email|

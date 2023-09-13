@@ -9,7 +9,7 @@ class SessionJobs::Invitation < SessionJob
     users.each do |user|
       next unless user.email_notification
 
-      scheduled_at = UserSession.find_by(user_id: user.id, session_id: session_id, health_clinic: health_clinic, finished_at: nil) if user.present?
+      scheduled_at = UserSession.find_by(user_id: user.id, session_id: session_id, health_clinic: health_clinic, finished_at: nil)&.scheduled_at
       SessionMailer.inform_to_an_email(
         session,
         user.email,
