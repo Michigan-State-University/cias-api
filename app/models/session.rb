@@ -106,10 +106,11 @@ class Session < ApplicationRecord
           user_id: user.id,
           health_clinic_id: health_clinic_id,
           type: user_session_type,
-          user_intervention_id: user_intervention.id,
-          scheduled_at: DateTime.now
+          user_intervention_id: user_intervention.id
         )
-        user_intervention.update!(status: 'in_progress') if user_session.finished_at.blank?
+        if user_session.finished_at.blank? && (user_session.scheduled_at.blank? || user_session.scheduled_at.past?)
+          user_intervention.update!(status: 'in_progress')
+        end
       end
 
       (emails - users.map(&:email)).each do |email|
