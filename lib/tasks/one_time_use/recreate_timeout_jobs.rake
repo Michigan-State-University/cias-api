@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 namespace :one_time_use do
-  desc 'Rename suprised to surprised'
   task recreate_timeout_jobs: :environment do
     user_sessions_scope.find_each do |user_session|
       estimated_timeout_time = user_session.last_answer_at + user_session.session.autofinish_delay.minutes
