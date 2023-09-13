@@ -18,7 +18,7 @@ RSpec.describe Invitation, type: :model do
       let(:invited) { create(:user, :confirmed, email: 'invited@test.org') }
 
       it 'send email' do
-        expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil).and_return(message_delivery)
+        expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil, nil).and_return(message_delivery)
         subject.resend
       end
     end
@@ -28,6 +28,17 @@ RSpec.describe Invitation, type: :model do
 
       it "Don't send email" do
         expect(SessionMailer).not_to receive(:inform_to_an_email)
+        subject.resend
+      end
+    end
+
+    context 'when user session exists' do
+      let(:invited) { create(:user, :confirmed) }
+      let!(:user_session) { create(:user_session, user: invited, session: session, scheduled_at: DateTime.now + 2.days) }
+      let(:scheduled_at) { user_session.scheduled_at }
+
+      it 'send email' do
+        expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil, scheduled_at).and_return(message_delivery)
         subject.resend
       end
     end
