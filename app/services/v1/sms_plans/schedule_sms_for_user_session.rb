@@ -13,13 +13,13 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def call
     return unless session.intervention.published?
+
+    execute_plans_for('SmsPlan::Alert')
+
     return unless user.sms_notification
+    return unless phone.present? && phone.confirmed?
 
-    session.sms_plans.each do |plan|
-      next unless can_run_plan?(plan)
-
-      send("#{plan.schedule}_schedule", plan) if plan.alert? || (phone.present? && phone.confirmed?)
-    end
+    execute_plans_for('SmsPlan::Normal')
   end
 
   private
@@ -28,6 +28,14 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def session
     @session ||= user_session.session
+  end
+
+  def execute_plans_for(type)
+    session.sms_plans.limit_to_types(type).each do |plan|
+      next unless can_run_plan?(plan)
+
+      send("#{plan.schedule}_schedule", plan)
+    end
   end
 
   def after_session_end_schedule(plan)
