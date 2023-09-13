@@ -182,6 +182,8 @@
                         <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
                           <div style="font-family:DM Sans, Helvetica, Arial;font-size:16px;font-weight:700;line-height:26px;text-align:center;color:#2F3850;">
                             <! -- MAIN-TEXT START --> <%= render inline: t('.html_body', session_name: @session.name) %> <! -- MAIN-TEXT END -->
+                            <%= render inline: t('.session_scheduled', date: @scheduled_at) if @scheduled_at.present? %>
+                            <%= render inline: t('.before_button_text') %>
                           </div>
                         </td>
                       </tr>

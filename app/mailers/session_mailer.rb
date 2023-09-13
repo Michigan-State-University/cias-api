@@ -7,10 +7,11 @@ class SessionMailer < ApplicationMailer
     mail(to: @email, subject: I18n.t('session_mailer.grant_access_to_a_user.subject'))
   end
 
-  def inform_to_an_email(session, email, health_clinic = nil)
+  def inform_to_an_email(session, email, health_clinic = nil, scheduled_at = nil)
     @session = session
     @email = email
     @health_clinic = health_clinic
+    @scheduled_at = scheduled_at
 
     mail(to: @email, subject: I18n.t('session_mailer.inform_to_an_email.subject'))
   end

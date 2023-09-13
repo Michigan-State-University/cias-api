@@ -13,7 +13,11 @@ class Invitation < ApplicationRecord
     return :ok unless invited_user.nil? || invited_user.email_notification
     return :unprocessable_entity unless invitable_type == 'Session' || invitable.published?
 
-    SessionMailer.inform_to_an_email(invitable, email, health_clinic).deliver_later
+    if invited_user.present?
+      scheduled_at = UserSession.find_by(user_id: invited_user.id, session_id: invitable.id, health_clinic: health_clinic,
+                                         finished_at: nil)
+    end
+    SessionMailer.inform_to_an_email(invitable, email, health_clinic, scheduled_at).deliver_later
     :ok
   end
 end
