@@ -1,23 +1,17 @@
 # frozen_string_literal: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
-  def show
-    authorize! :read, Intervention
-    authorize! :read, intervention_load
+  before_action :verify_access
 
+  def show
     render json: serialized_response(predefined_participant)
   end
 
   def index
-    authorize! :read, Intervention
-    authorize! :read, intervention_load
-
     render json: serialized_response(predefined_participants)
   end
 
   def create
-    authorize! :update, Intervention
-    authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     predefined_user = V1::Intervention::PredefinedParticipants::CreateService.call(intervention_load, predefined_user_parameters)
@@ -26,8 +20,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def update
-    authorize! :update, Intervention
-    authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     predefined_user = V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, predefined_user_parameters)
@@ -35,10 +27,15 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
+  def send_invitation
+    V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:invitation_sent_at), status: :ok
+  end
+
   private
 
   def predefined_user_parameters
-    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, phone_attributes: %i[iso prefix number])
+    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :auto_invitation, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load
@@ -55,5 +52,10 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def intervention_id
     params[:intervention_id]
+  end
+
+  def verify_access
+    authorize! :update, Intervention
+    authorize! :update, intervention_load
   end
 end

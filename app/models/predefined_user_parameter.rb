@@ -7,7 +7,7 @@ class PredefinedUserParameter < ApplicationRecord
 
   validates :slug, uniqueness: true
 
-  before_validation :generate_slug
+  before_create :generate_slug
 
   def generate_slug(suggested_slug = nil)
     suggested_slug ||= SecureRandom.base58(4)

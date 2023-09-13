@@ -10,6 +10,7 @@ class V1::Intervention::Publish
     timestamp_published_at
     calculate_days_after_schedule
     delete_preview_data
+    send_smses_to_predefined_users
   end
 
   private
@@ -54,5 +55,19 @@ class V1::Intervention::Publish
     return 0 if session.schedule_payload.blank?
 
     session.schedule_payload.days
+  end
+
+  def send_smses_to_predefined_users
+    return unless predefined_user_parameters.any?
+
+    predefined_user_parameters.each do |predefined_user_parameter|
+      next unless predefined_user_parameter.auto_invitation
+
+      V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_user_parameter.user)
+    end
+  end
+
+  def predefined_user_parameters
+    @predefined_user_parameters ||= intervention.predefined_user_parameters
   end
 end

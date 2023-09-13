@@ -14,7 +14,7 @@ class V1::Intervention::PredefinedParticipants::CreateService
     ActiveRecord::Base.transaction do
       user = create_predefined_user!
       Phone.create!(phone_params.merge({ user: user })) if phone_params
-      PredefinedUserParameter.create!(user: user, intervention: intervention, health_clinic_id: params[:health_clinic_id])
+      PredefinedUserParameter.create!(predefined_user_parameter_params.merge({ user: user, intervention: intervention }))
       user
     end
   end
@@ -25,6 +25,10 @@ class V1::Intervention::PredefinedParticipants::CreateService
 
   def phone_params
     params[:phone_attributes]
+  end
+
+  def predefined_user_parameter_params
+    params.slice(:health_clinic_id, :auto_invitation)
   end
 
   def create_predefined_user!
