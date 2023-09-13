@@ -20,7 +20,7 @@ def user_sessions
 end
 
 def perform_due_schedule(user_session)
-  SessionScheduleJob.perform_later(
+  SessionScheduleJob.perform_now(
     user_session.session.id,
     user_session.user.id,
     user_session.health_clinic,
