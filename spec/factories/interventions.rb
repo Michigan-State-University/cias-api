@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :intervention do
-    user
+    user { create(:user, :researcher, :confirmed) }
     name { 'Intervention' }
     license_type { 'unlimited' }
     trait :published do
