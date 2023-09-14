@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_12_091140) do
+ActiveRecord::Schema.define(version: 2023_09_05_090300) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -1066,7 +1066,7 @@ ActiveRecord::Schema.define(version: 2023_09_12_091140) do
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "predefined_user_parameters", "health_clinics"
   add_foreign_key "predefined_user_parameters", "interventions"
-  add_foreign_key "predefined_user_parameters", "users", on_delete: :cascade
+  add_foreign_key "predefined_user_parameters", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"
