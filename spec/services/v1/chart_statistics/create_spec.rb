@@ -19,7 +19,7 @@ RSpec.describe V1::ChartStatistics::Create do
   let(:filled_at) { DateTime.current }
   let(:chart) do
     create(:chart, formula: formula, dashboard_section: dashboard_section, status: 'published', chart_type: :pie_chart,
-                   published_at: DateTime.now, date_range_start: DateTime.yesterday, date_range_end: DateTime.tomorrow)
+           published_at: DateTime.now, date_range_start: DateTime.yesterday, date_range_end: DateTime.tomorrow)
   end
   let(:formula) do
     { 'payload' => 'session_var.fruit',
@@ -43,6 +43,22 @@ RSpec.describe V1::ChartStatistics::Create do
 
     it 'creates a new chart statistic' do
       expect { subject }.to change(ChartStatistic, :count).by(1)
+    end
+  end
+
+  context 'when the user session was finished near the end of the day in date_range_end' do
+    let(:user_session_finished_at) { chart.date_range_end + 24.hours - 1.second }
+
+    it 'creates a new chart statistic' do
+      expect { subject }.to change(ChartStatistic, :count).by(1)
+    end
+  end
+
+  context 'when the user session was finished just after the end of the day in date_range_end' do
+    let(:user_session_finished_at) { chart.date_range_end + 24.hours + 1.second }
+
+    it 'creates a new chart statistic' do
+      expect { subject }.not_to change(ChartStatistic, :count)
     end
   end
 
