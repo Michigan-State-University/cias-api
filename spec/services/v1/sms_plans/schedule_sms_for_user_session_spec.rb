@@ -512,6 +512,14 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
       end
     end
 
+    context 'when the participant blocks sms notifications' do
+      let!(:user) do
+        create(:user, :confirmed, :researcher, first_name: 'Randy', last_name: 'Rhoads', email: 'not.black.sabbath@gmail.com', sms_notification: false)
+      end
+
+      it_behaves_like 'correct sms job queue'
+    end
+
     context 'correctly applies personal data' do
       context 'when all are selected' do
         it_behaves_like 'correct sms job queue'
