@@ -40,13 +40,24 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def verify
-    # rzycic forbidden jak intervention.draft?
-    #/v1/predefined_participants/verify w body slug
-    slug = params[:slug]
+    return :forbidden unless predefined_user_parameter.intervention.published?
 
+    access_token_to_response!
+    render json: verify_response
   end
 
   private
+
+  def access_token_to_response!
+    response.headers.merge!(predefined_user_parameter.user.create_new_auth_token)
+  end
+
+  def verify_response
+    {
+      user: V1::UserSerializer.new(predefined_user_parameter.user).serializable_hash[:data],
+      redirect_data: V1::Intervention::PredefinedParticipants::VerifyService.call(predefined_user_parameter)
+    }
+  end
 
   def predefined_user_parameters
     params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, phone_attributes: %i[iso prefix number])
@@ -62,6 +73,10 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_participant
     @predefined_participant ||= predefined_participants.find(params[:id])
+  end
+
+  def predefined_user_parameter
+    @predefined_user_parameter ||= PredefinedUserParameter.find_by!(slug: params[:slug])
   end
 
   def intervention_id

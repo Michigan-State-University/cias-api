@@ -1,52 +1,48 @@
 # frozen_string_literal: true
 
 class V1::Intervention::PredefinedParticipants::VerifyService
-  def initialize(slug)
-    @slug = slug
+  def initialize(predefined_user_parameters)
+    @predefined_user_parameters = predefined_user_parameters
   end
 
-  def self.call(slug)
-    new(slug).call
+  def self.call(predefined_user_parameters)
+    new(predefined_user_parameters).call
   end
 
   def call
     {
-      intervention_id: predefined_user_parameter.intervention_id,
+      intervention_id: predefined_user_parameters.intervention_id,
       session_id: session&.id,
-      health_clinic_id: predefined_user_parameter.health_clinic_id,
+      health_clinic_id: predefined_user_parameters.health_clinic_id,
       multiple_fill_session_available: multiple_fill_session_available,
       user_intervention_id: user_intervention.id
     }
   end
 
-  attr_reader :slug
+  attr_reader :predefined_user_parameters
 
   private
 
-  def predefined_user_parameter
-    @predefined_user_parameter ||= PredefinedUserParameter.find_by!(slug: slug)
-  end
-
   def user_intervention
-    @user_intervention ||= UserIntervention.find_by(user_id: predefined_user_parameter.user_id, intervention_id: predefined_user_parameter.intervention_id)
+    @user_intervention ||= UserIntervention.find_or_create_by(user_id: predefined_user_parameters.user_id, intervention_id: intervention.id)
   end
 
   def intervention
-    @intervention ||= user_intervention.intervention
+    @intervention ||= predefined_user_parameters.intervention
   end
 
   def session
     return nil if intervention.sessions.blank?
 
     user_sessions = UserSession.where(user_intervention: user_intervention).order(:last_answer_at)
-    user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at = ? OR scheduled_at >', nil, DateTime.now)
+    user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at = ? OR scheduled_at < ?', nil, DateTime.now)
 
     return user_sessions_in_progress.last.session if user_sessions_in_progress.any?
     return nil if intervention.type.eql?('Intervention::FlexibleOrder')
 
     return intervention.sessions.order(:position).first if user_sessions.blank?
 
-    next_session = user_sessions.last.next_session
+    next_session = user_sessions.last.session.next_session
     next_user_session = UserSession.find_by(session_id: next_session.id)
 
     return next_session if next_user_session.blank?

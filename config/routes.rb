@@ -305,7 +305,7 @@ Rails.application.routes.draw do
     get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
     get 'jwk-set-1', as: :jwk_set, to: 'epic_on_fhir/jwk_sets#index'
     get '/s/:slug', to: 'links#show', as: :short
-    post 'predefined_participants/verify', to: 'v1/interventions/predefined_participants#verify', as: :verify_predefined_participant
+    post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
   end
 
   if Rails.env.development?
