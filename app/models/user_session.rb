@@ -74,8 +74,6 @@ class UserSession < ApplicationRecord
   end
 
   def user_intervention_inside_health_clinic?
-    return false if user_intervention.nil?
-
-    user_intervention.health_clinic_id.present?
+    user_intervention&.health_clinic_id.present?
   end
 end

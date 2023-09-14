@@ -25,8 +25,6 @@ class UserIntervention < ApplicationRecord
   end
 
   def intervention_inside_organization?
-    return false if intervention.nil?
-
-    intervention.organization_id.present?
+    intervention&.organization_id.present?
   end
 end
