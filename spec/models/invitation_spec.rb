@@ -35,7 +35,7 @@ RSpec.describe Invitation, type: :model do
     context 'when user session exists' do
       let(:invited) { create(:user, :confirmed) }
       let!(:user_session) { create(:user_session, user: invited, session: session, scheduled_at: scheduled_at) }
-      let!(:scheduled_at) { DateTime.now + 2.days }
+      let!(:scheduled_at) { (DateTime.now + 2.days).beginning_of_day }
 
       it 'send email' do
         expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil, scheduled_at).and_return(message_delivery)
