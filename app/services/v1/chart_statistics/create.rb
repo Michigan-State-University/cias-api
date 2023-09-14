@@ -12,7 +12,6 @@ class V1::ChartStatistics::Create
   end
 
   def call
-    require 'pry'; binding.pry
     return if health_clinic.nil?
     return if dentaku_service.exist_missing_variables?
     return if zero_division_error?
