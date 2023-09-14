@@ -81,7 +81,7 @@ FactoryBot.define do
     trait :with_predefined_participants do
       after(:create) do |intervention|
         create_list(:user, 5, :predefined_participant, :confirmed).each do |user|
-          create(:predefined_user_parameter, intervention: intervention, user: user)
+          user.predefined_user_parameter.update!(intervention_id: intervention.id)
         end
       end
     end
