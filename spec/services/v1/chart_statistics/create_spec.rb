@@ -19,7 +19,7 @@ RSpec.describe V1::ChartStatistics::Create do
   let(:filled_at) { DateTime.current }
   let(:chart) do
     create(:chart, formula: formula, dashboard_section: dashboard_section, status: 'published', chart_type: :pie_chart,
-           published_at: DateTime.now, date_range_start: DateTime.yesterday, date_range_end: DateTime.tomorrow)
+                   published_at: DateTime.now, date_range_start: DateTime.yesterday, date_range_end: DateTime.tomorrow)
   end
   let(:formula) do
     { 'payload' => 'session_var.fruit',
