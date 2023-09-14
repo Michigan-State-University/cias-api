@@ -27,6 +27,14 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
+  def destroy
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
+
+    predefined_participant.update!(active: false)
+
+    render status: :no_content
+  end
+
   def send_invitation
     V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_participant)
     render json: predefined_participant.predefined_user_parameter.reload.slice(:invitation_sent_at), status: :ok
@@ -35,7 +43,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   private
 
   def predefined_user_parameters
-    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :auto_invitation, phone_attributes: %i[iso prefix number])
+    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load

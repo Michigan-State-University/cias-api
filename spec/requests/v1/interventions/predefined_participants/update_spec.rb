@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants/:id', type: :request do
   let(:request) do
-    patch v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user.id), params: params,
-                                                                                                      headers: current_user.create_new_auth_token
+    patch v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user.id),
+          params: params, headers: current_user.create_new_auth_token
   end
   let!(:intervention) { create(:intervention, user: researcher) }
   let(:researcher) { create(:user, :researcher, :confirmed) }
@@ -36,6 +36,21 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
   end
 
   it_behaves_like 'users without access'
+
+  context 'researcher activates the account' do
+    let(:user) { create(:user, :predefined_participant, active: false) }
+    let(:params) do
+      {
+        predefined_user: {
+          active: true
+        }
+      }
+    end
+
+    it 'activates the user' do
+      expect { request }.to change { user.reload.active }.to(true)
+    end
+  end
 
   context 'when intervention has collaborators' do
     let!(:intervention) { create(:intervention, :with_collaborators, user: researcher) }
