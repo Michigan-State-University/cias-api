@@ -71,8 +71,8 @@ class V1::ChartStatistics::Create
   end
 
   def inside_date_range?
-    return false if chart.date_range_start.present? && chart.date_range_start.beginning_of_day > user_session.finished_at
-    return false if chart.date_range_end.present? && chart.date_range_end.end_of_day < user_session.finished_at
+    return false if chart.date_range_start.present? && chart.date_range_start > user_session.finished_at
+    return false if chart.date_range_end.present? && chart.date_range_end + 1.day <= user_session.finished_at
 
     true
   end
