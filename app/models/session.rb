@@ -113,6 +113,10 @@ class Session < ApplicationRecord
           user_intervention.update!(status: 'in_progress')
         end
       end
+
+      (emails - users.map(&:email)).each do |email|
+        invitations.create!(email: email, health_clinic_id: health_clinic_id)
+      end
     end
 
     SendFillInvitation::SessionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id, intervention_id)
