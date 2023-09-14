@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 namespace :one_time_use do
+  desc <<-DESC
+This task will restore SessionScheduleJobs based on UserSessions that have not yet been started,
+but have the scheduled_at parameter set to some date (not nil).
+It will also avoid creating duplicate sidekiq jobs, in case a ScheduleSessionJob already exists for the same parameters.
+However, it won't restore any scheduling for UserSessions that have not been scheduled by V1::UserSessionScheduleService.
+For this, you will need to run `rake one_time_use:recreate_timeout_jobs` before running this task.
+  DESC
   task recreate_session_schedule_jobs: :environment do
     p user_sessions.count
     user_sessions.find_each do |user_session|
