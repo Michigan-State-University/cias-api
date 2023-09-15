@@ -14,6 +14,14 @@ The tolerance for assuming it's the same job is 6 hours \
         restore_sms_job(start_time, content, phone, true, attachment_url = nil)
       end
 
+      def after_session_end_schedule(plan)
+        set_frequency(user_session.finished_at, plan)
+      end
+
+      def now_in_timezone
+        @now_in_timezone ||= Time.use_zone(timezone) { user_session.finished_at }
+      end
+
       def restore_sms_job(start_time, content, phone, is_alert, attachment_url = nil)
         return if start_time.past?
         job_exists = scheduled_set.each do |job|
@@ -44,5 +52,9 @@ end
 
 def scheduled_set
   @scheduled_set ||= Sidekiq::ScheduledSet.new
+end
+
+def user_sessions
+  UserSession.where.not(finished_at: nil)
 end
 
