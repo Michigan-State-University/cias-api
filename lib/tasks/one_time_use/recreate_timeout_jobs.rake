@@ -2,12 +2,11 @@
 
 namespace :one_time_use do
   desc <<-DESC
-This is the main rake task that will restore the jobs, as well as additional info for the other two tasks for them to restore it.
-The main goals of this task are:
-- recreate the UserSessionTimeoutJobs based on the last answer made by a participant and the session autofinish delay
-- it also recreates the scheduling for the next session - it executes branching (if needed) and creates a new UserSession
+This is the main rake task that will restore the jobs, as well as additional info for the other two tasks for them to restore it. \
+The main goals of this task are: \
+- recreate the UserSessionTimeoutJobs based on the last answer made by a participant and the session autofinish delay. \
+- it also recreates the scheduling for the next session - it executes branching (if needed) and creates a new UserSession. \
   with the correct scheduled_at parameter, however, it won't recreate SessionScheduleJobs, please use a separate rake task for it.
-- SMS: prob TODO
   DESC
   task recreate_timeout_jobs: :environment do
     user_sessions_scope.find_each do |user_session|
