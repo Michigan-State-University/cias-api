@@ -1,6 +1,8 @@
 namespace :one_time_use do
   desc <<-DESC
-todo
+This task will recreate all the scheduled sms jobs, both the one-time ones, as well as periodic (every day, every month etc). \
+The tolerance for assuming it's the same job is 6 hours \
+(if the SmsPlans::SendSmsJob has the same arguments and is within a 6 hours range it will be considered the same).
   DESC
   task recreate_sms_jobs: :environment do
     class RestoreScheduleSmsForUserSession < V1::SmsPlans::ScheduleSmsForUserSession
