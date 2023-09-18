@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
-  before_action :verify_access
+  before_action :verify_access, except: [:verify]
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def show
@@ -34,7 +34,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     access_token_to_response!
     render json: verify_response
   end
-  
+
   def destroy
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
@@ -78,7 +78,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def predefined_user_parameter
-    @predefined_user_parameter ||= PredefinedUserParameter.find_by!(slug: params[:slug])
+    @predefined_user_parameter ||= PredefinedUserParameter.find_by!(slug: slug)
   end
 
   def intervention_id

@@ -26,7 +26,6 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
 
     let(:first_session) { predefined_user_parameters.intervention.sessions.order(:position).first }
 
-
     it 'when intervention deesn\'t have sessions' do
       expect(subject[:session_id]).to eql first_session.id
     end
