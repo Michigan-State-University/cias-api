@@ -79,6 +79,7 @@ class V1::UserSessionScheduleService
 
     if date_of_schedule.past?
       user_intervention.update!(status: :in_progress)
+      next_user_session.update!(scheduled_at: date_of_schedule)
       next_session.send_link_to_session(user_session.user, health_clinic)
       return
     end
