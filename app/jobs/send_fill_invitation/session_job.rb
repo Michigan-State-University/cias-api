@@ -7,7 +7,7 @@ class SendFillInvitation::SessionJob < ApplicationJob
 
     existing_users_emails.each do |email|
       user = User.find_by(email: email)
-      next if user && !user.email_notification
+      next unless user.email_notification
 
       user_intervention = UserIntervention.find_or_create_by(user_id: user.id, intervention_id: intervention_id, health_clinic_id: health_clinic_id)
       user_session = UserSession.find_by(session_id: session_id,

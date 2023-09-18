@@ -7,7 +7,7 @@ class SendFillInvitation::InterventionJob < ApplicationJob
 
     existing_users_emails.each do |email|
       user = User.find_by(email: email)
-      next if user && !user.email_notification
+      next unless user.email_notification
 
       InterventionMailer.inform_to_an_email(intervention, email, health_clinic).deliver_now
     end
