@@ -3,7 +3,7 @@
 class UserSession::Classic < UserSession
   belongs_to :name_audio, class_name: 'Audio', optional: true
 
-  before_destroy :decrement_audio_usage
+  before_destroy :decrement_audio_usage, :cancel_timeout_job
 
   delegate :first_question, :autofinish_enabled, :autofinish_delay, :questions, to: :session
 

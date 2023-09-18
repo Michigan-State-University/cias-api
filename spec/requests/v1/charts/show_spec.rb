@@ -57,6 +57,9 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
                 }
               },
               'dashboard_section_id' => dashboard_section.id,
+              'date_range_start' => nil,
+              'date_range_end' => nil,
+              'interval_type' => 'monthly',
               'published_at' => nil
             }
           }

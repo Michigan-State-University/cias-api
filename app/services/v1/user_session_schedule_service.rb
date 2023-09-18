@@ -86,6 +86,6 @@ class V1::UserSessionScheduleService
 
     user_intervention.update!(status: :schedule_pending)
     next_user_session.update!(scheduled_at: date_of_schedule)
-    SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic)
+    SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic, user_intervention.id)
   end
 end

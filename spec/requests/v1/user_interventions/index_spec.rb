@@ -40,6 +40,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -62,6 +63,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -84,6 +86,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -106,6 +109,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'sessions_in_intervention' => 5,
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,

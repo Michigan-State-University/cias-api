@@ -5,7 +5,8 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
-  include ::TranslationAuxiliaryMethods
+  include TranslationAuxiliaryMethods
+  include MessageHandler
   extend DefaultValues
 
   CURRENT_VERSION = '1'
@@ -79,6 +80,7 @@ class Intervention < ApplicationRecord
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   before_save :remove_short_links, if: :will_save_change_to_organization_id?
+  before_update :cascade_access_type_change, if: :shared_to_changed?
   after_update_commit :status_change, :hf_access_change
 
   def assign_default_google_language
@@ -226,6 +228,22 @@ class Intervention < ApplicationRecord
 
   def remove_short_links
     short_links.destroy_all
+  end
+
+  def cascade_access_type_change
+    return unless shared_to == 'anyone'
+
+    permitted_schedules = %w[after_fill immediately]
+
+    sessions.each do |session|
+      next if session.schedule.in?(permitted_schedules)
+
+      session.update!(
+        schedule: 'after_fill',
+        schedule_payload: nil,
+        schedule_at: nil
+      )
+    end
   end
 
   def self.filter_by_collaboration_type(params, user)

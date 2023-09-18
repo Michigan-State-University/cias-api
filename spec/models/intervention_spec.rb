@@ -264,5 +264,16 @@ RSpec.describe Intervention, type: :model do
         expect(cloned_intervention.first.user_id).to eq(other_user.id)
       end
     end
+
+    context 'when the user duplicates here a session of another user' do
+      let(:other_user) { create(:user, :confirmed, :researcher) }
+      let(:params) { { user_id: other_user.id } }
+
+      it 'create a new intervention with correct user_id' do
+        cloned_intervention = intervention.clone(params: params)
+
+        expect(cloned_intervention.user).to eq(other_user)
+      end
+    end
   end
 end

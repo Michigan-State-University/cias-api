@@ -34,7 +34,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
             subject
 
             expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(
-              phone.prefix + phone.number, 'test', nil, user.id
+              phone.prefix + phone.number, 'test', nil, user.id, false, session.id
             )
           end
 
@@ -45,7 +45,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
               subject
 
               expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time).with(
-                phone.prefix + phone.number, 'test', url_for(sms_plan.no_formula_attachment), user.id
+                phone.prefix + phone.number, 'test', url_for(sms_plan.no_formula_attachment), user.id, false, session.id
               )
             end
           end
@@ -447,7 +447,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         it 'send sms with content of first variant' do
           subject
           expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
-            phone.prefix + phone.number, 'Hello John!', nil, user.id
+            phone.prefix + phone.number, 'Hello John!', nil, user.id, false, session.id
           )
         end
       end
@@ -473,7 +473,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         it 'send sms with content of first variant' do
           subject
           expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
-            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', nil, user.id
+            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', nil, user.id, false, session.id
           )
         end
       end
@@ -487,7 +487,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         it 'send sms with content of first variant' do
           subject
           expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(
-            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', url_for(variant1.attachment), user.id
+            phone.prefix + phone.number, 'variant 1 content, value: 1, prev_value: 1234', url_for(variant1.attachment), user.id, false, session.id
           )
         end
       end
@@ -508,8 +508,16 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
     shared_examples 'correct sms job queue' do
       it do
         subject
-        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(number, content, nil, user.id, true)
+        expect(SmsPlans::SendSmsJob).to have_been_enqueued.with(number, content, nil, user.id, true, session.id)
       end
+    end
+
+    context 'when the participant blocks sms notifications' do
+      let!(:user) do
+        create(:user, :confirmed, :researcher, first_name: 'Randy', last_name: 'Rhoads', email: 'not.black.sabbath@gmail.com', sms_notification: false)
+      end
+
+      it_behaves_like 'correct sms job queue'
     end
 
     context 'correctly applies personal data' do
