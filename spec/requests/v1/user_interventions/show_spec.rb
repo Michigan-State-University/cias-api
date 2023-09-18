@@ -39,10 +39,15 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
 
   context 'user_intervention with multiple sessions' do
     let!(:user_session1) do
-      create(:user_session, user_intervention: user_intervention, session: sessions.first, created_at: 1.month.ago, finished_at: 3.weeks.ago)
+      create(:user_session, user_intervention: user_intervention, health_clinic: health_clinic, session: sessions.first,
+                            created_at: 1.month.ago, finished_at: 3.weeks.ago)
     end
-    let!(:user_session2) { create(:user_session, user_intervention: user_intervention, session: sessions.first) }
-    let!(:user_session3) { create(:user_session, user_intervention: user_intervention, session: sessions.second) }
+    let!(:user_session2) do
+      create(:user_session, user_intervention: user_intervention, health_clinic: health_clinic, session: sessions.first)
+    end
+    let!(:user_session3) do
+      create(:user_session, user_intervention: user_intervention, health_clinic: health_clinic, session: sessions.second)
+    end
 
     before { request }
 
