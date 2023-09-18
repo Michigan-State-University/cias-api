@@ -89,4 +89,48 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       end
     end
   end
+
+  context 'intervention in the organization' do
+    let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+    let!(:health_system) { create(:health_system, name: 'Gotham Health System', organization: organization) }
+    let!(:health_clinic1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
+    let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
+
+    context 'when user has permission' do
+      context 'when intervention is published' do
+        before do
+          request
+        end
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:created)
+        end
+
+        it 'returns correct response data' do
+          expect(json_response['data'].size).to eq(4)
+        end
+
+        it 'create correct intervention invites' do
+          expect(intervention.reload.invitations.map(&:email)).to match_array(%w[test1@dom.com test2@com.com test3@dom.com
+                                                                               test4@com.com])
+          expect(intervention.reload.invitations.map(&:health_clinic_id).uniq).to match_array([health_clinic1.id,
+                                                                                               health_clinic2.id])
+        end
+      end
+
+      %w[draft closed archived].each do |status|
+        context "when intervention is #{status}" do
+          let!(:intervention_status) { status.to_sym }
+
+          before do
+            request
+          end
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:not_acceptable)
+          end
+        end
+      end
+    end
+  end
 end
