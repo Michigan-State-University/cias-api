@@ -11,9 +11,13 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
   let!(:invitation_email) { 'a@a.com' }
   let!(:params) do
     {
-      intervention_invitation: {
-        emails: [invitation_email, participant.email]
-      }
+      invitations: [
+        {
+          emails: [invitation_email, participant.email],
+          target_id: intervention.id,
+          target_type: 'intervention'
+        }
+      ]
     }
   end
   let(:request) { post v1_intervention_invitations_path(intervention_id: intervention.id), params: params, headers: user.create_new_auth_token }
@@ -81,7 +85,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
 
       it 'returns correct HTTP status (Unprocessable Entity)' do
         request
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

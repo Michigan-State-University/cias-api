@@ -177,6 +177,9 @@ ActiveRecord::Schema.define(version: 2023_09_05_090300) do
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
+    t.string "interval_type", default: "monthly"
+    t.datetime "date_range_start"
+    t.datetime "date_range_end"
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
@@ -455,6 +458,7 @@ ActiveRecord::Schema.define(version: 2023_09_05_090300) do
     t.integer "conversations_count"
     t.string "sensitive_data_state", default: "collected", null: false
     t.datetime "clear_sensitive_data_scheduled_at"
+    t.integer "navigators_count", default: 0
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
