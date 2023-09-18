@@ -36,7 +36,6 @@ end
 
 def recreate_schedule_job(user_session)
   job_exists = scheduled_set.each do |job|
-    p job['args'].first
     break true if job['args'].first >= {
       "job_class" => "SessionScheduleJob",
       "arguments" => [
