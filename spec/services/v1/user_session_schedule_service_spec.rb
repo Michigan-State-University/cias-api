@@ -70,6 +70,23 @@ RSpec.describe V1::UserSessionScheduleService do
             end
           end
         end
+
+        context 'when scheduling into the past' do
+          let!(:schedule) { 'exact_date' }
+          let!(:schedule_payload) { nil }
+          let!(:schedule_at) { 7.days.ago }
+
+          it "doesn't run the job" do
+            expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionScheduleJob)
+          end
+
+          it "sets the next user session's scheduled at to a past date" do
+            described_class.new(user_session).tap do |service|
+              service.schedule
+              expect(service.next_user_session.reload.scheduled_at.past?).to eq(true)
+            end
+          end
+        end
       end
     end
   end
@@ -101,7 +118,6 @@ RSpec.describe V1::UserSessionScheduleService do
             end
 
             it 'schedules on correct time' do
-              p expected_timestamp
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
                                                                          .with(second_session.id, user.id, user_session.health_clinic, user_intervention.id)
                                                                          .at(a_value_within(1.second).of(expected_timestamp))
@@ -158,7 +174,7 @@ RSpec.describe V1::UserSessionScheduleService do
               let!(:update_second_session) { second_session.update(days_after_date_variable_name: "#{user_session.session.variable}.days_after_date_variable") }
               let!(:answer) do
                 create(:answer_date, user_session: user_session,
-                                     body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })
+                       body: { data: [{ var: 'days_after_date_variable', value: tomorrow.to_s }] })
               end
 
               it 'calls correct method' do
@@ -210,20 +226,20 @@ RSpec.describe V1::UserSessionScheduleService do
                 {
                   payload: 'test',
                   patterns: [{
-                    match: '=2',
-                    target: [{
-                      id: second_session.id,
-                      probability: '100',
-                      type: 'Session'
-                    }]
-                  },
+                               match: '=2',
+                               target: [{
+                                          id: second_session.id,
+                                          probability: '100',
+                                          type: 'Session'
+                                        }]
+                             },
                              {
                                match: '=1',
                                target: [{
-                                 id: third_session.id,
-                                 probability: '100',
-                                 type: 'Session'
-                               }]
+                                          id: third_session.id,
+                                          probability: '100',
+                                          type: 'Session'
+                                        }]
                              }]
                 }
               end
@@ -253,20 +269,20 @@ RSpec.describe V1::UserSessionScheduleService do
                   {
                     payload: 'test',
                     patterns: [{
-                      match: '=2',
-                      target: [{
-                        id: second_session.id,
-                        probability: '100',
-                        type: 'Session'
-                      }]
-                    },
+                                 match: '=2',
+                                 target: [{
+                                            id: second_session.id,
+                                            probability: '100',
+                                            type: 'Session'
+                                          }]
+                               },
                                {
                                  match: '=1',
                                  target: [{
-                                   id: third_session.id,
-                                   probability: '100',
-                                   type: 'Session'
-                                 }]
+                                            id: third_session.id,
+                                            probability: '100',
+                                            type: 'Session'
+                                          }]
                                }]
                   }
                 end
@@ -281,20 +297,20 @@ RSpec.describe V1::UserSessionScheduleService do
                   {
                     payload: 'test',
                     patterns: [{
-                      match: '=2',
-                      target: [{
-                        id: second_session.id,
-                        probability: '100',
-                        type: 'Session'
-                      }]
-                    },
+                                 match: '=2',
+                                 target: [{
+                                            id: second_session.id,
+                                            probability: '100',
+                                            type: 'Session'
+                                          }]
+                               },
                                {
                                  match: '=3',
                                  target: [{
-                                   id: third_session.id,
-                                   probability: '100',
-                                   type: 'Session'
-                                 }]
+                                            id: third_session.id,
+                                            probability: '100',
+                                            type: 'Session'
+                                          }]
                                }]
                   }
                 end
