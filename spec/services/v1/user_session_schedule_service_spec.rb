@@ -101,8 +101,9 @@ RSpec.describe V1::UserSessionScheduleService do
             end
 
             it 'schedules on correct time' do
+              p expected_timestamp
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
-                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic, user_intervention.id)
                                                                          .at(a_value_within(1.second).of(expected_timestamp))
             end
 
