@@ -4,6 +4,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
   let(:subject) { described_class.call(predefined_user_parameters) }
   let!(:predefined_participant) { create(:user, :predefined_participant) }
   let(:predefined_user_parameters) { predefined_participant.predefined_user_parameter }
+  let(:first_session) { predefined_user_parameters.intervention.sessions.order(:position).first }
 
   it 'return expected response' do
     expect(subject.keys).to match_array(%i[intervention_id session_id health_clinic_id multiple_fill_session_available user_intervention_id])
@@ -23,8 +24,6 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
     before do
       create_list(:session, 3, intervention: predefined_user_parameters.intervention)
     end
-
-    let(:first_session) { predefined_user_parameters.intervention.sessions.order(:position).first }
 
     it 'when intervention deesn\'t have sessions' do
       expect(subject[:session_id]).to eql first_session.id
@@ -59,6 +58,50 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
         it 'return started session' do
           expect(subject[:session_id]).to eql first_session.id
         end
+      end
+    end
+  end
+
+  context 'flexible intervention' do
+    let(:user_intervention) { create(:user_intervention, user: predefined_participant, intervention: predefined_user_parameters.intervention) }
+    let(:user_session) { create(:user_session, user: predefined_participant, session: first_session, user_intervention: user_intervention) }
+
+    before do
+      predefined_user_parameters.intervention.update!(type: 'Intervention::FlexibleOrder')
+      create_list(:session, 3, intervention: predefined_user_parameters.intervention)
+      first_session.update!(multiple_fill: true)
+      user_session
+    end
+
+    it 'return current user_session' do
+      expect(subject[:session_id]).to eql first_session.id
+      expect(subject[:multiple_fill_session_available]).to be false
+    end
+
+    context 'all user sessions are finished' do
+      before do
+        user_session.finish
+      end
+
+      it 'return correct value for some keys' do
+        expect(subject[:session_id]).to be nil
+        expect(subject[:multiple_fill_session_available]).to be true
+      end
+    end
+
+    context 'multiple-fill session is finished but next session is already started' do
+      let(:second_user_session) do
+        create(:user_session, session: predefined_user_parameters.intervention.sessions.order(:position).second, user: predefined_participant,
+                              user_intervention: user_intervention)
+      end
+
+      before do
+        user_session.finish
+        second_user_session
+      end
+
+      it 'multiple fill session available should return nil if user has other session in progress' do
+        expect(subject[:multiple_fill_session_available]).to be false
       end
     end
   end

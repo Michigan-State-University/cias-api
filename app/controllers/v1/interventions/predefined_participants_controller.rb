@@ -29,7 +29,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def verify
-    return :forbidden unless predefined_user_parameter.intervention.published?
+    return head :forbidden unless predefined_user_parameter.intervention.published?
 
     access_token_to_response!
     render json: verify_response

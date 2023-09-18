@@ -35,7 +35,7 @@ class V1::Intervention::PredefinedParticipants::VerifyService
     return nil if intervention.sessions.blank?
 
     user_sessions = UserSession.where(user_intervention: user_intervention).order(:last_answer_at)
-    user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at = ? OR scheduled_at < ?', nil, DateTime.now)
+    user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at IS NULL OR scheduled_at < ?', DateTime.now)
 
     return user_sessions_in_progress.last.session if user_sessions_in_progress.any?
     return nil if intervention.type.eql?('Intervention::FlexibleOrder')
@@ -52,6 +52,10 @@ class V1::Intervention::PredefinedParticipants::VerifyService
   end
 
   def multiple_fill_session_available
-    UserSession.joins(:session).where(user_intervention: user_intervention, session: { multiple_fill: true }).where.not(finished_at: nil).any?
+    finished_multiple_fill_user_sessions = UserSession.joins(:session).where(user_intervention: user_intervention,
+                                                                             session: { multiple_fill: true }).where.not(finished_at: nil)
+    user_sessions_in_progress = UserSession.where(user_intervention: user_intervention, finished_at: nil)
+
+    finished_multiple_fill_user_sessions.any? && user_sessions_in_progress.blank?
   end
 end
