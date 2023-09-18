@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::ChartStatistics::BarChart::Numeric do
-  subject { described_class.new(data_collection, chart).generate_for_chart }
+  subject { described_class.new(data_collection, charts).generate }
 
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
@@ -34,8 +34,6 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   let(:charts) { Chart.all }
 
   context 'for all charts' do
-    subject { described_class.new(data_collection, charts).generate }
-
     context 'when charts are publish' do
       it 'return correct aggregated data' do
         expect(subject).to include(
@@ -105,6 +103,64 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
           }
         )
       end
+    end
+  end
+
+  context 'when chart has quarterly interval' do
+    subject { described_class.new(data_collection, charts).generate }
+
+    let!(:bar_chart1) do
+      create(:chart, name: 'bar_chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published', interval_type: :quarterly)
+    end
+    let!(:bar_chart2) do
+      create(:chart, name: 'bar_chart2', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published', interval_type: :quarterly)
+    end
+
+    let!(:chart_matched_statistic1) do
+      create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                        health_clinic: health_clinic, filled_at: DateTime.now)
+    end
+    let!(:chart_not_matched_statistic1) do
+      create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: DateTime.now)
+    end
+    let!(:chart_matched_statistic2) do
+      create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter)
+    end
+    let!(:chart_not_matched_statistic2) do
+      create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter)
+    end
+
+    it 'return correct aggregated data' do
+      expect(subject).to include(
+        {
+          'chart_id' => bar_chart1.id,
+          'data' => include(
+            {
+              'label' => "Q#{(chart_matched_statistic1.first.filled_at.month / 3.0).ceil} #{chart_matched_statistic1.first.filled_at.year}",
+              'value' => 10,
+              'color' => '#C766EA',
+              'notMatchedValue' => 5
+            },
+            {
+              'label' => "Q#{(chart_matched_statistic2.first.filled_at.month / 3.0).ceil} #{chart_matched_statistic2.first.filled_at.year}",
+              'value' => 3,
+              'color' => '#C766EA',
+              'notMatchedValue' => 5
+            }
+          ),
+          'population' => 23,
+          'dashboard_section_id' => bar_chart1.dashboard_section_id
+        },
+        {
+          'chart_id' => bar_chart2.id,
+          'data' => [],
+          'population' => 0,
+          'dashboard_section_id' => bar_chart2.dashboard_section_id
+        }
+      )
     end
   end
 end

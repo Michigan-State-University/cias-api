@@ -6,6 +6,7 @@ class Clone::Intervention < Clone::Base
     outcome.sensitive_data_state = 'collected'
     outcome.name = "Copy of #{outcome.name}"
     outcome.is_hidden = true
+    outcome.user_id = user_id if user_id.present?
     clear_organization!
     clear_cat_mh_settings!
     clear_hfhs_settings!

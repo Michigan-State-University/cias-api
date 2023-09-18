@@ -4,7 +4,7 @@ shared_examples 'user third_party role invitation, generating report sharing' do
   it 'invites new users with third party role to the system, shares generated report with the users' do
     expect { subject }.to change(User, :count).by(user_number).and \
       change(GeneratedReportsThirdPartyUser, :count).by(generated_reports_third_party_user_number)
-    expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.exactly(mail_number)
+    expect(SendNewReportNotificationJob).to have_been_enqueued.exactly(mail_number)
   end
 end
 

@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
-  before_action :verify_access
+  before_action :verify_access, except: [:verify]
+  skip_before_action :authenticate_user!, only: %i[verify]
 
   def show
     render json: serialized_response(predefined_participant)
@@ -27,6 +28,13 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user)
   end
 
+  def verify
+    return head :forbidden unless predefined_user_parameter.intervention.published?
+
+    access_token_to_response!
+    render json: verify_response
+  end
+
   def destroy
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
@@ -41,6 +49,17 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   private
+
+  def access_token_to_response!
+    response.headers.merge!(predefined_user_parameter.user.create_new_auth_token)
+  end
+
+  def verify_response
+    {
+      user: V1::UserSerializer.new(predefined_user_parameter.user).serializable_hash[:data],
+      redirect_data: V1::Intervention::PredefinedParticipants::VerifyService.call(predefined_user_parameter)
+    }
+  end
 
   def predefined_user_parameters
     params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, phone_attributes: %i[iso prefix number])
@@ -58,8 +77,16 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     @predefined_participant ||= predefined_participants.find(params[:id])
   end
 
+  def predefined_user_parameter
+    @predefined_user_parameter ||= PredefinedUserParameter.find_by!(slug: slug)
+  end
+
   def intervention_id
     params[:intervention_id]
+  end
+
+  def slug
+    params[:slug]
   end
 
   def verify_access

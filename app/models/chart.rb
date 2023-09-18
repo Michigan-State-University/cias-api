@@ -19,7 +19,7 @@ class Chart < ApplicationRecord
 
   enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
   enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
-
+  enum interval_type: { monthly: 'monthly', quarterly: 'quarterly' } # only for bar charts
   default_scope { order(:position) }
   after_update_commit :status_change
 
