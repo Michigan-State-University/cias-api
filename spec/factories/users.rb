@@ -8,7 +8,7 @@ FactoryBot.define do
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
     provider { 'email' }
     terms { true }
-    roles { %w[guest] }
+    roles { %w[researcher] }
     time_zone { 'Europe/Warsaw' }
 
     after(:create) do |user|
