@@ -64,7 +64,7 @@ Rails.application.routes.draw do
       get 'generated_conversations_transcript', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
-        resources :predefined_participants, only: %i[index create update show destroy] do
+        resources :predefined_participants do
           post 'send_invitation', on: :member
         end
         resources :answers, only: %i[index]
@@ -307,6 +307,7 @@ Rails.application.routes.draw do
     get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
     get 'jwk-set-1', as: :jwk_set, to: 'epic_on_fhir/jwk_sets#index'
     get '/s/:slug', to: 'links#show', as: :short
+    post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
   end
 
   if Rails.env.development?

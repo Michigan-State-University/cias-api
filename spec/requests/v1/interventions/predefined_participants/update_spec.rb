@@ -4,8 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants/:id', type: :request do
   let(:request) do
-    patch v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user.id),
-          params: params, headers: current_user.create_new_auth_token
+    patch v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user.id), params: params,
+                                                                                                      headers: current_user.create_new_auth_token
   end
   let!(:intervention) { create(:intervention, user: researcher) }
   let(:researcher) { create(:user, :researcher, :confirmed) }
