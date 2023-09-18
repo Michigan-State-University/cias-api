@@ -1,27 +1,18 @@
 # frozen_string_literal: true
 
-# frozen_string_require: true
-
 class V1::Interventions::PredefinedParticipantsController < V1Controller
+  before_action :verify_access
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def show
-    authorize! :read, Intervention
-    authorize! :read, intervention_load
-
     render json: serialized_response(predefined_participant)
   end
 
   def index
-    authorize! :read, Intervention
-    authorize! :read, intervention_load
-
     render json: serialized_response(predefined_participants)
   end
 
   def create
-    authorize! :update, Intervention
-    authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     predefined_user = V1::Intervention::PredefinedParticipants::CreateService.call(intervention_load, predefined_user_parameters)
@@ -30,8 +21,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def update
-    authorize! :update, Intervention
-    authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     predefined_user = V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, predefined_user_parameters)
@@ -44,6 +33,19 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
     access_token_to_response!
     render json: verify_response
+  end
+  
+  def destroy
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
+
+    predefined_participant.update!(active: false)
+
+    render status: :no_content
+  end
+
+  def send_invitation
+    V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:invitation_sent_at), status: :ok
   end
 
   private
@@ -60,7 +62,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def predefined_user_parameters
-    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, phone_attributes: %i[iso prefix number])
+    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load
@@ -85,5 +87,10 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def slug
     params[:slug]
+  end
+
+  def verify_access
+    authorize! :update, Intervention
+    authorize! :update, intervention_load
   end
 end

@@ -31,10 +31,26 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
 
   it 'return correct body' do
     request
-    expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id])
+    expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id auto_invitation
+                                                                       invitation_sent_at])
   end
 
   it_behaves_like 'users without access'
+
+  context 'researcher activates the account' do
+    let(:user) { create(:user, :predefined_participant, active: false) }
+    let(:params) do
+      {
+        predefined_user: {
+          active: true
+        }
+      }
+    end
+
+    it 'activates the user' do
+      expect { request }.to change { user.reload.active }.to(true)
+    end
+  end
 
   context 'when intervention has collaborators' do
     let!(:intervention) { create(:intervention, :with_collaborators, user: researcher) }
