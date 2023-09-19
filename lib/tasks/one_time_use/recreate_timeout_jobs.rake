@@ -28,7 +28,7 @@ def user_sessions_scope
   UserSession.joins(:session)
              .where(finished_at: nil)
              .where.not(last_answer_at: nil)
-             .where('sessions.autofinish_enabled IS TRUE')
+             .where(sessions: {autofinish_enabled:  true})
 end
 
 def recreate_timeout_job_for_user_session(user_session, timeout_datetime)
