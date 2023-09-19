@@ -252,11 +252,11 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       {
         invitations:
           [{
-             health_clinic_id: health_clinic1.id,
-             emails: %w[test1@dom.com test2@com.com],
-             target_id: session.id,
-             target_type: 'session'
-           },
+            health_clinic_id: health_clinic1.id,
+            emails: %w[test1@dom.com test2@com.com],
+            target_id: session.id,
+            target_type: 'session'
+          },
            {
              health_clinic_id: health_clinic2.id,
              emails: %w[test3@dom.com test4@com.com],

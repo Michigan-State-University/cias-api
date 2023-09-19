@@ -16,7 +16,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/invitations/:id', type
   end
 
   it 'removed invitation' do
-    expect{request}.to change(Invitation, :count).by(-1)
+    expect { request }.to change(Invitation, :count).by(-1)
   end
 
   it 'return correct http code' do
