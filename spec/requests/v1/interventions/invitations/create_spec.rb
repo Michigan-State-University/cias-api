@@ -240,4 +240,68 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       end
     end
   end
+
+  context 'session in the organization' do
+    let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
+    let!(:health_system) { create(:health_system, name: 'Gotham Health System', organization: organization) }
+    let!(:health_clinic1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
+    let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
+    let!(:intervention) { create(:intervention, status: intervention_status, shared_to: 'registered', organization: organization, user: user) }
+    let(:session) { create(:session, intervention_id: intervention.id) }
+    let(:params) do
+      {
+        invitations:
+          [{
+             health_clinic_id: health_clinic1.id,
+             emails: %w[test1@dom.com test2@com.com],
+             target_id: session.id,
+             target_type: 'session'
+           },
+           {
+             health_clinic_id: health_clinic2.id,
+             emails: %w[test3@dom.com test4@com.com],
+             target_id: session.id,
+             target_type: 'session'
+           }]
+      }
+    end
+
+    context 'when user has permission' do
+      context 'when intervention is published' do
+        before do
+          request
+        end
+
+        it 'invitations has information about health clinics' do
+          expect(session.reload.invitations.map(&:health_clinic_id).uniq).to match_array([health_clinic1.id, health_clinic2.id])
+        end
+
+        it 'returns correct http status' do
+          expect(response).to have_http_status(:created)
+        end
+
+        it 'returns correct response data' do
+          expect(json_response['data'].size).to eq(4)
+        end
+
+        it 'create correct session invites' do
+          expect(session.reload.invitations.map(&:email)).to match_array(%w[test1@dom.com test2@com.com test3@dom.com test4@com.com])
+        end
+      end
+
+      %w[draft closed archived].each do |status|
+        context "when intervention is #{status}" do
+          let!(:intervention_status) { status.to_sym }
+
+          before do
+            request
+          end
+
+          it 'returns correct http status' do
+            expect(response).to have_http_status(:not_acceptable)
+          end
+        end
+      end
+    end
+  end
 end
