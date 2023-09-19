@@ -47,11 +47,7 @@ def finish_due_classic_user_session(user_session, timeout_datetime)
   user_session.send(:delete_alternative_answers)
   user_session.reload
 
-  # user_session.decrement_audio_usage
-  unless user_session.name_audio.nil?
-    user_session.name_audio.decrement(:usage_counter)
-    user_session.name_audio.save!
-  end
+  user_session.send(:decrement_audio_usage)
 
   RecreateUserSessionScheduleService.new(user_session, timeout_datetime).schedule
   V1::ChartStatistics::CreateForUserSession.call(user_session)
