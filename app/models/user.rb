@@ -262,8 +262,7 @@ class User < ApplicationRecord
 
   def self.invite!(attributes = {}, invited_by = nil, options = {}, &block)
     User.new(**attributes).tap do |user|
-      user.valid?
-      raise ActiveRecord::RecordInvalid if user.errors[:email].present?
+      raise ActiveRecord::RecordInvalid if user.invalid? && user.errors[:email].present?
     end
     super(attributes, invited_by, options, &block)
   end
