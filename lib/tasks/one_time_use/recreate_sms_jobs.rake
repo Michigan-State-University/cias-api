@@ -1,7 +1,7 @@
 namespace :one_time_use do
   desc <<-DESC
 This task will recreate all the scheduled sms jobs, both the one-time ones, as well as periodic (every day, every month etc). \
-The tolerance for assuming it's the same job is 6 hours \
+The tolerance for assuming it's the same job is 5 hours \
 (if the SmsPlans::SendSmsJob has the same arguments and is within a 6 hours range it will be considered the same).
   DESC
   task recreate_sms_jobs: :environment do
@@ -35,7 +35,17 @@ The tolerance for assuming it's the same job is 6 hours \
               is_alert,
               user_session.session_id
             ],
-          } && start_time - 6.hours < job.at && start_time + 6.hours > job.at
+          } && job_near_timestamp?(job, start_time)
+
+          break true if job['args'].first >= {
+            "job_class" => "SmsPlans::SendSmsJob",
+            "arguments" => [
+              phone.full_number,
+              content,
+              attachment_url,
+              phone.user&.id,
+            ],
+          } && job_near_timestamp?(job, start_time)
         end || false
 
         return if job_exists
@@ -44,7 +54,10 @@ The tolerance for assuming it's the same job is 6 hours \
       end
     end
 
-    UserSession.find_each do |user_session|
+    user_sessions_count = user_sessions.count
+    puts "Found #{user_sessions_count} candidate user sessions"
+    user_sessions.find_each.with_index(1) do |user_session, i|
+      puts "Processing #{i}/#{user_sessions_count}"
       RestoreScheduleSmsForUserSession.call(user_session)
     end
   end
@@ -58,3 +71,6 @@ def user_sessions
   UserSession.where.not(finished_at: nil)
 end
 
+def job_near_timestamp?(job, timestamp, tolerance=5.hours)
+  timestamp - tolerance <= job.at && timestamp + tolerance >= job.at
+end
