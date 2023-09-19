@@ -46,6 +46,22 @@ RSpec.describe V1::ChartStatistics::Create do
     end
   end
 
+  context 'when the user session was finished near the end of the day in date_range_end' do
+    let(:user_session_finished_at) { chart.date_range_end + 24.hours - 1.second }
+
+    it 'creates a new chart statistic' do
+      expect { subject }.to change(ChartStatistic, :count).by(1)
+    end
+  end
+
+  context 'when the user session was finished just after the end of the day in date_range_end' do
+    let(:user_session_finished_at) { chart.date_range_end + 24.hours + 1.second }
+
+    it 'creates a new chart statistic' do
+      expect { subject }.not_to change(ChartStatistic, :count)
+    end
+  end
+
   context "when the user session was finished before the chart's data range" do
     let(:user_session_finished_at) { DateTime.now - 1.week }
 
