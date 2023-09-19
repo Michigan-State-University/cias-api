@@ -21,7 +21,6 @@ class V1::Intervention::CreateInvitation
   private
 
   def create_invitations!(invitation_params)
-
     object = fetch_object(invitation_params)
     if wrong_type_of_invitation_for_object?(invitation_params, object)
       raise ActiveModel::ForbiddenAttributesError, I18n.t('interventions.invitations.wrong_intervention_type')
