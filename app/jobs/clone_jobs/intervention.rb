@@ -4,6 +4,8 @@ class CloneJobs::Intervention < CloneJob
   def perform(user, intervention_id, clone_params)
     intervention = Intervention.find(intervention_id)
 
+    clone_params['user_id'] = user.id
+
     cloned_interventions = intervention.clone(params: clone_params)
     cloned_interventions = Array(cloned_interventions) unless cloned_interventions.is_a?(Array)
 

@@ -10,6 +10,8 @@ class UserSession < ApplicationRecord
   has_many :tlfb_days, class_name: 'Tlfb::Day', dependent: :destroy
   belongs_to :health_clinic, optional: true
 
+  validates :health_clinic_id, presence: true, if: :user_intervention_inside_health_clinic?
+
   def finish(_send_email: true)
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
@@ -69,5 +71,9 @@ class UserSession < ApplicationRecord
     return session.last_session? && finished_at.present? unless user_intervention.intervention.module_intervention?
 
     user_intervention.completed_sessions == user_intervention.sessions.size
+  end
+
+  def user_intervention_inside_health_clinic?
+    user_intervention&.health_clinic_id.present?
   end
 end

@@ -13,13 +13,13 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def call
     return unless session.intervention.published?
+
+    execute_plans_for('SmsPlan::Alert')
+
     return unless user.sms_notification
+    return unless phone.present? && phone.confirmed?
 
-    session.sms_plans.each do |plan|
-      next unless can_run_plan?(plan)
-
-      send("#{plan.schedule}_schedule", plan) if plan.alert? || (phone.present? && phone.confirmed?)
-    end
+    execute_plans_for('SmsPlan::Normal')
   end
 
   private
@@ -30,8 +30,22 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     @session ||= user_session.session
   end
 
+  def execute_plans_for(type)
+    session.sms_plans.limit_to_types(type).each do |plan|
+      next unless can_run_plan?(plan)
+
+      send("#{plan.schedule}_schedule", plan)
+    end
+  end
+
   def after_session_end_schedule(plan)
-    set_frequency(Time.current, plan)
+    current_time = if plan.is_a? SmsPlan::Alert
+                     Time.current
+                   else
+                     now_in_timezone
+                   end
+
+    set_frequency(current_time, plan, true)
   end
 
   def days_after_session_end_schedule(plan)
@@ -48,7 +62,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     true
   end
 
-  def set_frequency(start_time, plan)
+  def set_frequency(start_time, plan, send_first_right_after_finish = false)
     frequency = plan.frequency
     content = sms_content(plan)
     return if content.blank?
@@ -66,7 +80,14 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     if frequency == SmsPlan.frequencies[:once]
       send_sms(start_time, content, attachment_url)
     else
-      date = start_time
+
+      if send_first_right_after_finish
+        send_sms(start_time.utc, content, attachment_url)
+        date = start_time.next_day(number_days[frequency])
+      else
+        date = start_time
+      end
+
       while date.to_date <= finish_date.to_date
         send_sms(date.change(random_time).utc, content, attachment_url)
         date = date.next_day(number_days[frequency])

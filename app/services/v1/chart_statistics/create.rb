@@ -17,15 +17,16 @@ class V1::ChartStatistics::Create
     return if zero_division_error?
     return unless inside_date_range?
 
-    ChartStatistic.find_or_create_by!(
+    chart_statistic = ChartStatistic.find_or_initialize_by(
       label: label,
       organization: organization,
       health_system: health_system,
       health_clinic: health_clinic,
       chart: chart,
-      user: user_session.user,
-      filled_at: user_session.finished_at || DateTime.current
+      user: user_session.user
     )
+    chart_statistic.filled_at = user_session.finished_at || DateTime.current
+    chart_statistic.save!
   end
 
   private
