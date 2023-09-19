@@ -77,15 +77,14 @@ class V1::UserSessionScheduleService
   def schedule_until(date_of_schedule, next_session)
     return if date_of_schedule.blank?
 
+    next_user_session.update!(scheduled_at: date_of_schedule)
+
     if date_of_schedule.past?
       user_intervention.update!(status: :in_progress)
-      next_user_session.update!(scheduled_at: date_of_schedule)
       next_session.send_link_to_session(user_session.user, health_clinic)
-      return
+    else
+      user_intervention.update!(status: :schedule_pending)
+      SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic, user_intervention.id)
     end
-
-    user_intervention.update!(status: :schedule_pending)
-    next_user_session.update!(scheduled_at: date_of_schedule)
-    SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic, user_intervention.id)
   end
 end
