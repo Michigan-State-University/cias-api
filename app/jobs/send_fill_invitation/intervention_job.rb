@@ -8,7 +8,7 @@ class SendFillInvitation::InterventionJob < ApplicationJob
     User.where(email: existing_users_emails).find_each do |user|
       next unless user.email_notification
 
-      InterventionMailer.inform_to_an_email(intervention, email, health_clinic).deliver_now
+      InterventionMailer.inform_to_an_email(intervention, user.email, health_clinic).deliver_now
     end
 
     non_existing_users_emails.each do |email|
