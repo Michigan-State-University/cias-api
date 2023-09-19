@@ -9,7 +9,10 @@ However, it won't restore any scheduling for UserSessions that have not been sch
 For this, you will need to run `rake one_time_use:recreate_timeout_jobs` before running this task.
   DESC
   task recreate_session_schedule_jobs: :environment do
-    user_sessions.find_each do |user_session|
+    user_sessions_count = user_sessions.count
+    puts "Found #{user_sessions_count} candidate user sessions"
+    user_sessions.find_each.with_index(1) do |user_session, i|
+      puts "Processing #{i}/#{user_sessions_count}"
       if user_session.scheduled_at.past?
         perform_due_schedule(user_session)
       else
