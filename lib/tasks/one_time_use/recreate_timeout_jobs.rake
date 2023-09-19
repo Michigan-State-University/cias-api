@@ -44,7 +44,7 @@ end
 
 def finish_due_classic_user_session(user_session, timeout_datetime)
   user_session.update(finished_at: timeout_datetime)
-  user_session.answers.where(draft: true, alternative_branch: true).destroy_all # user_session.delete_alternative_answers
+  user_session.send(:delete_alternative_answers)
   user_session.reload
 
   # user_session.decrement_audio_usage
