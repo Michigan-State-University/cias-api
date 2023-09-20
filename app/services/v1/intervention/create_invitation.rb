@@ -35,6 +35,9 @@ class V1::Intervention::CreateInvitation
 
   def wrong_type_of_invitation_for_object?(params, object)
     target_type = params['target_type']
-    (target_type.eql?('intervention') && object.type.eql?('Intervention')) || (target_type.eql?('session') && object.intervention.type != 'Intervention')
+    return true if target_type.eql?('intervention') && object.type.eql?('Intervention')
+    return true if target_type.eql?('session') && object.intervention.type != 'Intervention'
+
+    false
   end
 end
