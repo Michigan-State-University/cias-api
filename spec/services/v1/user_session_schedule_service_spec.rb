@@ -70,6 +70,23 @@ RSpec.describe V1::UserSessionScheduleService do
             end
           end
         end
+
+        context 'when scheduling into the past' do
+          let!(:schedule) { 'exact_date' }
+          let!(:schedule_payload) { nil }
+          let!(:schedule_at) { 7.days.ago }
+
+          it "doesn't run the job" do
+            expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionScheduleJob)
+          end
+
+          it "sets the next user session's scheduled at to a past date" do
+            described_class.new(user_session).tap do |service|
+              service.schedule
+              expect(service.next_user_session.reload.scheduled_at.past?).to eq(true)
+            end
+          end
+        end
       end
     end
   end
