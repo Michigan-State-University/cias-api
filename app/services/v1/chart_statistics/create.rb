@@ -73,7 +73,8 @@ class V1::ChartStatistics::Create
 
   def inside_date_range?
     return false if chart.date_range_start.present? && chart.date_range_start > user_session.finished_at
-    return false if chart.date_range_end.present? && chart.date_range_end < user_session.finished_at
+    # +1.day because FE sends and BE stores the BEGINNING of the last day, and we need to include this day as a whole as well
+    return false if chart.date_range_end.present? && chart.date_range_end + 1.day <= user_session.finished_at
 
     true
   end
