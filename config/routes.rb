@@ -68,7 +68,9 @@ Rails.application.routes.draw do
           post 'send_invitation', on: :member
         end
         resources :answers, only: %i[index]
-        resources :invitations, only: %i[index create destroy]
+        resources :invitations, only: %i[index create destroy] do
+          get 'resend', on: :member
+        end
         resources :accesses, only: %i[index create destroy]
         resources :files, only: %i[create destroy]
         resources :short_links, only: %i[create index]
@@ -100,9 +102,6 @@ Rails.application.routes.draw do
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
-        resources :invitations, only: %i[index create] do
-          get 'resend', on: :member
-        end
         resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
@@ -211,16 +210,6 @@ Rails.application.routes.draw do
           end
         end
         resources :interventions, only: :index, controller: :interventions
-        scope module: 'interventions' do
-          resources :interventions do
-            resources :invitations, only: %i[create]
-          end
-        end
-        scope module: 'sessions' do
-          resources :sessions do
-            resources :invitations, only: %i[index create]
-          end
-        end
       end
     end
     get 'organization_invitations/confirm', to: 'organizations/invitations#confirm',
