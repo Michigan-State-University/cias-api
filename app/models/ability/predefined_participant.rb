@@ -11,7 +11,7 @@ class Ability::PredefinedParticipant < Ability::Base
   private
 
   def predefined_participant
-    enable_fill_in_access(user.id, { status: 'published', shared_to: 'anyone' })
+    enable_fill_in_access(user.id, { status: 'published' })
     can %i[index create], LiveChat::Conversation
   end
 end

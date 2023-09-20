@@ -21,6 +21,8 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
   end
 
   context 'intervention with sessions' do
+    let(:second_session) { predefined_user_parameters.intervention.sessions.order(:position).second }
+
     before do
       create_list(:session, 3, intervention: predefined_user_parameters.intervention)
     end
@@ -40,24 +42,46 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       end
     end
 
+    context 'when first user session is completed' do
+      before do
+        user_intervention = create(:user_intervention, user: predefined_participant, intervention: predefined_user_parameters.intervention)
+        create(:user_session, user: predefined_participant, session: first_session, finished_at: DateTime.now, user_intervention: user_intervention)
+      end
+
+      it 'return started session' do
+        expect(subject[:session_id]).to eql second_session.id
+      end
+    end
+
     context 'when session is scheduling is on' do
       before do
         user_intervention = create(:user_intervention, user: predefined_participant, intervention: predefined_user_parameters.intervention)
-        create(:user_session, user: predefined_participant, session: first_session, scheduled_at: scheduled_at, user_intervention: user_intervention)
+        create(:user_session, user: predefined_participant, session: first_session, finished_at: DateTime.now, user_intervention: user_intervention)
+        create(:user_session, user: predefined_participant, session: second_session, scheduled_at: scheduled_at, user_intervention: user_intervention)
       end
 
       let(:scheduled_at) { DateTime.now + 2.days }
 
       it 'return started session' do
-        expect(subject[:session_id]).to eql predefined_user_parameters.intervention.sessions.order(:position).second.id
+        expect(subject[:session_id]).to be nil
       end
 
       context 'scheduled at from past' do
         let(:scheduled_at) { DateTime.now - 2.days }
 
         it 'return started session' do
-          expect(subject[:session_id]).to eql first_session.id
+          expect(subject[:session_id]).to eql second_session.id
         end
+      end
+    end
+
+    context 'when intervention is completed' do
+      before do
+        create(:user_intervention, user: predefined_participant, intervention: predefined_user_parameters.intervention, status: :completed)
+      end
+
+      it 'return started session' do
+        expect(subject[:session_id]).to be nil
       end
     end
   end

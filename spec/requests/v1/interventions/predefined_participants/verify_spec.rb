@@ -77,4 +77,17 @@ RSpec.describe 'POST /v1/predefined_participants/verify', type: :request do
       expect(response).to have_http_status(:not_found)
     end
   end
+
+  context 'when a participant tries to perform a request' do
+    let(:participant) { create(:user, :participant, :confirmed) }
+    let!(:headers) { participant.create_new_auth_token }
+    let(:request) do
+      post v1_verify_predefined_participant_path, params: params, headers: headers
+    end
+
+    it 'return correct status' do
+      request
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
 end
