@@ -29,6 +29,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def verify
+    return head :unauthorized if current_v1_user.present? && !current_v1_user.role?('predefined_participant')
     return head :forbidden unless predefined_user_parameter.intervention.published?
 
     access_token_to_response!

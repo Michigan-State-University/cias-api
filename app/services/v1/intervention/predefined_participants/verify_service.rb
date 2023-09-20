@@ -33,6 +33,7 @@ class V1::Intervention::PredefinedParticipants::VerifyService
 
   def session
     return nil if intervention.sessions.blank?
+    return nil if user_intervention.completed?
 
     user_sessions = UserSession.where(user_intervention: user_intervention).order(:last_answer_at)
     user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at IS NULL OR scheduled_at < ?', DateTime.now)
@@ -42,7 +43,7 @@ class V1::Intervention::PredefinedParticipants::VerifyService
 
     return intervention.sessions.order(:position).first if user_sessions.blank?
 
-    next_session = user_sessions.last.session.next_session
+    next_session = user_sessions.where.not(finished_at: nil).last.session.next_session
     next_user_session = UserSession.find_by(session_id: next_session.id)
 
     return next_session if next_user_session.blank?
