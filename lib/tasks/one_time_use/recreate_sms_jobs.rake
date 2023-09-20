@@ -25,27 +25,25 @@ The tolerance for assuming it's the same job is 5 hours \
       def restore_sms_job(start_time, content, phone, is_alert, attachment_url = nil)
         return if start_time.past?
         job_exists = scheduled_set.each do |job|
-          break true if job['args'].first >= {
-            "job_class" => "SmsPlans::SendSmsJob",
-            "arguments" => [
-              phone.full_number,
-              content,
-              attachment_url,
-              phone.user&.id,
-              is_alert,
-              user_session.session_id
-            ],
-          } && job_near_timestamp?(job, start_time)
+          next unless job_near_timestamp?(job, start_time)
 
-          break true if job['args'].first >= {
+          params = job['args'].first
+          arguments = [
+            phone.full_number,
+            content,
+            attachment_url,
+            phone.user&.id,
+            is_alert,
+            user_session.session_id
+          ]
+
+          break true if params >= {
             "job_class" => "SmsPlans::SendSmsJob",
-            "arguments" => [
-              phone.full_number,
-              content,
-              attachment_url,
-              phone.user&.id,
-            ],
-          } && job_near_timestamp?(job, start_time)
+            "arguments" => arguments,
+          } || params >= {
+            "job_class" => "SmsPlans::SendSmsJob",
+            "arguments" => arguments[0..3],
+          }
         end || false
 
         return if job_exists
@@ -71,6 +69,6 @@ def user_sessions
   UserSession.where.not(finished_at: nil)
 end
 
-def job_near_timestamp?(job, timestamp, tolerance=5.hours)
+def job_near_timestamp?(job, timestamp, tolerance = 5.hours)
   timestamp - tolerance <= job.at && timestamp + tolerance >= job.at
 end
