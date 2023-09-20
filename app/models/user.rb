@@ -60,7 +60,7 @@ class User < ApplicationRecord
   # TEAMS
   belongs_to :team, optional: true # for members of team
   has_many :admins_teams, class_name: 'Team', dependent: :nullify,
-                          foreign_key: :team_admin_id, inverse_of: :team_admin # for team admin
+           foreign_key: :team_admin_id, inverse_of: :team_admin # for team admin
   delegate :name, to: :team, prefix: true, allow_nil: true
 
   # ORGANIZATIONS
@@ -77,7 +77,7 @@ class User < ApplicationRecord
 
   # REPORTS AVAILABLE FOR THIRD PARTY USER
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
-                                                 dependent: :destroy
+           dependent: :destroy
 
   # DOWNLOADED REPORTS
   has_many :downloaded_reports, dependent: :destroy
@@ -264,10 +264,8 @@ class User < ApplicationRecord
   end
 
   def self.invite!(attributes = {}, invited_by = nil, options = {}, &block)
-    User.new(**attributes).tap do |user|
-      user.valid?
-      raise ActiveRecord::RecordInvalid if user.errors[:email].present?
-    end
+    return if User.new(**attributes).tap(&:valid?).errors[:email].present?
+
     super(attributes, invited_by, options, &block)
   end
 
