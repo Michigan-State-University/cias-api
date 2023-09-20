@@ -9,6 +9,41 @@ The main goals of this task are: \
   with the correct scheduled_at parameter, however, it won't recreate SessionScheduleJobs, please use a separate rake task for it.
   DESC
   task recreate_timeout_jobs: :environment do
+    class RecreateUserSessionScheduleService < V1::UserSessionScheduleService
+      def initialize(user_session, now)
+        @now = now # define your own now
+        super(user_session)
+      end
+
+      attr_reader :user_session, :now, :all_var_values, :all_var_values_with_session_variables, :health_clinic
+      attr_accessor :next_user_session, :user_intervention
+
+      def after_fill_schedule(next_session)
+        next_user_session.update!(scheduled_at: now)
+        next_session.send_link_to_session(user_session.user, health_clinic)
+      end
+
+      def days_after_fill_schedule(next_session)
+        user_intervention.update!(status: :schedule_pending)
+        next_user_session.update!(scheduled_at: (now + next_session.schedule_payload.days))
+        # SessionScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id, health_clinic)
+      end
+
+      def schedule_until(date_of_schedule, next_session)
+        return unless date_of_schedule
+
+        if date_of_schedule.past?
+          user_intervention.update!(status: :in_progress)
+          next_session.send_link_to_session(user_session.user, health_clinic)
+          return
+        end
+
+        user_intervention.update!(status: :schedule_pending)
+        next_user_session.update!(scheduled_at: date_of_schedule)
+        # SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic, user_intervention.id)
+      end
+    end
+
     user_sessions_count = user_sessions.count
     puts "Found #{user_sessions_count} candidate user sessions"
     user_sessions.find_each.with_index(1) do |user_session, i|
@@ -97,39 +132,3 @@ def result_to_answers(user_session, result)
     end
   end
 end
-
-class RecreateUserSessionScheduleService < V1::UserSessionScheduleService
-  def initialize(user_session, now)
-    @now = now # define your own now
-    super(user_session)
-  end
-
-  attr_reader :user_session, :now, :all_var_values, :all_var_values_with_session_variables, :health_clinic
-  attr_accessor :next_user_session, :user_intervention
-
-  def after_fill_schedule(next_session)
-    next_user_session.update!(scheduled_at: now)
-    next_session.send_link_to_session(user_session.user, health_clinic)
-  end
-
-  def days_after_fill_schedule(next_session)
-    user_intervention.update!(status: :schedule_pending)
-    next_user_session.update!(scheduled_at: (now + next_session.schedule_payload.days))
-    # SessionScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id, health_clinic)
-  end
-
-  def schedule_until(date_of_schedule, next_session)
-    return unless date_of_schedule
-
-    if date_of_schedule.past?
-      user_intervention.update!(status: :in_progress)
-      next_session.send_link_to_session(user_session.user, health_clinic)
-      return
-    end
-
-    user_intervention.update!(status: :schedule_pending)
-    next_user_session.update!(scheduled_at: date_of_schedule)
-    # SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic, user_intervention.id)
-  end
-end
-
