@@ -8,6 +8,7 @@ class UserSession::Classic < UserSession
   delegate :first_question, :autofinish_enabled, :autofinish_delay, :questions, to: :session
 
   def on_answer
+    cancel_timeout_job
     return unless autofinish_enabled
 
     if any_question_run_timeout?
