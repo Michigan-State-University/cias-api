@@ -26,7 +26,6 @@ The main goals of this task are: \
       def days_after_fill_schedule(next_session)
         user_intervention.update!(status: :schedule_pending)
         next_user_session.update!(scheduled_at: (now + next_session.schedule_payload.days))
-        # SessionScheduleJob.set(wait: next_session.schedule_payload.days).perform_later(next_session.id, user_session.user.id, health_clinic)
       end
 
       def schedule_until(date_of_schedule, next_session)
@@ -40,7 +39,6 @@ The main goals of this task are: \
 
         user_intervention.update!(status: :schedule_pending)
         next_user_session.update!(scheduled_at: date_of_schedule)
-        # SessionScheduleJob.set(wait_until: date_of_schedule).perform_later(next_session.id, user_session.user.id, health_clinic, user_intervention.id)
       end
     end
 
