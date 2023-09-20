@@ -8,12 +8,11 @@ class V1::Interventions::InvitationsController < V1Controller
   end
 
   def create
-    intervention = intervention_load
-    authorize! :update, intervention
+    authorize! :update, intervention_load
     authorize! :create, Invitation
-    return head :not_acceptable unless intervention.published?
+    return head :not_acceptable unless intervention_load.published?
 
-    V1::Intervention::CreateInvitation.call(intervention, invitation_params[:invitations])
+    V1::Intervention::CreateInvitation.call(intervention_load, invitation_params[:invitations])
     render json: serialized_response(invitation_scope), status: :created
   end
 
