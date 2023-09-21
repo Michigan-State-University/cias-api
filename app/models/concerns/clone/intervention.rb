@@ -14,6 +14,7 @@ class Clone::Intervention < Clone::Base
     create_sessions
     reassign_branching
     outcome.update!(is_hidden: hidden)
+    reset_cache_counters
     outcome
   end
 
@@ -106,5 +107,10 @@ class Clone::Intervention < Clone::Base
 
   def clear_hfhs_settings!
     outcome.hfhs_access = false
+  end
+
+  def reset_cache_counters
+    Intervention.reset_counters(outcome.id, :navigators)
+    Intervention.reset_counters(outcome.id, :conversations)
   end
 end
