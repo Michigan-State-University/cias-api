@@ -264,7 +264,8 @@ class User < ApplicationRecord
   end
 
   def self.invite!(attributes = {}, invited_by = nil, options = {}, &block)
-    return if User.new(**attributes).tap(&:valid?).errors[:email].present?
+    user = User.new(**attributes)
+    return user if user.tap(&:valid?).errors.messages_for(:email).include? 'is not an email'
 
     super(attributes, invited_by, options, &block)
   end
