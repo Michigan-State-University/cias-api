@@ -33,8 +33,16 @@ RSpec.describe V1::Users::Invitations::Create do
     end
   end
 
-  context 'email is invalid' do
+  context 'email is nil' do
     let(:email) { nil }
+
+    it 'does not create new user' do
+      expect { subject }.not_to change(User, :count)
+    end
+  end
+
+  context 'email is invalid' do
+    let(:email) { 'a@a.a' }
 
     it 'does not create new user' do
       expect { subject }.not_to change(User, :count)
