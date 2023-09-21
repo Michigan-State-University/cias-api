@@ -43,6 +43,6 @@ class DataClearJobs::InformAndSchedule < ApplicationJob
   def send_email!(user)
     return InterventionMailer::ClearDataMailer.data_deleted(user, @intervention).deliver_now if send_immediately?
 
-    InterventionMailer::ClearDataMailer.inform(user, @intervention).deliver_now
+    InterventionMailer::ClearDataMailer.inform(user, @intervention, @number_of_days_to_remove).deliver_now
   end
 end
