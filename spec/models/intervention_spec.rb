@@ -164,9 +164,9 @@ RSpec.describe Intervention, type: :model do
     it 'reset cache counters' do
       expect(intervention.navigators_count).to be_positive
       expect(intervention.conversations_count).to be_positive
-      cloned_intervention = intervention.clone
-      expect(cloned_intervention.navigators_count).to be_positive
-      expect(cloned_intervention.conversations_count).to be_positive
+      cloned_intervention = intervention.clone.reload
+      expect(cloned_intervention.navigators_count).to be_zero
+      expect(cloned_intervention.conversations_count).to be_zero
     end
 
     it 'remove short links' do
