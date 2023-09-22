@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::Navigators::InvitationsController < V1Controller
+  include MessageHandler
   skip_before_action :authenticate_user!, only: %i[confirm]
 
   def index
@@ -41,6 +42,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
     end
     intervention.navigators << User.find_by(email: email)
     invitation.update!(accepted_at: DateTime.now)
+    broadcast_massage(intervention)
 
     redirect_to_web_app(success: I18n.t('live_chat.navigators.invitations.success', intervention_name: intervention.name))
   end
@@ -67,13 +69,15 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
     params[:id]
   end
 
-  def redirect_to_web_app(**message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
-  end
-
   def not_accepted_invitations
     intervention_load.live_chat_navigator_invitations.not_accepted
+  end
+
+  def broadcast_massage(intervention)
+    return if intervention.navigators_count != 1
+
+    channel = "navigators_in_intervention_channel_#{intervention.id}"
+
+    ActionCable.server.broadcast(channel, generic_message('', 'intervention_has_navigators'))
   end
 end

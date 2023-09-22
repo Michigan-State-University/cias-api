@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_10_121137) do
+ActiveRecord::Schema.define(version: 2023_08_30_041924) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -154,7 +154,7 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.uuid "health_system_id", null: false
     t.uuid "health_clinic_id", null: false
     t.uuid "chart_id", null: false
-    t.uuid "user_id", null: false
+    t.uuid "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.datetime "filled_at"
@@ -177,6 +177,9 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
+    t.string "interval_type", default: "monthly"
+    t.datetime "date_range_start"
+    t.datetime "date_range_end"
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
@@ -453,6 +456,9 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.integer "current_narrator", default: 0
     t.uuid "current_editor_id"
     t.integer "conversations_count"
+    t.string "sensitive_data_state", default: "collected", null: false
+    t.datetime "clear_sensitive_data_scheduled_at"
+    t.integer "navigators_count", default: 0
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -473,6 +479,14 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.uuid "health_clinic_id"
     t.index ["email_bidx"], name: "index_invitations_on_email_bidx"
     t.index ["health_clinic_id"], name: "index_invitations_on_health_clinic_id"
+  end
+
+  create_table "links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "url"
+    t.string "slug"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["url", "slug"], name: "index_links_on_url_and_slug", unique: true
   end
 
   create_table "live_chat_conversations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -708,6 +722,10 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
+    t.boolean "has_cover_letter", default: false, null: false
+    t.string "cover_letter_logo_type", default: "report_logo", null: false
+    t.string "cover_letter_description"
+    t.string "cover_letter_sender"
     t.boolean "is_duplicated_from_other_session", default: false, null: false
     t.boolean "duplicated_from_other_session_warning_dismissed", default: false, null: false
     t.index ["report_for"], name: "index_report_templates_on_report_for"
@@ -800,6 +818,14 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
     t.boolean "include_phone_number"
     t.boolean "include_email"
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
+  end
+
+  create_table "stars", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.index ["intervention_id"], name: "index_stars_on_intervention_id"
+    t.index ["user_id", "intervention_id"], name: "index_stars_on_user_id_and_intervention_id", unique: true
+    t.index ["user_id"], name: "index_stars_on_user_id"
   end
 
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1035,6 +1061,8 @@ ActiveRecord::Schema.define(version: 2023_08_10_121137) do
   add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
+  add_foreign_key "stars", "interventions"
+  add_foreign_key "stars", "users"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"

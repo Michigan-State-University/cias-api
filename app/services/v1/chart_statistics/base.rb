@@ -40,8 +40,12 @@ class V1::ChartStatistics::Base
     {
       'chart_id' => chart.id,
       'data' => statistics,
-      'population' => charts_data_collection.where(chart_id: chart.id).count,
+      'population' => entry_count_hash[chart.id] || 0,
       'dashboard_section_id' => chart.dashboard_section_id
     }
+  end
+
+  def entry_count_hash
+    @entry_count_hash ||= charts_data_collection.group(:chart_id).count
   end
 end

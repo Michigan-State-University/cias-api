@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 class V1::Organizations::Invitations::Create
-  def self.call(organization, user)
-    new(organization, user).call
+  def self.call(organizable, user)
+    new(organizable, user).call
   end
 
-  def initialize(organization, user)
-    @organization = organization
+  def initialize(organizable, user)
+    @organizable = organizable
     @user = user
   end
 
@@ -14,24 +14,25 @@ class V1::Organizations::Invitations::Create
     return if invitation_already_exists?
     return unless user.confirmed?
 
-    invitation = OrganizationInvitation.create!(
+    invitation = "#{organizable.class.name}Invitation".safe_constantize.create!(
       user: user,
-      organization: organization
+      "#{organizable.class.table_name.singularize}": organizable
     )
 
     OrganizableMailer.invite_user(
       invitation_token: invitation.invitation_token,
       email: user.email,
-      organizable: organization,
-      organizable_type: 'Organization'
+      organizable: organizable,
+      organizable_type: organizable.class.name.titlecase
     ).deliver_later
   end
 
   private
 
-  attr_reader :organization, :user
+  attr_reader :organizable, :user
 
   def invitation_already_exists?
-    OrganizationInvitation.not_accepted.exists?(user_id: user.id, organization_id: organization.id)
+    "#{organizable.class.name}Invitation".safe_constantize.not_accepted.exists?(user_id: user.id,
+                                                                                "#{organizable.class.table_name.singularize}_id": organizable.id)
   end
 end

@@ -28,6 +28,9 @@ en:
   activerecord:
     errors:
       models:
+        link:
+          slug:
+            too_long: "couldn't generate a unique key for this record"
         collaborator:
           attributes:
             user:
@@ -193,7 +196,9 @@ en:
       subject: You have been invited to complete a session.
       body: You have been invited to complete %{session_name}. Please click the link to get more information.
       header: CIAS Invitation
-      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.<br /><br />Click the button below to access.'
+      html_body: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.'
+      session_scheduled: 'This session will be accessible starting from %{date}'
+      before_button_text: 'Click the button below to access.'
       button_text: Go to the session
       invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
       invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
@@ -326,6 +331,23 @@ en:
       header: 'Welcome to CIAS'
       html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
       html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
+    clear_data:
+      subject: 'Important notice regarding your data'
+      button: 'Go to the app'
+      header: 'Your data will be deleted soon'
+      footnote: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:12px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      participant:
+        body: "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\"> Your responses and generated reports within this intervention will be permanently deleted within <span style='color:#C866EA;'>%{number_of_days}</span> days from today.<br /><br />If you wish to retain a copy of these reports for your records, we kindly request that you log in to the app and download the aforementioned reports before the deletion takes place.<br/><br/>We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
+      third_party:
+        body: "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\">Your generated reports within this intervention will be permanently deleted within <span style='color:#C866EA;'>%{number_of_days}</span> days from today.<br /><br/>If you wish to retain a copy of these reports for your records, we kindly request that you log in to the app and download the aforementioned reports before the deletion takes place.<br /><br />We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
+    data_removed:
+      subject: 'Important notice regarding your data'
+      header: 'Your data has been deleted'
+      footnote: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:12px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
+      participant:
+        body: "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\"> Your responses and generated reports within this intervention are permanently deleted.<br /><br /><br/><br/>We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
+      third_party:
+        body:  "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\">Your generated reports within this intervention are permanently deleted.<br /><br/>We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
   navigator_mailer:
     invitation:
       subject: "Welcome to the navigator role in CIAS!"

@@ -58,7 +58,8 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           'status' => 'draft',
           'shared_to' => 'anyone',
           'language_name' => 'English',
-          'language_code' => 'en'
+          'language_code' => 'en',
+          'starred' => false
         )
       end
 
