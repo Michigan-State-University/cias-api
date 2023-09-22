@@ -5,7 +5,7 @@ RSpec.describe DataClearJobs::InformAndSchedule, type: :job do
 
   let!(:intervention) { create(:intervention, :with_pdf_report, :with_conversations_transcript, user: create(:user, :researcher)) }
   let!(:user_intervention2) { create(:user_intervention, intervention: intervention, user: create(:user, :guest, :confirmed)) }
-  let(:delay) { 5 }
+  let(:delay) { 3 }
 
   before do
     ActiveJob::Base.queue_adapter = :test
@@ -25,7 +25,7 @@ RSpec.describe DataClearJobs::InformAndSchedule, type: :job do
     end
 
     it 'correct email was called' do
-      expect(InterventionMailer::ClearDataMailer).to receive(:inform)
+      expect(InterventionMailer::ClearDataMailer).to receive(:inform).with(user_intervention1.user, intervention, delay)
       subject
     end
 

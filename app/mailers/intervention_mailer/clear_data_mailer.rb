@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class InterventionMailer::ClearDataMailer < ApplicationMailer
-  def inform(user, intervention, number_of_days = 5)
+  def inform(user, intervention, number_of_days)
     @user = user
     @intervention = intervention
     @number_of_days = number_of_days
