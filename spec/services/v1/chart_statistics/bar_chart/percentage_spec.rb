@@ -152,4 +152,57 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
       expect(subject).to eql([])
     end
   end
+
+  context 'for quarterly charts' do
+    let!(:bar_chart1) do
+      create(:chart, name: 'percentage_bar_chart1', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart', status: 'published',
+                     interval_type: :quarterly)
+    end
+    let!(:chart_matched_statistic1) do
+      create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                        health_clinic: health_clinic, filled_at: DateTime.now)
+    end
+    let!(:chart_not_matched_statistic1) do
+      create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: DateTime.now)
+    end
+    let!(:chart_matched_statistic2) do
+      create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter)
+    end
+    let!(:chart_not_matched_statistic2) do
+      create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter)
+    end
+
+    it 'return correct aggregated data' do
+      expect(subject).to include(
+        {
+          'chart_id' => bar_chart1.id,
+          'data' => include(
+            {
+              'label' => "Q#{(chart_matched_statistic1.first.filled_at.month / 3.0).ceil} #{chart_matched_statistic1.first.filled_at.year}",
+              'value' => 66.67,
+              'color' => '#C766EA',
+              'population' => 15
+            },
+            {
+              'label' => "Q#{(chart_matched_statistic2.first.filled_at.month / 3.0).ceil} #{chart_matched_statistic2.first.filled_at.year}",
+              'value' => 37.5,
+              'color' => '#C766EA',
+              'population' => 8
+            }
+          ),
+          'population' => 23,
+          'dashboard_section_id' => bar_chart1.dashboard_section_id
+        },
+        {
+          'chart_id' => bar_chart2.id,
+          'data' => [],
+          'population' => 0,
+          'dashboard_section_id' => bar_chart2.dashboard_section_id
+        }
+      )
+    end
+  end
 end

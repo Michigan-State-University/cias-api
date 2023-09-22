@@ -33,6 +33,7 @@ module Log::UserRequest
     params[:image]&.delete(:file)
     params[:avatar]&.delete(:file)
     params[:report_template]&.delete(:logo)
+    params[:report_template]&.delete(:cover_letter_custom_logo)
     params[:variant]&.delete(:image)
     params[:intervention]&.delete(:files) unless params[:intervention].is_a?(String)
     params[:imported_file]&.delete(:file)

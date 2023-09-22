@@ -13,13 +13,13 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def call
     return unless session.intervention.published?
+
+    execute_plans_for('SmsPlan::Alert')
+
     return unless user.sms_notification
+    return unless phone.present? && phone.confirmed?
 
-    session.sms_plans.each do |plan|
-      next unless can_run_plan?(plan)
-
-      send("#{plan.schedule}_schedule", plan) if plan.alert? || (phone.present? && phone.confirmed?)
-    end
+    execute_plans_for('SmsPlan::Normal')
   end
 
   private
@@ -28,6 +28,14 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def session
     @session ||= user_session.session
+  end
+
+  def execute_plans_for(type)
+    session.sms_plans.limit_to_types(type).each do |plan|
+      next unless can_run_plan?(plan)
+
+      send("#{plan.schedule}_schedule", plan)
+    end
   end
 
   def after_session_end_schedule(plan)
@@ -158,11 +166,11 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def send_sms(start_time, content, attachment_url = nil)
-    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(user.phone.full_number, content, attachment_url, user.id)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(user.phone.full_number, content, attachment_url, user.id, false, user_session.session_id)
   end
 
   def send_alert(start_time, content, phone, attachment_url = nil)
-    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, attachment_url, phone.user&.id, true)
+    SmsPlans::SendSmsJob.set(wait_until: start_time).perform_later(phone.full_number, content, attachment_url, phone.user&.id, true, user_session.session_id)
   end
 
   def user_email(user)

@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '2.7.2'
 
-gem 'rails', '~> 6.1.7.4'
+gem 'rails', '~> 6.1.7', '>= 6.1.7.5'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.6.7'
 
@@ -38,7 +38,7 @@ gem 'postgresql_cursor'
 gem 'pry-rails'
 gem 'rack-cors'
 gem 'redis'
-gem 'sidekiq', '>= 6.4.0'
+gem 'sidekiq', '>= 7.1.3'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'

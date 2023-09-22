@@ -43,7 +43,8 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
             'shared_to' => shared_to,
             'csv_generated_at' => nil,
             'organization_id' => organization.id,
-            'google_language_id' => intervention.google_language_id
+            'google_language_id' => intervention.google_language_id,
+            'starred' => false
           )
         end
       end

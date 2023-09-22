@@ -18,6 +18,20 @@ RSpec.describe 'GET /v1/live_chat/navigators/invitations/confirm', type: :reques
     it do
       expect { request }.to change { intervention.reload.navigators.count }.by(1)
     end
+
+    it 'broadcast message' do
+      expect { request }.to have_broadcasted_to("navigators_in_intervention_channel_#{intervention.id}")
+    end
+
+    context 'when the intervention has already assigned navigators' do
+      before do
+        intervention.navigators << create(:user, :confirmed, :navigator)
+      end
+
+      it 'broadcast message' do
+        expect { request }.not_to have_broadcasted_to("navigators_in_intervention_channel_#{intervention.id}")
+      end
+    end
   end
 
   context 'Error behaviour' do

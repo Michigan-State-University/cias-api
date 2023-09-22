@@ -5,7 +5,8 @@ class Intervention < ApplicationRecord
   include Clone
   include Translate
   include InvitationInterface
-  include ::Intervention::TranslationAuxiliaryMethods
+  include TranslationAuxiliaryMethods
+  include MessageHandler
   extend DefaultValues
 
   CURRENT_VERSION = '1'
@@ -18,6 +19,7 @@ class Intervention < ApplicationRecord
   has_many :user_sessions, dependent: :restrict_with_exception, through: :sessions
   has_many :invitations, as: :invitable, dependent: :destroy
   has_many :intervention_accesses, dependent: :destroy
+  has_many :stars, dependent: :destroy
   has_one :navigator_setup, class_name: 'LiveChat::Interventions::NavigatorSetup', dependent: :destroy
   has_many :conversations, class_name: 'LiveChat::Conversation', dependent: :restrict_with_exception
   has_many :live_chat_navigator_invitations, class_name: 'LiveChat::Interventions::NavigatorInvitation', dependent: :destroy
@@ -29,8 +31,8 @@ class Intervention < ApplicationRecord
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true
 
-  has_many_attached :reports
-  has_many_attached :files
+  has_many_attached :reports, dependent: :purge_later # generated csv files for the researcher
+  has_many_attached :files # files for the participant added in modular intervention
   has_one_attached :logo, dependent: :purge_later
 
   has_many :short_links, as: :linkable, dependent: :destroy
@@ -53,7 +55,7 @@ class Intervention < ApplicationRecord
 
   scope :available_for_participant, lambda { |participant_email|
     left_joins(:intervention_accesses).published.not_shared_to_invited
-      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
+                                      .or(left_joins(:intervention_accesses).published.where(intervention_accesses: { email: participant_email }))
   }
 
   scope :only_visible, -> { where(is_hidden: false) }
@@ -65,15 +67,18 @@ class Intervention < ApplicationRecord
   scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
   scope :only_not_shared_with_anyone, ->(user_id) { left_joins(:collaborators).where(user_id: user_id, collaborators: { id: nil }) }
+  scope :only_starred_by_me, ->(user) { where(id: user.stars.pluck(:intervention_id)) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
   enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
   enum current_narrator: { peedy: 0, emmi: 1 }
+  enum sensitive_data_state: { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, _prefix: :sensitive_data
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   before_save :remove_short_links, if: :will_save_change_to_organization_id?
+  before_update :cascade_access_type_change, if: :shared_to_changed?
   after_update_commit :status_change, :hf_access_change
 
   def assign_default_google_language
@@ -123,7 +128,7 @@ class Intervention < ApplicationRecord
       end
     end
 
-    SendFillInvitationJob.perform_later(::Intervention, id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
+    SendFillInvitation::InterventionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
   end
 
   def give_user_access(emails)
@@ -146,6 +151,7 @@ class Intervention < ApplicationRecord
     scope = filter_by_collaboration_type(params, user)
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
+    scope = scope.only_starred_by_me(user) if params[:starred].present?
     scope.filter_by_name(params[:name])
   end
 
@@ -161,6 +167,10 @@ class Intervention < ApplicationRecord
 
   def module_intervention?
     false
+  end
+
+  def starred_by?(user_id)
+    stars.find_by(user_id: user_id).present?
   end
 
   def create_navigator_setup
@@ -183,6 +193,20 @@ class Intervention < ApplicationRecord
     sessions.where(type: 'Session::CatMh').any?
   end
 
+  def translation_prefix(destination_language_name_short)
+    update!(name: "(#{destination_language_name_short.upcase}) #{name}")
+  end
+
+  def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
+    translate_attribute('additional_text', additional_text, translator, source_language_name_short, destination_language_name_short)
+  end
+
+  def translate_sessions(translator, source_language_name_short, destination_language_name_short)
+    sessions.each do |session|
+      session.translate(translator, source_language_name_short, destination_language_name_short)
+    end
+  end
+
   def navigators_from_team
     id_scope = user.team_admin? ? user.admins_teams.pluck(:id) : user.team_id
     User.limit_to_roles('navigator').where(team_id: id_scope) if id_scope.present?
@@ -202,6 +226,22 @@ class Intervention < ApplicationRecord
 
   def remove_short_links
     short_links.destroy_all
+  end
+
+  def cascade_access_type_change
+    return unless shared_to == 'anyone'
+
+    permitted_schedules = %w[after_fill immediately]
+
+    sessions.each do |session|
+      next if session.schedule.in?(permitted_schedules)
+
+      session.update!(
+        schedule: 'after_fill',
+        schedule_payload: nil,
+        schedule_at: nil
+      )
+    end
   end
 
   def self.filter_by_collaboration_type(params, user)
