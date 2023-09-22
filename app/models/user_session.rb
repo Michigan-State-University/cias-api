@@ -76,4 +76,13 @@ class UserSession < ApplicationRecord
   def user_intervention_inside_health_clinic?
     user_intervention&.health_clinic_id.present?
   end
+
+  def check_uniqueness
+    UserSession.joins(:session).where(session: { multiple_fill: false }).find_by(user_id: user_id, session_id: session_id).blank?
+    #rubocop:disable all
+    if UserSession.joins(:session).where(session: { multiple_fill: false }).find_by(user_id: user_id, session_id: session_id).present?
+      raise ActiveRecord::RecordNotUnique, 'There already exists a user session for this user and session'
+    end
+    #rubocop:enable all
+  end
 end
