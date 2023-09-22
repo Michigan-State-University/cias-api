@@ -12,6 +12,8 @@ class UserSession < ApplicationRecord
 
   validates :health_clinic_id, presence: true, if: :user_intervention_inside_health_clinic?
 
+  before_create :check_uniqueness
+
   def finish(_send_email: true)
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
