@@ -80,10 +80,10 @@ class UserSession < ApplicationRecord
   end
 
   def check_uniqueness
-    #rubocop:disable all
-    if UserSession.joins(:session).where(session: { multiple_fill: false }).find_by(user_id: user_id, session_id: session_id).present?
-      raise ActiveRecord::RecordNotUnique, 'There already exists a user session for this user and session'
-    end
-    #rubocop:enable all
+    raise ActiveRecord::RecordNotUnique, 'There already exists a user session for this user and session' unless user_and_session_unique?
+  end
+
+  def user_and_session_unique?
+    UserSession.joins(:session).where(session: { multiple_fill: false }).find_by(user_id: user_id, session_id: session_id).blank?
   end
 end
