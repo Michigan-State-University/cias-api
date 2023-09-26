@@ -47,15 +47,15 @@ class Session < ApplicationRecord
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
   validates :settings, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/settings.json").to_s
-                                       }, message: lambda { |err|
-                                                     err
-                                                   } }
+    Rails.root.join("#{json_schema_path}/settings.json").to_s
+  }, message: lambda { |err|
+    err
+  } }
   validates :formulas, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
-                                       }, message: lambda { |err|
-                                                     err
-                                                   } }
+    Rails.root.join("#{json_schema_path}/formula.json").to_s
+  }, message: lambda { |err|
+    err
+  } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
   validates :autofinish_delay, presence: true, if: :autofinish_enabled
@@ -125,7 +125,9 @@ class Session < ApplicationRecord
   def send_link_to_session(user, health_clinic = nil)
     return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
-    SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
+    I18n.with_locale(intervention.language_code) do
+      SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
+    end
   end
 
   def available_now?(participant_date_with_payload = nil)

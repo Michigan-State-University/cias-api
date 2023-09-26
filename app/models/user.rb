@@ -57,7 +57,7 @@ class User < ApplicationRecord
   # TEAMS
   belongs_to :team, optional: true # for members of team
   has_many :admins_teams, class_name: 'Team', dependent: :nullify,
-                          foreign_key: :team_admin_id, inverse_of: :team_admin # for team admin
+           foreign_key: :team_admin_id, inverse_of: :team_admin # for team admin
   delegate :name, to: :team, prefix: true, allow_nil: true
 
   # ORGANIZATIONS
@@ -74,7 +74,7 @@ class User < ApplicationRecord
 
   # REPORTS AVAILABLE FOR THIRD PARTY USER
   has_many :generated_reports_third_party_users, foreign_key: :third_party_id, inverse_of: :third_party,
-                                                 dependent: :destroy
+           dependent: :destroy
 
   # DOWNLOADED REPORTS
   has_many :downloaded_reports, dependent: :destroy
@@ -265,7 +265,9 @@ class User < ApplicationRecord
   def send_welcome_email
     return if role?('guest') || role?('preview_session')
 
-    UserMailer.welcome_email(human_readable_role, email).deliver_later
+    I18n.with_locale(interventions.first&.language_code || 'en') do
+      UserMailer.welcome_email(human_readable_role, email).deliver_later
+    end
   end
 
   def team_is_present?
