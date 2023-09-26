@@ -43,7 +43,7 @@ class V1::QuestionGroup::ShareExternallyService
 
   def title_for_intervention
     I18n.t('duplication_with_structure.intervention_name', source_intervention_name: source_session.intervention.name,
-           user_full_name: "#{current_user.first_name} #{current_user.last_name}")
+                                                           user_full_name: "#{current_user.first_name} #{current_user.last_name}")
   end
 
   def check_if_user_has_correct_ability(user)
