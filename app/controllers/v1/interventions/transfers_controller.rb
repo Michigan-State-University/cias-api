@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class V1::Interventions::TransfersController < V1Controller
-  around_action :with_locale, only: %i[import export]
-
   def import
     authorize! :create, Intervention
 
