@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Translations::TranslationsController < V1Controller
+  around_action :with_locale, only: :translate_intervention
+
   def translate_intervention
     authorize! :translate, Intervention
 
@@ -20,5 +22,9 @@ class V1::Translations::TranslationsController < V1Controller
 
   def destination_google_tts_voice_id
     params.permit(:destination_google_tts_voice_id)[:destination_google_tts_voice_id]
+  end
+
+  def locale
+    Intervention.find(intervention_id).language_code
   end
 end

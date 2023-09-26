@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::ConversationsController < V1Controller
+  around_action :with_locale, only: :generate_transcript
+
   def index
     authorize! :index, LiveChat::Conversation
 
@@ -73,5 +75,9 @@ class V1::LiveChat::ConversationsController < V1Controller
 
   def intervention_load
     Intervention.accessible_by(current_ability).find(intervention_id)
+  end
+
+  def locale
+    intervention_load.language_code
   end
 end

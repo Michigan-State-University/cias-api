@@ -3,6 +3,8 @@
 class V1::SessionsController < V1Controller
   include Resource::Position
 
+  around_action :with_locale, only: %i[duplicate clone]
+
   def index
     authorize! :index, Session
 
@@ -130,5 +132,9 @@ class V1::SessionsController < V1Controller
 
   def session_params_for_create
     session_params.except(:cat_tests)
+  end
+
+  def locale
+    intervention.language_code
   end
 end

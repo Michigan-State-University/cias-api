@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::NarratorController < V1Controller
+  around_action :with_locale, only: :create
+
   def create
     authorize! :update, object_load
 
@@ -33,5 +35,9 @@ class V1::NarratorController < V1Controller
 
   def replaced_animation
     narrator_params[:replaced_animations]
+  end
+
+  def locale
+    object_load.language_code
   end
 end

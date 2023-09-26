@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::InterventionsController < V1Controller
+  around_action :with_locale, only: %i[clone export generate_conversations_transcript]
+
   def index
     collection = sorted_interventions_scope.detailed_search(params, current_v1_user)
 
@@ -148,5 +150,9 @@ class V1::InterventionsController < V1Controller
 
   def number_of_days_to_remove
     params[:delay].to_i
+  end
+
+  def locale
+    intervention_load.language_code
   end
 end

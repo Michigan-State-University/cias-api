@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Interventions::AnswersController < V1Controller
+  around_action :with_locale, only: :index
+
   def index
     authorize! :get_protected_attachment, intervention
 
@@ -27,5 +29,9 @@ class V1::Interventions::AnswersController < V1Controller
 
   def intervention_id
     params.require(:intervention_id)
+  end
+
+  def locale
+    intervention.language_code
   end
 end
