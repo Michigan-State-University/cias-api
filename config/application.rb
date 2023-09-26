@@ -36,7 +36,9 @@ module CiasApi
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+    config.i18n.available_locales = %i[en ar]
     config.i18n.default_locale = :en
+    config.i18n.fallbacks = true
     config.active_job.queue_adapter = :sidekiq
     config.filter_parameters << :password_confirmation
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
