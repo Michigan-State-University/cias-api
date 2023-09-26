@@ -31,7 +31,17 @@ class V1Controller < ApplicationController
     end
   end
 
+  protected
+
+  def with_locale
+    I18n.with_locale(locale) { yield }
+  end
+
   private
+
+  def locale
+    raise NotImplementedError
+  end
 
   def authenticate_user!
     head :unauthorized unless signed_in?
@@ -50,7 +60,7 @@ class V1Controller < ApplicationController
   end
 
   def render_json(**params)
-    path   = params[:path].presence || controller_path
+    path = params[:path].presence || controller_path
     action = params[:action].presence || action_name
     serializer = "#{path}/#{action}".classify.constantize
 
