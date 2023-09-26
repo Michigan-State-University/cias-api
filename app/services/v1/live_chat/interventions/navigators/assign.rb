@@ -13,8 +13,9 @@ class V1::LiveChat::Interventions::Navigators::Assign
   def call
     navigator = intervention.navigators_from_team.find(user_id)
     intervention.navigators << navigator
-
-    LiveChat::NavigatorMailer.navigator_from_team_invitation(navigator.email, intervention).deliver_now
+    I18n.with_locale(intervention.language_code) do
+      LiveChat::NavigatorMailer.navigator_from_team_invitation(navigator.email, intervention).deliver_now
+    end
     navigator
   end
 

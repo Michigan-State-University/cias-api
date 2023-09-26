@@ -24,8 +24,9 @@ class V1::QuestionGroup::ShareExternallyService
         new_intervention = researcher.interventions.create!(name: title_for_intervention)
         new_session = Session.create!(name: I18n.t('duplication_with_structure.session_name'), intervention: new_intervention)
         V1::QuestionGroup::DuplicateWithStructureService.call(new_session, selected_groups_with_questions)
-
-        CloneMailer.cloned_question_group_activate(researcher, new_intervention.name).deliver_now unless researcher.confirmed?
+        I18n.with_locale(source_session.intervention.language_code) do
+          CloneMailer.cloned_question_group_activate(researcher, new_intervention.name).deliver_now unless researcher.confirmed?
+        end
       end
     end
   end
@@ -42,7 +43,7 @@ class V1::QuestionGroup::ShareExternallyService
 
   def title_for_intervention
     I18n.t('duplication_with_structure.intervention_name', source_intervention_name: source_session.intervention.name,
-                                                           user_full_name: "#{current_user.first_name} #{current_user.last_name}")
+           user_full_name: "#{current_user.first_name} #{current_user.last_name}")
   end
 
   def check_if_user_has_correct_ability(user)

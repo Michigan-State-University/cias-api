@@ -6,18 +6,20 @@ class V1::ReportTemplates::GeneratePdfPreview
   end
 
   def initialize(report_template, current_v1_user)
-    @report_template   = report_template
-    @current_v1_user   = current_v1_user
+    @report_template = report_template
+    @current_v1_user = current_v1_user
   end
 
   def call
     return unless current_v1_user.email_notification
 
-    ReportTemplateMailer.template_preview(
-      email: current_v1_user.email,
-      report_template: report_template,
-      report_template_preview_pdf: render_pdf_report
-    ).deliver_now
+    I18n.with_locale(report_template.session.language_code) do
+      ReportTemplateMailer.template_preview(
+        email: current_v1_user.email,
+        report_template: report_template,
+        report_template_preview_pdf: render_pdf_report
+      ).deliver_now
+    end
   end
 
   private

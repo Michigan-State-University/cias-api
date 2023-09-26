@@ -2,6 +2,7 @@
 
 class Import::Basic::InterventionService
   include ImportOperations
+
   def self.call(user_id, intervention_hash)
     new(
       user_id,
@@ -69,7 +70,9 @@ class Import::Basic::InterventionService
 
     return unless user.email_notification
 
-    ImportMailer.result(user, intervention).deliver_now
+    I18n.with_locale(intervention.language_code) do
+      ImportMailer.result(user, intervention).deliver_now
+    end
   end
 
   def handle_branching!(target_question, questions)

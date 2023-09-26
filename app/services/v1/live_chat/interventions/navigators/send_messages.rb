@@ -18,10 +18,14 @@ class V1::LiveChat::Interventions::Navigators::SendMessages
     users.uniq.each do |user|
       case message_type
       when 'call_out'
-        LiveChat::NavigatorMailer.navigator_call_out_mail(user.email, intervention).deliver_now
+        I18n.with_locale(intervention.language_code) do
+          LiveChat::NavigatorMailer.navigator_call_out_mail(user.email, intervention).deliver_now
+        end
         send_sms(user, call_out_sms_content(intervention))
       when 'cancel_call_out'
-        LiveChat::NavigatorMailer.participant_handled_mail(user.email, intervention).deliver_now
+        I18n.with_locale(intervention.language_code) do
+          LiveChat::NavigatorMailer.participant_handled_mail(user.email, intervention).deliver_now
+        end
         send_sms(user, participant_handled_sms_content(intervention))
       end
     end
