@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_30_041924) do
+ActiveRecord::Schema.define(version: 2023_09_26_081202) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-09-26 09:33:02'::timestamp without time zone)"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
