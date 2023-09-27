@@ -25,7 +25,10 @@ class V1::QuestionGroup::ShareExternallyService
         new_session = Session.create!(name: I18n.t('duplication_with_structure.session_name'), intervention: new_intervention)
         V1::QuestionGroup::DuplicateWithStructureService.call(new_session, selected_groups_with_questions)
 
-        CloneMailer.cloned_question_group_activate(researcher, new_intervention.name).deliver_now unless researcher.confirmed?
+        unless researcher.confirmed?
+          CloneMailer.with(locale: source_session.language_code)
+                     .cloned_question_group_activate(researcher, new_intervention.name).deliver_now
+        end
       end
     end
   end

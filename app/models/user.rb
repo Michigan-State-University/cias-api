@@ -265,7 +265,7 @@ class User < ApplicationRecord
   def send_welcome_email
     return if role?('guest') || role?('preview_session')
 
-    UserMailer.welcome_email(human_readable_role, email).deliver_later
+    UserMailer.welcome_email(human_readable_role, email).deliver_later # TODO: locale
   end
 
   def team_is_present?

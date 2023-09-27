@@ -26,7 +26,7 @@ class V1::Teams::Invitations::Create
       email: user.email,
       team: team,
       roles: roles
-    ).deliver_later
+    ).deliver_later # TODO: locale
   end
 
   private

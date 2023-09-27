@@ -24,7 +24,7 @@ class V1::Organizations::Invitations::Create
       email: user.email,
       organizable: organizable,
       organizable_type: organizable.class.name.titlecase
-    ).deliver_later
+    ).deliver_later # TODO: locale
   end
 
   private

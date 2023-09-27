@@ -14,10 +14,10 @@ class DuplicateJobs::Session < DuplicateJob
 
     return unless user.email_notification
 
-    DuplicateMailer.confirmation(user, old_session, new_intervention).deliver_now
+    DuplicateMailer.with(locale: old_session.language_code).confirmation(user, old_session, new_intervention).deliver_now
   rescue StandardError
     return unless user.email_notification
 
-    CloneMailer.error(user).deliver_now
+    CloneMailer.with(locale: old_session.language_code).error(user).deliver_now
   end
 end

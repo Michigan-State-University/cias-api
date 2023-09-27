@@ -14,7 +14,7 @@ class V1::Users::Verifications::Create
     return if verification_code_from_headers && verification_code && !code_expired?
 
     user.user_verification_codes.create!(code: code)
-    UserMailer.send_verification_login_code(verification_code: code, email: user.email).deliver_later
+    UserMailer.send_verification_login_code(verification_code: code, email: user.email).deliver_later # TODO: locale
   end
 
   private

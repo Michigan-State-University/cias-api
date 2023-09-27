@@ -8,7 +8,7 @@ class MultipleCharacters::ChangeNarratorJob < ApplicationJob
       call(object_id, new_character, new_animations)
 
     @object = model.safe_constantize.find(object_id)
-    MultipleNarratorsMailer.successfully_changed(user.email, object).deliver_now
+    MultipleNarratorsMailer.with(locale: object.language_code).successfully_changed(user.email, object).deliver_now
     Notification.create!(user: user, notifiable: object, event: :new_narrator_was_set, data: generate_notification_body)
   end
 

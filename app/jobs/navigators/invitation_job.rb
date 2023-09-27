@@ -6,7 +6,7 @@ class Navigators::InvitationJob < ApplicationJob
     intervention = Intervention.find(intervention_id)
 
     users.each do |user|
-      LiveChat::NavigatorMailer.navigator_intervention_invitation(user.email, intervention).deliver_now
+      LiveChat::NavigatorMailer.with(locale: intervention.language_code).navigator_intervention_invitation(user.email, intervention).deliver_now
     end
   end
 end

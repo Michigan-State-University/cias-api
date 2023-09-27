@@ -9,10 +9,10 @@ class CloneJobs::Session < CloneJob
 
     return unless user.email_notification
 
-    CloneMailer.cloned_session(user, session.name, cloned_session).deliver_now
+    CloneMailer.with(locale: session.language_code).cloned_session(user, session.name, cloned_session).deliver_now
   rescue StandardError
     return unless user.email_notification
 
-    CloneMailer.error(user).deliver_now
+    CloneMailer.with(locale: session.language_code).error(user).deliver_now
   end
 end

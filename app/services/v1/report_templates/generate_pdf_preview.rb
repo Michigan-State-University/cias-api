@@ -17,7 +17,7 @@ class V1::ReportTemplates::GeneratePdfPreview
       email: current_v1_user.email,
       report_template: report_template,
       report_template_preview_pdf: render_pdf_report
-    ).deliver_now
+    ).deliver_now # TODO: locale
   end
 
   private

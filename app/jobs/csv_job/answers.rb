@@ -16,9 +16,9 @@ class CsvJob::Answers < CsvJob
     return unless user.email_notification
 
     if intervention.draft?
-      CsvMailer::Answers.csv_answers_preview(user, intervention, csv_content, requested_at).deliver_now
+      CsvMailer::Answers.with(locale: intervention.language_code).csv_answers_preview(user, intervention, csv_content, requested_at).deliver_now
     else
-      CsvMailer::Answers.csv_answers(user, intervention, requested_at).deliver_now
+      CsvMailer::Answers.with(locale: intervention.language_code).csv_answers(user, intervention, requested_at).deliver_now
     end
   end
 end

@@ -125,7 +125,7 @@ class Session < ApplicationRecord
   def send_link_to_session(user, health_clinic = nil)
     return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
-    SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
+    SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later # TODO: locale
   end
 
   def available_now?(participant_date_with_payload = nil)

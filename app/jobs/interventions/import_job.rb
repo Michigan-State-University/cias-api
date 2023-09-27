@@ -21,7 +21,7 @@ class Interventions::ImportJob < ApplicationJob
 
     return unless user.email_notification
 
-    ImportMailer.unsuccessful(user).deliver_now
+    ImportMailer.unsuccessful(user).deliver_now # TODO: locale
   end
 
   def create_notification!(user)
