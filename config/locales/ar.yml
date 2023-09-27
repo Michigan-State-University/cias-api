@@ -1,0 +1,386 @@
+ar:
+  hello: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  time:
+    formats:
+      file: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      report_file: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  question:
+    slider:
+      invalid_range: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      range_value_not_a_number: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    finish:
+      subtitle: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      text_to_speech: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    error:
+      published_intervention: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  question_group:
+    finish:
+      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    plain:
+      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    tlfb:
+      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  channels:
+    collaboration:
+      intervention:
+        forbidden_action: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  activerecord:
+    errors:
+      models:
+        link:
+          slug:
+            too_long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        collaborator:
+          attributes:
+            user:
+              already_exist: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        intervention:
+          attributes:
+            cat_mh_resources: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            cat_mh_setting: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            cat_mh_connection_failed:
+              title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            live_chat_wrong_session_status: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            collaborators:
+              data_access: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        user:
+          terms_not_accepted: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          2fa_code_needed: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          not_using_invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          attributes:
+            roles:
+              team_admin_must_have_a_team: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              organization_id_is_required_for_organization_admin: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            team_id:
+              team_admin_already_exists_for_the_team: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        team_invitation:
+          attributes:
+            user_id:
+              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        question_group:
+          question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          question_variable: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        organization_invitation:
+          attributes:
+            user_id:
+              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        health_system_invitation:
+          attributes:
+            user_id:
+              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        session:
+          attributes:
+            variable:
+              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        live_chat:
+          conversation:
+            no_navigator_available: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          message:
+            sent_in_archived_conversation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            attributes:
+              content:
+                too_long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          navigator:
+            not_researcher: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          navigator_setup:
+            file_too_big: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        short_link:
+          attributes:
+            name:
+              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      messages:
+        undestroyable: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  interventions:
+    invitations:
+      wrong_intervention_type: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    fixed_order:
+      wrong_sharing_target: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    flexible_order:
+      wrong_sharing_target: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    answers:
+      index:
+        csv: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  sessions:
+    sms_alerts:
+      no_data_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      no_first_name_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      no_last_name_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      no_email_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      no_phone_number_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  users:
+    invite:
+      researcher: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      not_active: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    preview:
+      cat_mh: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  user_sessions:
+    errors:
+      previous_question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      scheduled_session: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  teams:
+    invitations:
+      accepted: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  team_mailer:
+    invite_user:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      instruction: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  organizables:
+    invitations:
+      accepted: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  live_chat:
+    navigators:
+      invitations:
+        success: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        error: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  organizable_mailer:
+    invite_user:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      instruction: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  generated_report_mailer:
+    new_report_available:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  report_template_mailer:
+    template_preview:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  csv_mailer:
+    answers:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      preview:
+        subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  backup_mailer:
+    result:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  import_mailer:
+    result:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    unsuccessful:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      notification: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  session_mailer:
+    grant_access_to_a_user:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    inform_to_an_email:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      session_scheduled: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      before_button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link_for_anyone: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link_for_anyone_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    invite_to_session_and_registration:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body_invitation_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body_information_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  intervention_mailer:
+    inform_to_an_email:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    invite_to_intervention_and_registration:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body_information_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body_invitation_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  user_mailer:
+    send_verification_login_code:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body_first_paragraph: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body_second_paragraph: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      verification_code: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    welcome_email:
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      dashboard_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  clone_mailer:
+    intervention:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    intervention_activate:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      main_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      new_user: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body_part1: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body_part2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    session:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    question_group_activate:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      main_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      new_user: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body_part1: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body_part2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    error:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  duplicate_mailer:
+    session:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  duplication_with_structure:
+    intervention_name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    session_name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    question_group_title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    wrong_argument: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    wrong_sessions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    wrong_package: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    uniqueness_violation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    hfhs:
+      uniqueness_violation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      access_violation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    not_researcher: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  translation_mailer:
+    subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    error:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  multiple_narrators_mailer:
+    subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    intervention_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    session_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  mailer:
+    subject:
+      generic_invitation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    footnote:
+      not_reply: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      ignore_mail_msg: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      not_reply_with_email: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    collaborators:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      main_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      new_user: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body_part1: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      html_sub_body_part2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    clear_data:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      footnote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      participant:
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      third_party:
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    data_removed:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      footnote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      participant:
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      third_party:
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  navigator_mailer:
+    invitation:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      click_the_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      navigator_invite: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      accept: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    from_team:
+      invitation:
+        subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        navigator_invite: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    call_out:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      click_the_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    participant_handled:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  transcript_mailer:
+    open_inbox: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    conversation_transcript_ready:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    intervention_conversation_transcripts_ready:
+      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  epic_on_fhir:
+    error:
+      authentication: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      unexpected_error: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      patient:
+        not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      appointments:
+        not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
