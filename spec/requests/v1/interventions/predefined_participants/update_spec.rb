@@ -15,7 +15,9 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
     {
       predefined_user: {
         first_name: Faker::Name.first_name,
-        last_name: Faker::Name.last_name
+        last_name: Faker::Name.last_name,
+        email: 'predefined_user@example.com',
+        external_id: 'external_id'
       }
     }
   end
@@ -32,7 +34,13 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
   it 'return correct body' do
     request
     expect(json_response['data']['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id auto_invitation
-                                                                       invitation_sent_at])
+                                                                       invitation_sent_at email external_id])
+  end
+
+  it 'has correct values' do
+    request
+    expect(json_response['data']['attributes']['email']).to eql('predefined_user@example.com')
+    expect(json_response['data']['attributes']['external_id']).to eql('external_id')
   end
 
   it_behaves_like 'users without access'

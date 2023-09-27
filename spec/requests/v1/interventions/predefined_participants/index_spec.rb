@@ -23,7 +23,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/predefined_participants',
   it 'the element from array has correct keys' do
     request
     expect(json_response['data'].first['attributes'].keys).to match_array(%w[full_name first_name last_name phone slug health_clinic_id auto_invitation
-                                                                             invitation_sent_at])
+                                                                             invitation_sent_at email external_id])
   end
 
   it_behaves_like 'users without access'
