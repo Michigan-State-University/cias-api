@@ -48,6 +48,8 @@ class Intervention < ApplicationRecord
   attribute :shared_to, :string, default: 'anyone'
   attribute :original_text, :json, default: { additional_text: '' }
 
+  delegate :language_code, to: :google_language
+
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
   validate :cat_settings_validation, if: :published?
