@@ -3,7 +3,7 @@
 class UserSession::Classic < UserSession
   belongs_to :name_audio, class_name: 'Audio', optional: true
 
-  before_destroy :decrement_audio_usage
+  before_destroy :decrement_audio_usage, :cancel_timeout_job
 
   delegate :first_question, :autofinish_enabled, :autofinish_delay, :questions, to: :session
 
@@ -38,12 +38,13 @@ class UserSession::Classic < UserSession
     delete_alternative_answers
     reload
 
-    GenerateUserSessionReportsJob.perform_later(id)
-
     decrement_audio_usage
     V1::SmsPlans::ScheduleSmsForUserSession.call(self)
     V1::UserSessionScheduleService.new(self).schedule if send_email
     V1::ChartStatistics::CreateForUserSession.call(self)
+
+    AfterFinishUserSessionJob.perform_later(id, session.intervention)
+
     update_user_intervention(session_is_finished: true)
   end
 

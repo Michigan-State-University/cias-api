@@ -151,6 +151,55 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
                                                                                  'video' => false })
           end
         end
+
+        context 'third party question' do
+          let(:params) do
+            {
+              title: '<h2>Enter title here</h2>',
+              subtitle: '<p>Enter main text/question for screen here</p>',
+              type: 'Question::ThirdParty',
+              body: {
+                variable: { name: 'variable_name' },
+                data: [
+                  {
+                    payload: '',
+                    value: '',
+                    numeric_value: '',
+                    report_template_ids: ['']
+                  }
+                ]
+              },
+              narrator: {
+                blocks: [
+                  {
+                    action: 'NO_ACTION',
+                    animation: 'rest',
+                    text: [
+                      'Enter main text/question for screen here'
+                    ],
+                    audio_urls: [],
+                    sha256: [],
+                    type: 'ReadQuestion',
+                    endPosition: {
+                      x: 600,
+                      y: 550
+                    }
+                  }
+                ],
+                settings: {
+                  voice: true,
+                  animation: true,
+                  extra_space_for_narrator: false,
+                  character: 'peedy'
+                }
+              }
+            }
+          end
+
+          it 'return correct status' do
+            expect(response).to have_http_status(:created)
+          end
+        end
       end
 
       context 'when blocks' do

@@ -3,6 +3,7 @@
 class ReportTemplate::Section::Variant < ApplicationRecord
   has_paper_trail
   extend DefaultValues
+  include ::TranslationAuxiliaryMethods
 
   CURRENT_VERSION = '1'
 
@@ -11,31 +12,32 @@ class ReportTemplate::Section::Variant < ApplicationRecord
 
   attribute :original_text, :json, default: assign_default_values('original_text')
 
+  after_create :assign_next_position
+
   validates :image, content_type: %w[image/png image/jpg image/jpeg],
                     size: { less_than: 5.megabytes }
 
   scope :to_preview, -> { where(preview: true) }
+  default_scope { order(:position) }
 
   ATTR_NAMES_TO_COPY = %w[
     preview formula_match title content
   ].freeze
 
   def translate_title(translator, source_language_name_short, destination_language_name_short)
-    original_text['title'] = title
-    new_title = translator.translate(title, source_language_name_short, destination_language_name_short)
-
-    update!(title: new_title)
+    translate_attribute('title', title, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_content(translator, source_language_name_short, destination_language_name_short)
-    original_text['content'] = content
-    new_content = translator.translate(content, source_language_name_short, destination_language_name_short)
-
-    update!(content: new_content)
+    translate_attribute('content', content, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate(translator, source_language_name_short, destination_language_name_short)
     translate_title(translator, source_language_name_short, destination_language_name_short)
     translate_content(translator, source_language_name_short, destination_language_name_short)
+  end
+
+  def assign_next_position
+    self.position = report_template_section.variants.count - 1
   end
 end

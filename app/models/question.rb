@@ -8,7 +8,10 @@ class Question < ApplicationRecord
   include FormulaInterface
   include BlockHelper
   include Translate
+  include ::TranslationAuxiliaryMethods
 
+  UNIQUE_IN_SESSION = %w[Question::Name Question::ParticipantReport Question::ThirdParty Question::Phone
+                         Question::HenryFordInitial].freeze
   CURRENT_VERSION = '2'
 
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
@@ -125,17 +128,11 @@ class Question < ApplicationRecord
   end
 
   def translate_title(translator, source_language_name_short, destination_language_name_short)
-    original_text['title'] = title
-    new_title = translator.translate(title, source_language_name_short, destination_language_name_short)
-
-    update!(title: new_title)
+    translate_attribute('title', title, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-    original_text['subtitle'] = subtitle
-    new_subtitle = translator.translate(subtitle, source_language_name_short, destination_language_name_short)
-
-    update!(subtitle: new_subtitle)
+    translate_attribute('subtitle', subtitle, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_image_description(translator, source_language_name_short, destination_language_name_short)
@@ -196,7 +193,7 @@ class Question < ApplicationRecord
     return if body['data'].empty?
 
     question_variables.each do |variable|
-      next if variable.blank? || special_variable?(variable) || /^([a-zA-Z]|[0-9]+[a-zA-Z_]+)[a-zA-Z0-9_\b]*$/.match?(variable)
+      next if variable.blank? || special_variable?(variable) || /^([a-zA-Z]|[0-9]+[a-zA-Z_.]+)[a-zA-Z0-9_.\b]*$/.match?(variable)
 
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
     end

@@ -13,4 +13,8 @@ class V1::LiveChat::Interventions::LiveChatSetupSerializer < V1Serializer
       map_file_data(file_data)
     end
   end
+
+  attribute :has_assigned_navigators do |object|
+    object.intervention.navigators_count.positive?
+  end
 end

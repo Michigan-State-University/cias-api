@@ -36,9 +36,9 @@ class Clone::Session < Clone::Base
 
   def outcome_questions
     @outcome_questions ||= Question.unscoped
-            .includes(:question_group)
-            .where(question_groups: { session_id: outcome.id })
-            .order('question_groups.position ASC', 'questions.position ASC')
+                                   .includes(:question_group)
+                                   .where(question_groups: { session_id: outcome.id })
+                                   .order('question_groups.position ASC', 'questions.position ASC')
   end
 
   def outcome_questions_reassignment
@@ -54,11 +54,18 @@ class Clone::Session < Clone::Base
       formula['patterns'] = formula['patterns'].map do |pattern|
         index = 0
         pattern['target'].each do |current_target|
-          current_target['id'] = matching_outcome_target_id(pattern, index)
+          current_target['id'] =
+            if current_target['type'].eql?('Question::HenryFordInitial')
+              nil
+            else
+              matching_outcome_target_id(pattern, index)
+            end
           index += 1
         end
+        pattern['target'].delete_if { |branch| branch['id'].nil? }
         pattern
       end
+      formula['patterns'].delete_if { |pattern| pattern['target'].empty? }
     end
     question
   end
@@ -74,9 +81,9 @@ class Clone::Session < Clone::Base
     target = check_if_question_exists(target_id)
     if target
       outcome.questions
-          .joins(:question_group)
-          .where(question_groups: { position: target.question_group.position })
-          .find_by!(position: target.position).id
+             .joins(:question_group)
+             .where(question_groups: { position: target.question_group.position })
+             .find_by!(position: target.position).id
     else
       ''
     end
@@ -130,39 +137,25 @@ class Clone::Session < Clone::Base
   end
 
   def create_report_templates
-    outcome.report_templates_count = 0
     source.report_templates.each do |report_template|
-      new_report_template = ReportTemplate.new(report_template.slice(*ReportTemplate::ATTR_NAMES_TO_COPY))
-      outcome.report_templates << new_report_template
-
-      new_report_template.logo.attach(report_template.logo.blob) if report_template.logo.attachment
-      new_report_template.pdf_preview.attach(report_template.pdf_preview.blob) if report_template.pdf_preview.attachment
-
-      report_template.sections.each do |section|
-        new_section = ReportTemplate::Section.new(section.slice(*ReportTemplate::Section::ATTR_NAMES_TO_COPY))
-        new_report_template.sections << new_section
-
-        section.variants.each do |variant|
-          new_variant = ReportTemplate::Section::Variant.new(variant.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
-          new_section.variants << new_variant
-
-          new_variant.image.attach(variant.image.blob) if variant.image.attachment
-        end
-      end
+      outcome.report_templates << Clone::ReportTemplate.new(report_template, params: { session_id: outcome.id }, set_flag: false).execute
     end
+    Session.reset_counters(outcome.id, :report_templates)
   end
 
   def reassign_report_templates_to_third_party_screens
-    source_third_party_report_templates = source.report_templates.third_party
-    outcome_third_party_report_templates = outcome.report_templates.third_party
+    # pairs of ids of corresponding report templates in source and outcome
+    report_template_corresponding_ids = ReportTemplate
+                                          .joins('JOIN report_templates other ON report_templates.name = other.name')
+                                          .where('report_templates.session_id': source.id, 'other.session_id': outcome.id)
+                                          .where('report_templates.report_for': :third_party, 'other.report_for': :third_party)
+                                          .pluck('report_templates.id', 'other.id').to_h
 
     Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
       third_party_question.body_data.each do |third_party_question_body_data_element|
-        report_template_ids = third_party_question_body_data_element['report_template_ids']
-        new_report_template_ids = report_template_ids.each_with_object([]) do |report_template_id, new_report_template_ids| # rubocop:disable Lint/ShadowingOuterLocalVariable
-          source_report_template = source_third_party_report_templates.find(report_template_id)
-          outcome_report_template_id = outcome_third_party_report_templates.find_by(name: source_report_template.name)&.id
-          new_report_template_ids << outcome_report_template_id
+        new_report_template_ids = third_party_question_body_data_element['report_template_ids'].each_with_object([]) do |report_template_id, arr|
+          new_report_template_id = report_template_corresponding_ids[report_template_id]
+          arr << new_report_template_id unless new_report_template_id.nil?
         end
         third_party_question_body_data_element['report_template_ids'] = new_report_template_ids
       end

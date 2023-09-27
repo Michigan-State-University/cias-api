@@ -30,7 +30,6 @@ class V1::FlowService::NextQuestion::BranchingService
       obj_src = last_answered_question.exploit_formula(all_var_values, formula['payload'], formula['patterns'])
       break unless obj_src.nil?
     end
-
     additional_information[:warning] = obj_src if obj_src.is_a?(String)
 
     branching_question = fetch_target_question(obj_src)

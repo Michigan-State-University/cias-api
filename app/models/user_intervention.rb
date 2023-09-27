@@ -8,6 +8,8 @@ class UserIntervention < ApplicationRecord
 
   delegate :sessions, to: :intervention
 
+  validates :health_clinic_id, presence: true, if: :intervention_inside_organization?
+
   enum status: { ready_to_start: 'ready_to_start', in_progress: 'in_progress', completed: 'completed', schedule_pending: 'schedule_pending' }
 
   def last_answer_date
@@ -20,5 +22,9 @@ class UserIntervention < ApplicationRecord
 
   def contain_multiple_fill_session
     sessions.multiple_fill.any?
+  end
+
+  def intervention_inside_organization?
+    intervention&.organization_id.present?
   end
 end

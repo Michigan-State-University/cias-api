@@ -3,14 +3,18 @@
 class Clone::Intervention < Clone::Base
   def execute
     outcome.status = :draft
+    outcome.sensitive_data_state = 'collected'
     outcome.name = "Copy of #{outcome.name}"
     outcome.is_hidden = true
+    outcome.user_id = user_id if user_id.present?
     clear_organization!
     clear_cat_mh_settings!
+    clear_hfhs_settings!
     outcome.save!
     create_sessions
     reassign_branching
     outcome.update!(is_hidden: hidden)
+    reset_cache_counters
     outcome
   end
 
@@ -99,5 +103,14 @@ class Clone::Intervention < Clone::Base
     outcome.cat_mh_organization_id = nil
     outcome.cat_mh_pool = nil
     outcome.created_cat_mh_session_count = 0
+  end
+
+  def clear_hfhs_settings!
+    outcome.hfhs_access = false
+  end
+
+  def reset_cache_counters
+    Intervention.reset_counters(outcome.id, :navigators)
+    Intervention.reset_counters(outcome.id, :conversations)
   end
 end

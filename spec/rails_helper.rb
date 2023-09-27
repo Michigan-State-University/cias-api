@@ -90,6 +90,8 @@ RSpec.configure do |config|
     config.before { Bullet.start_request }
     config.after {  Bullet.end_request }
   end
+
+  config.include ActionCable::TestHelper
 end
 
 Shoulda::Matchers.configure do |config|

@@ -24,4 +24,13 @@ class Api::CatMh::Base
   def params
     {}
   end
+
+  def client
+    @client = Faraday.new(self.class::ENDPOINT) do |client|
+      client.request :url_encoded
+      client.adapter Faraday.default_adapter
+      client.headers['Cookie'] = cookie
+      client.headers['Content-Type'] = 'application/json'
+    end
+  end
 end

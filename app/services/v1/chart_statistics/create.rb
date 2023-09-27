@@ -15,16 +15,18 @@ class V1::ChartStatistics::Create
     return if health_clinic.nil?
     return if dentaku_service.exist_missing_variables?
     return if zero_division_error?
+    return unless inside_date_range?
 
-    ChartStatistic.find_or_create_by!(
+    chart_statistic = ChartStatistic.find_or_initialize_by(
       label: label,
       organization: organization,
       health_system: health_system,
       health_clinic: health_clinic,
       chart: chart,
-      user: user_session.user,
-      filled_at: user_session.finished_at || DateTime.current
+      user: user_session.user
     )
+    chart_statistic.filled_at = user_session.finished_at || DateTime.current
+    chart_statistic.save!
   end
 
   private
@@ -67,5 +69,13 @@ class V1::ChartStatistics::Create
 
   def zero_division_error?
     calculated_formula == Chart::ZERO_DIVISION_ERROR
+  end
+
+  def inside_date_range?
+    return false if chart.date_range_start.present? && chart.date_range_start > user_session.finished_at
+    # +1.day because FE sends and BE stores the BEGINNING of the last day, and we need to include this day as a whole as well
+    return false if chart.date_range_end.present? && chart.date_range_end + 1.day <= user_session.finished_at
+
+    true
   end
 end

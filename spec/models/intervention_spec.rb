@@ -18,6 +18,8 @@ RSpec.describe Intervention, type: :model do
     it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { should have_many(:short_links).dependent(:destroy) }
+    it { should have_many(:intervention_locations).dependent(:destroy) }
+    it { should have_many(:clinic_locations) }
     it { expect(initial_status.draft?).to be true }
   end
 
@@ -130,6 +132,25 @@ RSpec.describe Intervention, type: :model do
                                  { 'match' => '=3', 'target' => [{ 'id' => other_session.id, type: 'Session' }] }
                                ] }])
     end
+    let!(:question3) do
+      create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 3', position: 3,
+                               formulas: [{ 'payload' => 'var + 29', 'patterns' => [
+                                 { 'match' => '=6', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::HenryFordInitial' }] }
+                               ] }])
+    end
+    let!(:question4) do
+      create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 4', position: 4,
+                               formulas: [{ 'payload' => 'var + 87', 'patterns' => [
+                                 { 'match' => '=23', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::HenryFordInitial', 'probability' => '50' },
+                                                                  { 'id' => question5.id, type: 'Question::Single', 'probability' => '50' }] }
+                               ] }])
+    end
+    let!(:question5) do
+      create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 5', position: 5)
+    end
+    let(:henry_ford_question) { create(:question_henry_ford_initial_screen, question_group: question_group, position: 4) }
+    let!(:navigator) { LiveChat::Interventions::Navigator.create!(intervention: intervention, user: create(:user, :navigator, :confirmed)) }
+    let!(:conversation) { create(:live_chat_conversation, intervention: intervention) }
 
     it 'return correct data' do
       cloned_intervention = intervention.clone
@@ -140,9 +161,26 @@ RSpec.describe Intervention, type: :model do
       expect(cloned_intervention.name).to include('Copy of')
     end
 
+    it 'reset cache counters' do
+      expect(intervention.navigators_count).to be_positive
+      expect(intervention.conversations_count).to be_positive
+      cloned_intervention = intervention.clone.reload
+      expect(cloned_intervention.navigators_count).to be_zero
+      expect(cloned_intervention.conversations_count).to be_zero
+    end
+
     it 'remove short links' do
       cloned_intervention = intervention.clone
       expect(cloned_intervention.short_links.any?).to be false
+    end
+
+    context 'when the intervention is cleared' do
+      let(:intervention) { create(:intervention, sensitive_data_state: 'removed') }
+      let(:cloned_intervention) { intervention.clone }
+
+      it 'sets the reports_deleted flag to false' do
+        expect(cloned_intervention.sensitive_data_state).to eq('collected')
+      end
     end
 
     it 'correct clone questions to cloned session' do
@@ -175,6 +213,20 @@ RSpec.describe Intervention, type: :model do
               { 'match' => '=3', 'target' => [{ 'id' => cloned_sessions.second.id, 'type' => 'Session' }] }
             ]
           }]
+        ),
+        include(
+          'formulas' => [
+            'payload' => 'var + 29',
+            'patterns' => []
+          ]
+        ),
+        include(
+          'formulas' => [
+            'payload' => 'var + 87',
+            'patterns' => [
+              { 'match' => '=23', 'target' => [{ 'id' => cloned_questions.find_by(position: 5).id, 'type' => 'Question::Single', 'probability' => '50' }] }
+            ]
+          ]
         ),
         include(
           'position' => 999_999,
@@ -218,6 +270,17 @@ RSpec.describe Intervention, type: :model do
         cloned_intervention = intervention.clone(params: params)
 
         expect(cloned_intervention.first.user_id).to eq(other_user.id)
+      end
+    end
+
+    context 'when the user duplicates here a session of another user' do
+      let(:other_user) { create(:user, :confirmed, :researcher) }
+      let(:params) { { user_id: other_user.id } }
+
+      it 'create a new intervention with correct user_id' do
+        cloned_intervention = intervention.clone(params: params)
+
+        expect(cloned_intervention.user).to eq(other_user)
       end
     end
   end

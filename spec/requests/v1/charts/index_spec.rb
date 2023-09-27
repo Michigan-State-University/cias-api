@@ -57,6 +57,9 @@ RSpec.describe 'GET /v1/charts', type: :request do
               }
             },
             'dashboard_section_id' => dashboard_section.id,
+            'date_range_end' => nil,
+            'date_range_start' => nil,
+            'interval_type' => 'monthly',
             'published_at' => nil
           }
         },
@@ -81,6 +84,9 @@ RSpec.describe 'GET /v1/charts', type: :request do
               }
             },
             'dashboard_section_id' => dashboard_section.id,
+            'date_range_end' => nil,
+            'date_range_start' => nil,
+            'interval_type' => 'monthly',
             'published_at' => nil
           }
         },
@@ -105,6 +111,9 @@ RSpec.describe 'GET /v1/charts', type: :request do
               }
             },
             'dashboard_section_id' => other_dashboard_section.id,
+            'date_range_end' => nil,
+            'date_range_start' => nil,
+            'interval_type' => 'monthly',
             'published_at' => nil
           }
         }
@@ -128,6 +137,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
           'type' => 'chart',
           'attributes' => {
             'name' => chart.name,
+            'interval_type' => 'monthly',
             'description' => chart.description,
             'status' => 'draft',
             'trend_line' => false,
@@ -146,6 +156,8 @@ RSpec.describe 'GET /v1/charts', type: :request do
               }
             },
             'dashboard_section_id' => dashboard_section.id,
+            'date_range_start' => nil,
+            'date_range_end' => nil,
             'published_at' => nil
           }
         },
@@ -154,6 +166,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
           'type' => 'chart',
           'attributes' => {
             'name' => other_chart.name,
+            'interval_type' => 'monthly',
             'description' => other_chart.description,
             'status' => 'draft',
             'trend_line' => false,
@@ -170,6 +183,8 @@ RSpec.describe 'GET /v1/charts', type: :request do
               }
             },
             'dashboard_section_id' => dashboard_section.id,
+            'date_range_end' => nil,
+            'date_range_start' => nil,
             'published_at' => nil
           }
         }
