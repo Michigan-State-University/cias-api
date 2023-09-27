@@ -78,6 +78,6 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def locale
-    intervention_load.language_code
+    intervention_load&.language_code
   end
 end

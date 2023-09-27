@@ -25,6 +25,6 @@ class V1::Translations::TranslationsController < V1Controller
   end
 
   def locale
-    Intervention.find(intervention_id).language_code
+    Intervention.find(intervention_id)&.language_code
   end
 end

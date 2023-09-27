@@ -38,6 +38,6 @@ class V1::NarratorController < V1Controller
   end
 
   def locale
-    object_load.language_code
+    object_load&.language_code
   end
 end

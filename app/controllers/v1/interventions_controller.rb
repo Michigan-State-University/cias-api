@@ -153,6 +153,6 @@ class V1::InterventionsController < V1Controller
   end
 
   def locale
-    intervention_load.language_code
+    intervention_load&.language_code
   end
 end

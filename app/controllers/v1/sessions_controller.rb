@@ -135,6 +135,6 @@ class V1::SessionsController < V1Controller
   end
 
   def locale
-    intervention.language_code
+    intervention&.language_code
   end
 end

@@ -32,6 +32,6 @@ class V1::Interventions::AnswersController < V1Controller
   end
 
   def locale
-    intervention.language_code
+    intervention&.language_code
   end
 end
