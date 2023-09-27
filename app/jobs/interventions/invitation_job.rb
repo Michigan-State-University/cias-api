@@ -9,7 +9,7 @@ class Interventions::InvitationJob < ApplicationJob
     users.each do |user|
       next unless user.email_notification
 
-      InterventionMailer.inform_to_an_email(
+      InterventionMailer.with(locale: intervention.language_code).inform_to_an_email(
         intervention,
         user.email,
         health_clinic
@@ -17,7 +17,7 @@ class Interventions::InvitationJob < ApplicationJob
     end
 
     non_existing_user_emails.each do |email|
-      InterventionMailer.invite_to_intervention_and_registration(
+      InterventionMailer.with(locale: intervention.language_code).invite_to_intervention_and_registration(
         intervention,
         email,
         health_clinic

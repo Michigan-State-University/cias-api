@@ -13,11 +13,11 @@ class V1::ReportTemplates::GeneratePdfPreview
   def call
     return unless current_v1_user.email_notification
 
-    ReportTemplateMailer.template_preview(
+    ReportTemplateMailer.with(locale: report_template.session.language_code).template_preview(
       email: current_v1_user.email,
       report_template: report_template,
       report_template_preview_pdf: render_pdf_report
-    ).deliver_now # TODO: locale
+    ).deliver_now
   end
 
   private
