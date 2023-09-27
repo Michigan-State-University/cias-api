@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe SendNewReportNotificationJob, type: :job do
-  subject { described_class.perform_now(user.email) }
+  subject { described_class.perform_now(user.email, 'en') }
 
   before do
     ActiveJob::Base.queue_adapter = :test
