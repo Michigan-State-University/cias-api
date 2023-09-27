@@ -2,9 +2,11 @@
 
 RSpec.describe SessionScheduleJob, type: :job do
   let!(:session) { create(:session) }
+  let!(:user_intervention) { create(:user_intervention, intervention: session.intervention, user: user) }
   let!(:user) { create(:user, :participant) }
   let(:session_id) { session.id }
   let(:user_id) { user.id }
+  let(:user_intervention_id) { user_intervention.id }
 
   before do
     ActiveJob::Base.queue_adapter = :test
@@ -15,7 +17,7 @@ RSpec.describe SessionScheduleJob, type: :job do
   end
 
   after do
-    described_class.new.perform(session_id, user_id)
+    described_class.new.perform(session_id, user_id, nil, user_intervention_id)
   end
 
   context 'user session timeout body' do
@@ -39,6 +41,15 @@ RSpec.describe SessionScheduleJob, type: :job do
       it 'does not call finish on perform' do
         expect_any_instance_of(Session).not_to receive(:send_link_to_session)
       end
+    end
+  end
+
+  context 'when doesn\'t found session' do
+    let(:user_intervention_id) { 'example' }
+
+    it do
+      expect_any_instance_of(UserIntervention).not_to receive(:update)
+      expect_any_instance_of(Session).not_to receive(:send_link_to_session)
     end
   end
 end

@@ -31,15 +31,6 @@ class Api::CatMh::Answer < Api::CatMh::Base
 
   private
 
-  def client
-    @client = Faraday.new(ENDPOINT) do |client|
-      client.request :url_encoded
-      client.adapter Faraday.default_adapter
-      client.headers['Cookie'] = cookie
-      client.headers['Content-Type'] = 'application/json'
-    end
-  end
-
   def params
     {
       'questionID' => question_id,

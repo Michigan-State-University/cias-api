@@ -7,6 +7,7 @@ class Session < ApplicationRecord
   include FormulaInterface
   include InvitationInterface
   include Translate
+  include ::TranslationAuxiliaryMethods
 
   CURRENT_VERSION = '1'
 
@@ -118,7 +119,7 @@ class Session < ApplicationRecord
       end
     end
 
-    SendFillInvitationJob.perform_later(::Session, id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
+    SendFillInvitation::SessionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id, intervention_id)
   end
 
   def send_link_to_session(user, health_clinic = nil)
@@ -147,10 +148,7 @@ class Session < ApplicationRecord
   end
 
   def translate_name(translator, source_language_name_short, destination_language_name_short)
-    original_text['name'] = name
-    new_name = translator.translate(name, source_language_name_short, destination_language_name_short)
-
-    update!(name: new_name)
+    translate_attribute('name', name, translator, source_language_name_short, destination_language_name_short)
   end
 
   def translate_sms_plans(translator, source_language_name_short, destination_language_name_short)

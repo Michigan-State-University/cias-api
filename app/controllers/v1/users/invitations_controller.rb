@@ -91,12 +91,6 @@ class V1::Users::InvitationsController < V1Controller
     params[:invitation_token]
   end
 
-  def redirect_to_web_app(**message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV['WEB_URL']}?#{message.to_query}"
-  end
-
   def user_verification_code(user)
     user.user_verification_codes.where(confirmed: false).order(created_at: :desc).first&.code
   end

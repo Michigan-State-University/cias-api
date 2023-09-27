@@ -64,8 +64,28 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         expect(json_response['data']['attributes']).to include(
           'name' => 'New Intervention',
           'status' => 'published',
-          'shared_to' => 'anyone'
+          'shared_to' => 'anyone',
+          'starred' => false
         )
+      end
+
+      context 'clinic locations' do
+        let!(:location_ids) { create_list(:clinic_location, 3).map(&:id) }
+        let(:params) do
+          {
+            intervention: {
+              location_ids: location_ids
+            }
+          }
+        end
+
+        it 'assigns new locations to the intervention' do
+          expect(intervention.reload.intervention_locations.size).to be(3)
+        end
+
+        it 'returns information about locations in the response' do
+          expect(json_response['data']['relationships']['clinic_locations']).not_to be_empty
+        end
       end
 
       context 'short links' do
@@ -322,6 +342,68 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
 
       it 'returns live chat setting' do
         expect(json_response['data']['attributes']).to include('live_chat_enabled' => true)
+      end
+    end
+  end
+
+  context 'when changing the intervention shared to type' do
+    let(:intervention) { create(:intervention, user: user, shared_to: shared_to_change.first) }
+    let(:session) { create(:session, intervention: intervention, schedule: session_schedule, schedule_payload: schedule_payload, schedule_at: schedule_at) }
+    let(:schedule_payload) { nil }
+    let(:schedule_at) { nil }
+    let(:params) do
+      {
+        intervention: {
+          shared_to: shared_to_change.second
+        }
+      }
+    end
+
+    context "when changing to 'anyone'" do
+      let(:shared_to_change) { %w[registered anyone] }
+      let(:session_schedule) { 'exact_date' }
+      let(:schedule_payload) { 10 }
+      let(:schedule_at) { 2.days.from_now }
+
+      it 'changes the scheduling of all sessions to `after_fill`' do
+        expect { request }.to change { session.reload.schedule }.to('after_fill')
+      end
+
+      it 'clears the schedule_payload and schedule_at fields' do
+        expect { request }.to change { session.reload.schedule_payload || session.reload.schedule_at }.to(nil)
+      end
+    end
+
+    context "when changing to 'anyone' with an already correct schedule type" do
+      let(:shared_to_change) { %w[registered anyone] }
+      let(:session_schedule) { 'immediately' }
+
+      it 'keeps the scheduling on the same value' do
+        expect { request }.not_to change { session.reload.schedule }
+      end
+    end
+
+    context "when changing to not 'anyone'" do
+      let(:shared_to_change) { %w[anyone registered] }
+      let(:session_schedule) { 'immediately' }
+
+      it 'keeps the scheduling on the same value' do
+        expect { request }.not_to change { session.reload.schedule }
+      end
+    end
+
+    context "when changing from 'registered' to 'invited'" do
+      let(:shared_to_change) { %w[registered invited] }
+      let(:session_schedule) { 'exact_date' }
+      let(:schedule_payload) { 10 }
+      let(:schedule_at) { 2.days.from_now }
+
+      it 'keeps the scheduling on the same value' do
+        expect { request }.not_to change { session.reload.schedule }
+      end
+
+      it 'keeps the schedule_payload and schedule_at fields' do
+        expect { request }.not_to change { session.reload.schedule_payload && session.reload.schedule_at }
       end
     end
   end

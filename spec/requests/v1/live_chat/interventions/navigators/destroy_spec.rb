@@ -23,6 +23,20 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigators/:navigator_id',
     it 'Correctly removes navigators' do
       expect { request }.to change { intervention.navigators.reload.count }.by(-1)
     end
+
+    it 'broadcast message' do
+      expect { request }.to have_broadcasted_to("navigators_in_intervention_channel_#{intervention.id}")
+    end
+
+    context 'when intervention has many navigators' do
+      before do
+        intervention.navigators << create(:user, :confirmed, :navigator)
+      end
+
+      it 'broadcast message' do
+        expect { request }.not_to have_broadcasted_to("navigators_in_intervention_channel_#{intervention.id}")
+      end
+    end
   end
 
   context 'not current editor' do

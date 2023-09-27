@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Clone::Base
-  attr_accessor :source, :outcome, :options, :hidden, :clean_formulas, :position, :session_variables
+  attr_accessor :source, :outcome, :options, :hidden, :clean_formulas, :position, :user_id, :session_variables
 
   def initialize(source, **options)
     @source = source
@@ -10,6 +10,7 @@ class Clone::Base
     @clean_formulas = options.delete(:clean_formulas)
     @hidden = options.delete(:hidden)
     @position = options.delete(:position)
+    @user_id = options.delete(:user_id)
     @outcome.variable = options[:params][:variable] if options[:params].present? && options[:params][:variable].present?
     options.delete(:params)
     @outcome.assign_attributes(options)

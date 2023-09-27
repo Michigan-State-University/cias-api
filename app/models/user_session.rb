@@ -10,6 +10,8 @@ class UserSession < ApplicationRecord
   has_many :tlfb_days, class_name: 'Tlfb::Day', dependent: :destroy
   belongs_to :health_clinic, optional: true
 
+  validates :health_clinic_id, presence: true, if: :user_intervention_inside_health_clinic?
+
   def finish(_send_email: true)
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
@@ -18,8 +20,21 @@ class UserSession < ApplicationRecord
     answers.confirmed.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|
         key = include_session_var ? "#{session.variable}.#{obj['var']}" : obj['var']
-        var_values[key] = obj['value']
+        var_values[key] = map_to_numeric_value(obj, answer)
       end
+    end
+  end
+
+  def map_to_numeric_value(obj, answer)
+    return obj['value'] unless answer.class.in? [Answer::ParticipantReport, Answer::Phone, Answer::ThirdParty]
+
+    case answer.class.name
+    when 'Answer::ParticipantReport'
+      obj['value']['receive_report'] && 1 || 0
+    when 'Answer::Phone'
+      obj['value']['confirmed'] && 1 || 0
+    when 'Answer::ThirdParty'
+      obj['numeric_value']
     end
   end
 
@@ -56,5 +71,9 @@ class UserSession < ApplicationRecord
     return session.last_session? && finished_at.present? unless user_intervention.intervention.module_intervention?
 
     user_intervention.completed_sessions == user_intervention.sessions.size
+  end
+
+  def user_intervention_inside_health_clinic?
+    user_intervention&.health_clinic_id.present?
   end
 end

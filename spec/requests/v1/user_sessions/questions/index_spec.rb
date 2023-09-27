@@ -685,6 +685,33 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
       end
     end
+
+    context 'when integration with HFHS is on' do
+      let!(:next_question) { create(:question_henry_ford_initial_screen, question_group: question_group) }
+      let!(:user_session_with_hfhs) do
+        create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int)
+      end
+
+      before do
+        get v1_user_session_questions_url(user_session_with_hfhs.id), headers: user.create_new_auth_token
+      end
+
+      it 'returns only data' do
+        expect(json_response.keys).to match_array(%w[data answer])
+      end
+
+      it 'return correct question' do
+        expect(json_response['data']['id']).to eql(next_question.id)
+      end
+
+      context 'when user has assigned patient information' do
+        let(:participant) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
+
+        it 'returns data and patient_details' do
+          expect(json_response.keys).to match_array(%w[data answer hfhs_patient_detail])
+        end
+      end
+    end
   end
 
   context 'UserSession::CatMh' do

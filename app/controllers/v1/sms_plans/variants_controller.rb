@@ -65,4 +65,8 @@ class V1::SmsPlans::VariantsController < V1Controller
   def variant_params
     params.require(:variant).permit(:formula_match, :content, :attachment)
   end
+
+  def ability_to_update?
+    sms_plan.ability_to_update_for?(current_v1_user)
+  end
 end

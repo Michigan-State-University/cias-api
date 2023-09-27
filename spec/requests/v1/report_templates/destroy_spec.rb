@@ -7,7 +7,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
     delete v1_session_report_template_path(session_id: session.id, id: report_template.id),
            params: {}, headers: headers
   end
-  let!(:report_template) { create(:report_template, :with_logo) }
+  let!(:report_template) { create(:report_template, :with_logo, :with_custom_cover_letter_logo) }
   let(:session) { report_template.session }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
@@ -29,7 +29,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
         end
 
         it 'removes report template and it\'s attachments' do
-          expect { request }.to change(ActiveStorage::Attachment, :count).by(-1).and \
+          expect { request }.to change(ActiveStorage::Attachment, :count).by(-2).and \
             change(ReportTemplate, :count).by(-1)
 
           expect(ReportTemplate.exists?(report_template.id)).to be false

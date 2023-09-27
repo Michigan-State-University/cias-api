@@ -728,7 +728,8 @@ FactoryBot.define do
             value: '',
             report_template_ids: []
           }
-        ]
+        ],
+        variable: { name: '' }
       }
     end
     sequence(:position) { |s| s }
@@ -849,5 +850,44 @@ FactoryBot.define do
         }
       end
     end
+  end
+
+  factory :question_henry_ford, class: Question::HenryFord do
+    title { 'HenryFord' }
+    type { Question::HenryFord }
+    body do
+      {
+        data: [
+          {
+            payload: 'Never',
+            value: 'Never',
+            hfh_value: 'hfh1'
+          },
+          {
+            payload: 'Monthly or less',
+            value: 'Monthly or less',
+            hfh_value: 'hfh2'
+          }
+        ],
+        variable: {
+          name: 'AUDIT_1'
+        }
+      }
+    end
+
+    sequence(:position) { |s| s }
+    association :question_group
+  end
+
+  factory :question_henry_ford_initial_screen, class: Question::HenryFordInitial do
+    title { 'Question::HenryFordInitial' }
+    type { Question::HenryFordInitial }
+    body do
+      {
+        data: []
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
   end
 end
