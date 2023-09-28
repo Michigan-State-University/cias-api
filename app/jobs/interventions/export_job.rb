@@ -19,7 +19,7 @@ class Interventions::ExportJob < ApplicationJob
     file.write(intervention_data(@intervention))
     file.rewind
 
-    ExportMailer.with(locale: @intervention.language_code).result(@user, @intervention.name, file.path).deliver_now
+    ExportMailer.result(@user, @intervention.name, file.path).deliver_now
   ensure
     file.close
     file.unlink

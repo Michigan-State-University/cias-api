@@ -26,7 +26,7 @@ class V1::QuestionGroup::ShareExternallyService
         V1::QuestionGroup::DuplicateWithStructureService.call(new_session, selected_groups_with_questions)
 
         unless researcher.confirmed?
-          CloneMailer.with(locale: source_session.language_code)
+          CloneMailer
                      .cloned_question_group_activate(researcher, new_intervention.name).deliver_now
         end
       end

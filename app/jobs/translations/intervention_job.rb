@@ -10,14 +10,14 @@ class Translations::InterventionJob < ApplicationJob
 
     return unless current_user.email_notification
 
-    TranslationMailer.with(locale: intervention.language_code).confirmation(current_user, intervention, translated_intervention).deliver_now
+    TranslationMailer.confirmation(current_user, intervention, translated_intervention).deliver_now
   rescue StandardError => e
     logger.error "TRANSLATION ERROR LOG #{e}"
     translated_intervention&.sessions&.destroy_all
     translated_intervention&.destroy
     return unless current_user.email_notification
 
-    TranslationMailer.with(locale: intervention.language_code).error(current_user).deliver_now
+    TranslationMailer.error(current_user).deliver_now
   end
 
   private

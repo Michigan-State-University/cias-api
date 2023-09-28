@@ -33,8 +33,7 @@ class V1::Intervention::Collaborators::CreateService
 
   def send_emails_and_notifications!(new_user_emails)
     new_collaborators.each do |user|
-      InterventionMailer::CollaboratorsMailer.with(locale: intervention.language_code)
-                                             .invitation_user(user, intervention, user.email.in?(new_user_emails)).deliver_now
+      InterventionMailer::CollaboratorsMailer.invitation_user(user, intervention, user.email.in?(new_user_emails)).deliver_now
       Notification.create!(user: user, notifiable: intervention, event: :new_collaborator_added, data: generate_notification_body)
     end
   end
