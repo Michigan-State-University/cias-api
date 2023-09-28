@@ -6,7 +6,6 @@ class Interventions::ImportJob < ApplicationJob
   sidekiq_options retry: false
 
   def perform(user_id, intervention_hash)
-    Rails.logger.debug ">>> [#{self.class}] > #{intervention_hash}"
     ActiveRecord::Base.transaction do
       get_import_service_class(intervention_hash, Intervention).call(user_id, intervention_hash)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::SubclassNotFound, ActiveModel::UnknownAttributeError
