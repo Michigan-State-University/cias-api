@@ -104,7 +104,8 @@ RSpec.describe V1::UserSessionScheduleService do
             end
 
             it 'sends an email' do
-              expect(SessionMailer).to receive(:inform_to_an_email).with(second_session, user.email, user_session.health_clinic).and_return(message_delivery)
+              expect_to_call_mailer(SessionMailer, :inform_to_an_email,
+                                    args: [second_session, user.email, user_session.health_clinic], return_value: message_delivery)
             end
           end
 

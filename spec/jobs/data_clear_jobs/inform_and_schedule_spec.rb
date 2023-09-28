@@ -24,16 +24,16 @@ RSpec.describe DataClearJobs::InformAndSchedule, type: :job do
       expect(ActionMailer::Base.deliveries.last.to).to eq [participant.email]
     end
 
-    skip 'correct email was called' do
-      expect(InterventionMailer::ClearDataMailer).to receive(:inform).with(user_intervention1.user, intervention, delay)
+    it 'correct email was called' do
+      expect_to_call_mailer(InterventionMailer::ClearDataMailer, :inform, args: [user_intervention1.user, intervention, delay])
       subject
     end
 
     context 'when delay is 0' do
       let(:delay) { 0 }
 
-      skip 'correct email was called' do
-        expect(InterventionMailer::ClearDataMailer).to receive(:data_deleted)
+      it 'correct email was called' do
+        expect_to_call_mailer(InterventionMailer::ClearDataMailer, :data_deleted)
         subject
       end
     end
