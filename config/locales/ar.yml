@@ -1,386 +1,386 @@
 ar:
-  hello: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+  hello: إنهاء المجموعة
   time:
     formats:
-      file: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      report_file: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      file: إنهاء المجموعة
+      report_file: إنهاء المجموعة
   question:
     slider:
-      invalid_range: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      range_value_not_a_number: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      invalid_range: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      range_value_not_a_number: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     finish:
-      subtitle: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      text_to_speech: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subtitle: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      text_to_speech: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      title: حدث خطأ أثناء النسخ.
     error:
-      published_intervention: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      published_intervention: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   question_group:
     finish:
-      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      title: إنهاء المجموعة
     plain:
-      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      title: إنهاء المجموعة
     tlfb:
-      title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      title: إنهاء المجموعة
   channels:
     collaboration:
       intervention:
-        forbidden_action: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        forbidden_action: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   activerecord:
     errors:
       models:
         link:
           slug:
-            too_long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            too_long: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
         collaborator:
           attributes:
             user:
-              already_exist: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              already_exist: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
         intervention:
           attributes:
-            cat_mh_resources: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-            cat_mh_setting: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            cat_mh_resources: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+            cat_mh_setting: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
             cat_mh_connection_failed:
-              title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-              body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-              button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-            live_chat_wrong_session_status: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              title: حدث خطأ أثناء النسخ.
+              body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+              button: حدث خطأ أثناء النسخ.
+            live_chat_wrong_session_status: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
             collaborators:
-              data_access: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              data_access: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
         user:
-          terms_not_accepted: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-          2fa_code_needed: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-          not_using_invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          terms_not_accepted: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+          2fa_code_needed: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+          not_using_invitation_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
           attributes:
             roles:
-              team_admin_must_have_a_team: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-              organization_id_is_required_for_organization_admin: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              team_admin_must_have_a_team: حدث خطأ أثناء النسخ.
+              organization_id_is_required_for_organization_admin: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
             team_id:
-              team_admin_already_exists_for_the_team: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              team_admin_already_exists_for_the_team: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
         team_invitation:
           attributes:
             user_id:
-              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              already_exists: إنهاء المجموعة
         question_group:
-          question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-          question_variable: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+          question: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+          question_variable: حدث خطأ أثناء النسخ.
         organization_invitation:
           attributes:
             user_id:
-              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              already_exists: إنهاء المجموعة
         health_system_invitation:
           attributes:
             user_id:
-              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              already_exists: إنهاء المجموعة
         session:
           attributes:
             variable:
-              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              already_exists: إنهاء المجموعة
         live_chat:
           conversation:
-            no_navigator_available: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            no_navigator_available: حدث خطأ أثناء النسخ.
           message:
-            sent_in_archived_conversation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            sent_in_archived_conversation: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
             attributes:
               content:
-                too_long: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+                too_long: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
           navigator:
-            not_researcher: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            not_researcher: حدث خطأ أثناء النسخ.
           navigator_setup:
-            file_too_big: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            file_too_big: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
         short_link:
           attributes:
             name:
-              already_exists: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+              already_exists: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       messages:
-        undestroyable: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        undestroyable: إنهاء المجموعة
   interventions:
     invitations:
-      wrong_intervention_type: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      wrong_intervention_type: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     fixed_order:
-      wrong_sharing_target: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      wrong_sharing_target: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     flexible_order:
-      wrong_sharing_target: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      wrong_sharing_target: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     answers:
       index:
-        csv: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        csv: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   sessions:
     sms_alerts:
-      no_data_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      no_first_name_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      no_last_name_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      no_email_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      no_phone_number_provided: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      no_data_provided: حدث خطأ أثناء النسخ.
+      no_first_name_provided: حدث خطأ أثناء النسخ.
+      no_last_name_provided: حدث خطأ أثناء النسخ.
+      no_email_provided: حدث خطأ أثناء النسخ.
+      no_phone_number_provided: حدث خطأ أثناء النسخ.
   users:
     invite:
-      researcher: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      not_active: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      researcher: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      not_active: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     preview:
-      cat_mh: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      cat_mh: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   user_sessions:
     errors:
-      previous_question: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      scheduled_session: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      previous_question: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      scheduled_session: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   teams:
     invitations:
-      accepted: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      accepted: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      not_found: حدث خطأ أثناء النسخ.
   team_mailer:
     invite_user:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      instruction: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      instruction: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: حدث خطأ أثناء النسخ.
   organizables:
     invitations:
-      accepted: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      accepted: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      not_found: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   live_chat:
     navigators:
       invitations:
-        success: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        error: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        success: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+        error: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   organizable_mailer:
     invite_user:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      instruction: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      instruction: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: حدث خطأ أثناء النسخ.
   generated_report_mailer:
     new_report_available:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: إنهاء المجموعة
   report_template_mailer:
     template_preview:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   csv_mailer:
     answers:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: حدث خطأ أثناء النسخ.
+      html_body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: حدث خطأ أثناء النسخ.
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       preview:
-        subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+        header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+        html_body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   backup_mailer:
     result:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: حدث خطأ أثناء النسخ.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   import_mailer:
     result:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button: إنهاء المجموعة
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     unsuccessful:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      notification: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      notification: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   session_mailer:
     grant_access_to_a_user:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     inform_to_an_email:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      session_scheduled: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      before_button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link_for_anyone: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link_for_anyone_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: إنهاء المجموعة
+      html_body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      session_scheduled: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      before_button_text: حدث خطأ أثناء النسخ.
+      button_text: إنهاء المجموعة
+      invitation_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link_for_anyone: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link_for_anyone_from_clinic: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link_from_clinic: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     invite_to_session_and_registration:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body_invitation_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body_information_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: إنهاء المجموعة
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: إنهاء المجموعة
+      html_body_invitation_part: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_body_information_part: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: إنهاء المجموعة
+      invitation_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link_from_clinic: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   intervention_mailer:
     inform_to_an_email:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: إنهاء المجموعة
+      html_body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: حدث خطأ أثناء النسخ.
+      invitation_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link_from_clinic: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     invite_to_intervention_and_registration:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body_information_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body_invitation_part: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      invitation_link_from_clinic: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: إنهاء المجموعة
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: إنهاء المجموعة
+      html_body_information_part: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_body_invitation_part: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: إنهاء المجموعة
+      invitation_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      invitation_link_from_clinic: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   user_mailer:
     send_verification_login_code:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body_first_paragraph: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body_second_paragraph: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      verification_code: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      body_first_paragraph: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body_second_paragraph: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      verification_code: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     welcome_email:
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      dashboard_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      button_text: إنهاء المجموعة
+      dashboard_link: إنهاء المجموعة
+      subject: إنهاء المجموعة
+      html_body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_sub_body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: إنهاء المجموعة
   clone_mailer:
     intervention:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: حدث خطأ أثناء النسخ.
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     intervention_activate:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      main_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      new_user: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body_part1: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body_part2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: إنهاء المجموعة
+      header: إنهاء المجموعة
+      main_text: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      new_user: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button: إنهاء المجموعة
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_sub_body_part1: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_sub_body_part2: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     session:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: إنهاء المجموعة
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     question_group_activate:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      main_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      new_user: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body_part1: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body_part2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: إنهاء المجموعة
+      header: إنهاء المجموعة
+      main_text: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      new_user: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button: إنهاء المجموعة
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_sub_body_part1: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_sub_body_part2: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     error:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   duplicate_mailer:
     session:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      button_text: حدث خطأ أثناء النسخ.
+      link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   duplication_with_structure:
-    intervention_name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    session_name: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    question_group_title: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    wrong_argument: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    wrong_sessions: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    wrong_package: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    uniqueness_violation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    intervention_name: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    session_name: إنهاء المجموعة
+    question_group_title: حدث خطأ أثناء النسخ.
+    wrong_argument: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    wrong_sessions: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    wrong_package: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    uniqueness_violation: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     hfhs:
-      uniqueness_violation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      access_violation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    not_researcher: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      uniqueness_violation: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      access_violation: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    not_researcher: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   translation_mailer:
-    subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    subject: حدث خطأ أثناء النسخ.
+    header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    button_text: حدث خطأ أثناء النسخ.
+    link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     error:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   multiple_narrators_mailer:
-    subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    button_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    intervention_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-    session_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    subject: حدث خطأ أثناء النسخ.
+    header: حدث خطأ أثناء النسخ.
+    body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    button_text: إنهاء المجموعة
+    intervention_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+    session_link: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   mailer:
     subject:
-      generic_invitation: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      generic_invitation: إنهاء المجموعة
     footnote:
-      not_reply: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      ignore_mail_msg: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      not_reply_with_email: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      not_reply: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      ignore_mail_msg: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      not_reply_with_email: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     collaborators:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      main_text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      new_user: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body_part1: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      html_sub_body_part2: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: إنهاء المجموعة
+      button: إنهاء المجموعة
+      main_text: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      new_user: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: إنهاء المجموعة
+      html_sub_body_part1: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      html_sub_body_part2: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     clear_data:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      button: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      footnote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      button: إنهاء المجموعة
+      header: حدث خطأ أثناء النسخ.
+      footnote: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       participant:
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       third_party:
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     data_removed:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      footnote: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: حدث خطأ أثناء النسخ.
+      footnote: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       participant:
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       third_party:
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   navigator_mailer:
     invitation:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      click_the_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      navigator_invite: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      accept: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      click_the_link: حدث خطأ أثناء النسخ.
+      navigator_invite: حدث خطأ أثناء النسخ.
+      accept: إنهاء المجموعة
     from_team:
       invitation:
-        subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        navigator_invite: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-        body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+        navigator_invite: حدث خطأ أثناء النسخ.
+        body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     call_out:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      click_the_link: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      click_the_link: إنهاء المجموعة
     participant_handled:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      header: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      header: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   transcript_mailer:
-    open_inbox: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+    open_inbox: إنهاء المجموعة
     conversation_transcript_ready:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
     intervention_conversation_transcripts_ready:
-      subject: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      subject: حدث خطأ أثناء النسخ.
+      body: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
   epic_on_fhir:
     error:
-      authentication: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
-      unexpected_error: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+      authentication: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
+      unexpected_error: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       patient:
-        not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        not_found: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
       appointments:
-        not_found: "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+        not_found: لقد طلبت إعداد ملف يحتوي على بيانات الجلسة، ولذلك تتلقى هذه الرسالة. تم الانتهاء من طلبك بنجاح. يرجى تسجيل الدخول إلى التطبيق، ملف التقرير جاهز للتحميل.
