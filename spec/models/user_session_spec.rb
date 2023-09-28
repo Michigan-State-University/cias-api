@@ -65,9 +65,9 @@ RSpec.describe UserSession, type: :model do
             expect(answers.size).to be(2)
             variables = [answers.first.decrypted_body, answers.last.decrypted_body]
             expect(variables).to include(
-              { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
-              { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
-            )
+                                   { 'data' => [{ 'var' => 'dep_severity', 'value' => 43.9 }] },
+                                   { 'data' => [{ 'var' => 'dep_precision', 'value' => 5.0 }] }
+                                 )
           end
         end
 
@@ -220,6 +220,16 @@ RSpec.describe UserSession, type: :model do
 
       it 'disallows for health_clinic_id to be nil' do
         expect { user_session.update!(health_clinic_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      context 'when preview' do
+        let(:preview_user) { create(:user, :preview_session) }
+        let!(:user_intervention) { create(:user_intervention, user: preview_user, intervention: intervention, health_clinic_id: health_clinic.id) }
+        let!(:user_session) { create(:user_session, user: preview_user, user_intervention: user_intervention, health_clinic_id: health_clinic.id) }
+
+        it 'allows for health_clinic_id to be nil' do
+          expect(user_session.update!(health_clinic_id: nil)).to eq true
+        end
       end
     end
 
