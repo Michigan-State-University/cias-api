@@ -17,7 +17,7 @@ class Invitation < ApplicationRecord
                      UserSession.find_by(user_id: invited_user.id, session_id: invitable.id, health_clinic: health_clinic,
                                          finished_at: nil)&.scheduled_at
                    end
-    SessionMailer.inform_to_an_email(invitable, email, health_clinic, scheduled_at).deliver_later # TODO: locale
+    SessionMailer.with(locale: invitable.language_code).inform_to_an_email(invitable, email, health_clinic, scheduled_at).deliver_later
     :ok
   end
 end
