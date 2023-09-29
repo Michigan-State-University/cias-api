@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_30_041924) do
+ActiveRecord::Schema.define(version: 2023_09_29_103257) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -887,6 +887,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
+    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-09-29 10:26:12'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
     t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
@@ -924,6 +925,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
     t.boolean "started", default: false, null: false
+    t.boolean "multiple_fill"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
