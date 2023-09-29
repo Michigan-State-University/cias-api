@@ -14,7 +14,7 @@ class V1::Intervention::PredefinedParticipants::UpdateService
   def call
     ActiveRecord::Base.transaction do
       user.update!(user_params)
-      user.predefined_user_parameter.update(health_clinic_id: health_clinic_id) if health_clinic_id.present?
+      user.predefined_user_parameter.update(predefined_user_parameters)
     end
     user
   end
@@ -25,7 +25,11 @@ class V1::Intervention::PredefinedParticipants::UpdateService
   attr_accessor :user
 
   def user_params
-    params.except(:health_clinic_id)
+    params.except(:health_clinic_id, :external_id, :auto_invitation)
+  end
+
+  def predefined_user_parameters
+    params.except(:first_name, :last_name, :active, :email, :phone_attributes)
   end
 
   def health_clinic_id

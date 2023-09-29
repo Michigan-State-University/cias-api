@@ -46,6 +46,8 @@ class User < ApplicationRecord
 
   # ADDITIONAL PARAMETERS FOR PREDEFINED PARTICIPANTS
   has_one :predefined_user_parameter, dependent: :destroy
+  delegate :full_number, to: :phone, allow_nil: true
+  delegate :external_id, to: :predefined_user_parameter, allow_nil: true
 
   # AVATAR
   has_one_attached :avatar
