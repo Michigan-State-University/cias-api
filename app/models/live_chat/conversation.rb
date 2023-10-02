@@ -11,8 +11,6 @@ class LiveChat::Conversation < ApplicationRecord
 
   has_one_attached :transcript, dependent: :purge_later
 
-  delegate :language_code, to: :intervention
-
   scope :user_conversations, lambda { |user, is_archived|
     scope = LiveChat::Conversation.joins(:live_chat_interlocutors)
     scope = is_archived ? scope.where.not(archived_at: nil) : scope.where(archived_at: nil)
