@@ -29,11 +29,9 @@ class CloneJobs::Intervention < CloneJob
       next unless cloned_intervention.user.email_notification
 
       if cloned_intervention.user.confirmed?
-        CloneMailer
-                   .cloned_intervention(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
+        CloneMailer.cloned_intervention(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
       else
-        CloneMailer
-                   .cloned_intervention_activate(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
+        CloneMailer.cloned_intervention_activate(cloned_intervention.user, intervention.name, cloned_intervention.id).deliver_now
       end
     end
   end
