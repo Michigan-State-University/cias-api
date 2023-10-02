@@ -44,7 +44,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       end
 
       context 'when user has two answers for the same question' do
-        let!(:answer2) { create(:answer_single, question: question1, user_session: user_session, created_at: DateTime.parse("2022-10-02T08:25:47+02:00")) }
+        let!(:answer2) { create(:answer_single, question: question1, user_session: user_session, created_at: DateTime.parse('2022-10-02T08:25:47+02:00')) }
 
         it 'return correct question id' do
           request
