@@ -11,6 +11,8 @@ class AddInformationAboutMultipleSession < ActiveRecord::Migration[6.1]
         );
     SQL
 
-    add_index :user_sessions, [:user_id, :session_id], where: "(created_at > '#{DateTime.now.utc.to_s}'::timestamp) AND multiple_fill IS False"
+    change_column :user_sessions, :multiple_fill, :boolean, null: false, default: false
+
+    add_index :user_sessions, [:user_id, :session_id], where: "(created_at > '#{DateTime.now.utc.to_s}'::timestamp) AND multiple_fill IS False", unique: true
   end
 end
