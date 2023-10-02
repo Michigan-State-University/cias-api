@@ -63,7 +63,7 @@ class Intervention::Csv::Harvester
   end
 
   def set_rows
-    user_sessions.group_by(&:user_id).each_with_index do |grouped_user_sessions, row_index|
+    grouped_and_sorted_user_sessions.each_with_index do |grouped_user_sessions, row_index|
       initialize_row
       set_user_data(row_index, grouped_user_sessions.second.first)
 
@@ -182,6 +182,12 @@ class Intervention::Csv::Harvester
       "#{session.variable}.approach_number_#{approach_number || 1}.#{suffix}"
     else
       "#{session.variable}.#{suffix}"
+    end
+  end
+
+  def grouped_and_sorted_user_sessions
+    @grouped_and_sorted_user_sessions ||= user_sessions.group_by(&:user_id).sort_by do |grouped_user_sessions_per_user|
+      grouped_user_sessions_per_user[1].min_by(&:created_at).created_at
     end
   end
 end
