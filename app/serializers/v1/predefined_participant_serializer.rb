@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::PredefinedParticipantSerializer < V1Serializer
-  attributes :full_name, :first_name, :last_name, :email
+  attributes :full_name, :first_name, :last_name, :email, :active
 
   attribute :phone do |object|
     object.phone.as_json(only: %i[iso prefix number confirmed])
