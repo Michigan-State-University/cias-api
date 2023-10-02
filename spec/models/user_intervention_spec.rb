@@ -21,6 +21,15 @@ RSpec.describe UserIntervention, type: :model do
         it 'disallows for health_clinic_id to be nil' do
           expect { user_intervention.update!(health_clinic_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
         end
+
+        context 'when preview' do
+          let(:preview_user) { create(:user, :preview_session) }
+          let!(:user_intervention) { create(:user_intervention, user: preview_user, intervention: intervention, health_clinic_id: health_clinic.id) }
+
+          it 'allows for health_clinic_id to be nil' do
+            expect(user_intervention.update!(health_clinic_id: nil)).to eq true
+          end
+        end
       end
 
       context 'when in an intervention not in an organization' do

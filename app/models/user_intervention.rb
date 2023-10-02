@@ -8,7 +8,7 @@ class UserIntervention < ApplicationRecord
 
   delegate :sessions, to: :intervention
 
-  validates :health_clinic_id, presence: true, if: :intervention_inside_organization?
+  validates :health_clinic_id, presence: true, if: -> { intervention_inside_organization? && !preview? }
 
   enum status: { ready_to_start: 'ready_to_start', in_progress: 'in_progress', completed: 'completed', schedule_pending: 'schedule_pending' }
 
@@ -22,6 +22,10 @@ class UserIntervention < ApplicationRecord
 
   def contain_multiple_fill_session
     sessions.multiple_fill.any?
+  end
+
+  def preview?
+    user.role?('preview_session')
   end
 
   def intervention_inside_organization?
