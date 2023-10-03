@@ -264,8 +264,8 @@ class User < ApplicationRecord
 
   def send_welcome_email
     return if role?('guest') || role?('preview_session')
-    require 'pry'; binding.pry
-    mailer = role?('participant') && interventions.present? ? UserMailer.with(locale: interventions.first.language_code) : UserMailer
+
+    mailer = role?('participant') && user_interventions.present? ? UserMailer.with(locale: user_interventions.first.intervention.language_code) : UserMailer
     mailer.welcome_email(human_readable_role, email).deliver_later
   end
 

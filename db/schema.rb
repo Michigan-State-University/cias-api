@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_30_041924) do
+ActiveRecord::Schema.define(version: 2023_10_03_060946) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -990,6 +990,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.boolean "quick_exit_enabled", default: false, null: false
     t.boolean "online", default: false, null: false
     t.uuid "hfhs_patient_detail_id"
+    t.string "language_code", default: "en"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["hfhs_patient_detail_id"], name: "index_users_on_hfhs_patient_detail_id"

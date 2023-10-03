@@ -88,7 +88,7 @@ class Session < ApplicationRecord
 
     if intervention.shared_to != 'anyone'
       existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
-      invite_non_existing_users(non_existing_users_emails, true)
+      invite_non_existing_users(non_existing_users_emails, true, [:participant], intervention.language_code)
     end
 
     if intervention.shared_to_invited?

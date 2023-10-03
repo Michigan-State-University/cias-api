@@ -116,7 +116,7 @@ class Intervention < ApplicationRecord
 
     if shared_to != 'anyone'
       existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
-      invite_non_existing_users(non_existing_users_emails, true)
+      invite_non_existing_users(non_existing_users_emails, true, [:participant], language_code)
     end
 
     if shared_to_invited?
