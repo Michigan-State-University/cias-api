@@ -10,6 +10,10 @@ RSpec.describe UserIntervention, type: :model do
     it { should belong_to(:intervention) }
     it { should have_many(:user_sessions) }
 
+    it 'block to duplicate the record' do
+      expect { subject.dup.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
     context 'validation' do
       let(:intervention) { create(:intervention, organization: organization) }
 

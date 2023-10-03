@@ -6,6 +6,7 @@ FactoryBot.define do
     association :user
     association :session
     association :user_intervention
+    multiple_fill { false }
   end
 
   factory :user_session_cat_mh, class: UserSession::CatMh do

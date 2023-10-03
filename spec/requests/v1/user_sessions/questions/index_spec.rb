@@ -12,13 +12,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let!(:question) { create(:question_single, question_group: question_group) }
     let(:audio_id) { nil }
     let(:user_int) { create(:user_intervention, intervention: intervention, user: user) }
-    let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int) }
-    let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+    let(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int) }
     let(:status) { 'draft' }
     let(:user) { participant }
     let(:default_narrator_settings) { { voice: true, animation: true, character: 'peedy' } }
 
     context 'when start immediately is set' do
+      let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
       let!(:session2) { create(:session, intervention_id: intervention.id, schedule: :immediately) }
       let!(:question_group2) { create(:question_group, session: session2) }
       let!(:question2) { create(:question_single, question_group: question_group2) }
@@ -74,6 +74,8 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     end
 
     context 'branching logic' do
+      let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+
       before do
         get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
       end
@@ -374,12 +376,13 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     end
 
     context 'start preview from given question' do
+      let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
+      let(:params) { { preview_question_id: questions[2].id } }
+
       before do
         get v1_user_session_questions_url(user_session.id), params: params, headers: user.create_new_auth_token
       end
-
-      let(:questions) { create_list(:question_single, 4, question_group: question_group) }
-      let(:params) { { preview_question_id: questions[2].id } }
 
       context 'intervention is draft' do
         it 'returns correct question id' do
@@ -403,6 +406,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     context 'speech reflections' do
       let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let(:question) { questions.first }
+      let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
 
       before do
         get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
@@ -688,12 +692,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
     context 'when integration with HFHS is on' do
       let!(:next_question) { create(:question_henry_ford_initial_screen, question_group: question_group) }
-      let!(:user_session_with_hfhs) do
+      let!(:user_session) do
         create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int)
       end
 
       before do
-        get v1_user_session_questions_url(user_session_with_hfhs.id), headers: user.create_new_auth_token
+        get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token
       end
 
       it 'returns only data' do
@@ -701,7 +705,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       end
 
       it 'return correct question' do
-        expect(json_response['data']['id']).to eql(next_question.id)
+        expect(json_response['data']['id']).to eql(next_question.reload.id)
       end
 
       context 'when user has assigned patient information' do
