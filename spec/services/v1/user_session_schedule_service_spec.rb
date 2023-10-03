@@ -10,12 +10,13 @@ RSpec.describe V1::UserSessionScheduleService do
   end
   let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
   let!(:third_session) { create(:session, intervention: intervention, position: 3) }
+  let!(:organization_session) { create(:session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Health Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Heath System', organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
   let!(:user_session_not_belongs_to_organization) { create(:user_session, user: user, session: first_session, user_intervention: user_intervention) }
   let!(:user_session_belongs_to_organization) do
-    create(:user_session, user: user, session: first_session, health_clinic: health_clinic, user_intervention: user_intervention)
+    create(:user_session, user: user, session: organization_session, health_clinic: health_clinic, user_intervention: user_intervention)
   end
   let!(:user_sessions) do
     {
@@ -38,7 +39,7 @@ RSpec.describe V1::UserSessionScheduleService do
   context 'when user is preview_session' do
     let!(:user_session_not_belongs_to_organization) { create(:user_session, user: preview_user, session: first_session, user_intervention: user_intervention) }
     let!(:user_session_belongs_to_organization) do
-      create(:user_session, user: preview_user, session: first_session, health_clinic: health_clinic, user_intervention: user_intervention)
+      create(:user_session, user: preview_user, session: organization_session, health_clinic: health_clinic, user_intervention: user_intervention)
     end
     let!(:user_sessions) do
       {
@@ -67,6 +68,23 @@ RSpec.describe V1::UserSessionScheduleService do
               it 'does not schedule at all' do
                 expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionScheduleJob)
               end
+            end
+          end
+        end
+
+        context 'when scheduling into the past' do
+          let!(:schedule) { 'exact_date' }
+          let!(:schedule_payload) { nil }
+          let!(:schedule_at) { 7.days.ago }
+
+          it "doesn't run the job" do
+            expect { described_class.new(user_session).schedule }.not_to have_enqueued_job(SessionScheduleJob)
+          end
+
+          it "sets the next user session's scheduled at to a past date" do
+            described_class.new(user_session).tap do |service|
+              service.schedule
+              expect(service.next_user_session.reload.scheduled_at.past?).to eq(true)
             end
           end
         end
@@ -102,7 +120,7 @@ RSpec.describe V1::UserSessionScheduleService do
 
             it 'schedules on correct time' do
               expect { described_class.new(user_session).schedule }.to have_enqueued_job(SessionScheduleJob)
-                                                                         .with(second_session.id, user.id, user_session.health_clinic)
+                                                                         .with(second_session.id, user.id, user_session.health_clinic, user_intervention.id)
                                                                          .at(a_value_within(1.second).of(expected_timestamp))
             end
 

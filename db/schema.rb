@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_27_095211) do
+ActiveRecord::Schema.define(version: 2023_09_29_103257) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 2023_09_27_095211) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-09-27 06:01:13'::timestamp without time zone)"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
@@ -780,8 +781,8 @@ ActiveRecord::Schema.define(version: 2023_09_27_095211) do
     t.integer "estimated_time"
     t.integer "current_narrator", default: 0
     t.boolean "multiple_fill", default: false, null: false
-    t.boolean "autofinish_enabled", default: true, null: false
-    t.integer "autofinish_delay", default: 24, null: false
+    t.boolean "autofinish_enabled", default: false, null: false
+    t.integer "autofinish_delay", default: 1440, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -902,6 +903,7 @@ ActiveRecord::Schema.define(version: 2023_09_27_095211) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
+    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-02 06:00:26'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
     t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
@@ -939,10 +941,12 @@ ActiveRecord::Schema.define(version: 2023_09_27_095211) do
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
     t.boolean "started", default: false, null: false
+    t.boolean "multiple_fill", default: false, null: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-02 06:00:26'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
     t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end

@@ -151,6 +151,8 @@ RSpec.describe Intervention, type: :model do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 5', position: 5)
     end
     let(:henry_ford_question) { create(:question_henry_ford_initial_screen, question_group: question_group, position: 4) }
+    let!(:navigator) { LiveChat::Interventions::Navigator.create!(intervention: intervention, user: create(:user, :navigator, :confirmed)) }
+    let!(:conversation) { create(:live_chat_conversation, intervention: intervention) }
 
     it 'return correct data' do
       cloned_intervention = intervention.clone
@@ -159,6 +161,14 @@ RSpec.describe Intervention, type: :model do
                                             'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
+    end
+
+    it 'reset cache counters' do
+      expect(intervention.navigators_count).to be_positive
+      expect(intervention.conversations_count).to be_positive
+      cloned_intervention = intervention.clone.reload
+      expect(cloned_intervention.navigators_count).to be_zero
+      expect(cloned_intervention.conversations_count).to be_zero
     end
 
     it 'remove short links' do

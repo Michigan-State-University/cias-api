@@ -1052,6 +1052,21 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                        nil]]
         end
       end
+
+      context 'user_sessions are in order' do
+        let!(:user_session) { create(:user_session, session: session, created_at: 2.days.ago) }
+        let!(:user_session2) { create(:user_session, session: session, created_at: 1.day.ago) }
+        let!(:user_session3) { create(:user_session, session: session, created_at: 5.days.ago) }
+
+        it 'save every variables and scores to csv' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                        "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user_session3.user_id, user_session3.user.email, user_session3.created_at, nil, nil],
+                                      [user_session.user_id, user_session.user.email, user_session.created_at, nil, nil],
+                                      [user_session2.user_id, user_session2.user.email, user_session2.created_at, nil, nil]]
+        end
+      end
     end
   end
 end

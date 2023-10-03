@@ -130,7 +130,7 @@ class Intervention < ApplicationRecord
       end
     end
 
-    SendFillInvitationJob.perform_later(::Intervention, id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
+    SendFillInvitation::InterventionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
   end
 
   def give_user_access(emails)

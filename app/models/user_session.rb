@@ -10,7 +10,9 @@ class UserSession < ApplicationRecord
   has_many :tlfb_days, class_name: 'Tlfb::Day', dependent: :destroy
   belongs_to :health_clinic, optional: true
 
-  validates :health_clinic_id, presence: true, if: :user_intervention_inside_health_clinic?
+  validates :health_clinic_id, presence: true, if: -> { user_intervention_inside_health_clinic? && !preview? }
+
+  before_create :check_uniqueness
 
   def finish(_send_email: true)
     raise NotImplementedError, "subclass did not define #{__method__}"
@@ -73,7 +75,19 @@ class UserSession < ApplicationRecord
     user_intervention.completed_sessions == user_intervention.sessions.size
   end
 
+  def preview?
+    user.role?('preview_session')
+  end
+
   def user_intervention_inside_health_clinic?
     user_intervention&.health_clinic_id.present?
+  end
+
+  def check_uniqueness
+    raise ActiveRecord::RecordNotUnique, 'There already exists a user session for this user and session' unless user_and_session_unique?
+  end
+
+  def user_and_session_unique?
+    UserSession.joins(:session).where(session: { multiple_fill: false }).find_by(user_id: user_id, session_id: session_id).blank?
   end
 end

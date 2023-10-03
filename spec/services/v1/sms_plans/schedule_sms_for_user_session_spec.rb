@@ -181,13 +181,6 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                        frequency: SmsPlan.frequencies[:once_a_day], end_at: end_time
           )
         end
-        # 2021-07-20 12:00-17:00
-        let(:start_of_first_range) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 12 }).to_i }
-        end
-        let(:end_of_first_range) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 17 }).to_i }
-        end
         # 2021-07-21 12:00-17:00
         let(:start_of_second_range) do
           Time.use_zone('Europe/Warsaw') { Time.current.next_day.change({ hour: 12 }).to_i }
@@ -207,11 +200,15 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
           expect { subject }.to have_enqueued_job(SmsPlans::SendSmsJob).at_least(3).times
         end
 
+        it 'first sms should be send immediately' do
+          subject
+          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time)
+        end
+
         it 'each sms will be send in default time range' do
           subject
 
           scheduled_at_tab = ActiveJob::Base.queue_adapter.enqueued_jobs.pluck(:at).sort
-          expect(scheduled_at_tab[0]).to be_between(start_of_first_range, end_of_first_range)
           expect(scheduled_at_tab[1]).to be_between(start_of_second_range, end_of_second_range)
           expect(scheduled_at_tab[2]).to be_between(start_of_third_range, end_of_third_range)
         end
@@ -224,13 +221,6 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
             :sms_plan, session: session, no_formula_text: 'test',
                        frequency: SmsPlan.frequencies[:once_a_week], end_at: end_time
           )
-        end
-        # 2021-07-20 12:00-17:00
-        let(:start_of_first_range) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 12 }).to_i }
-        end
-        let(:end_of_first_range) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 17 }).to_i }
         end
         # 2021-07-27 12:00-17:00
         let(:start_of_second_range) do
@@ -251,11 +241,15 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
           expect { subject }.to have_enqueued_job(SmsPlans::SendSmsJob).at_least(3).times
         end
 
+        it 'first sms should be send immediately' do
+          subject
+          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time)
+        end
+
         it 'each sms will be send in default time range' do
           subject
 
           scheduled_at_tab = ActiveJob::Base.queue_adapter.enqueued_jobs.pluck(:at).sort
-          expect(scheduled_at_tab[0]).to be_between(start_of_first_range, end_of_first_range)
           expect(scheduled_at_tab[1]).to be_between(start_of_second_range, end_of_second_range)
           expect(scheduled_at_tab[2]).to be_between(start_of_third_range, end_of_third_range)
         end
@@ -269,13 +263,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                        frequency: SmsPlan.frequencies[:once_a_month], end_at: end_time
           )
         end
-        # 2021-07-20 12:00 - 17:00
-        let(:start_of_first_time_range) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 12 }).to_i }
-        end
-        let(:end_of_first_time_range) do
-          Time.use_zone('Europe/Warsaw') { Time.current.change({ hour: 17 }).to_i }
-        end
+
         # 2021-08-20 12:00 - 17:00
         let(:start_of_second_time_range) do
           Time.use_zone('Europe/Warsaw') { Time.current.next_day(30).change({ hour: 12 }).to_i }
@@ -295,11 +283,15 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
           expect { subject }.to have_enqueued_job(SmsPlans::SendSmsJob).at_least(3).times
         end
 
+        it 'first sms should be send immediately' do
+          subject
+          expect(SmsPlans::SendSmsJob).to have_been_enqueued.at(current_time)
+        end
+
         it 'each sms will be send in default time range' do
           subject
 
           scheduled_at_tab = ActiveJob::Base.queue_adapter.enqueued_jobs.pluck(:at).sort
-          expect(scheduled_at_tab[0]).to be_between(start_of_first_time_range, end_of_first_time_range)
           expect(scheduled_at_tab[1]).to be_between(start_of_second_time_range, end_of_second_time_range)
           expect(scheduled_at_tab[2]).to be_between(start_of_third_time_range, end_of_third_time_range)
         end
