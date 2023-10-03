@@ -22,7 +22,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/invitations/:id/resend', 
   end
 
   it 'send invitation' do
-    allow(SessionMailer).to receive(:inform_to_an_email).with(session, invitation.email, nil).and_return(message_delivery)
+    allow(SessionMailer).to receive(:inform_to_an_email).with(session, invitation.email, nil, nil).and_return(message_delivery)
     request
   end
 
