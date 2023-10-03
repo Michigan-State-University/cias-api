@@ -41,8 +41,8 @@ class DataClearJobs::InformAndSchedule < ApplicationJob
   end
 
   def send_email!(user)
-    return InterventionMailer::ClearDataMailer.with(locale: @intervention.language_code).data_deleted(user, @intervention).deliver_now if send_immediately?
+    return InterventionMailer::ClearDataMailer.data_deleted(user, @intervention).deliver_now if send_immediately?
 
-    InterventionMailer::ClearDataMailer.with(locale: @intervention.language_code).inform(user, @intervention, @number_of_days_to_remove).deliver_now
+    InterventionMailer::ClearDataMailer.inform(user, @intervention, @number_of_days_to_remove).deliver_now
   end
 end
