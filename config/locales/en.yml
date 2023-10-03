@@ -21,6 +21,8 @@ en:
       title: Next Group
     tlfb:
       title: TLFB Study Group
+  predefined_participant:
+    invitation: "You have been invited to complete %{intervention_name} intervention. Click the link to access: %{link}"
   channels:
     collaboration:
       intervention:
@@ -95,7 +97,7 @@ en:
         undestroyable: Forbidden operation
   interventions:
     invitations:
-      wrong_intervention_type: "Users can only be invited to module interventions (fixed & flexible order)"
+      wrong_intervention_type: "Wrong type of the invitation for selected object"
     fixed_order:
       wrong_sharing_target: "Fixed order interventions can only be shared to registered participants (Got %{shared_to})"
     flexible_order:

@@ -1038,6 +1038,21 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
 
+      context 'when predefined participants are present' do
+        let(:predefined_user_parameter) { create(:predefined_user_parameter, intervention: intervention) }
+        let(:user) { predefined_user_parameter.user }
+
+        it 'save additional headers and value to file' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, 'predefined_participant.first_name', 'predefined_participant.last_name',
+                                        'predefined_participant.external_id', 'predefined_participant.full_number',
+                                        "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
+                                        "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[user.id, user.email, user.first_name, user.last_name, user.external_id, user.full_number, user_session.created_at, nil,
+                                       nil]]
+        end
+      end
+
       context 'user_sessions are in order' do
         let!(:user_session) { create(:user_session, session: session, created_at: 2.days.ago) }
         let!(:user_session2) { create(:user_session, session: session, created_at: 1.day.ago) }

@@ -657,6 +657,21 @@ ActiveRecord::Schema.define(version: 2023_09_29_103257) do
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
+  create_table "predefined_user_parameters", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "slug", null: false
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.uuid "health_clinic_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "auto_invitation", default: false, null: false
+    t.datetime "invitation_sent_at"
+    t.string "external_id"
+    t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
+    t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
+    t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"
+  end
+
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "session_id", null: false
     t.string "title", null: false
@@ -1058,6 +1073,9 @@ ActiveRecord::Schema.define(version: 2023_09_29_103257) do
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
+  add_foreign_key "predefined_user_parameters", "health_clinics"
+  add_foreign_key "predefined_user_parameters", "interventions"
+  add_foreign_key "predefined_user_parameters", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"

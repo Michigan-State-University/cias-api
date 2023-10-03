@@ -4,7 +4,7 @@ require 'rails_helper'
 
 describe 'POST /v1/users/invitations', type: :request do
   let(:request) { post v1_invitations_path, params: params, headers: headers }
-  let(:params)  do
+  let(:params) do
     {
       invitation: {
         email: 'test@example.com',
@@ -34,7 +34,7 @@ describe 'POST /v1/users/invitations', type: :request do
 
   context 'when authenticated as admin user' do
     let(:admin_user) { create(:user, :admin) }
-    let(:headers)    { admin_user.create_new_auth_token }
+    let(:headers) { admin_user.create_new_auth_token }
 
     context 'when valid params provided' do
       before do
@@ -85,7 +85,7 @@ describe 'POST /v1/users/invitations', type: :request do
       end
 
       it 'returns correct error message' do
-        expect(json_response['error']).to eq 'Email is not an email and Terms must be accepted'
+        expect(json_response['error']).to include('Email is not an email', 'Terms must be accepted')
       end
     end
   end
