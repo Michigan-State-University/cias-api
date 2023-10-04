@@ -45,7 +45,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::UpdateService do
     end
 
     it 'remove assigned phone' do
-      expect{subject}.to change(Phone, :count).by(-1)
+      expect { subject }.to change(Phone, :count).by(-1)
     end
   end
 end
