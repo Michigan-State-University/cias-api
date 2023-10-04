@@ -47,7 +47,11 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
 
       expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.twice
       expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
-            .with(new_user.email, 'en', number_of_generated_reports)
+                                                                .with(
+                                                                  new_user.email,
+                                                                  number_of_generated_reports,
+                                                                  { locale: user_session.session.language_code }
+                                                                )
 
       expect(new_user).to have_attributes(
         roles: ['third_party'],
