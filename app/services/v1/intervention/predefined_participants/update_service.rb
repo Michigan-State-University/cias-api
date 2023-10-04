@@ -15,6 +15,7 @@ class V1::Intervention::PredefinedParticipants::UpdateService
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       user.predefined_user_parameter.update(predefined_user_parameters)
+      remove_phone! if predefined_user_parameters[:phone_attributes].blank?
     end
     user
   end
@@ -34,5 +35,9 @@ class V1::Intervention::PredefinedParticipants::UpdateService
 
   def health_clinic_id
     @health_clinic_id ||= params[:health_clinic_id]
+  end
+
+  def remove_phone!
+    user.phone&.destroy!
   end
 end
