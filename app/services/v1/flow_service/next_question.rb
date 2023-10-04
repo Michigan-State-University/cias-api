@@ -20,7 +20,7 @@ class V1::FlowService::NextQuestion
     end
 
     @last_answered_question = user_session.last_answer&.question
-    return user_session.first_question.prepare_to_display if @last_answered_question.nil?
+    return next_or_current_question(user_session.first_question).prepare_to_display if @last_answered_question.nil?
 
     question = branching_service.call
     question = schedule_service.call(question)
@@ -30,7 +30,7 @@ class V1::FlowService::NextQuestion
       user_session.finish
     end
 
-    question
+    next_or_current_question(question)
   end
 
   def additional_information
@@ -40,6 +40,17 @@ class V1::FlowService::NextQuestion
   end
 
   private
+
+  def next_or_current_question(question)
+    return question if question.is_a?(Hash)
+    return question unless user_session.user.role?('predefined_participant')
+    return question unless question.is_a?(Question::ParticipantReport)
+
+    question_group = question.question_group
+    question = question_group.questions.find_by(position: (question.position + 1))
+    question ||= user_session.session.question_groups.where('position > ?', question_group.position).order(:position).first.questions.order(:position).first
+    question
+  end
 
   def assign_next_session_id(intervention)
     return unless intervention.module_intervention?

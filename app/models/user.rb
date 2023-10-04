@@ -21,7 +21,7 @@ class User < ApplicationRecord
 
   # Order of roles is important because final authorization is the sum of all roles
   APP_ROLES = %w[guest preview_session participant third_party health_clinic_admin health_system_admin
-                 organization_admin researcher e_intervention_admin team_admin admin navigator].freeze
+                 organization_admin researcher e_intervention_admin team_admin admin navigator predefined_participant].freeze
 
   FORMATTING_APP_ROLE_EXCEPTIONS = {
     'e_intervention_admin' => 'E-intervention admin',
@@ -43,6 +43,11 @@ class User < ApplicationRecord
   # PHONE NUMBER
   has_one :phone, dependent: :destroy
   accepts_nested_attributes_for :phone, update_only: true
+
+  # ADDITIONAL PARAMETERS FOR PREDEFINED PARTICIPANTS
+  has_one :predefined_user_parameter, dependent: :destroy
+  delegate :full_number, to: :phone, allow_nil: true
+  delegate :external_id, to: :predefined_user_parameter, allow_nil: true
 
   # AVATAR
   has_one_attached :avatar
@@ -188,7 +193,7 @@ class User < ApplicationRecord
   end
 
   def with_invalid_email?
-    roles.include?('guest') || roles.include?('preview_session')
+    (roles & %w[guest preview_session predefined_participant]).any?
   end
 
   def cache_key
@@ -258,6 +263,13 @@ class User < ApplicationRecord
 
   def missing_require_fields?
     first_name.blank? || last_name.blank? || !terms
+  end
+
+  def self.invite!(attributes = {}, invited_by = nil, options = {}, &block)
+    user = User.new(**attributes)
+    return user if user.tap(&:valid?).errors.messages_for(:email).include? 'is not an email'
+
+    super(attributes, invited_by, options, &block)
   end
 
   private

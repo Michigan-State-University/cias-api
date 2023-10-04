@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 2023_10_03_060946) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-10-04 06:08:07'::timestamp without time zone)"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
@@ -656,6 +657,21 @@ ActiveRecord::Schema.define(version: 2023_10_03_060946) do
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
+  create_table "predefined_user_parameters", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "slug", null: false
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.uuid "health_clinic_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "auto_invitation", default: false, null: false
+    t.datetime "invitation_sent_at"
+    t.string "external_id"
+    t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
+    t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
+    t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"
+  end
+
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "session_id", null: false
     t.string "title", null: false
@@ -887,6 +903,7 @@ ActiveRecord::Schema.define(version: 2023_10_03_060946) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
+    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-04 06:08:07'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
     t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
@@ -924,10 +941,12 @@ ActiveRecord::Schema.define(version: 2023_10_03_060946) do
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
     t.boolean "started", default: false, null: false
+    t.boolean "multiple_fill", default: false, null: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-04 06:08:07'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
     t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end
@@ -1055,6 +1074,9 @@ ActiveRecord::Schema.define(version: 2023_10_03_060946) do
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
+  add_foreign_key "predefined_user_parameters", "health_clinics"
+  add_foreign_key "predefined_user_parameters", "interventions"
+  add_foreign_key "predefined_user_parameters", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"

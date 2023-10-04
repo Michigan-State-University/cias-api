@@ -11,6 +11,10 @@ RSpec.describe UserSession, type: :model do
     it { should have_many(:generated_reports) }
     it { should be_valid }
     it { should belong_to(:user_intervention) }
+
+    it 'block to duplicate the record' do
+      expect { subject.dup.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
   end
 
   context 'instance methods' do
@@ -178,8 +182,8 @@ RSpec.describe UserSession, type: :model do
       let(:intervention) { create(:intervention) }
       let(:user_intervention) { create(:user_intervention, intervention: intervention, status: :in_progress) }
       let(:session) { create(:session, :multiple_times, intervention: intervention) }
-      let(:user_session) { create(:user_session, user_intervention: user_intervention, session: session, user: user) }
-      let(:user_session2) { create(:user_session, user_intervention: user_intervention, session: session, user: user) }
+      let(:user_session) { create(:user_session, user_intervention: user_intervention, session: session, user: user, multiple_fill: true) }
+      let(:user_session2) { create(:user_session, user_intervention: user_intervention, session: session, user: user, multiple_fill: true) }
 
       it 'does not change status to completed when having multiple fill sessions' do
         user_session.finish(send_email: false)
@@ -220,6 +224,16 @@ RSpec.describe UserSession, type: :model do
 
       it 'disallows for health_clinic_id to be nil' do
         expect { user_session.update!(health_clinic_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+
+      context 'when preview' do
+        let(:preview_user) { create(:user, :preview_session) }
+        let!(:user_intervention) { create(:user_intervention, user: preview_user, intervention: intervention, health_clinic_id: health_clinic.id) }
+        let!(:user_session) { create(:user_session, user: preview_user, user_intervention: user_intervention, health_clinic_id: health_clinic.id) }
+
+        it 'allows for health_clinic_id to be nil' do
+          expect(user_session.update!(health_clinic_id: nil)).to eq true
+        end
       end
     end
 

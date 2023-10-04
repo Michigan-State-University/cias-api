@@ -15,6 +15,8 @@ RSpec.describe Intervention, type: :model do
     it { should have_many(:conversations) }
     it { should have_many(:notifications) }
     it { should have_many(:collaborators) }
+    it { should have_many(:predefined_user_parameters) }
+    it { should have_many(:predefined_users).through(:predefined_user_parameters) }
     it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { should have_many(:short_links).dependent(:destroy) }
