@@ -78,5 +78,9 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
     it 'user session has the "started" flag set to true' do
       expect(user_session.reload.started).to be true
     end
+
+    it 'user intervention has correct status' do
+      expect(user_session.user_intervention.reload.status).to eq('in_progress')
+    end
   end
 end
