@@ -120,6 +120,7 @@ en:
       cat_mh: "User preview is unavailable for CAT-MH sessions"
   user_sessions:
     errors:
+      already_finished: 'You cannot provide an answer for the finished session'
       previous_question: 'Previous question is unavailable for this type of session'
       scheduled_session: 'You cannot fill scheduled session before the set time'
   teams:
