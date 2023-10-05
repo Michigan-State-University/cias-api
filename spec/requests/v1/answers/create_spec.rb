@@ -30,6 +30,19 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
     post v1_user_session_answers_path(user_session.id), params: params, headers: user.create_new_auth_token
   end
 
+  context 'when user session is finished' do
+    let(:user) { create(:user, :participant, :confirmed) }
+    let(:user_session) { create(:user_session, user: user, session: session, finished_at: DateTime.now) }
+
+    it 'returns correct http status' do
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'return correct error msg' do
+      expect(json_response['message']).to eq 'You cannot provide an answer for the finished session'
+    end
+  end
+
   context 'when creating an answer' do
     %i[admin researcher participant guest].each do |role|
       let(:user) { create(:user, :confirmed, role) }
