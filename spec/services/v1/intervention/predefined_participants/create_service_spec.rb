@@ -69,4 +69,20 @@ RSpec.describe V1::Intervention::PredefinedParticipants::CreateService do
       expect { subject }.not_to change(Phone, :count)
     end
   end
+
+  context 'email has to be uniq' do
+    let!(:user) { create(:user, :confirmed) }
+    let(:params) do
+      {
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        health_clinic_id: health_clinic_id,
+        email: user.email
+      }
+    end
+
+    it 'raise an error' do
+      expect { subject }.to raise_exception(ActiveRecord::RecordInvalid)
+    end
+  end
 end
