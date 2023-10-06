@@ -38,7 +38,9 @@ class V1::Intervention::PredefinedParticipants::CreateService
       user.email = params[:email] || "#{Time.current.to_i}_#{SecureRandom.hex(10)}@predefined-participant.true"
       user.first_name = params[:first_name]
       user.last_name = params[:last_name]
-      user.save(validate: false)
+      user.terms = true
+      user.password = SecureRandom.hex
+      user.save!
     end
   end
 end
