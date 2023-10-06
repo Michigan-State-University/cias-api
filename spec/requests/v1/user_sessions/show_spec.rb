@@ -63,6 +63,8 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
       request
     end
 
+    it_behaves_like 'deactivated account'
+
     it 'return correct status' do
       expect(response).to have_http_status(:ok)
     end

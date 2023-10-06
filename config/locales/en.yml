@@ -113,6 +113,7 @@ en:
       no_email_provided: "E-mail not provided"
       no_phone_number_provided: "Phone number not provided"
   users:
+    deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
       not_active: "Invitation has been cancelled or was already used"
