@@ -116,6 +116,8 @@ en:
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
       not_active: "Invitation has been cancelled or was already used"
+      predefined:
+        not_active: 'Invitation cannot be sent to a deactivated user'
     preview:
       cat_mh: "User preview is unavailable for CAT-MH sessions"
   user_sessions:
