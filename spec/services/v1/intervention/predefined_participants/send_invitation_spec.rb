@@ -29,5 +29,15 @@ RSpec.describe V1::Intervention::PredefinedParticipants::SendInvitation do
       message = Message.order(:created_at).last
       expect(message.body).to include("#{ENV['WEB_URL']}/usr/#{user.predefined_user_parameter.slug}")
     end
+
+    context 'when the user is deactivated' do
+      before do
+        user.update!(active: false)
+      end
+
+      it 'raise an exception' do
+        expect { subject }.to raise_error(ActiveRecord::ActiveRecordError)
+      end
+    end
   end
 end

@@ -11,6 +11,7 @@ class V1::Intervention::PredefinedParticipants::SendInvitation
 
   def call
     return if user.phone.blank?
+    raise ActiveRecord::ActiveRecordError, I18n.t('users.invite.predefined.not_active') unless user.active?
 
     sms = Message.create(phone: number, body: content)
     Communication::Sms.new(sms.id).send_message
