@@ -15,7 +15,7 @@ class V1::Intervention::PredefinedParticipants::UpdateService
     ActiveRecord::Base.transaction do
       user.update!(user_params)
       user.predefined_user_parameter.update(predefined_user_parameters)
-      remove_phone! if predefined_user_parameters[:phone_attributes].blank?
+      remove_phone! if remove_phone_number?
     end
     user
   end
@@ -39,5 +39,9 @@ class V1::Intervention::PredefinedParticipants::UpdateService
 
   def remove_phone!
     user.phone&.destroy!
+  end
+
+  def remove_phone_number?
+    user_params[:phone_attributes].blank? && params[:active].blank?
   end
 end

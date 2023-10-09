@@ -70,5 +70,17 @@ RSpec.describe V1::Intervention::PredefinedParticipants::UpdateService do
     it 'remove assigned phone' do
       expect { subject }.to change(Phone, :count).by(-1)
     end
+
+    context 'when a researcher wants to reactivate the user' do
+      let(:params) do
+        {
+          active: true
+        }
+      end
+
+      it 'remove assigned phone' do
+        expect { subject }.not_to change(Phone, :count)
+      end
+    end
   end
 end
