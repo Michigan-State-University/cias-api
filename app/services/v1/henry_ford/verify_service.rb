@@ -99,6 +99,14 @@ class V1::HenryFord::VerifyService
                    &.dig(:resource, :participant)
                    &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }&.dig(:actor, :display)
 
+      valid_appointment?(location, parsed_date)
+    end
+  end
+
+  def valid_appointment?(location, parsed_date)
+    if ENV.fetch('HFHS_APPOINTMENTS_FROM_PAST', 0).to_i == 1
+      available_location?(location)
+    else
       available_location?(location) && (parsed_date&.today? || parsed_date&.future?)
     end
   end
