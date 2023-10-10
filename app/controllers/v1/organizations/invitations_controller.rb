@@ -2,6 +2,7 @@
 
 class V1::Organizations::InvitationsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[confirm]
+  skip_before_action :block_deactivated_account, only: %i[confirm]
 
   def invite_intervention_admin
     authorize! :invite_e_intervention_admin, Organization
