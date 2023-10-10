@@ -4,22 +4,13 @@ class V1::TwilloMessageController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
-    p '==============PARAMS START=============='
-    p params
-    p '==============PARAMS END=============='
+    response = V1::Sms::Replay.call(params)
+    render xml: response
   end
 
   private
 
-  def from
-    params[:from]
-  end
-
-  def to
-    params[:to]
-  end
-
-  def body
-    params[:body]
+  def transform_keys
+    @transform_keys ||= params.deep_transform_keys(&:underscore)
   end
 end
