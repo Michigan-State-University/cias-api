@@ -17,7 +17,8 @@ class V1::HenryFord::VerifyService
   attr_accessor :resource
 
   def call
-    @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code)
+    require 'pry'; binding.pry
+    @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code, mrn)
     @appointments = Api::EpicOnFhir::Appointments.call(epic_patient_id)
 
     create_or_find_resource!
