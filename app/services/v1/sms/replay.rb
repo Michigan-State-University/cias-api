@@ -12,9 +12,9 @@ class V1::Sms::Replay
   end
 
   def call
+    p '-------------IN THE SERVICE------------'
     return help_message unless message.casecmp('STOP').zero?
-
-    p '-------------DELETING SMSes...------------'
+    p '----------------DETECTED STOP-------------'
 
     delete_messaged_for(from_number)
     p '-------------GENERATEING RESPONSE...------------'

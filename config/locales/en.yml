@@ -15,8 +15,8 @@ en:
     error:
       published_intervention: 'Cannot update question in the published intervention'
   sms_replay:
-    help: "Replay STOP to block all already scheduled SMSes."
-    stop: "You have successfully been unsubscribed. You will not receive already scheduled messages"
+    help: "CIAS: Replay STOP to block all already scheduled SMSes."
+    stop: "CIAS: You have successfully been unsubscribed. You will not receive already scheduled messages"
   question_group:
     finish:
       title: Finish Group
