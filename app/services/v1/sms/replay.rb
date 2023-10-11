@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 class V1::Sms::Replay
   def self.call(params)
     new(params).call
@@ -15,7 +14,10 @@ class V1::Sms::Replay
   def call
     return help_message unless message.casecmp('STOP').zero?
 
+    p '-------------DELETING SMSes...------------'
+
     delete_messaged_for(from_number)
+    p '-------------GENERATEING RESPONSE...------------'
     stop_message
   end
 
@@ -43,7 +45,7 @@ class V1::Sms::Replay
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
       job_args = job.first.args
-      job.delete if (job_args['job_class'] == 'SmsPlans::SendSmsJob' && job_args['arguments'].first.eql?(number))
+      job.delete if job_args['job_class'] == 'SmsPlans::SendSmsJob' && job_args['arguments'].first.eql?(number)
     end
   end
 end
