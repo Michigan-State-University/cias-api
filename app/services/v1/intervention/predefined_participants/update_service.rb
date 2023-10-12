@@ -17,7 +17,7 @@ class V1::Intervention::PredefinedParticipants::UpdateService
       user.predefined_user_parameter.update(predefined_user_parameters)
       remove_phone! if remove_phone_number?
     end
-    user.reload
+    user
   end
 
   private
@@ -39,6 +39,7 @@ class V1::Intervention::PredefinedParticipants::UpdateService
 
   def remove_phone!
     user.phone&.destroy!
+    user.update!(phone: nil)
   end
 
   def remove_phone_number?
