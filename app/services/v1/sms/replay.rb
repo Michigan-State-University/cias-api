@@ -12,31 +12,17 @@ class V1::Sms::Replay
   end
 
   def call
-    return help_message unless message.casecmp('STOP').zero?
-    p '----------------DETECTED STOP-------------'
+    return response_message unless message.casecmp('STOP').zero?
 
     delete_messaged_for(from_number)
-    p '-------------GENERATEING RESPONSE...------------'
-    stop_message
+    response_message
   end
 
   attr_reader :from_number, :to_number, :message
 
   private
 
-  def help_message
-    response.message do |message|
-      message.body(I18n.t('sms_replay.help'))
-    end
-  end
-
-  def stop_message
-    response.message do |message|
-      message.body(I18n.t('sms_replay.stop'))
-    end
-  end
-
-  def response
+  def response_message
     @response ||= Twilio::TwiML::MessagingResponse.new
   end
 
