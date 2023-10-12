@@ -6,12 +6,13 @@ class V1::Sms::Replay
   end
 
   def initialize(params)
-    @from_number = params['from']
-    @to_number = params['to']
-    @message = params['body'].to_s
+    @from_number = params[:from]
+    @to_number = params[:to]
+    @message = params[:body].to_s
   end
 
   def call
+    p "W SERWISIE: FROM -> #{from_number} TO-> #{to_number} BODY -> #{message} <-"
     p '-------------IN THE SERVICE------------'
     return help_message unless message.casecmp('STOP').zero?
     p '----------------DETECTED STOP-------------'

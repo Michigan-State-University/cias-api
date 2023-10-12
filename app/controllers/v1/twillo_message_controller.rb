@@ -7,13 +7,13 @@ class V1::TwilloMessageController < V1Controller
     p '-------------RECEIVED BODY------------'
     p transform_keys
     p '-------------END RECEIVED BODY------------'
-    response = V1::Sms::Replay.call(transform_keys)
+    response = V1::Sms::Replay.call(transformed_params)
     render xml: response
   end
 
   private
 
-  def transform_keys
-    @transform_keys ||= params.deep_transform_keys(&:underscore)
+  def transformed_params
+    @transformed_params ||= params.deep_transform_keys(&:underscore)
   end
 end
