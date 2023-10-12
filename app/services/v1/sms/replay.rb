@@ -23,7 +23,7 @@ class V1::Sms::Replay
   private
 
   def response_message
-    @response ||= Twilio::TwiML::MessagingResponse.new
+    @response_message ||= Twilio::TwiML::MessagingResponse.new
   end
 
   def delete_messaged_for(number)
