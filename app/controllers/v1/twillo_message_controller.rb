@@ -5,9 +5,9 @@ class V1::TwilloMessageController < V1Controller
 
   def create
     p '-------------RECEIVED BODY------------'
-    p params[:body]
+    p transform_keys
     p '-------------END RECEIVED BODY------------'
-    response = V1::Sms::Replay.call(params)
+    response = V1::Sms::Replay.call(transform_keys)
     render xml: response
   end
 

@@ -6,9 +6,9 @@ class V1::Sms::Replay
   end
 
   def initialize(params)
-    @from_number = params[:from]
-    @to_number = params[:to]
-    @message = params[:body].to_s
+    @from_number = params['from']
+    @to_number = params['to']
+    @message = params['body'].to_s
   end
 
   def call
