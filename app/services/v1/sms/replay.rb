@@ -12,8 +12,6 @@ class V1::Sms::Replay
   end
 
   def call
-    p "W SERWISIE: FROM -> #{from_number} TO-> #{to_number} BODY -> #{message} <-"
-    p '-------------IN THE SERVICE------------'
     return help_message unless message.casecmp('STOP').zero?
     p '----------------DETECTED STOP-------------'
 
@@ -45,7 +43,7 @@ class V1::Sms::Replay
   def delete_messaged_for(number)
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
-      job_args = job.first.args
+      job_args = job.args.first
       job.delete if job_args['job_class'] == 'SmsPlans::SendSmsJob' && job_args['arguments'].first.eql?(number)
     end
   end

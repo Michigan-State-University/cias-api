@@ -4,9 +4,6 @@ class V1::TwilloMessageController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
-    p '-------------RECEIVED BODY------------'
-    p transformed_params
-    p '-------------END RECEIVED BODY------------'
     response = V1::Sms::Replay.call(transformed_params)
     render xml: response
   end
