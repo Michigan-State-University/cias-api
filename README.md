@@ -17,7 +17,7 @@ CIAS 3.0 platform source code is divided into two separate repositories:
 - [Frontend package](https://github.com/Michigan-State-University/cias-web#readme)
 - [Backend package](https://github.com/Michigan-State-University/cias-api#readme) - <b>current</b>
 
-### Digital Behavioral Health Interventions Made Easy
+## Digital Behavioral Health Interventions Made Easy
 
 CIAS stands for Computerized Intervention Authoring System. CIAS gives you the ability to create and manage
 multi-session interventions without writing a single line of code. With this robust platform, you can develop and
