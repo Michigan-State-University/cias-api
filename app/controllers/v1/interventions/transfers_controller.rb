@@ -3,11 +3,10 @@
 class V1::Interventions::TransfersController < V1Controller
   def import
     authorize! :create, Intervention
-
-    file = intervention_import_params[:file]
     return render status: :bad_request unless correct_format?(file)
 
-    Interventions::ImportJob.perform_later(current_v1_user.id, JSON.parse(file).deep_transform_keys(&:to_sym))
+    import_file = ImportFile.create!(file: file)
+    Interventions::ImportJob.perform_later(current_v1_user.id, import_file.id)
     render status: :created
   end
 
@@ -31,5 +30,9 @@ class V1::Interventions::TransfersController < V1Controller
 
   def correct_format?(file)
     file.content_type == 'application/json'
+  end
+
+  def file
+    @file ||= intervention_import_params[:file]
   end
 end

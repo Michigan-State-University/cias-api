@@ -5,7 +5,9 @@ class Interventions::ImportJob < ApplicationJob
 
   sidekiq_options retry: false
 
-  def perform(user_id, intervention_hash)
+  def perform(user_id, intervention_file_id)
+    file = ImportFile.find(intervention_file_id).file.blob
+    intervention_hash = JSON.parse(file.download).deep_transform_keys(&:to_sym)
     ActiveRecord::Base.transaction do
       get_import_service_class(intervention_hash, Intervention).call(user_id, intervention_hash)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::SubclassNotFound, ActiveModel::UnknownAttributeError
