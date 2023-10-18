@@ -81,6 +81,8 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
         expect(answer.reload.alternative_branch).to be(false)
       end
     end
+
+    it_behaves_like 'deactivated account'
   end
 
   context 'UserSession::CatMh' do

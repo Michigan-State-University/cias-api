@@ -15,10 +15,18 @@ class Clone::Intervention < Clone::Base
     reassign_branching
     outcome.update!(is_hidden: hidden)
     reset_cache_counters
+    attach_logo
     outcome
   end
 
   private
+
+  def attach_logo
+    return unless source.logo.attachment
+
+    outcome.logo.attach(source.logo.blob)
+    outcome.logo_blob.update!(description: source.logo_blob.description)
+  end
 
   def create_sessions
     source.sessions.order(:position).each do |session|
