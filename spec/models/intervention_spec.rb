@@ -37,6 +37,14 @@ RSpec.describe Intervention, type: :model do
         intervention.translate(translator, source_language_name_short, destination_language_name_short)
       end
 
+      it 'has correct value in the original text' do
+        expect(intervention.original_text['image_alt']).to eq 'This is the description'
+      end
+
+      it 'has correctly translated img description' do
+        expect(intervention.logo.description).to eq 'from=>en to=>pl text=>This is the description'
+      end
+
       describe '#translation_prefix' do
         it 'add correct prefix' do
           expect(intervention.reload.name).to include("(#{destination_language_name_short.upcase}) New intervention")
@@ -283,6 +291,15 @@ RSpec.describe Intervention, type: :model do
         cloned_intervention = intervention.clone(params: params)
 
         expect(cloned_intervention.user).to eq(other_user)
+      end
+    end
+
+    context 'when intervention has logo' do
+      let(:intervention) { create(:intervention_with_logo) }
+      let(:cloned_intervention) { intervention.clone }
+
+      it 'logo was cloned' do
+        expect(cloned_intervention.logo.attached?).to be true
       end
     end
   end
