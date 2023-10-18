@@ -110,7 +110,7 @@ class V1::HenryFord::VerifyService
   end
 
   def intervention_locations
-    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.external_name}".downcase }
+    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.external_name}".downcase.lstrip }
   end
 
   def available_locations
