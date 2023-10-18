@@ -56,7 +56,8 @@ RSpec.describe ReportTemplate, type: :model do
     let(:destination_language_short) { 'pl' }
 
     let(:translation_test_report_template) do
-      create(:report_template, summary: 'Translation test summary', name: 'Test report template name')
+      create(:report_template, summary: 'Translation test summary', name: 'Test report template name', cover_letter_sender: 'Cover letter sender',
+                               cover_letter_description: 'Cover letter description')
     end
 
     it '#translate_summary' do
@@ -67,6 +68,12 @@ RSpec.describe ReportTemplate, type: :model do
     it '#translate_name' do
       translation_test_report_template.translate_name(translator, source_language_short, destination_language_short)
       expect(translation_test_report_template.name).to include('from=>en to=>pl text=>Test report template name')
+    end
+
+    it '#translate_fax_attributes' do
+      translation_test_report_template.translate_fax_attributes(translator, source_language_short, destination_language_short)
+      expect(translation_test_report_template.cover_letter_sender).to include('from=>en to=>pl text=>Cover letter sender')
+      expect(translation_test_report_template.cover_letter_description).to include('from=>en to=>pl text=>Cover letter description')
     end
   end
 
