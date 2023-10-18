@@ -5,5 +5,5 @@ class ClinicLocation < ApplicationRecord
   has_many :intervention_locations, dependent: :destroy
   has_many :interventions, through: :intervention_locations
 
-  validates :department, :name, presence: true
+  validates :name, presence: true
 end
