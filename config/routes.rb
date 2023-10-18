@@ -64,8 +64,13 @@ Rails.application.routes.draw do
       get 'generated_conversations_transcript', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
+        resources :predefined_participants do
+          post 'send_invitation', on: :member
+        end
         resources :answers, only: %i[index]
-        resources :invitations, only: %i[index create destroy]
+        resources :invitations, only: %i[index create destroy] do
+          get 'resend', on: :member
+        end
         resources :accesses, only: %i[index create destroy]
         resources :files, only: %i[create destroy]
         resources :short_links, only: %i[create index]
@@ -97,9 +102,6 @@ Rails.application.routes.draw do
       patch 'questions/move', to: 'questions#move', as: :move_question
       delete 'delete_questions', to: 'questions#destroy'
       scope module: 'sessions' do
-        resources :invitations, only: %i[index create] do
-          get 'resend', on: :member
-        end
         resources :sms_plans, only: :index
         resources :report_templates, only: %i[index show create update destroy] do
           delete :remove_logo
@@ -208,16 +210,6 @@ Rails.application.routes.draw do
           end
         end
         resources :interventions, only: :index, controller: :interventions
-        scope module: 'interventions' do
-          resources :interventions do
-            resources :invitations, only: %i[create]
-          end
-        end
-        scope module: 'sessions' do
-          resources :sessions do
-            resources :invitations, only: %i[index create]
-          end
-        end
       end
     end
     get 'organization_invitations/confirm', to: 'organizations/invitations#confirm',
@@ -304,6 +296,7 @@ Rails.application.routes.draw do
     get 'verify_short_link', as: :verify_short_links, to: '/v1/interventions/short_links#verify'
     get 'jwk-set-1', as: :jwk_set, to: 'epic_on_fhir/jwk_sets#index'
     get '/s/:slug', to: 'links#show', as: :short
+    post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
   end
 
   if Rails.env.development?

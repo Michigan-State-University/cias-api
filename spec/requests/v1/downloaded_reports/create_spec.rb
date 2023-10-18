@@ -216,7 +216,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
   end
 
   context 'for guest' do
-    let!(:user) { create(:user, :confirmed) }
+    let!(:user) { create(:user, :confirmed, :guest) }
     let(:headers) { user.create_new_auth_token }
 
     let!(:report) { create(:generated_report) }

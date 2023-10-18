@@ -20,6 +20,7 @@ class V1::UserSessionsController < V1Controller
     render json: serialized_response(user_session), status: :ok
 
     user_session.update!(started: true)
+    user_session.user_intervention.in_progress!
   end
 
   def show_or_create

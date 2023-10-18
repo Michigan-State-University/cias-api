@@ -14,6 +14,8 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def create
+    raise ActiveRecord::RecordNotSaved, I18n.t('user_sessions.errors.already_finished') if user_session_load.finished_at?
+
     answer = V1::AnswerService.call(current_v1_user, user_session_id, question_id, answer_params)
     return head answer['status'] if user_session_load.type == 'UserSession::CatMh'
 

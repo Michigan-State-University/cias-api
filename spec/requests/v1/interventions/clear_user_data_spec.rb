@@ -38,7 +38,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
     it 'does enqueued job' do
       request
-      expect(DataClearJobs::InformAndSchedule).to have_been_enqueued.with(intervention.id, params[:delay])
+      expect(DataClearJobs::ClearUserData).to have_been_enqueued.with(intervention.id)
     end
   end
 
@@ -54,7 +54,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
     it 'does not enqueued job' do
       request
-      expect(DataClearJobs::InformAndSchedule).not_to have_been_enqueued.with(intervention.id, params[:delay])
+      expect(DataClearJobs::ClearUserData).not_to have_been_enqueued.with(intervention.id)
     end
   end
 
