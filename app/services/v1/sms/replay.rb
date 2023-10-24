@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 class V1::Sms::Replay
-  def self.call(params)
-    new(params).call
+  def self.call(from, to, body)
+    new(from, to, body).call
   end
 
-  def initialize(params)
-    @from_number = params[:from]
-    @to_number = params[:to]
-    @message = params[:body].to_s
+  def initialize(from, to, body)
+    @from_number = from
+    @to_number = to
+    @message = body.to_s.strip
   end
 
   def call
