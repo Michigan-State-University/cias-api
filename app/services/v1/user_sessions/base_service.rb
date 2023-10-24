@@ -31,7 +31,8 @@ class V1::UserSessions::BaseService
       health_clinic_id: health_clinic_id,
       type: type,
       user_intervention_id: user_intervention.id,
-      number_of_attempts: counter
+      number_of_attempts: counter,
+      multiple_fill: session.multiple_fill
     )
     user_session.started = true
     user_session

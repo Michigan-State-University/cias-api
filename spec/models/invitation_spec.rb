@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Invitation, type: :model do
   subject { create(:invitation, email: invited.email, invitable: session) }
 
-  let!(:session) { create(:session) }
+  let!(:session) { create(:session, intervention: create(:intervention, :published)) }
   let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
 
   describe '#resend' do
@@ -20,6 +20,15 @@ RSpec.describe Invitation, type: :model do
       it 'send email' do
         expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil, nil).and_return(message_delivery)
         subject.resend
+      end
+
+      context 'for intervention' do
+        subject { create(:invitation, email: invited.email, invitable: session.intervention) }
+
+        it 'send email' do
+          expect(InterventionMailer).to receive(:inform_to_an_email).with(session.intervention, invited.email, nil).and_return(message_delivery)
+          subject.resend
+        end
       end
     end
 

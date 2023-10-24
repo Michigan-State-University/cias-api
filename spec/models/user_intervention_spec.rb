@@ -10,6 +10,10 @@ RSpec.describe UserIntervention, type: :model do
     it { should belong_to(:intervention) }
     it { should have_many(:user_sessions) }
 
+    it 'block to duplicate the record' do
+      expect { subject.dup.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+
     context 'validation' do
       let(:intervention) { create(:intervention, organization: organization) }
 
@@ -20,6 +24,15 @@ RSpec.describe UserIntervention, type: :model do
 
         it 'disallows for health_clinic_id to be nil' do
           expect { user_intervention.update!(health_clinic_id: nil) }.to raise_error(ActiveRecord::RecordInvalid)
+        end
+
+        context 'when preview' do
+          let(:preview_user) { create(:user, :preview_session) }
+          let!(:user_intervention) { create(:user_intervention, user: preview_user, intervention: intervention, health_clinic_id: health_clinic.id) }
+
+          it 'allows for health_clinic_id to be nil' do
+            expect(user_intervention.update!(health_clinic_id: nil)).to eq true
+          end
         end
       end
 

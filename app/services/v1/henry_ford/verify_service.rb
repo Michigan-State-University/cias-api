@@ -60,7 +60,7 @@ class V1::HenryFord::VerifyService
 
     visit_id = appointment&.dig(:resource, :identifier, 0, :value)
 
-    location_id = available_locations.where("LOWER(CONCAT(department, ' ', name)) LIKE ?",
+    location_id = available_locations.where("LOWER(CONCAT(department, ' ', external_name)) LIKE ?",
                                             appointment
                                               .dig(:resource, :participant)
                                               .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
@@ -110,7 +110,7 @@ class V1::HenryFord::VerifyService
   end
 
   def intervention_locations
-    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.name}".downcase }
+    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.external_name}".downcase.lstrip }
   end
 
   def available_locations

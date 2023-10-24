@@ -23,9 +23,8 @@ class V1::AnswerService
     if user_session.type == 'UserSession::CatMh'
       answer = cat_mh_api.on_user_answer(user_session, question_id, response(answer_params), duration(user_session))
     else
-      answer = answer_params[:type].constantize.where(question_id: question_id, user_session_id: user_session_id)
-                                   .order(:created_at)
-                                   .first_or_initialize(question_id: question_id, user_session_id: user_session_id)
+      answer = answer_params[:type].constantize
+                                   .find_or_initialize_by(question_id: question_id, user_session_id: user_session_id)
       answer.assign_attributes(answer_params)
       answer.save!
       answer.on_answer

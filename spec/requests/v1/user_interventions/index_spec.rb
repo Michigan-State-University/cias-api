@@ -7,13 +7,12 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
   let(:user) { admin }
 
   let(:participant1) { create(:user, :confirmed, :participant) }
-  let(:participant2) { create(:user, :confirmed, :participant) }
 
   let(:intervention) { create(:intervention, :published) }
   let!(:sessions) { create_list(:session, 5, intervention_id: intervention.id) }
 
   let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'completed') }
-  let!(:user_interventions2) { create_list(:user_intervention, 3, intervention: intervention, user: participant2, status: 'in_progress') }
+  let!(:user_interventions2) { create_list(:user_intervention, 3, intervention: intervention, status: 'in_progress') }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) { {} }
@@ -166,10 +165,10 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
   end
 
   context 'when user is participant should return only user_interventions belongs to him' do
-    let(:user) { participant2 }
+    let(:user) { participant1 }
 
     it 'return correct data' do
-      expect(json_response['data'].size).to be(3)
+      expect(json_response['data'].size).to be(1)
     end
   end
 

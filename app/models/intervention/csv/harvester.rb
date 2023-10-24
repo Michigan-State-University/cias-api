@@ -36,6 +36,7 @@ class Intervention::Csv::Harvester
     end
 
     header.unshift(hf_headers(sessions))
+    header.unshift(predefined_user_headers(sessions))
     header.flatten!
     header.unshift(:email)
     header.unshift(:user_id)
@@ -63,9 +64,10 @@ class Intervention::Csv::Harvester
   end
 
   def set_rows
-    user_sessions.group_by(&:user_id).each_with_index do |grouped_user_sessions, row_index|
+    grouped_and_sorted_user_sessions.each_with_index do |grouped_user_sessions, row_index|
       initialize_row
       set_user_data(row_index, grouped_user_sessions.second.first)
+      predefined_user_data(row_index, grouped_user_sessions.second.first.user)
 
       grouped_user_sessions.second.each do |user_session|
         user_session.answers.each do |answer|
@@ -151,6 +153,21 @@ class Intervention::Csv::Harvester
     hf_initial_question.csv_header_names
   end
 
+  def predefined_user_headers(sessions)
+    return [] if sessions.first&.intervention&.predefined_user_parameters.blank?
+
+    %i[first_name last_name external_id full_number].map { |column| "predefined_participant.#{column}" }
+  end
+
+  def predefined_user_data(row_index, user)
+    %i[first_name last_name external_id full_number].each do |column|
+      var_index = header.index("predefined_participant.#{column}")
+      next if var_index.nil?
+
+      rows[row_index][var_index] = user.send(column)
+    end
+  end
+
   def fill_hf_initial_screen(row_index, user_session)
     return unless user_session.session.intervention.hfhs_access
 
@@ -182,6 +199,12 @@ class Intervention::Csv::Harvester
       "#{session.variable}.approach_number_#{approach_number || 1}.#{suffix}"
     else
       "#{session.variable}.#{suffix}"
+    end
+  end
+
+  def grouped_and_sorted_user_sessions
+    @grouped_and_sorted_user_sessions ||= user_sessions.group_by(&:user_id).sort_by do |grouped_user_sessions_per_user|
+      grouped_user_sessions_per_user[1].min_by(&:created_at).created_at
     end
   end
 end

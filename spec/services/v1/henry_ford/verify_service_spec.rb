@@ -6,7 +6,11 @@ RSpec.describe V1::HenryFord::VerifyService do
   let(:intervention) { create(:intervention) }
   let!(:location) do
     create(:intervention_location, intervention: intervention,
-                                   clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD', external_id: 'externalID'))
+                                   clinic_location: create(:clinic_location,
+                                                           name: 'brukowa',
+                                                           department: 'HTD',
+                                                           external_id: 'externalID',
+                                                           external_name: 'brukowa'))
   end
   let!(:session) { create(:session, intervention: intervention) }
   let(:params) do
