@@ -50,20 +50,14 @@
       }
 
       .d-table {
-        display: table;
         width: 100%;
       }
 
-      .d-table-row {
-        display: table-row;
-      }
-
-      .d-table-row .d-table-cell:first-child {
+      tr td:first-child {
         width: 100%;
       }
 
       .d-table-cell {
-        display: table-cell;
         vertical-align: top;
       }
 
@@ -79,8 +73,8 @@
         margin-bottom: 30px;
       }
 
-      .ml-large {
-        margin-left: 60px;
+      .image-spacer {
+        width: 60px;
       }
     </style>
   </head>
@@ -88,36 +82,45 @@
   <body>
     <div class="container">
       <!-- REPORT HEADER -->
-      <div class="header mb-medium"><%= report_template.summary %></div>
+      <div class="header mb-medium" dir='auto'><%= report_template.summary %></div>
 
       <!-- SINGLE SECTION -->
       <%- variants.each do |variant| %>
         <% next if variant.content.blank? && variant.title.blank? %>
 
-        <div class="section d-table mb-big nobreak">
+        <table class="section d-table mb-big nobreak" cellspacing="0" cellpadding="0" dir='auto'>
+          <tbody>
           <!-- FIRST LINE -->
-          <div class="d-table-row">
-            <!-- TILE -->
-            <div class="d-table-cell">
-              <div class="section-title mb-small"><%= variant.title %></div>
-            </div>
-          </div>
+            <tr>
+              <!-- TITLE -->
+              <td class="d-table-cell">
+                <div class="section-title mb-small"><%= variant.title %></div>
+              </td>
+            </tr>
 
-          <!-- SECOND LINE -->
-          <div class="d-table-row">
-            <!-- TEXT -->
-            <div class="d-table-cell">
-              <p class="section-text"><%= variant.content %></p>
-            </div>
+            <!-- SECOND LINE -->
+            <tr>
+              <!-- TEXT -->
+              <td class="d-table-cell" dir='auto'>
+                <p class="section-text"><%= variant.content %></p>
+              </td>
 
-            <!-- IMAGE -->
-            <div class="d-table-cell">
+            <!-- IMAGE SPACER -->
+            <td class="d-table-cell">
               <% if variant.image.attached? %>
-                <img class="section-image ml-large" src="<%= Rails.application.routes.url_helpers.url_for(variant.image) %>" />
+              <div class="image-spacer" />
               <% end %>
-            </div>
-          </div>
-        </div>
+            </td>
+
+              <!-- IMAGE -->
+              <td class="d-table-cell">
+                <% if variant.image.attached? %>
+                  <img class="section-image" src="<%= Rails.application.routes.url_helpers.url_for(variant.image) %>" />
+                <% end %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       <% end %>
     </div>
   </body>
