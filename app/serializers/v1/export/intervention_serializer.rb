@@ -5,7 +5,7 @@ class V1::Export::InterventionSerializer < ActiveModel::Serializer
 
   attributes :quick_exit, :type, :shared_to, :additional_text, :original_text, :current_narrator
 
-  has_many :sessions, serializer: V1::Export::SessionSerializer
+  # has_many :sessions, serializer: V1::Export::SessionSerializer
   has_many :intervention_accesses, serializer: V1::Export::InterventionAccessSerializer
 
   attribute :name do
@@ -27,4 +27,6 @@ class V1::Export::InterventionSerializer < ActiveModel::Serializer
   attribute :version do
     Intervention::CURRENT_VERSION
   end
+
+  #sessions bedziemy recznie doklejac
 end

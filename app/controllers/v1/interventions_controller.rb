@@ -42,13 +42,13 @@ class V1::InterventionsController < V1Controller
     render status: :ok
   end
 
-  def export
-    authorize! :update, Intervention
-
-    Interventions::ExportJob.perform_later(current_v1_user.id, params[:id])
-
-    render status: :ok
-  end
+  # def export
+  #   authorize! :update, Intervention
+  #
+  #   Interventions::ExportJob.perform_later(current_v1_user.id, params[:id])
+  #
+  #   render status: :ok
+  # end
 
   def generate_conversations_transcript
     authorize! :update, Intervention

@@ -46,6 +46,10 @@ class V1::InterventionSerializer < V1Serializer
     url_for(object.logo) if object.logo.attached?
   end
 
+  attribute :exported_data_url do |object|
+    url_for(object.exported_data) if object.exported_data.attached?
+  end
+
   attribute :image_alt do |object|
     object.logo_blob.description if object.logo_blob.present?
   end
