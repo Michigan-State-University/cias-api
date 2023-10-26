@@ -27,8 +27,9 @@ class Interventions::ExportJob < ApplicationJob
     # file.write(intervention_data(@intervention))
     # file.rewind
     # require 'pry'; binding.pry
-    file = generated_file
+    file = Tempfile.new([@intervention.id, '.json'])
     @intervention.exported_data.attach(io: file, filename: "exported_#{@intervention.name}_#{Time.now.strftime("%F-%T")}.json", content_type: "application/json")
+    generated_file
     ExportMailer.result(@user, @intervention.name, file.path).deliver_now
   ensure
     file.close
