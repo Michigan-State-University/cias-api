@@ -88,20 +88,23 @@
       <%- variants.each do |variant| %>
         <% next if variant.content.blank? && variant.title.blank? %>
 
-        <table class="section d-table mb-big nobreak" cellspacing="0" cellpadding="0" dir='auto'>
+        <!-- TITLE -->
+        <table class="d-table nobreak" cellspacing="0" cellpadding="0" dir='auto'>
           <tbody>
-          <!-- FIRST LINE -->
             <tr>
-              <!-- TITLE -->
               <td class="d-table-cell">
                 <div class="section-title mb-small"><%= variant.title %></div>
               </td>
             </tr>
+          </tbody>
+        </table>
 
-            <!-- SECOND LINE -->
+        <!-- CONTENT AND IMAGE -->
+        <table class="d-table mb-big nobreak" cellspacing="0" cellpadding="0" dir='auto'>
+          <tbody>
             <tr>
               <!-- TEXT -->
-              <td class="d-table-cell" dir='auto'>
+              <td class="d-table-cell">
                 <p class="section-text"><%= variant.content %></p>
               </td>
 
