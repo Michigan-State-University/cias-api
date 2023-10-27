@@ -27,13 +27,15 @@ class Interventions::ExportJob < ApplicationJob
     # file.write(intervention_data(@intervention))
     # file.rewind
     # require 'pry'; binding.pry
-    file = Tempfile.new([@intervention.id, '.json'])
-    @intervention.exported_data.attach(io: file, filename: "exported_#{@intervention.name}_#{Time.now.strftime("%F-%T")}.json", content_type: "application/json")
-    generated_file
-    ExportMailer.result(@user, @intervention.name, file.path).deliver_now
+    # file = generated_file
+    # @intervention.exported_data.attach(io: file, filename: "exported_#{@intervention.name}_#{Time.now.strftime("%F-%T")}.json", content_type: "application/json")
+    # ExportMailer.result(@user, @intervention.name, file.path).deliver_now
+
+    json_data = V1::Export::InterventionSerializer.new(@intervention).serializable_hash(include: '**')
+    @intervention.exported_data.attach(io:  StringIO.new(json_data.to_json), filename: "exported_#{@intervention.name}_#{Time.now.strftime("%F-%T")}.json", content_type: "application/json")
   ensure
-    file.close
-    file.unlink
+    # file.close
+    # file.unlink
   end
 
   def intervention_data(intervention)

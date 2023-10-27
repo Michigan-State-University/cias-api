@@ -16,10 +16,7 @@ class V1::Intervention::ExportData
   end
 
   def generate_file
-    # require 'pry'; binding.pry
-    file_path = ActiveStorage::Blob.service.send(:path_for, intervention.exported_data.key)
-    file = File.open(file_path, 'wb')
-
+    file = Tempfile.new([@intervention.id, '.json'])
     data = V1::Export::InterventionSerializer.new(intervention).serializable_hash(include: '**')
     file.write(JSON.pretty_generate(data))
     file.seek(-2, IO::SEEK_END)
@@ -38,8 +35,8 @@ class V1::Intervention::ExportData
     end
     file.seek(-1, IO::SEEK_END)
     file.write "]\n}"
-    file.close
-    file.unlink
+    file.rewind
+    file
   end
 
   def question_groups_to_hash(session, file)
