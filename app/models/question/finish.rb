@@ -10,8 +10,18 @@ class Question::Finish < Question
 
   attr_readonly :position
 
+  before_validation :assign_default_title_and_subtitle
+
   def csv_header_names
     []
+  end
+
+  def assign_default_title_and_subtitle
+    return unless new_record?
+    return unless session.intervention.google_language.language_code.eql?('ar')
+
+    self.title = I18n.with_locale('ar') { I18n.t('question.finish.title') }
+    self.subtitle = I18n.with_locale('ar') { I18n.t('question.finish.subtitle') }
   end
 
   def after_commit_callbacks
