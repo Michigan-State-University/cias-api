@@ -2,7 +2,7 @@
 
 RSpec.describe Question::Finish, type: :model do
   describe 'Question::Finish' do
-    subject(:question_finish) { build(:question_finish) }
+    subject(:question_finish) { create(:question_finish) }
 
     it { should belong_to(:question_group) }
     it { should be_valid }
