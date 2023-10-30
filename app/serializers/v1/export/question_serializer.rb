@@ -14,7 +14,7 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
   end
 
   attribute :image do
-    export_file(object.image) # potencjalnie moze duzo kosztowac
+    export_file(object.image)
   end
 
   attribute :version do
