@@ -22,7 +22,7 @@ en:
     tlfb:
       title: TLFB Study Group
   predefined_participant:
-    invitation: "You have been invited to complete %{intervention_name} intervention. Click the link to access: %{link}"
+    invitation: "Hello! Please click the link below to begin or continue your progress on %{intervention_name}. %{link}. Thank you!"
   channels:
     collaboration:
       intervention:
@@ -374,3 +374,4 @@ en:
         not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
         not_found: "Insufficient information for further processing."
+  phone_verification: "Your CIAS verification code is: %{verification_code}"

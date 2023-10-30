@@ -41,6 +41,7 @@ class Session < ApplicationRecord
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
   delegate :ability_to_update_for?, to: :intervention
+  delegate :language_code, to: :intervention
 
   scope :multiple_fill, -> { where(multiple_fill: true) }
 
@@ -87,7 +88,7 @@ class Session < ApplicationRecord
 
     if intervention.shared_to != 'anyone'
       existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
-      invite_non_existing_users(non_existing_users_emails, true)
+      invite_non_existing_users(non_existing_users_emails, true, [:participant], intervention.language_code)
     end
 
     if intervention.shared_to_invited?
@@ -123,7 +124,7 @@ class Session < ApplicationRecord
   def send_link_to_session(user, health_clinic = nil)
     return if !intervention.published? || user.with_invalid_email? || user.email_notification.blank?
 
-    SessionMailer.inform_to_an_email(self, user.email, health_clinic).deliver_later
+    SessionMailer.with(locale: language_code).inform_to_an_email(self, user.email, health_clinic).deliver_later
   end
 
   def available_now?(participant_date_with_payload = nil)

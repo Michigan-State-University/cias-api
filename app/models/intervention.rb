@@ -52,6 +52,8 @@ class Intervention < ApplicationRecord
   attribute :shared_to, :string, default: 'anyone'
   attribute :original_text, :json, default: { additional_text: '' }
 
+  delegate :language_code, to: :google_language
+
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
   validate :cat_settings_validation, if: :published?
@@ -118,7 +120,7 @@ class Intervention < ApplicationRecord
 
     if shared_to != 'anyone'
       existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
-      invite_non_existing_users(non_existing_users_emails, true)
+      invite_non_existing_users(non_existing_users_emails, true, [:participant], language_code)
     end
 
     if shared_to_invited?
@@ -203,6 +205,15 @@ class Intervention < ApplicationRecord
 
   def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
     translate_attribute('additional_text', additional_text, translator, source_language_name_short, destination_language_name_short)
+  end
+
+  def translate_logo_description(translator, source_language_name_short, destination_language_name_short)
+    return unless logo.attached?
+
+    original_text['image_alt'] = logo_blob.description
+
+    new_value = translator.translate(logo_blob.description, source_language_name_short, destination_language_name_short)
+    logo_blob.update!(description: new_value)
   end
 
   def translate_sessions(translator, source_language_name_short, destination_language_name_short)

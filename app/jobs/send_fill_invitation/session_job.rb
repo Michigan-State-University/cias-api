@@ -14,11 +14,11 @@ class SendFillInvitation::SessionJob < ApplicationJob
                                          health_clinic_id: health_clinic_id,
                                          type: session.user_session_type,
                                          user_intervention_id: user_intervention.id)
-      SessionMailer.inform_to_an_email(session, user.email, health_clinic, user_session&.scheduled_at).deliver_now
+      SessionMailer.with(locale: session.language_code).inform_to_an_email(session, user.email, health_clinic, user_session&.scheduled_at).deliver_now
     end
 
     non_existing_users_emails.each do |email|
-      SessionMailer.invite_to_session_and_registration(session, email, health_clinic).deliver_now
+      SessionMailer.with(locale: session.language_code).invite_to_session_and_registration(session, email, health_clinic).deliver_now
     end
   end
 end
