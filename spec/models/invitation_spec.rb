@@ -18,7 +18,8 @@ RSpec.describe Invitation, type: :model do
       let(:invited) { create(:user, :confirmed, email: 'invited@test.org') }
 
       it 'send email' do
-        expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil, nil).and_return(message_delivery)
+        expect_to_call_mailer(SessionMailer, :inform_to_an_email,
+                              args: [session, invited.email, nil, nil], return_value: message_delivery)
         subject.resend
       end
 
@@ -26,7 +27,8 @@ RSpec.describe Invitation, type: :model do
         subject { create(:invitation, email: invited.email, invitable: session.intervention) }
 
         it 'send email' do
-          expect(InterventionMailer).to receive(:inform_to_an_email).with(session.intervention, invited.email, nil).and_return(message_delivery)
+          expect_to_call_mailer(InterventionMailer, :inform_to_an_email,
+                                args: [session.intervention, invited.email, nil], return_value: message_delivery)
           subject.resend
         end
       end
@@ -47,7 +49,8 @@ RSpec.describe Invitation, type: :model do
       let!(:scheduled_at) { (DateTime.now + 2.days).beginning_of_day }
 
       it 'send email' do
-        expect(SessionMailer).to receive(:inform_to_an_email).with(session, invited.email, nil, scheduled_at).and_return(message_delivery)
+        expect_to_call_mailer(SessionMailer, :inform_to_an_email,
+                              args: [session, invited.email, nil, scheduled_at], return_value: message_delivery)
         subject.resend
       end
     end

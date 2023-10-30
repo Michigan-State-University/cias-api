@@ -7,6 +7,7 @@ class V1::Users::SmsTokens::Send
 
   def initialize(user, phone_params)
     @phone = V1::Users::SmsTokens::Phone.new(user, phone_params[:phone_number], phone_params[:iso], phone_params[:prefix]).phone
+    @user = user
   end
 
   def call
@@ -15,7 +16,9 @@ class V1::Users::SmsTokens::Send
     phone.refresh_confirmation_code
     sms = Message.create(
       phone: number,
-      body: "Your CIAS verification code is: #{phone.confirmation_code}"
+      body: I18n.with_locale(user.language_code) do
+        I18n.t('phone_verification', verification_code: phone.confirmation_code)
+      end
     )
     service = Communication::Sms.new(sms.id)
     service.send_message
@@ -25,6 +28,7 @@ class V1::Users::SmsTokens::Send
   private
 
   attr_accessor :phone
+  attr_reader :user
 
   def number
     phone.prefix + phone.number

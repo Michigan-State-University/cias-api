@@ -373,3 +373,4 @@ en:
         not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
         not_found: "Insufficient information for further processing."
+  phone_verification: "Your CIAS verification code is: %{verification_code}"

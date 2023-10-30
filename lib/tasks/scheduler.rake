@@ -9,7 +9,8 @@ task interventions_schedule: :environment do
   users = User.where(id: interventions.users)
   interventions.each do |intervention|
     intervention.user_interventions.each do |user_intervention|
-      InvitationMailer.added_user_to_intervention(users.find(user_intervention.user_id).email, intervention).deliver_now
+      InvitationMailer.with(locale: intervention.language_code)
+                      .added_user_to_intervention(users.find(user_intervention.user_id).email, intervention).deliver_now
     end
   end
 end
