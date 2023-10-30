@@ -205,6 +205,15 @@ class Intervention < ApplicationRecord
     translate_attribute('additional_text', additional_text, translator, source_language_name_short, destination_language_name_short)
   end
 
+  def translate_logo_description(translator, source_language_name_short, destination_language_name_short)
+    return unless logo.attached?
+
+    original_text['image_alt'] = logo_blob.description
+
+    new_value = translator.translate(logo_blob.description, source_language_name_short, destination_language_name_short)
+    logo_blob.update!(description: new_value)
+  end
+
   def translate_sessions(translator, source_language_name_short, destination_language_name_short)
     sessions.each do |session|
       session.translate(translator, source_language_name_short, destination_language_name_short)

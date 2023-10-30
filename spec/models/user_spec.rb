@@ -225,4 +225,15 @@ describe User, type: :model do
       expect { user.confirm }.to have_enqueued_job(ActionMailer::MailDeliveryJob).once
     end
   end
+
+  context 'predefined participant' do
+    it 'doesn\'t receive welcome emails' do
+      expect do
+        described_class.create!(first_name: 'Predefined', last_name: 'User', email: 'predefined_user@example.com', password: 'Password1!',
+                                roles: ['predefined_participant'], terms: true, confirmed_at: DateTime.now)
+      end.not_to change {
+                   ActionMailer::Base.deliveries.size
+                 }
+    end
+  end
 end

@@ -110,9 +110,7 @@ class Session < ApplicationRecord
           type: user_session_type,
           user_intervention_id: user_intervention.id
         )
-        if user_session.finished_at.blank? && (user_session.scheduled_at.blank? || user_session.scheduled_at.past?)
-          user_intervention.update!(status: 'in_progress')
-        end
+        user_intervention.update!(status: 'in_progress') if user_session.started && (user_session.scheduled_at.blank? || user_session.scheduled_at.past?)
       end
 
       (emails - users.map(&:email)).each do |email|
