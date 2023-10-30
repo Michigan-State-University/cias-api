@@ -27,6 +27,4 @@ class V1::Export::InterventionSerializer < ActiveModel::Serializer
   attribute :version do
     Intervention::CURRENT_VERSION
   end
-
-  #sessions bedziemy recznie doklejac
 end

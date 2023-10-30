@@ -403,7 +403,7 @@ ActiveRecord::Schema.define(version: 2023_10_16_080013) do
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end
 
-  create_table "import_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+  create_table "imported_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

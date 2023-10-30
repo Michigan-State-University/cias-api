@@ -5,7 +5,7 @@ class V1::Interventions::TransfersController < V1Controller
     authorize! :create, Intervention
     return render status: :bad_request unless correct_format?(file)
 
-    import_file = ImportFile.create!(file: file)
+    import_file = ImportedFile.create!(file: file)
     Interventions::ImportJob.perform_later(current_v1_user.id, import_file.id)
     render status: :created
   end

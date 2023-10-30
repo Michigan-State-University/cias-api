@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class ImportFile < ApplicationRecord
+class ImportedFile < ApplicationRecord
   has_one_attached :file, dependent: :purge_later
 end
