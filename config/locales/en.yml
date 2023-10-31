@@ -130,6 +130,11 @@ en:
     invitations:
       accepted: "You've successfully joined team %{team_name}."
       not_found: "Team Invitation not found"
+  short_link:
+    error:
+      not_available: 'Invention is not available'
+      only_registered: 'Interventions can only be completed by a registered user'
+      only_invited: 'Interventions can only be completed by a invited user'
   team_mailer:
     invite_user:
       subject:      You've been invited to the Team

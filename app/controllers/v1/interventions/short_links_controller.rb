@@ -20,7 +20,8 @@ class V1::Interventions::ShortLinksController < V1Controller
   end
 
   def verify
-    render json: V1::ShortLinks::MapService.call(name)
+    render json: V1::ShortLinks::MapService.call(name, current_v1_user)
+    # render json: V1::ShortLinks::MapService.call(slug)
   end
 
   private
@@ -57,6 +58,10 @@ class V1::Interventions::ShortLinksController < V1Controller
 
   def in_organization?
     intervention_load.organization.present?
+  end
+
+  def name
+    params[:name]
   end
 
   def name
