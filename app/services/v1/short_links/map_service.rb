@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::ShortLinks::MapService
+  include StaticLinkHelper
+
   def initialize(name, current_user)
     @name = name
     @current_user = current_user
@@ -17,11 +19,13 @@ class V1::ShortLinks::MapService
     check_intervention_access
 
     {
-      intervention_id: intervention.id,
-      session_id: nil,
-      health_clinic_id: short_link.health_clinic_id,
-      multiple_fill_session_available: true,
-      user_intervention_id: user_intervention&.id
+      data: {
+        intervention_id: intervention.id,
+        session_id: available_now_session(intervention, user_intervention)&.id,
+        health_clinic_id: short_link.health_clinic_id,
+        multiple_fill_session_available: multiple_fill_session_available(user_intervention),
+        user_intervention_id: user_intervention&.id
+      }
     }.to_json
   end
 
@@ -46,7 +50,7 @@ class V1::ShortLinks::MapService
   end
 
   def user_intervention
-    UserIntervention.find_by(user_id: current_user.id, intervention_id: intervention.id)
+    @user_intervention ||= UserIntervention.find_by(user_id: current_user.id, intervention_id: intervention.id)
   end
 
   def check_intervention_status
@@ -60,13 +64,26 @@ class V1::ShortLinks::MapService
   def check_intervention_access
     return if intervention.shared_to_anyone?
 
-    if !current_user&.role?('participant') && intervention.shared_to_registered?
+    handle_access_denied unless allowed_access?(intervention, current_user)
+  end
+
+  def allowed_access?(intervention, current_user)
+    return true if current_user&.role?('participant') && intervention.shared_to_registered?
+    return true if intervention.shared_to_invited? && invited_user?(intervention, current_user)
+
+    false
+  end
+
+  def invited_user?(intervention, current_user)
+    intervention.intervention_accesses.pluck(:email).include?(current_user&.email)
+  end
+
+  def handle_access_denied
+    unless current_user&.role?('participant')
       raise ComplexException.new(I18n.t('short_link.error.only_registered'), { reason: 'ONLY_REGISTERED' },
                                  :unauthorized)
     end
-    if intervention.shared_to_invited? && !intervention.intervention_accesses.pluck(:email).include?(current_user&.email)
-      raise ComplexException.new(I18n.t('short_link.error.only_invited'), { reason: 'ONLY_INVITED' },
-                                 :forbidden)
-    end
+
+    raise ComplexException.new(I18n.t('short_link.error.only_invited'), { reason: 'ONLY_INVITED' }, :forbidden)
   end
 end
