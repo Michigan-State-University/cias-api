@@ -47,7 +47,7 @@ namespace :one_time_use do
     p 'Adding external name to clinic locations...'
 
     locations.each do |location|
-      ClinicLocation.find_by(name: location[:name].downcase, department: 'HFMC').update!(external_name: location[:external_name].downcase, department: location[:department])
+      ClinicLocation.find_by(name: location[:name].downcase, department: 'HFMC')&.update!(external_name: location[:external_name].downcase, department: location[:department])
     end
   end
 end
