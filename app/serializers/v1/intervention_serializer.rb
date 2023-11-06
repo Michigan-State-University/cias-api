@@ -26,12 +26,13 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions&.first&.google_tts_voice&.google_tts_language&.language_name
   end
 
-  attribute :csv_generated_at do |object|
-    object.newest_report.created_at if object.reports.attached?
-  end
+  attribute :csv do |object|
+    return {} unless object.reports.attached?
 
-  attribute :csv_filename do |object|
-    object.newest_report.blob.filename if object.reports.attached?
+    {
+      generated_at: object.newest_report.created_at,
+      filename: object.newest_report.blob.filename
+    }
   end
 
   attribute :language_name do |object|
@@ -42,16 +43,27 @@ class V1::InterventionSerializer < V1Serializer
     object.google_language.language_code
   end
 
-  attribute :logo_url do |object|
-    url_for(object.logo) if object.logo.attached?
-  end
-
   attribute :exported_data_url do |object|
     url_for(object.exported_data) if object.exported_data.attached?
   end
 
-  attribute :image_alt do |object|
-    object.logo_blob.description if object.logo_blob.present?
+  attribute :exported_data do |object|
+    return {} unless object.exported_data.attached?
+
+    exported_data = object.exported_data
+    {
+      url: url_for(exported_data),
+      generated_at: exported_data.blob.created_at.in_time_zone('UTC')
+    }
+  end
+
+  attribute :logo do |object|
+    return {} unless object.logo.attached?
+
+    {
+      url: url_for(object.logo),
+      alt: object.logo_blob.description
+    }
   end
 
   attribute :user do |object|
@@ -66,12 +78,14 @@ class V1::InterventionSerializer < V1Serializer
     object.sessions.exists?(type: 'Session::CatMh')
   end
 
-  attribute :conversations_transcript_generated_at do |object|
-    object.conversations_transcript.blob.created_at.in_time_zone('UTC') if object.conversations_transcript.attached?
-  end
+  attribute :conversations_transcript do |object|
+    return {} unless object.conversations_transcript.attached?
 
-  attribute :conversations_transcript_filename do |object|
-    object.conversations_transcript.blob.filename if object.conversations_transcript.attached?
+    blob = object.conversations_transcript.blob
+    {
+      generated_at: blob.created_at.in_time_zone('UTC'),
+      filename: blob.filename
+    }
   end
 
   attribute :conversations_present do |object|
