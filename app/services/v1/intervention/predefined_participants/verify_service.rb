@@ -2,6 +2,7 @@
 
 class V1::Intervention::PredefinedParticipants::VerifyService
   include StaticLinkHelper
+
   def initialize(predefined_user_parameters)
     @predefined_user_parameters = predefined_user_parameters
   end

@@ -132,7 +132,7 @@ en:
       not_found: "Team Invitation not found"
   short_link:
     error:
-      not_available: 'Invention is not available'
+      not_available: 'Intervention is not available'
       only_registered: 'Interventions can only be completed by a registered user'
       only_invited: 'Interventions can only be completed by a invited user'
   team_mailer:
