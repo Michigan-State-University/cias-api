@@ -25,7 +25,7 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     it {
       expect(json_response['data'].symbolize_keys).to include({
                                                                 intervention_id: intervention.id,
-                                                                session_id: nil,
+                                                                session_id: session.id,
                                                                 health_clinic_id: nil,
                                                                 multiple_fill_session_available: false,
                                                                 user_intervention_id: nil

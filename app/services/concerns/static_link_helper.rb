@@ -3,7 +3,7 @@
 module StaticLinkHelper
   def available_now_session(intervention, user_intervention)
     return nil if intervention.sessions.blank?
-    return nil if user_intervention.blank? || user_intervention.completed?
+    return nil if user_intervention&.completed?
 
     user_sessions = UserSession.where(user_intervention: user_intervention).order(:last_answer_at)
     user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at IS NULL OR scheduled_at < ?', DateTime.now)
