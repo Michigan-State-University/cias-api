@@ -33,6 +33,18 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     }
   end
 
+  context 'without token' do
+    let(:request) do
+      post v1_verify_short_links_path, params: params
+    end
+
+    before do
+      request
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+  end
+
   context 'sequential intervention with open sessions' do
     let!(:session) { create(:session, intervention: intervention) }
     let(:user_intervention) { create(:user_intervention, user: participant, intervention: intervention) }
