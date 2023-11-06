@@ -25,8 +25,8 @@ RSpec.describe 'PATCH  /v1/interventions/:interventions_id/logo', type: :request
       before { request }
 
       it 'JSON response contains proper attributes' do
-        expect(json_response['data']['attributes']).to include(
-          'image_alt' => 'New logo'
+        expect(json_response['data']['attributes']['logo']).to include(
+          'alt' => 'New logo'
         )
       end
     end
