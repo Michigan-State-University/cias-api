@@ -22,7 +22,7 @@ en:
     tlfb:
       title: TLFB Study Group
   predefined_participant:
-    invitation: "Hello! Please click the link below to begin or continue your progress on %{intervention_name}. %{link}. Thank you!"
+    invitation: "Hello! Please click the link below to begin or continue your progress on %{intervention_name} %{link}"
   channels:
     collaboration:
       intervention:
