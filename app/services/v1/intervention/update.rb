@@ -9,6 +9,7 @@ class V1::Intervention::Update
   def execute
     ActiveRecord::Base.transaction do
       assign_locations!
+      intervention.aasm.fire!(status) if status.present?
       intervention.assign_attributes(params)
       intervention.save!
     end
@@ -26,5 +27,9 @@ class V1::Intervention::Update
 
     intervention.intervention_locations.destroy_all
     params.delete(:location_ids)&.each { |location_id| intervention.intervention_locations.create!(clinic_location_id: location_id) }
+  end
+
+  def status
+    @status ||= params.delete(:status)
   end
 end

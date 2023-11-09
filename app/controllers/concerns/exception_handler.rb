@@ -83,6 +83,10 @@ module ExceptionHandler
     rescue_from ActiveModel::ForbiddenAttributesError do |exc|
       render json: msg(exc), status: :forbidden
     end
+
+    rescue_from AASM::InvalidTransition do |exc|
+      render json: msg(exc), status: :bad_request
+    end
   end
 
   private
