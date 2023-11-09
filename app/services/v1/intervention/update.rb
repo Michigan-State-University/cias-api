@@ -7,9 +7,10 @@ class V1::Intervention::Update
   end
 
   def execute
+    status_transition_validation
+
     ActiveRecord::Base.transaction do
       assign_locations!
-      intervention.aasm.fire!(status) if status.present?
       intervention.assign_attributes(params)
       intervention.save!
     end
@@ -30,6 +31,14 @@ class V1::Intervention::Update
   end
 
   def status
-    @status ||= params.delete(:status)
+    @status ||= params[:status]
+  end
+
+  def status_transition_validation
+    return if status.blank?
+    return if intervention.public_send("may_#{status}?")
+
+    raise ActiveRecord::ActiveRecordError,
+          I18n.t('activerecord.errors.models.intervention.attributes.status_transition', current_status: intervention.status, new_status: status)
   end
 end

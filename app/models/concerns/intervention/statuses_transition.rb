@@ -16,7 +16,7 @@ module Intervention::StatusesTransition
   included do
     include AASM
 
-    aasm column: :status, use_transactions: true, enum: true do
+    aasm column: :status, whiny_transitions: true, enum: true do
       state :draft, initial: true
       state :published
       state :closed
@@ -38,11 +38,10 @@ module Intervention::StatusesTransition
       event :paused do
         transitions from: :published, to: :paused
       end
-    end
 
-    # def aasm_event_failed(event_name, old_state_name)
-    #   require 'pry'; binding.pry
-    #   # use custom exception/messages, report metrics, etc
-    # end
+      event :draft do
+        transitions from: [], to: %i[published archived]
+      end
+    end
   end
 end

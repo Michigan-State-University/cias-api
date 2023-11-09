@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::UserSessions::QuestionsController < V1Controller
+  before_action :validate_intervention_status
+
   def index
     authorize! :read, user_session
 
@@ -19,6 +21,10 @@ class V1::UserSessions::QuestionsController < V1Controller
   end
 
   private
+
+  def intervention
+    @intervention ||= user_session.session.intervention
+  end
 
   def flow_service
     V1::FlowService.new(user_session)
