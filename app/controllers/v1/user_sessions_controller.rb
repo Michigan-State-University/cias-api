@@ -2,6 +2,7 @@
 
 class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[create show_or_create]
+  before_action :validate_intervention_status
 
   def create
     user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
@@ -87,7 +88,15 @@ class V1::UserSessionsController < V1Controller
   end
 
   def intervention
-    Session.find(session_id).intervention
+    # require 'pry'; binding.pry
+    @intervention = case params[:action]
+                    when 'quick_exit'
+                      user_session_load.session.intervention
+                    when 'show'
+                      Session.find(params[:session_id]).intervention
+                    else
+                      Session.find(session_id).intervention
+                    end
   end
 
   def intervention_id

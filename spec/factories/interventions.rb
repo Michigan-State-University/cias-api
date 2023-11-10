@@ -15,7 +15,7 @@ FactoryBot.define do
       status { 'archived' }
     end
     trait :paused do
-      status {'paused'}
+      status { 'paused' }
     end
     shared_to { 'anyone' }
 

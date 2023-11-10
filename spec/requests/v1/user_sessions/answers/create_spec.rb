@@ -84,19 +84,7 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
 
     it_behaves_like 'deactivated account'
 
-    context 'when intervention is paused' do
-      let!(:session) { create(:session, intervention: create(:intervention, :paused, user_id: user.id)) }
-
-      it 'returns correct response code' do
-        request
-        expect(response).to have_http_status(:bad_request)
-      end
-
-      it 'returns proper error message' do
-        request
-        expect(json_response['message']).to include('Intervention is paused for some reason. During that time no one can take part in the study')
-      end
-    end
+    it_behaves_like 'paused intervention'
   end
 
   context 'UserSession::CatMh' do
