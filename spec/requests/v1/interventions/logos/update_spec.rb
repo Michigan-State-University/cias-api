@@ -10,7 +10,7 @@ RSpec.describe 'PATCH  /v1/interventions/:interventions_id/logo', type: :request
   let(:params) do
     {
       logo: {
-        image_alt: 'New logo'
+        alt: 'New logo'
       }
     }
   end
