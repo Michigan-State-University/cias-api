@@ -37,6 +37,8 @@ class Intervention < ApplicationRecord
   has_many_attached :files # files for the participant added in modular intervention
   has_one_attached :logo, dependent: :purge_later
 
+  has_one_attached :exported_data, dependent: :purge_later
+
   has_many :short_links, as: :linkable, dependent: :destroy
 
   has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false

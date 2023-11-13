@@ -184,8 +184,9 @@ en:
   backup_mailer:
     result:
       subject: Your CIAS Intervention is ready to download!
-      body: Your Intervention is ready to download!
-      header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
+      header: Your Intervention is ready to download!
+      body: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
+      button: Download intervention
   import_mailer:
     result:
       subject: CIAS Intervention Import
