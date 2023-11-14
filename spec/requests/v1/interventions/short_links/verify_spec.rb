@@ -77,7 +77,7 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     it { expect(response).to have_http_status(:bad_request) }
 
     it {
-      expect(json_response).to include({ 'message' => 'Invention is not available', 'details' => { 'reason' => 'INTERVENTION_DRAFT' } })
+      expect(json_response).to include({ 'message' => 'Intervention is not available', 'details' => { 'reason' => 'INTERVENTION_DRAFT' } })
     }
   end
 
@@ -91,7 +91,7 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     it { expect(response).to have_http_status(:bad_request) }
 
     it {
-      expect(json_response).to include({ 'message' => 'Invention is not available', 'details' => { 'reason' => 'INTERVENTION_CLOSED' } })
+      expect(json_response).to include({ 'message' => 'Intervention is not available', 'details' => { 'reason' => 'INTERVENTION_CLOSED' } })
     }
   end
 
