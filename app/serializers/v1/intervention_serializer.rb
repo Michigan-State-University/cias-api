@@ -48,7 +48,8 @@ class V1::InterventionSerializer < V1Serializer
       exported_data = object.exported_data
       {
         url: url_for(exported_data),
-        generated_at: exported_data.blob.created_at.in_time_zone('UTC')
+        generated_at: exported_data.blob.created_at.in_time_zone('UTC'),
+        filename: exported_data.blob.filename
       }
     end
   end

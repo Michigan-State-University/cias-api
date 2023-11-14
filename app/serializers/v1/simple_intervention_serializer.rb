@@ -19,6 +19,18 @@ class V1::SimpleInterventionSerializer < V1Serializer
     object.sessions.size
   end
 
+  attribute :exported_data do |object|
+    if object.exported_data.attached?
+      exported_data = object.exported_data
+      {
+        url: url_for(exported_data),
+        generated_at: exported_data.blob.created_at.in_time_zone('UTC'),
+        filename: exported_data.blob.filename
+      }
+    end
+  end
+
+
   def self.record_cache_options(options, fieldset, include_list, params)
     return super(options, fieldset, include_list, params) if params[:current_user_id].blank?
 
