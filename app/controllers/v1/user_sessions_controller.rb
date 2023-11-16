@@ -88,7 +88,6 @@ class V1::UserSessionsController < V1Controller
   end
 
   def intervention
-    # require 'pry'; binding.pry
     @intervention = case params[:action]
                     when 'quick_exit'
                       user_session_load.session.intervention
