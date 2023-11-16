@@ -15,14 +15,14 @@ class V1::TwilloMessageController < V1Controller
   end
 
   def from
-    params[:from]
+    transformed_params[:from]
   end
 
   def to
-    params[:to]
+    transformed_params[:to]
   end
 
   def body
-    params[:body]
+    transformed_params[:body]
   end
 end
