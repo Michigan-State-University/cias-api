@@ -4,6 +4,7 @@ class V1::TwilloMessageController < V1Controller
   skip_before_action :authenticate_user!
 
   def create
+    p "TWILLO: FROM -> [#{from}] TO->[#{to}] BODY -> [#{body}]"
     response = V1::Sms::Replay.call(from, to, body)
     render xml: response
   end
