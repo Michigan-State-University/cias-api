@@ -982,10 +982,15 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             expect(subject.header).to include(:user_id, :email, 'henry_ford_health.patient_id', 'henry_ford_health.first_name', 'henry_ford_health.last_name',
                                               'henry_ford_health.gender', 'henry_ford_health.date_of_birth', 'henry_ford_health.zip_code',
                                               'henry_ford_health.phone_number', 'henry_ford_health.phone_type',
+                                              'henry_ford_health.provided_first_name', 'henry_ford_health.provided_last_name',
+                                              'henry_ford_health.provided_sex', 'henry_ford_health.provided_dob', 'henry_ford_health.provided_zip',
+                                              'henry_ford_health.phone_number', 'henry_ford_health.phone_type',
                                               "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                               "#{session.variable}.metadata.session_duration")
 
             expect(subject.rows.first).to include(user.id, user.email, patient_details.patient_id, patient_details.first_name, patient_details.last_name,
+                                                  patient_details.dob, patient_details.sex, patient_details.zip_code, patient_details.phone_number,
+                                                  patient_details.phone_type, patient_details.first_name, patient_details.last_name,
                                                   patient_details.dob, patient_details.sex, patient_details.zip_code, patient_details.phone_number,
                                                   patient_details.phone_type, user_session.created_at, nil, nil)
           end
@@ -997,11 +1002,14 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
               subject.collect
               expect(subject.header).to include(:user_id, :email, 'henry_ford_health.patient_id', 'henry_ford_health.first_name', 'henry_ford_health.last_name',
                                                 'henry_ford_health.gender', 'henry_ford_health.date_of_birth', 'henry_ford_health.zip_code',
+                                                'henry_ford_health.provided_first_name', 'henry_ford_health.provided_last_name',
+                                                'henry_ford_health.provided_sex', 'henry_ford_health.provided_dob', 'henry_ford_health.provided_zip',
+                                                'henry_ford_health.phone_number', 'henry_ford_health.phone_type',
                                                 "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                                 "#{session.variable}.metadata.session_duration")
 
               expect(subject.rows.first).to include(user.id, user.email, nil, nil, nil,
-                                                    nil, nil, nil, user_session.created_at, nil, nil)
+                                                    nil, nil, nil, nil, nil, nil, nil, nil, nil, user_session.created_at, nil, nil)
             end
           end
         end
