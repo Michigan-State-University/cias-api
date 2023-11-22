@@ -12,7 +12,8 @@ class Question::HenryFordInitial < Question
   end
 
   def csv_decoded_attrs
-    %w[patient_id first_name last_name sex dob zip_code phone_number phone_type]
+    %w[patient_id first_name last_name sex dob zip_code phone_number phone_type provided_first_name provided_last_name provided_sex provided_dob
+       provided_zip provided_phone_number provided_phone_type]
   end
 
   def rename_attrs(attrs)

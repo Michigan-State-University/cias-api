@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_10_12_092639) do
+ActiveRecord::Schema.define(version: 2023_11_21_114839) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -399,6 +399,20 @@ ActiveRecord::Schema.define(version: 2023_10_12_092639) do
     t.string "phone_number_bidx"
     t.string "phone_type_ciphertext"
     t.string "phone_type_bidx"
+    t.string "provided_first_name_ciphertext"
+    t.string "provided_last_name_ciphertext"
+    t.string "provided_dob_ciphertext"
+    t.string "provided_sex_ciphertext"
+    t.string "provided_zip_ciphertext"
+    t.string "provided_phone_type_ciphertext"
+    t.string "provided_phone_number_ciphertext"
+    t.string "provided_first_name_bidx"
+    t.string "provided_last_name_bidx"
+    t.string "provided_dob_bidx"
+    t.string "provided_sex_bidx"
+    t.string "provided_zip_bidx"
+    t.string "provided_phone_type_bidx"
+    t.string "provided_phone_number_bidx"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end
