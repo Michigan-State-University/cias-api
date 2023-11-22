@@ -21,6 +21,8 @@ en:
       title: Next Group
     tlfb:
       title: TLFB Study Group
+  predefined_participant:
+    invitation: "You have been invited to complete %{intervention_name} intervention. Click the link to access: %{link}"
   channels:
     collaboration:
       intervention:
@@ -95,7 +97,7 @@ en:
         undestroyable: Forbidden operation
   interventions:
     invitations:
-      wrong_intervention_type: "Users can only be invited to module interventions (fixed & flexible order)"
+      wrong_intervention_type: "Wrong type of the invitation for selected object"
     fixed_order:
       wrong_sharing_target: "Fixed order interventions can only be shared to registered participants (Got %{shared_to})"
     flexible_order:
@@ -111,13 +113,17 @@ en:
       no_email_provided: "E-mail not provided"
       no_phone_number_provided: "Phone number not provided"
   users:
+    deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
       researcher: The request to invite users as a researcher through emails has been successfully created. We will soon send invitation emails to every user.
       not_active: "Invitation has been cancelled or was already used"
+      predefined:
+        not_active: 'Invitation cannot be sent to a deactivated user'
     preview:
       cat_mh: "User preview is unavailable for CAT-MH sessions"
   user_sessions:
     errors:
+      already_finished: 'You cannot provide an answer for the finished session'
       previous_question: 'Previous question is unavailable for this type of session'
       scheduled_session: 'You cannot fill scheduled session before the set time'
   teams:
@@ -331,23 +337,6 @@ en:
       header: 'Welcome to CIAS'
       html_sub_body_part1: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
       html_sub_body_part2: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">A quick note: Every 30 days, you will be asked to authenticate your account<br> using a verification code sent to your email.</div>'
-    clear_data:
-      subject: 'Important notice regarding your data'
-      button: 'Go to the app'
-      header: 'Your data will be deleted soon'
-      footnote: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:12px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
-      participant:
-        body: "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\"> Your responses and generated reports within this intervention will be permanently deleted within <span style='color:#C866EA;'>%{number_of_days}</span> days from today.<br /><br />If you wish to retain a copy of these reports for your records, we kindly request that you log in to the app and download the aforementioned reports before the deletion takes place.<br/><br/>We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
-      third_party:
-        body: "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\">Your generated reports within this intervention will be permanently deleted within <span style='color:#C866EA;'>%{number_of_days}</span> days from today.<br /><br/>If you wish to retain a copy of these reports for your records, we kindly request that you log in to the app and download the aforementioned reports before the deletion takes place.<br /><br />We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
-    data_removed:
-      subject: 'Important notice regarding your data'
-      header: 'Your data has been deleted'
-      footnote: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:12px;line-height:24px;text-align:center;color:#2F3850;">If you have any questions or concerns while using CIAS,<br>please contact the person or group that referred you.<br /><br /></div>'
-      participant:
-        body: "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\"> Your responses and generated reports within this intervention are permanently deleted.<br /><br /><br/><br/>We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
-      third_party:
-        body:  "For privacy and security reasons intervention owner of the <span style='color:#C866EA;'>%{intervention_name}</span> study, which you were part of, has triggered action of removing all sensitive data associated with this intervention.<br /><br /><div style=\"font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;font-weight:normal;\">Your generated reports within this intervention are permanently deleted.<br /><br/>We appreciate your understanding and apologize for any inconvenience this may cause.</div>"
   navigator_mailer:
     invitation:
       subject: "Welcome to the navigator role in CIAS!"

@@ -49,6 +49,11 @@ class ReportTemplate < ApplicationRecord
     translate_attribute('summary', summary, translator, source_language_name_short, destination_language_name_short)
   end
 
+  def translate_fax_attributes(translator, source_language_name_short, destination_language_name_short)
+    translate_attribute('cover_letter_sender', cover_letter_sender, translator, source_language_name_short, destination_language_name_short)
+    translate_attribute('cover_letter_description', cover_letter_description, translator, source_language_name_short, destination_language_name_short)
+  end
+
   def translate_name(translator, source_language_name_short, destination_language_name_short)
     translate_attribute('name', name, translator, source_language_name_short, destination_language_name_short)
   end

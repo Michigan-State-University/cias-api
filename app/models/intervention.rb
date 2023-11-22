@@ -27,6 +27,8 @@ class Intervention < ApplicationRecord
   has_many :navigators, through: :intervention_navigators, source: :user
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
+  has_many :predefined_user_parameters, dependent: :destroy
+  has_many :predefined_users, through: :predefined_user_parameters, source: :user
 
   has_many :collaborators, dependent: :destroy, inverse_of: :intervention
   belongs_to :current_editor, class_name: 'User', optional: true
@@ -199,6 +201,15 @@ class Intervention < ApplicationRecord
 
   def translate_additional_text(translator, source_language_name_short, destination_language_name_short)
     translate_attribute('additional_text', additional_text, translator, source_language_name_short, destination_language_name_short)
+  end
+
+  def translate_logo_description(translator, source_language_name_short, destination_language_name_short)
+    return unless logo.attached?
+
+    original_text['image_alt'] = logo_blob.description
+
+    new_value = translator.translate(logo_blob.description, source_language_name_short, destination_language_name_short)
+    logo_blob.update!(description: new_value)
   end
 
   def translate_sessions(translator, source_language_name_short, destination_language_name_short)
