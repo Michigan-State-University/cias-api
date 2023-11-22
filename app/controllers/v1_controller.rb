@@ -8,6 +8,7 @@ class V1Controller < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_paper_trail_whodunnit
+  before_action :block_deactivated_account
 
   def current_v1_user
     @current_v1_user ||= super
@@ -43,6 +44,12 @@ class V1Controller < ApplicationController
 
   def current_ability
     @current_ability ||= current_v1_user.ability
+  end
+
+  def block_deactivated_account
+    return unless signed_in?
+
+    raise CanCan::AccessDenied, I18n.t('users.deactivated') unless current_v1_user.active
   end
 
   def invalidate_cache(obj)

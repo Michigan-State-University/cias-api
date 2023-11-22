@@ -63,6 +63,8 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
       request
     end
 
+    it_behaves_like 'deactivated account'
+
     it 'return correct status' do
       expect(response).to have_http_status(:ok)
     end
@@ -77,6 +79,10 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
 
     it 'user session has the "started" flag set to true' do
       expect(user_session.reload.started).to be true
+    end
+
+    it 'user intervention has correct status' do
+      expect(user_session.user_intervention.reload.status).to eq('in_progress')
     end
   end
 end

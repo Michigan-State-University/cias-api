@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :intervention do
-    user
+    user { create(:user, :researcher, :confirmed) }
     name { 'Intervention' }
     license_type { 'unlimited' }
     trait :published do
@@ -76,6 +76,14 @@ FactoryBot.define do
 
     trait :with_pdf_report do
       reports { [FactoryHelpers.upload_file('spec/fixtures/pdf/example_report.pdf', binary: true)] }
+    end
+
+    trait :with_predefined_participants do
+      after(:create) do |intervention|
+        create_list(:user, 5, :predefined_participant, :confirmed).each do |user|
+          user.predefined_user_parameter.update!(intervention_id: intervention.id)
+        end
+      end
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_08_30_041924) do
+ActiveRecord::Schema.define(version: 2023_10_12_092639) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-10-04 06:08:07'::timestamp without time zone)"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
@@ -577,51 +578,6 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
-  create_table "oauth_access_grants", force: :cascade do |t|
-    t.bigint "resource_owner_id"
-    t.bigint "application_id", null: false
-    t.string "token", null: false
-    t.integer "expires_in", null: false
-    t.text "redirect_uri", null: false
-    t.datetime "created_at", null: false
-    t.datetime "revoked_at"
-    t.string "scopes", default: "", null: false
-    t.index ["application_id"], name: "index_oauth_access_grants_on_application_id"
-    t.index ["resource_owner_id"], name: "index_oauth_access_grants_on_resource_owner_id"
-    t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true
-  end
-
-  create_table "oauth_access_tokens", force: :cascade do |t|
-    t.bigint "resource_owner_id"
-    t.bigint "application_id", null: false
-    t.string "token", null: false
-    t.string "refresh_token"
-    t.integer "expires_in"
-    t.datetime "revoked_at"
-    t.datetime "created_at", null: false
-    t.string "scopes"
-    t.string "previous_refresh_token", default: "", null: false
-    t.index ["application_id"], name: "index_oauth_access_tokens_on_application_id"
-    t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
-    t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
-    t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
-  end
-
-  create_table "oauth_applications", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "uid", null: false
-    t.string "secret", null: false
-    t.text "redirect_uri"
-    t.string "scopes", default: "", null: false
-    t.boolean "confidential", default: true, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.bigint "owner_id"
-    t.string "owner_type"
-    t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
-    t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
-  end
-
   create_table "organization_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "organization_id"
@@ -654,6 +610,21 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.uuid "navigator_setup_id"
     t.string "communication_way"
     t.index ["user_id"], name: "index_phones_on_user_id"
+  end
+
+  create_table "predefined_user_parameters", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "slug", null: false
+    t.uuid "user_id", null: false
+    t.uuid "intervention_id", null: false
+    t.uuid "health_clinic_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.boolean "auto_invitation", default: false, null: false
+    t.datetime "invitation_sent_at"
+    t.string "external_id"
+    t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
+    t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
+    t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"
   end
 
   create_table "question_groups", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -887,6 +858,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
+    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-04 06:08:07'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
     t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
@@ -924,10 +896,12 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
     t.boolean "started", default: false, null: false
+    t.boolean "multiple_fill", default: false, null: false
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-04 06:08:07'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
     t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end
@@ -990,6 +964,7 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
     t.boolean "quick_exit_enabled", default: false, null: false
     t.boolean "online", default: false, null: false
     t.uuid "hfhs_patient_detail_id"
+    t.boolean "email_autogenerated", default: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email_bidx"], name: "index_users_on_email_bidx", unique: true
     t.index ["hfhs_patient_detail_id"], name: "index_users_on_hfhs_patient_detail_id"
@@ -1051,9 +1026,10 @@ ActiveRecord::Schema.define(version: 2023_08_30_041924) do
   add_foreign_key "live_chat_navigator_setups", "interventions"
   add_foreign_key "live_chat_summoning_users", "interventions"
   add_foreign_key "live_chat_summoning_users", "users"
-  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
-  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
+  add_foreign_key "predefined_user_parameters", "health_clinics"
+  add_foreign_key "predefined_user_parameters", "interventions"
+  add_foreign_key "predefined_user_parameters", "users"
   add_foreign_key "question_groups", "sessions"
   add_foreign_key "questions", "question_groups"
   add_foreign_key "sessions", "cat_mh_languages"

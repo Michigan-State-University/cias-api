@@ -15,6 +15,8 @@ RSpec.describe Intervention, type: :model do
     it { should have_many(:conversations) }
     it { should have_many(:notifications) }
     it { should have_many(:collaborators) }
+    it { should have_many(:predefined_user_parameters) }
+    it { should have_many(:predefined_users).through(:predefined_user_parameters) }
     it { should belong_to(:google_language).optional }
     it { should be_valid }
     it { should have_many(:short_links).dependent(:destroy) }
@@ -33,6 +35,14 @@ RSpec.describe Intervention, type: :model do
       before do
         intervention.logo_blob.description = 'This is the description'
         intervention.translate(translator, source_language_name_short, destination_language_name_short)
+      end
+
+      it 'has correct value in the original text' do
+        expect(intervention.original_text['image_alt']).to eq 'This is the description'
+      end
+
+      it 'has correctly translated img description' do
+        expect(intervention.logo.description).to eq 'from=>en to=>pl text=>This is the description'
       end
 
       describe '#translation_prefix' do
@@ -281,6 +291,15 @@ RSpec.describe Intervention, type: :model do
         cloned_intervention = intervention.clone(params: params)
 
         expect(cloned_intervention.user).to eq(other_user)
+      end
+    end
+
+    context 'when intervention has logo' do
+      let(:intervention) { create(:intervention_with_logo) }
+      let(:cloned_intervention) { intervention.clone }
+
+      it 'logo was cloned' do
+        expect(cloned_intervention.logo.attached?).to be true
       end
     end
   end
