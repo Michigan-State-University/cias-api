@@ -915,7 +915,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_114839) do
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
-    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-04 06:08:07'::timestamp without time zone)"
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-04 06:08:07'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
     t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end
