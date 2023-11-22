@@ -19,6 +19,11 @@ RSpec.describe V1::UserSessions::CreateService do
       expect(subject.user_intervention.reload.status).to eql('in_progress')
     end
 
+    it 'user has the same language as intervention' do
+      subject
+      expect(user.reload.language_code).eql? intervention.language_code
+    end
+
     it 'instantiate user session' do
       expect(subject).to be_instance_of(UserSession::Classic)
     end
