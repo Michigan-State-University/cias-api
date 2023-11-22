@@ -14,14 +14,13 @@ class Interventions::RePublishJob < ApplicationJob
 
     #SMSes
     user_session.each do |user_session|
-      user = user_session
+      user = user_session.user
       next unless user.sms_notification
       next unless user.phone.present? && user.phone.confirmed?
 
       sms_service =V1::SmsPlans::ScheduleSmsForUserSession.new(user_session)
       user_session.session.sms_plans.limit_to_types('SmsPlan::Normal').each do |plan|
         next unless sms_service.send(:can_run_plan?, plan)
-
         #check if plan.schedule is correct, we don't want to run "after session end"
 
       end
