@@ -84,6 +84,10 @@ module SmsHelper
     @phone_answer ||= user_session.answers.find_by(type: 'Answer::Phone')
   end
 
+  def session
+    @session ||= user_session.session
+  end
+
   def time_ranges_defined_by_user
     @time_ranges_defined_by_user = phone_answer&.migrated_body&.dig('data', 0, 'value', 'time_ranges')
   end

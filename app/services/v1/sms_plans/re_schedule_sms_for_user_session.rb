@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::SmsPlans::ReScheduleSmsForUserSession
+  include ::SmsHelper
   include Rails.application.routes.url_helpers
 
   def self.call(user_session)
@@ -43,7 +44,7 @@ class V1::SmsPlans::ReScheduleSmsForUserSession
   end
 
   def paused_at
-    @paused_at ||= intervention.paused_at
+    @paused_at ||= session.intervention.paused_at
   end
 
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
@@ -78,7 +79,8 @@ class V1::SmsPlans::ReScheduleSmsForUserSession
   end
 
   def send_sms(start_time, content, attachment_url = nil)
-    SmsPlans::SendSmsJob.set(wait_until: (start_time + offset.days)).perform_later(user.phone.full_number, content, attachment_url, user.id, false, user_session.session_id)
+    SmsPlans::SendSmsJob.set(wait_until: (start_time + offset.days)).perform_later(user.phone.full_number, content, attachment_url, user.id, false,
+                                                                                   user_session.session_id)
   end
 
   def offset

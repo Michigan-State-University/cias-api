@@ -26,10 +26,6 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   attr_reader :user_session
 
-  def session
-    @session ||= user_session.session
-  end
-
   def execute_plans_for(type)
     session.sms_plans.limit_to_types(type).each do |plan|
       next unless can_run_plan?(plan)

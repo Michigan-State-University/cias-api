@@ -11,14 +11,14 @@ class Interventions::RePublishJob < ApplicationJob
 
   private
 
-  def send_scheduled_invitation_from_past(user_session, intervention)
-    user_session.where(scheduled_at: intervention.paused_at..DateTime.now).each do |user_session|
+  def send_scheduled_invitation_from_past(user_sessions, intervention)
+    user_sessions.where(scheduled_at: intervention.paused_at..DateTime.now).each do |user_session|
       user_session.session.send_link_to_session(user_session.user, user_session.health_clinic)
     end
   end
 
-  def reschedule_canceled_smses(user_session)
-    user_session.each do |user_session|
+  def reschedule_canceled_smses(user_sessions)
+    user_sessions.each do |user_session|
       V1::SmsPlans::ReScheduleSmsForUserSession.call(user_session)
     end
   end
