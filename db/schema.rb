@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 2023_11_20_065841) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
-    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-10-25 05:30:04'::timestamp without time zone)"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-11-06 11:45:14'::timestamp without time zone)"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
@@ -402,6 +402,11 @@ ActiveRecord::Schema.define(version: 2023_11_20_065841) do
     t.string "phone_type_bidx"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
+  end
+
+  create_table "imported_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "intervention_accesses", force: :cascade do |t|
@@ -860,7 +865,7 @@ ActiveRecord::Schema.define(version: 2023_11_20_065841) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
-    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-25 05:30:04'::timestamp without time zone)"
+    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-11-06 11:45:14'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
     t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
@@ -903,7 +908,7 @@ ActiveRecord::Schema.define(version: 2023_11_20_065841) do
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
-    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-25 05:30:04'::timestamp without time zone) AND (multiple_fill IS FALSE))"
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-11-06 11:45:14'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
     t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end

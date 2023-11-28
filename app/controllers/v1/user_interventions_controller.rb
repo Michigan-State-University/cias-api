@@ -42,7 +42,7 @@ class V1::UserInterventionsController < V1Controller
     UserIntervention.joins(:intervention)
                     .accessible_by(current_ability)
                     .order(created_at: :desc)
-                    .where(intervention: { status: 'published' })
+                    .where(intervention: { status: %w[published paused] })
   end
 
   def user_intervention_params

@@ -9,10 +9,12 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
   let(:participant1) { create(:user, :confirmed, :participant) }
 
   let(:intervention) { create(:intervention, :published) }
+  let(:paused_intervention) { create(:intervention, :paused) }
   let!(:sessions) { create_list(:session, 5, intervention_id: intervention.id) }
 
   let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'completed') }
   let!(:user_interventions2) { create_list(:user_intervention, 3, intervention: intervention, status: 'in_progress') }
+  let!(:user_interventions3) { create_list(:user_intervention, 2, intervention: paused_intervention, status: 'in_progress') }
 
   let(:headers) { user.create_new_auth_token }
   let(:params) { {} }
@@ -24,7 +26,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
 
   context 'when user is admin' do
     it 'return data has correct size' do
-      expect(json_response['data'].size).to be(4)
+      expect(json_response['data'].size).to be(6)
     end
 
     it 'return correct data' do
@@ -44,6 +46,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'id' => intervention.id,
               'type' => intervention.type,
               'name' => intervention.name,
+              'status' => intervention.status,
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
@@ -67,6 +70,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'id' => intervention.id,
               'type' => intervention.type,
               'name' => intervention.name,
+              'status' => intervention.status,
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
@@ -90,6 +94,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'id' => intervention.id,
               'type' => intervention.type,
               'name' => intervention.name,
+              'status' => intervention.status,
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
@@ -112,7 +117,56 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
+              'status' => intervention.status,
               'name' => intervention.name,
+              'additional_text' => '',
+              'image_alt' => nil,
+              'logo_url' => nil,
+              'files' => [],
+              'live_chat_enabled' => false
+            }
+          }
+        },
+        {
+          'id' => user_interventions3[0].id,
+          'type' => 'user_intervention',
+          'attributes' => {
+            'blocked' => false,
+            'completed_sessions' => 0,
+            'status' => 'in_progress',
+            'sessions_in_intervention' => 0,
+            'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
+            'intervention' => {
+              'id' => paused_intervention.id,
+              'type' => paused_intervention.type,
+              'status' => paused_intervention.status,
+              'name' => paused_intervention.name,
+              'additional_text' => '',
+              'image_alt' => nil,
+              'logo_url' => nil,
+              'files' => [],
+              'live_chat_enabled' => false
+            }
+          }
+        },
+        {
+          'id' => user_interventions3[0].id,
+          'type' => 'user_intervention',
+          'attributes' => {
+            'blocked' => false,
+            'completed_sessions' => 0,
+            'status' => 'in_progress',
+            'sessions_in_intervention' => 0,
+            'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
+            'intervention' => {
+              'id' => paused_intervention.id,
+              'type' => paused_intervention.type,
+              'status' => paused_intervention.status,
+              'name' => paused_intervention.name,
               'additional_text' => '',
               'image_alt' => nil,
               'logo_url' => nil,
@@ -128,7 +182,8 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
       let!(:sessions) { create(:session, :multiple_times, intervention_id: intervention.id) }
 
       it 'inform that intervention contains multiple fill session' do
-        expect(json_response['data'][0]['attributes']).to include(
+        filtered_response = json_response['data'].select { |user_intervention| user_intervention['attributes']['intervention']['id'] == intervention.id }
+        expect(filtered_response[0]['attributes']).to include(
           {
             'blocked' => false,
             'completed_sessions' => 0,
@@ -144,7 +199,8 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'live_chat_enabled' => false,
               'logo_url' => nil,
               'name' => intervention.name,
-              'type' => 'Intervention'
+              'type' => 'Intervention',
+              'status' => intervention.status
             }
           }
         )
@@ -159,7 +215,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
       end
 
       it 'return correct collection size' do
-        expect(json_response['user_interventions_size']).to be(4)
+        expect(json_response['user_interventions_size']).to be(6)
       end
     end
   end
