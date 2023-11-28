@@ -11,7 +11,12 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
   let(:intervention) { create(:intervention, :published) }
   let!(:sessions) { create_list(:session, 5, intervention_id: intervention.id) }
 
+  let(:intervention_with_restriction) { create(:intervention, :published, shared_to: :invited) }
+  let!(:sessions_in_intervention_with_restriction) { create_list(:session, 2, intervention_id: intervention_with_restriction.id) }
+  let!(:intervention_access) { create(:intervention_access, intervention: intervention_with_restriction, email: participant1.email.upcase) }
+
   let!(:user_interventions1) { create(:user_intervention, intervention: intervention, user: participant1, status: 'completed') }
+  let!(:user_intervention3) { create(:user_intervention, intervention: intervention_with_restriction, user: participant1, status: 'in_progress') }
   let!(:user_interventions2) { create_list(:user_intervention, 3, intervention: intervention, status: 'in_progress') }
 
   let(:headers) { user.create_new_auth_token }
@@ -24,7 +29,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
 
   context 'when user is admin' do
     it 'return data has correct size' do
-      expect(json_response['data'].size).to be(4)
+      expect(json_response['data'].size).to be(5)
     end
 
     it 'return correct data' do
@@ -120,6 +125,29 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
               'live_chat_enabled' => false
             }
           }
+        },
+        {
+          'id' => user_intervention3.id,
+          'type' => 'user_intervention',
+          'attributes' => {
+            'blocked' => false,
+            'completed_sessions' => 0,
+            'status' => 'in_progress',
+            'sessions_in_intervention' => 2,
+            'last_answer_date' => nil,
+            'contain_multiple_fill_session' => false,
+            'health_clinic_id' => nil,
+            'intervention' => {
+              'id' => intervention_with_restriction.id,
+              'type' => intervention_with_restriction.type,
+              'name' => intervention_with_restriction.name,
+              'additional_text' => '',
+              'image_alt' => nil,
+              'logo_url' => nil,
+              'files' => [],
+              'live_chat_enabled' => false
+            }
+          }
         }
       )
     end
@@ -159,7 +187,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
       end
 
       it 'return correct collection size' do
-        expect(json_response['user_interventions_size']).to be(4)
+        expect(json_response['user_interventions_size']).to be(5)
       end
     end
   end
@@ -168,7 +196,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
     let(:user) { participant1 }
 
     it 'return correct data' do
-      expect(json_response['data'].size).to be(1)
+      expect(json_response['data'].size).to be(2)
     end
   end
 
@@ -182,7 +210,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
     let!(:user_interventions3) { create(:user_intervention, intervention: intervention_archived, user: participant1, status: 'ready_to_start') }
 
     it 'return only interventions which have published status' do
-      expect(json_response['data'].size).to be(1)
+      expect(json_response['data'].size).to be(2)
     end
   end
 end
