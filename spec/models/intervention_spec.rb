@@ -25,6 +25,29 @@ RSpec.describe Intervention, type: :model do
     it { expect(initial_status.draft?).to be true }
   end
 
+  describe 'callbacks' do
+    before do
+      ActiveJob::Base.queue_adapter = :test
+    end
+
+    let(:intervention) { create(:intervention) }
+
+    it 'enqueues PublishJob' do
+      intervention.update(status: 'published')
+      expect(Interventions::PublishJob).to have_been_enqueued.with(intervention.id)
+    end
+
+    it 'enqueues PauseJob' do
+      intervention.update(status: 'paused')
+      expect(Interventions::PauseJob).to have_been_enqueued.with(intervention.id)
+    end
+
+    it 'enqueues RePublishJob' do
+      intervention.update(status: 'published', paused_at: Time.current)
+      expect(Interventions::RePublishJob).to have_been_enqueued.with(intervention.id)
+    end
+  end
+
   describe 'instance methods' do
     describe 'translation' do
       let(:intervention) { create(:intervention_with_logo, name: 'New intervention') }

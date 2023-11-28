@@ -43,7 +43,7 @@ class V1::SmsPlans::ReScheduleSmsForUserSession
   end
 
   def paused_at
-    intervention.paused_at
+    @paused_at ||= intervention.paused_at
   end
 
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
@@ -75,5 +75,13 @@ class V1::SmsPlans::ReScheduleSmsForUserSession
 
   def should_be_send?(planed_time)
     planed_time.utc >= paused_at.utc
+  end
+
+  def send_sms(start_time, content, attachment_url = nil)
+    SmsPlans::SendSmsJob.set(wait_until: (start_time + offset.days)).perform_later(user.phone.full_number, content, attachment_url, user.id, false, user_session.session_id)
+  end
+
+  def offset
+    @offset ||= Time.zone.today.mjd - paused_at.to_date.mjd
   end
 end
