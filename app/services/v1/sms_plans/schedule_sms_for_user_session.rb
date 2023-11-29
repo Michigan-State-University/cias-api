@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::SmsPlans::ScheduleSmsForUserSession
+  include Rails.application.routes.url_helpers
   include ::SmsHelper
 
   def self.call(user_session)
