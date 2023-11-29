@@ -3,7 +3,7 @@
 RSpec.describe Interventions::RePublishJob, type: :job do
   subject { described_class.perform_now(intervention.id) }
 
-  let(:intervention) { create(:intervention, paused_at: 2.days.ago) }
+  let(:intervention) { create(:intervention, paused_at: 2.days.ago, status: :published) }
   let(:session) { create(:session, intervention: intervention) }
   let!(:user_session) { create(:user_session, scheduled_at: 1.day.ago, session: session) }
 
@@ -12,12 +12,9 @@ RSpec.describe Interventions::RePublishJob, type: :job do
   end
 
   it 'cancel timeout job' do
-    # TODO: fix this test
-    # allow(UserSession).to receive(:where).and_return([user_session])
-    # allow(user_session).to receive(:session).and_return(session)
-    # allow(user_session).to receive(:user).and_return(user_session.user)
-    # allow(user_session).to receive(:health_clinic).and_return(user_session.health_clinic)
-    expect(session).to receive(:send_link_to_session).with(user_session.user, user_session.health_clinic)
+    expect_to_call_mailer(SessionMailer, :inform_to_an_email,
+                          args: [session, user_session.user.email, nil],
+                          params: { locale: 'en' })
     subject
   end
 
