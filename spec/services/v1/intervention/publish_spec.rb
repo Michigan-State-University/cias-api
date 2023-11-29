@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe V1::Intervention::Publish do
   let!(:intervention) { create(:intervention, published_at: nil) }
   let!(:session) { create(:session, intervention: intervention) }
+  let!(:session_with_autoclose) { create(:session, intervention: intervention, autoclose_enabled: true, autoclose_at: autoclose_at) }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
   let!(:preview_session_user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
@@ -15,12 +16,14 @@ RSpec.describe V1::Intervention::Publish do
   let!(:third_session) { create(:session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload) }
   let(:schedule) { 'after_fill' }
   let(:schedule_at) { Date.current + 10.days }
+  let(:autoclose_at) { Date.current + 20.days }
   let(:schedule_payload) { 7 }
   let(:days_after_payload) { 5 }
   let(:instance) { instance_double(described_class) }
 
   before do
     Timecop.freeze
+    ActiveJob::Base.queue_adapter = :test
   end
 
   after do
@@ -32,6 +35,11 @@ RSpec.describe V1::Intervention::Publish do
       allow(instance).to receive(:calculate_days_after_schedule)
       allow(instance).to receive(:timestamp_published_at)
       described_class.new(intervention).execute
+    end
+
+    it 'schedule autoclose jobs' do
+      described_class.new(intervention).execute
+      expect(SessionJobs::AutocloseSessionJob).to have_been_enqueued.at(autoclose_at).with(session_with_autoclose.id)
     end
 
     it 'sets correct publish at timestamp' do
