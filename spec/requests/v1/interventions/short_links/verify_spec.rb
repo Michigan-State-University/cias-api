@@ -95,6 +95,20 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     }
   end
 
+  context 'when intervention is paused' do
+    let(:intervention) { create(:intervention, :paused, user: researcher) }
+
+    before do
+      request
+    end
+
+    it { expect(response).to have_http_status(:bad_request) }
+
+    it {
+      expect(json_response).to include({ 'message' => 'Intervention is not available', 'details' => { 'reason' => 'INTERVENTION_PAUSED' } })
+    }
+  end
+
   context 'quest without access' do
     let(:user) { create(:user, :guest, :confirmed) }
     let(:intervention) { create(:intervention, :published, user: researcher, shared_to: 'registered') }
