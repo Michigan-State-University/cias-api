@@ -19,6 +19,7 @@ class V1::Interventions::LogosController < V1Controller
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
     intervention_load.logo_blob&.update!(description: intervention_params[:alt])
+    intervention_load.touch
     render json: serialized_response(intervention_load, 'Intervention')
   end
 
