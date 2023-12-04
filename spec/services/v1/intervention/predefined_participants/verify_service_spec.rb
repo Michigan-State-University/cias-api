@@ -116,7 +116,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
     context 'multiple-fill session is finished but next session is already started' do
       let(:second_user_session) do
         create(:user_session, session: predefined_user_parameters.intervention.sessions.order(:position).second, user: predefined_participant,
-                              user_intervention: user_intervention)
+                              user_intervention: user_intervention, started: true)
       end
 
       before do

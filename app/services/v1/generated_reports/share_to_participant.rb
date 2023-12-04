@@ -22,10 +22,10 @@ class V1::GeneratedReports::ShareToParticipant
     return unless participant.email_notification
 
     if participant.confirmed?
-      GeneratedReportMailer.new_report_available(participant.email).deliver_now
+      GeneratedReportMailer.with(locale: user_session.session.language_code).new_report_available(participant.email).deliver_now
     else
       SendNewReportNotificationJob.set(wait: 30.seconds)
-        .perform_later(participant.email)
+        .perform_later(participant.email, user_session.session.language_code)
     end
   end
 

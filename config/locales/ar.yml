@@ -1,0 +1,79 @@
+ar:
+  hello: مرحبًا %{full_name}!
+  question:
+    finish:
+      subtitle: '<p>أدخل النص الرئيسي للشاشة هنا</p><p><br></p><p><em>ملاحظة: هذه هي الشاشة الأخيرة التي سيشاهدها المشاركون في هذه الجلسة</em></p>'
+      text_to_speech: 'أدخل النص الرئيسي للشاشة هنا. هذه هي الشاشة الأخيرة التي سيراها المشاركون في هذه الجلسة'
+      title: '<h2>أدخل العنوان هنا</h2>'
+  generated_report_mailer:
+    new_report_available:
+      subject: "التقارير الجديدة في النظام جاهزة لك"
+      header: "التقارير الجديدة في النظام جاهزة لك"
+      body: "لديك %{number_of_generated_reports} تقرير(ت) جديدة(جديد) متاحة(متاح) للتنزيل في لوحة القيادة الخاصة بك. انقر على الرابط أدناه لزيارة لوحة القيادة الخاصة بك."
+      button_text: قم بزيارة لوحة التحكم
+  session_mailer:
+    grant_access_to_a_user:
+      subject: لقد حصلت على حق الوصول والجلسة متاحة للانتهاء!
+      body: لقد حصلت على حق الوصول إلى الجلسة %{session_name}. الرجاء الضغط على الرابط لملء الجلسة.
+      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+    inform_to_an_email:
+      subject: لقد تمت دعوتك لإكمال الجلسة.
+      body: لقد تمت دعوتك لإكمال %{session_name}. الرجاء الضغط على الرابط للحصول على مزيد من المعلومات.
+      header: دعوة CIAS
+      html_body: 'لقد تمت دعوتك لإكمال جلسة <span style="color: #c866ea;">%{session_name}</span>.'
+      session_scheduled: 'سيكون الوصول إلى هذه الجلسة متاحًا بدءًا من %{date}'
+      before_button_text: 'انقر فوق الزر أدناه للوصول.'
+      button_text: اذهب إلى الجلسة
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+    invite_to_session_and_registration:
+      subject: دعوة CIAS
+      body: لقد تمت دعوتك لإكمال %{session_name}. الرجاء الضغط على الرابط للحصول على مزيد من المعلومات.
+      header: دعوة CIAS
+      html_body_invitation_part: 'لقد تمت دعوتك لإكمال جلسة <span style="color: #c866ea;">%{session_name}</span>.'
+      html_body_information_part: "للوصول إلى هذه الجلسة، ستحتاج أولاً إلى إنشاء حساب CIAS بمجرد الانتهاء من هذه العملية، سترى الجلسة. إذا كانت لديك أسئلة حول هذه العملية، فيرجى الاتصال بالشخص أو المجموعة المرتبطة بهذه الجلسة والتي أحالتك."
+      button_text: "هيا بنا نبدأ"
+      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
+      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
+  intervention_mailer:
+    inform_to_an_email:
+      subject: لقد تمت دعوتك لإكمال التدخل.
+      body: لقد تمت دعوتك لإكمال %{intervention_name}. الرجاء الضغط على الرابط للحصول على مزيد من المعلومات.
+      header: دعوة CIAS
+      html_body: 'لقد تمت دعوتك لإكمال %{intervention_name}</ br /><br>انقر فوق الزر أدناه للوصول.'
+      button_text: انتقل إلى التدخل
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/invite"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
+    invite_to_intervention_and_registration:
+      subject: دعوة CIAS
+      body: لقد تمت دعوتك لإكمال %{intervention_name}. الرجاء الضغط على الرابط للحصول على مزيد من المعلومات.
+      header: CIAS Invitation
+      html_body_information_part: "للوصول إلى هذا التدخل، ستحتاج أولاً إلى إنشاء حساب CIAS، وبمجرد الانتهاء من هذه العملية سترى التدخل. إذا كانت لديك أسئلة حول هذه العملية، فيرجى الاتصال بالشخص أو المجموعة المرتبطة بهذا التدخل والتي أحالك."
+      html_body_invitation_part: "لقد تمت دعوتك لإكمال <span style='color: #c866ea;'>%{intervention_name}</span>."
+      button_text: "هيا بنا نبدأ"
+      invitation_link: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}"
+      invitation_link_from_clinic: "%{domain}/register?intervention_id=%{intervention_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}"
+  user_mailer:
+    send_verification_login_code:
+      subject: التحقق من هويتك في CIAS
+      header: التحقق من هويتك في CIAS
+      body_first_paragraph: لقد قمت مؤخرًا بتسجيل الدخول إلى CIAS من متصفح أو تطبيق لا نتعرف عليه أو أن آخر عملية تحقق أجريتها كانت قبل أكثر من 30 يومًا.
+      body_second_paragraph: لضمان أمان حسابك، نحتاج إلى التحقق من هويتك. أدخل الكود التالي عندما يطلب منك CIAS.
+      verification_code: 'رمز التحقق: %{verification_code}'
+    welcome_email:
+      button_text: هيا بنا نبدأ
+      dashboard_link: "%{web_url}/login"
+      subject: مرحبا بكم في CIAS
+      html_body: "لقد قمت بإنشاء حساب %{role} بنجاح!<br />يمكنك استخدام الرابط أدناه في أي وقت للوصول إلى لوحة معلومات التدخل الخاصة بك."
+      html_sub_body: '<div style="font-family:DM Sans, Helvetica, Arial;font-size:14px;line-height:24px;text-align:center;color:#2F3850;">ملاحظة سريعة: سيُطلب منك كل 30 يومًا مصادقة حسابك باستخدام رمز التحقق الذي يتم إرساله إلى بريدك الإلكتروني.<br /><br />إذا كانت لديك أية أسئلة أو استفسارات أثناء استخدام CIAS، فيرجى الاتصال بالشخص أو المجموعة التي أحالك.</div>'
+      header: مرحبا بكم في CIAS
+  mailer:
+    subject:
+      generic_invitation: دعوة CIAS
+    footnote:
+      not_reply: '<br /><br />الرجاء عدم الرد على هذا البريد الإلكتروني، فهو لا يقبل الرسائل الواردة. إذا كنت بحاجة إلى مساعدة بشأن هذا البرنامج، فيرجى الاتصال بالشخص أو المجموعة التي أحالك إلى هذا الموقع. شكرًا لك!'
+      ignore_mail_msg: "<br /><br />إذا لم تطلب ذلك، فيرجى تجاهل هذا البريد الإلكتروني.<br /><br /> يرجى عدم الرد على هذا البريد الإلكتروني، لأنه لا يقبل الرسائل الواردة. إذا كنت بحاجة إلى مساعدة بشأن هذا البرنامج، فيرجى الاتصال بالشخص أو المجموعة التي أحالك إلى هذا الموقع. شكرًا لك!"
+      not_reply_with_email: "إذا لم تطلب ذلك، يرجى تجاهل هذه الرسالة الإلكترونية.<br />الرجاء عدم الرد على هذا البريد الإلكتروني، فهو لا يقبل الرسائل الواردة.<br />يمكنك الوصول إلينا مباشرة على  <a href=\"mailto:cias@msu.edu\" style=\"color: #107969; font-weight: 700\">cias@msu.edu</a>.شكرًا لك!<br />"
+  phone_verification: "رمز التحقق CIAS الخاص بك هو: %{verification_code}"
