@@ -108,6 +108,36 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
             end
           end
 
+          context 'when user skips the question but has confirmed phone' do
+            let!(:phone_answer) do
+              create(:answer_phone, user_session: user_session, skipped: true,
+                                    body: {
+                                      'data' => [
+                                        {
+                                          'var' => '',
+                                          'value' => ''
+                                        }
+                                      ]
+                                    })
+            end
+
+            let(:start_of_range) do
+              Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 11 }).utc }
+            end
+            let(:end_of_range) do
+              Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 12 }).utc }
+            end
+
+            it 'send sms for 5 days between 12 and 17 (default range) after the session ends' do
+              clear_enqueued_jobs
+              subject
+              scheduled_at = ActiveJob::Base.queue_adapter.enqueued_jobs.last[:at]
+
+              expect(SmsPlans::SendSmsJob).to have_been_enqueued
+              expect(scheduled_at).to be_between(start_of_time_range, end_of_time_range)
+            end
+          end
+
           context 'when user defined preferable time ranges' do
             let!(:phone_answer) do
               create(:answer_phone, user_session: user_session,

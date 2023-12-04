@@ -31,8 +31,8 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
 
       it 'JSON response contains proper attributes' do
         logo_url = polymorphic_url(intervention.reload.logo).sub('http://www.example.com/', '')
-        expect(json_response['data']['attributes']).to include(
-          'logo_url' => include(logo_url)
+        expect(json_response['data']['attributes']['logo']).to include(
+          'url' => include(logo_url)
         )
       end
     end

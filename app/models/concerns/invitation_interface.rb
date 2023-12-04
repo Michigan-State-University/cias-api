@@ -9,9 +9,9 @@ module InvitationInterface
     [existing_emails, non_existing_emails]
   end
 
-  def invite_non_existing_users(emails, skip_invitation = false, roles = [:participant])
+  def invite_non_existing_users(emails, skip_invitation = false, roles = [:participant], language_code = 'en')
     emails.each do |email|
-      User.invite!(email: email, roles: roles) { |user| user.skip_invitation = skip_invitation }
+      User.invite!(email: email, roles: roles, language_code: language_code) { |user| user.skip_invitation = skip_invitation }
     end
   end
 end

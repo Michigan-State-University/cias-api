@@ -33,9 +33,12 @@ class V1::GeneratedReports::ShareToThirdParty
 
       num_of_generated_reports = number_of_generated_reports[user.email]
       if user.confirmed?
-        GeneratedReportMailer.new_report_available(user.email, num_of_generated_reports).deliver_now if num_of_generated_reports.positive?
+        if num_of_generated_reports.positive?
+          GeneratedReportMailer.with(locale: user_session.session.language_code)
+                               .new_report_available(user.email, num_of_generated_reports).deliver_now
+        end
       else
-        SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email, num_of_generated_reports)
+        SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email, num_of_generated_reports, locale: user_session.session.language_code)
       end
     end
   end

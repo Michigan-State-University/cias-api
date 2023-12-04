@@ -37,6 +37,8 @@ class Intervention < ApplicationRecord
   has_many_attached :files # files for the participant added in modular intervention
   has_one_attached :logo, dependent: :purge_later
 
+  has_one_attached :exported_data, dependent: :purge_later
+
   has_many :short_links, as: :linkable, dependent: :destroy
 
   has_one :logo_attachment, -> { where(name: 'logo') }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
@@ -49,6 +51,8 @@ class Intervention < ApplicationRecord
 
   attribute :shared_to, :string, default: 'anyone'
   attribute :original_text, :json, default: { additional_text: '' }
+
+  delegate :language_code, to: :google_language
 
   validates :name, :shared_to, presence: true
   validate :cat_sessions_validation, if: :published?
@@ -116,7 +120,7 @@ class Intervention < ApplicationRecord
 
     if shared_to != 'anyone'
       existing_users_emails, non_existing_users_emails = split_emails_exist(emails)
-      invite_non_existing_users(non_existing_users_emails, true)
+      invite_non_existing_users(non_existing_users_emails, true, [:participant], language_code)
     end
 
     if shared_to_invited?

@@ -18,7 +18,8 @@ class V1::Interventions::LogosController < V1Controller
     return render status: :method_not_allowed if intervention_published?
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    intervention_load.logo_blob&.update!(description: intervention_params[:image_alt])
+    intervention_load.logo_blob&.update!(description: intervention_params[:alt])
+    intervention_load.touch # rubocop:disable Rails/SkipsModelValidations
     render json: serialized_response(intervention_load, 'Intervention')
   end
 
@@ -40,7 +41,7 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   def intervention_params
-    params.require(:logo).permit(:file, :image_alt)
+    params.require(:logo).permit(:file, :alt)
   end
 
   def intervention_published?

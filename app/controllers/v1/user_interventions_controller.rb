@@ -22,7 +22,7 @@ class V1::UserInterventionsController < V1Controller
       health_clinic_id: health_clinic_id
     )
 
-    current_v1_user.update!(quick_exit_enabled: intervention_load.quick_exit)
+    current_v1_user.update!(quick_exit_enabled: intervention_load.quick_exit, language_code: user_intervention.intervention.language_code)
 
     render json: serialized_response(user_intervention)
   end

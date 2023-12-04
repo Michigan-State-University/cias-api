@@ -9,7 +9,8 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
     create(:session,
            intervention: create(:intervention,
                                 intervention_locations: [create(:intervention_location,
-                                                                clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD'))]))
+                                                                clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD',
+                                                                                                          external_name: 'brukowa'))]))
   end
 
   let(:headers) { user.create_new_auth_token }
