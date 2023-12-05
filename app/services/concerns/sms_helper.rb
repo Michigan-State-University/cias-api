@@ -75,11 +75,6 @@ module SmsHelper
     @user ||= user_session.user
   end
 
-  def timezone
-    timezone_defined_by_user = phone_answer&.migrated_body&.dig('data', 0, 'value', 'timezone').to_s
-    ActiveSupport::TimeZone[timezone_defined_by_user].present? ? timezone_defined_by_user : Phonelib.parse(phone.full_number).timezone
-  end
-
   def phone_answer
     @phone_answer ||= user_session.answers.find_by(type: 'Answer::Phone')
   end
