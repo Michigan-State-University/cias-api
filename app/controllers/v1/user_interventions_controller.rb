@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::UserInterventionsController < V1Controller
+  before_action :validate_intervention_status, only: %i[create]
   def index
     collection = user_intervention_scope
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
@@ -22,7 +23,7 @@ class V1::UserInterventionsController < V1Controller
       health_clinic_id: health_clinic_id
     )
 
-    current_v1_user.update!(quick_exit_enabled: intervention_load.quick_exit, language_code: user_intervention.intervention.language_code)
+    current_v1_user.update!(quick_exit_enabled: intervention.quick_exit, language_code: user_intervention.intervention.language_code)
 
     render json: serialized_response(user_intervention)
   end
@@ -33,7 +34,7 @@ class V1::UserInterventionsController < V1Controller
     user_intervention_scope.find(params[:id])
   end
 
-  def intervention_load
+  def intervention
     Intervention.find(intervention_id)
   end
 
@@ -41,7 +42,7 @@ class V1::UserInterventionsController < V1Controller
     UserIntervention.joins(:intervention)
                     .accessible_by(current_ability)
                     .order(created_at: :desc)
-                    .where(intervention: { status: 'published' })
+                    .where(intervention: { status: %w[published paused] })
   end
 
   def user_intervention_params

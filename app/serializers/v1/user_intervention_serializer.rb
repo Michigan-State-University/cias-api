@@ -24,6 +24,7 @@ class V1::UserInterventionSerializer < V1Serializer
     {
       name: object.intervention.name,
       type: object.intervention.type,
+      status: object.intervention.status,
       additional_text: object.intervention.additional_text,
       logo_url: object.intervention.logo.attached? ? url_for(object.intervention.logo) : nil,
       image_alt: object.intervention.logo_blob.present? ? object.intervention.logo_blob.description : nil,

@@ -15,7 +15,32 @@ RSpec.describe 'POST /v1/predefined_participants/verify', type: :request do
 
   it 'when the slug is correct but intervention is draft' do
     request
-    expect(response).to have_http_status(:forbidden)
+    expect(response).to have_http_status(:bad_request)
+    expect(json_response).to include({ 'message' => 'Intervention is not available', 'details' => { 'reason' => 'INTERVENTION_DRAFT' } })
+  end
+
+  context 'when intervention is paused' do
+    before do
+      user.predefined_user_parameter.intervention.update!(status: :paused)
+    end
+
+    it 'returns correct status and error message' do
+      request
+      expect(response).to have_http_status(:bad_request)
+      expect(json_response).to include({ 'message' => 'Intervention is not available', 'details' => { 'reason' => 'INTERVENTION_PAUSED' } })
+    end
+  end
+
+  context 'when intervention is closed/archived' do
+    before do
+      user.predefined_user_parameter.intervention.update!(status: :closed)
+    end
+
+    it 'returns correct status and error message' do
+      request
+      expect(response).to have_http_status(:bad_request)
+      expect(json_response).to include({ 'message' => 'Intervention is not available', 'details' => { 'reason' => 'INTERVENTION_CLOSED' } })
+    end
   end
 
   context 'when intervention is published' do

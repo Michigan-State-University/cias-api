@@ -14,6 +14,8 @@ RSpec.describe 'POST /v1/user_interventions', type: :request do
 
   let(:request) { post v1_user_interventions_path, headers: user.create_new_auth_token, params: params }
 
+  it_behaves_like 'paused intervention'
+
   context 'when auth' do
     context 'is invalid' do
       let(:request) { post v1_user_interventions_path }
