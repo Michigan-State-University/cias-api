@@ -7,6 +7,7 @@ class SessionScheduleJob < ApplicationJob
     user_intervention = UserIntervention.find_by(id: user_intervention_id)
 
     return if user_intervention.blank?
+    return if user_intervention.intervention.paused?
 
     user_intervention.update!(status: :in_progress)
 

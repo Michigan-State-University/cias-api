@@ -93,7 +93,13 @@ class Intervention < ApplicationRecord
   def status_change
     return unless saved_change_to_attribute?(:status)
 
-    ::Interventions::PublishJob.perform_later(id) if status == 'published'
+    if published? && paused_at.present?
+      ::Interventions::RePublishJob.perform_later(id)
+    elsif published?
+      ::Interventions::PublishJob.perform_later(id)
+    elsif paused?
+      ::Interventions::PauseJob.perform_later(id)
+    end
   end
 
   def hf_access_change
