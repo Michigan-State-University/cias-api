@@ -9,11 +9,17 @@ RSpec.describe 'PATCH  /v1/user_sessions/:user_session_id/quick_exit', type: :re
   let(:status) { :published }
   let(:intervention) { create(:intervention, user: researcher, status: status, shared_to: shared_to) }
   let(:session) { create(:session, intervention: intervention) }
-  let(:user_session) { create(:user_session, user: participant) }
+  let(:user_session) { create(:user_session, user: participant, session: session) }
   let(:headers) { participant.create_new_auth_token }
   let(:request) { patch v1_user_session_quick_exit_path(user_session.id), headers: headers }
 
   before { request }
+
+  context 'when the intervention is paused' do
+    let(:user) { researcher }
+
+    it_behaves_like 'paused intervention'
+  end
 
   context 'when user want to quick exit form own user session' do
     it 'update correct field' do

@@ -46,6 +46,7 @@ en:
               body: 'Unfortunately, something went wrong while downloading the CAT-MH questions. Please try again or contact the researcher who sent this session to you.'
               button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
+            status_transition: 'You cannot change status from %{current_status} to %{new_status}.'
             collaborators:
               data_access: "Only owner can change 'data_access' parameter"
         user:
@@ -98,6 +99,7 @@ en:
   interventions:
     invitations:
       wrong_intervention_type: "Wrong type of the invitation for selected object"
+    paused: 'Intervention is paused for some reason. During that time no one can take part in the study'
     fixed_order:
       wrong_sharing_target: "Fixed order interventions can only be shared to registered participants (Got %{shared_to})"
     flexible_order:

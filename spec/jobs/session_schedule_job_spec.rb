@@ -20,6 +20,16 @@ RSpec.describe SessionScheduleJob, type: :job do
     described_class.new.perform(session_id, user_id, nil, user_intervention_id)
   end
 
+  context 'when intervention is paused' do
+    before do
+      session.intervention.update!(status: 'paused')
+    end
+
+    it 'not send a link when intervention is published' do
+      expect(session).not_to receive(:send_link_to_session)
+    end
+  end
+
   context 'user session timeout body' do
     context 'with correct session and user id' do
       it 'calls finish on perform' do
