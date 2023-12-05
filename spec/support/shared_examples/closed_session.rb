@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.shared_examples 'closed session' do
-  let!(:intervention) { create(:intervention, :paused, user_id: user.id) }
+  let!(:intervention) { create(:intervention, user_id: user.id) }
   let!(:session) { create(:session, intervention: intervention, autoclose_enabled: true, autoclose_at: (DateTime.now - 2.days)) }
 
   before { request }
