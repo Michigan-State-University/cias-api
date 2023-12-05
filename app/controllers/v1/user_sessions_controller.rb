@@ -25,6 +25,7 @@ class V1::UserSessionsController < V1Controller
   end
 
   def show_or_create
+    validate_session_status
     user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
@@ -83,6 +84,10 @@ class V1::UserSessionsController < V1Controller
     user_session_params[:session_id]
   end
 
+  def session
+    @session ||= Session.find(session_id)
+  end
+
   def user_session_id
     params[:user_session_id]
   end
@@ -108,5 +113,11 @@ class V1::UserSessionsController < V1Controller
 
   def user_id
     current_v1_user_or_guest_user.id
+  end
+
+  def validate_session_status
+    return unless session.autoclose_enabled
+
+    raise ComplexException.new(I18n.t('sessions.closed'), { reason: 'SESSION_CLOSED' }, :bad_request) if Time.zone.now > session.autoclose_at
   end
 end
