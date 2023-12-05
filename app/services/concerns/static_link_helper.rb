@@ -23,9 +23,10 @@ module StaticLinkHelper
   end
 
   def multiple_fill_session_available(user_intervention)
+    # require 'pry'; binding.pry
     finished_multiple_fill_user_sessions = UserSession.joins(:session).where(user_intervention: user_intervention,
                                                                              session: { multiple_fill: true }).where.not(finished_at: nil)
-    user_sessions_in_progress = UserSession.where(user_intervention: user_intervention, finished_at: nil)
+    user_sessions_in_progress = UserSession.where(user_intervention: user_intervention, finished_at: nil, started: true)
 
     finished_multiple_fill_user_sessions.any? && user_sessions_in_progress.blank?
   end

@@ -17,7 +17,7 @@ class V1::UserInterventionSerializer < V1Serializer
   end
 
   attribute :blocked do |object|
-    object.intervention.shared_to_invited? && object.intervention.intervention_accesses.pluck(:email).exclude?(object.user.email)
+    object.intervention.shared_to_invited? && object.intervention.intervention_accesses.pluck(:email).map(&:downcase).exclude?(object.user.email)
   end
 
   attribute :intervention do |object|

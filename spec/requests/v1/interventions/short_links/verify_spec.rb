@@ -157,6 +157,68 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     }
   end
 
+  context 'sequential intervention with finished session (multiple-fill)' do
+    let(:intervention) { create(:intervention, :published, user: researcher) }
+    let!(:session1) { create(:session, intervention: intervention, position: 1, multiple_fill: true) }
+    let!(:session2) { create(:session, intervention: intervention, position: 2) }
+    let!(:user_intervention) { create(:user_intervention, intervention: intervention, user: participant) }
+    let!(:user_session) { create(:user_session, user_intervention: user_intervention, user: participant, session: session1, finished_at: DateTime.now) }
+
+    context 'only first session is finished' do
+      before do
+        request
+      end
+
+      it { expect(response).to have_http_status(:ok) }
+
+      it {
+        expect(json_response['data'].symbolize_keys).to include({
+                                                                  intervention_id: intervention.id,
+                                                                  health_clinic_id: nil,
+                                                                  session_id: session2.id,
+                                                                  multiple_fill_session_available: true,
+                                                                  user_intervention_id: user_intervention.id
+                                                                })
+      }
+    end
+
+    context 'next session is created but not started' do
+      let!(:user_session2) { create(:user_session, user_intervention: user_intervention, user: participant, session: session2) }
+
+      before do
+        request
+      end
+
+      it {
+        expect(json_response['data'].symbolize_keys).to include({
+                                                                  intervention_id: intervention.id,
+                                                                  health_clinic_id: nil,
+                                                                  session_id: session2.id,
+                                                                  multiple_fill_session_available: true,
+                                                                  user_intervention_id: user_intervention.id
+                                                                })
+      }
+    end
+
+    context 'when second session is started' do
+      let!(:user_session2) { create(:user_session, user_intervention: user_intervention, user: participant, session: session2, started: true) }
+
+      before do
+        request
+      end
+
+      it {
+        expect(json_response['data'].symbolize_keys).to include({
+                                                                  intervention_id: intervention.id,
+                                                                  health_clinic_id: nil,
+                                                                  session_id: session2.id,
+                                                                  multiple_fill_session_available: false,
+                                                                  user_intervention_id: user_intervention.id
+                                                                })
+      }
+    end
+  end
+
   context 'sequential module intervention with sessions' do
     let(:intervention) { create(:flexible_order_intervention, :published, user: researcher) }
     let!(:session) { create(:session, intervention: intervention) }

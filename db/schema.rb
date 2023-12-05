@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_20_065841) do
+ActiveRecord::Schema.define(version: 2023_11_29_073515) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -745,6 +745,8 @@ ActiveRecord::Schema.define(version: 2023_11_20_065841) do
     t.boolean "multiple_fill", default: false, null: false
     t.boolean "autofinish_enabled", default: false, null: false
     t.integer "autofinish_delay", default: 1440, null: false
+    t.boolean "autoclose_enabled", default: false
+    t.datetime "autoclose_at"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
