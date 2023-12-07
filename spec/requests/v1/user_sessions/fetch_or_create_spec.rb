@@ -54,6 +54,8 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
 
   it_behaves_like 'paused intervention'
 
+  it_behaves_like 'closed session'
+
   context 'exists' do
     let!(:user_int) { create(:user_intervention, intervention: intervention, user: user, status: 'in_progress') }
     let!(:user_session) { create(:user_session, user: user, session: session, user_intervention: user_int) }
