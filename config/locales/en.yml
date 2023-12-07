@@ -108,6 +108,7 @@ en:
       index:
         csv: The request to send the CSV file has been successfully created. We will soon send an email to you with the request status.
   sessions:
+    closed: 'You try to fill session after the time defined by researcher'
     sms_alerts:
       no_data_provided: "No personal data provided"
       no_first_name_provided: "First name not provided"
