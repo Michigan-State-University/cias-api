@@ -66,6 +66,14 @@ FactoryBot.define do
       end
     end
 
+    trait :with_mania_test_type_and_variables do
+      after(:build) do |session|
+        test_type = create(:cat_mh_test_type, name: 'Mania/Hypomania', short_name: 'm/hm')
+        test_type.cat_mh_test_attributes << CatMhTestAttribute.create(name: 'severity', variable_type: 'number', range: '0-100')
+        session.cat_mh_test_types << test_type
+      end
+    end
+
     trait :with_cat_mh_info do
       after(:build) do |session|
         language = CatMhLanguage.create(language_id: 1, name: 'English')

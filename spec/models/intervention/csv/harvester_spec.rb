@@ -9,7 +9,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
   describe '#collect_data' do
     context 'when session is Session::CatMh' do
       let!(:intervention) { create(:intervention) }
-      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, intervention: intervention) }
+      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, :with_mania_test_type_and_variables, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
       let!(:answer_body1) do
         {
@@ -31,15 +31,26 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           ]
         }
       end
+      let!(:answer_body3) do
+        {
+          'data' => [
+            {
+              'var' => 'm/hm_severity',
+              'value' => '7.8'
+            }
+          ]
+        }
+      end
       let!(:answer1) { create(:answer_cat_mh, body: answer_body1, user_session: user_session) }
       let!(:answer2) { create(:answer_cat_mh, body: answer_body2, user_session: user_session) }
+      let!(:answer3) { create(:answer_cat_mh, body: answer_body3, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
         expect(subject.header).to eq [:user_id, :email, "#{session.variable}.dep_severity", "#{session.variable}.dep_precision",
-                                      "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
-                                      "#{session.variable}.metadata.session_duration"]
-        expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', '2', user_session.created_at, nil, nil]]
+                                      "#{session.variable}.mhm_severity", "#{session.variable}.metadata.session_start",
+                                      "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+        expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', '2', '7.8', user_session.created_at, nil, nil]]
       end
     end
 
