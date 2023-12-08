@@ -20,7 +20,7 @@ class Session::CatMh < Session
   def fetch_variables(filter_options = {})
     cat_mh_test_types.map do |type|
       target_attrs = filter_options[:only_digit_variables] ? type.cat_mh_test_attributes.where(variable_type: 'number') : type.cat_mh_test_attributes
-      variable_names = target_attrs.map { |var| "#{type.short_name}_#{var.name}" }
+      variable_names = target_attrs.map { |var| "#{type.short_name.tr('/', '')}_#{var.name}" }
       {
         subtitle: type.name,
         variables: variable_names
