@@ -16,7 +16,7 @@ class HfhsPatientDetail < ApplicationRecord
 
   has_many :users, dependent: :nullify
 
-  validates :patient_id, :first_name, :last_name, :sex, :zip_code, :dob, :phone_number, presence: true
+  validates :patient_id, presence: true
 
   enum phone_type: { home: 'home', mobile: 'mobile', work: 'work' }
 end

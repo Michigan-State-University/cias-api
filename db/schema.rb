@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_21_114839) do
+ActiveRecord::Schema.define(version: 2023_12_11_092832) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_114839) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
-    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-10-25 05:30:04'::timestamp without time zone)"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "(created_at > '2023-12-11 09:18:12'::timestamp without time zone)"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
@@ -382,12 +382,12 @@ ActiveRecord::Schema.define(version: 2023_11_21_114839) do
 
   create_table "hfhs_patient_details", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "patient_id_ciphertext"
-    t.string "first_name_ciphertext", null: false
-    t.string "last_name_ciphertext", null: false
-    t.string "dob_ciphertext", null: false
-    t.string "sex_ciphertext", null: false
+    t.string "first_name_ciphertext"
+    t.string "last_name_ciphertext"
+    t.string "dob_ciphertext"
+    t.string "sex_ciphertext"
     t.string "visit_id_ciphertext", default: ""
-    t.string "zip_code_ciphertext", default: "", null: false
+    t.string "zip_code_ciphertext", default: ""
     t.string "patient_id_bidx"
     t.string "first_name_bidx"
     t.string "last_name_bidx"
@@ -878,7 +878,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_114839) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
-    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-25 05:30:04'::timestamp without time zone)"
+    t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-12-11 09:18:12'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
     t.index ["user_id"], name: "index_user_interventions_on_user_id"
   end
@@ -921,7 +921,7 @@ ActiveRecord::Schema.define(version: 2023_11_21_114839) do
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
-    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-25 05:30:04'::timestamp without time zone) AND (multiple_fill IS FALSE))"
+    t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-12-11 09:18:12'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
     t.index ["user_intervention_id"], name: "index_user_sessions_on_user_intervention_id"
   end

@@ -62,7 +62,7 @@ RSpec.describe V1::HenryFord::VerifyService do
       )
     end
 
-    it 'create a new record' do
+    it 'raise exception' do
       expect { subject }.to raise_error(EpicOnFhir::NotFound)
     end
   end
