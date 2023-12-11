@@ -77,7 +77,14 @@ FactoryBot.define do
                                                   visit_id: '',
                                                   phone_number: Faker::PhoneNumber.cell_phone,
                                                   phone_type: 'home',
-                                                  zip_code: '48127').id
+                                                  zip_code: '48127',
+                                                  provided_first_name: user.first_name,
+                                                  provided_last_name: user.last_name,
+                                                  provided_dob: (DateTime.now - 20.years).to_s,
+                                                  provided_sex: 'F',
+                                                  provided_phone_number: Faker::PhoneNumber.cell_phone,
+                                                  provided_phone_type: 'home',
+                                                  provided_zip: '48127').id
         user.update(hfhs_patient_detail_id: hfhs_detail_id)
       end
     end

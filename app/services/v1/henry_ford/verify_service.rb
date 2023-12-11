@@ -63,6 +63,8 @@ class V1::HenryFord::VerifyService
   end
 
   def parsed_dob
+    return if dob.blank?
+
     Date.parse(dob).strftime('%Y-%m-%d')
   end
 

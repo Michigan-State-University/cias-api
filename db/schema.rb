@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_11_21_114839) do
+ActiveRecord::Schema.define(version: 2023_12_11_092832) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -382,12 +382,12 @@ ActiveRecord::Schema.define(version: 2023_11_21_114839) do
 
   create_table "hfhs_patient_details", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "patient_id_ciphertext"
-    t.string "first_name_ciphertext", null: false
-    t.string "last_name_ciphertext", null: false
-    t.string "dob_ciphertext", null: false
-    t.string "sex_ciphertext", null: false
+    t.string "first_name_ciphertext"
+    t.string "last_name_ciphertext"
+    t.string "dob_ciphertext"
+    t.string "sex_ciphertext"
     t.string "visit_id_ciphertext", default: ""
-    t.string "zip_code_ciphertext", default: "", null: false
+    t.string "zip_code_ciphertext", default: ""
     t.string "patient_id_bidx"
     t.string "first_name_bidx"
     t.string "last_name_bidx"
