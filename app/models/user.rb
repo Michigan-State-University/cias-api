@@ -194,7 +194,9 @@ class User < ApplicationRecord
   end
 
   def with_invalid_email?
-    (roles & %w[guest preview_session predefined_participant]).any?
+    return email.blank? if roles.include?('predefined_participant')
+
+    (roles & %w[guest preview_session]).any?
   end
 
   def cache_key

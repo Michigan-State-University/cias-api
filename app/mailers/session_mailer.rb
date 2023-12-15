@@ -12,6 +12,7 @@ class SessionMailer < ApplicationMailer
     @email = email
     @health_clinic = health_clinic
     @scheduled_at = scheduled_at
+    @link_to_session = link_to_session(session, health_clinic, email)
 
     mail(to: @email, subject: I18n.t('session_mailer.inform_to_an_email.subject'))
   end
@@ -25,5 +26,36 @@ class SessionMailer < ApplicationMailer
     @invitation_token = @user.raw_invitation_token
 
     mail(to: @email, subject: I18n.t('session_mailer.invite_to_session_and_registration.subject'))
+  end
+
+  private
+
+  def link_to_session(session, health_clinic, email)
+    user = User.find_by(email: email)
+    return "#{ENV['WEB_URL']}/usr/#{user.predefined_user_parameter.slug}" if user&.roles&.include?('predefined_participant')
+
+    if session.intervention.shared_to_anyone?
+      (if health_clinic.nil?
+         I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone',
+                domain: ENV['WEB_URL'], session_id: session.id,
+                intervention_id: session.intervention_id)
+       else
+         I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
+                domain: ENV['WEB_URL'], session_id: session.id,
+                intervention_id: session.intervention_id,
+                health_clinic_id: health_clinic.id)
+       end)
+    else
+      (if health_clinic.nil?
+         I18n.t('session_mailer.inform_to_an_email.invitation_link',
+                domain: ENV['WEB_URL'],
+                intervention_id: session.intervention_id, session_id: session.id)
+       else
+         I18n.t('session_mailer.inform_to_an_email.invitation_link_from_clinic',
+                domain: ENV['WEB_URL'],
+                intervention_id: session.intervention_id, session_id: session.id,
+                health_clinic_id: health_clinic.id)
+       end)
+    end
   end
 end
