@@ -148,7 +148,7 @@ class Intervention < ApplicationRecord
     return if emails.empty?
 
     InterventionAccess.transaction do
-      emails.each { |email| InterventionAccess.create!(intervention_id: id, email: email) }
+      emails.each { |email| InterventionAccess.create!(intervention_id: id, email: email.downcase) }
     end
   end
 
