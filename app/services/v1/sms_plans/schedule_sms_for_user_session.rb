@@ -190,7 +190,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def timezone
-    timezone_defined_by_user = phone_answer&.migrated_body&.dig('data', 0, 'value', 'timezone').to_s
+    timezone_defined_by_user = value_provided_by_the_user.present? ? value_provided_by_the_user['timezone'].to_s : ''
     ActiveSupport::TimeZone[timezone_defined_by_user].present? ? timezone_defined_by_user : Phonelib.parse(phone.full_number).timezone
   end
 
@@ -199,7 +199,15 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def time_ranges_defined_by_user
-    @time_ranges_defined_by_user = phone_answer&.migrated_body&.dig('data', 0, 'value', 'time_ranges')
+    @time_ranges_defined_by_user ||= if value_provided_by_the_user.present?
+                                       value_provided_by_the_user['time_ranges']
+                                     else
+                                       ''
+                                     end
+  end
+
+  def value_provided_by_the_user
+    @value_provided_by_the_user ||= phone_answer&.migrated_body&.dig('data', 0, 'value')
   end
 
   def random_time

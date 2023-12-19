@@ -128,7 +128,7 @@ class Import::Basic::InterventionService
 
     scope.joins(:question_group)
              .where(question_group: { position: location[:question_group_position], session_id: question_in_scope.question_group.session.id })
-             .find_by!(position: location[:object_position])&.id
+             .find_by(position: location[:object_position])&.id
   end
 
   def create_notification!

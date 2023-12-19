@@ -22,7 +22,7 @@ en:
     tlfb:
       title: TLFB Study Group
   predefined_participant:
-    invitation: "You have been invited to complete %{intervention_name} intervention. Click the link to access: %{link}"
+    invitation: "Hello! Please click the link below to begin or continue your progress on %{intervention_name} %{link}"
   channels:
     collaboration:
       intervention:
@@ -130,6 +130,11 @@ en:
     invitations:
       accepted: "You've successfully joined team %{team_name}."
       not_found: "Team Invitation not found"
+  short_link:
+    error:
+      not_available: 'Intervention is not available'
+      only_registered: 'Interventions can only be completed by a registered user'
+      only_invited: 'Interventions can only be completed by a invited user'
   team_mailer:
     invite_user:
       subject:      You've been invited to the Team
@@ -179,8 +184,9 @@ en:
   backup_mailer:
     result:
       subject: Your CIAS Intervention is ready to download!
-      body: Your Intervention is ready to download!
-      header: File with your intervention structure has been generated successfully. You can find it in the attachment in this e-mail. You can download it, store on your computer, and import it to the CIAS application anytime.
+      header: Your Intervention is ready to download!
+      body: The intervention structure file has been successfully generated. To access it, simply click the "Download intervention" button below. Once downloaded, you can store it on your computer and import it into the CIAS application at your convenience.
+      button: Download intervention
   import_mailer:
     result:
       subject: CIAS Intervention Import
@@ -373,3 +379,4 @@ en:
         not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
         not_found: "Insufficient information for further processing."
+  phone_verification: "Your CIAS verification code is: %{verification_code}"

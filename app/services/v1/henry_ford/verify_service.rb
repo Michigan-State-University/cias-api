@@ -34,7 +34,37 @@ class V1::HenryFord::VerifyService
     end
   end
 
+  def epic_first_name
+    @patient[:entry][0][:resource][:name][0][:given][0]
+  end
+
+  def epic_last_name
+    @patient[:entry][0][:resource][:name][0][:family]
+  end
+
+  def epic_sex
+    @patient[:entry][0][:resource][:gender][0].upcase
+  end
+
+  def epic_phone_number
+    @patient[:entry][0][:resource][:telecom][0][:value]
+  end
+
+  def epic_phone_type
+    @patient[:entry][0][:resource][:telecom][0][:use]
+  end
+
+  def epic_zip_code
+    @patient[:entry][0][:resource][:address].detect { |address| address[:use].eql?('home') }&.dig(:postalCode) || zip_code
+  end
+
+  def epic_dob
+    @patient[:entry][0][:resource][:birthDate]
+  end
+
   def parsed_dob
+    return if dob.blank?
+
     Date.parse(dob).strftime('%Y-%m-%d')
   end
 
@@ -60,7 +90,7 @@ class V1::HenryFord::VerifyService
 
     visit_id = appointment&.dig(:resource, :identifier, 0, :value)
 
-    location_id = available_locations.where("LOWER(CONCAT(department, ' ', name)) LIKE ?",
+    location_id = available_locations.where("LOWER(CONCAT(department, ' ', external_name)) LIKE ?",
                                             appointment
                                               .dig(:resource, :participant)
                                               .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
@@ -73,13 +103,20 @@ class V1::HenryFord::VerifyService
   def create_or_find_resource!
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,
-      first_name: first_name,
-      last_name: last_name,
-      dob: Date.parse(dob),
-      gender: sex,
-      zip: zip_code,
-      phone_type: phone_type,
-      phone_number: phone_number
+      first_name: epic_first_name,
+      last_name: epic_last_name,
+      dob: Date.parse(epic_dob),
+      gender: epic_sex,
+      zip_code: epic_zip_code,
+      phone_type: epic_phone_type,
+      phone_number: epic_phone_number,
+      provided_first_name: first_name,
+      provided_last_name: last_name,
+      provided_dob: dob,
+      provided_gender: sex,
+      provided_zip: zip_code,
+      provided_phone_type: phone_type,
+      provided_phone_number: phone_number
     )
     resource.update!(visit_id: hfhs_visit_id)
   end
@@ -118,7 +155,7 @@ class V1::HenryFord::VerifyService
   end
 
   def intervention_locations
-    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.name}".downcase }
+    @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.external_name}".downcase.lstrip }
   end
 
   def available_locations

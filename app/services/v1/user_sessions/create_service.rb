@@ -10,6 +10,7 @@ class V1::UserSessions::CreateService < V1::UserSessions::BaseService
 
     @user_intervention.in_progress!
 
+    User.find(user_id).update!(language_code: @user_intervention.intervention.language_code)
     new_user_session_for(:new, number_of_attempts)
   end
 end
