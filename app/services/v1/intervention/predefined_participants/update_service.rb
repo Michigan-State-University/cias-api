@@ -30,7 +30,7 @@ class V1::Intervention::PredefinedParticipants::UpdateService
   end
 
   def predefined_user_parameters
-    params.except(:first_name, :last_name, :active, :email, :phone_attributes)
+    params.except(:first_name, :last_name, :active, :email, :phone_attributes, :email_notification, :sms_notification)
   end
 
   def health_clinic_id

@@ -65,7 +65,8 @@ Rails.application.routes.draw do
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
         resources :predefined_participants do
-          post 'send_invitation', on: :member
+          post 'send_sms_invitation', on: :member
+          post 'send_email_invitation', on: :member
         end
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy] do
