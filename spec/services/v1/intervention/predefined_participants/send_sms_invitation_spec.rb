@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe V1::Intervention::PredefinedParticipants::SendInvitation do
+RSpec.describe V1::Intervention::PredefinedParticipants::SendSmsInvitation do
   let(:subject) { described_class.call(user) }
   let(:intervention) { create(:intervention, :with_predefined_participants) }
   let!(:user) { intervention.predefined_users.first }

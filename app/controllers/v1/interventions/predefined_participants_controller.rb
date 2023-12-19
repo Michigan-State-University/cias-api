@@ -46,12 +46,13 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def send_sms_invitation
-    V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_participant)
+    V1::Intervention::PredefinedParticipants::SendSmsInvitation.call(predefined_participant)
     render json: predefined_participant.predefined_user_parameter.reload.slice(:sms_invitation_sent_at), status: :ok
   end
 
   def send_email_invitation
-
+    V1::Intervention::PredefinedParticipants::SendEmailInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:email_invitation_sent_at), status: :ok
   end
 
   private

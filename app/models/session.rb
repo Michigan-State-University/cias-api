@@ -132,7 +132,7 @@ class Session < ApplicationRecord
     return if !intervention.published? || user.sms_notification.blank?
     return if user.phone.blank? || (!user.phone.confirmed? && user.roles.exclude?('predefined_participant'))
 
-    content = I18n.t('sessions.reminder', intervention_name: intervention.name, link: ::V1::Session::Link.call(self, health_clinic, user.email))
+    content = I18n.t('sessions.reminder', intervention_name: intervention.name, link: ::V1::SessionOrIntervention::Link.call(self, health_clinic, user.email))
     sms = Message.create(phone: user.phone.full_number, body: content)
     Communication::Sms.new(sms.id).send_message
   end
