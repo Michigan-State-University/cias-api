@@ -7,7 +7,7 @@ class V1::PredefinedParticipantSerializer < V1Serializer
     object.phone.as_json(only: %i[iso prefix number confirmed])
   end
 
-  %i[slug auto_invitation invitation_sent_at health_clinic_id external_id].each do |attr|
+  %i[slug auto_invitation sms_invitation_sent_at email_invitation_sent_at health_clinic_id external_id].each do |attr|
     attribute attr do |object|
       object.predefined_user_parameter.send(attr)
     end
