@@ -65,7 +65,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_user_parameters
     params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, :external_id, :email,
-                                            phone_attributes: %i[iso prefix number])
+                                            :sms_notification, :email_notification, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load

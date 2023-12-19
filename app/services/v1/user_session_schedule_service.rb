@@ -46,7 +46,7 @@ class V1::UserSessionScheduleService
   end
 
   def days_after_fill_schedule(next_session)
-    schedule_until(DateTime.now + next_session.schedule_payload.days, next_session)
+    schedule_until(DateTime.now + next_session.schedule_payload.seconds, next_session)
   end
 
   def exact_date_schedule(next_session)

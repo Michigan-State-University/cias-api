@@ -13,6 +13,15 @@ class SessionScheduleJob < ApplicationJob
 
     session = Session.find_by(id: session_id)
     user = User.find_by(id: user_id)
-    session&.send_link_to_session(user, health_clinic) if user
+
+    return unless user
+
+    if user.roles.include?('predefined_participant')
+      settings = user.predefined_user_parameter
+      session&.send_sms_to_session(user, health_clinic) if settings.sms_notification
+      return unless settings.email_notification
+    end
+
+    session&.send_link_to_session(user, health_clinic)
   end
 end
