@@ -83,7 +83,11 @@ class V1::UserSessionsController < V1Controller
   end
 
   def session_id
-    user_session_params[:session_id]
+    if params[:action] == 'show'
+      params[:session_id]
+    else
+      user_session_params[:session_id]
+    end
   end
 
   def user_session_id
