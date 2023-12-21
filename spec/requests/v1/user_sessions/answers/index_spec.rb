@@ -32,6 +32,8 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
         it 'returns correct response code' do
           expect(response).to have_http_status(:ok)
         end
+
+        it_behaves_like 'paused intervention'
       end
     end
   end

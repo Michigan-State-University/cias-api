@@ -9,7 +9,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
   describe '#collect_data' do
     context 'when session is Session::CatMh' do
       let!(:intervention) { create(:intervention) }
-      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, intervention: intervention) }
+      let(:session) { create(:cat_mh_session, :with_test_type_and_variables, :with_mania_test_type_and_variables, intervention: intervention) }
       let!(:user_session) { create(:user_session, user: user, session: session) }
       let!(:answer_body1) do
         {
@@ -31,15 +31,26 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           ]
         }
       end
+      let!(:answer_body3) do
+        {
+          'data' => [
+            {
+              'var' => 'm/hm_severity',
+              'value' => '7.8'
+            }
+          ]
+        }
+      end
       let!(:answer1) { create(:answer_cat_mh, body: answer_body1, user_session: user_session) }
       let!(:answer2) { create(:answer_cat_mh, body: answer_body2, user_session: user_session) }
+      let!(:answer3) { create(:answer_cat_mh, body: answer_body3, user_session: user_session) }
 
       it 'save every variables and scores to csv' do
         subject.collect
         expect(subject.header).to eq [:user_id, :email, "#{session.variable}.dep_severity", "#{session.variable}.dep_precision",
-                                      "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
-                                      "#{session.variable}.metadata.session_duration"]
-        expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', '2', user_session.created_at, nil, nil]]
+                                      "#{session.variable}.mhm_severity", "#{session.variable}.metadata.session_start",
+                                      "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+        expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', '2', '7.8', user_session.answers.first.created_at, nil, nil]]
       end
     end
 
@@ -77,7 +88,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.answers.first.created_at, nil,
+                                       nil]]
         end
 
         context 'set correct order based on question group position' do
@@ -109,7 +121,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_2", "#{session.variable}.test",
                                           "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                           "#{session.variable}.metadata.session_duration"]
-            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '2', '1', answer.user_session.created_at, nil, nil]]
+            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '2', '1', answer.user_session.answers.first.created_at,
+                                         nil, nil]]
           end
         end
       end
@@ -151,7 +164,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2",
                                         "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                         "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', '2', answer.user_session.created_at, nil,
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', '2', answer.created_at, nil,
                                        nil]]
         end
       end
@@ -184,7 +197,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1',
+                                       answer.user_session.answers.first.created_at, nil, nil]]
         end
       end
 
@@ -214,7 +228,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1, answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1, answer.user_session.answers.first.created_at, nil, nil]]
         end
       end
 
@@ -259,7 +273,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.test_2",
                                         "#{session.variable}.metadata.session_start", "#{session.variable}.metadata.session_end",
                                         "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email, '1', '2', answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email, '1', '2',
+                                       answer.user_session.answers.first.created_at, nil, nil]]
         end
       end
 
@@ -292,7 +307,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_1", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1, answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 1, answer.created_at, nil, nil]]
         end
       end
 
@@ -324,7 +339,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.site", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, true, answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, true,
+                                       answer.user_session.answers.first.created_at, nil, nil]]
         end
       end
 
@@ -354,8 +370,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.date", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12', answer.user_session.created_at,
-                                       nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2012-12-12',
+                                       answer.user_session.answers.first.created_at, nil, nil]]
         end
       end
 
@@ -386,7 +402,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.phone", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
           expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '{provided_number => +48123123123}',
-                                       answer.user_session.created_at, nil, nil]]
+                                       answer.user_session.answers.first.created_at, nil, nil]]
         end
 
         context 'with selected time ranges' do
@@ -414,7 +430,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                           "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
             expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s,
                                          '{provided_number => +48123123123, selected_time_ranges => [{"from"=>7, "to"=>9, "label"=>"early_morning"}], timezone => Europe/Warsaw}',
-                                         answer.user_session.created_at, nil, nil]]
+                                         answer.user_session.answers.first.created_at, nil, nil]]
           end
           # rubocop:enable Layout/LineLength
         end
@@ -446,7 +462,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.currency", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD', answer.user_session.created_at, nil,
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '1000 USD', answer.created_at, nil,
                                        nil]]
         end
       end
@@ -514,7 +530,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
               answer1.user_session.user_id.to_s,
               answer1.user_session.user.email.to_s,
               '1', nil, nil, { 'name' => 'John', 'phonetic_name' => 'John' },
-              answer1.user_session.created_at, nil, nil
+              answer1.created_at, nil, nil
             ]
           ]
         end
@@ -541,7 +557,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
           expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email,
                                        { 'value' => 'test@tes.com', 'numeric_value' => '1', 'report_template' => ['report_name'] },
-                                       answer.user_session.created_at, nil, nil]]
+                                       answer.user_session.answers.first.created_at, nil, nil]]
         end
       end
 
@@ -599,8 +615,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         it 'save the values into one row' do
           subject.collect
           expect(subject.rows.size).to eq 1
-          expect(subject.rows).to eq [[answer2.user_session.user_id.to_s, answer2.user_session.user.email.to_s, '1', answer.user_session.created_at, nil, nil,
-                                       '3', answer2.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer2.user_session.user_id.to_s, answer2.user_session.user.email.to_s, '1', answer.created_at, nil, nil,
+                                       '3', answer2.created_at, nil, nil]]
         end
       end
 
@@ -631,7 +647,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 888, answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, 888, answer.created_at, nil, nil]]
         end
       end
 
@@ -650,14 +666,15 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         let!(:answer) { create(:answer_single, question: question, skipped: true, user_session: user_session) }
 
         before do
-          user_session.update!(finished_at: user_session.created_at + 5.hours)
+          user_session.update!(finished_at: answer.created_at + 5.hours)
         end
 
         it 'correctly shows an end date & session duration' do
           subject.collect
           expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[user_session.user.id, user_session.user.email, 888, user_session.created_at, user_session.finished_at, '05:00:00']]
+          expect(subject.rows).to eq [[user_session.user.id, user_session.user.email, 888, user_session.answers.first.created_at, user_session.finished_at,
+                                       '05:00:00']]
         end
 
         context 'when more than 1 session is finished' do
@@ -690,14 +707,14 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           end
           let(:expected_rows) do
             [
-              [user.id, user.email, 888, user_session1.created_at, user_session1.finished_at, '05:00:00', 888, user_session2.created_at,
-               user_session2.finished_at, '06:50:40']
+              [user.id, user.email, 888, user_session1.answers.first.created_at, user_session1.finished_at, '05:00:00', 888,
+               user_session2.answers.first.created_at, user_session2.finished_at, '06:50:40']
             ]
           end
 
           before do
-            user_session1.update!(finished_at: user_session1.created_at + 5.hours)
-            user_session2.update!(finished_at: user_session2.created_at + 6.hours + 50.minutes + 40.seconds)
+            user_session1.update!(finished_at: user_session1.answers.first.created_at + 5.hours)
+            user_session2.update!(finished_at: user_session2.answers.first.created_at + 6.hours + 50.minutes + 40.seconds)
           end
 
           it 'correctly shows end dates & durations' do
@@ -950,7 +967,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                         "#{session.variable}.approach_number_1.metadata.session_start",
                                         "#{session.variable}.approach_number_1.metadata.session_end",
                                         "#{session.variable}.approach_number_1.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.answers.first.created_at, nil,
+                                       nil]]
         end
 
         context 'when number of attempts is empty' do
@@ -962,7 +980,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                           "#{session.variable}.approach_number_1.metadata.session_start",
                                           "#{session.variable}.approach_number_1.metadata.session_end",
                                           "#{session.variable}.approach_number_1.metadata.session_duration"]
-            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.answers.first.created_at, nil,
+                                         nil]]
           end
         end
       end
@@ -992,7 +1011,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                                   patient_details.dob, patient_details.sex, patient_details.zip_code, patient_details.phone_number,
                                                   patient_details.phone_type, patient_details.first_name, patient_details.last_name,
                                                   patient_details.dob, patient_details.sex, patient_details.zip_code, patient_details.phone_number,
-                                                  patient_details.phone_type, user_session.created_at, nil, nil)
+                                                  patient_details.phone_type, user_session.answers.first.created_at, nil, nil)
           end
 
           context 'unfinished user_session - without assigned hfhs_user_detail' do
@@ -1009,7 +1028,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                                 "#{session.variable}.metadata.session_duration")
 
               expect(subject.rows.first).to include(user.id, user.email, nil, nil, nil,
-                                                    nil, nil, nil, nil, nil, nil, nil, nil, nil, user_session.created_at, nil, nil)
+                                                    nil, nil, nil, nil, nil, nil, nil, nil, nil, user_session.answers.first.created_at, nil, nil)
             end
           end
         end
@@ -1041,7 +1060,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
             subject.collect
             expect(subject.header).to eq [:user_id, :email, "#{session.variable}.test_hf", "#{session.variable}.metadata.session_start",
                                           "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.created_at, nil, nil]]
+            expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.answers.first.created_at, nil,
+                                         nil]]
           end
         end
       end

@@ -160,9 +160,9 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
   end
 
   context 'CAT-MH sessions' do
-    let(:cat_mh_session) { create(:cat_mh_session, :with_test_type_and_variables, :with_cat_mh_info) }
+    let(:cat_mh_session) { create(:cat_mh_session, :with_test_type_and_variables, :with_mania_test_type_and_variables, :with_cat_mh_info) }
     let(:expected_cat_vars) do
-      cat_mh_session.cat_mh_test_types.flat_map { |type| type.cat_mh_test_attributes.map { |var| "#{type.short_name}_#{var.name}" } }
+      cat_mh_session.cat_mh_test_types.flat_map { |type| type.cat_mh_test_attributes.map { |var| "#{type.short_name.tr('/', '')}_#{var.name}" } }
     end
     let(:expected_cat_titles) do
       cat_mh_session.cat_mh_test_types.map(&:name)
@@ -193,20 +193,25 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
       end
     end
 
-    it_behaves_like 'correct CAT-MH session', 2
+    it_behaves_like 'correct CAT-MH session', 3
 
     context 'digit only' do
       let(:params) { { only_digit_variables: true } }
       let(:expected_cat_vars) do
         cat_mh_session.cat_mh_test_types.
-          flat_map { |type| type.cat_mh_test_attributes.filter { |var| var.variable_type == 'number' }.map { |var| "#{type.short_name}_#{var.name}" } }
+          flat_map do |type|
+          only_numeric_variables = type.cat_mh_test_attributes.filter do |var|
+            var.variable_type == 'number'
+          end
+          only_numeric_variables.map { |var| "#{type.short_name.tr('/', '')}_#{var.name}" }
+        end
       end
 
       let(:request) do
         get v1_fetch_variables_path(id: cat_mh_session.id), headers: headers, params: params
       end
 
-      it_behaves_like 'correct CAT-MH session', 2
+      it_behaves_like 'correct CAT-MH session', 3
     end
   end
 end

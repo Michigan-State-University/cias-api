@@ -59,6 +59,11 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions/:id', type: :req
             expect(json_response['data']['attributes']['autofinish_enabled']).to eq false
             expect(json_response['data']['attributes']['autofinish_delay']).to eq 1440
           end
+
+          it 'keys responsible for autoclose with default value' do
+            expect(json_response['data']['attributes']['autoclose_enabled']).to eq false
+            expect(json_response['data']['attributes']['autoclose_at']).to eq nil
+          end
         end
       end
     end
