@@ -25,7 +25,7 @@ class V1::UserSessionScheduleService
 
     send("#{next_session.schedule}_schedule", next_session)
 
-    next_user_session.finish if next_session.autoclose_at.past?
+    next_user_session.finish if next_session.autoclose_at&.past?
   end
 
   def create_next_user_session(next_session)
