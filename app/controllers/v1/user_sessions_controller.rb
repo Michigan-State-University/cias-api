@@ -15,6 +15,7 @@ class V1::UserSessionsController < V1Controller
   end
 
   def show
+    validate_session_status
     authorize! :read, UserSession
 
     user_session = V1::UserSessions::FetchService.call(params[:session_id], current_v1_user.id, params[:health_clinic_id])
