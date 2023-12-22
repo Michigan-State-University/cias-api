@@ -14,6 +14,9 @@ FactoryBot.define do
     trait :archived do
       status { 'archived' }
     end
+    trait :paused do
+      status { 'paused' }
+    end
     shared_to { 'anyone' }
 
     trait :with_navigator_setup do

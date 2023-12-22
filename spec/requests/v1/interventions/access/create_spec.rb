@@ -63,5 +63,23 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/accesses', type: :reques
         it { expect(response).to have_http_status(:created) }
       end
     end
+
+    context 'new email' do
+      let!(:emails) { ['exAMPle@test.com'] }
+
+      before { request }
+
+      it 'returns correct HTTP status (Created)' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'returns correct response data amount' do
+        expect(json_response['data'].size).to eq 1
+      end
+
+      it 'returns correct response data' do
+        expect(intervention.reload.intervention_accesses.map(&:email)).to match_array ['example@test.com']
+      end
+    end
   end
 end

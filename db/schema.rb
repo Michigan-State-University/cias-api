@@ -480,6 +480,7 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.string "sensitive_data_state", default: "collected", null: false
     t.datetime "clear_sensitive_data_scheduled_at"
     t.integer "navigators_count", default: 0
+    t.datetime "paused_at"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -758,6 +759,8 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.boolean "multiple_fill", default: false, null: false
     t.boolean "autofinish_enabled", default: false, null: false
     t.integer "autofinish_delay", default: 1440, null: false
+    t.boolean "autoclose_enabled", default: false
+    t.datetime "autoclose_at"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

@@ -15,7 +15,7 @@ class V1::Intervention::PredefinedParticipants::VerifyService
     {
       intervention_id: predefined_user_parameters.intervention_id,
       session_id: available_now_session(intervention, user_intervention)&.id,
-      health_clinic_id: predefined_user_parameters.health_clinic_id,
+      health_clinic_id: health_clinic_id,
       multiple_fill_session_available: multiple_fill_session_available(user_intervention),
       user_intervention_id: user_intervention.id
     }
@@ -26,10 +26,15 @@ class V1::Intervention::PredefinedParticipants::VerifyService
   private
 
   def user_intervention
-    @user_intervention ||= UserIntervention.find_or_create_by(user_id: predefined_user_parameters.user_id, intervention_id: intervention.id)
+    @user_intervention ||= UserIntervention.find_or_create_by(user_id: predefined_user_parameters.user_id, intervention_id: intervention.id,
+                                                              health_clinic_id: health_clinic_id)
   end
 
   def intervention
     @intervention ||= predefined_user_parameters.intervention
+  end
+
+  def health_clinic_id
+    @health_clinic_id ||= predefined_user_parameters.health_clinic_id
   end
 end

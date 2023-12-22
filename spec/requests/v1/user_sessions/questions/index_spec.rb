@@ -23,6 +23,12 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       it_behaves_like 'deactivated account'
     end
 
+    context 'when the intervention is paused' do
+      let(:request) { get v1_user_session_questions_url(user_session.id), headers: user.create_new_auth_token }
+
+      it_behaves_like 'paused intervention'
+    end
+
     context 'when start immediately is set' do
       let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
       let!(:session2) { create(:session, intervention_id: intervention.id, schedule: :immediately) }

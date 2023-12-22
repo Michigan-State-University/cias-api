@@ -15,7 +15,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       expect { subject }.to change(UserIntervention, :count).by(1)
     end
 
-    it 'when intervention deesn\'t have sessions' do
+    it 'when intervention doesn\'t have sessions' do
       expect(subject[:session_id]).to be nil
     end
   end
@@ -127,6 +127,20 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       it 'multiple fill session available should return nil if user has other session in progress' do
         expect(subject[:multiple_fill_session_available]).to be false
       end
+    end
+  end
+
+  context 'flexible intervention inside organization' do
+    let(:organization) { create(:organization, :with_health_clinics) }
+
+    before do
+      intervention = predefined_user_parameters.intervention
+      intervention.update!(organization: organization, type: 'Intervention::FlexibleOrder')
+      predefined_user_parameters.update!(health_clinic: organization.health_systems.first.health_clinics.first)
+    end
+
+    it 'return user intervention' do
+      expect { subject }.to change(UserIntervention, :count).by(1)
     end
   end
 end

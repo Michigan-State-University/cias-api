@@ -89,4 +89,8 @@ class V1::FlowService::NextQuestion
 
     nil
   end
+
+  def all_var_values
+    @all_var_values ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values(true)
+  end
 end

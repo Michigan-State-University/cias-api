@@ -17,6 +17,12 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
     let(:user_int) { create(:user_intervention, intervention: intervention, user: participant) }
     let!(:user_session) { create(:user_session, user: participant, session: session, user_intervention: user_int) }
 
+    context 'when the intervention is paused' do
+      let(:user) { researcher }
+
+      it_behaves_like 'paused intervention'
+    end
+
     context 'when user session hasn\'t any answers' do
       it 'return empty body' do
         request

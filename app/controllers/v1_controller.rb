@@ -52,6 +52,12 @@ class V1Controller < ApplicationController
     raise CanCan::AccessDenied, I18n.t('users.deactivated') unless current_v1_user.active
   end
 
+  def validate_intervention_status
+    return unless intervention.paused?
+
+    raise ComplexException.new(I18n.t('interventions.paused'), { reason: 'INTERVENTION_PAUSED' }, :bad_request)
+  end
+
   def invalidate_cache(obj)
     Rails.cache.delete(obj.cache_key)
   end

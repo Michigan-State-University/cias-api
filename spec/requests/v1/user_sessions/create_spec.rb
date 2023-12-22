@@ -52,4 +52,8 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   end
 
   it_behaves_like 'create user session'
+
+  it_behaves_like 'paused intervention'
+
+  it_behaves_like 'closed session'
 end

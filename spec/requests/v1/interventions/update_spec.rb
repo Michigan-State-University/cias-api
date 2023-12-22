@@ -182,6 +182,40 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         'cat_mh_pool' => 100
       )
     end
+
+    context 'change status to paused' do
+      let(:params) do
+        {
+          intervention: {
+            status: 'paused'
+          }
+        }
+      end
+
+      it 'updates a intervention object' do
+        expect(intervention.reload.attributes).to include(
+          'status' => 'paused'
+        )
+      end
+    end
+
+    context 'try to change to incorrect status' do
+      let(:params) do
+        {
+          intervention: {
+            status: 'draft'
+          }
+        }
+      end
+
+      it 'return correct status' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'return correct error message' do
+        expect(json_response['message']).to eql('You cannot change status from published to draft.')
+      end
+    end
   end
 
   context 'when one of the roles is researcher' do
@@ -301,7 +335,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
   context 'live_chat' do
     context 'when intervention closed/archived and live chat enabled' do
       let(:user) { create(:user, :admin, :confirmed) }
-      let(:intervention) { create(:intervention, user: user, status: 'closed') }
+      let(:intervention) { create(:intervention, :closed, user: user) }
       let(:headers) { user.create_new_auth_token }
       let(:params) do
         {

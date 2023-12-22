@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::UserSessions::AnswersController < V1Controller
+  before_action :validate_intervention_status
+
   def index
     authorize! :index, Answer
 
@@ -25,7 +27,11 @@ class V1::UserSessions::AnswersController < V1Controller
   private
 
   def user_session_load
-    UserSession.find(user_session_id)
+    @user_session_load ||= UserSession.find(user_session_id)
+  end
+
+  def intervention
+    @intervention ||= user_session_load.session.intervention
   end
 
   def answers_scope
