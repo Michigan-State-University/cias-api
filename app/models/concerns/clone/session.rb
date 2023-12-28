@@ -74,18 +74,18 @@ class Clone::Session < Clone::Base
     target_id = pattern['target'][index]['id']
     return check_if_session_exists(target_id) if pattern['target'][index]['type'].include?('Session') || target_id.empty?
 
-    matching_question_id(target_id)
+    matching_question(target_id)&.id || ''
   end
 
-  def matching_question_id(target_id)
+  def matching_question(target_id)
     target = check_if_question_exists(target_id)
     if target
       outcome.questions
              .joins(:question_group)
              .where(question_groups: { position: target.question_group.position })
-             .find_by!(position: target.position).id
+             .find_by!(position: target.position)
     else
-      ''
+      nil
     end
   end
 
@@ -98,7 +98,10 @@ class Clone::Session < Clone::Base
   end
 
   def check_if_question_exists(target_id)
-    source.questions.find(target_id)
+    Question
+      .joins(question_group: { session: :intervention })
+      .where(intervention: { id: source.intervention.id })
+      .find(target_id)
   rescue ActiveRecord::RecordNotFound
     nil
   end
@@ -111,8 +114,10 @@ class Clone::Session < Clone::Base
 
       next block if reflection_question_id.nil?
 
-      matched_reflection_question_id = matching_question_id(reflection_question_id)
-      block['question_id'] = matched_reflection_question_id
+      matched_reflection_question = matching_question(reflection_question_id)
+      block['question_id'] = matched_reflection_question&.id || ''
+      block['question_group_id'] = matched_reflection_question&.question_group_id || ''
+      block['session_id'] = outcome.id
     end
     question
   end
