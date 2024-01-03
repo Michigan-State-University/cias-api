@@ -99,7 +99,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
           expect(
             json_response['data']['attributes']['narrator']['blocks'].select do |block|
               %w[Reflection ReflectionFormula].include?(block['type'])
-            end.size
+            end.count
           ).to eq(1)
         end
       end
