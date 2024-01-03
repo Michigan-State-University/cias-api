@@ -22,7 +22,7 @@ class V1::UserSessions::PreviousQuestionService
 
     question = reflection_service.call(previous_question)
     {
-      question: previous_question,
+      question: question,
       answer: previous_answer
     }
   end
