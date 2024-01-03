@@ -68,21 +68,40 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
     context 'when user want to see last question -  second undo' do
       let!(:answer1) { create(:answer_single, question: question1, user_session: user_session) }
       let!(:answer2) { create(:answer_single, question: question2, user_session: user_session) }
-      let(:params) { { current_question_id: question2.id } }
 
-      it 'return correct question id' do
-        request
-        expect(json_response['data']['id']).to eq(question1.id)
+      context 'when previous question does not have reflection' do
+        let(:params) { { current_question_id: question2.id } }
+
+        it 'return correct question id' do
+          request
+          expect(json_response['data']['id']).to eq(question1.id)
+        end
+
+        it 'return answer with question' do
+          request
+          expect(json_response['answer']['id']).to eq(answer1.id)
+        end
+
+        it 'change answer to draft' do
+          request
+          expect(answer1.reload.draft).to be(true)
+        end
       end
 
-      it 'return answer with question' do
-        request
-        expect(json_response['answer']['id']).to eq(answer1.id)
-      end
+      context 'when previous question has reflection' do
+        let!(:question2) { create(:question_single, :narrator_blocks_with_cases, question_group: question_group) }
+        let!(:question3) { create(:question_single, question_group: question_group) }
+        let!(:answer3) { create(:answer_single, question: question3, user_session: user_session) }
+        let(:params) { { current_question_id: question3.id } }
 
-      it 'change answer to draft' do
-        request
-        expect(answer1.reload.draft).to be(true)
+        it 'return narrator block with type Reflection' do
+          request
+          expect(
+            json_response['data']['attributes']['narrator']['blocks'].select do |block|
+              %w[Reflection ReflectionFormula].include?(block['type'])
+            end.size
+          ).to eq(1)
+        end
       end
     end
 
