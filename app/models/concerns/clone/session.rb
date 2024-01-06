@@ -11,7 +11,7 @@ class Clone::Session < Clone::Base
       create_sms_plans
       create_report_templates
       outcome_questions_reassignment
-      remove_hf_initial_screen if outcome_with_hf_access?
+      remove_hf_initial_screen unless outcome_with_hf_access?
       reassign_report_templates_to_third_party_screens
       reassign_tests
     end
