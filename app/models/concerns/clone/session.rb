@@ -87,33 +87,27 @@ class Clone::Session < Clone::Base
 
   def matching_outcome_target_id(pattern, index)
     target_id = pattern['target'][index]['id']
-    if pattern['target'][index]['type'].include?('Session') || target_id.empty?
-      return check_if_session_exists(target_id)&.id
-    end
+    return check_if_session_exists(target_id)&.id if pattern['target'][index]['type'].include?('Session') || target_id.empty?
 
     matching_question(target_id)&.id || ''
   end
 
   def matching_question(target_id, target_session = nil)
     target = check_if_question_exists(target_id)
-    if target
-      target_session ||= outcome
-      target_session.questions
-                       .joins(:question_group)
-                       .where(question_groups: { position: target.question_group.position })
-                       .find_by!(position: target.position)
-    else
-      nil
-    end
+    return unless target
+
+    target_session ||= outcome
+    target_session.questions
+                      .joins(:question_group)
+                      .where(question_groups: { position: target.question_group.position })
+                      .find_by!(position: target.position)
   end
 
   def matching_session(target_id)
     target = check_if_session_exists(target_id)
-    if target
-      outcome.intervention.sessions.find_by!(position: target.position)
-    else
-      nil
-    end
+    return unless target
+
+    outcome.intervention.sessions.find_by!(position: target.position)
   end
 
   def check_if_session_exists(target_id)
