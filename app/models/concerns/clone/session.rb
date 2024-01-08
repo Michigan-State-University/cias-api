@@ -21,13 +21,7 @@ class Clone::Session < Clone::Base
   private
 
   def remove_hf_initial_screen
-    outcome_questions.find_each do |question|
-      question.destroy if hf_initial_screen?(question)
-    end
-  end
-
-  def hf_initial_screen?(question)
-    question.is_a?(::Question::HenryFordInitial)
+    outcome_questions.where(type: 'Question::HenryFordInitial').destroy_all
   end
 
   def outcome_with_hf_access?
