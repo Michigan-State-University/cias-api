@@ -11,6 +11,7 @@ class Clone::Session < Clone::Base
       create_sms_plans
       create_report_templates
       outcome_questions_reassignment
+      remove_hf_initial_screen unless outcome_with_hf_access?
       reassign_report_templates_to_third_party_screens
       reassign_tests
     end
@@ -18,6 +19,14 @@ class Clone::Session < Clone::Base
   end
 
   private
+
+  def remove_hf_initial_screen
+    outcome_questions.where(type: 'Question::HenryFordInitial').destroy_all
+  end
+
+  def outcome_with_hf_access?
+    outcome.intervention.hfhs_access
+  end
 
   def create_question_groups
     # CAT-MH sessions won't have question groups so it will throw an error if we try to access them
@@ -72,33 +81,42 @@ class Clone::Session < Clone::Base
 
   def matching_outcome_target_id(pattern, index)
     target_id = pattern['target'][index]['id']
-    return check_if_session_exists(target_id) if pattern['target'][index]['type'].include?('Session') || target_id.empty?
+    return check_if_session_exists(target_id)&.id if pattern['target'][index]['type'].include?('Session') || target_id.empty?
 
-    matching_question_id(target_id)
+    matching_question(target_id)&.id || ''
   end
 
-  def matching_question_id(target_id)
+  def matching_question(target_id, target_session = nil)
     target = check_if_question_exists(target_id)
-    if target
-      outcome.questions
-             .joins(:question_group)
-             .where(question_groups: { position: target.question_group.position })
-             .find_by!(position: target.position).id
-    else
-      ''
-    end
+    return unless target
+
+    target_session ||= outcome
+    target_session.questions
+                      .joins(:question_group)
+                      .where(question_groups: { position: target.question_group.position })
+                      .find_by!(position: target.position)
+  end
+
+  def matching_session(target_id)
+    target = check_if_session_exists(target_id)
+    return unless target
+
+    outcome.intervention.sessions.find_by!(position: target.position)
   end
 
   def check_if_session_exists(target_id)
-    return '' if target_id.empty?
+    return nil if target_id&.empty?
 
-    source.intervention.sessions.find(target_id).id
+    source.intervention.sessions.find(target_id)
   rescue ActiveRecord::RecordNotFound
-    ''
+    nil
   end
 
   def check_if_question_exists(target_id)
-    source.questions.find(target_id)
+    Question
+      .joins(question_group: { session: :intervention })
+      .where(intervention: { id: source.intervention.id })
+      .find(target_id)
   rescue ActiveRecord::RecordNotFound
     nil
   end
@@ -111,8 +129,11 @@ class Clone::Session < Clone::Base
 
       next block if reflection_question_id.nil?
 
-      matched_reflection_question_id = matching_question_id(reflection_question_id)
-      block['question_id'] = matched_reflection_question_id
+      matched_reflection_session = matching_session(block['session_id'])
+      matched_reflection_question = matching_question(reflection_question_id, matched_reflection_session)
+      block['question_id'] = matched_reflection_question&.id || ''
+      block['question_group_id'] = matched_reflection_question&.question_group_id || ''
+      block['session_id'] = matched_reflection_session&.id
     end
     question
   end
