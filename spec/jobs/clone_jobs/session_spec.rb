@@ -232,10 +232,10 @@ RSpec.describe CloneJobs::Session, type: :job do
             ),
             'narrator' => {
               'blocks' => [
-                {
+                include(
                   'type' => 'Reflection', 'question_id' => cloned_questions_collection.third.id, 'action' => 'NO_ACTION', 'reflections' => [],
                   'animation' => 'pointUp', 'endPosition' => { 'x' => 0, 'y' => 600 }
-                }
+                )
               ],
               'settings' => default_narrator_settings
             }

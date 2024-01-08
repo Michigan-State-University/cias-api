@@ -6,11 +6,13 @@ class DuplicateJobs::Session < DuplicateJob
     old_session = Session.accessible_by(user.ability).find(session_id)
     new_position = new_intervention.sessions.order(:position).last&.position.to_i + 1
     new_variable = "duplicated_#{old_session.variable}_#{new_position}"
-    Clone::Session.new(old_session,
-                       intervention_id: new_intervention.id,
-                       clean_formulas: true,
-                       variable: new_variable,
-                       position: new_position).execute
+    Clone::Session.new(
+      old_session,
+      intervention_id: new_intervention.id,
+      clean_formulas: true,
+      variable: new_variable,
+      position: new_position
+    ).execute
 
     return unless user.email_notification
 

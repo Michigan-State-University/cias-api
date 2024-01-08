@@ -11,7 +11,7 @@ class V1::FlowService::ReflectionService
   attr_accessor :user_session, :additional_information
 
   def call(question)
-    return question if question.is_a?(Hash)
+    return question if question.is_a?(Hash) || question.nil?
 
     question = question.swap_name_mp3(name_audio, name_answer)
 
