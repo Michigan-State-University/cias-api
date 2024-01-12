@@ -51,11 +51,11 @@ class V1::SessionOrIntervention::Link
 
   def intervention_link(intervention)
     if health_clinic.nil?
-      t('intervention_mailer.inform_to_an_email.invitation_link', domain: ENV['WEB_URL'],
-                                                                  intervention_id: intervention.id)
+      I18n.t('intervention_mailer.inform_to_an_email.invitation_link', domain: ENV['WEB_URL'],
+                                                                       intervention_id: intervention.id)
     else
-      t('intervention_mailer.inform_to_an_email.invitation_link_from_clinic', domain: ENV['WEB_URL'],
-                                                                              intervention_id: intervention.id, health_clinic_id: health_clinic.id)
+      I18n.t('intervention_mailer.inform_to_an_email.invitation_link_from_clinic', domain: ENV['WEB_URL'],
+                                                                                   intervention_id: intervention.id, health_clinic_id: health_clinic.id)
     end
   end
 end
