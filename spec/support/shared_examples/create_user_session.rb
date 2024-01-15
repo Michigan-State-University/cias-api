@@ -106,11 +106,7 @@ RSpec.shared_examples 'create user session' do
         let(:intervention_user) { researcher }
 
         it 'returns correct http status' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'returns correct data' do
-          expect(json_response['data']['type']).to eq('user_session')
+          expect(response).to have_http_status(:forbidden)
         end
       end
     end

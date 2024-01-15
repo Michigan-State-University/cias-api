@@ -29,6 +29,7 @@ class V1::UserSessionsController < V1Controller
   def show_or_create
     validate_session_status
     user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
+    # require 'pry'; binding.pry
     authorize! :create, user_session
     user_session.save!
     @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
