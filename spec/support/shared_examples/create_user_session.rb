@@ -44,7 +44,7 @@ RSpec.shared_examples 'create user session' do
       end
 
       context 'create UserSession::CatMh' do
-        let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
+        let(:session) { create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, intervention: intervention) }
 
         it 'user session have correct type' do
           request
@@ -106,11 +106,7 @@ RSpec.shared_examples 'create user session' do
         let(:intervention_user) { researcher }
 
         it 'returns correct http status' do
-          expect(response).to have_http_status(:ok)
-        end
-
-        it 'returns correct data' do
-          expect(json_response['data']['type']).to eq('user_session')
+          expect(response).to have_http_status(:forbidden)
         end
       end
     end
