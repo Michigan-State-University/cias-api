@@ -10,6 +10,7 @@ RSpec.shared_examples 'paused intervention' do
   end
 
   it 'returns proper error message' do
-    expect(json_response['message']).to include('Intervention is paused for some reason. During that time no one can take part in the study')
+    expect(json_response['message'])
+      .to include('This study is temporarily unavailable. Please check with the research team or clinic to find out when it will resume, or try back later')
   end
 end
