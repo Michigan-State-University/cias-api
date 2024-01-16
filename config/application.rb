@@ -38,7 +38,7 @@ module CiasApi
     config.api_only = true
 
     config.i18n.tap do |i18n|
-      i18n.available_locales = %i[en ar]
+      i18n.available_locales = %i[en ar es]
       i18n.default_locale = :en
       i18n.enforce_available_locales = false
       i18n.fallbacks = true
