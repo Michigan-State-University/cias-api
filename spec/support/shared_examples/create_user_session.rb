@@ -44,7 +44,7 @@ RSpec.shared_examples 'create user session' do
       end
 
       context 'create UserSession::CatMh' do
-        let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
+        let(:session) { create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, intervention: intervention) }
 
         it 'user session have correct type' do
           request

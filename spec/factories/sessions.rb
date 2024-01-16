@@ -79,9 +79,8 @@ FactoryBot.define do
         language = CatMhLanguage.create(language_id: 1, name: 'English')
         time_frame = CatMhTimeFrame.create(timeframe_id: 1, description: 'Past hour', short_name: '1h')
         population = CatMhPopulation.create(name: 'General')
-        cat_mh_test_type = CatMhTestType.create(short_name: 'mdd', name: 'Major Depressive Disorder', cat_mh_population: population)
 
-        session.update!(cat_mh_language: language, cat_mh_time_frame: time_frame, cat_mh_population: population, cat_mh_test_types: [cat_mh_test_type])
+        session.update!(cat_mh_language: language, cat_mh_time_frame: time_frame, cat_mh_population: population)
       end
     end
 
