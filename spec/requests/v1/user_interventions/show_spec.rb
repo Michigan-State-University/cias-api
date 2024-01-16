@@ -63,4 +63,19 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
       expect(json_response['data']['attributes']['user_sessions']['data'].map { |us| us['attributes']['filled_out_count'] }).to include(0, 1)
     }
   end
+
+  context 'predefined participnat has access to session shared to invited' do
+    let!(:intervention) { create(:flexible_order_intervention, user: user, status: 'published', shared_to: 'invited') }
+    let!(:user) { create(:user, :predefined_participant, :confirmed) }
+
+    before { request }
+
+    it 'returns correct HTTP status code (OK)' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns correct blocked status' do
+      expect(json_response['data']['attributes']['blocked']).to eq(false)
+    end
+  end
 end
