@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Clone::Session < Clone::Base
-  def execute
+  def execute(clone_single_session: false)
     outcome.position = position || outcome.intervention.sessions.size
     outcome.clear_formulas if clean_formulas
     outcome.days_after_date_variable_name = nil if clean_formulas
@@ -10,7 +10,7 @@ class Clone::Session < Clone::Base
       outcome.save!
       create_sms_plans
       create_report_templates
-      outcome_questions_reassignment
+      outcome_questions_reassignment(clone_single_session)
       remove_hf_initial_screen unless outcome_with_hf_access?
       reassign_report_templates_to_third_party_screens
       reassign_tests
@@ -50,12 +50,19 @@ class Clone::Session < Clone::Base
                                    .order('question_groups.position ASC', 'questions.position ASC')
   end
 
-  def outcome_questions_reassignment
+  def outcome_questions_reassignment(clone_single_session)
     outcome_questions.find_each do |question|
       question = reassign_branching_question(question)
       question = reassign_question_reflections(question)
+      question = remove_invalid_reflections(question) if clone_single_session
       question.save!
     end
+  end
+
+  def remove_invalid_reflections(question)
+    question.narrator['blocks'].delete_if { |block| block['type'] == 'Reflection' && block['question_id'].present? }
+    question.save!
+    question
   end
 
   def reassign_branching_question(question)

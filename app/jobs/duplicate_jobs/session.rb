@@ -12,7 +12,7 @@ class DuplicateJobs::Session < DuplicateJob
       clean_formulas: true,
       variable: new_variable,
       position: new_position
-    ).execute
+    ).execute(clone_single_session: true)
 
     return unless user.email_notification
 

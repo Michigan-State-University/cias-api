@@ -27,7 +27,7 @@ class V1::Question::Update
   attr_accessor :question
 
   def adjust_reflections(previous_variable)
-    return if previous_variable == include?(question.body['variable']['name'])
+    return if previous_variable == question.body['variable']['name']
 
     UpdateJobs::AdjustQuestionReflections.perform_later(question, previous_variable)
   end
