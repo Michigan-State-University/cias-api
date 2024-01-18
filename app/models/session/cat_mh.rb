@@ -17,7 +17,7 @@ class Session::CatMh < Session
     cat_mh_language_id.present? && cat_mh_population_id.present? && cat_mh_time_frame_id.present? && cat_mh_test_types.size.positive?
   end
 
-  def fetch_variables(filter_options = {})
+  def fetch_variables(filter_options = {}, _filtered_question_id = nil)
     cat_mh_test_types.map do |type|
       target_attrs = filter_options[:only_digit_variables] ? type.cat_mh_test_attributes.where(variable_type: 'number') : type.cat_mh_test_attributes
       variable_names = target_attrs.map { |var| "#{type.short_name.tr('/', '')}_#{var.name}" }
