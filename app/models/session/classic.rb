@@ -66,11 +66,13 @@ class Session::Classic < Session
     UserSession::Classic.name
   end
 
-  def fetch_variables(filter_options = {})
+  def fetch_variables(filter_options = {}, filtered_question_id = nil)
+    filtered = (questions.where.not(id: filtered_question_id) if filtered_question_id.present?)
+
     filtered = if filter_options[:allow_list].present?
-                 questions.where(type: filter_options[:allow_list])
+                 filtered.where(type: filter_options[:allow_list])
                else
-                 questions.reorder('"question_groups"."position" ASC, "questions"."position" ASC')
+                 filtered.reorder('"question_groups"."position" ASC, "questions"."position" ASC')
                end
     target_question = questions.find_by(id: filter_options[:question_id])
     if target_question
