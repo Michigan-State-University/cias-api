@@ -67,7 +67,11 @@ class Session::Classic < Session
   end
 
   def fetch_variables(filter_options = {}, filtered_question_id = nil)
-    filtered = (questions.where.not(id: filtered_question_id) if filtered_question_id.present?)
+    filtered = if filtered_question_id.present?
+                 questions.where.not(id: filtered_question_id)
+               else
+                 questions
+               end
 
     filtered = if filter_options[:allow_list].present?
                  filtered.where(type: filter_options[:allow_list])
