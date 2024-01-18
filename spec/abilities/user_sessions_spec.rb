@@ -66,15 +66,15 @@ describe UserSession do
       let(:user) { team1.team_admin }
 
       it 'can manage user_sessions of the user belonging to his team' do
-        expect(subject).to have_abilities({ manage: true }, team1_user_session1)
+        expect(subject).to have_abilities({ read: true }, team1_user_session1)
       end
 
       it 'can manage his user_sessions' do
-        expect(subject).to have_abilities({ manage: true }, team1_user_session2)
+        expect(subject).to have_abilities({ read: true }, team1_user_session2)
       end
 
       it 'can\'t manage user_sessions of users from another team' do
-        expect(subject).to have_abilities({ manage: false }, team2_user_session1)
+        expect(subject).to have_abilities({ read: false }, team2_user_session1)
       end
     end
   end
