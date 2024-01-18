@@ -167,7 +167,7 @@ class Session < ApplicationRecord
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 
-  def fetch_variables(_filter_options = {})
+  def fetch_variables(_filter_options = {}, _filtered_question_id = nil)
     raise NotImplementedError, "Subclass of Session did not define #{__method__}"
   end
 
