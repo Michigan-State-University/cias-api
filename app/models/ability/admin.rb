@@ -21,6 +21,7 @@ class Ability::Admin < Ability::Base
       intervention.user_id != user.id
     end
     cannot :manage, GeneratedReport
+    cannot :create, UserSession
     can :manage, GeneratedReport, user_session: { session: { intervention: { user_id: user.id } } }
     enable_data_access(user)
   end

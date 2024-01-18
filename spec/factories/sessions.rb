@@ -80,7 +80,7 @@ FactoryBot.define do
         time_frame = CatMhTimeFrame.create(timeframe_id: 1, description: 'Past hour', short_name: '1h')
         population = CatMhPopulation.create(name: 'General')
 
-        session.update(cat_mh_language: language, cat_mh_time_frame: time_frame, cat_mh_population: population)
+        session.update!(cat_mh_language: language, cat_mh_time_frame: time_frame, cat_mh_population: population)
       end
     end
 
