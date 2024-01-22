@@ -17,12 +17,12 @@ class V1::UserInterventionSerializer < V1Serializer
   end
 
   attribute :blocked do |object|
-   object.intervention.shared_to_invited? &&
+    object.intervention.shared_to_invited? &&
       object.intervention.intervention_accesses
             .pluck(:email)
             .map(&:downcase)
             .exclude?(object.user.email) &&
-        object.user.roles.exclude?('predefined_participant')
+      object.user.roles.exclude?('predefined_participant')
   end
 
   attribute :intervention do |object|
