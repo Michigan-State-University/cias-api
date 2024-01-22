@@ -28,7 +28,7 @@ class V1::Intervention::PredefinedParticipants::CreateService
   end
 
   def predefined_user_parameter_params
-    params.slice(:health_clinic_id, :auto_invitation, :external_id, :sms_notification, :email_notification, :sms_notification, :email_notification)
+    params.slice(:health_clinic_id, :auto_invitation, :external_id, :sms_notification, :email_notification)
   end
 
   def create_predefined_user!

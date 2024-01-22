@@ -629,7 +629,7 @@ ActiveRecord::Schema.define(version: 2023_12_19_102141) do
     t.boolean "auto_invitation", default: false, null: false
     t.datetime "sms_invitation_sent_at"
     t.string "external_id"
-    t.boolean "sms_notification", default: true
+    t.boolean "sms_notification", default: false
     t.boolean "email_notification", default: false
     t.datetime "email_invitation_sent_at"
     t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
