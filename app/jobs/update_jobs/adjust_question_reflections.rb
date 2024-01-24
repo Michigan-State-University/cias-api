@@ -21,6 +21,7 @@ class UpdateJobs::AdjustQuestionReflections < CloneJob
     Question
        .within_intervention(question.session.intervention_id)
        .where.not(id: question.id)
-       .select { |q| q.narrator['blocks'].pluck('type', 'question_id').include?(['Reflection', question.id]) }
+       .joins("CROSS JOIN jsonb_array_elements(narrator->'blocks') AS narrator_block")
+       .where('narrator_block @> ?', { type: 'Reflection', question_id: question.id }.to_json)
   end
 end
