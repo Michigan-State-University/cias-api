@@ -21,7 +21,7 @@ RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
       body: {
         data: [{ payload: 'a1', value: '1' }, { payload: 'a2', value: '2' }],
         variable: { name: 'var' }
-      },
+      }
     )
   end
   let!(:question2) do
@@ -32,24 +32,24 @@ RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
                                    action: 'NO_ACTION',
                                    question_id: question1.id,
                                    reflections: [
-                                    {
-                                      text: ['Test1'],
-                                      value: '1',
-                                      type: 'Speech',
-                                      sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
-                                      payload: 'a1',
-                                      variable: 'var',
-                                      audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3'],
-                                    },
-                                    {
-                                      text: ['Test2'],
-                                      value: '2',
-                                      type: 'Speech',
-                                      sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
-                                      payload: 'a2',
-                                      variable: 'var',
-                                      audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3'],
-                                    },
+                                     {
+                                       text: ['Test1'],
+                                       value: '1',
+                                       type: 'Speech',
+                                       sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
+                                       payload: 'a1',
+                                       variable: 'var',
+                                       audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3']
+                                     },
+                                     {
+                                       text: ['Test2'],
+                                       value: '2',
+                                       type: 'Speech',
+                                       sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
+                                       payload: 'a2',
+                                       variable: 'var',
+                                       audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3']
+                                     }
                                    ],
                                    animation: 'pointUp',
                                    type: 'Reflection',
