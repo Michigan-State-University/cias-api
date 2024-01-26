@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::Intervention::PredefinedParticipants::SendInvitation
+class V1::Intervention::PredefinedParticipants::SendSmsInvitation
   def initialize(user)
     @user = user
   end
@@ -15,7 +15,7 @@ class V1::Intervention::PredefinedParticipants::SendInvitation
 
     sms = Message.create(phone: number, body: content)
     Communication::Sms.new(sms.id).send_message
-    user.predefined_user_parameter.update!(invitation_sent_at: DateTime.now)
+    user.predefined_user_parameter.update!(sms_invitation_sent_at: DateTime.now)
   end
 
   attr_accessor :user

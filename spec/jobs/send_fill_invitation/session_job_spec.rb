@@ -50,6 +50,17 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
     end
   end
 
+  context 'send invitation to predefined participant' do
+    let!(:intervention) { create(:intervention, :published, :with_predefined_participants, user: user) }
+    let(:predefined_participant) { intervention.predefined_users.first }
+    let(:emails) { [predefined_participant.email] }
+
+    it do
+      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
+      expect(ActionMailer::Base.deliveries.last.html_part.body).to include("#{ENV['WEB_URL']}/usr/#{predefined_participant.predefined_user_parameter.slug}")
+    end
+  end
+
   context 'when inviting non-existing users' do
     let!(:non_existing_emails) { ['mike.wazowski@gmail.com'] }
     let!(:emails) { [] }
