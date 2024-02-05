@@ -32,7 +32,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
                                                                                   domain: ENV['WEB_URL'],
                                                                                   intervention_id: intervention.id,
                                                                                   session_id: session.id,
-                                                                                  health_clinic_id: health_clinic.id))
+                                                                                  health_clinic_id: health_clinic.id,
+                                                                                  language_code: intervention.language_code))
     end
 
     context 'shared to registered sends correct email' do
@@ -45,7 +46,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
                                                                                     domain: ENV['WEB_URL'],
                                                                                     intervention_id: intervention.id,
                                                                                     session_id: session.id,
-                                                                                    health_clinic_id: health_clinic.id))
+                                                                                    health_clinic_id: health_clinic.id,
+                                                                                    language_code: intervention.language_code))
       end
     end
   end
@@ -72,7 +74,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
              session_id: session.id,
              user_role: 'participant',
              email: non_existing_emails.first,
-             invitation_token: 'token').tr('&', ' ')
+             invitation_token: 'token',
+             language_code: intervention.language_code).tr('&', ' ')
     end
 
     it do
