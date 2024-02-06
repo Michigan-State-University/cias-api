@@ -364,7 +364,7 @@ GEM
       nokogiri (~> 1.11)
     method_source (1.0.0)
     mini_mime (1.1.5)
-    mini_portile2 (2.8.4)
+    mini_portile2 (2.8.5)
     minitest (5.19.0)
     msgpack (1.4.2)
     multi_json (1.15.0)
@@ -381,8 +381,8 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.4)
-      mini_portile2 (~> 2.8.2)
+    nokogiri (1.14.3)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     notiffany (0.1.3)
       nenv (~> 0.1)
@@ -422,7 +422,7 @@ GEM
     public_suffix (4.0.6)
     puma (5.6.8)
       nio4r (~> 2.0)
-    racc (1.7.1)
+    racc (1.7.3)
     rack (2.2.8)
     rack-attack (6.5.0)
       rack (>= 1.0, < 3)
@@ -648,7 +648,7 @@ DEPENDENCIES
   logstop
   loofah (>= 2.19.1)
   metainspector (~> 5.5)
-  nokogiri (~> 1.15)
+  nokogiri (= 1.14.3)
   oj
   overcommit
   pagy
