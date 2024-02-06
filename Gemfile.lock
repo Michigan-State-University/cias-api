@@ -648,7 +648,7 @@ DEPENDENCIES
   logstop
   loofah (>= 2.19.1)
   metainspector (~> 5.5)
-  nokogiri (>= 1.14.3)
+  nokogiri (~> 1.15)
   oj
   overcommit
   pagy
@@ -694,4 +694,4 @@ RUBY VERSION
    ruby 2.7.2p137
 
 BUNDLED WITH
-   2.4.22
+   2.3.22
