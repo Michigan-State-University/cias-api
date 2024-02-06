@@ -28,12 +28,14 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
 
     it 'return proper body' do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
-                                                                                  domain: ENV['WEB_URL'],
-                                                                                  intervention_id: intervention.id,
-                                                                                  session_id: session.id,
-                                                                                  health_clinic_id: health_clinic.id,
-                                                                                  language_code: intervention.language_code))
+      expect(
+        ActionMailer::Base.deliveries.last.html_part.body.decoded.gsub('&amp;', ' ')
+      ).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
+                          domain: ENV['WEB_URL'],
+                          intervention_id: intervention.id,
+                          session_id: session.id,
+                          health_clinic_id: health_clinic.id,
+                          language_code: intervention.language_code).tr('&', ' '))
     end
 
     context 'shared to registered sends correct email' do
