@@ -648,7 +648,7 @@ DEPENDENCIES
   logstop
   loofah (>= 2.19.1)
   metainspector (~> 5.5)
-  nokogiri (= 1.14.3)
+  nokogiri (>= 1.13.6)
   oj
   overcommit
   pagy
