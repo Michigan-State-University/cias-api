@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '2.7.2'
+ruby '3.0.6'
 
 gem 'rails', '~> 6.1.7', '>= 6.1.7.5'
 gem 'pg', '~> 1.2'
@@ -13,7 +13,7 @@ gem 'activerecord_json_validator'
 gem 'activestorage', '>= 6.1.4.7'
 gem 'active_storage_validations'
 gem 'active_model_serializers', '~> 0.10.0'
-gem 'bootsnap', '>= 1.4', require: false
+gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
 gem 'connection_pool'
@@ -30,9 +30,9 @@ gem 'google-protobuf', '>= 3.23.4'
 gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
 gem 'metainspector', '~> 5.5'
-gem 'nokogiri', '>= 1.14.3'
+gem 'nokogiri', '>= 1.16.2'
 gem 'oj'
-gem 'pagy'
+gem 'pagy', '~> 4.0'
 gem 'phonelib'
 gem 'postgresql_cursor'
 gem 'pry-rails'
