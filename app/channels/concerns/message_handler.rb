@@ -5,7 +5,7 @@ module MessageHandler
 
   protected
 
-  def format_error_message(exc, status, topic, **additional_error_data)
+  def format_error_message(exc, status, topic, additional_error_data)
     {
       data: {
         error: exc.message,

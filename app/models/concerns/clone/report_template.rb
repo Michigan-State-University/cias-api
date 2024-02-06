@@ -3,7 +3,7 @@
 class Clone::ReportTemplate
   attr_accessor :source, :outcome, :set_flag
 
-  def initialize(source, **options)
+  def initialize(source, options)
     @source = source
     @outcome = @source.dup
     @set_flag = options[:set_flag].nil? ? true : options.delete(:set_flag)
