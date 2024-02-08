@@ -27,7 +27,9 @@ class V1::Intervention::PredefinedParticipants::SendSmsInvitation
   end
 
   def content
-    I18n.t('predefined_participant.invitation', intervention_name: intervention_name, link: link)
+    I18n.with_locale(intervention_language_code) do
+      I18n.t('predefined_participant.invitation', intervention_name: intervention_name, link: link)
+    end
   end
 
   def link
@@ -36,6 +38,10 @@ class V1::Intervention::PredefinedParticipants::SendSmsInvitation
 
   def intervention_name
     predefined_user_parameter.intervention.name
+  end
+
+  def intervention_language_code
+    predefined_user_parameter.intervention.language_code
   end
 
   def predefined_user_parameter
