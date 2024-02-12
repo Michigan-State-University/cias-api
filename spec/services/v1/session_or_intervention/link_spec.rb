@@ -3,17 +3,20 @@
 RSpec.describe V1::SessionOrIntervention::Link do
   include ActiveJob::TestHelper
 
-  subject { described_class.call(session_or_intervention, health_clinic, email) }
+  subject { described_class.call(session, health_clinic, email) }
 
   let!(:user) { create(:user, :confirmed, :participant) }
-  let!(:session_or_intervention) { create(:session) }
+  let!(:intervention) { create(:intervention) }
+  let!(:session) { create(:session, intervention: intervention) }
   let!(:health_clinic) { nil }
   let(:email) { user.email }
 
   it 'returns link to the session' do
     expect(subject).to eq(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone',
-                                 domain: ENV['WEB_URL'], session_id: session_or_intervention.id,
-                                 intervention_id: session_or_intervention.intervention_id))
+                                 domain: ENV['WEB_URL'],
+                                 session_id: session.id,
+                                 intervention_id: intervention.id,
+                                 language_code: intervention.language_code))
   end
 
   context 'link as information about health clinic' do
@@ -21,19 +24,23 @@ RSpec.describe V1::SessionOrIntervention::Link do
 
     it 'returns link to the session in organization' do
       expect(subject).to eq(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
-                                   domain: ENV['WEB_URL'], session_id: session_or_intervention.id,
-                                   intervention_id: session_or_intervention.intervention_id,
-                                   health_clinic_id: health_clinic.id))
+                                   domain: ENV['WEB_URL'],
+                                   session_id: session.id,
+                                   intervention_id: intervention.id,
+                                   health_clinic_id: health_clinic.id,
+                                   language_code: intervention.language_code))
     end
   end
 
   context 'intervention with restrictions' do
-    let!(:session_or_intervention) { create(:session, intervention: create(:intervention, shared_to: 'registered')) }
+    let!(:intervention) { create(:intervention, shared_to: 'registered') }
 
     it 'returns link to the session or registration' do
       expect(subject).to eq(I18n.t('session_mailer.inform_to_an_email.invitation_link',
                                    domain: ENV['WEB_URL'],
-                                   intervention_id: session_or_intervention.intervention_id, session_id: session_or_intervention.id))
+                                   intervention_id: intervention.id,
+                                   session_id: session.id,
+                                   language_code: intervention.language_code))
     end
   end
 

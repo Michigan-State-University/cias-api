@@ -86,7 +86,7 @@ RSpec.describe 'POST /v1/predefined_participants/verify', type: :request do
     it 'return information needed to redirect the user' do
       request
       expect(json_response['redirect_data'].keys).to match_array(%w[intervention_id session_id health_clinic_id multiple_fill_session_available
-                                                                    user_intervention_id])
+                                                                    user_intervention_id lang])
     end
   end
 
