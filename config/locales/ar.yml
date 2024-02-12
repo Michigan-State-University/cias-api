@@ -19,7 +19,7 @@ ar:
     grant_access_to_a_user:
       subject: لقد حصلت على حق الوصول والجلسة متاحة للانتهاء!
       body: لقد حصلت على حق الوصول إلى الجلسة %{session_name}. الرجاء الضغط على الرابط لملء الجلسة.
-      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
     inform_to_an_email:
       subject: لقد تمت دعوتك لإكمال الجلسة.
       body: لقد تمت دعوتك لإكمال %{session_name}. الرجاء الضغط على الرابط للحصول على مزيد من المعلومات.
@@ -28,10 +28,10 @@ ar:
       session_scheduled: 'سيكون الوصول إلى هذه الجلسة متاحًا بدءًا من %{date}'
       before_button_text: 'انقر فوق الزر أدناه للوصول.'
       button_text: اذهب إلى الجلسة
-      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
-      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
+      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
+      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}&lang=%{language_code}"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}&lang=%{language_code}"
     invite_to_session_and_registration:
       subject: دعوة CIAS
       body: لقد تمت دعوتك لإكمال %{session_name}. الرجاء الضغط على الرابط للحصول على مزيد من المعلومات.
@@ -39,8 +39,8 @@ ar:
       html_body_invitation_part: 'لقد تمت دعوتك لإكمال جلسة <span style="color: #c866ea;">%{session_name}</span>.'
       html_body_information_part: "للوصول إلى هذه الجلسة، ستحتاج أولاً إلى إنشاء حساب CIAS بمجرد الانتهاء من هذه العملية، سترى الجلسة. إذا كانت لديك أسئلة حول هذه العملية، فيرجى الاتصال بالشخص أو المجموعة المرتبطة بهذه الجلسة والتي أحالتك."
       button_text: "هيا بنا نبدأ"
-      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
-      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
+      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&lang=%{language_code}'
+      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}&lang=%{language_code}'
   intervention_mailer:
     inform_to_an_email:
       subject: لقد تمت دعوتك لإكمال التدخل.
