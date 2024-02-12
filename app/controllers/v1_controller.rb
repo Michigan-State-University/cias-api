@@ -62,14 +62,6 @@ class V1Controller < ApplicationController
     Rails.cache.delete(obj.cache_key)
   end
 
-  def render_json(params)
-    path   = params[:path].presence || controller_path
-    action = params[:action].presence || action_name
-    serializer = "#{path}/#{action}".classify.constantize
-
-    render json: serializer.new(params.except(:path, :action, :status)).render, status: params[:status]
-  end
-
   def redirect_to_web_app(message)
     message.transform_values! { |v| Base64.encode64(v) }
 
