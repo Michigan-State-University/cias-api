@@ -5,6 +5,10 @@ es:
       subtitle: '<p>Introduzca aquí el texto principal de la pantalla</p><p><br></p><p><em>Nota: ésta es la última pantalla que verán los participantes en esta sesión.</em></p>'
       text_to_speech: 'Introduzca aquí el texto principal de la pantalla. Esta es la última pantalla que verán los participantes en esta sesión'
       title: '<h2>Escriba aquí el título</h2>'
+  sessions:
+    reminder: "¡Hola! Su próxima sesión ya está disponible. Por favor, haga clic en el enlace de abajo para continuar su progreso en %{intervention_name} %{link}"
+  predefined_participant:
+    invitation: "¡Hola! Por favor, haga clic en el enlace de abajo para comenzar o continuar su progreso en %{intervention_name} %{link}"
   generated_report_mailer:
     new_report_available:
       subject: "Los nuevos informes del sistema están listos para usted"
@@ -15,7 +19,7 @@ es:
     grant_access_to_a_user:
       subject: ¡Tienes acceso y la sesión está disponible para ser completada!
       body: Ha accedido a la sesión %{session_name}. Haga clic en el enlace para completar la sesión.
-      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
     inform_to_an_email:
       subject: Se le ha invitado a completar una sesión.
       body: Ha sido invitado a completar %{session_name}. Haga clic en el enlace para obtener más información.
@@ -24,10 +28,10 @@ es:
       session_scheduled: 'Esta sesión será accesible a partir de %{date}'
       before_button_text: 'Pulse el botón de abajo para acceder.'
       button_text: Vaya a la sesión
-      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
-      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
+      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
+      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}&lang=%{language_code}"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}&lang=%{language_code}"
     invite_to_session_and_registration:
       subject: CIAS Invitación
       body: Ha sido invitado a completar %{session_name}. Haga clic en el enlace para obtener más información.
@@ -35,8 +39,8 @@ es:
       html_body_invitation_part: 'Ha sido invitado a completar la sesión <span style="color: #c866ea;">%{session_name}</span>.'
       html_body_information_part: "Para acceder a esta sesión, <span style='font-weight: 700'>primero deberá crear una cuenta CIAS</span>, una vez finalizado ese proceso podrá ver la sesión. Si tiene preguntas sobre este proceso, por favor contacte a la persona o grupo asociado a esta sesión que lo refirió."
       button_text: "Empecemos"
-      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
-      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
+      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&lang=%{language_code}'
+      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}&lang=%{language_code}'
   intervention_mailer:
     inform_to_an_email:
       subject: Se le ha invitado a completar una intervención.

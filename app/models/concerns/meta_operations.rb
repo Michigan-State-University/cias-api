@@ -16,7 +16,7 @@ module MetaOperations
     attr_accessor :add_to, :tmp_file
     attr_reader :stream, :options
 
-    def initialize(**params)
+    def initialize(params)
       @stream = params[:stream]
       @add_to = params[:add_to]
       @options = params.except(:stream, :add_to)
