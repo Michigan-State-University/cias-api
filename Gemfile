@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '3.0.6'
+ruby '3.1.4'
 
 gem 'rails', '~> 6.1.7', '>= 6.1.7.5'
 gem 'pg', '~> 1.2'
@@ -10,7 +10,7 @@ gem 'puma', '~> 5.6.8'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
-gem 'activestorage', '>= 6.1.4.7'
+gem 'activestorage', '~> 6.1.7.7'
 gem 'active_storage_validations'
 gem 'active_model_serializers', '~> 0.10.0'
 gem 'bootsnap', '>= 1.9.3', require: false
@@ -18,9 +18,9 @@ gem 'cancancan'
 gem 'config'
 gem 'connection_pool'
 gem 'dentaku'
-gem 'devise-argon2'
-gem 'devise_invitable'
-gem 'devise_token_auth'
+gem 'devise-argon2', '~> 1.1.0'
+gem 'devise_invitable', '~> 2.0.8'
+gem 'devise_token_auth', '~> 1.2.2'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
 gem 'jmespath', '>= 1.6.1'
@@ -42,7 +42,7 @@ gem 'sidekiq', '>= 7.1.3'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'
-gem 'rack', '>= 2.2.6.3'
+gem 'rack', '~> 2.2.8.1'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.4.4'
 gem 'secure_headers'
@@ -65,7 +65,7 @@ gem 'grpc', '~> 1.53.2'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 
 group :development, :test do
-  gem 'bundler-audit'
+  gem 'bundler-audit', '~> 0.9.1'
   gem 'bullet'
   gem 'dotenv-rails'
   gem 'fasterer', require: false
