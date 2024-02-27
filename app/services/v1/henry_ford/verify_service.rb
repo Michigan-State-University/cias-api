@@ -61,13 +61,16 @@ class V1::HenryFord::VerifyService
     raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.appointments.not_found') if appointment.blank?
 
     visit_id = appointment&.dig(:resource, :identifier, 0, :value)
+    appointment_name = appointment
+                         .dig(:resource, :participant)
+                         .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                         &.dig(:actor, :display)
+                         &.downcase.to_s
 
-    location_id = available_locations.where("LOWER(CONCAT(department, ' ', external_name)) LIKE ?",
-                                            appointment
-                                              .dig(:resource, :participant)
-                                              .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
-                                              &.dig(:actor, :display)
-                                              &.downcase.to_s).first.external_id
+    location_id = available_locations.where(
+      "regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?",
+      appointment_name
+    ).first.external_id
 
     "_#{location_id}_#{visit_id}"
   end
