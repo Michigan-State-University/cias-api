@@ -23,11 +23,11 @@ class Session < ApplicationRecord
   has_many :users, through: :user_sessions
   has_many :notifications, as: :notifiable, dependent: :destroy
 
-  attribute :settings, :json, default: assign_default_values('settings')
+  attribute :settings, :json, default: -> { assign_default_values('settings') }
   attribute :position, :integer, default: 1
-  attribute :formulas, :json, default: assign_default_values('formulas')
-  attribute :body, :json, default: assign_default_values('body')
-  attribute :original_text, :json, default: { name: '' }
+  attribute :formulas, :json, default: -> { assign_default_values('formulas') }
+  attribute :body, :json, default: -> { assign_default_values('body') }
+  attribute :original_text, :json, default: -> { { name: '' } }
 
   enum schedule: { days_after: 'days_after',
                    days_after_fill: 'days_after_fill',

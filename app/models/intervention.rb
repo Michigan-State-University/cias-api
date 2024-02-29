@@ -51,7 +51,7 @@ class Intervention < ApplicationRecord
   has_many :clinic_locations, through: :intervention_locations
 
   attribute :shared_to, :string, default: 'anyone'
-  attribute :original_text, :json, default: { additional_text: '' }
+  attribute :original_text, :json, default: -> { { additional_text: '' } }
 
   delegate :language_code, to: :google_language
 

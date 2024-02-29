@@ -29,7 +29,7 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
           expect { subject }.to change(User, :count).by(1)
 
           expect(ActionMailer::MailDeliveryJob).to have_been_enqueued
-          expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
+          expect(SendNewReportNotificationJob).to have_been_enqueued.at(30.seconds.from_now)
             .with(new_participant.email, 'en')
 
           expect(participant_report.reload.participant_id).to eq(new_participant.id)

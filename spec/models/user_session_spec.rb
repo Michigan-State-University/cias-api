@@ -86,7 +86,7 @@ RSpec.describe UserSession, type: :model do
 
       context 'user session on answer' do
         let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id, session: create(:session, autofinish_enabled: true)) }
-        let(:expected_timestamp) { Time.current + 24.hours }
+        let(:expected_timestamp) { 24.hours.from_now }
         let(:timeout_job_id) { nil }
 
         context 'timeout_job_id is nil' do
@@ -141,7 +141,7 @@ RSpec.describe UserSession, type: :model do
         end
 
         context 'when delay is not default' do
-          let(:expected_timestamp) { Time.current + 72.minutes }
+          let(:expected_timestamp) { 72.minutes.from_now }
 
           before do
             user_session.session.update!(autofinish_delay: 72)
