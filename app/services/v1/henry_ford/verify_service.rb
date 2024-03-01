@@ -67,10 +67,10 @@ class V1::HenryFord::VerifyService
                          &.dig(:actor, :display)
                          &.downcase.to_s
 
-    location_id = available_locations.where(
-      "regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?",
-      appointment_name
-    ).first.external_id
+    location_id = available_locations
+                   .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
+                   .first
+                   .external_id
 
     "_#{location_id}_#{visit_id}"
   end
