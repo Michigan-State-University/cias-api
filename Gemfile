@@ -19,7 +19,7 @@ gem 'config'
 gem 'connection_pool'
 gem 'dentaku'
 gem 'devise-argon2'
-gem 'devise_invitable', '>= 2.0.9'
+gem 'devise_invitable'
 gem 'devise_token_auth'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
