@@ -433,3 +433,7 @@ RSpec/OverwritingSetup:
 
 Naming/AccessorMethodName:
   Enabled: true
+
+Naming/BlockForwarding:
+  Enabled: true
+  EnforcedStyle: explicit
