@@ -72,7 +72,7 @@ group :development, :test do
   gem 'overcommit', require: false
   gem 'pry-byebug'
   gem 'rack-test'
-  gem 'rubocop', require: false
+  gem 'rubocop', '>= 1.22.3', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
