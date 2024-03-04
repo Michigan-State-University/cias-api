@@ -65,6 +65,10 @@ class Question < ApplicationRecord
 
   scope :tlfb, -> { where('type like ?', '%Tlfb%') }
   scope :without_tlfb, -> { where('type not like ?', '%Tlfb%') }
+  scope :within_intervention, lambda { |intervention_id|
+    includes(question_group: :session)
+    .where(question_groups: { sessions: { intervention_id: intervention_id } })
+  }
   default_scope { order(:position) }
 
   def subclass_name

@@ -7,7 +7,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
   let(:first_session) { predefined_user_parameters.intervention.sessions.order(:position).first }
 
   it 'return expected response' do
-    expect(subject.keys).to match_array(%i[intervention_id session_id health_clinic_id multiple_fill_session_available user_intervention_id])
+    expect(subject.keys).to match_array(%i[intervention_id session_id health_clinic_id multiple_fill_session_available user_intervention_id lang])
   end
 
   context 'first execution of this service for the user' do

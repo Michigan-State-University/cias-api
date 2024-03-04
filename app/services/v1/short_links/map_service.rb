@@ -24,7 +24,8 @@ class V1::ShortLinks::MapService
         session_id: available_now_session(intervention, user_intervention)&.id,
         health_clinic_id: short_link.health_clinic_id,
         multiple_fill_session_available: multiple_fill_session_available(user_intervention),
-        user_intervention_id: user_intervention&.id
+        user_intervention_id: user_intervention&.id,
+        lang: intervention.language_code
       }
     }.to_json
   end

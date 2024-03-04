@@ -45,9 +45,14 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render status: :no_content
   end
 
-  def send_invitation
-    V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_participant)
-    render json: predefined_participant.predefined_user_parameter.reload.slice(:invitation_sent_at), status: :ok
+  def send_sms_invitation
+    V1::Intervention::PredefinedParticipants::SendSmsInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:sms_invitation_sent_at), status: :ok
+  end
+
+  def send_email_invitation
+    V1::Intervention::PredefinedParticipants::SendEmailInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:email_invitation_sent_at), status: :ok
   end
 
   private
@@ -65,7 +70,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_user_parameters
     params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, :external_id, :email,
-                                            phone_attributes: %i[iso prefix number])
+                                            :sms_notification, :email_notification, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load

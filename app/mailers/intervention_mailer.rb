@@ -4,7 +4,7 @@ class InterventionMailer < ApplicationMailer
   def inform_to_an_email(intervention, email, health_clinic = nil)
     @intervention = intervention
     @email = email
-    @health_clinic = health_clinic
+    @link = V1::SessionOrIntervention::Link.call(intervention, health_clinic, email)
 
     mail(to: @email, subject: I18n.t('intervention_mailer.inform_to_an_email.subject'))
   end

@@ -3,7 +3,7 @@
 class Clone::Base
   attr_accessor :source, :outcome, :options, :hidden, :clean_formulas, :position, :user_id, :session_variables
 
-  def initialize(source, **options)
+  def initialize(source, options)
     @source = source
     @outcome = @source.dup
     @session_variables = options.delete(:session_variables)

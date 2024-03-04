@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_12_11_092832) do
+ActiveRecord::Schema.define(version: 2024_01_30_154837) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -641,8 +641,11 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "auto_invitation", default: false, null: false
-    t.datetime "invitation_sent_at"
+    t.datetime "sms_invitation_sent_at"
     t.string "external_id"
+    t.boolean "sms_notification", default: false
+    t.boolean "email_notification", default: false
+    t.datetime "email_invitation_sent_at"
     t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
     t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
     t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"

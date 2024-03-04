@@ -347,4 +347,99 @@ RSpec.describe CloneJobs::Session, type: :job do
       )
     end
   end
+
+  context 'when cloning session with reflection' do
+    subject { described_class.perform_now(user, session) }
+
+    let!(:session) { create(:session, intervention: intervention, position: 1) }
+    let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
+    let!(:question1) do
+      create(
+        :question_single,
+        question_group: question_group,
+        subtitle: 'Question Subtitle',
+        position: 1,
+        body: {
+          data: [{ payload: 'a1', value: '1' }, { payload: 'a2', value: '2' }],
+          variable: { name: 'var' }
+        }
+      )
+    end
+    let!(:question2) do
+      create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 2', position: 2,
+                               narrator: {
+                                 blocks: [
+                                   {
+                                     action: 'NO_ACTION',
+                                     question_id: question1.id,
+                                     reflections: [
+                                       {
+                                         text: ['Test1'],
+                                         value: '1',
+                                         type: 'Speech',
+                                         sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
+                                         payload: 'a1',
+                                         variable: 'var',
+                                         audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3']
+                                       },
+                                       {
+                                         text: ['Test2'],
+                                         value: '2',
+                                         type: 'Speech',
+                                         sha256: ['80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2'],
+                                         payload: 'a2',
+                                         variable: 'var',
+                                         audio_urls: ['spec/factories/audio/80fc22b48738e42f920aca2c00b189ae565a268c45334e4cb5d056bede799cd2.mp3']
+                                       }
+                                     ],
+                                     animation: 'pointUp',
+                                     type: 'Reflection',
+                                     endPosition: {
+                                       x: 0,
+                                       y: 600
+                                     }
+                                   }
+                                 ],
+                                 settings: default_narrator_settings
+                               })
+    end
+    let(:default_narrator_settings) do
+      {
+        'voice' => true,
+        'animation' => true,
+        'character' => 'peedy'
+      }
+    end
+
+    before do
+      subject
+      intervention.reload
+    end
+
+    it 'adds new session to intervention' do
+      expect(intervention.sessions.count).to be(2)
+    end
+
+    it 'clones reflections from session' do
+      expect(intervention.sessions.last.questions.second.narrator['blocks'].first).to include(
+        'question_id' => intervention.sessions.last.questions.first.id,
+        'reflections' => [
+          include(
+            'text' => ['Test1'],
+            'value' => '1',
+            'type' => 'Speech',
+            'variable' => 'var'
+          ),
+          include(
+            'text' => ['Test2'],
+            'value' => '2',
+            'type' => 'Speech',
+            'variable' => 'var'
+          )
+        ],
+        'type' => 'Reflection',
+        'session_id' => nil
+      )
+    end
+  end
 end

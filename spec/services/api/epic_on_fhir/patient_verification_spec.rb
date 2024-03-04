@@ -19,8 +19,7 @@ describe Api::EpicOnFhir::PatientVerification do
 
   it 'when API return correct data' do
     stub_request(:post, "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match")
-      .with(query: { '_format' => 'json' },
-            body: hash_including({
+      .with(body: hash_including({
                                    resourceType: 'Parameters',
                                    parameter: [
                                      {
@@ -64,8 +63,7 @@ describe Api::EpicOnFhir::PatientVerification do
 
     it 'request should include mrn' do
       stub_request(:post, "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match")
-        .with(query: { '_format' => 'json' },
-              body: hash_including({
+        .with(body: hash_including({
                                      resourceType: 'Parameters',
                                      parameter: [
                                        {
@@ -114,7 +112,6 @@ describe Api::EpicOnFhir::PatientVerification do
 
   it 'when third part tool return 404' do
     stub_request(:post, "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match")
-      .with(query: { '_format' => 'json' })
       .to_return(status: 200, body: File.read('spec/fixtures/integrations/henry_ford/patient_not_found.json'))
 
     expect { subject }.to raise_error(EpicOnFhir::NotFound)

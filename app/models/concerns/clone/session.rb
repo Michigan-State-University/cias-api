@@ -54,8 +54,18 @@ class Clone::Session < Clone::Base
     outcome_questions.find_each do |question|
       question = reassign_branching_question(question)
       question = reassign_question_reflections(question)
+      question = remove_invalid_reflections(question) if clone_single_session?
       question.save!
     end
+  end
+
+  def clone_single_session?
+    outcome.intervention_id != source.intervention_id
+  end
+
+  def remove_invalid_reflections(question)
+    question.narrator['blocks'].delete_if { |block| block['type'] == 'Reflection' && block['question_id'].present? }
+    question
   end
 
   def reassign_branching_question(question)

@@ -25,11 +25,6 @@ class V1::FlowService::NextQuestion
     question = branching_service.call
     question = schedule_service.call(question)
 
-    if !question.is_a?(Hash) && question.type == 'Question::Finish'
-      assign_next_session_id(user_session.session.intervention)
-      user_session.finish
-    end
-
     next_or_current_question(question)
   end
 
@@ -43,6 +38,12 @@ class V1::FlowService::NextQuestion
 
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
+
+    if question.type == 'Question::Finish'
+      assign_next_session_id(user_session.session.intervention)
+      user_session.finish
+    end
+
     return question unless user_session.user.role?('predefined_participant')
     return question unless question.is_a?(Question::ParticipantReport)
 
