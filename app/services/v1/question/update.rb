@@ -14,7 +14,7 @@ class V1::Question::Update
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.published_intervention') if question.session.published?
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.not_uniq_variable') if new_variable_is_taken?(new_variables)
 
-    previous_var = question.body['variable']['name']
+    previous_var = question.body['variable']
     question.assign_attributes(question_params.except(:type))
     question.execute_narrator
     question.save!
@@ -28,7 +28,8 @@ class V1::Question::Update
   attr_accessor :question
 
   def adjust_reflections(previous_variable)
-    return if previous_variable == question.body['variable']['name']
+    return unless previous_variable
+    return if previous_variable['name'] == question.body['variable']['name']
 
     UpdateJobs::AdjustQuestionReflections.perform_later(question, previous_variable)
   end
