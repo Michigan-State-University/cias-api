@@ -93,7 +93,7 @@ class Session < ApplicationRecord
     end
 
     if intervention.shared_to_invited?
-      emails_without_access = emails - intervention.intervention_accesses.map(&:email).map(&:downcase)
+      emails_without_access = emails - intervention.intervention_accesses.map { |access| access.email&.downcase }
       intervention.give_user_access(emails_without_access)
     end
 

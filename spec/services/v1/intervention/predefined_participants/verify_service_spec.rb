@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
-  let(:subject) { described_class.call(predefined_user_parameters) }
+  subject { described_class.call(predefined_user_parameters) }
+
   let!(:predefined_participant) { create(:user, :predefined_participant) }
   let(:predefined_user_parameters) { predefined_participant.predefined_user_parameter }
   let(:first_session) { predefined_user_parameters.intervention.sessions.order(:position).first }

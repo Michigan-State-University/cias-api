@@ -131,7 +131,7 @@ class Intervention < ApplicationRecord
     end
 
     if shared_to_invited?
-      emails_without_access = emails - intervention_accesses.map(&:email).map(&:downcase)
+      emails_without_access = emails - intervention_accesses.map { |access| access.email&.downcase }
       give_user_access(emails_without_access)
     end
 
@@ -170,7 +170,7 @@ class Intervention < ApplicationRecord
 
   def cat_sessions_validation
     sessions.where(type: 'Session::CatMh').find_each do |session|
-      errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_resources', session_id: session.id) unless session.contains_necessary_resources? # rubocop:disable Layout/LineLength
+      errors.add(:base, (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_resources', session_id: session.id)) unless session.contains_necessary_resources? # rubocop:disable Layout/LineLength
     end
   end
 
@@ -193,13 +193,13 @@ class Intervention < ApplicationRecord
   def cat_settings_validation
     return if !intervention_have_cat_mh_sessions? || (cat_mh_application_id.present? && cat_mh_organization_id.present?)
 
-    errors[:base] << (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting') if license_type_limited? && (cat_mh_pool.blank? || cat_mh_pool.negative?) # rubocop:disable Layout/LineLength
+    errors.add(:base, (I18n.t 'activerecord.errors.models.intervention.attributes.cat_mh_setting')) if license_type_limited? && (cat_mh_pool.blank? || cat_mh_pool.negative?) # rubocop:disable Layout/LineLength
   end
 
   def live_chat_validation
     return if status == 'published' || status == 'draft'
 
-    errors[:base] << I18n.t('activerecord.errors.models.intervention.attributes.live_chat_wrong_session_status') if live_chat_enabled
+    errors.add(:base, I18n.t('activerecord.errors.models.intervention.attributes.live_chat_wrong_session_status')) if live_chat_enabled
   end
 
   def intervention_have_cat_mh_sessions?

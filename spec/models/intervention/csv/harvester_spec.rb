@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Intervention::Csv::Harvester, type: :model do
-  let(:subject) { described_class.new(intervention.sessions) }
+  subject { described_class.new(intervention.sessions) }
+
   let(:user) { create(:user, :confirmed, :admin) }
 
   describe '#collect_data' do
@@ -678,6 +679,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
 
         context 'when more than 1 session is finished' do
+          subject { described_class.new(intervention1.sessions) }
+
           let!(:question_body) do
             {
               'data' => [
@@ -687,7 +690,6 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
               'variable' => { 'name' => 'test' }
             }
           end
-          let(:subject) { described_class.new(intervention1.sessions) }
           let!(:intervention1) { create(:intervention) }
           let!(:session1) { create(:session, intervention: intervention1, position: 1) }
           let!(:user_session1) { create(:user_session, session: session1, user: user) }

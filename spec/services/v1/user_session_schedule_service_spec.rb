@@ -48,7 +48,7 @@ RSpec.describe V1::UserSessionScheduleService do
       }
     end
 
-    context 'check behavior to user session belongs and doesn't belongs to organization' do
+    context 'check behavior to user session belongs and doesn\'t belongs to organization' do
       %w[user_session_not_belongs_to_organization user_session_belongs_to_organization].each do |specific_user_session|
         let(:user_session) { user_sessions[specific_user_session] }
 
@@ -92,7 +92,7 @@ RSpec.describe V1::UserSessionScheduleService do
     end
   end
 
-  context 'check behavior to user session belongs and doesn't belongs to organization' do
+  context 'check behavior to user session belongs and doesn\'t belongs to organization' do
     %w[user_session_not_belongs_to_organization user_session_belongs_to_organization].each do |specific_user_session|
       let(:user_session) { user_sessions[specific_user_session] }
       context 'user session schedule service' do
@@ -204,7 +204,7 @@ RSpec.describe V1::UserSessionScheduleService do
               end
 
               it 'does not schedule' do
-                expect(described_class.new(user_session).schedule).to be(nil)
+                expect(described_class.new(user_session).schedule).to be_nil
               end
             end
           end

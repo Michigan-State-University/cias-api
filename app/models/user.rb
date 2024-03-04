@@ -272,11 +272,11 @@ class User < ApplicationRecord
     first_name.blank? || last_name.blank? || !terms
   end
 
-  def self.invite!(attributes = {}, invited_by = nil, options = {}, &)
+  def self.invite!(attributes = {}, invited_by = nil, options = {}, &block)
     user = User.new(**attributes)
     return user if user.tap(&:valid?).errors.messages_for(:email).include? 'is not an email'
 
-    super(attributes, invited_by, options, &)
+    super(attributes, invited_by, options, &block)
   end
 
   private
