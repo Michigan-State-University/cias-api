@@ -103,7 +103,7 @@ RSpec.describe CloneJobs::Session, type: :job do
       let!(:user) { create(:user, :confirmed, :researcher, email_notification: false) }
 
       it "Don't send email" do
-        expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+        expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
       end
 
       it 'change session counter' do

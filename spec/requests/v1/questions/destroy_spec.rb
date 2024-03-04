@@ -50,7 +50,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
           end
 
           it 'deletes questions' do
-            expect(Question.find_by(id: questions.first.id)).to eq(nil)
+            expect(Question.find_by(id: questions.first.id)).to be_nil
           end
 
           it 'keeps last question' do
@@ -62,11 +62,11 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
           end
 
           it 'deletes first question_group' do
-            expect(QuestionGroup.find_by(id: question_group.id)).to eq(nil)
+            expect(QuestionGroup.find_by(id: question_group.id)).to be_nil
           end
 
           it 'deletes answers' do
-            expect(Answer.find_by(id: answers.first.id)).to eq(nil)
+            expect(Answer.find_by(id: answers.first.id)).to be_nil
           end
         end
       end
@@ -90,7 +90,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
 
     it { expect(response).to have_http_status(:not_found) }
     it { expect(questions.size).to be(3) }
-    it { expect(questions.first).not_to be(nil) }
+    it { expect(questions.first).not_to be_nil }
     it { expect(other_questions.size).to be(3) }
   end
 
@@ -170,11 +170,11 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
     end
 
     it 'deletes duplicated question' do
-      expect(Question.find_by(id: duplicated_question.id)).to eq(nil)
+      expect(Question.find_by(id: duplicated_question.id)).to be_nil
     end
 
     it 'do not delete the original' do
-      expect(Question.find_by(id: new_question.id)).not_to eq(nil)
+      expect(Question.find_by(id: new_question.id)).not_to be_nil
     end
   end
 end

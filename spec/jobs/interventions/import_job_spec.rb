@@ -15,7 +15,7 @@ RSpec.describe Interventions::ImportJob, type: :job do
     end
 
     it 'do not create intervention' do
-      expect { subject }.to change(Intervention, :count).by(0)
+      expect { subject }.not_to change(Intervention, :count)
     end
   end
 end

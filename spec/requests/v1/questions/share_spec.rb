@@ -86,7 +86,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
         end
 
         it 'returns empty response' do
-          expect(response[:data]).to be(nil)
+          expect(response[:data]).to be_nil
         end
 
         include_examples 'records are created'
@@ -103,7 +103,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
           end
 
           it 'returns empty response' do
-            expect(response[:data]).to be(nil)
+            expect(response[:data]).to be_nil
           end
 
           include_examples 'records are created'
@@ -150,7 +150,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
             end
 
             it 'returns empty response' do
-              expect(response[:data]).to be(nil)
+              expect(response[:data]).to be_nil
             end
 
             include_examples 'records are created'

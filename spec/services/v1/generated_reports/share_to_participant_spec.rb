@@ -158,7 +158,7 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
     end
 
     it 'send email' do
-      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
     end
   end
 end

@@ -33,7 +33,7 @@ RSpec.describe V1::UserSessions::CreateService do
     let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
 
     it 'return existing user intervention' do
-      expect { subject }.to change(UserIntervention, :count).by(0)
+      expect { subject }.not_to change(UserIntervention, :count)
     end
 
     it 'instantiate user session' do

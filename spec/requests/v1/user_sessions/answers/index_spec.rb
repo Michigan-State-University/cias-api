@@ -26,7 +26,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
         end
 
         it 'returns correct answers' do
-          expect(answers_response).to eq(true)
+          expect(answers_response).to be(true)
         end
 
         it 'returns correct response code' do

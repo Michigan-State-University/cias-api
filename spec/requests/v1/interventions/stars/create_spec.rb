@@ -15,11 +15,11 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/star', type: :request do
     before { request }
 
     it 'the admin sees the intervention as starred' do
-      expect(intervention.starred_by?(admin.id)).to eq(true)
+      expect(intervention.starred_by?(admin.id)).to be(true)
     end
 
     it 'the owner still does not see their intervention as starred' do
-      expect(intervention.starred_by?(researcher.id)).to eq(false)
+      expect(intervention.starred_by?(researcher.id)).to be(false)
     end
   end
 

@@ -36,19 +36,19 @@ RSpec.describe DataClearJobs::ClearUserData, type: :job do
   it 'remove all guests without any user_intervention' do
     user_id = user_intervention2.user.id
     subject
-    expect(User.find_by(id: user_id)).to be nil
+    expect(User.find_by(id: user_id)).to be_nil
   end
 
   it 'remove all predefined participants without any user_intervention' do
     user_id = user_intervention3.user.id
     subject
-    expect(User.find_by(id: user_id)).to be nil
+    expect(User.find_by(id: user_id)).to be_nil
   end
 
   it 'removes associated predefined user parameters' do
     predefined_user_parameter_id = user_intervention3.user.predefined_user_parameter.id
     subject
-    expect(PredefinedUserParameter.find_by(id: predefined_user_parameter_id)).to be nil
+    expect(PredefinedUserParameter.find_by(id: predefined_user_parameter_id)).to be_nil
   end
 
   it 'participants are stay intact' do

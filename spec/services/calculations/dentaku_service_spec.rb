@@ -79,7 +79,7 @@ RSpec.describe Calculations::DentakuService do
       let(:formula) {}
 
       it 'throws proper error' do
-        expect(call).to eq(nil)
+        expect(call).to be_nil
       end
 
       it 'does not change dentaku calculator memory' do

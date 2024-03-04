@@ -27,7 +27,7 @@ RSpec.describe V1::Users::Verifications::Create do
       subject
       user_verification_codes = user.reload.user_verification_codes
       expect(user_verification_codes.count).to eq number_of_codes
-      expect(user_verification_codes.exists?(code: code)).to eq true if exist456 == true
+      expect(user_verification_codes.exists?(code: code)).to be true if exist456 == true
       expect(user_verification_codes.last.code).to eq last_code if last_code
     end
   end

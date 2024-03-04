@@ -85,7 +85,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
       end
 
       it 'returns verification code in response' do
-        expect(json_response['verification_code']).not_to be nil
+        expect(json_response['verification_code']).not_to be_nil
         expect(json_response['verification_code']).to eq user_with_pending_invitation.user_verification_codes.order(created_at: :desc).first.code
       end
     end

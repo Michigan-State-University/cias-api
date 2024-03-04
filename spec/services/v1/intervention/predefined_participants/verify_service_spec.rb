@@ -16,7 +16,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
     end
 
     it 'when intervention doesn\'t have sessions' do
-      expect(subject[:session_id]).to be nil
+      expect(subject[:session_id]).to be_nil
     end
   end
 
@@ -63,7 +63,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       let(:scheduled_at) { DateTime.now + 2.days }
 
       it 'return started session' do
-        expect(subject[:session_id]).to be nil
+        expect(subject[:session_id]).to be_nil
       end
 
       context 'scheduled at from past' do
@@ -81,7 +81,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       end
 
       it 'return started session' do
-        expect(subject[:session_id]).to be nil
+        expect(subject[:session_id]).to be_nil
       end
     end
   end
@@ -108,7 +108,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       end
 
       it 'return correct value for some keys' do
-        expect(subject[:session_id]).to be nil
+        expect(subject[:session_id]).to be_nil
         expect(subject[:multiple_fill_session_available]).to be true
       end
     end

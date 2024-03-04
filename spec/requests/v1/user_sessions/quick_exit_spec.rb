@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH  /v1/user_sessions/:user_session_id/quick_exit', type: :request do
+RSpec.describe 'PATCH /v1/user_sessions/:user_session_id/quick_exit', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:shared_to) { :anyone }

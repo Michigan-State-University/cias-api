@@ -30,7 +30,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
 
     it 'fill data' do
       request
-      expect(User.find_by(email: 'test@test.com').terms).to eq(true)
+      expect(User.find_by(email: 'test@test.com').terms).to be(true)
     end
   end
 

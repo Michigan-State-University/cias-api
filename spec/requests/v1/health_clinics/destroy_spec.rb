@@ -32,7 +32,7 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
       before { request }
 
       it 'return correct organizable and user_health_clinics' do
-        expect(health_clinic_admin.reload.organizable_id).to eq(nil)
+        expect(health_clinic_admin.reload.organizable_id).to be_nil
         expect(health_clinic_admin.user_health_clinics).to match_array([])
       end
 
@@ -41,11 +41,11 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
       end
 
       it 'health clinic is deleted' do
-        expect(HealthClinic.find_by(id: health_system.id)).to eq(nil)
+        expect(HealthClinic.find_by(id: health_system.id)).to be_nil
       end
 
       it 'health_clinic admin active status is false' do
-        expect(health_clinic_admin.reload.active?).to eq(false)
+        expect(health_clinic_admin.reload.active?).to be(false)
       end
 
       it 'does not change chart statistic count' do

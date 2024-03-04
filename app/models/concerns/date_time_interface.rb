@@ -5,7 +5,7 @@ module DateTimeInterface
     seconds_diff = end_time - start_time
     duration = ActiveSupport::Duration.build(seconds_diff.abs)
     parts = duration.parts
-    total_hours = (parts[:hours] || 0) + (parts[:days] || 0) * 24
+    total_hours = (parts[:hours] || 0) + ((parts[:days] || 0) * 24)
     format('%<hours>02d:%<minutes>02d:%<seconds>02d',
            hours: total_hours,
            minutes: parts[:minutes] || 0,

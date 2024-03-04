@@ -76,7 +76,7 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'patient data doesn\'t assign ' do
+    it 'patient data doesn't assign' do
       expect(user.reload.hfhs_patient_detail).to eq(hfhs_data)
     end
   end

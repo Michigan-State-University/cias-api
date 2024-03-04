@@ -74,7 +74,7 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
       expect { subject.call }.to raise_error(ArgumentError)
     end
 
-    context 'henry ford health - initial screen and default intervention don\'t have access to HFHS -> initial screen should be skipped ' do
+    context 'henry ford health - initial screen and default intervention don't have access to HFHS -> initial screen should be skipped' do
       let(:intervention) { create(:intervention) }
       let!(:target_session) { create(:session, intervention: intervention) }
       let!(:question3) { create(:question_henry_ford_initial_screen, question_group: question_group) }

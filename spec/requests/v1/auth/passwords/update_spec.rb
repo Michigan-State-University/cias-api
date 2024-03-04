@@ -27,7 +27,7 @@ describe 'PATCH /v1/auth/password', type: :request do
     end
 
     it 'changes password' do
-      expect(current_user.reload.valid_password?('ComplPass1!')).to eq true
+      expect(current_user.reload.valid_password?('ComplPass1!')).to be true
     end
   end
 
@@ -38,7 +38,7 @@ describe 'PATCH /v1/auth/password', type: :request do
       it { expect(response).to have_http_status(:unprocessable_entity) }
 
       it 'does not change password' do
-        expect(current_user.reload.valid_password?('NewPassword1!')).to eq false
+        expect(current_user.reload.valid_password?('NewPassword1!')).to be false
       end
 
       it 'contains the proper error message' do
@@ -52,7 +52,7 @@ describe 'PATCH /v1/auth/password', type: :request do
       it { expect(response).to have_http_status(:unprocessable_entity) }
 
       it 'does not change password' do
-        expect(current_user.reload.valid_password?('NewPassword1!')).to eq false
+        expect(current_user.reload.valid_password?('NewPassword1!')).to be false
       end
 
       it 'contains the proper error message' do
