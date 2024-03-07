@@ -413,15 +413,16 @@ RSpec.describe CloneJobs::Session, type: :job do
 
     before do
       subject
+      intervention.reload
     end
 
     it 'adds new session to intervention' do
-      expect(intervention.reload.sessions.count).to be(2)
+      expect(intervention.sessions.count).to be(2)
     end
 
     it 'clones reflections from session' do
-      expect(intervention.reload.sessions.last.questions.second.narrator['blocks'].first).to include(
-        'question_id' => intervention.reload.sessions.last.questions.first.id,
+      expect(intervention.sessions.last.questions.second.narrator['blocks'].first).to include(
+        'question_id' => intervention.sessions.last.questions.first.id,
         'reflections' => [
           include(
             'text' => ['Test1'],

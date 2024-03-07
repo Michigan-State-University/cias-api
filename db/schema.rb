@@ -382,12 +382,12 @@ ActiveRecord::Schema.define(version: 2024_01_30_154837) do
 
   create_table "hfhs_patient_details", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "patient_id_ciphertext"
-    t.string "first_name_ciphertext", null: false
-    t.string "last_name_ciphertext", null: false
-    t.string "dob_ciphertext", null: false
-    t.string "sex_ciphertext", null: false
+    t.string "first_name_ciphertext"
+    t.string "last_name_ciphertext"
+    t.string "dob_ciphertext"
+    t.string "sex_ciphertext"
     t.string "visit_id_ciphertext", default: ""
-    t.string "zip_code_ciphertext", default: "", null: false
+    t.string "zip_code_ciphertext", default: ""
     t.string "patient_id_bidx"
     t.string "first_name_bidx"
     t.string "last_name_bidx"
@@ -400,6 +400,20 @@ ActiveRecord::Schema.define(version: 2024_01_30_154837) do
     t.string "phone_number_bidx"
     t.string "phone_type_ciphertext"
     t.string "phone_type_bidx"
+    t.string "provided_first_name_ciphertext"
+    t.string "provided_last_name_ciphertext"
+    t.string "provided_dob_ciphertext"
+    t.string "provided_sex_ciphertext"
+    t.string "provided_zip_ciphertext"
+    t.string "provided_phone_type_ciphertext"
+    t.string "provided_phone_number_ciphertext"
+    t.string "provided_first_name_bidx"
+    t.string "provided_last_name_bidx"
+    t.string "provided_dob_bidx"
+    t.string "provided_sex_bidx"
+    t.string "provided_zip_bidx"
+    t.string "provided_phone_type_bidx"
+    t.string "provided_phone_number_bidx"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end

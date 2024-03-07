@@ -143,8 +143,17 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
 
     it 'contain information about patient details' do
       request
-      expect(json_response['hfhs_patient_detail']).to include(participant.hfhs_patient_detail.slice(:patient_id, :first_name, :last_name, :sex, :zip_code,
-                                                                                                    :phone_number, :phone_type))
+      hfhs_patient_detail = participant.hfhs_patient_detail
+      expect(json_response['hfhs_patient_detail']).to include(
+        { 'patient_id' => participant.hfhs_patient_detail.patient_id,
+          'zip_code' => hfhs_patient_detail.provided_zip,
+          'first_name' => hfhs_patient_detail.provided_first_name,
+          'last_name' => hfhs_patient_detail.provided_last_name,
+          'dob' => hfhs_patient_detail.provided_dob,
+          'sex' => hfhs_patient_detail.provided_sex,
+          'phone_number' => hfhs_patient_detail.provided_phone_number,
+          'phone_type' => hfhs_patient_detail.provided_phone_type }
+      )
     end
 
     it 'have all expected kayes in hfh\'s section' do
