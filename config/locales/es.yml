@@ -47,7 +47,7 @@ es:
       body: Se le ha invitado a participar en %{intervention_name}. Haga clic en el enlace para obtener más información.
       header: CIAS Invitación
       html_body: 'Se le ha invitado a completar <span style="color: #c866ea;">%{intervention_name}</span>.<br /><br />Haga clic en el botón de abajo para acceder.'
-      button_text: Go to the intervention
+      button_text: Ir a la intervención
       invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/invite"
       invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/invite?cid=%{health_clinic_id}"
     invite_to_intervention_and_registration:
