@@ -95,10 +95,22 @@ class V1::HenryFord::VerifyService
                          &.dig(:actor, :display)
                          &.downcase.to_s
 
-    location_id = available_locations
+    appointment_location_id = appointment
+                               .dig(:resource, :participant)
+                               .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                               &.dig(:actor, :reference)
+                               &.to_s
+
+    appointment_location_auxiliary_id = appointment_location_id.sub('Location/', '')
+
+    location = available_locations
                    .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
                    .first
-                   .external_id
+
+    location_id = location.external_id
+    appointment_location_id = location.epic_identifier
+    location.update!(auxiliary_epic_identifier: appointment_location_auxiliary_id)
+    Rails.logger.send(:info, "HFHS_IDENTIFIER_LOG test: #{appointment_location_id}, auxiliary: #{appointment_location_auxiliary_id}")
 
     "_#{location_id}_#{visit_id}"
   end
