@@ -53,7 +53,6 @@ class UpdateClinicLocationNamesFromHenryFord < ActiveRecord::Migration[6.1]
       },
     ].each do |clinic_location_params|
       clinic_location = AuxiliaryClinicLocation.find_by(name: clinic_location_params[:name])
-      byebug
       if clinic_location.present?
         clinic_location.update!(clinic_location_params)
       else
