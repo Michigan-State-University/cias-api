@@ -136,7 +136,7 @@ RSpec.describe V1::LiveChat::Conversations::GenerateTranscript do
                      conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%m/%d/%Y'),
                      conversation.created_at.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC')).strftime('%I:%M:%S %p'), nil,
                      *conversation.messages.map { |message| "[#{message.user.navigator? ? 'N' : 'P'}] \"#{message.content}\"" }]
-            array << [nil] * (message_count - conversation.messages.size) if array.size < message_count
+            array << ([nil] * (message_count - conversation.messages.size)) if array.size < message_count
             array
           end
         ]

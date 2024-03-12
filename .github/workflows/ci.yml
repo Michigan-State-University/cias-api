@@ -15,7 +15,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.0.6
+          ruby-version: 3.1.4
         env:
           RUBYOPT: --jit
 
@@ -75,7 +75,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
-          ruby-version: 3.0.6
+          ruby-version: 3.1.4
         env:
           RUBYOPT: --jit
       - run: cp .env.template .env

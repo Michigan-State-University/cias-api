@@ -20,7 +20,7 @@ RSpec.describe 'PATCH /v1/users/confirm_logging_code', type: :request do
     let!(:user) { create(:user) }
 
     it 'return 408 status' do
-      user.user_verification_codes.last.update!(created_at: Time.current - 2.hours)
+      user.user_verification_codes.last.update!(created_at: 2.hours.ago)
       request
       expect(response).to have_http_status(:request_timeout)
     end

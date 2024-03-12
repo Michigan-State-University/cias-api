@@ -26,12 +26,12 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
     context 'when user session hasn\'t any answers' do
       it 'return empty body' do
         request
-        expect(json_response['data']).to be(nil)
-        expect(json_response['answer']).to be(nil)
+        expect(json_response['data']).to be_nil
+        expect(json_response['answer']).to be_nil
       end
     end
 
-    context 'when user want to see last question -  first undo' do
+    context 'when user want to see last question - first undo' do
       let!(:answer) { create(:answer_single, question: question1, user_session: user_session) }
 
       it 'return correct question id' do
@@ -65,7 +65,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       end
     end
 
-    context 'when user want to see last question -  second undo' do
+    context 'when user want to see last question - second undo' do
       let!(:answer1) { create(:answer_single, question: question1, user_session: user_session) }
       let!(:answer2) { create(:answer_single, question: question2, user_session: user_session) }
 
@@ -126,7 +126,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       it 'return correct body' do
         request
         expect(json_response['data']['id']).to eq(question1.id)
-        expect(json_response['answer']).to be(nil)
+        expect(json_response['answer']).to be_nil
       end
     end
   end

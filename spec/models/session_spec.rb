@@ -75,7 +75,7 @@ RSpec.describe Session, type: :model do
           let(:schedule) { 'exact_date' }
 
           context 'session is in the feature' do
-            it 'returns false ' do
+            it 'returns false' do
               expect(session.available_now?).to be(false)
             end
           end
@@ -202,7 +202,7 @@ RSpec.describe Session, type: :model do
           let!(:session2) { create(:session, variable: variable, intervention: intervention) }
 
           it 'invalidate' do
-            expect(subject.validate).to eq false
+            expect(subject.validate).to be false
           end
         end
 
@@ -210,13 +210,13 @@ RSpec.describe Session, type: :model do
           let!(:session2) { create(:session, variable: variable) }
 
           it 'validate' do
-            expect(subject.validate).to eq true
+            expect(subject.validate).to be true
           end
         end
 
         context "when variable doesn't exist in other sessions" do
           it 'validate' do
-            expect(subject.validate).to eq true
+            expect(subject.validate).to be true
           end
         end
       end

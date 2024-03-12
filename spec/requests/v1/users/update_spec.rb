@@ -212,7 +212,7 @@ describe 'PATCH /v1/users/:id', type: :request do
           end
 
           it 'updates feedback_completed to true' do
-            expect(current_user.reload.feedback_completed).to eq(true)
+            expect(current_user.reload.feedback_completed).to be(true)
           end
         end
 

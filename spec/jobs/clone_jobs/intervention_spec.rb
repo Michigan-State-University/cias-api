@@ -29,7 +29,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     let!(:user) { create(:user, :confirmed, :researcher, email_notification: false) }
 
     it "Don't send email" do
-      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
     end
   end
 
@@ -77,7 +77,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
 
     it 'does not copy over the HFH access setting' do
       subject
-      expect(Intervention.order(:created_at).last.attributes['hfhs_access']).not_to eq true
+      expect(Intervention.order(:created_at).last.attributes['hfhs_access']).not_to be true
     end
   end
 

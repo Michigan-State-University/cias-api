@@ -10,7 +10,7 @@ class ReportTemplate::Section::Variant < ApplicationRecord
   belongs_to :report_template_section, class_name: 'ReportTemplate::Section'
   has_one_attached :image
 
-  attribute :original_text, :json, default: assign_default_values('original_text')
+  attribute :original_text, :json, default: -> { assign_default_values('original_text') }
 
   after_create :assign_next_position
 

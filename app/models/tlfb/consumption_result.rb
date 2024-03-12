@@ -6,7 +6,7 @@ class Tlfb::ConsumptionResult < ApplicationRecord
   delegate :user_session, to: :day
   delegate :question_group, to: :day
 
-  attribute :body, :json, default: {}
+  attribute :body, :json, default: -> { {} }
   validates :body, json: {
     schema: -> { Rails.root.join("#{json_schema_path}/body.json").to_s },
     message: ->(err) { err }

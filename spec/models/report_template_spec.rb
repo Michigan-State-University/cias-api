@@ -107,7 +107,7 @@ RSpec.describe ReportTemplate, type: :model do
     end
 
     it 'has "is_duplicated_from_other_session" flag off' do
-      expect(subject.is_duplicated_from_other_session).to eq(false)
+      expect(subject.is_duplicated_from_other_session).to be(false)
     end
 
     context 'when we duplicate template to other session' do
@@ -124,14 +124,14 @@ RSpec.describe ReportTemplate, type: :model do
       end
 
       it 'has "is_duplicated_from_other_session" flag on' do
-        expect(subject.reload.is_duplicated_from_other_session).to eq(true)
+        expect(subject.reload.is_duplicated_from_other_session).to be(true)
       end
 
       context 'when the option to set flag is off' do
         subject { Clone::ReportTemplate.new(report_template, params: { session_id: session.id }, set_flag: false).execute }
 
         it 'has "is_duplicated_from_other_session" flag on' do
-          expect(subject.is_duplicated_from_other_session).to eq(false)
+          expect(subject.is_duplicated_from_other_session).to be(false)
         end
       end
     end

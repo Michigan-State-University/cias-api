@@ -187,7 +187,7 @@ RSpec.describe 'GET /v1/health_clinics/:id', type: :request do
       end
     end
 
-    context 'when user is ' do
+    context 'when user is' do
       %w[organization_admin e_intervention_admin].each do |role|
         context role.to_s do
           let(:user) { roles_organization2[role] }

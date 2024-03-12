@@ -46,7 +46,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
       expect(generated_report.reload.third_party_users).to include(new_user)
 
       expect(ActionMailer::MailDeliveryJob).to have_been_enqueued.twice
-      expect(SendNewReportNotificationJob).to have_been_enqueued.at(Time.current + 30.seconds)
+      expect(SendNewReportNotificationJob).to have_been_enqueued.at(30.seconds.from_now)
                                                                 .with(
                                                                   new_user.email,
                                                                   number_of_generated_reports,

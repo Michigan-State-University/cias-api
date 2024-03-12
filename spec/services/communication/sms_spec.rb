@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Communication::Sms do
+  subject { described_class.new(message.id) }
+
   let(:message) { create :message, :with_code }
-  let(:subject) { described_class.new(message.id) }
   let(:client) { subject.client }
   let(:call) { subject.send_message }
 

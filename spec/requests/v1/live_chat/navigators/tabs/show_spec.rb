@@ -47,7 +47,7 @@ RSpec.describe 'GET /v1/live_chat/intervention/:id/navigator_tab', type: :reques
         get v1_live_chat_intervention_navigator_tab_path(id: intervention2.id), headers: headers
       end
 
-      it 'return empty array in navigator in the team section ' do
+      it 'return empty array in navigator in the team section' do
         expect(json_response['data']['attributes']['navigators_in_team'].size).to be(0)
       end
     end

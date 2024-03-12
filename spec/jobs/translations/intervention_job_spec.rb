@@ -29,7 +29,7 @@ RSpec.describe Translations::InterventionJob, type: :job do
     let!(:user) { create(:user, :confirmed, :researcher, email_notification: false) }
 
     it "Don't send email" do
-      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
     end
   end
 

@@ -43,13 +43,13 @@ RSpec.describe OrganizationInvitation, type: :model do
       end
 
       it 'organization invitation is invalid on create' do
-        expect(organization_invitation.valid?(:create)).to eq(false)
+        expect(organization_invitation.valid?(:create)).to be(false)
         expect(organization_invitation.errors.messages[:user_id]).to include('already exists')
       end
 
       it 'organization invitation valid on update' do
-        expect(organization_invitation.valid?(:update)).to eq(true)
-        expect(not_accepted_organization_invitation.valid?(:update)).to eq(true)
+        expect(organization_invitation.valid?(:update)).to be(true)
+        expect(not_accepted_organization_invitation.valid?(:update)).to be(true)
       end
     end
   end

@@ -587,7 +587,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
         end
       end
 
-      context 'another type, then speech block, another ' do
+      context 'another type, then speech block, another' do
         let(:params) { params_another_reflection_another }
 
         it 'will contains blocks' do
@@ -599,7 +599,7 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
         end
       end
 
-      context 'pause block ' do
+      context 'pause block' do
         let(:params) { params_pause }
 
         it 'will contains blocks' do

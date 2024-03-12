@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH  /v1/report_templates/sections/:section_id/move_variants', type: :request do
+RSpec.describe 'PATCH /v1/report_templates/sections/:section_id/move_variants', type: :request do
   let(:request) { patch v1_report_template_section_move_variants_path(report_template_section.id), params: params, headers: headers }
   let(:user) { create(:user, :researcher, :confirmed) }
   let(:headers) { user.create_new_auth_token }

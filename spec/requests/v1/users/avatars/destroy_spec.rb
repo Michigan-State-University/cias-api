@@ -33,7 +33,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'removes attached avatar' do
-        expect(current_user.reload.avatar.attachment).to eq nil
+        expect(current_user.reload.avatar.attachment).to be_nil
       end
     end
   end
@@ -52,7 +52,7 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'removes attached avatar' do
-        expect(other_user.reload.avatar.attachment).to eq nil
+        expect(other_user.reload.avatar.attachment).to be_nil
       end
     end
   end

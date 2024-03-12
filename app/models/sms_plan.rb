@@ -15,7 +15,7 @@ class SmsPlan < ApplicationRecord
   has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
   has_one_attached :no_formula_attachment, dependent: :purge_later
 
-  attribute :original_text, :json, default: assign_default_values('original_text')
+  attribute :original_text, :json, default: -> { assign_default_values('original_text') }
 
   validates :name, :schedule, :frequency, presence: true
 

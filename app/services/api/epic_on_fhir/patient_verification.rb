@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
-  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match"
+  ENDPOINT = "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match".freeze
   SYSTEM_ID = ENV.fetch('EPIC_ON_FHIR_SYSTEM')
 
   def self.call(first_name, last_name, birth_date, phone_number, phone_type, postal_code, mrn = nil)

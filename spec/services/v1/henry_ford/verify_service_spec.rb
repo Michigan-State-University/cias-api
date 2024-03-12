@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::HenryFord::VerifyService do
-  let(:subject) { described_class.new(user, params, session.id).call }
+  subject { described_class.new(user, params, session.id).call }
+
   let(:user) { create(:user, :participant, :confirmed) }
   let(:intervention) { create(:intervention) }
   let!(:location) do

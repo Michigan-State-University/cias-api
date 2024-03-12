@@ -16,7 +16,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/files/:id', type: :req
       it { expect(response).to have_http_status(:ok) }
 
       it 'return correct data' do
-        expect(json_response['data']['attributes']['files']).to be nil
+        expect(json_response['data']['attributes']['files']).to be_nil
       end
     end
 

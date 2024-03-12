@@ -32,7 +32,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/short_links', type: :requ
     end
 
     it 'return empty health clinics param' do
-      expect(json_response['health_clinics']).to be nil
+      expect(json_response['health_clinics']).to be_nil
     end
   end
 

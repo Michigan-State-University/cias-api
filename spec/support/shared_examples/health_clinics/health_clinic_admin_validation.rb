@@ -4,7 +4,7 @@ RSpec.shared_examples 'without health clinic' do
   subject { user.valid? }
 
   it 'does not have health clinic' do
-    expect(user.organizable).to be(nil)
+    expect(user.organizable).to be_nil
     subject
   end
 end

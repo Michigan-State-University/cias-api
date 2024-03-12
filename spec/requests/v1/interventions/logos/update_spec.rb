@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH  /v1/interventions/:interventions_id/logo', type: :request do
+RSpec.describe 'PATCH /v1/interventions/:interventions_id/logo', type: :request do
   let(:current_user) { create(:user, :confirmed, :admin) }
   let(:other_user) { create(:user, :confirmed, :participant) }
   let(:other_user2) { create(:user, :confirmed, :third_party) }

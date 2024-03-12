@@ -13,7 +13,7 @@ RSpec.describe V1::SmsPlans::CalculateMatchedVariant do
     let!(:all_var_answer_values) { { 'no_yes_var' => 1 } }
 
     it 'returns nil' do
-      expect(subject).to eq nil
+      expect(subject).to be_nil
     end
   end
 

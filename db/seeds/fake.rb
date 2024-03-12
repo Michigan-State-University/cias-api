@@ -301,7 +301,7 @@ class Fake
         {
           data: [
             {
-              payload: Faker::Creature::Dog.name
+              payload: Faker::Creature::Cat.name
             }
           ],
           variable: {
@@ -316,7 +316,7 @@ class Fake
             }
           ],
           variable: {
-            name: Faker::Alphanumeric.alpha(number: 6)
+            name: Faker::Alphanumeric.alpha(number: 4)
           }
         }
       else

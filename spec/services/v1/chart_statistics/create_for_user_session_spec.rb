@@ -109,10 +109,10 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
           user: user
         )
 
-        expect(chart_statistics.exists?(label: 'Label1', chart: pie_chart1)).to eq true
-        expect(chart_statistics.exists?(label: 'Other', chart: pie_chart2)).to eq true
-        expect(chart_statistics.exists?(label: 'Matched', chart: bar_chart1)).to eq true
-        expect(chart_statistics.exists?(label: 'NotMatched', chart: bar_chart2)).to eq true
+        expect(chart_statistics.exists?(label: 'Label1', chart: pie_chart1)).to be true
+        expect(chart_statistics.exists?(label: 'Other', chart: pie_chart2)).to be true
+        expect(chart_statistics.exists?(label: 'Matched', chart: bar_chart1)).to be true
+        expect(chart_statistics.exists?(label: 'NotMatched', chart: bar_chart2)).to be true
       end
     end
 

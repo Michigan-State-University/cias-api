@@ -33,7 +33,7 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
 
     it 'sets the "sensitive_data_state" flag to "prepared_to_remove"' do
       request
-      expect(intervention.reload.sensitive_data_marked_to_remove?).to eq(true)
+      expect(intervention.reload.sensitive_data_marked_to_remove?).to be(true)
     end
 
     it 'does enqueued job' do

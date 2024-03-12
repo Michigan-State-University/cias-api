@@ -35,7 +35,7 @@ RSpec.describe 'DELETE /v1/organizations/:organization_id/dashboard_sections/:id
       end
 
       it 'dashboard section is deleted' do
-        expect(DashboardSection.find_by(id: dashboard_section.id)).to eq(nil)
+        expect(DashboardSection.find_by(id: dashboard_section.id)).to be_nil
       end
     end
 

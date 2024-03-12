@@ -31,7 +31,7 @@ RSpec.describe V1::Users::Update do
     end
 
     it 'throws proper error message' do
-      expect { subject }.to raise_error 'unknown attribute \'test\' for User.'
+      expect { subject }.to raise_error(ActiveModel::UnknownAttributeError)
     end
   end
 end

@@ -47,7 +47,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       it do
         request
         phone = intervention.navigator_setup.phone
-        expect(phone).not_to be nil
+        expect(phone).not_to be_nil
         expect(phone.number).to eq 111_111_111.to_s
         expect(phone.iso).to eq 'US'
         expect(phone.prefix).to eq '+1'
@@ -70,7 +70,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       it do
         request
         phone = intervention.navigator_setup.message_phone
-        expect(phone).not_to be nil
+        expect(phone).not_to be_nil
         expect(phone.number).to eq 222_222_222.to_s
         expect(phone.iso).to eq 'US'
         expect(phone.prefix).to eq '+1'
@@ -179,7 +179,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
 
         it 'correctly deletes previous file' do
           request
-          expect(intervention.navigator_setup.reload.filled_script_template.attached?).to eq false
+          expect(intervention.navigator_setup.reload.filled_script_template.attached?).to be false
           expect(ActiveStorage::Attachment.count).to be 0
         end
       end
@@ -215,7 +215,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
 
     it do
       request
-      expect(intervention.navigator_setup.reload.phone).to be nil
+      expect(intervention.navigator_setup.reload.phone).to be_nil
       expect(Phone.count).to eq 0
     end
   end
@@ -233,7 +233,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
 
     it do
       request
-      expect(intervention.navigator_setup.reload.message_phone).to be nil
+      expect(intervention.navigator_setup.reload.message_phone).to be_nil
       expect(Phone.count).to eq 0
     end
   end

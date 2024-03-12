@@ -34,7 +34,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     let!(:user) { create(:user, :confirmed, :researcher, email_notification: false) }
 
     it "Don't send email" do
-      expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+      expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
     end
   end
 
@@ -52,7 +52,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     end
 
     it 'have correct question group' do
-      expect(new_intervention.sessions.last.question_groups.first).not_to eq(nil)
+      expect(new_intervention.sessions.last.question_groups.first).not_to be_nil
       expect(new_intervention.sessions.last.question_groups.first.title).to eq(session.question_groups.first.title)
     end
 
@@ -64,7 +64,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     end
 
     it 'clears the days_after_variable_name value' do
-      expect(new_intervention.reload.sessions.first['days_after_date_variable_name']).to eq(nil)
+      expect(new_intervention.reload.sessions.first['days_after_date_variable_name']).to be_nil
     end
   end
 

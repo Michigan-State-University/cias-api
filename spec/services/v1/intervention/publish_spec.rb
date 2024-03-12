@@ -58,11 +58,11 @@ RSpec.describe V1::Intervention::Publish do
 
       it 'clear preview users and preview user sessions' do
         described_class.new(intervention).execute
-        expect(User.exists?(id: preview_session_user.id)).to eq false
-        expect(UserIntervention.exists?(id: user_session.id)).to eq false
-        expect(UserSession.exists?(id: user_session.id)).to eq false
-        expect(UserLogRequest.exists?(user_id: preview_session_user.id)).to eq false
-        expect(Phone.exists?(id: preview_user_phone.id)).to eq false
+        expect(User.exists?(id: preview_session_user.id)).to be false
+        expect(UserIntervention.exists?(id: user_session.id)).to be false
+        expect(UserSession.exists?(id: user_session.id)).to be false
+        expect(UserLogRequest.exists?(user_id: preview_session_user.id)).to be false
+        expect(Phone.exists?(id: preview_user_phone.id)).to be false
       end
     end
   end

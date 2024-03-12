@@ -49,7 +49,7 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
     let!(:invited_researcher) { create(:user, :researcher, :confirmed) }
 
     it 'does not create a new user account' do
-      expect { subject.call }.to change(User, :count).by(0)
+      expect { subject.call }.not_to change(User, :count)
     end
   end
 
@@ -65,7 +65,7 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
     end
 
     it 'does not create a new user account' do
-      expect { subject.call }.to change(User, :count).by(0)
+      expect { subject.call }.not_to change(User, :count)
     end
 
     it 'sends an email to the researcher' do

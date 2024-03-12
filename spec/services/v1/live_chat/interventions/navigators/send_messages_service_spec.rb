@@ -4,7 +4,7 @@ RSpec.describe V1::LiveChat::Interventions::Navigators::SendMessages do
   WebMock.disable!
   WebMock.allow_net_connect!
 
-  let(:subject) { described_class.call(intervention, message_type) }
+  subject { described_class.call(intervention, message_type) }
 
   let!(:user) { create(:user, :admin, :confirmed) }
   let!(:navigator) { create(:user, :navigator, :confirmed) }
@@ -52,8 +52,9 @@ RSpec.describe V1::LiveChat::Interventions::Navigators::SendMessages do
   end
 
   context 'cancel_call_out' do
+    subject { described_class.call(intervention, message_type, navigator) }
+
     let(:message_type) { 'cancel_call_out' }
-    let(:subject) { described_class.call(intervention, message_type, navigator) }
 
     context 'correctly sends emails' do
       let!(:mails) { ActionMailer::Base.deliveries }

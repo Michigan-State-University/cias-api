@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Intervention::PredefinedParticipants::CreateService do
-  let(:subject) { described_class.call(intervention, params) }
+  subject { described_class.call(intervention, params) }
+
   let!(:intervention) { create(:intervention) }
   let!(:health_clinic_id) { create(:health_clinic).id }
   let(:params) do

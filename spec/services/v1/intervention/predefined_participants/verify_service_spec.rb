@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
-  let(:subject) { described_class.call(predefined_user_parameters) }
+  subject { described_class.call(predefined_user_parameters) }
+
   let!(:predefined_participant) { create(:user, :predefined_participant) }
   let(:predefined_user_parameters) { predefined_participant.predefined_user_parameter }
   let(:first_session) { predefined_user_parameters.intervention.sessions.order(:position).first }
@@ -16,7 +17,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
     end
 
     it 'when intervention doesn\'t have sessions' do
-      expect(subject[:session_id]).to be nil
+      expect(subject[:session_id]).to be_nil
     end
   end
 
@@ -63,7 +64,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       let(:scheduled_at) { DateTime.now + 2.days }
 
       it 'return started session' do
-        expect(subject[:session_id]).to be nil
+        expect(subject[:session_id]).to be_nil
       end
 
       context 'scheduled at from past' do
@@ -81,7 +82,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       end
 
       it 'return started session' do
-        expect(subject[:session_id]).to be nil
+        expect(subject[:session_id]).to be_nil
       end
     end
   end
@@ -108,7 +109,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
       end
 
       it 'return correct value for some keys' do
-        expect(subject[:session_id]).to be nil
+        expect(subject[:session_id]).to be_nil
         expect(subject[:multiple_fill_session_available]).to be true
       end
     end

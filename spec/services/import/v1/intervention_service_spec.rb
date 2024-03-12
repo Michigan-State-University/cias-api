@@ -31,7 +31,7 @@ RSpec.describe Import::V1::InterventionService do
   let(:logo) { FactoryHelpers.upload_file('spec/fixtures/images/logo.png', 'image/png', true) }
 
   let(:logo_data) do
-    File.open(logo.path, 'rb').read
+    File.binread(logo.path)
   end
 
   it 'create intervention' do

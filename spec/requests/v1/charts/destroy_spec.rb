@@ -45,7 +45,7 @@ RSpec.describe 'DELETE /v1/charts/:id', type: :request do
       end
 
       it 'health clinic is deleted' do
-        expect(Chart.find_by(id: chart.id)).to eq(nil)
+        expect(Chart.find_by(id: chart.id)).to be_nil
       end
     end
 

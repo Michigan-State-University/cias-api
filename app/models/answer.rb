@@ -7,8 +7,8 @@ class Answer < ApplicationRecord
   belongs_to :question, inverse_of: :answers, optional: true
   belongs_to :user_session, optional: true
 
-  attribute :decrypted_body, :json, default: { data: [] }
-  attribute :body, :json, default: { data: [] }
+  attribute :decrypted_body, :json, default: -> { { data: [] } }
+  attribute :body, :json, default: -> { { data: [] } }
 
   delegate :subclass_name, :settings, :position, :title, :subtitle, :formulas, to: :question, allow_nil: true
 

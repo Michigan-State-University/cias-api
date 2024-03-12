@@ -82,7 +82,7 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
 
     it 'does not have warning set' do
       subject.call
-      expect(subject.additional_information[:warning]).to be nil
+      expect(subject.additional_information[:warning]).to be_nil
     end
   end
 
