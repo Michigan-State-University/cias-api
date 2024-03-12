@@ -2,8 +2,6 @@
 
 class UpdateClinicLocationNamesFromHenryFord < ActiveRecord::Migration[6.1]
   def change
-    add_column :clinic_locations, :epic_identifier, :text, default: ''
-    add_column :clinic_locations, :auxiliary_epic_identifier, :text, default: ''
     update_henry_ford_clinic_locations!
   end
 
@@ -55,6 +53,7 @@ class UpdateClinicLocationNamesFromHenryFord < ActiveRecord::Migration[6.1]
       },
     ].each do |clinic_location_params|
       clinic_location = AuxiliaryClinicLocation.find_by(name: clinic_location_params[:name])
+      byebug
       if clinic_location.present?
         clinic_location.update!(clinic_location_params)
       else
