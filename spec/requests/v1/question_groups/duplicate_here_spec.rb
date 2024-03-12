@@ -105,7 +105,11 @@ RSpec.describe 'POST /v1/sessions/:session_id/question_group/duplicate_here', ty
     end
 
     it 'didn\'t add any group' do
-      expect { request }.not_to change(QuestionGroup, :count).and.not_to change(Question, :count)
+      expect { request }.not_to change(QuestionGroup, :count)
+    end
+
+    it 'didn\'t add any Question' do
+      expect { request }.not_to change(Question, :count)
     end
 
     it 'return correct status and msg' do
