@@ -112,7 +112,6 @@ namespace :one_time_use do
         auxiliary_epic_identifier: '',
       }
     ].each do |clinic_location_params|
-      byebug
       clinic_location = ClinicLocation.find_by(name: clinic_location_params[:name])
       if clinic_location.present?
         clinic_location.update!(clinic_location_params)
