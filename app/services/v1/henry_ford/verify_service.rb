@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::HenryFord::VerifyService
+class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
   SYSTEM_IDENTIFIER = ENV.fetch('EPIC_ON_FHIR_SYSTEM_IDENTIFIER')
 
   def self.call(user, patient_params, session_id)
