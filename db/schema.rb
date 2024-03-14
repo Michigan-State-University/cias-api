@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_12_121037) do
+ActiveRecord::Schema.define(version: 2024_03_12_120947) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -191,8 +191,8 @@ ActiveRecord::Schema.define(version: 2024_03_12_121037) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "external_id"
     t.string "external_name"
-    t.text "epic_identifier", default: ""
-    t.text "auxiliary_epic_identifier", default: ""
+    t.string "epic_identifier", default: ""
+    t.string "auxiliary_epic_identifier", default: ""
     t.index ["external_id"], name: "index_clinic_locations_on_external_id", unique: true
   end
 
