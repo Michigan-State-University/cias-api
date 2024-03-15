@@ -2,8 +2,10 @@
 
 class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[create show_or_create]
+  before_action :validate_intervention_status
 
   def create
+    validate_session_status
     user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
@@ -13,6 +15,7 @@ class V1::UserSessionsController < V1Controller
   end
 
   def show
+    validate_session_status
     authorize! :read, UserSession
 
     user_session = V1::UserSessions::FetchService.call(params[:session_id], current_v1_user.id, params[:health_clinic_id])
@@ -24,6 +27,7 @@ class V1::UserSessionsController < V1Controller
   end
 
   def show_or_create
+    validate_session_status
     user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
@@ -79,7 +83,11 @@ class V1::UserSessionsController < V1Controller
   end
 
   def session_id
-    user_session_params[:session_id]
+    if params[:action] == 'show'
+      params[:session_id]
+    else
+      user_session_params[:session_id]
+    end
   end
 
   def user_session_id
@@ -87,7 +95,14 @@ class V1::UserSessionsController < V1Controller
   end
 
   def intervention
-    Session.find(session_id).intervention
+    @intervention = case params[:action]
+                    when 'quick_exit'
+                      user_session_load.session.intervention
+                    when 'show'
+                      Session.find(params[:session_id]).intervention
+                    else
+                      Session.find(session_id).intervention
+                    end
   end
 
   def intervention_id
@@ -100,5 +115,11 @@ class V1::UserSessionsController < V1Controller
 
   def user_id
     current_v1_user_or_guest_user.id
+  end
+
+  def validate_session_status
+    return unless session_load.autoclose_enabled
+
+    raise ComplexException.new(I18n.t('sessions.closed'), { reason: 'SESSION_CLOSED' }, :bad_request) if Time.zone.now > session_load.autoclose_at
   end
 end

@@ -27,9 +27,9 @@ require 'rspec/rails'
 # require only the support files necessary.
 #
 # Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
-Dir[Rails.root.join('spec/support/**/*.rb')].sort.each(&method(:require))
+Dir[Rails.root.join('spec/support/**/*.rb')].each(&method(:require))
 # Temporary fix for missing cancancan classes in RSpec
-Dir[Rails.root.join('app/models/ability/*.rb')].sort.each(&method(:require))
+Dir[Rails.root.join('app/models/ability/*.rb')].each(&method(:require))
 
 # include custom cancan matcher
 require 'support/custom_cancan_matcher'

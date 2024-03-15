@@ -8,10 +8,10 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:guest) { create(:user, :confirmed, :guest) }
   let(:preview_session) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
-  let(:user) { admin }
+  let(:user) { participant }
   let(:intervention_user) { admin }
   let(:shared_to) { :anyone }
-  let(:status) { :draft }
+  let(:status) { :published }
   let(:invitations) { [] }
   let(:intervention) do
     create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, intervention_accesses: accesses,
@@ -52,4 +52,8 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   end
 
   it_behaves_like 'create user session'
+
+  it_behaves_like 'paused intervention'
+
+  it_behaves_like 'closed session'
 end

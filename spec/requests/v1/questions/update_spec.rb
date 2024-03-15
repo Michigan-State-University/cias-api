@@ -84,6 +84,37 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
         end
       end
 
+      context 'variable is taken' do
+        let!(:previous_question) { create(:question_slider, question_group: question_group, body: previous_question_body) }
+        let(:previous_question_body) do
+          {
+            data: [
+              {
+                payload: {
+                  range_start: 0,
+                  range_end: 10,
+                  start_value: 'test 1',
+                  end_value: 'test 1'
+                }
+              }
+            ],
+            variable: {
+              name: 'var_test_1'
+            }
+          }
+        end
+
+        it 'return correct status' do
+          request
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'return correct error message' do
+          request
+          expect(json_response['message']).to include I18n.t('question.error.not_uniq_variable')
+        end
+      end
+
       context 'when intervention is published' do
         let(:session) { create(:session, intervention: create(:intervention, :published)) }
 

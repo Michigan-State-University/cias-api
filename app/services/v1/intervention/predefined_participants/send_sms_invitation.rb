@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::Intervention::PredefinedParticipants::SendInvitation
+class V1::Intervention::PredefinedParticipants::SendSmsInvitation
   def initialize(user)
     @user = user
   end
@@ -15,7 +15,7 @@ class V1::Intervention::PredefinedParticipants::SendInvitation
 
     sms = Message.create(phone: number, body: content)
     Communication::Sms.new(sms.id).send_message
-    user.predefined_user_parameter.update!(invitation_sent_at: DateTime.now)
+    user.predefined_user_parameter.update!(sms_invitation_sent_at: DateTime.now)
   end
 
   attr_accessor :user
@@ -27,7 +27,9 @@ class V1::Intervention::PredefinedParticipants::SendInvitation
   end
 
   def content
-    I18n.t('predefined_participant.invitation', intervention_name: intervention_name, link: link)
+    I18n.with_locale(intervention_language_code) do
+      I18n.t('predefined_participant.invitation', intervention_name: intervention_name, link: link)
+    end
   end
 
   def link
@@ -36,6 +38,10 @@ class V1::Intervention::PredefinedParticipants::SendInvitation
 
   def intervention_name
     predefined_user_parameter.intervention.name
+  end
+
+  def intervention_language_code
+    predefined_user_parameter.intervention.language_code
   end
 
   def predefined_user_parameter

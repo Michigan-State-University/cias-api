@@ -2,14 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/:id/send_invitation', type: :request do
+RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/:id/sms_send_invitation', type: :request do
   let!(:intervention) { create(:intervention, :with_predefined_participants, user: researcher) }
   let(:researcher) { create(:user, :researcher, :confirmed) }
   let(:user) { intervention.predefined_users.first }
   let(:user_id) { user.id }
   let(:current_user) { researcher }
   let(:request) do
-    post send_invitation_v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user_id), headers: current_user.create_new_auth_token
+    post send_sms_invitation_v1_intervention_predefined_participant_path(intervention_id: intervention.id, id: user_id),
+         headers: current_user.create_new_auth_token
   end
 
   before do
@@ -37,7 +38,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
 
     it 'return correct body' do
       request
-      expect(json_response['invitation_sent_at']).to be_present
+      expect(json_response['sms_invitation_sent_at']).to be_present
     end
 
     it 'skip creation of message' do

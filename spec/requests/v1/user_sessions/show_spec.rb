@@ -24,6 +24,8 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
     end
   end
 
+  it_behaves_like 'paused intervention'
+
   context 'when user intervention does\'t exits' do
     before do
       request

@@ -24,7 +24,8 @@ class V1::ShortLinks::MapService
         session_id: available_now_session(intervention, user_intervention)&.id,
         health_clinic_id: short_link.health_clinic_id,
         multiple_fill_session_available: multiple_fill_session_available(user_intervention),
-        user_intervention_id: user_intervention&.id
+        user_intervention_id: user_intervention&.id,
+        lang: intervention.language_code
       }
     }.to_json
   end
@@ -57,6 +58,8 @@ class V1::ShortLinks::MapService
     return if intervention.published?
 
     raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_DRAFT' }, :bad_request) if intervention.draft?
+
+    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_PAUSED' }, :bad_request) if intervention.paused?
 
     raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_CLOSED' }, :bad_request)
   end

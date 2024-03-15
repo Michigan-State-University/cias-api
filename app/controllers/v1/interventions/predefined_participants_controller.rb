@@ -30,7 +30,8 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def verify
     return head :unauthorized if current_v1_user.present? && !current_v1_user.role?('predefined_participant')
-    return head :forbidden unless predefined_user_parameter.intervention.published?
+
+    check_intervention_status
 
     access_token_to_response!
     render json: verify_response
@@ -44,9 +45,14 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render status: :no_content
   end
 
-  def send_invitation
-    V1::Intervention::PredefinedParticipants::SendInvitation.call(predefined_participant)
-    render json: predefined_participant.predefined_user_parameter.reload.slice(:invitation_sent_at), status: :ok
+  def send_sms_invitation
+    V1::Intervention::PredefinedParticipants::SendSmsInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:sms_invitation_sent_at), status: :ok
+  end
+
+  def send_email_invitation
+    V1::Intervention::PredefinedParticipants::SendEmailInvitation.call(predefined_participant)
+    render json: predefined_participant.predefined_user_parameter.reload.slice(:email_invitation_sent_at), status: :ok
   end
 
   private
@@ -64,7 +70,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_user_parameters
     params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, :external_id, :email,
-                                            phone_attributes: %i[iso prefix number])
+                                            :sms_notification, :email_notification, phone_attributes: %i[iso prefix number])
   end
 
   def intervention_load
@@ -94,5 +100,16 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def verify_access
     authorize! :update, Intervention
     authorize! :update, intervention_load
+  end
+
+  def check_intervention_status
+    intervention = predefined_user_parameter.intervention
+    return if intervention.published?
+
+    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_DRAFT' }, :bad_request) if intervention.draft?
+
+    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_PAUSED' }, :bad_request) if intervention.paused?
+
+    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_CLOSED' }, :bad_request)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_12_11_092832) do
+ActiveRecord::Schema.define(version: 2024_03_12_120947) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -191,6 +191,8 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "external_id"
     t.string "external_name"
+    t.string "epic_identifier", default: ""
+    t.string "auxiliary_epic_identifier", default: ""
     t.index ["external_id"], name: "index_clinic_locations_on_external_id", unique: true
   end
 
@@ -480,6 +482,7 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.string "sensitive_data_state", default: "collected", null: false
     t.datetime "clear_sensitive_data_scheduled_at"
     t.integer "navigators_count", default: 0
+    t.datetime "paused_at"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -640,8 +643,11 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "auto_invitation", default: false, null: false
-    t.datetime "invitation_sent_at"
+    t.datetime "sms_invitation_sent_at"
     t.string "external_id"
+    t.boolean "sms_notification", default: false
+    t.boolean "email_notification", default: false
+    t.datetime "email_invitation_sent_at"
     t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
     t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
     t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"
@@ -758,6 +764,8 @@ ActiveRecord::Schema.define(version: 2023_12_11_092832) do
     t.boolean "multiple_fill", default: false, null: false
     t.boolean "autofinish_enabled", default: false, null: false
     t.integer "autofinish_delay", default: 1440, null: false
+    t.boolean "autoclose_enabled", default: false
+    t.datetime "autoclose_at"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

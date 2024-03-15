@@ -14,6 +14,7 @@ en:
       title: '<h2>Enter title here</h2>'
     error:
       published_intervention: 'Cannot update question in the published intervention'
+      not_uniq_variable: 'This variable name is already in use!'
   question_group:
     finish:
       title: Finish Group
@@ -46,6 +47,7 @@ en:
               body: 'Unfortunately, something went wrong while downloading the CAT-MH questions. Please try again or contact the researcher who sent this session to you.'
               button: 'Go back to home page'
             live_chat_wrong_session_status: 'Live chat cannot be turned on for closed or archived interventions.'
+            status_transition: 'You cannot change status from %{current_status} to %{new_status}.'
             collaborators:
               data_access: "Only owner can change 'data_access' parameter"
         user:
@@ -98,6 +100,7 @@ en:
   interventions:
     invitations:
       wrong_intervention_type: "Wrong type of the invitation for selected object"
+    paused: 'This study is temporarily unavailable. Please check with the research team or clinic to find out when it will resume, or try back later'
     fixed_order:
       wrong_sharing_target: "Fixed order interventions can only be shared to registered participants (Got %{shared_to})"
     flexible_order:
@@ -106,6 +109,8 @@ en:
       index:
         csv: The request to send the CSV file has been successfully created. We will soon send an email to you with the request status.
   sessions:
+    closed: 'You try to fill session after the time defined by researcher'
+    reminder: "Hello! Your next session is available now! Please click the link below to continue your progress on %{intervention_name} %{link}"
     sms_alerts:
       no_data_provided: "No personal data provided"
       no_first_name_provided: "First name not provided"
@@ -203,7 +208,7 @@ en:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
       body: You got access to session %{session_name}. Please click in the link to fill the session.
-      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
+      invitation_link: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
     inform_to_an_email:
       subject: You have been invited to complete a session.
       body: You have been invited to complete %{session_name}. Please click the link to get more information.
@@ -212,10 +217,10 @@ en:
       session_scheduled: 'This session will be accessible starting from %{date}'
       before_button_text: 'Click the button below to access.'
       button_text: Go to the session
-      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill"
-      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
-      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}"
+      invitation_link: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
+      invitation_link_for_anyone: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?lang=%{language_code}"
+      invitation_link_for_anyone_from_clinic: "%{domain}/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}&lang=%{language_code}"
+      invitation_link_from_clinic: "%{domain}/login?redirect_to=/interventions/%{intervention_id}/sessions/%{session_id}/fill?cid=%{health_clinic_id}&lang=%{language_code}"
     invite_to_session_and_registration:
       subject: CIAS Invitation
       body: You have been invited to complete %{session_name}. Please click the link to get more information.
@@ -223,8 +228,8 @@ en:
       html_body_invitation_part: 'You have been invited to complete <span style="color: #c866ea;">%{session_name}</span> session.'
       html_body_information_part: "To access this session, you will <span style='font-weight: 700'>first need to create a CIAS account</span>, once you have finished that process you will see the session. If you have questions about this process, please contact the person or group associated with this session that referred you."
       button_text: "Let's Get Started"
-      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}'
-      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}'
+      invitation_link: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&lang=%{language_code}'
+      invitation_link_from_clinic: '%{domain}/register?intervention_id=%{intervention_id}&session_id=%{session_id}&role=%{user_role}&invitation_token=%{invitation_token}&email=%{email}&cid=%{health_clinic_id}&lang=%{language_code}'
   intervention_mailer:
     inform_to_an_email:
       subject: You have been invited to complete an intervention.

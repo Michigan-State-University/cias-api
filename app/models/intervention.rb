@@ -2,6 +2,7 @@
 
 class Intervention < ApplicationRecord
   has_paper_trail
+  include Intervention::StatusesTransition
   include Clone
   include Translate
   include InvitationInterface
@@ -76,7 +77,7 @@ class Intervention < ApplicationRecord
   scope :only_starred_by_me, ->(user) { where(id: user.stars.pluck(:intervention_id)) }
 
   enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
-  enum status: { draft: 'draft', published: 'published', closed: 'closed', archived: 'archived' }
+  enum status: STATUSES
   enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
   enum current_narrator: { peedy: 0, emmi: 1 }
   enum sensitive_data_state: { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, _prefix: :sensitive_data
@@ -94,7 +95,13 @@ class Intervention < ApplicationRecord
   def status_change
     return unless saved_change_to_attribute?(:status)
 
-    ::Interventions::PublishJob.perform_later(id) if status == 'published'
+    if published? && paused_at.present?
+      ::Interventions::RePublishJob.perform_later(id)
+    elsif published?
+      ::Interventions::PublishJob.perform_later(id)
+    elsif paused?
+      ::Interventions::PauseJob.perform_later(id)
+    end
   end
 
   def hf_access_change
@@ -141,7 +148,7 @@ class Intervention < ApplicationRecord
     return if emails.empty?
 
     InterventionAccess.transaction do
-      emails.each { |email| InterventionAccess.create!(intervention_id: id, email: email) }
+      emails.each { |email| InterventionAccess.create!(intervention_id: id, email: email.downcase) }
     end
   end
 

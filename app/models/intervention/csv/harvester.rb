@@ -95,7 +95,7 @@ class Intervention::Csv::Harvester
 
   def metadata(session, user_session, row_index, approach_number, multiple_fill)
     session_headers_index = header.index(column_name(multiple_fill, session, 'metadata.session_start', approach_number))
-    session_start = user_session.created_at
+    session_start = user_session.answers.first&.created_at || user_session.created_at
     session_end = user_session.finished_at
     unless session_end.nil?
       rows[row_index][session_headers_index + 2] = time_diff(session_start, session_end) # session duration

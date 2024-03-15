@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::HenryFord::VerifyService
+class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
   SYSTEM_IDENTIFIER = ENV.fetch('EPIC_ON_FHIR_SYSTEM_IDENTIFIER')
 
   def self.call(user, patient_params, session_id)
@@ -90,14 +90,41 @@ class V1::HenryFord::VerifyService
 
     visit_id = appointment&.dig(:resource, :identifier, 0, :value)
 
-    location_id = available_locations.where("LOWER(CONCAT(department, ' ', external_name)) LIKE ?",
-                                            appointment
-                                              .dig(:resource, :participant)
-                                              .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
-                                              &.dig(:actor, :display)
-                                              &.downcase.to_s).first.external_id
+    location, location_auxiliary_id = verify_by_identifier(appointment)
+    location ||= verify_by_name(appointment, location_auxiliary_id)
+
+    location_id = location.external_id
 
     "_#{location_id}_#{visit_id}"
+  end
+
+  def verify_by_name(appointment, location_identifer)
+    appointment_name = appointment
+                         .dig(:resource, :participant)
+                         .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                         &.dig(:actor, :display)
+                         &.downcase.to_s
+
+    location = available_locations
+                   .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
+                   .first
+
+    appointment_location_id = location.epic_identifier
+    location.update!(auxiliary_epic_identifier: location_identifer)
+    Rails.logger.send(:info, "HFHS_IDENTIFIER_LOG test: #{appointment_location_id}, auxiliary: #{location_identifer}")
+
+    location
+  end
+
+  def verify_by_identifier(appointment)
+    appointment_location_id = appointment
+                               .dig(:resource, :participant)
+                               .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                               &.dig(:actor, :reference)
+                               &.to_s
+
+    appointment_location_auxiliary_id = appointment_location_id.sub('Location/', '')
+    [available_locations.where(auxiliary_epic_identifier: appointment_location_auxiliary_id).first, appointment_location_auxiliary_id]
   end
 
   def create_or_find_resource!
@@ -134,28 +161,39 @@ class V1::HenryFord::VerifyService
 
       location = appointment
                    &.dig(:resource, :participant)
-                   &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }&.dig(:actor, :display)
+                   &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }
+                   &.dig(:actor, :display)
 
-      valid_appointment?(location, parsed_date)
+      location_identifier = appointment
+                               &.dig(:resource, :participant)
+                               &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }
+                               &.dig(:actor, :reference)
+                               &.sub('Location/', '')
+
+      valid_appointment?(location, location_identifier, parsed_date)
     end
   end
 
-  def valid_appointment?(location, parsed_date)
+  def valid_appointment?(location, location_identifier, parsed_date)
     if ENV.fetch('HFHS_APPOINTMENTS_FROM_PAST', 0).to_i == 1
-      available_location?(location)
+      available_location?(location, location_identifier)
     else
-      available_location?(location) && (parsed_date&.today? || parsed_date&.future?)
+      available_location?(location, location_identifier) && (parsed_date&.today? || parsed_date&.future?)
     end
   end
 
-  def available_location?(location)
+  def available_location?(location, location_identifier)
     return false if location.blank?
 
-    location.downcase.in?(intervention_locations)
+    location.downcase.in?(intervention_locations) || location_identifier.in?(intervention_locations_identifiers)
   end
 
   def intervention_locations
     @intervention_locations ||= available_locations.map { |location| "#{location.department} #{location.external_name}".downcase.lstrip }
+  end
+
+  def intervention_locations_identifiers
+    @intervention_locations_identifiers ||= available_locations.pluck(:auxiliary_epic_identifier).compact.uniq
   end
 
   def available_locations

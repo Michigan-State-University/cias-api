@@ -11,6 +11,7 @@ class V1::Intervention::Publish
     calculate_days_after_schedule
     delete_preview_data
     send_smses_to_predefined_users
+    set_autoclose_for_sessions
   end
 
   private
@@ -69,5 +70,13 @@ class V1::Intervention::Publish
 
   def predefined_user_parameters
     @predefined_user_parameters ||= intervention.predefined_user_parameters
+  end
+
+  def set_autoclose_for_sessions
+    intervention.sessions.find_each do |session|
+      next unless session.autoclose_enabled
+
+      SessionJobs::AutocloseSessionJob.set(wait_until: session.autoclose_at).perform_later(session.id)
+    end
   end
 end

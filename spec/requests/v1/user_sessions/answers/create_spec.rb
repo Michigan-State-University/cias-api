@@ -83,6 +83,8 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
     end
 
     it_behaves_like 'deactivated account'
+
+    it_behaves_like 'paused intervention'
   end
 
   context 'UserSession::CatMh' do

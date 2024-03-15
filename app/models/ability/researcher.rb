@@ -20,7 +20,7 @@ class Ability::Researcher < Ability::Base
     can %i[read list_researchers], User, id: participants_and_researchers(user)
     can :create, :preview_session_user
     can %i[manage manage_collaborators], Intervention, user_id: user.id
-    can :manage, UserSession, session: { intervention: { user_id: user.id } }
+    can %i[read], UserSession, session: { intervention: { user_id: user.id } }
     can :read, UserIntervention, intervention: { user_id: user.id }
     can :manage, Session, intervention: { user_id: user.id }
     can :manage, Invitation, invitable_type: 'Session', invitable_id: Session.accessible_by(ability, :update)

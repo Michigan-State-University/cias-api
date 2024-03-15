@@ -17,13 +17,19 @@ class V1::UserInterventionSerializer < V1Serializer
   end
 
   attribute :blocked do |object|
-    object.intervention.shared_to_invited? && object.intervention.intervention_accesses.pluck(:email).map(&:downcase).exclude?(object.user.email)
+    object.intervention.shared_to_invited? &&
+      object.intervention.intervention_accesses
+            .pluck(:email)
+            .map(&:downcase)
+            .exclude?(object.user.email) &&
+      object.user.roles.exclude?('predefined_participant')
   end
 
   attribute :intervention do |object|
     {
       name: object.intervention.name,
       type: object.intervention.type,
+      status: object.intervention.status,
       additional_text: object.intervention.additional_text,
       logo_url: object.intervention.logo.attached? ? url_for(object.intervention.logo) : nil,
       image_alt: object.intervention.logo_blob.present? ? object.intervention.logo_blob.description : nil,

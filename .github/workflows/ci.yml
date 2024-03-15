@@ -15,7 +15,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: 3.0.6
         env:
           RUBYOPT: --jit
 
@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-gems-
       - name: Install dependencies
         run: |
-          gem install bundler
+          gem install bundler -v 2.4.22
           bundle config set path 'vendor/bundle'
           bundle install
 
@@ -75,7 +75,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
-          ruby-version: 2.7.2
+          ruby-version: 3.0.6
         env:
           RUBYOPT: --jit
       - run: cp .env.template .env

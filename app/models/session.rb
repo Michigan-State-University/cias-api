@@ -61,6 +61,7 @@ class Session < ApplicationRecord
   validate :unique_variable, on: %i[create update]
   validates :autofinish_delay, presence: true, if: :autofinish_enabled
   validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
+  validates :autoclose_at, presence: true, if: :autoclose_enabled
 
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
@@ -127,6 +128,15 @@ class Session < ApplicationRecord
     SessionMailer.with(locale: language_code).inform_to_an_email(self, user.email, health_clinic).deliver_later
   end
 
+  def send_sms_to_session(user, health_clinic = nil)
+    return if !intervention.published? || user.sms_notification.blank?
+    return if user.phone.blank? || (!user.phone.confirmed? && user.roles.exclude?('predefined_participant'))
+
+    content = I18n.t('sessions.reminder', intervention_name: intervention.name, link: ::V1::SessionOrIntervention::Link.call(self, health_clinic, user.email))
+    sms = Message.create(phone: user.phone.full_number, body: content)
+    Communication::Sms.new(sms.id).send_message
+  end
+
   def available_now?(participant_date_with_payload = nil)
     return true if schedule == 'after_fill'
     return true if %w[days_after exact_date].include?(schedule) && schedule_at.noon.past?
@@ -166,7 +176,7 @@ class Session < ApplicationRecord
     raise NotImplementedError, "#{self.class.name} must implement #{__method__}"
   end
 
-  def fetch_variables(_filter_options = {})
+  def fetch_variables(_filter_options = {}, _filtered_question_id = nil)
     raise NotImplementedError, "Subclass of Session did not define #{__method__}"
   end
 

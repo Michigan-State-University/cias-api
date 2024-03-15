@@ -12,6 +12,7 @@ class SessionMailer < ApplicationMailer
     @email = email
     @health_clinic = health_clinic
     @scheduled_at = scheduled_at
+    @link_to_session = V1::SessionOrIntervention::Link.call(session, health_clinic, email)
 
     mail(to: @email, subject: I18n.t('session_mailer.inform_to_an_email.subject'))
   end
