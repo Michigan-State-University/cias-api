@@ -29,7 +29,7 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
-    sms_session_type = session.type === "Session::Sms"
+    sms_session_type = session.type.match?('Session::Sms')
     session.assign_google_tts_voice(first_session) unless sms_session_type
     session.current_narrator = intervention.current_narrator unless sms_session_type
     session.position = sessions.last&.position.to_i + 1
@@ -40,7 +40,7 @@ class V1::SessionService
   def update(session_id, session_params)
     sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
-    sms_session_type = session.type === "Session::Sms"
+    sms_session_type = session.type.match?('Session::Sms')
     session.assign_attributes(session_params.except(:cat_tests))
     assign_cat_tests_to_session(session, session_params)
     session.integral_update unless sms_session_type
