@@ -6,7 +6,7 @@ describe Hl7::AnswersMapper do
   subject { described_class.call(user_session.id) }
 
   let!(:participant) { create(:user, :confirmed, :participant) }
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:user_session) { create(:user_session, finished_at: 2.days.ago) }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question1) { create(:question_henry_ford, question_group: question_group) }

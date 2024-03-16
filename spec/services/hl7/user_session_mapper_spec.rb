@@ -6,7 +6,7 @@ describe Hl7::UserSessionMapper do
   subject { described_class.call(user_session.id) }
 
   let!(:participant) { create(:user, :confirmed, :participant) }
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
   let!(:user_session) { create(:user_session, finished_at: DateTime.now, user: patient) }
   let!(:question_group) { create(:question_group, session: session) }

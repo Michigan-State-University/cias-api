@@ -7,7 +7,7 @@ RSpec.describe V1::SessionOrIntervention::Link do
 
   let!(:user) { create(:user, :confirmed, :participant) }
   let!(:intervention) { create(:intervention) }
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let!(:health_clinic) { nil }
   let(:email) { user.email }
 

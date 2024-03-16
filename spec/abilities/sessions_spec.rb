@@ -18,11 +18,11 @@ describe Session do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      @team1_session1 = create(:session, intervention: team1_intervention1)
-      @team1_session2 = create(:session, intervention: team1_intervention2)
-      @team2_session1 = create(:session, intervention: team2_intervention1)
-      @team2_session2 = create(:session, intervention: team2_intervention2)
-      @team3_session1 = create(:session, intervention: team3_intervention1)
+      @team1_session1 = create(:classic_session, intervention: team1_intervention1)
+      @team1_session2 = create(:classic_session, intervention: team1_intervention2)
+      @team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      @team2_session2 = create(:classic_session, intervention: team2_intervention2)
+      @team3_session1 = create(:classic_session, intervention: team3_intervention1)
     end
   end
 
@@ -45,7 +45,7 @@ describe Session do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:resource) { create(:session, intervention: intervention) }
+      let!(:resource) { create(:classic_session, intervention: intervention) }
       let(:user) { collaborator }
 
       it_behaves_like 'collaborator has expected access to resource'
@@ -70,7 +70,7 @@ describe Session do
 
     context 'e-intervention admin' do
       let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin) }
-      let!(:session) { create(:session, intervention: create(:intervention, organization: organization)) }
+      let!(:session) { create(:classic_session, intervention: create(:intervention, organization: organization)) }
       let(:user) { organization.e_intervention_admins.first }
 
       it 'can read his session' do
@@ -98,7 +98,7 @@ describe Session do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:session) { create(:session, intervention: intervention) }
+      let!(:session) { create(:classic_session, intervention: intervention) }
       let(:user) { collaborator }
 
       it do

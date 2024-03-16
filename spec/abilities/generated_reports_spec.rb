@@ -21,12 +21,12 @@ describe GeneratedReport do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      team1_session1 = create(:session, intervention: team1_intervention1)
-      team1_session2 = create(:session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
-      team3_session1 = create(:session, intervention: team3_intervention1)
-      admin_session = create(:session, intervention: admin_intervention)
+      team1_session1 = create(:classic_session, intervention: team1_intervention1)
+      team1_session2 = create(:classic_session, intervention: team1_intervention2)
+      team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      team2_session2 = create(:classic_session, intervention: team2_intervention2)
+      team3_session1 = create(:classic_session, intervention: team3_intervention1)
+      admin_session = create(:classic_session, intervention: admin_intervention)
 
       team1_user_session1 = create(:user_session, session: team1_session1)
       team1_user_session2 = create(:user_session, session: team1_session2)
@@ -63,7 +63,7 @@ describe GeneratedReport do
     context 'collaborator' do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
-      let!(:generated_report) { create(:generated_report, user_session: create(:user_session, session: create(:session, intervention: intervention))) }
+      let!(:generated_report) { create(:generated_report, user_session: create(:user_session, session: create(:classic_session, intervention: intervention))) }
       let(:user) { collaborator }
 
       it { should have_abilities({ manage: false }, generated_report) }
@@ -169,7 +169,7 @@ describe GeneratedReport do
     context 'collaborator' do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
-      let!(:generated_report) { create(:generated_report, user_session: create(:user_session, session: create(:session, intervention: intervention))) }
+      let!(:generated_report) { create(:generated_report, user_session: create(:user_session, session: create(:classic_session, intervention: intervention))) }
       let(:user) { collaborator }
 
       it 'can access only reports generated in his interventions' do

@@ -16,10 +16,10 @@ describe Invitation do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      team1_session1 = create(:session, intervention: team1_intervention1)
-      team1_session2 = create(:session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
+      team1_session1 = create(:classic_session, intervention: team1_intervention1)
+      team1_session2 = create(:classic_session, intervention: team1_intervention2)
+      team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      team2_session2 = create(:classic_session, intervention: team2_intervention2)
 
       @team1_session_invitation1 = create(:session_invitation, invitable: team1_session1)
       @team1_session_invitation2 = create(:session_invitation, invitable: team1_session2)
@@ -44,7 +44,7 @@ describe Invitation do
 
     context 'collaborator with view access' do
       let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: researcher)]) }
-      let!(:invitation) { create(:session_invitation, invitable: create(:session, intervention: intervention)) }
+      let!(:invitation) { create(:session_invitation, invitable: create(:classic_session, intervention: intervention)) }
       let(:researcher) { create(:user, :researcher, :confirmed) }
       let(:user) { researcher }
 
@@ -54,7 +54,7 @@ describe Invitation do
 
     context 'collaborator with edit access' do
       let!(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: researcher, edit: true)]) }
-      let!(:invitation) { create(:session_invitation, invitable: create(:session, intervention: intervention)) }
+      let!(:invitation) { create(:session_invitation, invitable: create(:classic_session, intervention: intervention)) }
       let(:researcher) { create(:user, :researcher, :confirmed) }
       let(:user) { researcher }
 

@@ -4,7 +4,7 @@ RSpec.describe 'Benchmark', type: :request do
   context 'v1/questions #index' do
     let!(:admin) { create(:user, :confirmed, :admin) }
     let!(:headers) { admin.create_new_auth_token }
-    let!(:session) { create(:session) }
+    let!(:session) { create(:classic_session) }
     let!(:small_question_group) { create(:question_group, session: session) }
     let!(:large_question_group) { create(:question_group, session: session) }
     let!(:small_questions) { create_list(:question_single, 25, question_group: small_question_group) }

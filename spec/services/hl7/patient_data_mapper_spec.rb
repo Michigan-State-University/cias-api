@@ -5,7 +5,7 @@ require 'rails_helper'
 describe Hl7::PatientDataMapper do
   subject { described_class.call(patient.id, user_session.id, 'ORU', 'R01') }
 
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
   let!(:user_session) { create(:user_session, user: patient) }
   let!(:question_group) { create(:question_group, session: session) }

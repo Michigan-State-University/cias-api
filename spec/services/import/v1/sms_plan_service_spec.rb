@@ -24,7 +24,7 @@ RSpec.describe Import::V1::SmsPlanService do
     }
   end
 
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
   let(:session_id) { session.id }
 
   it 'creates an sms plan' do

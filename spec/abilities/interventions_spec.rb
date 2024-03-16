@@ -151,7 +151,7 @@ describe Intervention do
     context 'preview_session' do
       let!(:published_intervention) { create(:intervention, :published) }
       let!(:draft_intervention) { create(:intervention) }
-      let!(:preview_session) { create(:session, intervention: draft_intervention) }
+      let!(:preview_session) { create(:classic_session, intervention: draft_intervention) }
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }
 

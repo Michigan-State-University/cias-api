@@ -13,28 +13,28 @@ describe DownloadedReport do
   let!(:team1_generated_report1) do
     create(:generated_report, user_session:
       create(:user_session, session:
-        create(:session, intervention:
+        create(:classic_session, intervention:
           create(:intervention, user_id: team1.team_admin.id))))
   end
 
   let!(:team1_generated_report2) do
     create(:generated_report, user_session:
       create(:user_session, session:
-        create(:session, intervention:
+        create(:classic_session, intervention:
           create(:intervention, user_id: team1_researcher.id))))
   end
 
   let!(:team2_generated_report1) do
     create(:generated_report, user_session:
       create(:user_session, session:
-        create(:session, intervention:
+        create(:classic_session, intervention:
           create(:intervention, user_id: team2.team_admin.id))))
   end
 
   let!(:team3_generated_report1) do
     create(:generated_report, user_session:
       create(:user_session, session:
-        create(:session, intervention:
+        create(:classic_session, intervention:
           create(:intervention, user_id: team3_researcher.id))))
   end
 
@@ -72,7 +72,7 @@ describe DownloadedReport do
       let!(:generated_report) do
         create(:generated_report, user_session:
           create(:user_session, session:
-            create(:session, intervention: intervention)))
+            create(:classic_session, intervention: intervention)))
       end
       let!(:downloaded_report) { create(:downloaded_report, generated_report: generated_report, user_id: user.id) }
 

@@ -15,7 +15,7 @@ RSpec.describe Import::V1::QuestionGroupService do
     }
   end
 
-  let(:session_id) { create(:session).id }
+  let(:session_id) { create(:classic_session).id }
 
   it 'create question group' do
     expect { subject }.to change(QuestionGroup, :count).by(2)

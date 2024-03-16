@@ -4,7 +4,7 @@ RSpec.describe V1::ReportTemplates::GeneratePdfPreview do
   subject { described_class.call(report_template, current_v1_user) }
 
   let!(:current_v1_user) { create(:user, :confirmed, :admin) }
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:report_template) { create(:report_template, session: session) }
   let!(:section1) do
     create(:report_template_section, report_template: report_template)

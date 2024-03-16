@@ -16,10 +16,10 @@ describe UserSession do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      team1_session1 = create(:session, intervention: team1_intervention1)
-      team1_session2 = create(:session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
+      team1_session1 = create(:classic_session, intervention: team1_intervention1)
+      team1_session2 = create(:classic_session, intervention: team1_intervention2)
+      team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      team2_session2 = create(:classic_session, intervention: team2_intervention2)
 
       @team1_user_session1 = create(:user_session, session: team1_session1)
       @team1_user_session2 = create(:user_session, session: team1_session2)
@@ -46,7 +46,7 @@ describe UserSession do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:user_session) { create(:user_session, session: create(:session, intervention: intervention)) }
+      let!(:user_session) { create(:user_session, session: create(:classic_session, intervention: intervention)) }
       let(:user) { collaborator }
 
       it do

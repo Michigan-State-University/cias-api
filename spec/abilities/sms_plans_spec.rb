@@ -16,7 +16,7 @@ describe SmsPlan do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:resource) { create(:sms_plan, session: create(:session, intervention: intervention)) }
+      let!(:resource) { create(:sms_plan, session: create(:classic_session, intervention: intervention)) }
       let(:user) { collaborator }
 
       it_behaves_like 'collaborator has expected access to resource'
@@ -26,18 +26,18 @@ describe SmsPlan do
       let!(:user) { create(:user, :confirmed, :team_admin) }
       let!(:team) { create(:team, team_admin: user) }
       let!(:intervention1) { create(:intervention, user: user) }
-      let!(:session1) { create(:session, intervention: intervention1) }
+      let!(:session1) { create(:classic_session, intervention: intervention1) }
       let!(:sms_plan1) { create(:sms_plan, session: session1) }
 
       let!(:user2) { create(:user, :researcher, team: team) }
       let!(:intervention2) { create(:intervention, user: user2) }
-      let!(:session2) { create(:session, intervention: intervention2) }
+      let!(:session2) { create(:classic_session, intervention: intervention2) }
       let!(:sms_plan2) { create(:sms_plan, session: session2) }
 
       let!(:another_team) { create(:team, team_admin: user) }
       let!(:user3) { create(:user, :researcher, team: another_team) }
       let!(:intervention3) { create(:intervention, user: user3) }
-      let!(:session3) { create(:session, intervention: intervention3) }
+      let!(:session3) { create(:classic_session, intervention: intervention3) }
       let!(:sms_plan3) { create(:sms_plan, session: session3) }
 
       it { should have_abilities(:manage, described_class) }
@@ -92,8 +92,8 @@ describe SmsPlan do
 
     let(:ability) { Ability.new(user) }
 
-    let(:session1) { create(:session) }
-    let(:session2) { create(:session) }
+    let(:session1) { create(:classic_session) }
+    let(:session2) { create(:classic_session) }
     let!(:sms_plan1) { create(:sms_plan, session: session1) }
     let!(:sms_plan2) { create(:sms_plan, session: session2) }
 
@@ -109,7 +109,7 @@ describe SmsPlan do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:sms_plan) { create(:sms_plan, session: create(:session, intervention: intervention)) }
+      let!(:sms_plan) { create(:sms_plan, session: create(:classic_session, intervention: intervention)) }
       let(:user) { collaborator }
 
       it 'can access all sms plans' do
@@ -120,7 +120,7 @@ describe SmsPlan do
     context 'researcher' do
       let!(:user) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention, user: user) }
-      let(:session1) { create(:session, intervention: intervention) }
+      let(:session1) { create(:classic_session, intervention: intervention) }
 
       it 'can access for sms plan connected with session of intervention created by researcher' do
         expect(subject).to include(sms_plan1)
@@ -133,7 +133,7 @@ describe SmsPlan do
       let!(:user) { team.team_admin }
       let(:team_intervention) { create(:intervention, user: user) }
 
-      let(:session1) { create(:session, intervention: team_intervention) }
+      let(:session1) { create(:classic_session, intervention: team_intervention) }
 
       it 'can access for sms plan connected with session of intervention from his team' do
         expect(subject).to include(sms_plan1)

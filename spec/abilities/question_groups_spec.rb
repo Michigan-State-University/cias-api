@@ -19,11 +19,11 @@ describe QuestionGroup do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      team1_session1 = create(:session, intervention: team1_intervention1)
-      team1_session2 = create(:session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
-      team3_session1 = create(:session, intervention: team3_intervention1)
+      team1_session1 = create(:classic_session, intervention: team1_intervention1)
+      team1_session2 = create(:classic_session, intervention: team1_intervention2)
+      team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      team2_session2 = create(:classic_session, intervention: team2_intervention2)
+      team3_session1 = create(:classic_session, intervention: team3_intervention1)
 
       @team1_question_group1 = create(:question_group, session: team1_session1)
       @team1_question_group2 = create(:question_group, session: team1_session2)
@@ -52,7 +52,7 @@ describe QuestionGroup do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:resource) { create(:question_group, session: create(:session, intervention: intervention)) }
+      let!(:resource) { create(:question_group, session: create(:classic_session, intervention: intervention)) }
       let(:user) { collaborator }
 
       it_behaves_like 'collaborator has expected access to resource'
@@ -95,7 +95,7 @@ describe QuestionGroup do
       let(:collaborator) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention) }
       let!(:collaborator_connection) { create(:collaborator, intervention: intervention, user: collaborator, view: true) }
-      let!(:question_group) { create(:question_group, session: create(:session, intervention: intervention)) }
+      let!(:question_group) { create(:question_group, session: create(:classic_session, intervention: intervention)) }
       let(:user) { collaborator }
 
       it do
@@ -153,7 +153,7 @@ describe QuestionGroup do
     end
 
     context 'preview_session' do
-      let!(:preview_session) { create(:session) }
+      let!(:preview_session) { create(:classic_session) }
       let!(:prev_question_group) { create(:question_group, session: preview_session) }
 
       let!(:user) { create(:user, :confirmed, :preview_session, preview_session_id: preview_session.id) }

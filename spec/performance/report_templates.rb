@@ -4,7 +4,7 @@ RSpec.describe 'Performance', type: :request do
   context 'Report templates' do
     let!(:user) { create(:user, :confirmed, :admin) }
     let!(:headers) { user.create_new_auth_token }
-    let!(:session) { create(:session) }
+    let!(:session) { create(:classic_session) }
     let!(:report_templates) { create_list(:report_template, 20, :with_logo, session: session) }
     let!(:report_template) { create(:report_template, :with_logo, session: session) }
 

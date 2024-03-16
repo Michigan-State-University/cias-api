@@ -4,7 +4,7 @@ RSpec.describe 'Performance', type: :request do
   context 'Question groups' do
     let!(:user) { create(:user, :confirmed, :admin) }
     let!(:headers) { user.create_new_auth_token }
-    let!(:session) { create(:session) }
+    let!(:session) { create(:classic_session) }
     let!(:question_groups) { create_list(:question_group, 20, session: session) }
     let!(:question_group) { create(:question_group, session: session) }
 

@@ -17,10 +17,10 @@ describe Answer do
     RSpec::Mocks.with_temporary_scope do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
-      team1_session1 = create(:session, intervention: team1_intervention1)
-      team1_session2 = create(:session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
+      team1_session1 = create(:classic_session, intervention: team1_intervention1)
+      team1_session2 = create(:classic_session, intervention: team1_intervention2)
+      team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      team2_session2 = create(:classic_session, intervention: team2_intervention2)
 
       team1_question_group1 = create(:question_group, session: team1_session1)
       team1_question_group2 = create(:question_group, session: team1_session2)
@@ -57,7 +57,7 @@ describe Answer do
       let(:intervention) { create(:intervention, collaborators: [create(:collaborator, user: collaborator)]) }
       let!(:answer) do
         create(:answer_multiple,
-               question: create(:question_multiple, question_group: create(:question_group, session: create(:session, intervention: intervention))))
+               question: create(:question_multiple, question_group: create(:question_group, session: create(:classic_session, intervention: intervention))))
       end
       let(:user) { collaborator }
 
@@ -91,7 +91,7 @@ describe Answer do
     end
 
     context 'preview_session' do
-      let!(:preview_session) { create(:session) }
+      let!(:preview_session) { create(:classic_session) }
       let!(:prev_question_group) { create(:question_group, session: preview_session) }
       let!(:prev_question) { create(:question_multiple, question_group: prev_question_group) }
       let!(:prev_answer) { create(:answer_multiple, question: prev_question, user_session: user_session) }

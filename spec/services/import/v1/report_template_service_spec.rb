@@ -19,7 +19,7 @@ RSpec.describe Import::V1::ReportTemplateService do
     }
   end
 
-  let(:session_id) { create(:session).id }
+  let(:session_id) { create(:classic_session).id }
 
   it 'create question group' do
     expect { subject }.to change(ReportTemplate, :count).by(1)
