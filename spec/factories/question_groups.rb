@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :question_group, class: QuestionGroup::Classic::Plain do
     title { Faker::Name.name }
-    association(:session)
+    association(:classic_session)
     factory :question_group_plain, class: QuestionGroup::Classic::Plain do
     end
     factory :question_group_finish, class: QuestionGroup::Classic::Finish do

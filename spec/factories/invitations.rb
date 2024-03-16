@@ -3,6 +3,6 @@
 FactoryBot.define do
   factory :invitation do
     sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
-    invitable { build(:session) }
+    invitable { build(:classic_session) }
   end
 end

@@ -5,7 +5,7 @@ FactoryBot.define do
     name       { Faker::Name.name }
     report_for { 'third_party' }
     summary    { 'Your session summary' }
-    association(:session)
+    association(:classic_session)
 
     trait :third_party do
       report_for { 'third_party' }
