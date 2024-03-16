@@ -20,7 +20,7 @@ class QuestionGroup < ApplicationRecord
     type == 'QuestionGroup::Classic::Finish'
   end
 
-  scope :classic_type, -> () { where(type: %w[QuestionGroup::Classic::Plain QuestionGroup::Classic::Finish]) }
+  scope :classic_type, -> { where(type: %w[QuestionGroup::Classic::Plain QuestionGroup::Classic::Finish]) }
 
-  scope :sms_type, -> () { where(type: %w[QuestionGroup::Sms::Plain QuestionGroup::Sms::Finish]) }
+  scope :sms_type, -> { where(type: %w[QuestionGroup::Sms::Plain QuestionGroup::Sms::Finish]) }
 end
