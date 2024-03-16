@@ -8,7 +8,7 @@ module Intervention::Csv::Tlfb
 
     return if session.type.eql? 'Session::CatMh'
 
-    session.question_groups.where(type: 'QuestionGroup::Tlfb').find_each do |tlfb_question_group|
+    session.question_groups.where(type: 'QuestionGroup::Classic::Tlfb').find_each do |tlfb_question_group|
       session_variable = session.variable
       days = Tlfb::Day.where(user_session_id: user_session.id, question_group_id: tlfb_question_group.id)
       days.each_with_index do |day, day_index|

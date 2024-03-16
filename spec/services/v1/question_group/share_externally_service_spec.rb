@@ -11,7 +11,7 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
   let!(:session2) { create(:session, intervention: intervention) }
   let!(:researcher) { create(:user, :researcher) }
 
-  let!(:question_group) { create(:question_group, session: session1, type: 'QuestionGroup::Plain') }
+  let!(:question_group) { create(:question_group, session: session1, type: 'QuestionGroup::Classic::Plain') }
   let!(:question1) { create(:question_single, question_group: question_group) }
   let!(:question2) { create(:question_multiple, question_group: question_group) }
   let!(:question3) { create(:question_feedback, question_group: question_group) }

@@ -38,7 +38,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def create_new_group_in_session(session, selected_group)
-    position = session.question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
+    position = session.question_groups.where.not(type: 'QuestionGroup::Classic::Finish').last&.position.to_i + 1
     QuestionGroup.create(session_id: session.id, title: I18n.t('duplication_with_structure.question_group_title', source_group_title: selected_group.title),
                          position: position, type: selected_group.type)
   end

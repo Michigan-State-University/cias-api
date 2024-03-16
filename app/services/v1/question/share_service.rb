@@ -78,7 +78,7 @@ class V1::Question::ShareService
       )
       QuestionGroup.create!(
         title: 'Copied Slides',
-        type: tlfb_type ? 'QuestionGroup::Tlfb' : 'QuestionGroup::Plain',
+        type: tlfb_type ? 'QuestionGroup::Classic::Tlfb' : 'QuestionGroup::Classic::Plain',
         session: new_session
       )
     end

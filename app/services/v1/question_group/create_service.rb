@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::CreateService
-  attr_reader :questions_params, :question_group_params, :session
+  attr_reader :questions_params, :question_group_params, :session, :question_group_class
   attr_accessor :questions
 
   def self.call(question_group_params, questions, questions_params, session)
@@ -13,13 +13,14 @@ class V1::QuestionGroup::CreateService
     @questions = questions
     @questions_params = questions_params
     @session = session
+    @question_group_class = session.type == 'Session::Sms' ? QuestionGroup::Sms : QuestionGroup::Classic
   end
 
   def call
     raise ActiveRecord::ActiveRecordError if questions.tlfb.any?
 
-    qg_plain = QuestionGroup.new(session_id: session.id, **question_group_params)
-    qg_plain.position = session.question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
+    qg_plain = question_group_class.new(session_id: session.id, **question_group_params)
+    qg_plain.position = session.question_groups.where.not(type: 'QuestionGroup::Classic::Finish').last&.position.to_i + 1
     qg_plain.save!
 
     questions.each do |question|

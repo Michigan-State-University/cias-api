@@ -162,7 +162,7 @@ RSpec.describe CloneJobs::Session, type: :job do
       end
 
       it 'has one finish question_group' do
-        expect(cloned_session.question_groups.where(type: 'QuestionGroup::Finish').size).to eq(1)
+        expect(cloned_session.question_groups.where(type: 'QuestionGroup::Classic::Finish').size).to eq(1)
       end
 
       it 'correctly clone questions (question group 1)' do

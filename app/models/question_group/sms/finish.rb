@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class QuestionGroup::Finish < QuestionGroup
+class QuestionGroup::Sms::Finish < QuestionGroup::Sms
   has_one :question_finish, inverse_of: :question_group, class_name: '::Question::Finish',
                             foreign_key: :question_group_id, dependent: :destroy
 

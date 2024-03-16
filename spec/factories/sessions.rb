@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :session do
+  factory :session, class: Session::Classic do
     sequence(:name) { |s| "session_#{s}" }
     sequence(:variable) { |s| "session_#{s}" }
     sequence(:position) { |s| s }

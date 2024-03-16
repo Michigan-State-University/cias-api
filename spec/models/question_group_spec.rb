@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe QuestionGroup, type: :model do
-  describe 'QuestionGroup::Plain' do
+  describe 'QuestionGroup::Classic::Plain' do
     subject(:question_group_plain) { build(:question_group_plain) }
 
     it { should belong_to(:session) }
@@ -14,7 +14,7 @@ RSpec.describe QuestionGroup, type: :model do
     end
   end
 
-  describe 'QuestionGroup::Finish' do
+  describe 'QuestionGroup::Classic::Finish' do
     describe 'model definition' do
       subject(:question_group_finish) { build(:question_group_finish) }
 

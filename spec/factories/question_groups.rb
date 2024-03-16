@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :question_group do
+  factory :question_group, class: QuestionGroup::Classic::Plain do
     title { Faker::Name.name }
     association(:session)
-    factory :question_group_plain, class: QuestionGroup::Plain do
+    factory :question_group_plain, class: QuestionGroup::Classic::Plain do
     end
-    factory :question_group_finish, class: QuestionGroup::Finish do
+    factory :question_group_finish, class: QuestionGroup::Classic::Finish do
     end
-    factory :tlfb_group, class: QuestionGroup::Tlfb do
+    factory :tlfb_group, class: QuestionGroup::Classic::Tlfb do
       title { 'TLFB Study Group' }
 
       after(:build) do |question_group|

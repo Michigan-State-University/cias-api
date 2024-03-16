@@ -9,7 +9,7 @@ RSpec.describe Import::V1::QuestionGroupService do
     {
       title: 'Group 1',
       position: 1,
-      type: 'QuestionGroup::Plain',
+      type: 'QuestionGroup::Classic::Plain',
       version: '1',
       questions: []
     }

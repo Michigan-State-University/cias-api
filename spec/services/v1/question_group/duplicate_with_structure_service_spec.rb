@@ -13,7 +13,7 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
   let!(:session1) { create(:session, intervention: intervention) }
   let!(:session2) { create(:session, intervention: intervention) }
 
-  let!(:question_group) { create(:question_group, session: session1, type: 'QuestionGroup::Plain') }
+  let!(:question_group) { create(:question_group, session: session1, type: 'QuestionGroup::Classic::Plain') }
   let!(:question1) { create(:question_single, question_group: question_group) }
   let!(:question2) { create(:question_multiple, question_group: question_group) }
   let!(:question3) { create(:question_feedback, question_group: question_group) }
@@ -31,7 +31,7 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
     result = subject.call
     expect(result).to be_a(Array)
     expect(result.size).to be 1
-    expect(result.first.type).to eql('QuestionGroup::Plain')
+    expect(result.first.type).to eql('QuestionGroup::Classic::Plain')
   end
 
   context 'when at least one argument is invalid' do

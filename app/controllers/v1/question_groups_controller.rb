@@ -126,7 +126,10 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_groups_scope
-    @question_groups_scope ||= QuestionGroup.includes(:session, questions: [:image_blob, { image_attachment: :blob }])
+    session_load
+
+    initial_scope = @session_load.type == 'Session::Sms' ? QuestionGroup.sms_type : QuestionGroup.classic_type
+    @question_groups_scope ||= initial_scope.includes(:session, questions: [:image_blob, { image_attachment: :blob }])
                                             .accessible_by(current_ability).where(session_id: session_id).order(:position)
   end
 
