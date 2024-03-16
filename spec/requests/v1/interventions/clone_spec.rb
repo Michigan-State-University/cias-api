@@ -8,16 +8,16 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let!(:session) { create(:classic_session, intervention: intervention, position: 1) }
   let!(:other_session) do
     create(:classic_session, intervention: intervention, position: 2,
-                     formulas: [{ 'payload' => 'var + 2',
-                                  'patterns' =>
+                             formulas: [{ 'payload' => 'var + 2',
+                                          'patterns' =>
                         [{ 'match' => '=1',
                            'target' =>
                              [{ 'id' => third_session.id, 'type' => 'Session' }] }] }])
   end
   let!(:third_session) do
     create(:classic_session, intervention: intervention, position: 3,
-                     formulas: [{ 'payload' => '',
-                                  'patterns' =>
+                             formulas: [{ 'payload' => '',
+                                          'patterns' =>
                         [{ 'match' => '',
                            'target' =>
                              [{ 'id' => '', 'type' => 'Session' }] }] }])

@@ -12,8 +12,8 @@ RSpec.describe CloneJobs::Session, type: :job do
       create(:classic_session, :with_report_templates, intervention: intervention, position: 1, formulas: [{ 'payload' => 'var + 5', 'patterns' => [
                { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
              ] }],
-                                               settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
-                                               days_after_date_variable_name: 'var1')
+                                                       settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
+                                                       days_after_date_variable_name: 'var1')
     end
     let!(:other_session) { create(:classic_session, intervention: intervention, position: 2) }
     let!(:sms_plan) { create(:sms_plan, session: session) }

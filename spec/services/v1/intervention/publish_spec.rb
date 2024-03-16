@@ -12,7 +12,9 @@ RSpec.describe V1::Intervention::Publish do
   let!(:user_intervention) { create(:user_intervention, intervention: intervention, user: preview_session_user) }
   let!(:user_session) { create(:user_session, user_id: preview_session_user.id, session_id: session.id, user_intervention: user_intervention) }
   let!(:answers) { create(:answer_single, question: question, user_session: user_session) }
-  let!(:second_session) { create(:classic_session, intervention: intervention, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
+  let!(:second_session) do
+    create(:classic_session, intervention: intervention, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload)
+  end
   let!(:third_session) { create(:classic_session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload) }
   let(:schedule) { 'after_fill' }
   let(:schedule_at) { Date.current + 10.days }
