@@ -6,7 +6,7 @@ RSpec.describe 'POST /v1/preview_session_users', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:params) do
     {
       session_id: session.id

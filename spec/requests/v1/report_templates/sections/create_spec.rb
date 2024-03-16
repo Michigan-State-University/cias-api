@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/report_templates/:report_template_id/sections', type: :
     post v1_report_template_sections_path(report_template_id: report_template.id),
          params: params, headers: headers
   end
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:report_template) { create(:report_template, session: session) }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }

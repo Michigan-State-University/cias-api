@@ -31,7 +31,7 @@ RSpec.describe Session, type: :model do
 
       describe '#available_now?' do
         let(:session) do
-          create(:session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload)
+          create(:classic_session, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload)
         end
         let(:schedule) { 'after_fill' }
         let(:schedule_at) { DateTime.now.tomorrow }
@@ -100,7 +100,7 @@ RSpec.describe Session, type: :model do
 
         let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
         let(:intervention) { create(:intervention, status: status) }
-        let(:session) { create(:session, intervention: intervention) }
+        let(:session) { create(:classic_session, intervention: intervention) }
         let(:status) { :draft }
 
         context 'intervention is draft' do
@@ -153,7 +153,7 @@ RSpec.describe Session, type: :model do
       end
 
       describe '#session_variables' do
-        let!(:session) { create(:session) }
+        let!(:session) { create(:classic_session) }
         let!(:question_group) { create(:question_group, session: session) }
         let!(:question) { create(:question_single, :branching_to_session, question_group: question_group) }
 
@@ -163,7 +163,7 @@ RSpec.describe Session, type: :model do
       end
 
       describe '#translate' do
-        let!(:session) { create(:session, :with_sms_plans_with_text, :with_report_templates) }
+        let!(:session) { create(:classic_session, :with_sms_plans_with_text, :with_report_templates) }
         let(:translator) { V1::Google::TranslationService.new }
         let(:source_language_name_short) { 'en' }
         let(:destination_language_name_short) { 'pl' }
@@ -199,7 +199,7 @@ RSpec.describe Session, type: :model do
     context 'validations' do
       context 'unique_variable' do
         context 'when variable exists in other session of the same intervention' do
-          let!(:session2) { create(:session, variable: variable, intervention: intervention) }
+          let!(:session2) { create(:classic_session, variable: variable, intervention: intervention) }
 
           it 'invalidate' do
             expect(subject.validate).to eq false
@@ -207,7 +207,7 @@ RSpec.describe Session, type: :model do
         end
 
         context 'when variable exists in other session, but in other intervention' do
-          let!(:session2) { create(:session, variable: variable) }
+          let!(:session2) { create(:classic_session, variable: variable) }
 
           it 'validate' do
             expect(subject.validate).to eq true

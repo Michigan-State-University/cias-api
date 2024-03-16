@@ -8,7 +8,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
 
   context 'Session::Classic' do
     let(:session) do
-      create(:session, :with_report_templates,
+      create(:classic_session, :with_report_templates,
              intervention: intervention,
              formulas: [{ 'payload' => 'var + 5', 'patterns' => [
                { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
@@ -18,7 +18,7 @@ RSpec.describe 'POST /v1/sessions/:id/clone', type: :request do
     end
     let!(:sms_plan) { create(:sms_plan, session: session) }
     let!(:variant) { create(:sms_plan_variant, :with_attachment, sms_plan: sms_plan) }
-    let!(:other_session) { create(:session, intervention: intervention) }
+    let!(:other_session) { create(:classic_session, intervention: intervention) }
     let!(:question_group1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
     let!(:question_group2) { create(:question_group, title: 'Question Group Title 2', session: session, position: 2) }
     let!(:question1) do

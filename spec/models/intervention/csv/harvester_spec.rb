@@ -689,12 +689,12 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           end
           let(:subject) { described_class.new(intervention1.sessions) }
           let!(:intervention1) { create(:intervention) }
-          let!(:session1) { create(:session, intervention: intervention1, position: 1) }
+          let!(:session1) { create(:classic_session, intervention: intervention1, position: 1) }
           let!(:user_session1) { create(:user_session, session: session1, user: user) }
           let!(:question_group1) { create(:question_group_plain, session: session1) }
           let!(:question1) { create(:question_single, question_group: question_group1, body: question_body) }
           let!(:answer1) { create(:answer_single, question: question1, skipped: true, user_session: user_session1) }
-          let!(:session2) { create(:session, intervention: intervention1, position: 2) }
+          let!(:session2) { create(:classic_session, intervention: intervention1, position: 2) }
           let!(:question_group2) { create(:question_group_plain, session: session2) }
           let!(:user_session2) { create(:user_session, session: session2, user: user) }
           let!(:question2) { create(:question_single, question_group: question_group2, body: question_body) }
@@ -728,7 +728,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       context 'when no questions in session' do
         let(:sessions) { [session] }
         let(:intervention) { create(:intervention, user: user) }
-        let(:session) { create(:session, intervention: intervention) }
+        let(:session) { create(:classic_session, intervention: intervention) }
 
         it 'shows start, end and duration columns in csv' do
           subject.collect

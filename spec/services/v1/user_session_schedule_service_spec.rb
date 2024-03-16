@@ -4,13 +4,13 @@ RSpec.describe V1::UserSessionScheduleService do
   let!(:intervention) { create(:intervention, :published) }
   let!(:user) { create(:user, :participant) }
   let!(:preview_user) { create(:user, :preview_session) }
-  let!(:first_session) { create(:session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
+  let!(:first_session) { create(:classic_session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
   let!(:second_session) do
-    create(:session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at)
+    create(:classic_session, intervention: intervention, schedule: schedule, schedule_payload: schedule_payload, position: 2, schedule_at: schedule_at)
   end
   let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
-  let!(:third_session) { create(:session, intervention: intervention, position: 3) }
-  let!(:organization_session) { create(:session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
+  let!(:third_session) { create(:classic_session, intervention: intervention, position: 3) }
+  let!(:organization_session) { create(:classic_session, intervention: intervention, position: 1, settings: settings, formulas: [formula]) }
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Health Organization') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, name: 'Heath System', organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }

@@ -16,7 +16,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
     create(:intervention, user: intervention_user, status: status, shared_to: shared_to, invitations: invitations, intervention_accesses: accesses,
                           cat_mh_pool: 10)
   end
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:accesses) { [] }
   let(:headers) { user.create_new_auth_token }
   let(:params) do

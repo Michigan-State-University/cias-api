@@ -5,7 +5,7 @@ RSpec.describe V1::SmsPlans::ReScheduleSmsForUserSession do
   subject { described_class.call(user_session) }
 
   let(:intervention) { create(:intervention, status: 'published', paused_at: 5.days.ago) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:participant) { create(:user, :participant, :with_phone) }
   let!(:user_session) { create(:user_session, user: participant, session: session, finished_at: 7.days.ago) }
   let!(:sms_plan) { create(:sms_plan_with_text, session: session, frequency: 'once_a_day', end_at: 2.days.ago) }

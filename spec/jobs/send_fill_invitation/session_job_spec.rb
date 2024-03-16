@@ -7,7 +7,7 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
   let!(:user2) { create(:user, :confirmed, :participant) }
   let!(:intervention) { create(:intervention, :published, user: user) }
   let!(:non_existing_emails) { [] }
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let(:emails) { [user2.email] }
   let(:health_clinic_id) { nil }
   let(:intervention_id) { intervention.id }
@@ -24,7 +24,7 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
     let(:health_clinic_id) { health_clinic.id }
     let!(:intervention_status) { :published }
     let(:intervention) { create(:intervention, status: intervention_status) }
-    let(:session) { create(:session, intervention_id: intervention.id) }
+    let(:session) { create(:classic_session, intervention_id: intervention.id) }
 
     it 'return proper body' do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)

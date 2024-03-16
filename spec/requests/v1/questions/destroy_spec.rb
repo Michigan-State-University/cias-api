@@ -12,7 +12,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
       'admin_with_multiple_roles' => admin_with_multiple_roles
     }
   end
-  let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
+  let!(:session) { create(:classic_session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group, title: 'First Question Group', session: session) }
   let!(:other_question_group) { create(:question_group, title: 'Second Question Group', session: session) }
   let!(:questions) { create_list(:question_slider, 3, question_group: question_group) }

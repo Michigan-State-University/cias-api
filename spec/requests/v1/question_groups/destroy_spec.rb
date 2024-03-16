@@ -8,7 +8,7 @@ describe 'DELETE /v1/sessions/:session_id/question_groups/:id', type: :request d
   end
 
   let(:intervention) { create(:intervention, :published) }
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let!(:question_group) { create(:question_group, session: session, title: 'QuestionGroup Title') }
   let!(:questions) { create_list(:question_free_response, 3, title: 'Question Title', question_group: question_group) }
 

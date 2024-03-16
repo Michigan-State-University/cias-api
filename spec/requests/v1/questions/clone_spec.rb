@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,

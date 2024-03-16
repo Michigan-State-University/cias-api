@@ -5,7 +5,7 @@ RSpec.describe V1::UserSessions::CreateService do
 
   let(:user) { create(:user, :confirmed, :participant) }
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, :multiple_times, intervention: intervention) }
+  let(:session) { create(:classic_session, :multiple_times, intervention: intervention) }
   let(:health_clinic_id) { nil }
   let(:user_id) { user.id }
   let(:session_id) { session.id }

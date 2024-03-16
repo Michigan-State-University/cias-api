@@ -208,7 +208,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
     end
 
     context 'with multiple fill session' do
-      let!(:sessions) { create(:session, :multiple_times, intervention_id: intervention.id) }
+      let!(:sessions) { create(:classic_session, :multiple_times, intervention_id: intervention.id) }
 
       it 'inform that intervention contains multiple fill session' do
         filtered_response = json_response['data'].select { |user_intervention| user_intervention['attributes']['intervention']['id'] == intervention.id }

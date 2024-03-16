@@ -8,7 +8,7 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
   let!(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
 
   context 'when params are valid' do
     let(:params) do
@@ -123,7 +123,7 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
     let(:another_user) { create(:user, :confirmed, :researcher) }
     let(:headers) { user.create_new_auth_token }
     let!(:intervention) { create(:intervention, user: another_user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:params) do
       {
         sms_plan: {
@@ -144,7 +144,7 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
 
   context 'when intervention was published' do
     let(:intervention) { create(:intervention, :published) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:params) do
       {
         sms_plan: {

@@ -20,9 +20,9 @@ describe ReportTemplate do
 
       team1_session1 = create(:classic_session, intervention: team1_intervention1)
       team1_session2 = create(:classic_session, intervention: team1_intervention2)
-      team2_session1 = create(:session, intervention: team2_intervention1)
-      team2_session2 = create(:session, intervention: team2_intervention2)
-      team3_session1 = create(:session, intervention: team3_intervention1)
+      team2_session1 = create(:classic_session, intervention: team2_intervention1)
+      team2_session2 = create(:classic_session, intervention: team2_intervention2)
+      team3_session1 = create(:classic_session, intervention: team3_intervention1)
 
       @team1_report_template1 = create(:report_template, session: team1_session1)
       @team1_report_template2 = create(:report_template, session: team1_session2)

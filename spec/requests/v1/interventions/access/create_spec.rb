@@ -5,7 +5,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/accesses', type: :reques
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id) }
   let!(:intervention_status) { :published }
-  let!(:session) { create(:session, intervention_id: intervention.id) }
+  let!(:session) { create(:classic_session, intervention_id: intervention.id) }
   let!(:participant2) { create(:user, :confirmed, :participant) }
   let!(:emails) { [participant2.email, participant.email] }
   let!(:params) do

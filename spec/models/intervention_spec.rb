@@ -135,9 +135,9 @@ RSpec.describe Intervention, type: :model do
   context 'clone' do
     let(:user) { create(:user, :confirmed, :researcher) }
     let(:intervention) { create(:intervention, :with_short_link) }
-    let!(:session) { create(:session, intervention: intervention, position: 1) }
+    let!(:session) { create(:classic_session, intervention: intervention, position: 1) }
     let!(:other_session) do
-      create(:session, intervention: intervention, position: 2,
+      create(:classic_session, intervention: intervention, position: 2,
                        formulas: [{ 'payload' => 'var + 2',
                                     'patterns' =>
                           [{ 'match' => '=1',
@@ -145,7 +145,7 @@ RSpec.describe Intervention, type: :model do
                                [{ 'id' => third_session.id, 'type' => 'Session' }] }] }])
     end
     let!(:third_session) do
-      create(:session, intervention: intervention, position: 3,
+      create(:classic_session, intervention: intervention, position: 3,
                        formulas: [{ 'payload' => '',
                                     'patterns' =>
                           [{ 'match' => '',

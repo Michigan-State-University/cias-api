@@ -3,7 +3,7 @@
 RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/move_variants', type: :request do
   let(:user) { create(:user, :admin, :confirmed) }
   let(:intervention) { create(:intervention, user: user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:sms_plan) { create(:sms_plan, session: session) }
   let!(:sms_variants) { create_list(:sms_plan_variant, 3, sms_plan: sms_plan) }
 

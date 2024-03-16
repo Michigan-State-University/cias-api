@@ -85,7 +85,7 @@ RSpec.describe UserSession, type: :model do
       end
 
       context 'user session on answer' do
-        let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id, session: create(:session, autofinish_enabled: true)) }
+        let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id, session: create(:classic_session, autofinish_enabled: true)) }
         let(:expected_timestamp) { Time.current + 24.hours }
         let(:timeout_job_id) { nil }
 
@@ -181,7 +181,7 @@ RSpec.describe UserSession, type: :model do
       let(:user) { create(:user, :confirmed, :participant) }
       let(:intervention) { create(:intervention) }
       let(:user_intervention) { create(:user_intervention, intervention: intervention, status: :in_progress) }
-      let(:session) { create(:session, :multiple_times, intervention: intervention) }
+      let(:session) { create(:classic_session, :multiple_times, intervention: intervention) }
       let(:user_session) { create(:user_session, user_intervention: user_intervention, session: session, user: user, multiple_fill: true) }
       let(:user_session2) { create(:user_session, user_intervention: user_intervention, session: session, user: user, multiple_fill: true) }
 

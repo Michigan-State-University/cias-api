@@ -8,7 +8,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id/attachment', type
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let(:sms_plan_id) { sms_plan.id }
   let!(:variant) { create(:sms_plan_variant, :with_attachment, sms_plan: sms_plan) }

@@ -118,7 +118,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
         end
 
         context 'when first session have default voice settings' do
-          let!(:session) { create(:session, intervention_id: intervention.id, google_tts_voice_id: first_voice.id) }
+          let!(:session) { create(:classic_session, intervention_id: intervention.id, google_tts_voice_id: first_voice.id) }
 
           it 'return good voice settings' do
             expect(Session.last.google_tts_voice).to eq(first_voice)

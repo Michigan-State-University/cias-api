@@ -5,8 +5,8 @@ require 'rails_helper'
 describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :request do
   let(:request) { post clone_v1_session_question_group_path(session_id: session.id, id: question_group.id), headers: headers }
 
-  let!(:session) { create(:session, intervention: create(:intervention, :published)) }
-  let!(:other_session) { create(:session) }
+  let!(:session) { create(:classic_session, intervention: create(:intervention, :published)) }
+  let!(:other_session) { create(:classic_session) }
   let!(:question_group) { create(:question_group, title: 'Question Group Title', session: session) }
   let!(:question1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,

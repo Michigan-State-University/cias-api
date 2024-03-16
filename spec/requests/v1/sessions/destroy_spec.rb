@@ -13,7 +13,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
     }
   end
   let(:intervention) { create(:intervention) }
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let!(:question_group) { create(:question_group_plain, session: session) }
   let!(:questions) { create_list(:question_single, 4, question_group: question_group) }
   let!(:answers) { create_list(:answer_single, 3, question: questions.first) }

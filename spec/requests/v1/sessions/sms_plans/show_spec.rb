@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/sessions/:session_id/sms_plans', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
   let(:headers) { user.create_new_auth_token }
   let(:request) { get v1_session_sms_plans_path(session_id: session.id), headers: headers }
   let!(:sms_plan1) { create(:sms_plan, session: session) }

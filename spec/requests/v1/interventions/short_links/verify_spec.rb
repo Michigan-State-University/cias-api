@@ -14,7 +14,7 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
   end
 
   context 'sequential intervention with sessions' do
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
 
     before do
       request
@@ -46,7 +46,7 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
   end
 
   context 'sequential intervention with open sessions' do
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
     let(:user_intervention) { create(:user_intervention, user: participant, intervention: intervention) }
     let!(:user_session) { create(:user_session, session: session, user: participant, user_intervention: user_intervention) }
 
@@ -159,8 +159,8 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
 
   context 'sequential intervention with finished session (multiple-fill)' do
     let(:intervention) { create(:intervention, :published, user: researcher) }
-    let!(:session1) { create(:session, intervention: intervention, position: 1, multiple_fill: true) }
-    let!(:session2) { create(:session, intervention: intervention, position: 2) }
+    let!(:session1) { create(:classic_session, intervention: intervention, position: 1, multiple_fill: true) }
+    let!(:session2) { create(:classic_session, intervention: intervention, position: 2) }
     let!(:user_intervention) { create(:user_intervention, intervention: intervention, user: participant) }
     let!(:user_session) { create(:user_session, user_intervention: user_intervention, user: participant, session: session1, finished_at: DateTime.now) }
 
@@ -221,7 +221,7 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
 
   context 'sequential module intervention with sessions' do
     let(:intervention) { create(:flexible_order_intervention, :published, user: researcher) }
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
 
     before do
       request

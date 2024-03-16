@@ -7,7 +7,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     let(:participant) { create(:user, :confirmed, :participant) }
     let(:researcher) { create(:user, :confirmed, :researcher) }
     let!(:intervention) { create(:intervention, user_id: researcher.id, status: status, license_type: 'unlimited') }
-    let!(:session) { create(:session, intervention_id: intervention.id) }
+    let!(:session) { create(:classic_session, intervention_id: intervention.id) }
     let!(:question_group) { create(:question_group, session: session) }
     let!(:question) { create(:question_single, question_group: question_group) }
     let(:audio_id) { nil }
@@ -31,7 +31,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
     context 'when start immediately is set' do
       let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
-      let!(:session2) { create(:session, intervention_id: intervention.id, schedule: :immediately) }
+      let!(:session2) { create(:classic_session, intervention_id: intervention.id, schedule: :immediately) }
       let!(:question_group2) { create(:question_group, session: session2) }
       let!(:question2) { create(:question_single, question_group: question_group2) }
       let(:status) { 'published' }
@@ -50,7 +50,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
     end
 
     context 'tlfb logic' do
-      let!(:tlfb_session) { create(:session, intervention_id: intervention.id) }
+      let!(:tlfb_session) { create(:classic_session, intervention_id: intervention.id) }
       let!(:tlfb_question_group) { create(:tlfb_group, session: tlfb_session) }
       let!(:tlfb_user_session) do
         create(:user_session, user_id: participant.id, session_id: tlfb_session.id, name_audio_id: audio_id, user_intervention: user_int)
@@ -340,9 +340,9 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
       context 'modules intervention' do
         let!(:intervention) { create(:fixed_order_intervention, user_id: researcher.id, status: status) }
-        let!(:session) { create(:session, intervention_id: intervention.id) }
+        let!(:session) { create(:classic_session, intervention_id: intervention.id) }
         let!(:user_session) { create(:user_session, user_id: participant.id, session_id: session.id, name_audio_id: audio_id, user_intervention: user_int) }
-        let!(:next_session) { create(:session, intervention_id: intervention.id) }
+        let!(:next_session) { create(:classic_session, intervention_id: intervention.id) }
         let(:questions) { create_list(:question_single, 4, question_group: question_group) }
         let!(:question) do
           question = questions.first
@@ -480,7 +480,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
         end
 
         context 'refection from another session' do
-          let(:session2) { create(:session, intervention: intervention, name: 'dwa') }
+          let(:session2) { create(:classic_session, intervention: intervention, name: 'dwa') }
           let!(:user_session2) { create(:user_session, session: session2, user_intervention: user_int) }
           let!(:question_group2) { create(:question_group, session: session2) }
           let!(:question2) { create(:question_single, question_group: question_group2) }

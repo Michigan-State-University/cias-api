@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', type: :request do
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: user) }
-  let(:session1) { create(:session, position: 4, intervention: intervention) }
-  let(:session2) { create(:session, position: 5, intervention: intervention) }
-  let(:session3) { create(:session, position: 6, intervention: intervention) }
+  let(:session1) { create(:classic_session, position: 4, intervention: intervention) }
+  let(:session2) { create(:classic_session, position: 5, intervention: intervention) }
+  let(:session3) { create(:classic_session, position: 6, intervention: intervention) }
   let(:params) do
     {
       session: {

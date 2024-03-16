@@ -8,7 +8,7 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
           params: params, headers: headers
   end
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:report_template) { create(:report_template, session: session) }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
@@ -126,7 +126,7 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
   context 'when changing the type from for third party to for participant' do
     let(:user) { create(:user, :confirmed, :admin) }
     let(:intervention) { create(:intervention, user: user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:report_template) { create(:report_template, session: session, report_for: :third_party) }
     let(:other_report_template) { create(:report_template, session: session, report_for: :third_party) }
     let(:question_group) { create(:question_group, session: session) }

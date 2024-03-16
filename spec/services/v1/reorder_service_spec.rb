@@ -6,7 +6,7 @@ RSpec.describe V1::ReorderService do
 
     let(:user) { create(:user, :admin, :confirmed) }
     let(:intervention) { create(:intervention, user: user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:sms_plan) { create(:sms_plan, session: session) }
     let!(:sms_variants) { create_list(:sms_plan_variant, 5, sms_plan: sms_plan) }
 
@@ -56,7 +56,7 @@ RSpec.describe V1::ReorderService do
     subject { described_class.call(report_template.sections, params) }
 
     let!(:current_v1_user) { create(:user, :confirmed, :admin) }
-    let!(:session) { create(:session) }
+    let!(:session) { create(:classic_session) }
     let!(:report_template) { create(:report_template, session: session) }
     let!(:section1) do
       create(:report_template_section, report_template: report_template, position: 0)

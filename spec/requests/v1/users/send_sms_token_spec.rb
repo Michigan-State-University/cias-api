@@ -12,7 +12,7 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
 
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: researcher) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_phone, question_group: question_group) }
 

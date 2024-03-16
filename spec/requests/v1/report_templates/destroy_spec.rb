@@ -57,7 +57,7 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/report_template/:id', type: :req
   context 'deletion of report template id from third party report question' do
     let(:user) { create(:user, :confirmed, :admin) }
     let(:intervention) { create(:intervention, user: user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:report_template) { create(:report_template, session: session) }
     let(:question_group) { create(:question_group, session: session) }
     let(:third_party_questions) { create_list(:question_third_party, 2, question_group: question_group) }

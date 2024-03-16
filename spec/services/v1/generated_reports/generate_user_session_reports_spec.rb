@@ -4,7 +4,7 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
   subject { described_class.call(user_session) }
 
   let!(:current_v1_user) { create(:user, :confirmed, :guest) }
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:third_party_report_template) { create(:report_template, :third_party, session: session) }
   let!(:participant_report_template) { create(:report_template, :participant, session: session) }
   let!(:user_session) { create(:user_session, user: current_v1_user, session: session) }

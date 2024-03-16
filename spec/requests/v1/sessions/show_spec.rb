@@ -13,7 +13,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/sessions/:id', type: :req
     }
   end
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention_id: intervention.id) }
+  let(:session) { create(:classic_session, intervention_id: intervention.id) }
   let!(:sms_plan) { create(:sms_plan, session: session) }
 
   let(:headers) { user.create_new_auth_token }

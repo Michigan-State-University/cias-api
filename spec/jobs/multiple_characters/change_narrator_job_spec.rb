@@ -29,7 +29,7 @@ RSpec.describe MultipleCharacters::ChangeNarratorJob, type: :job do
 
   describe 'session' do
     let(:model) { Session.name }
-    let(:object_id) { create(:session).id }
+    let(:object_id) { create(:classic_session).id }
 
     before do
       ActiveJob::Base.queue_adapter = :test

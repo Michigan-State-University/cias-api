@@ -3,7 +3,7 @@
 RSpec.describe 'v1/question_groups/share_externally', type: :request do
   let(:main_user) { create(:user, :admin, :confirmed) }
   let(:intervention) { create(:intervention, user: main_user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_groups) do
     create_list(:question_group, 3, session: session)
   end
@@ -53,7 +53,7 @@ RSpec.describe 'v1/question_groups/share_externally', type: :request do
   context 'when trying to share from unowned session' do
     let(:main_user) { create(:user, :researcher, :confirmed) }
     let(:target_intervention) { create(:intervention, user: target_user) }
-    let(:target_session) { create(:session, intervention: target_intervention) }
+    let(:target_session) { create(:classic_session, intervention: target_intervention) }
     let(:session) { target_session }
 
     it 'fails with Not Found HTTP status code' do

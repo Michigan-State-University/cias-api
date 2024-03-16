@@ -6,7 +6,7 @@ RSpec.describe V1::Sms::Replay do
   subject { described_class.call(from, to, body) }
 
   let!(:user) { create(:user, :confirmed, :participant) }
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let(:from) { '+48555777888' }
   let(:to) { '+48555444777' }
   let(:body) { 'STOP' }

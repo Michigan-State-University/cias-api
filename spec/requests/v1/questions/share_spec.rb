@@ -10,7 +10,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
   let(:researcher2) { create(:user, :confirmed, :researcher, team_id: team.id) }
 
   let(:intervention) { create(:intervention, user: user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_group) { create(:question_group, session: session) }
   let(:other_question_group) { create(:question_group, session: session) }
   let(:questions) { create_list(:question_single, 3, question_group: question_group) }
@@ -176,7 +176,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
 
             context 'one question doesn\'t belong to current researcher' do
               let(:researcher1_intervention) { create(:intervention, user: researcher1) }
-              let(:researcher1_session) { create(:session, intervention: researcher1_intervention) }
+              let(:researcher1_session) { create(:classic_session, intervention: researcher1_intervention) }
               let(:researcher1_question_group) { create(:question_group, session: researcher1_session) }
               let(:researcher1_questions) do
                 create_list(:question_single, 3, question_group: researcher1_question_group)

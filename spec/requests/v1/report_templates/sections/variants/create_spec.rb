@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/report_templates/sections/:section_id/variants', type: 
     post v1_report_template_section_variants_path(section_id: report_template_section.id),
          params: params, headers: headers
   end
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:report_template) { create(:report_template, session: session) }
   let!(:report_template_section) { create(:report_template_section, report_template: report_template) }
   let(:user) { create(:user, :confirmed, :admin) }

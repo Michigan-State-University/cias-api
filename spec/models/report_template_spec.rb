@@ -113,7 +113,7 @@ RSpec.describe ReportTemplate, type: :model do
     context 'when we duplicate template to other session' do
       subject { Clone::ReportTemplate.new(report_template, params: { session_id: session.id }).execute }
 
-      let(:session) { create(:session) }
+      let(:session) { create(:classic_session) }
 
       it 'create a template' do
         expect { subject }.to change(described_class, :count).by(1)

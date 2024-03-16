@@ -12,7 +12,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
       context "user session for role #{role} has answers" do
         let!(:user) { create(:user, :confirmed, role) }
         let!(:intervention) { create(:intervention, user_id: user.id) }
-        let!(:session) { create(:session, intervention_id: intervention.id) }
+        let!(:session) { create(:classic_session, intervention_id: intervention.id) }
         let!(:user_session) { create(:user_session, session: session) }
         let!(:question_group) { create(:question_group, session: session) }
         let!(:questions) { create_list(:question_single, 5, question_group: question_group) }
@@ -42,7 +42,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
     %i[participant guest].each do |role|
       let!(:user) { create(:user, :confirmed, role) }
       let!(:intervention) { create(:intervention, user_id: user.id) }
-      let!(:session) { create(:session, intervention_id: intervention.id) }
+      let!(:session) { create(:classic_session, intervention_id: intervention.id) }
       let!(:user_session) { create(:user_session, session: session, user_id: user.id) }
       let!(:question_group) { create(:question_group, session: session) }
       let!(:questions) { create_list(:question_single, 5, question_group: question_group) }

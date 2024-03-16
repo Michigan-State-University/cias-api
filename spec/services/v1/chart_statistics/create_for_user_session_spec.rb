@@ -91,7 +91,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          session = create(:session, intervention: intervention, variable: session_var)
+          session = create(:classic_session, intervention: intervention, variable: session_var)
           @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
           @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
           @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '1' }] })
@@ -120,7 +120,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          session = create(:session, intervention: intervention, variable: session_var)
+          session = create(:classic_session, intervention: intervention, variable: session_var)
           @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
           @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
         end
@@ -153,7 +153,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          session = create(:session, intervention: intervention, variable: session_var)
+          session = create(:classic_session, intervention: intervention, variable: session_var)
           @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic, finished_at: filled_at)
           @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
           @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '1' }] })
@@ -189,7 +189,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     before_all do
       RSpec::Mocks.with_temporary_scope do
         allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-        session = create(:session, intervention: intervention, variable: session_var)
+        session = create(:classic_session, intervention: intervention, variable: session_var)
         @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic, finished_at: filled_at)
         @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
         @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '0' }] })
@@ -205,7 +205,7 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     before_all do
       RSpec::Mocks.with_temporary_scope do
         allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-        session = create(:session, intervention: intervention, variable: session_var)
+        session = create(:classic_session, intervention: intervention, variable: session_var)
         @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
       end
     end

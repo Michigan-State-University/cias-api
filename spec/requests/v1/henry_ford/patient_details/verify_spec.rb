@@ -6,7 +6,7 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
   let(:user) { create(:user, :confirmed, :participant) }
   let!(:hfhs_data) { create(:hfhs_patient_detail) }
   let!(:session) do
-    create(:session,
+    create(:classic_session,
            intervention: create(:intervention,
                                 intervention_locations: [create(:intervention_location,
                                                                 clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD',

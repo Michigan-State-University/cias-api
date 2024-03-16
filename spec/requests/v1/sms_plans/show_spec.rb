@@ -21,7 +21,7 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
     context 'team admin' do
       let(:user) { create(:user, :confirmed, :team_admin) }
       let!(:intervention) { create(:intervention, user: user) }
-      let!(:session) { create(:session, intervention: intervention) }
+      let!(:session) { create(:classic_session, intervention: intervention) }
       let!(:sms_plan) { create(:sms_plan, session: session) }
 
       it 'has correct http code :ok' do
@@ -65,7 +65,7 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
     context 'when given sms plan is an alert' do
       let!(:user) { create(:user, :confirmed, :admin) }
       let!(:intervention) { create(:intervention, user: user) }
-      let!(:session) { create(:session, intervention: intervention) }
+      let!(:session) { create(:classic_session, intervention: intervention) }
       let!(:sms_plan) { create(:sms_alert, session: session, phones: [phone]) }
       let!(:phone) { create(:phone, :confirmed) }
       let!(:sms_plan_id) { sms_plan.id }

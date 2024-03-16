@@ -16,7 +16,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/invitations', type: :requ
     let!(:health_clinic1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
     let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
     let(:intervention) { create(:intervention, :published) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let!(:session_invitations1) do
       create_list(:session_invitation, 3, health_clinic_id: health_clinic1.id, invitable_id: session.id,
                                           invitable_type: 'Session')

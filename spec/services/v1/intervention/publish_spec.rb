@@ -4,16 +4,16 @@ require 'rails_helper'
 
 RSpec.describe V1::Intervention::Publish do
   let!(:intervention) { create(:intervention, published_at: nil) }
-  let!(:session) { create(:session, intervention: intervention) }
-  let!(:session_with_autoclose) { create(:session, intervention: intervention, autoclose_enabled: true, autoclose_at: autoclose_at) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
+  let!(:session_with_autoclose) { create(:classic_session, intervention: intervention, autoclose_enabled: true, autoclose_at: autoclose_at) }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
   let!(:preview_session_user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
   let!(:user_intervention) { create(:user_intervention, intervention: intervention, user: preview_session_user) }
   let!(:user_session) { create(:user_session, user_id: preview_session_user.id, session_id: session.id, user_intervention: user_intervention) }
   let!(:answers) { create(:answer_single, question: question, user_session: user_session) }
-  let!(:second_session) { create(:session, intervention: intervention, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
-  let!(:third_session) { create(:session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload) }
+  let!(:second_session) { create(:classic_session, intervention: intervention, schedule: schedule, schedule_at: schedule_at, schedule_payload: schedule_payload) }
+  let!(:third_session) { create(:classic_session, intervention: intervention, schedule: 'days_after', schedule_payload: days_after_payload) }
   let(:schedule) { 'after_fill' }
   let(:schedule_at) { Date.current + 10.days }
   let(:autoclose_at) { Date.current + 20.days }

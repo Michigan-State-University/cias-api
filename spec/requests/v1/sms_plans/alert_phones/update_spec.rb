@@ -3,7 +3,7 @@
 RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:intervention) { create(:intervention, user: user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:sms_alert) { create(:sms_plan, type: 'SmsPlan::Alert', session: session) }
   let!(:phone) { create(:phone, :confirmed, sms_plans: [sms_alert]) }
   let(:headers) { user.create_new_auth_token }

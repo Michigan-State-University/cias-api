@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions/:id/change_narr
 
   let(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user: user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:headers) { user.create_new_auth_token }
   let(:params) do
     {

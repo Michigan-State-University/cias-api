@@ -7,9 +7,9 @@ RSpec.describe DuplicateJobs::Session, type: :job do
   let!(:user) { create(:user, :confirmed, :researcher) }
   let!(:intervention) { create(:intervention, user: user, status: 'published') }
   let!(:new_intervention) { create(:intervention, user: user, status: 'published') }
-  let!(:other_session) { create(:session, intervention: intervention) }
+  let!(:other_session) { create(:classic_session, intervention: intervention) }
   let!(:session) do
-    create(:session, intervention: intervention, name: 'Test', formulas: [{ 'payload' => 'var + 5', 'patterns' => [
+    create(:classic_session, intervention: intervention, name: 'Test', formulas: [{ 'payload' => 'var + 5', 'patterns' => [
              { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
            ] }])
   end
@@ -103,8 +103,8 @@ RSpec.describe DuplicateJobs::Session, type: :job do
   context 'when duplicating session with reflection' do
     subject { described_class.perform_now(user, session2.id, new_intervention.id) }
 
-    let!(:session1) { create(:session, intervention: intervention, position: 1) }
-    let!(:session2) { create(:session, intervention: intervention, position: 2) }
+    let!(:session1) { create(:classic_session, intervention: intervention, position: 1) }
+    let!(:session2) { create(:classic_session, intervention: intervention, position: 2) }
     let!(:question_group1) { create(:question_group, title: 'Question Group Title 1', session: session1, position: 1) }
     let!(:question_group2) { create(:question_group, title: 'Question Group Title 2', session: session2, position: 1) }
     let!(:session1_question) do

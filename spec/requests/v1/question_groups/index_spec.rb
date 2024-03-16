@@ -14,7 +14,7 @@ describe 'GET /v1/sessions/:session_id/question_groups', type: :request do
                           user: intervention_user)
   end
 
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let(:shared_to) { :anyone }
   let(:intervention_status) { :published }
   let(:intervention_user) { admin }

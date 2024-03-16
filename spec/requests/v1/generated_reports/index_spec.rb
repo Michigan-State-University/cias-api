@@ -17,8 +17,8 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
   context 'when there are generated reports' do
     let!(:intervention_owner) { user }
     let!(:intervention) { create(:intervention, user: intervention_owner) }
-    let!(:session1) { create(:session, intervention: intervention) }
-    let!(:session2) { create(:session, intervention: intervention) }
+    let!(:session1) { create(:classic_session, intervention: intervention) }
+    let!(:session2) { create(:classic_session, intervention: intervention) }
     let!(:user_session1) { create(:user_session, user: user, session: session1) }
     let!(:user_session2) { create(:user_session, user: user, session: session2) }
     let!(:participant_report) do

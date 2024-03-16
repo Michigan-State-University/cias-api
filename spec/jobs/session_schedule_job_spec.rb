@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe SessionScheduleJob, type: :job do
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:user_intervention) { create(:user_intervention, intervention: session.intervention, user: user) }
   let!(:user) { create(:user, :participant) }
   let(:session_id) { session.id }
@@ -32,7 +32,7 @@ RSpec.describe SessionScheduleJob, type: :job do
 
   context 'predefined participant' do
     let(:intervention) { create(:intervention, :with_predefined_participants) }
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
     let!(:user) { intervention.predefined_users.first }
 
     before do

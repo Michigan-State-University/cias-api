@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request do
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
   let!(:variant_id) { variant.id }
@@ -59,7 +59,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/variants/:id', type: :request d
 
       context 'when intervention was published' do
         let(:intervention) { create(:intervention, :published) }
-        let(:session) { create(:session, intervention: intervention) }
+        let(:session) { create(:classic_session, intervention: intervention) }
         let(:params) do
           {
             variant: {

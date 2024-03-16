@@ -4,7 +4,7 @@ RSpec.describe 'POST v1/tlfb/consumption_results', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:user) { admin }
   let(:intervention) { create(:intervention, user: admin) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_group) { create(:tlfb_group, session: session) }
   let!(:day) { create(:tlfb_day, user_session: user_session, question_group: question_group, exact_date: Time.zone.today) }
   let(:user_session) { create(:user_session, session: session) }

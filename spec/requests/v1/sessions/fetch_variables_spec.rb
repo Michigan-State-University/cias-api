@@ -6,7 +6,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
 
   context 'Classic sessions' do
     let!(:intervention) { create(:intervention, user: user) }
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
     let!(:question_group) { create(:question_group, session: session, position: 1) }
     let!(:questions) do
       [

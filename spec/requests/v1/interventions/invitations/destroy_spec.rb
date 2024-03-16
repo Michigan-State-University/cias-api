@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'DELETE /v1/interventions/:intervention_id/invitations/:id', type: :request do
   let!(:user) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, :published, user: user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:invitation) do
     create(:session_invitation, invitable_id: session.id, invitable_type: 'Session')
   end

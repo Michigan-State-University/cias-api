@@ -5,7 +5,7 @@ RSpec.describe Question::ThirdParty, type: :model do
     context 'it correctly downcases third party emails' do
       let(:user) { create(:user, :confirmed, :researcher) }
       let(:intervention) { create(:intervention, user: user) }
-      let(:session) { create(:session, intervention: intervention) }
+      let(:session) { create(:classic_session, intervention: intervention) }
       let(:question_group) { create(:question_group, session: session) }
       let(:question) { create(:question_third_party, question_group: question_group) }
 

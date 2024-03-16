@@ -6,7 +6,7 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let!(:intervention) { create(:intervention, user_id: researcher.id, status: status, license_type: 'unlimited') }
-  let!(:session) { create(:session, intervention_id: intervention.id) }
+  let!(:session) { create(:classic_session, intervention_id: intervention.id) }
   let(:status) { 'draft' }
   let!(:question_group) { create(:question_group, session: session) }
   let!(:question) { create(:question_single, question_group: question_group) }
@@ -435,7 +435,7 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
 
   context 'response when branching is set to another session' do
     let!(:other_session) do
-      create(:session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at)
+      create(:classic_session, intervention_id: intervention.id, position: 2, schedule: schedule, schedule_at: schedule_at)
     end
     let!(:other_question_group) { create(:question_group, session_id: other_session.id) }
     let!(:other_question) { create(:question_single, question_group_id: other_question_group.id) }

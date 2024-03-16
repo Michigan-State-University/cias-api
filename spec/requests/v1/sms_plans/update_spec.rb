@@ -15,7 +15,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
   end
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:sms_plan) { create :sms_plan, session: session }
   let(:params) do
     {
@@ -58,7 +58,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
 
       context 'when intervention was published' do
         let(:intervention) { create(:intervention, :published) }
-        let(:session) { create(:session, intervention: intervention) }
+        let(:session) { create(:classic_session, intervention: intervention) }
 
         it 'returns 405 status' do
           expect { request }.not_to change(sms_plan, :name)
@@ -104,7 +104,7 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
     let(:another_user) { create(:user, :confirmed, :researcher) }
     let(:headers) { user.create_new_auth_token }
     let!(:intervention) { create(:intervention, user: another_user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:params) do
       {
         sms_plan: {

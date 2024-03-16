@@ -5,7 +5,7 @@ RSpec.describe V1::Translations::Intervention do
     subject { described_class.call(intervention, language.id, voice.id) }
 
     let!(:intervention) { create(:intervention, name: 'Test') }
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
 
     let_it_be(:tts_language) { create(:google_tts_language, :with_voices, language_name: 'French (France)') }
     let_it_be(:voice) { tts_language.google_tts_voices.first }

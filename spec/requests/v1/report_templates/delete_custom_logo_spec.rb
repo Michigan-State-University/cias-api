@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'DELETE v1/sessions/:session_id/report_templates/:id/remove_cover_letter_custom_logo', type: :request do
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:user) { create(:user, :researcher, :confirmed) }
 
   let(:headers) { user.create_new_auth_token }

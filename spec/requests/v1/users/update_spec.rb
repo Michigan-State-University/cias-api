@@ -240,7 +240,7 @@ describe 'PATCH /v1/users/:id', type: :request do
               let!(:other_user) { create(:user, :participant, :confirmed, active: false) }
               let!(:user_id) { other_user.id }
               let(:intervention) { create(:intervention, user: current_user) }
-              let!(:session) { create(:session, intervention: intervention) }
+              let!(:session) { create(:classic_session, intervention: intervention) }
               let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
               let!(:question) { create(:question_slider, question_group: question_group) }
               let(:user_intervention) { create(:user_intervention, intervention: intervention, user: other_user) }
@@ -297,7 +297,7 @@ describe 'PATCH /v1/users/:id', type: :request do
         let!(:other_user) { create(:user, :participant, :confirmed) }
         let!(:user_id) { other_user.id }
         let(:intervention) { create(:intervention, user: current_user) }
-        let!(:session) { create(:session, intervention: intervention) }
+        let!(:session) { create(:classic_session, intervention: intervention) }
         let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
         let!(:question) { create(:question_slider, question_group: question_group) }
         let(:user_intervention) { create(:user_intervention, user: other_user, intervention: intervention) }
@@ -346,7 +346,7 @@ describe 'PATCH /v1/users/:id', type: :request do
     let(:team_participant) { create(:user, :participant, team_id: team1.id) }
     let(:other_team_participant) { create(:user, :participant, team_id: team1.id) }
     let(:researcher) { create(:user, :researcher, team_id: team1.id) }
-    let!(:session) { create(:session, intervention: create(:intervention, user: researcher)) }
+    let!(:session) { create(:classic_session, intervention: create(:intervention, user: researcher)) }
     let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
     let!(:question) { create(:question_slider, question_group: question_group) }
     let!(:answer) { create(:answer_slider, question: question, user_session: create(:user_session, user: team_participant, session: session)) }

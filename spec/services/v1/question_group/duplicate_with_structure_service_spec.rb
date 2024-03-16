@@ -10,8 +10,8 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
       { 'id' => question_group.id, 'question_ids' => [question1.id, question3.id] }
     ]
   end
-  let!(:session1) { create(:session, intervention: intervention) }
-  let!(:session2) { create(:session, intervention: intervention) }
+  let!(:session1) { create(:classic_session, intervention: intervention) }
+  let!(:session2) { create(:classic_session, intervention: intervention) }
 
   let!(:question_group) { create(:question_group, session: session1, type: 'QuestionGroup::Classic::Plain') }
   let!(:question1) { create(:question_single, question_group: question_group) }
@@ -76,7 +76,7 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
 
     context 'henry ford health - initial screen and default intervention don\'t have access to HFHS -> initial screen should be skipped ' do
       let(:intervention) { create(:intervention) }
-      let!(:target_session) { create(:session, intervention: intervention) }
+      let!(:target_session) { create(:classic_session, intervention: intervention) }
       let!(:question3) { create(:question_henry_ford_initial_screen, question_group: question_group) }
       let(:selected_groups_with_questions) do
         [

@@ -9,8 +9,8 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
   end
 
   let(:intervention) { create(:intervention, user: user) }
-  let(:session) { create(:session, :with_report_templates, intervention: intervention, name: 'Pierwsza') }
-  let(:session2) { create(:session, name: 'Second', intervention: intervention) }
+  let(:session) { create(:classic_session, :with_report_templates, intervention: intervention, name: 'Pierwsza') }
+  let(:session2) { create(:classic_session, name: 'Second', intervention: intervention) }
   let!(:report_template) { session.report_templates.last }
   let(:headers) { user.create_new_auth_token }
   let!(:user) { create(:user, :confirmed, :researcher) }
@@ -59,7 +59,7 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
     end
 
     context 'duplicate report to other session in the another intervention' do
-      let(:another_session) { create(:session) }
+      let(:another_session) { create(:classic_session) }
       let(:params) { { report_template: { session_id: another_session.id } } }
 
       it 'return created' do
@@ -68,7 +68,7 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
       end
 
       context 'when session belongs to intervention with collaborators' do
-        let(:another_session) { create(:session, intervention: create(:intervention, :with_collaborators)) }
+        let(:another_session) { create(:classic_session, intervention: create(:intervention, :with_collaborators)) }
 
         it 'return created' do
           request

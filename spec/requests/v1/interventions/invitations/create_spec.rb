@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:intervention) { create(:flexible_order_intervention, status: intervention_status, user_id: user.id, shared_to: 'registered') }
   let!(:intervention_status) { :published }
-  let!(:session) { create(:session, intervention_id: intervention.id) }
+  let!(:session) { create(:classic_session, intervention_id: intervention.id) }
   let!(:invitation_email) { 'a@a.com' }
   let!(:params) do
     {
@@ -153,7 +153,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
 
   context 'create session invitation' do
     let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true, shared_to: 'registered') }
-    let!(:session) { create(:session, intervention_id: intervention.id) }
+    let!(:session) { create(:classic_session, intervention_id: intervention.id) }
     let!(:invitation_email) { 'a@a.com' }
     let!(:params) do
       {
@@ -247,7 +247,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
     let!(:health_clinic1) { create(:health_clinic, name: 'Health Clinic 1', health_system: health_system) }
     let!(:health_clinic2) { create(:health_clinic, name: 'Health Clinic 2', health_system: health_system) }
     let!(:intervention) { create(:intervention, status: intervention_status, shared_to: 'registered', organization: organization, user: user) }
-    let(:session) { create(:session, intervention_id: intervention.id) }
+    let(:session) { create(:classic_session, intervention_id: intervention.id) }
     let(:params) do
       {
         invitations:

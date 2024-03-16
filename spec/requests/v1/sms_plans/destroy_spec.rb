@@ -15,7 +15,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:id', type: :request do
   end
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session) }
   let(:sms_plan_id) { sms_plan.id }
 
@@ -47,7 +47,7 @@ RSpec.describe 'DELETE /v1/sms_plans/:id', type: :request do
 
       context 'when intervention was published' do
         let(:intervention) { create(:intervention, :published) }
-        let(:session) { create(:session, intervention: intervention) }
+        let(:session) { create(:classic_session, intervention: intervention) }
 
         it 'returns 405 status' do
           expect { request }.not_to change(SmsPlan, :count)

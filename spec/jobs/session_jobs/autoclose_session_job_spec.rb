@@ -3,7 +3,7 @@
 RSpec.describe SessionJobs::AutocloseSessionJob, type: :job do
   subject { described_class.perform_now(session.id) }
 
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
   let!(:user_sessions) { create_list(:user_session, 3, session: session) }
 
   before do

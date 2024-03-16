@@ -4,7 +4,7 @@ RSpec.describe 'GET /v1/sessions/:id/reflectable_questions', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention, user: user) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_group1) { create(:question_group, session: session) }
   let(:question_group2) { create(:question_group, session: session) }
   let!(:questions) do

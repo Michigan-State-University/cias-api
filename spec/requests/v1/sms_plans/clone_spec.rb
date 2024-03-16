@@ -6,7 +6,7 @@ RSpec.describe 'POST /v1/sms_plan/:id/clone', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
   let(:headers) { user.create_new_auth_token }
   let!(:sms_plan) { create(:sms_plan, name: 'Plan name', session: session) }
   let!(:variants) { create_list(:sms_plan_variant, 3, sms_plan: sms_plan, formula_match: 'test', content: 'content') }

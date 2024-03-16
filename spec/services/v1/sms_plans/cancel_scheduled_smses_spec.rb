@@ -6,7 +6,7 @@ RSpec.describe V1::SmsPlans::CancelScheduledSmses do
   let(:user) { create(:user, :participant, :confirmed) }
   let(:intervention) { create(:intervention) }
   let(:intervention_id) { intervention.id }
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
 
   before do
     ActiveJob::Base.queue_adapter = :test

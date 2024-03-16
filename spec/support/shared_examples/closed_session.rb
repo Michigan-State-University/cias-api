@@ -2,7 +2,7 @@
 
 RSpec.shared_examples 'closed session' do
   let!(:intervention) { create(:intervention, user_id: user.id) }
-  let!(:session) { create(:session, intervention: intervention, autoclose_enabled: true, autoclose_at: (DateTime.now - 2.days)) }
+  let!(:session) { create(:classic_session, intervention: intervention, autoclose_enabled: true, autoclose_at: (DateTime.now - 2.days)) }
 
   before { request }
 

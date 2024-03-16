@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/variants', type: :request do
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:sms_plan) { create(:sms_plan, session: session) }
   let(:request) { post v1_sms_plan_variants_path(sms_plan_id: sms_plan.id), params: params, headers: headers }
   let(:admin) { create(:user, :confirmed, :admin) }
@@ -56,7 +56,7 @@ RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/variants', type: :request do
 
       context 'when intervention was published' do
         let(:intervention) { create(:intervention, :published) }
-        let(:session) { create(:session, intervention: intervention) }
+        let(:session) { create(:classic_session, intervention: intervention) }
         let(:params) { {} }
 
         it 'returns 405 status' do

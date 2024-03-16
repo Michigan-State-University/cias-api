@@ -2,7 +2,7 @@
 
 RSpec.describe SessionJobs::ReloadAudio, type: :job do
   let!(:google_tts_voice) { create(:google_tts_voice, language_code: 'pl') }
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
 
   describe '#perform_later' do
     it 'recreate audio' do

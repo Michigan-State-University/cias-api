@@ -382,7 +382,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
 
   context 'when changing the intervention shared to type' do
     let(:intervention) { create(:intervention, user: user, shared_to: shared_to_change.first) }
-    let(:session) { create(:session, intervention: intervention, schedule: session_schedule, schedule_payload: schedule_payload, schedule_at: schedule_at) }
+    let(:session) { create(:classic_session, intervention: intervention, schedule: session_schedule, schedule_payload: schedule_payload, schedule_at: schedule_at) }
     let(:schedule_payload) { nil }
     let(:schedule_at) { nil }
     let(:params) do

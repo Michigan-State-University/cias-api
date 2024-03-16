@@ -9,7 +9,7 @@ RSpec.describe 'PUT /v1/report_templates/sections/:section_id/variants/:id', typ
       id: report_template_section_variant.id
     ), params: params, headers: headers
   end
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:report_template) { create(:report_template, session: session) }
   let!(:report_template_section) { create(:report_template_section, report_template: report_template) }
   let!(:report_template_section_variant) do

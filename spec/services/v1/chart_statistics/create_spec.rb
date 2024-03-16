@@ -10,7 +10,7 @@ RSpec.describe V1::ChartStatistics::Create do
   let(:health_clinic) { create(:health_clinic, health_system: health_system) }
 
   let(:intervention) { create(:intervention, :published, organization: organization) }
-  let(:session) { create(:session, intervention: intervention, variable: 'session_var') }
+  let(:session) { create(:classic_session, intervention: intervention, variable: 'session_var') }
   let(:user_session) { create(:user_session, user: user, session: session, health_clinic: health_clinic, finished_at: user_session_finished_at) }
 
   let(:admin) { create(:user, :admin, :confirmed) }

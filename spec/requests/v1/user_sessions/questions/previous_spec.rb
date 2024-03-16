@@ -10,7 +10,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
   let(:params) { {} }
 
   context 'UserSession::Classic' do
-    let!(:session) { create(:session, intervention_id: intervention.id) }
+    let!(:session) { create(:classic_session, intervention_id: intervention.id) }
     let!(:question_group) { create(:question_group, session: session) }
     let!(:question1) { create(:question_single, question_group: question_group) }
     let!(:question2) { create(:question_single, question_group: question_group) }
@@ -134,7 +134,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
   context 'with henry ford integration' do
     let(:participant) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
     let!(:intervention) { create(:intervention, user_id: researcher.id, status: 'published', hfhs_access: true) }
-    let!(:session) { create(:session, intervention_id: intervention.id) }
+    let!(:session) { create(:classic_session, intervention_id: intervention.id) }
     let!(:question_group) { create(:question_group, session: session) }
     let!(:question1) { create(:question_henry_ford_initial_screen, question_group: question_group) }
     let!(:answer) { create(:answer_henry_ford_initial, question: question1, user_session: user_session) }

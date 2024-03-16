@@ -12,7 +12,7 @@ RSpec.describe V1::HenryFord::VerifyService do
                                                            external_id: 'externalID',
                                                            external_name: 'brukowa'))
   end
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let(:params) do
     {
       first_name: user.first_name,

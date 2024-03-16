@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'GET /v1/report_templates/:report_template_id/sections/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:report_template) { create(:report_template, session: session) }
   let!(:report_template_section1) { create(:report_template_section, report_template: report_template) }
   let!(:report_template_section2) { create(:report_template_section, report_template: report_template) }

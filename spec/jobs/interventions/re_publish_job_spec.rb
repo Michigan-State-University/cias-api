@@ -4,7 +4,7 @@ RSpec.describe Interventions::RePublishJob, type: :job do
   subject { described_class.perform_now(intervention.id) }
 
   let(:intervention) { create(:intervention, paused_at: 2.days.ago, status: :published) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:user_session) { create(:user_session, scheduled_at: 1.day.ago, session: session) }
 
   before do

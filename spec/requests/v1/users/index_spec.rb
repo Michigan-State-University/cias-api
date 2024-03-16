@@ -124,7 +124,7 @@ RSpec.describe 'GET /v1/users', type: :request do
   context 'when current_user is researcher' do
     let(:current_user) { researcher }
     let(:intervention) { create(:intervention, user: current_user) }
-    let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+    let!(:session) { create(:classic_session, intervention: create(:intervention, user: current_user)) }
     let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
     let!(:question) { create(:question_slider, question_group: question_group) }
     let(:user_intervention) { create(:user_intervention, user: participant1, intervention: intervention) }
@@ -156,7 +156,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     context 'when researcher does not have any session but participant answered other user question' do
       let!(:params) { {} }
       let(:intervention) { create(:intervention) }
-      let!(:session) { create(:session, intervention: intervention) }
+      let!(:session) { create(:classic_session, intervention: intervention) }
       let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
       let!(:question) { create(:question_slider, question_group: question_group) }
       let(:user_intervention) { create(:user_intervention, intervention: intervention, user: participant1) }
@@ -174,7 +174,7 @@ RSpec.describe 'GET /v1/users', type: :request do
 
     context 'when nobody answered on researcher questions' do
       let!(:params) { {} }
-      let!(:session) { create(:session, intervention: create(:intervention, user: current_user)) }
+      let!(:session) { create(:classic_session, intervention: create(:intervention, user: current_user)) }
       let!(:question_group) { create(:question_group, title: 'Test Question Group', session: session, position: 1) }
       let!(:question) { create(:question_slider, question_group: question_group) }
       let!(:answer) { nil }
@@ -215,7 +215,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:answer1) do
       intervention = create(:intervention, user: team_researcher)
       user_intervention = create(:user_intervention, intervention: intervention, user: team_participant)
-      session = create(:session, intervention: intervention)
+      session = create(:classic_session, intervention: intervention)
       user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_participant)
       question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
       question = create(:question_slider, question_group: question_group)
@@ -225,7 +225,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:answer2) do
       intervention = create(:intervention, user: team_intervention_admin)
       user_intervention = create(:user_intervention, intervention: intervention, user: team_participant2)
-      session = create(:session, intervention: intervention)
+      session = create(:classic_session, intervention: intervention)
       user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_participant2)
       question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
       question = create(:question_slider, question_group: question_group)
@@ -235,7 +235,7 @@ RSpec.describe 'GET /v1/users', type: :request do
     let!(:answer3) do
       intervention = create(:intervention, user: current_user)
       user_intervention = create(:user_intervention, intervention: intervention, user: team_admin_participant)
-      session = create(:session, intervention: intervention)
+      session = create(:classic_session, intervention: intervention)
       user_session = create(:user_session, session: session, user_intervention: user_intervention, user: team_admin_participant)
       question_group = create(:question_group, title: 'Test Question Group', session: session, position: 1)
       question = create(:question_slider, question_group: question_group)

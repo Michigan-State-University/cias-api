@@ -5,7 +5,7 @@ RSpec.describe V1::FlowService::NextQuestion do
 
   let(:predefined_user) { create(:user, :predefined_participant) }
   let(:intervention) { create(:intervention, status: :published) }
-  let!(:session) { create(:session, intervention_id: intervention.id) }
+  let!(:session) { create(:classic_session, intervention_id: intervention.id) }
   let(:user_int) { create(:user_intervention, intervention: intervention, user: predefined_user) }
   let!(:user_session) { create(:user_session, user_id: predefined_user.id, session_id: session.id, user_intervention: user_int) }
   let!(:question_group) { create(:question_group, session: session, position: 1) }

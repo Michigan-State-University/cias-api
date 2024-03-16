@@ -5,7 +5,7 @@ RSpec.describe 'PATCH v1/tlfb/consumption_results/:id', type: :request do
   let(:user) { admin }
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention, user: admin) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_group) { create(:tlfb_group, session: session) }
   let(:user_session) { create(:user_session, session: session) }
   let(:day) { create(:tlfb_day, user_session: user_session, question_group: question_group) }

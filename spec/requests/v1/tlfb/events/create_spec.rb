@@ -6,7 +6,7 @@ RSpec.describe 'POST /v1/tlfb/events', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:user) { admin }
   let(:intervention) { create(:intervention, status: status) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:question_group) { create(:tlfb_group, session: session) }
   let(:participant) { create(:user, :confirmed, :participant) }
   let(:headers) { participant.create_new_auth_token }

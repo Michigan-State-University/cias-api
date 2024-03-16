@@ -9,13 +9,13 @@ RSpec.describe CloneJobs::Session, type: :job do
 
   context 'Session::Classic' do
     let!(:session) do
-      create(:session, :with_report_templates, intervention: intervention, position: 1, formulas: [{ 'payload' => 'var + 5', 'patterns' => [
+      create(:classic_session, :with_report_templates, intervention: intervention, position: 1, formulas: [{ 'payload' => 'var + 5', 'patterns' => [
                { 'match' => '=8', 'target' => [{ 'id' => other_session.id, 'probability' => '100', type: 'Session' }] }
              ] }],
                                                settings: { 'formula' => true, 'narrator' => { 'animation' => true, 'voice' => true } },
                                                days_after_date_variable_name: 'var1')
     end
-    let!(:other_session) { create(:session, intervention: intervention, position: 2) }
+    let!(:other_session) { create(:classic_session, intervention: intervention, position: 2) }
     let!(:sms_plan) { create(:sms_plan, session: session) }
     let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan) }
     let!(:question_group1) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
@@ -351,7 +351,7 @@ RSpec.describe CloneJobs::Session, type: :job do
   context 'when cloning session with reflection' do
     subject { described_class.perform_now(user, session) }
 
-    let!(:session) { create(:session, intervention: intervention, position: 1) }
+    let!(:session) { create(:classic_session, intervention: intervention, position: 1) }
     let!(:question_group) { create(:question_group, title: 'Question Group Title 1', session: session, position: 1) }
     let!(:question1) do
       create(

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'DELETE /v1/tlfb/events', type: :request do
   let(:intervention) { create(:intervention, status: status) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let!(:question_group) { create(:tlfb_group, session: session) }
   let!(:user_session) { create(:user_session, user: participant, session_id: session.id) }
   let(:day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }

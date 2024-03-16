@@ -7,8 +7,8 @@ RSpec.describe V1::UserInterventionService do
     let(:user) { create(:user) }
     let(:intervention) { create(:intervention) }
     let(:user_intervention) { create(:user_intervention, intervention: intervention) }
-    let!(:session1) { create(:session, intervention: intervention, variable: 's1234') }
-    let!(:session2) { create(:session, intervention: intervention) }
+    let!(:session1) { create(:classic_session, intervention: intervention, variable: 's1234') }
+    let!(:session2) { create(:classic_session, intervention: intervention) }
     let(:user_session1) { create(:user_session, user: user, session: session1, user_intervention: user_intervention) }
     let!(:user_session2) { create(:user_session, user: user, session: session2, user_intervention: user_intervention) }
     let!(:question_group1) { create(:question_group, session: session1) }

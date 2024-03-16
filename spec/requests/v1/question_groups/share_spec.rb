@@ -5,7 +5,7 @@ require 'rails_helper'
 describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :request do
   let(:user) { create(:user, :researcher) }
   let!(:intervention) { create(:intervention, user: user) }
-  let!(:session) { create(:session, intervention: intervention) }
+  let!(:session) { create(:classic_session, intervention: intervention) }
   let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
   let!(:other_question_group) { create(:question_group_plain, session: session, position: 2) }
   let!(:question_ids) do
@@ -19,7 +19,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
   end
 
   let!(:other_intervention) { create(:intervention, user: user) }
-  let!(:other_session) { create(:session, intervention: other_intervention) }
+  let!(:other_session) { create(:classic_session, intervention: other_intervention) }
   let!(:shared_question_group) { create(:question_group_plain, session: other_session, position: 1) }
   let!(:shared_questions) do
     create_list(:question_free_response, 2, title: 'Shared question Id Title', question_group: shared_question_group)
@@ -237,7 +237,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         context 'when intervention belongs to other researcher' do
           let!(:other_user) { create(:user, :researcher) }
           let!(:other_intervention) { create(:intervention, user: other_user) }
-          let!(:other_session) { create(:session, intervention: other_intervention) }
+          let!(:other_session) { create(:classic_session, intervention: other_intervention) }
           let!(:shared_question_group) { create(:question_group_plain, session: other_session, position: 1) }
           let!(:shared_questions) do
             create_list(:question_free_response, 2, title: 'Shared question Id Title', question_group: shared_question_group)
@@ -254,7 +254,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
         context 'when intervention is published' do
           let!(:published_intervention) { create(:intervention, :published, user: user) }
-          let!(:published_session) { create(:session, intervention: published_intervention) }
+          let!(:published_session) { create(:classic_session, intervention: published_intervention) }
           let!(:published_question_group) { create(:question_group_plain, session: published_session, position: 1) }
           let!(:request) do
             post share_v1_session_question_group_path(session_id: published_session.id, id: published_question_group.id),
@@ -316,7 +316,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
     context 'testing validation in sharing questions' do
       let!(:third_intervention) { create(:intervention, user: user) }
-      let!(:session_with_name) { create(:session, intervention: third_intervention) }
+      let!(:session_with_name) { create(:classic_session, intervention: third_intervention) }
       let!(:question_group_with_name) { create(:question_group_plain, session: session_with_name, position: 1) }
       let!(:name_question) do
         create(:question_name, title: 'Name Question 1', question_group: question_group_with_name)
@@ -328,7 +328,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         create(:question_free_response, title: 'Free Response 1', question_group: question_group_with_name)
       end
 
-      let!(:other_session_with_name) { create(:session, intervention: third_intervention) }
+      let!(:other_session_with_name) { create(:classic_session, intervention: third_intervention) }
       let!(:other_question_group_with_name) do
         create(:question_group_plain, session: other_session_with_name, position: 1)
       end

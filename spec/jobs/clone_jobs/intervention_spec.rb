@@ -52,7 +52,7 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     let(:intervention) do
       create(:intervention, name: 'CAT-MH', cat_mh_application_id: 'application_id', cat_mh_organization_id: 'organization_id', cat_mh_pool: 100)
     end
-    let!(:session) { create(:session, intervention: intervention, position: 1) }
+    let!(:session) { create(:classic_session, intervention: intervention, position: 1) }
 
     it 'create a new cloned' do
       expect { subject }.to change(Intervention, :count).by(1)

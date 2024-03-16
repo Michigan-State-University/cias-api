@@ -4,7 +4,7 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
   context 'correctly clones all the groups from one session to another in different intervention' do
     let(:user) { create(:user, :admin, :confirmed) }
     let(:intervention) { create(:intervention, user: user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:question_groups) { create_list(:question_group, 3, session: session) }
     let!(:questions) do
       [
@@ -19,7 +19,7 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
       ]
     end
     let(:other_intervention) { create(:intervention, user: user) }
-    let(:target_session) { create(:session, intervention: other_intervention) }
+    let(:target_session) { create(:classic_session, intervention: other_intervention) }
 
     let(:params) do
       {
@@ -56,7 +56,7 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
   context 'improper behaviour' do
     let(:user) { create(:user, :admin, :confirmed) }
     let(:intervention) { create(:intervention, user: user) }
-    let(:session) { create(:session, intervention: intervention) }
+    let(:session) { create(:classic_session, intervention: intervention) }
     let(:question_groups) { create_list(:question_group, 3, session: session) }
     let!(:questions) do
       [
@@ -71,7 +71,7 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
       ]
     end
     let(:other_intervention) { create(:intervention, user: user) }
-    let(:target_session) { create(:session, intervention: other_intervention) }
+    let(:target_session) { create(:classic_session, intervention: other_intervention) }
 
     let(:request) { post v1_question_groups_duplicate_internally_path, params: params, headers: user.create_new_auth_token }
 

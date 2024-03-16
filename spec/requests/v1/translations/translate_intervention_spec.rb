@@ -14,7 +14,7 @@ RSpec.describe 'POST /v1/interventions/:id/translate', type: :request do
       context "when user role is #{role}" do
         let(:user) { create(:user, :confirmed, role) }
         let(:headers) { user.create_new_auth_token }
-        let(:session) { create(:session, name: 'Test session') }
+        let(:session) { create(:classic_session, name: 'Test session') }
         let(:intervention) { create(:intervention, name: 'Test intervention', user: user, sessions: [session]) }
 
         before { request }

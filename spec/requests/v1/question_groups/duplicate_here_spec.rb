@@ -3,7 +3,7 @@
 RSpec.describe 'POST /v1/sessions/:session_id/question_group/duplicate_here', type: :request do
   let(:researcher) { create(:user, :researcher, :confirmed) }
   let(:intervention) { create(:intervention, user: researcher) }
-  let(:session) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
   let(:question_groups) do
     create_list(:question_group, 3, session: session)
   end

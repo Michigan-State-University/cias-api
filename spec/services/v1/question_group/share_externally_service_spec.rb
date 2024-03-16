@@ -7,8 +7,8 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
 
   let!(:current_user) { create(:user, :researcher) }
   let!(:intervention) { create(:intervention, user_id: current_user.id) }
-  let!(:session1) { create(:session, intervention: intervention) }
-  let!(:session2) { create(:session, intervention: intervention) }
+  let!(:session1) { create(:classic_session, intervention: intervention) }
+  let!(:session2) { create(:classic_session, intervention: intervention) }
   let!(:researcher) { create(:user, :researcher) }
 
   let!(:question_group) { create(:question_group, session: session1, type: 'QuestionGroup::Classic::Plain') }

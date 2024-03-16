@@ -6,8 +6,8 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:researcher_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant researcher guest]) }
   let(:user) { researcher }
-  let!(:session) { create(:session, intervention: create(:intervention, user: user)) }
-  let!(:other_session) { create(:session, intervention: create(:intervention, user: user)) }
+  let!(:session) { create(:classic_session, intervention: create(:intervention, user: user)) }
+  let!(:other_session) { create(:classic_session, intervention: create(:intervention, user: user)) }
   let!(:question_group) { create(:question_group_plain, session: session, position: 1) }
   let!(:other_question_group) { create(:question_group_plain, session: other_session, position: 1) }
   let!(:question_ids) do

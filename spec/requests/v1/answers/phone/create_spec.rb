@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request do
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:intervention) { create(:intervention, user_id: researcher.id) }
-  let(:session) { create(:session, intervention_id: intervention.id) }
+  let(:session) { create(:classic_session, intervention_id: intervention.id) }
   let(:user_session) { create(:user_session, session: session, user: user) }
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_phone, question_group: question_group) }

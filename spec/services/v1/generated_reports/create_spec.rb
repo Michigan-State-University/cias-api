@@ -8,7 +8,7 @@ RSpec.describe V1::GeneratedReports::Create do
       allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
 
       intervention = create(:intervention)
-      session = create(:session, intervention: intervention)
+      session = create(:classic_session, intervention: intervention)
       @user_session = create(:user_session, session: session)
       @report_template = create(:report_template, session: session)
       section1 = create(:report_template_section, report_template: @report_template,

@@ -28,7 +28,7 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
   let(:request) { post v1_user_session_answers_path(user_session.id), headers: user.create_new_auth_token, params: params }
 
   context 'UserSession::Classic' do
-    let(:session) { create(:session, intervention_id: intervention.id) }
+    let(:session) { create(:classic_session, intervention_id: intervention.id) }
     let(:question_group) { create(:question_group, session: session) }
     let(:question) { create(:question_single, question_group: question_group) }
     let(:user_session) { create(:user_session, user: user, session: session) }

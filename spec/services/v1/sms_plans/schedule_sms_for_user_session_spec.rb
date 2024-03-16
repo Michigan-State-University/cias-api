@@ -7,8 +7,8 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
   let(:intervention) { create(:intervention, :published) }
   let(:user_intervention) { create(:user_intervention, intervention: intervention) }
-  let(:session) { create(:session, intervention: intervention) }
-  let(:session2) { create(:session, intervention: intervention) }
+  let(:session) { create(:classic_session, intervention: intervention) }
+  let(:session2) { create(:classic_session, intervention: intervention) }
   let!(:sms_plan) { create(:sms_plan, session: session, no_formula_text: 'test') }
   let(:user) { create(:user, :confirmed) }
   let!(:phone) { create(:phone, :confirmed, user: user) }
@@ -520,7 +520,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
     let!(:user) { create(:user, :confirmed, :researcher, first_name: 'Randy', last_name: 'Rhoads', email: 'not.black.sabbath@gmail.com') }
     let!(:phone) { create(:phone, :confirmed, user: user) }
     let!(:intervention) { create(:intervention, :published) }
-    let!(:session) { create(:session, intervention: intervention) }
+    let!(:session) { create(:classic_session, intervention: intervention) }
     let!(:user_session) { create(:user_session, user: user, session: session) }
     let!(:sms_plan) { create(:alert_with_personal_data, session: session) }
     let!(:sms_phone_number) { AlertPhone.create!(sms_plan: sms_plan, phone: phone) }
@@ -579,7 +579,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         let!(:user) { create(:user, :confirmed, :researcher, first_name: 'Randy', last_name: 'Rhoads', email: 'not.black.sabbath@gmail.com') }
         let!(:phone) { create(:phone, :confirmed, user: user) }
         let!(:intervention) { create(:intervention, :published) }
-        let!(:session) { create(:session, intervention: intervention) }
+        let!(:session) { create(:classic_session, intervention: intervention) }
         let!(:sms_plan) { create(:alert_with_personal_data, session: session) }
         let!(:sms_phone_number) { AlertPhone.create!(sms_plan: sms_plan, phone: phone) }
 

@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_template', type: :request d
     post v1_session_report_templates_path(session_id: session.id),
          params: params, headers: headers
   end
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:admin_with_multiple_roles) { create(:user, :confirmed, roles: %w[participant admin guest]) }
   let(:user) { admin }

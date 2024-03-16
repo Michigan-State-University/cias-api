@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers/:id', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
-  let(:session) { create(:session) }
+  let(:session) { create(:classic_session) }
   let(:user_session) { create(:user_session, user: user, session: session) }
   let(:question) { create(:question_free_response) }
   let(:answer) { create(:answer_free_response, user_session: user_session, question: question) }

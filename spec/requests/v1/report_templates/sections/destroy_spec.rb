@@ -7,7 +7,7 @@ RSpec.describe 'DELETE /v1/report_templates/:report_template_id/sections/:id', t
     delete v1_report_template_section_path(report_template_id: report_template.id, id: report_template_section.id),
            params: {}, headers: headers
   end
-  let!(:session) { create(:session) }
+  let!(:session) { create(:classic_session) }
   let!(:report_template) { create(:report_template, session: session) }
   let!(:report_template_section) { create(:report_template_section, report_template: report_template) }
   let(:user) { create(:user, :confirmed, :admin) }

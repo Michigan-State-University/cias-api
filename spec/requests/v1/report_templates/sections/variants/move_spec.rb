@@ -8,7 +8,7 @@ RSpec.describe 'PATCH  /v1/report_templates/sections/:section_id/move_variants',
   let(:headers) { user.create_new_auth_token }
   let(:intervention) { create(:intervention, user: user) }
   let(:report_template_section) do
-    create(:report_template_section, report_template: create(:report_template, session: create(:session, intervention: intervention)))
+    create(:report_template_section, report_template: create(:report_template, session: create(:classic_session, intervention: intervention)))
   end
   let!(:report_template_section_variant1) { create(:report_template_section_variant, report_template_section: report_template_section, position: 0) }
   let!(:report_template_section_variant2) { create(:report_template_section_variant, report_template_section: report_template_section, position: 2) }
