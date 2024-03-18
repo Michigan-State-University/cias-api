@@ -42,6 +42,6 @@ class V1::AudioService
   end
 
   def unify_text(text)
-    text.tr(',!.', '').strip.downcase
+    text.tr('¿,!.', '').strip.downcase
   end
 end
