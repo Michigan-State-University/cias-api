@@ -26,7 +26,7 @@ RSpec.describe 'POST /v1/interventions/:id/clone', type: :request do
   let!(:question1) do
     create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
                              formulas: [{ 'payload' => 'var + 3', 'patterns' => [
-                               { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
+                               { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Classic::Single' }] }
                              ] }])
   end
   let!(:question2) do

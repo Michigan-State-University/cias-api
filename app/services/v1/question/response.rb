@@ -29,7 +29,7 @@ class V1::Question::Response
       end
 
       response = response.merge(answer: serialized_hash(next_question[:answer], Answer)[:data])
-      if next_question[:question].is_a?(Question::HenryFordInitial) && current_user.hfhs_patient_detail_id?
+      if next_question[:question].is_a?(Question::Classic::HenryFordInitial) && current_user.hfhs_patient_detail_id?
         response = response.merge(hfhs_patient_detail: serialized_hash(current_user.hfhs_patient_detail,
                                                                        HfhsPatientDetail)[:data][:attributes])
       end

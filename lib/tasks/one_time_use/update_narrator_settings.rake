@@ -8,7 +8,7 @@ namespace :one_time_use do
       query = <<~SQL.squish
       UPDATE questions
       SET narrator = jsonb_set(narrator, '{settings, extra_space_for_narrator}', 'false', true)
-      WHERE type NOT IN ('Question::TlfbConfig', 'Question::TlfbEvents', 'Question::TlfbQuestion')
+      WHERE type NOT IN ('Question::Classic::TlfbConfig', 'Question::Classic::TlfbEvents', 'Question::Classic::TlfbQuestion')
       SQL
       ActiveRecord::Base.connection.exec_query(query)
     }

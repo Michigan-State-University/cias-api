@@ -364,38 +364,38 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         }
       end
 
-      it 'when Question::Name exist in session return BadRequest' do
+      it 'when Question::Classic::Name exist in session return BadRequest' do
         request1
         expect(response).to have_http_status(:unprocessable_entity)
         expect(question_group_with_name.reload.questions.size).to be(3)
       end
 
-      it 'when Question::Name exit in other session and in a group' do
+      it 'when Question::Classic::Name exit in other session and in a group' do
         request2
         expect(response).to have_http_status(:unprocessable_entity)
         expect(other_question_group_with_name.reload.questions.size).to be(1)
       end
 
-      it 'when Question::Name exit in other session but not in a group' do
+      it 'when Question::Classic::Name exit in other session but not in a group' do
         request3
         expect(response).to have_http_status(:unprocessable_entity)
         expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
       end
 
       context 'testing rollback when in group is invalid question' do
-        it 'when in group of shared questions is Question::Name and exit in group' do
+        it 'when in group of shared questions is Question::Classic::Name and exit in group' do
           request4
           expect(response).to have_http_status(:unprocessable_entity)
           expect(question_group_with_name.reload.questions.size).to be(3)
         end
 
-        it 'when in group of shared questions is Question::Name and Question::Name exit in other session and in a group' do
+        it 'when in group of shared questions is Question::Classic::Name and Question::Classic::Name exit in other session and in a group' do
           request5
           expect(response).to have_http_status(:unprocessable_entity)
           expect(other_question_group_with_name.reload.questions.size).to be(1)
         end
 
-        it 'when in group of shared questions is Question::Name and Question::Name exit in other session but not in a group' do
+        it 'when in group of shared questions is Question::Classic::Name and Question::Classic::Name exit in other session but not in a group' do
           request6
           expect(response).to have_http_status(:unprocessable_entity)
           expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)

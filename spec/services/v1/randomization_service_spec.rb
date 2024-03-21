@@ -6,9 +6,9 @@ RSpec.describe V1::RandomizationService do
   describe 'target array have a some records' do
     let(:target_array) do
       [
-        { 'id' => 'question_1', 'probability' => '50', type: 'Question::Single' },
-        { 'id' => 'question_2', 'probability' => '20', type: 'Question::Single' },
-        { 'id' => 'question_2', 'probability' => '30', type: 'Question::Single' }
+        { 'id' => 'question_1', 'probability' => '50', type: 'Question::Classic::Single' },
+        { 'id' => 'question_2', 'probability' => '20', type: 'Question::Classic::Single' },
+        { 'id' => 'question_2', 'probability' => '30', type: 'Question::Classic::Single' }
       ]
     end
 
@@ -26,7 +26,7 @@ RSpec.describe V1::RandomizationService do
   describe 'target array have an one records without probability' do
     let(:target_array) do
       [
-        { 'id' => 'question_1', type: 'Question::Single' }
+        { 'id' => 'question_1', type: 'Question::Classic::Single' }
       ]
     end
 

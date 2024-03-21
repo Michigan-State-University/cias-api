@@ -74,7 +74,7 @@ class V1::SessionsController < V1Controller
   def reflectable_questions
     authorize! :read, Session
 
-    questions = session_obj.questions.where(type: %w[Question::Grid Question::Multiple Question::Single])
+    questions = session_obj.questions.where(type: %w[Question::Classic::Grid Question::Classic::Multiple Question::Classic::Single])
 
     render json: serialized_response(questions, 'ReflectableQuestion')
   end

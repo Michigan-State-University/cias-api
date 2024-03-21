@@ -3,7 +3,7 @@
 namespace :interventions do
   desc 'Fix report templates in existing interventions'
   task fix_report_templates_in_questions: :environment do
-    questions = Question::ThirdParty.all
+    questions = Question::Classic::ThirdParty.all
 
     @fixed_question = 0
     p 'START ANALYZING QUESTIONS...'

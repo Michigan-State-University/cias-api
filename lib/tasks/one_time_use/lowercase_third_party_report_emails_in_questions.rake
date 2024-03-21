@@ -6,8 +6,8 @@ namespace :one_time_use do
   task lowercase_third_party_report_emails_in_questions: :environment do
     questions_fixed, total_entries_fixed = 0, 0
     p 'STARTING THE EMAIL FIXING PROCESS'
-    questions_count = Question::ThirdParty.count
-    Question::ThirdParty.find_each.with_index do |question, index|
+    questions_count = Question::Classic::ThirdParty.count
+    Question::Classic::ThirdParty.find_each.with_index do |question, index|
       fixed_in_question = 0
       question.body['data'].each do |data|
         if /[[:upper:]]/.match?(data['value'])

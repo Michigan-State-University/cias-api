@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Single, type: :model do
-  describe 'Question::Single' do
+RSpec.describe Question::Classic::Single, type: :model do
+  describe 'Question::Classic::Single' do
     describe 'expected behaviour' do
       subject(:question_single) { build(:question_single) }
 

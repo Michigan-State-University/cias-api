@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class QuestionGroup::Classic::Finish < QuestionGroup::Classic
-  has_one :question_finish, inverse_of: :question_group, class_name: '::Question::Finish',
+  has_one :question_finish, inverse_of: :question_group, class_name: '::Question::Classic::Finish',
                             foreign_key: :question_group_id, dependent: :destroy
 
   attribute :title, :string, default: I18n.t('question_group.finish.title')

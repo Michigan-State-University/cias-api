@@ -65,7 +65,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
 
     context 'with question filters' do
       context 'without target question id' do
-        let(:params) { { allow_list: %w[Question::Multiple Question::Grid] } }
+        let(:params) { { allow_list: %w[Question::Classic::Multiple Question::Classic::Grid] } }
 
         let(:request) do
           get v1_fetch_variables_path(id: session.id), headers: headers, params: params
@@ -75,7 +75,7 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
       end
 
       context 'with target question id' do
-        let(:params) { { allow_list: %w[Question::Multiple Question::Grid] } }
+        let(:params) { { allow_list: %w[Question::Classic::Multiple Question::Classic::Grid] } }
 
         let(:request) do
           get v1_fetch_variables_path(id: session.id, question_id: questions[3].id), headers: headers, params: params

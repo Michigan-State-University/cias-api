@@ -12,7 +12,7 @@ RSpec.describe V1::FlowService::NextQuestion do
   let!(:question) { create(:question_participant_report, question_group: question_group, position: 1) }
 
   it 'first and last question is participant report screen' do
-    expect(subject.type).to eql('Question::Finish')
+    expect(subject.type).to eql('Question::Classic::Finish')
   end
 
   context 'question group has next question' do
@@ -29,7 +29,7 @@ RSpec.describe V1::FlowService::NextQuestion do
     let!(:second_question) { create(:question_participant_report, question_group: question_group, position: 2) }
 
     it 'first and last question is participant report screen' do
-      expect(subject.type).to eql('Question::Finish')
+      expect(subject.type).to eql('Question::Classic::Finish')
     end
 
     context 'single question after participnat report screen' do

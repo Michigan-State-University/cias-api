@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Feedback, type: :model do
-  describe 'Question::Feedback' do
+RSpec.describe Question::Classic::Feedback, type: :model do
+  describe 'Question::Classic::Feedback' do
     subject(:question_feedback) { build(:question_feedback) }
 
     it { should belong_to(:question_group) }

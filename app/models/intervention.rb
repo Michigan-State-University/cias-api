@@ -108,7 +108,7 @@ class Intervention < ApplicationRecord
     return unless saved_change_to_attribute?(:hfhs_access)
     return if hfhs_access
 
-    ::Question::HenryFordInitial.joins(:question_group).where(question_groups: { session: sessions }).delete_all
+    ::Question::Classic::HenryFordInitial.joins(:question_group).where(question_groups: { session: sessions }).delete_all
   end
 
   def export_answers_as(type:)

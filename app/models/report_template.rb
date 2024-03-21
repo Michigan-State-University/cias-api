@@ -69,7 +69,7 @@ class ReportTemplate < ApplicationRecord
   private
 
   def remove_template_from_third_party_questions
-    session.questions.where(type: 'Question::ThirdParty').find_each do |question|
+    session.questions.where(type: 'Question::Classic::ThirdParty').find_each do |question|
       question.body_data.each do |data|
         data['report_template_ids'].delete(id)
       end

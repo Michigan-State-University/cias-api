@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::HenryFord, type: :model do
-  describe 'Question::HenryFord' do
+RSpec.describe Question::Classic::HenryFord, type: :model do
+  describe 'Question::Classic::HenryFord' do
     describe 'expected behaviour' do
       subject(:question_henry_ford) { build(:question_henry_ford) }
 

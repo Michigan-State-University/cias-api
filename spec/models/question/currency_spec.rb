@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Currency, type: :model do
-  describe 'Question::Currency' do
+RSpec.describe Question::Classic::Currency, type: :model do
+  describe 'Question::Classic::Currency' do
     describe 'expected behaviour' do
       subject(:question_currency) { build(:question_currency) }
 

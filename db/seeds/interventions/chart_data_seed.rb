@@ -62,7 +62,7 @@ def create_fruits_session!(intervention, participants, organization)
     name: 'Random fruit over a 1 year period'
   )
 
-  question = Question::Single.create!(
+  question = Question::Classic::Single.create!(
     title: '<h2>Fruit Question</h2>',
     subtitle: '<p>What\'s your favorite fruit?</p>',
     question_group_id: QuestionGroup.create!(title: 'Test Group', session_id: fruits_session.id).id,
@@ -98,7 +98,7 @@ def create_months_session!(intervention, participants, organization)
     name: 'Current over a 2 year period'
   )
 
-  question = Question::Single.create!(
+  question = Question::Classic::Single.create!(
     title: '<h2>Fruit Question</h2>',
     subtitle: '<p>What\'s the current month?</p>',
     question_group_id: QuestionGroup.find_or_create_by!(title: 'Test Group', session_id: months_session.id).id,

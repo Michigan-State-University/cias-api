@@ -41,9 +41,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_slider, class: Question::Slider do
+  factory :question_slider, class: Question::Classic::Slider do
     title { 'Slider' }
-    type { Question::Slider }
+    type { Question::Classic::Slider }
     body do
       {
         data: [
@@ -65,9 +65,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_bar_graph, class: Question::BarGraph do
+  factory :question_bar_graph, class: Question::Classic::BarGraph do
     title { 'Bar Graph' }
-    type { Question::BarGraph }
+    type { Question::Classic::BarGraph }
     body do
       {
         data: [
@@ -89,9 +89,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_feedback, class: Question::Feedback do
+  factory :question_feedback, class: Question::Classic::Feedback do
     title { 'Feedback' }
-    type { Question::Feedback }
+    type { Question::Classic::Feedback }
     body do
       {
         data: [
@@ -118,8 +118,8 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_finish, class: Question::Finish do
-    type { Question::Finish }
+  factory :question_finish, class: Question::Classic::Finish do
+    type { Question::Classic::Finish }
     body do
       {
         data: []
@@ -128,9 +128,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_follow_up_contact, class: Question::FollowUpContact do
+  factory :question_follow_up_contact, class: Question::Classic::FollowUpContact do
     title { 'Follow-up contact' }
-    type { Question::FollowUpContact }
+    type { Question::Classic::FollowUpContact }
     body do
       {
         data: [
@@ -152,9 +152,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_grid, class: Question::Grid do
+  factory :question_grid, class: Question::Classic::Grid do
     title { 'Grid' }
-    type { Question::Grid }
+    type { Question::Classic::Grid }
     body do
       {
         data: [
@@ -191,9 +191,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_information, class: Question::Information do
+  factory :question_information, class: Question::Classic::Information do
     title { 'Information' }
-    type { Question::Information }
+    type { Question::Classic::Information }
     body do
       {
         data: []
@@ -203,9 +203,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_multiple, class: Question::Multiple do
+  factory :question_multiple, class: Question::Classic::Multiple do
     title { 'Multiple' }
-    type { Question::Multiple }
+    type { Question::Classic::Multiple }
     body do
       {
         data: [
@@ -248,9 +248,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_number, class: Question::Number do
+  factory :question_number, class: Question::Classic::Number do
     title { 'Number' }
-    type { Question::Number }
+    type { Question::Classic::Number }
     body do
       {
         data: [
@@ -267,9 +267,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_single, class: Question::Single do
+  factory :question_single, class: Question::Classic::Single do
     title { 'Single' }
-    type { Question::Single }
+    type { Question::Classic::Single }
     image { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
     body do
       {
@@ -346,7 +346,7 @@ FactoryBot.define do
                 target: [{
                   id: '',
                   probability: '100',
-                  type: 'Question::Single'
+                  type: 'Question::Classic::Single'
                 }]
               }
             ]
@@ -560,9 +560,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_free_response, class: Question::FreeResponse do
+  factory :question_free_response, class: Question::Classic::FreeResponse do
     title { 'Free Response' }
-    type { Question::FreeResponse }
+    type { Question::Classic::FreeResponse }
     body do
       {
         data: [
@@ -583,9 +583,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_external_link, class: Question::ExternalLink do
+  factory :question_external_link, class: Question::Classic::ExternalLink do
     title { 'External Link' }
-    type { Question::ExternalLink }
+    type { Question::Classic::ExternalLink }
     body do
       {
         data: [
@@ -602,9 +602,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_date, class: Question::Date do
+  factory :question_date, class: Question::Classic::Date do
     title { 'date' }
-    type { Question::Date }
+    type { Question::Classic::Date }
     body do
       {
         data: [
@@ -625,9 +625,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_phone, class: Question::Phone do
+  factory :question_phone, class: Question::Classic::Phone do
     title { 'Phone' }
-    type { Question::Phone }
+    type { Question::Classic::Phone }
     body do
       {
         data: [
@@ -648,9 +648,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_currency, class: Question::Currency do
+  factory :question_currency, class: Question::Classic::Currency do
     title { 'Currency' }
-    type { Question::Currency }
+    type { Question::Classic::Currency }
     body do
       {
         data: [
@@ -671,9 +671,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_name, class: Question::Name do
+  factory :question_name, class: Question::Classic::Name do
     title { 'Name screen' }
-    type { Question::Name }
+    type { Question::Classic::Name }
     body do
       {
         data: [
@@ -694,9 +694,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_participant_report, class: Question::ParticipantReport do
+  factory :question_participant_report, class: Question::Classic::ParticipantReport do
     title { 'ParticipantReport' }
-    type { Question::ParticipantReport }
+    type { Question::Classic::ParticipantReport }
     body do
       {
         data: [
@@ -717,9 +717,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_third_party, class: Question::ThirdParty do
+  factory :question_third_party, class: Question::Classic::ThirdParty do
     title { 'Third party' }
-    type { Question::ThirdParty }
+    type { Question::Classic::ThirdParty }
     body do
       {
         data: [
@@ -740,9 +740,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_tlfb_config, class: Question::TlfbConfig do
+  factory :question_tlfb_config, class: Question::Classic::TlfbConfig do
     title { 'TlfbConfig' }
-    type { Question::TlfbConfig }
+    type { Question::Classic::TlfbConfig }
     body do
       {
         data: [
@@ -762,9 +762,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_tlfb_event, class: Question::TlfbEvents do
+  factory :question_tlfb_event, class: Question::Classic::TlfbEvents do
     title { 'TlfbEvents' }
-    type { Question::TlfbEvents }
+    type { Question::Classic::TlfbEvents }
     body do
       {
         data: [
@@ -782,9 +782,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_tlfb_question, class: Question::TlfbQuestion do
+  factory :question_tlfb_question, class: Question::Classic::TlfbQuestion do
     title { 'TlfbQuestion' }
-    type { Question::TlfbQuestion }
+    type { Question::Classic::TlfbQuestion }
     body do
       {
         data: [
@@ -852,9 +852,9 @@ FactoryBot.define do
     end
   end
 
-  factory :question_henry_ford, class: Question::HenryFord do
+  factory :question_henry_ford, class: Question::Classic::HenryFord do
     title { 'HenryFord' }
-    type { Question::HenryFord }
+    type { Question::Classic::HenryFord }
     body do
       {
         data: [
@@ -879,9 +879,9 @@ FactoryBot.define do
     association :question_group
   end
 
-  factory :question_henry_ford_initial_screen, class: Question::HenryFordInitial do
-    title { 'Question::HenryFordInitial' }
-    type { Question::HenryFordInitial }
+  factory :question_henry_ford_initial_screen, class: Question::Classic::HenryFordInitial do
+    title { 'Question::Classic::HenryFordInitial' }
+    type { Question::Classic::HenryFordInitial }
     body do
       {
         data: []

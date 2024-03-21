@@ -15,7 +15,7 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
   let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
 
   context 'returns finish screen if only question' do
-    it { expect(subject.call.type).to eq 'Question::Finish' }
+    it { expect(subject.call.type).to eq 'Question::Classic::Finish' }
 
     it { expect(subject.call.id).to eq session.questions.last.id }
   end
@@ -146,12 +146,12 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
       let(:questions) { create_list(:question_single, 4, question_group: question_group) }
       let(:target_question_id) { questions.last.id }
 
-      context 'formula is fully set and uses variable belongs to Question::ParticipantReport' do
+      context 'formula is fully set and uses variable belongs to Question::Classic::ParticipantReport' do
         let!(:question) do
           question = create(:question_participant_report, question_group: question_group)
           question.formulas = [{ 'payload' => 'participant_rep',
                                  'patterns' => [{ 'match' => '=1',
-                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Single', 'probability' => '100' }] }] }]
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }] }]
           question.body = { 'data' => [{ 'payload' => '' }], 'variable' => { 'name' => 'participant_rep' } }
           question.save
           question
@@ -169,12 +169,12 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
         end
       end
 
-      context 'formula is fully set and uses variable belongs to Question::Phone' do
+      context 'formula is fully set and uses variable belongs to Question::Classic::Phone' do
         let!(:question) do
           question = create(:question_phone, question_group: question_group)
           question.formulas = [{ 'payload' => 'phone',
                                  'patterns' => [{ 'match' => '=1',
-                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Single', 'probability' => '100' }] }] }]
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }] }]
           question.body = { 'data' => [{ 'payload' => '' }], 'variable' => { 'name' => 'phone' } }
           question.save
           question
@@ -192,12 +192,12 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
         end
       end
 
-      context 'formula is fully set and uses variable belongs to Question::ThirdParty' do
+      context 'formula is fully set and uses variable belongs to Question::Classic::ThirdParty' do
         let!(:question) do
           question = create(:question_third_party, question_group: question_group)
           question.formulas = [{ 'payload' => 'third_party',
                                  'patterns' => [{ 'match' => '=1',
-                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Single', 'probability' => '100' }] }] }]
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }] }]
           question.body = { 'data' => [{ 'value' => 'email@example.com', 'numeric_value' => '1', 'payload' => '', 'report_template_ids' => [] }],
                             'variable' => { 'name' => 'third_party' } }
           question.save

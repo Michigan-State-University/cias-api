@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::ExternalLink, type: :model do
-  describe 'Question::ExternalLink' do
+RSpec.describe Question::Classic::ExternalLink, type: :model do
+  describe 'Question::Classic::ExternalLink' do
     subject(:question_external_link) { build(:question_external_link) }
 
     it { should belong_to(:question_group) }

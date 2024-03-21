@@ -35,10 +35,10 @@ class V1::Question::Update
   end
 
   def new_variables
-    return [] if question.is_a?(Question::TlfbQuestion)
-    return question_params&.dig(:body, :data)&.map { |row| row.dig(:variable, :name)&.downcase } if question.is_a?(Question::Multiple)
+    return [] if question.is_a?(Question::Classic::TlfbQuestion)
+    return question_params&.dig(:body, :data)&.map { |row| row.dig(:variable, :name)&.downcase } if question.is_a?(Question::Classic::Multiple)
 
-    if question.is_a?(Question::Grid)
+    if question.is_a?(Question::Classic::Grid)
       return question_params&.dig(:body, :data)&.first&.dig(:payload, :rows)&.map do |row|
                row.dig(:variable, :name).downcase
              end&.reject(&:empty?)

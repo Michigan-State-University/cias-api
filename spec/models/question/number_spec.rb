@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Number, type: :model do
-  describe 'Question::Number' do
+RSpec.describe Question::Classic::Number, type: :model do
+  describe 'Question::Classic::Number' do
     subject(:question_number) { build(:question_number) }
 
     it { should belong_to(:question_group) }

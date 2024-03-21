@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::QuestionGroup::DuplicateWithStructureService
-  SKIPPABLE_QUESTIONS = %w[Question::HenryFordInitial].freeze
+  SKIPPABLE_QUESTIONS = %w[Question::Classic::HenryFordInitial].freeze
 
   def self.call(session, selected_groups_with_questions)
     new(session, selected_groups_with_questions).call
@@ -66,7 +66,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def validate_uniqueness_of_question(question, session)
-    return unless question.type.in?(Question::UNIQUE_IN_SESSION)
+    return unless question.type.in?(Question::Classic::UNIQUE_IN_SESSION)
 
     raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session(question, session)
     raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness(question,
@@ -74,11 +74,11 @@ class V1::QuestionGroup::DuplicateWithStructureService
   end
 
   def uniq_question_already_in_session(question, session)
-    session.questions.where(type: question.type).any? && question.type.in?(Question::UNIQUE_IN_SESSION)
+    session.questions.where(type: question.type).any? && question.type.in?(Question::Classic::UNIQUE_IN_SESSION)
   end
 
   def validate_hfhs_access_and_uniqueness(question, intervention)
-    return true unless question.type.eql?('Question::HenryFordInitial')
+    return true unless question.type.eql?('Question::Classic::HenryFordInitial')
     return false unless intervention.hfhs_access?
 
     intervention.hfhs_access? && session.questions.where(type: question.type).blank?

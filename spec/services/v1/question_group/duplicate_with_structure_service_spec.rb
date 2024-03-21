@@ -24,7 +24,7 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
     created_question_group = session1.question_groups.find_by(position: 2)
     expect(created_question_group.title).to eql("Copy of #{question_group.title}")
     expect(created_question_group.questions.count).to be 2
-    expect(created_question_group.questions.pluck(:type)).to include('Question::Single', 'Question::Feedback')
+    expect(created_question_group.questions.pluck(:type)).to include('Question::Classic::Single', 'Question::Classic::Feedback')
   end
 
   it 'return new groups' do

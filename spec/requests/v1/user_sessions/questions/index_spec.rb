@@ -61,7 +61,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       end
 
       it 'skip tlfbConfig and return tlfbEvent' do
-        expect(json_response['data']['attributes']['type']).to eq('Question::TlfbEvents')
+        expect(json_response['data']['attributes']['type']).to eq('Question::Classic::TlfbEvents')
       end
 
       it 'return information that tlfbEvent is a first question instead of tlfbConfig' do
@@ -368,7 +368,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           let(:questions) { create_list(:question_single, 1, question_group: question_group) }
 
           it 'returns next question' do
-            expect(json_response['data']['attributes']['type']).to eq 'Question::Finish'
+            expect(json_response['data']['attributes']['type']).to eq 'Question::Classic::Finish'
           end
         end
       end
@@ -746,7 +746,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
     it 'question have a default settings' do
       expect(json_response['data']['attributes']).to include(
-        'type' => 'Question::Single',
+        'type' => 'Question::Classic::Single',
         'settings' => {
           'image' => false,
           'title' => true,

@@ -13,7 +13,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
   let(:params) do
     {
       question: {
-        type: 'Question::Multiple',
+        type: 'Question::Classic::Multiple',
         position: 99,
         title: 'Question Test 1',
         subtitle: 'test 1',
@@ -129,7 +129,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
         context 'number question' do
           let(:params) do
             {
-              title: '<h2>Enter title here</h2>', subtitle: '<p>Enter main text/question for screen here</p>', type: 'Question::Number', body: {
+              title: '<h2>Enter title here</h2>', subtitle: '<p>Enter main text/question for screen here</p>', type: 'Question::Classic::Number', body: {
                 variable: { name: '' }, data: [{ payload: '' }]
               }, narrator: { blocks: [{ action: 'NO_ACTION', animation: 'rest', text: ['Enter main text/question for screen here'],
                                         audio_urls: [], sha256: [],
@@ -157,7 +157,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
             {
               title: '<h2>Enter title here</h2>',
               subtitle: '<p>Enter main text/question for screen here</p>',
-              type: 'Question::ThirdParty',
+              type: 'Question::Classic::ThirdParty',
               body: {
                 variable: { name: 'variable_name' },
                 data: [
@@ -266,7 +266,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     let(:params) do
       {
         question: {
-          type: 'Question::Multiple',
+          type: 'Question::Classic::Multiple',
           position: 99,
           title: 'Question Test 1',
           subtitle: 'test 1',

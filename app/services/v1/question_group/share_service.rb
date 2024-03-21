@@ -68,7 +68,7 @@ class V1::QuestionGroup::ShareService
   end
 
   def validate_uniqueness(question, question_group)
-    return unless question.type.in?(Question::UNIQUE_IN_SESSION)
+    return unless question.type.in?(Question::Classic::UNIQUE_IN_SESSION)
 
     return unless question_type_exist_in_session(question, question_group)
 
@@ -76,7 +76,7 @@ class V1::QuestionGroup::ShareService
   end
 
   def validate_hf_access(question)
-    return unless question.is_a?(::Question::HenryFordInitial)
+    return unless question.is_a?(::Question::Classic::HenryFordInitial)
 
     return if intervention.hfhs_access
 

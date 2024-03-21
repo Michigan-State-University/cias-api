@@ -2,8 +2,8 @@
 
 module CatMh::QuestionMapping
   ANSWER_TYPE_TO_QUESTION_TYPES = {
-    1 => 'Question::Single',
-    2 => 'Question::Multiple'
+    1 => 'Question::Classic::Single',
+    2 => 'Question::Classic::Multiple'
   }.freeze
 
   def prepare_question(user_session, question)
@@ -100,7 +100,7 @@ module CatMh::QuestionMapping
   end
 
   def question_type(cat_mh_question_hash)
-    return 'Question::Finish' if cat_mh_question_hash['questionID'] == -1
+    return 'Question::Classic::Finish' if cat_mh_question_hash['questionID'] == -1
 
     ANSWER_TYPE_TO_QUESTION_TYPES[cat_mh_question_hash['answerType']]
   end

@@ -35,7 +35,7 @@ module Intervention::Csv::Tlfb
   end
 
   def simple_yes_or_no?(tlfb_question_group)
-    question_body = tlfb_question_group.questions.find_by(type: 'Question::TlfbQuestion').body
+    question_body = tlfb_question_group.questions.find_by(type: 'Question::Classic::TlfbQuestion').body
 
     question_body.dig('data', 0, 'payload', 'substance_groups').blank? && question_body.dig('data', 0, 'payload', 'substances').blank?
   end
@@ -45,7 +45,7 @@ module Intervention::Csv::Tlfb
   end
 
   def fill_by_default_value(tlfb_group, row_index, session_variable, day_number)
-    tlfb_question = tlfb_group.questions.find_by(type: 'Question::TlfbQuestion')
+    tlfb_question = tlfb_group.questions.find_by(type: 'Question::Classic::TlfbQuestion')
 
     if tlfb_question.body_data.first.dig('payload', 'substances_with_group')
       fill_by_default_for_substance_groups(tlfb_question.body_data.first.dig('payload', 'substance_groups'), row_index, session_variable, day_number)

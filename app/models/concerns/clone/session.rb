@@ -21,7 +21,7 @@ class Clone::Session < Clone::Base
   private
 
   def remove_hf_initial_screen
-    outcome_questions.where(type: 'Question::HenryFordInitial').destroy_all
+    outcome_questions.where(type: 'Question::Classic::HenryFordInitial').destroy_all
   end
 
   def outcome_with_hf_access?
@@ -74,7 +74,7 @@ class Clone::Session < Clone::Base
         index = 0
         pattern['target'].each do |current_target|
           current_target['id'] =
-            if current_target['type'].eql?('Question::HenryFordInitial')
+            if current_target['type'].eql?('Question::Classic::HenryFordInitial')
               nil
             else
               matching_outcome_target_id(pattern, index)
@@ -182,7 +182,7 @@ class Clone::Session < Clone::Base
                                           .where('report_templates.report_for': :third_party, 'other.report_for': :third_party)
                                           .pluck('report_templates.id', 'other.id').to_h
 
-    Question::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
+    Question::Classic::ThirdParty.includes(:question_group).where(question_groups: { session_id: outcome.id }).find_each do |third_party_question|
       third_party_question.body_data.each do |third_party_question_body_data_element|
         new_report_template_ids = third_party_question_body_data_element['report_template_ids'].each_with_object([]) do |report_template_id, arr|
           new_report_template_id = report_template_corresponding_ids[report_template_id]

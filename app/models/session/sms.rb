@@ -87,6 +87,6 @@ class Session::Sms < Session
 
     qg_finish = ::QuestionGroup::Sms::Finish.new(session_id: id)
     qg_finish.save!
-    ::Question::Finish.create!(question_group_id: qg_finish.id)
+    ::Question::Classic::Finish.create!(question_group_id: qg_finish.id)
   end
 end

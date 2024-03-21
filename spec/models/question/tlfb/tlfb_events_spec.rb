@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Tlfb::TlfbEvents, type: :model do
-  describe 'Question::Tlfb::TlfbEvents' do
+RSpec.describe Question::Classic::Tlfb::TlfbEvents, type: :model do
+  describe 'Question::Classic::Tlfb::TlfbEvents' do
     subject(:question_tlfb_event) { build(:question_tlfb_event) }
 
     it { should belong_to(:question_group) }

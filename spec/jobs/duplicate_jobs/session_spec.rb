@@ -96,7 +96,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
     end
 
     it 'do not duplicate hf initial screen' do
-      expect(cloned_questions).to eq(['Question::Single'])
+      expect(cloned_questions).to eq(['Question::Classic::Single'])
     end
   end
 

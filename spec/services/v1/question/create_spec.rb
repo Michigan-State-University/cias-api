@@ -9,7 +9,7 @@ RSpec.describe V1::Question::Create do
   let(:blocks) { [] }
   let(:question_params) do
     {
-      type: 'Question::Multiple',
+      type: 'Question::Classic::Multiple',
       position: 99,
       title: 'Question Test 1',
       subtitle: 'test 1',

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::BarGraph, type: :model do
-  describe 'Question::BarGraph' do
+RSpec.describe Question::Classic::BarGraph, type: :model do
+  describe 'Question::Classic::BarGraph' do
     subject(:question_bar_graph) { build(:question_bar_graph) }
 
     it { should belong_to(:question_group) }

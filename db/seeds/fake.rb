@@ -105,7 +105,7 @@ class Fake
         session = Session.find(session_ids.sample)
 
         question = Question.new(
-          type: "Question::#{sample_type}",
+          type: "Question::Classic::#{sample_type}",
           question_group: session.question_group_plains.first,
           position: rand(1..100),
           title: sample_type,
@@ -189,7 +189,7 @@ class Fake
 
     def create_answers
       (100..140).to_a.sample.times do
-        question = Question.where.not(type: 'Question::Finish').order('RANDOM()').first
+        question = Question.where.not(type: 'Question::Classic::Finish').order('RANDOM()').first
         answer = Answer.new(
           user_id: user_ids.sample,
           question: question,

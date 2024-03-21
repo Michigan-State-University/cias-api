@@ -7,7 +7,7 @@ RSpec.describe Import::V1::QuestionService do
 
   let(:question_hash) do
     {
-      type: 'Question::Single',
+      type: 'Question::Classic::Single',
       settings: {
         image: false,
         title: true,

@@ -32,11 +32,11 @@ end
 def assign_variable!(question)
   position = question.position
   case question.type
-  when 'Question::Multiple'
+  when 'Question::Classic::Multiple'
     question.body['data'].each_with_index do |row, index|
       row['variable']['name'] = create_variable(position, index)
     end
-  when 'Question::Grid'
+  when 'Question::Classic::Grid'
     question.body['data'][0]['payload']['rows'].each_with_index do |row, index|
       row['variable']['name'] = create_variable(position, index)
     end
@@ -56,18 +56,18 @@ def assign_data_to_answer(answer, question)
   var_name = question.question_variables&.sample
   data = []
   case question.type
-  when 'Question::Date'
+  when 'Question::Classic::Date'
     value = Faker::Date.birthday(min_age: 0, max_age: 1)
-  when 'Question::FreeResponse'
+  when 'Question::Classic::FreeResponse'
     value = Faker::Food.dish
-  when 'Question::Currency'
+  when 'Question::Classic::Currency'
     value = "#{Faker::Currency.code} #{Faker::Number.decimal(l_digits: 3)}"
   else
     value = rand(1..5).to_s
   end
   data << { var: var_name, value: value }
 
-  if question.type == 'Question::Grid' || question.type == 'Question::Multiple'
+  if question.type == 'Question::Classic::Grid' || question.type == 'Question::Classic::Multiple'
     data = []
     var_name = question.question_variables
     var_name.each do |var|

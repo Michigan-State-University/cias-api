@@ -10,11 +10,10 @@ class Question < ApplicationRecord
   include Translate
   include ::TranslationAuxiliaryMethods
 
-  UNIQUE_IN_SESSION = %w[Question::Name Question::ParticipantReport Question::ThirdParty Question::Phone
-                         Question::HenryFordInitial].freeze
+  UNIQUE_IN_SESSION = %w[Question::Classic::Name Question::Classic::ParticipantReport Question::Classic::ThirdParty Question::Classic::Phone
+                         Question::Classic::HenryFordInitial].freeze
   CURRENT_VERSION = '2'
 
-  belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
 
   attribute :narrator, :json, default: assign_default_values('narrator')
@@ -92,7 +91,7 @@ class Question < ApplicationRecord
 
       name_text = name_answer.nil? ? 'name' : name_answer['name']
 
-      "Question::Narrator::Block::#{block['type'].classify}".safe_constantize&.swap_name(block, name_audio_url, name_text)
+      "Question::Classic::Narrator::Block::#{block['type'].classify}".safe_constantize&.swap_name(block, name_audio_url, name_text)
     end
     self
   end
@@ -181,7 +180,7 @@ class Question < ApplicationRecord
   end
 
   def initialize_narrator
-    narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish' && narrator['blocks'].empty?
+    narrator['blocks'] << default_finish_screen_block if type == 'Question::Classic::Finish' && narrator['blocks'].empty?
     execute_narrator
   end
 

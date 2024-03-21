@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::FreeResponse, type: :model do
-  describe 'Question::FreeResponse' do
+RSpec.describe Question::Classic::FreeResponse, type: :model do
+  describe 'Question::Classic::FreeResponse' do
     describe 'expected behaviour' do
       subject(:question_free_response) { build(:question_free_response) }
 

@@ -18,7 +18,7 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
   end
 
   attribute :version do
-    Question::CURRENT_VERSION
+    Question::Classic::CURRENT_VERSION
   end
 
   private

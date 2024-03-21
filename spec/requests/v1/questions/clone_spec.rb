@@ -13,7 +13,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
                                'patterns' => [
                                  { 'match' => '=7',
                                    'target' => [{ 'id' => question2.id, 'probability' => '100',
-                                                  type: 'Question::Single' }] }
+                                                  type: 'Question::Classic::Single' }] }
                                ]
                              }],
                              body: {
@@ -83,7 +83,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
                                    'payload' => 'var + 3',
                                    'patterns' => [
                                      { 'match' => '=7',
-                                       'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
+                                       'target' => [{ 'id' => question2.id, type: 'Question::Classic::Single' }] }
                                    ]
                                  }],
                                  body: {

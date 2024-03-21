@@ -24,7 +24,7 @@ INTERVENTION_NAMES_DIRECTED = ['Husbands', 'Pregnant women', 'Underage teenagers
 QUESTION_TYPES = %i[question_feedback question_grid question_information question_multiple question_number question_single
                     question_free_response question_date question_currency].freeze
 
-QUESTIONS_WITHOUT_ANSWERS = %w[Question::Finish Question::HenryFordInitial].freeze
+QUESTIONS_WITHOUT_ANSWERS = %w[Question::Classic::Finish Question::Classic::HenryFordInitial].freeze
 # rubocop:disable Lint/TopLevelReturnWithArgument, Rails/Output
 return puts '# Will not pollute database. Generator is disabled on this environment' unless ENV['GENERATOR_ENABLED'] == '1'
 # rubocop:enable Lint/TopLevelReturnWithArgument

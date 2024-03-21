@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Date, type: :model do
-  describe 'Question::Date' do
+RSpec.describe Question::Classic::Date, type: :model do
+  describe 'Question::Classic::Date' do
     describe 'expected behaviour' do
       subject(:question_date) { build(:question_date) }
 

@@ -11,7 +11,7 @@ class V1::FlowService::ScheduleService
   attr_accessor :user_session, :additional_information
 
   def call(question)
-    return question unless question.is_a?(Question::Finish) || (question.is_a?(Hash) && question.dig('data', 'attributes', 'type').eql?('Question::Finish'))
+    return question unless question.is_a?(Question::Classic::Finish) || (question.is_a?(Hash) && question.dig('data', 'attributes', 'type').eql?('Question::Classic::Finish'))
     return question unless next_session.present? && next_session.schedule_immediately?
 
     next_user_session = next_user_session!(next_session)

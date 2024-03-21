@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe Question, type: :model do
   describe 'callbacks' do
     context 'after_create' do
-      context 'when question has type Question::Finish' do
+      context 'when question has type Question::Classic::Finish' do
         let(:question_finish) { create(:question_finish) }
 
         it 'creates default block' do

@@ -54,7 +54,7 @@ class Intervention::Csv::Harvester
   end
 
   def ignored_types
-    %w[Question::Feedback Question::Information Question::Finish Question::ThirdParty]
+    %w[Question::Classic::Feedback Question::Classic::Information Question::Classic::Finish Question::Classic::ThirdParty]
   end
 
   def add_session_variable_to_question_variable(session, variable, index, multiple_fill)
@@ -147,7 +147,7 @@ class Intervention::Csv::Harvester
   def hf_headers(sessions)
     return [] unless sessions.first&.intervention&.hfhs_access
 
-    hf_initial_question = Question::HenryFordInitial.joins(:question_group).find_by(question_group: { session: sessions })
+    hf_initial_question = Question::Classic::HenryFordInitial.joins(:question_group).find_by(question_group: { session: sessions })
     return [] if hf_initial_question.nil?
 
     hf_initial_question.csv_header_names
@@ -171,7 +171,7 @@ class Intervention::Csv::Harvester
   def fill_hf_initial_screen(row_index, user_session)
     return unless user_session.session.intervention.hfhs_access
 
-    question = ::Question::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
+    question = ::Question::Classic::HenryFordInitial.joins(:answers).find_by(answers: { user_session: user_session })
     attrs = question&.csv_decoded_attrs
     patient_details = patient_details(user_session, attrs)
     return if patient_details.blank?

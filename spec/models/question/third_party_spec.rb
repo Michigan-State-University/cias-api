@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::ThirdParty, type: :model do
+RSpec.describe Question::Classic::ThirdParty, type: :model do
   describe 'callback methods' do
     context 'it correctly downcases third party emails' do
       let(:user) { create(:user, :confirmed, :researcher) }

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::FollowUpContact, type: :model do
-  describe 'Question::FollowUpContact' do
+RSpec.describe Question::Classic::FollowUpContact, type: :model do
+  describe 'Question::Classic::FollowUpContact' do
     subject(:question_follow_up_contact) { build(:question_follow_up_contact) }
 
     it { should belong_to(:question_group) }

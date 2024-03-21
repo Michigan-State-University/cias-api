@@ -112,8 +112,8 @@ class Session::Classic < Session
   end
 
   def digit_variable_questions
-    %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number Question::ThirdParty Question::ParticipantReport Question::Phone
-       Question::HenryFord]
+    %w[Question::Classic::Single Question::Classic::Slider Question::Classic::Grid Question::Classic::Multiple Question::Classic::Number Question::Classic::ThirdParty Question::Classic::ParticipantReport Question::Classic::Phone
+       Question::Classic::HenryFord]
   end
 
   def present_variables(variables)
@@ -125,6 +125,6 @@ class Session::Classic < Session
 
     qg_finish = ::QuestionGroup::Classic::Finish.new(session_id: id)
     qg_finish.save!
-    ::Question::Finish.create!(question_group_id: qg_finish.id)
+    ::Question::Classic::Finish.create!(question_group_id: qg_finish.id)
   end
 end

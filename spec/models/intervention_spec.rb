@@ -156,7 +156,7 @@ RSpec.describe Intervention, type: :model do
     let!(:question1) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle', position: 1,
                                formulas: [{ 'payload' => 'var + 3', 'patterns' => [
-                                 { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Single' }] }
+                                 { 'match' => '=7', 'target' => [{ 'id' => question2.id, type: 'Question::Classic::Single' }] }
                                ] }])
     end
     let!(:question2) do
@@ -168,14 +168,14 @@ RSpec.describe Intervention, type: :model do
     let!(:question3) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 3', position: 3,
                                formulas: [{ 'payload' => 'var + 29', 'patterns' => [
-                                 { 'match' => '=6', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::HenryFordInitial' }] }
+                                 { 'match' => '=6', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::Classic::HenryFordInitial' }] }
                                ] }])
     end
     let!(:question4) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 4', position: 4,
                                formulas: [{ 'payload' => 'var + 87', 'patterns' => [
-                                 { 'match' => '=23', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::HenryFordInitial', 'probability' => '50' },
-                                                                  { 'id' => question5.id, type: 'Question::Single', 'probability' => '50' }] }
+                                 { 'match' => '=23', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::Classic::HenryFordInitial', 'probability' => '50' },
+                                                                  { 'id' => question5.id, type: 'Question::Classic::Single', 'probability' => '50' }] }
                                ] }])
     end
     let!(:question5) do
@@ -230,7 +230,7 @@ RSpec.describe Intervention, type: :model do
           'formulas' => [{
             'payload' => 'var + 3',
             'patterns' => [
-              { 'match' => '=7', 'target' => [{ 'id' => cloned_questions.second.id, 'type' => 'Question::Single' }] }
+              { 'match' => '=7', 'target' => [{ 'id' => cloned_questions.second.id, 'type' => 'Question::Classic::Single' }] }
             ]
           }]
         ),
@@ -257,13 +257,13 @@ RSpec.describe Intervention, type: :model do
           'formulas' => [
             'payload' => 'var + 87',
             'patterns' => [
-              { 'match' => '=23', 'target' => [{ 'id' => cloned_questions.find_by(position: 5).id, 'type' => 'Question::Single', 'probability' => '50' }] }
+              { 'match' => '=23', 'target' => [{ 'id' => cloned_questions.find_by(position: 5).id, 'type' => 'Question::Classic::Single', 'probability' => '50' }] }
             ]
           ]
         ),
         include(
           'position' => 999_999,
-          'type' => 'Question::Finish'
+          'type' => 'Question::Classic::Finish'
         )
       )
     end

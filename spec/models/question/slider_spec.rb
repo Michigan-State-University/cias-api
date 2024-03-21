@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-RSpec.describe Question::Slider, type: :model do
-  describe 'Question::Slider' do
+RSpec.describe Question::Classic::Slider, type: :model do
+  describe 'Question::Classic::Slider' do
     subject(:question_slider) { build(:question_slider) }
 
     it { should belong_to(:question_group) }

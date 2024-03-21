@@ -39,13 +39,13 @@ class V1::FlowService::NextQuestion
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
 
-    if question.type == 'Question::Finish'
+    if question.type == 'Question::Classic::Finish'
       assign_next_session_id(user_session.session.intervention)
       user_session.finish
     end
 
     return question unless user_session.user.role?('predefined_participant')
-    return question unless question.is_a?(Question::ParticipantReport)
+    return question unless question.is_a?(Question::Classic::ParticipantReport)
 
     question_group = question.question_group
     question = question_group.questions.find_by(position: (question.position + 1))

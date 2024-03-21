@@ -21,7 +21,7 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
     2.times do |i|
       question = {
         title: "Question Title #{i + 1}",
-        type: Question::FollowUpContact,
+        type: Question::Classic::FollowUpContact,
         body: {
           data: [
             {
