@@ -20,7 +20,7 @@ class Ability::EInterventionAdmin < Ability::Base
     can :read, ReportTemplate::Section::Variant,
         report_template_section: { report_template: { session: { intervention: { id: interventions_in_organization_ids(user) } } } }
     can :read, QuestionGroup, session: { intervention: { id: interventions_in_organization_ids(user) } }
-    can :read, Question, question_group: { session: { intervention: { id: interventions_in_organization_ids(user) } } }
+    can :read, Question::Classic, question_group: { session: { intervention: { id: interventions_in_organization_ids(user) } } }
     can :read, UserSession, session: { intervention: { user_id: user.id } }
     can :manage, UserIntervention, intervention: { user_id: user.id }
     can %i[read update], Organization, id: user.accepted_organization_ids

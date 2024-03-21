@@ -119,7 +119,7 @@ class Question < ApplicationRecord
   end
 
   def execute_narrator
-    Narrator.new(self).execute
+    Classic::Narrator.new(self).execute
   end
 
   def remove_blocks_with_types(block_types_to_remove)

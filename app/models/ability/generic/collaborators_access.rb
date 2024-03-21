@@ -6,7 +6,7 @@ module Ability::Generic::CollaboratorsAccess
     can :read, Session, intervention: { collaborators: { user_id: user.id, view: true } }
     can :read, InterventionAccess, intervention: { collaborators: { user_id: user.id, view: true } }
     can :read, QuestionGroup, session: { intervention: { collaborators: { user_id: user.id, view: true } } }
-    can :read, Question, question_group: { session: { intervention: { collaborators: { user_id: user.id, view: true } } } }
+    can :read, Question::Classic, question_group: { session: { intervention: { collaborators: { user_id: user.id, view: true } } } }
     can :read, ReportTemplate, session: { intervention: { collaborators: { user_id: user.id, view: true } } }
     can :read, ReportTemplate::Section, report_template: { session: { intervention: { collaborators: { user_id: user.id, view: true } } } }
     can :read, ReportTemplate::Section::Variant,
@@ -22,7 +22,7 @@ module Ability::Generic::CollaboratorsAccess
     can :manage, Session, intervention: { collaborators: { user_id: user.id, edit: true } }
     can :manage, InterventionAccess, intervention: { collaborators: { user_id: user.id, edit: true } }
     can :manage, QuestionGroup, session: { intervention: { collaborators: { user_id: user.id, edit: true } } }
-    can :manage, Question, question_group: { session: { intervention: { collaborators: { user_id: user.id, edit: true } } } }
+    can :manage, Question::Classic, question_group: { session: { intervention: { collaborators: { user_id: user.id, edit: true } } } }
     can :manage, ReportTemplate, session: { intervention: { collaborators: { user_id: user.id, edit: true } } }
     can :manage, ReportTemplate::Section, report_template: { session: { intervention: { collaborators: { user_id: user.id, edit: true } } } }
     can :manage, ReportTemplate::Section::Variant,

@@ -11,6 +11,34 @@ session:
   ]
   body:
     data: [ ]
+question/classic:
+  settings:
+    image: false
+    video: false
+    title: true
+    subtitle: true
+    narrator_skippable: false
+    start_autofinish_timer: false
+  narrator:
+    settings:
+      voice: true
+      animation: true
+      character: peedy
+    blocks: []
+  formulas: [
+    {
+      payload: '',
+      patterns: [ ]
+    }
+  ]
+  body:
+    data: []
+  original_text:
+    {
+      title : '',
+      subtitle: '',
+      image_description: ''
+    }
 question:
   settings:
     image: false

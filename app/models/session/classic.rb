@@ -126,6 +126,6 @@ class Session::Classic < Session
 
     qg_finish = ::QuestionGroup::Classic::Finish.new(session_id: id)
     qg_finish.save!
-    ::Question::Classic::Finish.create!(question_group_id: qg_finish.id)
+    # ::Question::Classic::Finish.create!(question_group_id: qg_finish.id)
   end
 end
