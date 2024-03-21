@@ -39,7 +39,9 @@ class Question::Classic::Narrator::Blobs
     end
 
     count_hash.each do |count, audio_ids|
+      # rubocop:disable Rails/SkipsModelValidations
       Audio.where(sha256: audio_ids).update_counters(usage_counter: -count)
+      # rubocop:enable Rails/SkipsModelValidations
     end
   end
 

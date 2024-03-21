@@ -112,8 +112,9 @@ class Session::Classic < Session
   end
 
   def digit_variable_questions
-    %w[Question::Classic::Single Question::Classic::Slider Question::Classic::Grid Question::Classic::Multiple Question::Classic::Number Question::Classic::ThirdParty Question::Classic::ParticipantReport Question::Classic::Phone
-       Question::Classic::HenryFord]
+    %w[Question::Classic::Single Question::Classic::Slider Question::Classic::Grid Question::Classic::Multiple
+       Question::Classic::Number Question::Classic::ThirdParty Question::Classic::ParticipantReport
+       Question::Classic::Phone Question::Classic::HenryFord]
   end
 
   def present_variables(variables)

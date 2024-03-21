@@ -173,10 +173,20 @@ RSpec.describe Intervention, type: :model do
     end
     let!(:question4) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 4', position: 4,
-                               formulas: [{ 'payload' => 'var + 87', 'patterns' => [
-                                 { 'match' => '=23', 'target' => [{ 'id' => henry_ford_question.id, type: 'Question::Classic::HenryFordInitial', 'probability' => '50' },
-                                                                  { 'id' => question5.id, type: 'Question::Classic::Single', 'probability' => '50' }] }
-                               ] }])
+                               formulas: [
+                                 { 'payload' => 'var + 87',
+                                   'patterns' => [{
+                                     'match' => '=23',
+                                     'target' => [{
+                                       'id' => henry_ford_question.id,
+                                       type: 'Question::Classic::HenryFordInitial',
+                                       'probability' => '50'
+                                     },
+                                                  { 'id' => question5.id,
+                                                    type: 'Question::Classic::Single',
+                                                    'probability' => '50' }]
+                                   }] }
+                               ])
     end
     let!(:question5) do
       create(:question_single, question_group: question_group, subtitle: 'Question Subtitle 5', position: 5)
