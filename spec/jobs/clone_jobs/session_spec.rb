@@ -176,7 +176,8 @@ RSpec.describe CloneJobs::Session, type: :job do
             'formulas' => [{
               'payload' => 'var + 3',
               'patterns' => [
-                { 'match' => '=7', 'target' => [{ 'id' => cloned_questions_collection.second.id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }
+                { 'match' => '=7',
+                  'target' => [{ 'id' => cloned_questions_collection.second.id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }
               ]
             }]
           ),
@@ -202,7 +203,8 @@ RSpec.describe CloneJobs::Session, type: :job do
             'formulas' => [{
               'payload' => 'var + 2',
               'patterns' => [
-                { 'match' => '=4', 'target' => [{ 'id' => cloned_questions_collection.fourth.id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }
+                { 'match' => '=4',
+                  'target' => [{ 'id' => cloned_questions_collection.fourth.id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }
               ]
             }]
           )
@@ -220,7 +222,8 @@ RSpec.describe CloneJobs::Session, type: :job do
             'formulas' => [{
               'payload' => 'var + 7',
               'patterns' => [
-                { 'match' => '=11', 'target' => [{ 'id' => cloned_questions_collection.first.id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }
+                { 'match' => '=11',
+                  'target' => [{ 'id' => cloned_questions_collection.first.id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }
               ]
             }]
           ),

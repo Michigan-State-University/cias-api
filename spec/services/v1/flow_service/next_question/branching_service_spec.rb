@@ -151,7 +151,8 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
           question = create(:question_participant_report, question_group: question_group)
           question.formulas = [{ 'payload' => 'participant_rep',
                                  'patterns' => [{ 'match' => '=1',
-                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }] }]
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single',
+                                                                 'probability' => '100' }] }] }]
           question.body = { 'data' => [{ 'payload' => '' }], 'variable' => { 'name' => 'participant_rep' } }
           question.save
           question
@@ -174,7 +175,8 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
           question = create(:question_phone, question_group: question_group)
           question.formulas = [{ 'payload' => 'phone',
                                  'patterns' => [{ 'match' => '=1',
-                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }] }]
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single',
+                                                                 'probability' => '100' }] }] }]
           question.body = { 'data' => [{ 'payload' => '' }], 'variable' => { 'name' => 'phone' } }
           question.save
           question
@@ -197,7 +199,8 @@ RSpec.describe V1::FlowService::NextQuestion::BranchingService do
           question = create(:question_third_party, question_group: question_group)
           question.formulas = [{ 'payload' => 'third_party',
                                  'patterns' => [{ 'match' => '=1',
-                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single', 'probability' => '100' }] }] }]
+                                                  'target' => [{ 'id' => target_question_id, 'type' => 'Question::Classic::Single',
+                                                                 'probability' => '100' }] }] }]
           question.body = { 'data' => [{ 'value' => 'email@example.com', 'numeric_value' => '1', 'payload' => '', 'report_template_ids' => [] }],
                             'variable' => { 'name' => 'third_party' } }
           question.save

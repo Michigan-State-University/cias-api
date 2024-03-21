@@ -257,7 +257,8 @@ RSpec.describe Intervention, type: :model do
           'formulas' => [
             'payload' => 'var + 87',
             'patterns' => [
-              { 'match' => '=23', 'target' => [{ 'id' => cloned_questions.find_by(position: 5).id, 'type' => 'Question::Classic::Single', 'probability' => '50' }] }
+              { 'match' => '=23',
+                'target' => [{ 'id' => cloned_questions.find_by(position: 5).id, 'type' => 'Question::Classic::Single', 'probability' => '50' }] }
             ]
           ]
         ),
