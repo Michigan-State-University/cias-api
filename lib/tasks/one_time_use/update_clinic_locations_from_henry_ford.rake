@@ -110,6 +110,46 @@ namespace :one_time_use do
         external_name: 'Henry Ford Pediatrics - Royal Oak',
         epic_identifier: 'eu-Dcnz-kWm8.SFtCPcHRHYnHCF8gUxKrJ6YZV35S-rk3',
         auxiliary_epic_identifier: '',
+      },
+      {
+        department: '',
+        name: 'ford rd pediatrics',
+        external_id: '1010200006',
+        external_name: 'Henry Ford Pediatrics - Ford Rd',
+        epic_identifier: 'eahnL1gZAue7EtE7rhzzoPJD-4qrnWT-72TkjhqiLOGA3',
+        auxiliary_epic_identifier: '',
+      },
+      {
+        department: '',
+        name: 'harbortown pediatrics',
+        external_id: '1010220011',
+        external_name: 'Henry Ford Pediatrics - Harbortown',
+        epic_identifier: 'eGFipTDH5FmP0A1rT7xMUKOXfRD9JXDkd3Ed.dKQGf-k3',
+        auxiliary_epic_identifier: '',
+      },
+      {
+        department: '',
+        name: 'lakeside pediatrics',
+        external_id: '1010230015',
+        external_name: 'Henry Ford Pediatrics - Lakeside',
+        epic_identifier: 'ex61bpEaWc0rzdwh6yAzwWQqt3LI55ABenRu2h2W4gRI3',
+        auxiliary_epic_identifier: '',
+      },
+      {
+        department: '',
+        name: 'detc infectious disease',
+        external_id: '1010010049',
+        external_name: 'Henry Ford Infectious Disease - Henry Ford Hospital, K Building',
+        epic_identifier: 'e3VkAE2hVaw18SjzMiFuZPGbHtAo0yzcl3av5rrVPYj43',
+        auxiliary_epic_identifier: '',
+      },
+      {
+        department: '',
+        name: 'taylor pediatrics',
+        external_id: '1010350014',
+        external_name: 'Henry Ford Pediatrics - Taylor',
+        epic_identifier: 'e4kGbIl4r.foLsXUzlLahLe3QnNwW6Ft1CE74OrkVNJY3',
+        auxiliary_epic_identifier: '',
       }
     ].each do |clinic_location_params|
       clinic_location = ClinicLocation.find_by(name: clinic_location_params[:name])
