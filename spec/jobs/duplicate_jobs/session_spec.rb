@@ -125,6 +125,7 @@ RSpec.describe DuplicateJobs::Session, type: :job do
                                  blocks: [
                                    {
                                      action: 'NO_ACTION',
+                                     session_id: session1,
                                      question_id: session1_question.id,
                                      reflections: [
                                        {
