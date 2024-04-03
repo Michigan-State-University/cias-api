@@ -65,12 +65,12 @@ class Clone::Session < Clone::Base
 
   def remove_invalid_reflections(question)
     question.narrator['blocks'].delete_if do |block|
-      block['type'] == 'Reflection' && block['question_id'].present? && !session_exists_inside_intervention?(question, block['session_id'])
+      block['type'] == 'Reflection' && block['question_id'].present? && !session_exists_inside_target_intervention?(question, block['session_id'])
     end
     question
   end
 
-  def session_exists_inside_intervention?(question, session_id)
+  def session_exists_inside_target_intervention?(question, session_id)
     session_id.nil? || (question.session.id != session_id && question.session.intervention.sessions.pluck(:id).include?(session_id))
   end
 
