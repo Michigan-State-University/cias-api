@@ -9,6 +9,7 @@ RSpec.describe Question::Sms, type: :model do
 
     describe 'validation of question assignments' do
       let(:question) { build(:question_sms_information, question_group: question_group) }
+
       it_behaves_like 'can be be assigned to sms session'
       it_behaves_like 'cannot be assigned to classic session'
     end
@@ -23,7 +24,7 @@ RSpec.describe Question::Sms, type: :model do
 
         it 'returns nil with passed taken variables' do
           expect(question_sms_information.variable_clone_prefix(%w[clone_question_slider_var
-                                                        clone1_question_slider_var])).to eq(nil)
+                                                                   clone1_question_slider_var])).to eq(nil)
         end
       end
 

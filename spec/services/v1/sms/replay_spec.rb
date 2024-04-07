@@ -46,14 +46,16 @@ RSpec.describe V1::Sms::Replay do
   context 'sending text, which matches sms_code of session' do
     context 'when session session code has proper length' do
       let(:body) { 'SMS_CODE' }
+
       it 'creates new user session' do
         expect_any_instance_of(described_class).to receive(:handle_message_with_sms_code)
         subject
       end
-      end
+    end
 
     context 'when session session code does not have proper length' do
       let(:body) { 'SMS' }
+
       it 'does not create new user session' do
         expect_any_instance_of(described_class).not_to receive(:handle_message_with_sms_code)
         subject

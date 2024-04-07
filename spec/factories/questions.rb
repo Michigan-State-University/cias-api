@@ -702,7 +702,7 @@ FactoryBot.define do
         data: [
           {
             payload: '',
-            value: '',
+            value: ''
           }
         ],
         variable: {

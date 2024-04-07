@@ -6,7 +6,7 @@ class V1::Users::CreateGuest
   end
 
   def call(phone_number)
-    user = User.new.tap do |user|
+    new_user = User.new.tap do |user|
       user.roles = %w[guest]
       user.skip_confirmation!
       user.email = "#{Time.current.to_i}_#{SecureRandom.hex(10)}@guest.true"
@@ -18,9 +18,9 @@ class V1::Users::CreateGuest
       national_number = Phonelib.parse(phone_number).national(false)
       iso = Phonelib.parse(phone_number).country
 
-      Phone.new(prefix: "+#{number_prefix}", number: national_number, iso: iso, user: user).save!
+      Phone.new(prefix: "+#{number_prefix}", number: national_number, iso: iso, user: new_user).save!
     end
 
-    user
+    new_user
   end
 end

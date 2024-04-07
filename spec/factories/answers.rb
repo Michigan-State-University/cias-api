@@ -47,7 +47,7 @@ FactoryBot.define do
     factory :answer_information do
       type { Answer::Information }
       association :question, factory: :question_information
-      end
+    end
     factory :answer_sms_information do
       type { Answer::SmsInformation }
       association :question, factory: :question_sms_information
@@ -59,7 +59,7 @@ FactoryBot.define do
     factory :answer_single, class: Answer::Single do
       type { Answer::Single }
       association :question, factory: :question_single
-      end
+    end
     factory :answer_sms, class: Answer::Sms do
       type { Answer::Sms }
       association :question, factory: :question_sms

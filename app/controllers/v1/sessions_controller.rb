@@ -121,8 +121,8 @@ class V1::SessionsController < V1Controller
                                     narrator: {}, settings: {},
                                     formulas: [
                                       :payload, { patterns: [:match, {
-                                      target: %i[type probability id]
-                                    }] }
+                                        target: %i[type probability id]
+                                      }] }
                                     ], cat_tests: [])
   end
 

@@ -2,6 +2,7 @@
 
 class V1::Sms::Replay
   attr_reader :from_number, :to_number, :message
+
   def self.call(from, to, body)
     new(from, to, body).call
   end
@@ -17,7 +18,7 @@ class V1::Sms::Replay
 
   def call
     # Handle case with SMS stop signal
-    if message.downcase === 'stop'
+    if message.downcase.match?('stop')
       delete_messaged_for(from_number)
       return response_message
     end
@@ -25,15 +26,12 @@ class V1::Sms::Replay
     # Handle incoming message
     if message.length >= Session::Sms::SMS_CODE_MIN_LENGTH
       handle_message_with_sms_code
-      return response_message
-    end
-
-    if message.length < Session::Sms::SMS_CODE_MIN_LENGTH
+    else
       handle_message_with_answer
-      response_message
     end
-  end
 
+    response_message
+  end
 
   private
 
@@ -80,7 +78,8 @@ class V1::Sms::Replay
           return
         end
 
-        V1::AnswerService.call(@user, user_session.id, question.id, { type: "Answer::Sms", body: { data: [{ value: message, var: question.body['variable']['name']}]}})
+        V1::AnswerService.call(@user, user_session.id, question.id,
+                               { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
         handle_next_question(user_session: user_session)
       else
         SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
@@ -90,8 +89,6 @@ class V1::Sms::Replay
     end
   end
 
-  private
-
   def handle_next_question(user_session:)
     user = user_session.user
     question = V1::FlowService::NextQuestion.new(user_session).call(nil)
@@ -99,14 +96,16 @@ class V1::Sms::Replay
   end
 
   def handle_sms_question_in_session(user_session:, question:, user:)
-    if question.type === 'Question::SmsInformation'
+    # rubocop:disable Style/IdenticalConditionalBranches
+    if question.type.match?('Question::SmsInformation')
       SmsPlans::SendSmsJob.perform_later(user.full_number, question.title, nil, user.id)
-      V1::AnswerService.call(user, user_session.id, question.id, {type: "Answer::SmsInformation", body: { data: [{ value: "", var: "" }]}})
+      V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [{ value: '', var: '' }] } })
       next_question = V1::FlowService::NextQuestion.new(user_session).call(nil)
       SmsPlans::SendSmsJob.perform_later(user.full_number, next_question.title, nil, user.id) if next_question
     else
       SmsPlans::SendSmsJob.perform_later(user.full_number, question.title, nil, user.id)
     end
+    # rubocop:enable Style/IdenticalConditionalBranches
   end
 
   def create_new_user_session!(session:, user:)

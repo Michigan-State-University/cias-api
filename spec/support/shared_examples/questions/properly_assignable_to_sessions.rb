@@ -28,7 +28,7 @@ RSpec.shared_examples 'cannot be assigned to classic session' do
   it 'does not create question' do
     expect(question.save).to eq false
   end
-  end
+end
 
 RSpec.shared_examples 'can be assigned to classic session' do
   let(:intervention) { create(:intervention) }

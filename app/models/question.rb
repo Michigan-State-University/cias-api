@@ -206,12 +206,13 @@ class Question < ApplicationRecord
 
   def properly_assigned
     return true unless question_group
+
     session_type = session.type
 
-    if session_type === 'Session::Sms'
+    if session_type.match?('Session::Sms')
       errors.add(:base, "Can not add #{type} to #{session_type}") unless type == 'Question::Sms' || type == 'Question::SmsInformation'
-    else
-      errors.add(:base, "Can not add #{type} to #{session_type}") if type == 'Question::Sms' || type == 'Question::SmsInformation'
+    elsif type == 'Question::Sms' || type == 'Question::SmsInformation'
+      errors.add(:base, "Can not add #{type} to #{session_type}")
     end
   end
 

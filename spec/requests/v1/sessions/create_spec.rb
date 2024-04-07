@@ -88,6 +88,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
               expect(Session.last.type).to eql('Session::CatMh')
             end
           end
+
           context 'and include Sms type' do
             let(:params) do
               {

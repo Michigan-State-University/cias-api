@@ -48,8 +48,8 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:intervention) { create(:intervention) }
         let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention) }
         let(:user) { create(:user, :with_phone) }
-        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention)}
-        let!(:user_session) { create(:sms_user_session, user: user, session: session)}
+        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
+        let!(:user_session) { create(:sms_user_session, user: user, session: session) }
 
         it 'does not create new user session' do
           expect { request }.not_to change(user.user_sessions, :count)
@@ -62,8 +62,8 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
           let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
           let!(:question_group) { create(:question_group, session: session) }
           let!(:question) { create(:question_sms, question_group: question_group) }
-          let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention)}
-          let!(:user_session) { create(:sms_user_session, user: user, session: session)}
+          let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
+          let!(:user_session) { create(:sms_user_session, user: user, session: session) }
 
           it 'does not create new answer' do
             expect { request }.not_to change(user_session.answers, :count)
@@ -79,7 +79,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
           let!(:question) { create(:question_sms, question_group: question_group) }
           let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
           let!(:user_session) { create(:sms_user_session, user: user, session: session) }
-          let!(:answer) { create(:answer_sms, user_session: user_session, question: question)}
+          let!(:answer) { create(:answer_sms, user_session: user_session, question: question) }
 
           it 'does not create any answer' do
             expect { request }.not_to change(user_session.answers, :count)
@@ -104,8 +104,8 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
         let!(:question_group) { create(:question_group, session: session) }
         let!(:question) { create(:question_sms, question_group: question_group) }
-        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention)}
-        let!(:user_session) { create(:sms_user_session, user: user, session: session)}
+        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
+        let!(:user_session) { create(:sms_user_session, user: user, session: session) }
 
         it 'creates new answer' do
           expect { request }.to change(user_session.answers, :count).by(1)
@@ -121,7 +121,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:question) { create(:question_sms, question_group: question_group) }
         let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
         let!(:user_session) { create(:sms_user_session, user: user, session: session) }
-        let!(:answer) { create(:answer_sms, user_session: user_session, question: question)}
+        let!(:answer) { create(:answer_sms, user_session: user_session, question: question) }
 
         it 'does not create any answer' do
           expect { request }.not_to change(user_session.answers, :count)

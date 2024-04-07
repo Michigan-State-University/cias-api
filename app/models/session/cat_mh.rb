@@ -9,7 +9,7 @@ class Session::CatMh < Session
 
   validates :sms_code, absence: true
   validates :question_groups, absence: true
-  # TODO Add rest of associations (like questions etc) to validate absence and move them from subclasses of Session to Session
+  # TODO: Add rest of associations (like questions etc) to validate absence and move them from subclasses of Session to Session
 
   def translate_questions(_translator, _source_language_name_short, _destination_language_name_short); end
 

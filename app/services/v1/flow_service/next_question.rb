@@ -39,11 +39,9 @@ class V1::FlowService::NextQuestion
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
 
-    if user_session.type == 'UserSession::Sms'
-      unless question
-        user_session.finish
-        return question
-      end
+    if user_session.type == 'UserSession::Sms' && !question
+      user_session.finish
+      return question
     end
 
     if question.type == 'Question::Finish'
