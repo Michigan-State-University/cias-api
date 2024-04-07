@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_03_12_120947) do
+ActiveRecord::Schema.define(version: 2024_03_20_151937) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -632,6 +632,8 @@ ActiveRecord::Schema.define(version: 2024_03_12_120947) do
     t.text "number_ciphertext"
     t.uuid "navigator_setup_id"
     t.string "communication_way"
+    t.string "number_bidx"
+    t.index ["number_bidx"], name: "index_phones_on_number_bidx"
     t.index ["user_id"], name: "index_phones_on_user_id"
   end
 
@@ -766,6 +768,7 @@ ActiveRecord::Schema.define(version: 2024_03_12_120947) do
     t.integer "autofinish_delay", default: 1440, null: false
     t.boolean "autoclose_enabled", default: false
     t.datetime "autoclose_at"
+    t.string "sms_code"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

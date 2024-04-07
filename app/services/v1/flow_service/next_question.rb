@@ -39,6 +39,13 @@ class V1::FlowService::NextQuestion
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
 
+    if user_session.type == 'UserSession::Sms'
+      unless question
+        user_session.finish
+        return question
+      end
+    end
+
     if question.type == 'Question::Finish'
       assign_next_session_id(user_session.session.intervention)
       user_session.finish

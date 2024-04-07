@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "minItems": 1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "payload": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            },
+            "original_text" : {
+              "type": "string"
+            }
+          },
+          "required": [
+            "payload",
+            "value"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "variable": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "data",
+    "variable"
+  ],
+  "additionalProperties": false
+}

@@ -29,8 +29,9 @@ class V1::SessionService
 
   def create(session_params)
     session = sessions.new(session_params)
-    session.assign_google_tts_voice(first_session)
-    session.current_narrator = intervention.current_narrator
+    session_type_sms = session.type === 'Session::Sms'
+    session.assign_google_tts_voice(first_session) unless session_type_sms
+    session.current_narrator = intervention.current_narrator unless session_type_sms
     session.position = sessions.last&.position.to_i + 1
     session.save!
     session
@@ -40,8 +41,9 @@ class V1::SessionService
     sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
     session.assign_attributes(session_params.except(:cat_tests))
-    assign_cat_tests_to_session(session, session_params)
-    session.integral_update
+    session_type_sms = session.type === 'Session::Sms'
+    assign_cat_tests_to_session(session, session_params) unless session_type_sms
+    session.integral_update unless session_type_sms
     session
   end
 

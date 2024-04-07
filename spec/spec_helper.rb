@@ -254,6 +254,12 @@ RSpec.configure do |config|
         status: 200
       }
     )
+
+    allow_any_instance_of(Communication::Sms).to receive(:send_message).and_return(
+      {
+        status: 200
+      }
+    )
   end
 
   config.before :suite do

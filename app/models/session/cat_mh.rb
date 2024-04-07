@@ -7,6 +7,10 @@ class Session::CatMh < Session
   has_many :tests, dependent: :destroy, foreign_key: :session_id, inverse_of: :session
   has_many :cat_mh_test_types, through: :tests
 
+  validates :sms_code, absence: true
+  validates :question_groups, absence: true
+  # TODO Add rest of associations (like questions etc) to validate absence and move them from subclasses of Session to Session
+
   def translate_questions(_translator, _source_language_name_short, _destination_language_name_short); end
 
   def user_session_type

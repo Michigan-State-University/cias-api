@@ -7,6 +7,8 @@ FactoryBot.define do
     factory :question_group_plain, class: QuestionGroup::Plain do
     end
     factory :question_group_finish, class: QuestionGroup::Finish do
+      end
+    factory :question_group_initial, class: QuestionGroup::Initial do
     end
     factory :tlfb_group, class: QuestionGroup::Tlfb do
       title { 'TLFB Study Group' }

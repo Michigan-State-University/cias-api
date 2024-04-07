@@ -56,6 +56,7 @@ class Question < ApplicationRecord
                                                                  err
                                                                } }
   validate :correct_variable_format
+  validate :properly_assigned
 
   delegate :session, to: :question_group
   delegate :ability_to_update_for?, to: :question_group
@@ -200,6 +201,17 @@ class Question < ApplicationRecord
       next if variable.blank? || special_variable?(variable) || /^([a-zA-Z]|[0-9]+[a-zA-Z_.]+)[a-zA-Z0-9_.\b]*$/.match?(variable)
 
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+    end
+  end
+
+  def properly_assigned
+    return true unless question_group
+    session_type = session.type
+
+    if session_type === 'Session::Sms'
+      errors.add(:base, "Can not add #{type} to #{session_type}") unless type == 'Question::Sms' || type == 'Question::SmsInformation'
+    else
+      errors.add(:base, "Can not add #{type} to #{session_type}") if type == 'Question::Sms' || type == 'Question::SmsInformation'
     end
   end
 
