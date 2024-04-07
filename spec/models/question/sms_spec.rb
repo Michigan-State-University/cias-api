@@ -25,7 +25,7 @@ RSpec.describe Question::Sms, type: :model do
 
           it 'sets correct variable with passed taken variables' do
             expect(question_sms.variable_clone_prefix(%w[clone_sms_var
-                                                            clone1_sms_var])).to eq('clone2_sms_var')
+                                                         clone1_sms_var])).to eq('clone2_sms_var')
           end
         end
 
@@ -58,17 +58,17 @@ RSpec.describe Question::Sms, type: :model do
         it '#translate_body' do
           question_sms.translate_body(translator, source_language_name_short, destination_language_name_short)
           expect(question_sms.body['data']).to include(
-                                                    {
-                                                      'payload' => '',
-                                                      'value' => '1',
-                                                      'original_text' => ''
-                                                    },
-                                                    {
-                                                      'payload' => 'from=>en to=>pl text=>example2',
-                                                      'value' => '',
-                                                      'original_text' => 'example2'
-                                                    }
-                                                  )
+            {
+              'payload' => '',
+              'value' => '1',
+              'original_text' => ''
+            },
+            {
+              'payload' => 'from=>en to=>pl text=>example2',
+              'value' => '',
+              'original_text' => 'example2'
+            }
+          )
         end
       end
     end
