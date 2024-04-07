@@ -2,6 +2,14 @@
 
 RSpec.describe 'POST /v1/sms/replay', type: :request do
   context 'when valid params are passed' do
+    before do
+      allow_any_instance_of(Communication::Sms).to receive(:send_message).and_return(
+        {
+          status: 200
+        }
+      )
+    end
+
     let(:params) do
       {
         body: 'EXAMPLE',
