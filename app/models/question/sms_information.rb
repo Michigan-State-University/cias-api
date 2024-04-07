@@ -23,6 +23,7 @@ class Question::SmsInformation < Question
 
   def assign_default_title_and_subtitle
     return unless new_record?
+    return true unless question_group
 
     language_code = session.intervention.google_language&.language_code
     return unless language_code.in?(%w[ar es])
