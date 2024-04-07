@@ -10,7 +10,7 @@ RSpec.describe Question::Sms, type: :model do
     describe 'validation of question assignments' do
       let(:question) { build(:question_sms, question_group: question_group) }
 
-      it_behaves_like 'can be be assigned to sms session'
+      it_behaves_like 'can be assigned to sms session'
       it_behaves_like 'cannot be assigned to classic session'
     end
 
