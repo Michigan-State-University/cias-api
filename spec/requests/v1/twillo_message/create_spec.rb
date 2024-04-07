@@ -60,7 +60,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
           let!(:intervention) { create(:intervention) }
           let!(:question_group_initial) { build(:question_group_initial) }
           let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
-          let!(:question_group) { create(:question_group, session: session) }
+          let!(:question_group) { create(:sms_question_group, session: session) }
           let!(:question) { create(:question_sms, question_group: question_group) }
           let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
           let!(:user_session) { create(:sms_user_session, user: user, session: session) }
@@ -75,7 +75,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
           let!(:intervention) { create(:intervention) }
           let!(:question_group_initial) { build(:question_group_initial) }
           let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
-          let!(:question_group) { create(:question_group, session: session) }
+          let!(:question_group) { create(:sms_question_group, session: session) }
           let!(:question) { create(:question_sms, question_group: question_group) }
           let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
           let!(:user_session) { create(:sms_user_session, user: user, session: session) }

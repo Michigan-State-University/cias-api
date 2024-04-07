@@ -99,7 +99,7 @@ class V1::Sms::Replay
     # rubocop:disable Style/IdenticalConditionalBranches
     if question.type.match?('Question::SmsInformation')
       SmsPlans::SendSmsJob.perform_later(user.full_number, question.title, nil, user.id)
-      V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [{ value: '', var: '' }] } })
+      V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [] } })
       next_question = V1::FlowService::NextQuestion.new(user_session).call(nil)
       SmsPlans::SendSmsJob.perform_later(user.full_number, next_question.title, nil, user.id) if next_question
     else

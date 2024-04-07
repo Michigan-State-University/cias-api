@@ -702,6 +702,10 @@ FactoryBot.define do
         data: [
           {
             payload: '',
+            value: '1'
+          },
+          {
+            payload: 'example2',
             value: ''
           }
         ],
@@ -711,7 +715,7 @@ FactoryBot.define do
       }
     end
     sequence(:position) { |s| s }
-    association :question_group
+    association :question_group, factory: :sms_question_group
 
     trait :body_data_empty do
       body { { data: [] } }
@@ -723,18 +727,11 @@ FactoryBot.define do
     type { Question::SmsInformation }
     body do
       {
-        data: [
-          {
-            payload: ''
-          }
-        ],
-        variable: {
-          name: '.:name:.'
-        }
+        data: []
       }
     end
     sequence(:position) { |s| s }
-    association :question_group
+    association :question_group, factory: :sms_question_group
 
     trait :body_data_empty do
       body { { data: [] } }
