@@ -312,9 +312,9 @@ RSpec.describe CloneJobs::Session, type: :job do
     let!(:session) do
       create(:cat_mh_session, :with_cat_mh_info, :with_test_type_and_variables, :with_sms_plans, :with_report_templates, intervention: intervention)
     end
-    let(:outcome_cat_mh_test_types) { Session.order(:created_at).last.cat_mh_test_types }
-    let(:outcome_sms_plans) { Session.order(:created_at).last.sms_plans }
-    let(:outcome_report_templates) { Session.order(:created_at).last.report_templates }
+    let(:outcome_cat_mh_test_types) { session.cat_mh_test_types }
+    let(:outcome_sms_plans) { session.sms_plans }
+    let(:outcome_report_templates) { session.report_templates }
 
     before { subject }
 
