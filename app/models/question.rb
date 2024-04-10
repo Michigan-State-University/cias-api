@@ -183,6 +183,7 @@ class Question < ApplicationRecord
 
   def initialize_narrator
     return if %w[Question::Sms Question::SmsInformation].include?(type)
+
     narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish' && narrator['blocks'].empty?
     execute_narrator
   end

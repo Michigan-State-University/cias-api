@@ -6,8 +6,8 @@ class Question::SmsInformation < Question
 
   attribute :sms_schedule, :jsonb, default: {}
   validates :sms_schedule,
-            json: { schema: lambda { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
-                    message: lambda { |err|  err } },
+            json: { schema: -> { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
+                    message: ->(err) { err } },
             if: -> { question_group&.sms_schedule.blank? }
 
   before_validation :assign_default_title_and_subtitle

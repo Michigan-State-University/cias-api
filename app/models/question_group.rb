@@ -18,8 +18,8 @@ class QuestionGroup < ApplicationRecord
 
   attribute :sms_schedule, :jsonb, default: {}
   validates :sms_schedule,
-            json: { schema: lambda { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
-                    message: lambda { |err|  err } }, if: -> { session&.type === 'Session::Sms' },
+            json: { schema: -> { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
+                    message: ->(err) { err } }, if: -> { session&.type&.match?('Session::Sms') },
             allow_blank: true
 
   def finish?
