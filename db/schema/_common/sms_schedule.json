@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "period": { "type": "string" },
+    "day_of_period": { "type": "string" },
+    "time": {
+      "type": "object",
+      "properties": {
+        "exact": {
+          "type": "string"
+        },
+        "range": {
+          "type": "object",
+          "properties": {
+            "from": { "type": "string" },
+            "to": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

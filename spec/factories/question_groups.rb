@@ -24,5 +24,14 @@ FactoryBot.define do
     association(:session, factory: :sms_session)
     factory :question_group_initial, class: QuestionGroup::Initial do
     end
+    sms_schedule do
+      {
+        "period": 'weekly',
+        "day_of_period": '1', # Monday
+        "time": {
+          exact: '8:00 AM'
+        }
+      }
+    end
   end
 end

@@ -49,6 +49,48 @@ RSpec.describe Question::SmsInformation, type: :model do
           expect(question_sms_information.question_variables).to match_array []
         end
       end
+
+
+      describe '#schedule_at' do
+        context 'when weekly period is provided' do
+          let(:question_sms_information) { create(:question_sms_information,
+                                      sms_schedule: { "period": 'weekly',
+                                                      "day_of_period": 'monday',
+                                                      "time": { exact: '8:00 AM' } })}
+          it 'returns proper date' do
+            date = Date.current.wday === 1 ?
+                     DateTime.current.change({hour: 8}) :
+                     DateTime.commercial(Date.today.year, 1+Date.today.cweek, 1).change({hour: 8})
+            expect(question_sms_information.schedule_at).to eq date
+          end
+        end
+
+        context 'when monthly period is provided' do
+          let(:question_sms_information) { create(:question_sms_information,
+                                      sms_schedule: { "period": 'monthly',
+                                                      "day_of_period": '1',
+                                                      "time": { exact: '8:00 AM' } })}
+          it 'returns proper date' do
+            date = Date.current.mday === 1 ?
+                     DateTime.current.change({hour: 8}) :
+                     DateTime.current.change({month: DateTime.current.month + 1, day: 1, hour: 8})
+            expect(question_sms_information.schedule_at).to eq date
+          end
+        end
+
+        context 'when daily period is provided' do
+          let(:question_sms_information) { create(:question_sms_information,
+                                      sms_schedule: { "period": 'daily',
+                                                      "day_of_period": '1',
+                                                      "time": { exact: '8:00 AM' } })}
+          it 'returns proper date' do
+            date = DateTime.current.hour >= 8 && DateTime.current.minute >= 0 && DateTime.current.second >= 0 ?
+                     DateTime.current.change({day: DateTime.current.day + 1, hour: 8}) :
+                     DateTime.current.change({hour: 8})
+            expect(question_sms_information.schedule_at).to eq date
+          end
+        end
+      end
     end
   end
 end

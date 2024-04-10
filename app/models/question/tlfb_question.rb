@@ -3,6 +3,8 @@
 class Question::TlfbQuestion < Question::Tlfb
   attribute :settings, :json, default: -> { { start_autofinish_timer: false } }
 
+  validates :sms_schedule, absence: true
+
   def translate_body(translator, source_language_name_short, destination_language_name_short)
     body['data'].each do |record|
       record['original_text'] = record['payload'].deep_dup

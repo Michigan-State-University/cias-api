@@ -16,6 +16,12 @@ class QuestionGroup < ApplicationRecord
 
   delegate :ability_to_update_for?, to: :session
 
+  attribute :sms_schedule, :jsonb, default: {}
+  validates :sms_schedule,
+            json: { schema: lambda { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
+                    message: lambda { |err|  err } }, if: -> { session&.type === 'Session::Sms' },
+            allow_blank: true
+
   def finish?
     type == 'QuestionGroup::Finish'
   end

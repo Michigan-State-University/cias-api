@@ -3,7 +3,7 @@
 RSpec.shared_examples 'cannot be assigned to sms session' do
   let(:intervention) { create(:intervention) }
   let(:session) { create(:sms_session, intervention: intervention) }
-  let(:question_group) { create(:question_group, session: session) }
+  let(:question_group) { create(:sms_question_group, session: session) }
 
   it 'does not create question' do
     expect(question.save).to eq false
@@ -13,7 +13,7 @@ end
 RSpec.shared_examples 'can be assigned to sms session' do
   let(:intervention) { create(:intervention) }
   let(:session) { create(:sms_session, intervention: intervention) }
-  let(:question_group) { create(:question_group, session: session) }
+  let(:question_group) { create(:sms_question_group, session: session) }
 
   it 'does create question' do
     expect(question.save).to eq true
