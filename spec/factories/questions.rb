@@ -717,7 +717,7 @@ FactoryBot.define do
     sms_schedule do
       {
         period: 'weekly',
-        day_of_period: '1', # Monday
+        day_of_period: 'monday', # Monday
         time: {
           exact: '8:00 AM'
         }
@@ -742,7 +742,7 @@ FactoryBot.define do
     sms_schedule do
       {
         period: 'weekly',
-        day_of_period: '1', # Monday
+        day_of_period: 'monday', # Monday
         time: {
           exact: '8:00 AM'
         }

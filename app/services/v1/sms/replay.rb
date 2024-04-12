@@ -80,6 +80,8 @@ class V1::Sms::Replay
 
         V1::AnswerService.call(@user, user_session.id, question.id,
                                { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
+        @user.update(pending_sms_answer: false)
+        remove_question_followups(@user.id, question.id, user_session.id)
         handle_next_question(user_session: user_session)
       else
         SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
@@ -96,21 +98,19 @@ class V1::Sms::Replay
   end
 
   def handle_sms_question_in_session(user_session:, question:, user:)
-    # rubocop:disable Style/IdenticalConditionalBranches
-    if question.type.match?('Question::SmsInformation')
-      SmsPlans::SendSmsJob.perform_later(user.full_number, question.title, nil, user.id)
-      V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [] } })
-      next_question = V1::FlowService::NextQuestion.new(user_session).call(nil)
-      SmsPlans::SendSmsJob.perform_later(user.full_number, next_question.title, nil, user.id) if next_question
-    else
-      SmsPlans::SendSmsJob.perform_later(user.full_number, question.title, nil, user.id)
-    end
-    # rubocop:enable Style/IdenticalConditionalBranches
+    UserSessionJobs::SendQuestionSmsJob.set(wait_until: question.schedule_at).perform_later(user.id, question.id, user_session.id) if question
   end
 
   def create_new_user_session!(session:, user:)
     user_session = V1::UserSessions::CreateService.call(session.id, user.id, nil)
     user_session.save!
     user_session
+  end
+
+  def remove_question_followups(user_id, question_id, user_session_id)
+    queue = Sidekiq::Queue.new('sms_questions')
+    queue.each do |job|
+      job.delete if job.klass == 'UserSessionJobs::SendQuestionSmsJob' && job.args == [user_id, question_id, user_session_id]
+    end
   end
 end
