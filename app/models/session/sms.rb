@@ -24,6 +24,11 @@ class Session::Sms < Session
     end
   end
 
+  def integral_update
+    return if published?
+    save!
+  end
+
   def session_variables
     [].tap do |array|
       question_groups.each do |question_group|

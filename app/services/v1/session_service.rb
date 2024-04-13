@@ -43,7 +43,7 @@ class V1::SessionService
     session.assign_attributes(session_params.except(:cat_tests))
     session_type_sms = session.type.match?('Session::Sms')
     assign_cat_tests_to_session(session, session_params) unless session_type_sms
-    session.integral_update unless session_type_sms
+    session.integral_update
     session
   end
 
