@@ -12,6 +12,8 @@ class Session::Sms < Session
 
   validates :sms_code, presence: true, if: -> { published? }
 
+  attribute :settings, :json, default: {"narrator"=>{"voice"=>false, "animation"=>false}}
+
   after_commit :create_core_children, on: :create
 
   def first_question

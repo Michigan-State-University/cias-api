@@ -3,7 +3,16 @@
 class Question::Sms < Question
   include ::Question::CloneableVariable
 
-  attribute :settings, :json, default: -> { assign_default_values('settings') }
+  attribute :settings, :json, default: -> { {
+    "image": false,
+    "title": false,
+    "video": false,
+    "required": false,
+    "subtitle": true,
+    "proceed_button": false,
+    "narrator_skippable": false,
+    "start_autofinish_timer": false
+  } }
 
   attribute :sms_schedule, :jsonb, default: {}
   validates :sms_schedule,

@@ -1,8 +1,17 @@
 # frozen_string_literal: true
 
 class Question::SmsInformation < Question
-  attribute :title, :string, default: I18n.t('question.sms.initial.title')
-  attribute :settings, :json, default: -> { assign_default_values('settings') }
+  attribute :subtitle, :string, default: I18n.t('question.sms.initial.title')
+  attribute :settings, :json, default: -> { {
+    "image": false,
+    "title": false,
+    "video": false,
+    "required": false,
+    "subtitle": true,
+    "proceed_button": false,
+    "narrator_skippable": false,
+    "start_autofinish_timer": false
+  } }
 
   attribute :sms_schedule, :jsonb, default: {}
   validates :sms_schedule,
@@ -34,7 +43,7 @@ class Question::SmsInformation < Question
     language_code = session.intervention.google_language&.language_code
     return unless language_code.in?(%w[ar es])
 
-    self.title = I18n.with_locale(language_code) { I18n.t('question.sms.initial.title') }
+    self.subtitle = I18n.with_locale(language_code) { I18n.t('question.sms.initial.title') }
   end
 
   def schedule_at
