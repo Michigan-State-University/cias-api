@@ -98,7 +98,7 @@ class V1::Sms::Replay
   end
 
   def handle_sms_question_in_session(user_session:, question:, user:)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: question.schedule_at).perform_later(user.id, question.id, user_session.id) if question
+    UserSessionJobs::SendQuestionSmsJob.set(wait_until: question.schedule_in(user_session)).perform_later(user.id, question.id, user_session.id) if question
   end
 
   def create_new_user_session!(session:, user:)

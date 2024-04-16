@@ -40,57 +40,50 @@ RSpec.describe Question::Sms, type: :model do
         end
 
         describe '#schedule_at' do
-          context 'when weekly period is provided' do
-            let(:question_sms) do
+          context 'when \"from last question\" scope is provided' do
+            let!(:user) { create(:user, :with_phone) }
+            let!(:intervention) { create(:intervention) }
+            let!(:question_group_initial) { build(:question_group_initial) }
+            let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
+            let!(:question_group) { create(:sms_question_group, session: session) }
+            let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
+            let!(:user_session) { create(:sms_user_session, user: user, session: session) }
+            let!(:question_sms1) { create(:question_sms, question_group: question_group) }
+            let!(:answer1) { create(:answer_sms, question: question_sms1, user_session: user_session)}
+            let!(:question_sms2) do
               create(:question_sms,
-                     sms_schedule: { period: 'weekly',
-                                     day_of_period: 'monday',
-                                     time: { exact: '8:00 AM' } })
-            end
-
-            it 'returns proper date' do
-              date = if Date.current.wday == 1
-                       DateTime.current.change({ hour: 8 })
-                     else
-                       DateTime.commercial(Time.zone.today.year, 1 + Time.zone.today.cweek, 1).change({ hour: 8 })
-                     end
-              expect(question_sms.schedule_at).to eq date
-            end
-          end
-
-          context 'when monthly period is provided' do
-            let(:question_sms) do
-              create(:question_sms,
-                     sms_schedule: { period: 'monthly',
+                     question_group: question_group,
+                     sms_schedule: { period: 'from_last_question',
                                      day_of_period: '1',
                                      time: { exact: '8:00 AM' } })
             end
 
             it 'returns proper date' do
-              date = if Date.current.mday == 1
-                       DateTime.current.change({ hour: 8 })
-                     else
-                       DateTime.current.change({ month: DateTime.current.month + 1, day: 1, hour: 8 })
-                     end
-              expect(question_sms.schedule_at).to eq date
+              date = (question_sms1.answers.last.created_at + 1.day).change(hour: 8)
+              expect(question_sms2.schedule_in(user_session)).to eq date
             end
-          end
+            end
 
-          context 'when daily period is provided' do
-            let(:question_sms) do
+          context 'when \"from session start\" scope is provided' do
+            let!(:user) { create(:user, :with_phone) }
+            let!(:intervention) { create(:intervention) }
+            let!(:question_group_initial) { build(:question_group_initial) }
+            let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
+            let!(:question_group) { create(:sms_question_group, session: session) }
+            let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
+            let!(:user_session) { create(:sms_user_session, user: user, session: session) }
+            let(:question_sms1) { create(:question_sms, question_group: question_group) }
+            let(:question_sms2) do
               create(:question_sms,
-                     sms_schedule: { period: 'daily',
-                                     day_of_period: '1',
+                     question_group: question_group,
+                     sms_schedule: { period: 'from_user_session_start',
+                                     day_of_period: '3',
                                      time: { exact: '8:00 AM' } })
             end
 
             it 'returns proper date' do
-              date = if DateTime.current.hour >= 8 && DateTime.current.minute >= 0 && DateTime.current.second >= 0
-                       DateTime.current.change({ day: DateTime.current.day + 1, hour: 8 })
-                     else
-                       DateTime.current.change({ hour: 8 })
-                     end
-              expect(question_sms.schedule_at).to eq date
+              date = (user_session.created_at + 3.day).change(hour: 8)
+              expect(question_sms2.schedule_in(user_session)).to eq date
             end
           end
         end
@@ -101,14 +94,9 @@ RSpec.describe Question::Sms, type: :model do
         let(:source_language_name_short) { 'en' }
         let(:destination_language_name_short) { 'pl' }
 
-        it '#translate_title' do
-          question_sms.translate_title(translator, source_language_name_short, destination_language_name_short)
-          expect(question_sms.title).to include('from=>en to=>pl text=>Sms')
-        end
-
         it '#translate_subtitle' do
           question_sms.translate_subtitle(translator, source_language_name_short, destination_language_name_short)
-          expect(question_sms.subtitle).to equal(nil)
+          expect(question_sms.subtitle).to include('from=>en to=>pl text=>Sms screen')
         end
 
         it '#translate_body' do

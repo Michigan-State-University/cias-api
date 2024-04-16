@@ -13,13 +13,19 @@ class Question::SmsInformation < Question
     "start_autofinish_timer": false
   } }
 
-  attribute :sms_schedule, :jsonb, default: {}
+  attribute :sms_schedule, :jsonb, default: {
+    period: 'from_last_question',
+    day_of_period: '1',
+    time: {
+      exact: '8:00 AM'
+    }
+  }
   validates :sms_schedule,
             json: { schema: -> { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
                     message: ->(err) { err } },
             if: -> { question_group&.sms_schedule.blank? }
 
-  before_validation :assign_default_title_and_subtitle
+  before_validation :assign_default_subtitle
 
   def self.assign_default_values(attr)
     super(attr).merge(
@@ -36,7 +42,7 @@ class Question::SmsInformation < Question
     end
   end
 
-  def assign_default_title_and_subtitle
+  def assign_default_subtitle
     return unless new_record?
     return true unless question_group
 
@@ -46,46 +52,30 @@ class Question::SmsInformation < Question
     self.subtitle = I18n.with_locale(language_code) { I18n.t('question.sms.initial.title') }
   end
 
-  def schedule_at
+  def schedule_in(user_session)
     proper_schedule = sms_schedule || question_group.sms_schedule
+    last_item_datetime = case proper_schedule['period']
+                         when 'from_last_question'
+                           if user_session.answers.any?
+                             user_session.answers.last&.created_at
+                           else
+                             user_session.created_at
+                           end
+                         when 'from_user_session_start'
+                           user_session.created_at
+                         else
+                           DateTime.current
+                         end
 
-    case proper_schedule['period']
-    when 'monthly'
-      date = DateTime.now.beginning_of_month + (proper_schedule['day_of_period'].to_i - 1).days
+    date = last_item_datetime + proper_schedule['day_of_period'].to_i.day
 
-      datetime = if proper_schedule['time']['exact']
-                   DateTime.parse(proper_schedule['time']['exact']).change(year: date.year, month: date.month, day: date.day)
-                 else
-                   from = DateTime.parse(proper_schedule['time']['range']['from']).change(year: date.year, month: date.month, day: date.day)
-                   to = DateTime.parse(proper_schedule['time']['range']['to']).change(year: date.year, month: date.month, day: date.day)
-                   rand(from..to)
-                 end
 
-      datetime += 1.month if datetime < DateTime.current
-      datetime
-    when 'weekly'
-      date = DateTime.now.beginning_of_week(sms_schedule['day_of_period'].to_sym)
-
-      datetime = if proper_schedule['time']['exact']
-                   DateTime.parse(proper_schedule['time']['exact']).change(year: date.year, month: date.month, day: date.day)
-                 else
-                   from = DateTime.parse(proper_schedule['time']['range']['from']).change(year: date.year, month: date.month, day: date.day)
-                   to = DateTime.parse(proper_schedule['time']['range']['to']).change(year: date.year, month: date.month, day: date.day)
-                   rand(from..to)
-                 end
-
-      datetime += 1.week if datetime < DateTime.current
-      datetime
-    when 'daily'
-      datetime = if proper_schedule['time']['exact']
-                   DateTime.parse(proper_schedule['time']['exact'])
-                 else
-                   from = DateTime.parse(proper_schedule['time']['range']['from'])
-                   to = DateTime.parse(proper_schedule['time']['range']['to'])
-                   rand(from..to)
-                 end
-      datetime += 1.day if datetime < DateTime.current
-      datetime
+    if proper_schedule['time']['exact']
+      DateTime.parse(proper_schedule['time']['exact']).change(year: date.year, month: date.month, day: date.day)
+    else
+      from = DateTime.parse(proper_schedule['time']['range']['from']).change(year: date.year, month: date.month, day: date.day)
+      to = DateTime.parse(proper_schedule['time']['range']['to']).change(year: date.year, month: date.month, day: date.day)
+      rand(from..to)
     end
   end
 end

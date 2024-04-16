@@ -695,7 +695,7 @@ FactoryBot.define do
   end
 
   factory :question_sms, class: Question::Sms do
-    title { 'Sms screen' }
+    subtitle { 'Sms screen' }
     type { Question::Sms }
     body do
       {
@@ -716,8 +716,8 @@ FactoryBot.define do
     end
     sms_schedule do
       {
-        period: 'weekly',
-        day_of_period: 'monday', # Monday
+        period: 'from_last_question',
+        day_of_period: '1',
         time: {
           exact: '8:00 AM'
         }
@@ -732,7 +732,7 @@ FactoryBot.define do
   end
 
   factory :question_sms_information, class: Question::SmsInformation do
-    title { 'Name screen' }
+    subtitle { 'Name screen' }
     type { Question::SmsInformation }
     body do
       {
@@ -741,8 +741,8 @@ FactoryBot.define do
     end
     sms_schedule do
       {
-        period: 'weekly',
-        day_of_period: 'monday', # Monday
+        period: 'from_last_question',
+        day_of_period: '1',
         time: {
           exact: '8:00 AM'
         }
