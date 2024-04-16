@@ -2,16 +2,18 @@
 
 class Question::SmsInformation < Question
   attribute :subtitle, :string, default: I18n.t('question.sms.initial.title')
-  attribute :settings, :json, default: -> { {
-    "image": false,
-    "title": false,
-    "video": false,
-    "required": false,
-    "subtitle": true,
-    "proceed_button": false,
-    "narrator_skippable": false,
-    "start_autofinish_timer": false
-  } }
+  attribute :settings, :json, default: lambda {
+                                         {
+                                           image: false,
+                                           title: false,
+                                           video: false,
+                                           required: false,
+                                           subtitle: true,
+                                           proceed_button: false,
+                                           narrator_skippable: false,
+                                           start_autofinish_timer: false
+                                         }
+                                       }
 
   attribute :sms_schedule, :jsonb, default: {
     period: 'from_last_question',
@@ -68,7 +70,6 @@ class Question::SmsInformation < Question
                          end
 
     date = last_item_datetime + proper_schedule['day_of_period'].to_i.day
-
 
     if proper_schedule['time']['exact']
       DateTime.parse(proper_schedule['time']['exact']).change(year: date.year, month: date.month, day: date.day)

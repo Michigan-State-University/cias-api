@@ -12,7 +12,7 @@ class Session::Sms < Session
 
   validates :sms_code, presence: true, if: -> { published? }
 
-  attribute :settings, :json, default: {"narrator"=>{"voice"=>false, "animation"=>false}}
+  attribute :settings, :json, default: { 'narrator' => { 'voice' => false, 'animation' => false } }
 
   after_commit :create_core_children, on: :create
 
@@ -28,6 +28,7 @@ class Session::Sms < Session
 
   def integral_update
     return if published?
+
     save!
   end
 

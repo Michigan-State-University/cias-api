@@ -57,7 +57,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   end
 
   def schedule_question_followup(user_id, question_id, user_session_id)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_at + 1.days).perform_later(user_id, question_id, user_session_id)
+    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_at + 1.day).perform_later(user_id, question_id, user_session_id)
     UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_at + 2.days).perform_later(user_id, question_id, user_session_id)
   end
 end

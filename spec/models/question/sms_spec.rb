@@ -49,7 +49,7 @@ RSpec.describe Question::Sms, type: :model do
             let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
             let!(:user_session) { create(:sms_user_session, user: user, session: session) }
             let!(:question_sms1) { create(:question_sms, question_group: question_group) }
-            let!(:answer1) { create(:answer_sms, question: question_sms1, user_session: user_session)}
+            let!(:answer1) { create(:answer_sms, question: question_sms1, user_session: user_session) }
             let!(:question_sms2) do
               create(:question_sms,
                      question_group: question_group,
@@ -62,7 +62,7 @@ RSpec.describe Question::Sms, type: :model do
               date = (question_sms1.answers.last.created_at + 1.day).change(hour: 8)
               expect(question_sms2.schedule_in(user_session)).to eq date
             end
-            end
+          end
 
           context 'when \"from session start\" scope is provided' do
             let!(:user) { create(:user, :with_phone) }
@@ -82,7 +82,7 @@ RSpec.describe Question::Sms, type: :model do
             end
 
             it 'returns proper date' do
-              date = (user_session.created_at + 3.day).change(hour: 8)
+              date = (user_session.created_at + 3.days).change(hour: 8)
               expect(question_sms2.schedule_in(user_session)).to eq date
             end
           end
