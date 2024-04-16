@@ -13,22 +13,26 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
     # Handle case when user has pending answers
     if user.pending_sms_answer
-      if question.type.match?('Question::SmsInformation')
-        # Handle case with outdated SmsInformation question - reschedule question in 5 minutes till the end of the day
-        datetime_of_next_job = DateTime.current + 5.minutes
+      # Handle case with outdated question - reschedule question in 5 minutes till the end of the day
+      datetime_of_next_job = DateTime.current + 5.minutes
 
-        # Skip question if next day
-        if datetime_of_next_job > question.schedule_at.end_of_day
-          V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [] } })
+      # Skip question if next day
+      if datetime_of_next_job > question.schedule_in(user_session).end_of_day
+        if question.type.match?('Question::SmsInformation')
+          V1::AnswerService.call(user,
+                                 user_session.id,
+                                 question.id,
+                                 { type: 'Answer::SmsInformation',
+                                   body: { data: [] } })
         else
-          UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id)
+          V1::AnswerService.call(user,
+                                 user_session.id,
+                                 question.id,
+                                 { type: 'Answer::Sms',
+                                   body: { data: [{ value: '', var: question.body['variable']['name'] }] } })
         end
       else
-        # Handle case with outdated SMS question - reschedule question in 5 hours for 3 days
-        datetime_of_next_job = DateTime.current + 1.day
-        unless datetime_of_next_job > question.schedule_at + 3.days
-          UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id)
-        end
+        UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id)
       end
     end
 
@@ -41,10 +45,9 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
       # Create answer and schedule next question
       V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [] } })
       next_question = V1::FlowService::NextQuestion.new(user_session).call(nil)
-      UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_at).perform_later(user_id, question_id, user_session_id) if next_question
+      UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session)).perform_later(user_id, question_id, user_session_id) if next_question
     else
-      # Schedule question followup
-      schedule_question_followup(user_id, question_id, user_session_id)
+      # Set pending answer flag
       user.update(pending_sms_answer: true)
     end
   end
@@ -56,8 +59,8 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     Communication::Sms.new(sms.id).send_message
   end
 
-  def schedule_question_followup(user_id, question_id, user_session_id)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_at + 1.day).perform_later(user_id, question_id, user_session_id)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_at + 2.days).perform_later(user_id, question_id, user_session_id)
+  def schedule_question_followup(user, question, user_session)
+    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 1.day).perform_later(user.id, question.id, user_session.id)
+    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 2.day).perform_later(user.id, question.id, user_session.id)
   end
 end

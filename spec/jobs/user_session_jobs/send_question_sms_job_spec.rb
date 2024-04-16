@@ -44,11 +44,14 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
       let!(:user) { create(:user, :with_phone, pending_sms_answer: true) }
 
       context 'when desired question is SmsInformation' do
+        let!(:previous_question) { create(:question_sms, question_group: question_group) }
+        let!(:previous_question_answer) { create(:answer_sms, question: previous_question, user_session: user_session) }
         let!(:question) do
           create(:question_sms_information,
                  question_group: question_group,
                  sms_schedule: {
-                   period: 'daily',
+                   period: 'from_last_question',
+                   day_of_period: '1',
                    time: {
                      exact: '8:00 AM'
                    }
@@ -87,11 +90,14 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
       end
 
       context 'when desired question is Sms' do
+        let!(:previous_question) { create(:question_sms, question_group: question_group) }
+        let!(:previous_question_answer) { create(:answer_sms, question: previous_question, user_session: user_session) }
         let!(:question) do
           create(:question_sms,
                  question_group: question_group,
                  sms_schedule: {
-                   period: 'daily',
+                   period: 'from_last_question',
+                   day_of_period: '1',
                    time: {
                      exact: '8:00 AM'
                    }
@@ -106,7 +112,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules new sending job' do
-            travel_to question.schedule_in(user_session) + 1.day do
+            travel_to question.schedule_in(user_session).change({ hour: 12 }) do
               expect { subject }.to have_enqueued_job(described_class)
             end
           end
@@ -116,7 +122,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule new sending job' do
-            travel_to question.schedule_in(user_session) + 3.days do
+            travel_to question.schedule_in(user_session).change({ hour: 23, min: 59 }) do
               expect { subject }.not_to have_enqueued_job(described_class)
             end
           end
