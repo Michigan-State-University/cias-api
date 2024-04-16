@@ -73,7 +73,8 @@ class V1::Sms::Replay
       if user_session
         question = V1::FlowService::NextQuestion.new(user_session).call(nil)
 
-        unless question
+        # Case when user sends wrong message
+        if !question || question.type.match?('Question::SmsInformation')
           SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
           return
         end

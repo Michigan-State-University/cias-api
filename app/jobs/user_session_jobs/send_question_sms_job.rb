@@ -45,7 +45,10 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
       # Create answer and schedule next question
       V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [] } })
       next_question = V1::FlowService::NextQuestion.new(user_session).call(nil)
-      UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session)).perform_later(user_id, question_id, user_session_id) if next_question
+      if next_question
+        UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session)).perform_later(user_id, question_id,
+                                                                                                                   user_session_id)
+      end
     else
       # Set pending answer flag
       user.update(pending_sms_answer: true)
@@ -61,6 +64,6 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
   def schedule_question_followup(user, question, user_session)
     UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 1.day).perform_later(user.id, question.id, user_session.id)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 2.day).perform_later(user.id, question.id, user_session.id)
+    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 2.days).perform_later(user.id, question.id, user_session.id)
   end
 end
