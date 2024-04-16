@@ -63,7 +63,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules new sending job' do
-            travel_to question.schedule_at.change({ hour: 12 }) do
+            travel_to question.schedule_in(user_session).change({ hour: 12 }) do
               expect { subject }.to have_enqueued_job(described_class)
             end
           end
@@ -73,13 +73,13 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule new sending job' do
-            travel_to question.schedule_at.change({ hour: 23, min: 59 }) do
+            travel_to question.schedule_in(user_session).change({ hour: 23, min: 59 }) do
               expect { subject }.not_to have_enqueued_job(described_class)
             end
           end
 
           it 'creates new answer' do
-            travel_to question.schedule_at.change({ hour: 23, min: 59 }) do
+            travel_to question.schedule_in(user_session).change({ hour: 23, min: 59 }) do
               expect { subject }.to change(Answer::SmsInformation, :count).by(1)
             end
           end
@@ -106,7 +106,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules new sending job' do
-            travel_to question.schedule_at + 1.day do
+            travel_to question.schedule_in(user_session) + 1.day do
               expect { subject }.to have_enqueued_job(described_class)
             end
           end
@@ -116,7 +116,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule new sending job' do
-            travel_to question.schedule_at + 3.days do
+            travel_to question.schedule_in(user_session) + 3.days do
               expect { subject }.not_to have_enqueued_job(described_class)
             end
           end

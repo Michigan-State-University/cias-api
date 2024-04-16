@@ -35,7 +35,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     return if user.pending_sms_answer
 
     # Handle case with no pending answers, send current question
-    send_sms(user.full_number, question.title)
+    send_sms(user.full_number, question.subtitle)
 
     if question.type.match?('Question::SmsInformation')
       # Create answer and schedule next question
