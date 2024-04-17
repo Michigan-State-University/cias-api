@@ -46,8 +46,8 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
       V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [] } })
       next_question = V1::FlowService::NextQuestion.new(user_session).call(nil)
       if next_question
-        UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session)).perform_later(user_id, question_id,
-                                                                                                                   user_session_id)
+        UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session))
+                                           .perform_later(user_id, question_id, user_session_id)
       end
     else
       # Set pending answer flag
