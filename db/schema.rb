@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_04_11_125816) do
+ActiveRecord::Schema.define(version: 2024_04_17_190116) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -930,6 +930,8 @@ ActiveRecord::Schema.define(version: 2024_04_11_125816) do
     t.integer "number_of_attempts", default: 1
     t.boolean "started", default: false, null: false
     t.boolean "multiple_fill", default: false, null: false
+    t.uuid "current_question_id"
+    t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"

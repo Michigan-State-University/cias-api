@@ -40,6 +40,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
     # Handle case with no pending answers, send current question
     send_sms(user.full_number, question.subtitle)
+    user_session.update!(current_question_id: question.uuid)
 
     if question.type.match?('Question::SmsInformation')
       # Create answer and schedule next question
@@ -60,10 +61,5 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   def send_sms(number, content)
     sms = Message.create(phone: number, body: content, attachment_url: nil)
     Communication::Sms.new(sms.id).send_message
-  end
-
-  def schedule_question_followup(user, question, user_session)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 1.day).perform_later(user.id, question.id, user_session.id)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: next_question.schedule_in(user_session) + 2.days).perform_later(user.id, question.id, user_session.id)
   end
 end

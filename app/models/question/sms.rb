@@ -48,7 +48,7 @@ class Question::Sms < Question
   end
 
   def schedule_in(user_session)
-    proper_schedule = sms_schedule || question_group.sms_schedule
+    proper_schedule = sms_schedule
     last_item_datetime = case proper_schedule['period']
                          when 'from_last_question'
                            user_session.answers.last.created_at

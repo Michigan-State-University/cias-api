@@ -71,13 +71,16 @@ class V1::Sms::Replay
     if @user
       user_session = UserSession::Sms.find_by(user_id: @user.id)
       if user_session
-        question = V1::FlowService::NextQuestion.new(user_session).call(nil)
+        question = Question.find(user_session.current_question_id)
 
         # Case when user sends wrong message
-        if !question || question.type.match?('Question::SmsInformation')
+        if question.type.match?('Question::SmsInformation')
           SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
           return
         end
+
+        # Remove scheduled followups if user session has only one answer - it means only initial message was sent
+        remove_question_followups(@user.id, question.id, user_session.id) if user_session.answers.count == 1
 
         V1::AnswerService.call(@user, user_session.id, question.id,
                                { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
@@ -98,12 +101,23 @@ class V1::Sms::Replay
   end
 
   def handle_sms_question_in_session(user_session:, question:, user:)
-    UserSessionJobs::SendQuestionSmsJob.set(wait_until: question.schedule_in(user_session)).perform_later(user.id, question.id, user_session.id) if question
+    if %w[weekly monthly].include?(question.sms_schedule['period'])
+      UserSessionJobs::SendReccuringSmsJob.set(wait_until: question.schedule_in(user_session)).perform_later(user.id, question.id, user_session.id)
+    elsif question
+      UserSessionJobs::SendQuestionSmsJob.set(wait_until: question.schedule_in(user_session)).perform_later(user.id, question.id, user_session.id)
+    end
   end
 
   def create_new_user_session!(session:, user:)
     user_session = V1::UserSessions::CreateService.call(session.id, user.id, nil)
     user_session.save!
     user_session
+  end
+
+  def remove_question_followups(user_id, question_id, user_session_id)
+    queue = Sidekiq::Queue.new('sms_questions')
+    queue.each do |job|
+      job.delete if job.klass == 'UserSessionJobs::SendQuestionSmsJob' && job.args == [user_id, question_id, user_session_id]
+    end
   end
 end
