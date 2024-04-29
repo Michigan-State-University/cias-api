@@ -2,6 +2,7 @@
 
 require 'rails_helper'
 
+
 RSpec.describe 'GET /v1/organizations/:organization_id/interventions', type: :request do
   let(:organization1) { create(:organization) }
   let(:organization2) { create(:organization) }
