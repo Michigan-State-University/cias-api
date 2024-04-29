@@ -64,8 +64,14 @@ class Clone::Session < Clone::Base
   end
 
   def remove_invalid_reflections(question)
-    question.narrator['blocks'].delete_if { |block| block['type'] == 'Reflection' && block['question_id'].present? }
+    question.narrator['blocks'].delete_if do |block|
+      block['type'] == 'Reflection' && block['question_id'].present? && !session_exists_inside_target_intervention?(question, block['session_id'])
+    end
     question
+  end
+
+  def session_exists_inside_target_intervention?(question, session_id)
+    session_id.nil? || (question.session.id != session_id && question.session.intervention.sessions.pluck(:id).include?(session_id))
   end
 
   def reassign_branching_question(question)
@@ -139,11 +145,12 @@ class Clone::Session < Clone::Base
 
       next block if reflection_question_id.nil?
 
+      previous_session_id_assigned = block['session_id']
       matched_reflection_session = matching_session(block['session_id'])
       matched_reflection_question = matching_question(reflection_question_id, matched_reflection_session)
       block['question_id'] = matched_reflection_question&.id || ''
       block['question_group_id'] = matched_reflection_question&.question_group_id || ''
-      block['session_id'] = matched_reflection_session&.id
+      block['session_id'] = matched_reflection_session&.id || previous_session_id_assigned
     end
     question
   end
