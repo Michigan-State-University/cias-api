@@ -26,6 +26,8 @@ RSpec.describe V1::QuestionGroup::ShareInternallyService do
   end
 
   it 'all params are valid' do
-    expect { subject.call }.to change(QuestionGroup, :count).by(1).and.not_to change(Session, :count).and.not_to change(Intervention, :count)
+    expect { subject.call }.to change(QuestionGroup, :count).by(1)
+    expect { subject.call }.not_to change(Session, :count)
+    expect { subject.call }.not_to change(Intervention, :count)
   end
 end
