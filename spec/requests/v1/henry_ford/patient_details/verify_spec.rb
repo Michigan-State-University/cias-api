@@ -77,7 +77,11 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
     end
 
     it 'patient data doesn\'t assign' do
-      expect(user.reload.hfhs_patient_detail).to eq(hfhs_data)
+      expect(user.reload.hfhs_patient_detail.provided_last_name).to eq(hfhs_data.last_name)
+      expect(user.reload.hfhs_patient_detail.provided_first_name).to eq(hfhs_data.first_name)
+      expect(user.reload.hfhs_patient_detail.provided_zip).to eq(hfhs_data.zip_code)
+      expect(user.reload.hfhs_patient_detail.provided_phone_number).to eq(hfhs_data.phone_number)
+      expect(user.reload.hfhs_patient_detail.provided_sex).to eq(hfhs_data.sex)
     end
   end
 end
