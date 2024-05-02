@@ -69,16 +69,12 @@ class V1::Sms::Replay
     if @user
       user_session = UserSession::Sms.find_by(user_id: @user.id)
       if user_session
-
-        p user_session.current_question_id
-
         unless user_session.current_question_id
           SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
           return
         end
 
         question = Question.find(user_session.current_question_id)
-
 
         V1::AnswerService.call(@user, user_session.id, question.id,
                                { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
