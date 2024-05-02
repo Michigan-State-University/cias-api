@@ -424,18 +424,18 @@ RSpec.describe CloneJobs::Session, type: :job do
       expect(intervention.sessions.last.questions.second.narrator['blocks'].first).to include(
         'question_id' => intervention.sessions.last.questions.first.id,
         'reflections' => include(
-          include(
-            'text' => ['Test1'],
-            'value' => '1',
-            'type' => 'Speech',
-            'variable' => 'var'
-          ),
-          include(
-            'text' => ['Test2'],
-            'value' => '2',
-            'type' => 'Speech',
-            'variable' => 'var'
-          )
+          include({
+                    'text' => ['Test1'],
+                    'value' => '1',
+                    'type' => 'Speech',
+                    'variable' => 'var'
+                  }),
+          include({
+                    'text' => ['Test2'],
+                    'value' => '2',
+                    'type' => 'Speech',
+                    'variable' => 'var'
+                  })
         ),
         'type' => 'Reflection',
         'session_id' => nil
