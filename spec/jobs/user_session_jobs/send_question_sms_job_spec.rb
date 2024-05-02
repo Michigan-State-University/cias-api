@@ -66,7 +66,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules new sending job' do
-            travel_to question.schedule_in(user_session).change({ hour: 12 }) do
+            travel_to DateTime.current.change({ hour: 12 }) do
               expect { subject }.to have_enqueued_job(described_class)
             end
           end
@@ -76,14 +76,14 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule new sending job' do
-            travel_to question.schedule_in(user_session).change({ hour: 23, min: 59 }) do
+            travel_to DateTime.current.change({ hour: 23, min: 59 }) do
               expect { subject }.not_to have_enqueued_job(described_class)
             end
           end
 
-          it 'creates new answer' do
-            travel_to question.schedule_in(user_session).change({ hour: 23, min: 59 }) do
-              expect { subject }.to change(Answer::SmsInformation, :count).by(1)
+          it 'does not create new answer' do
+            travel_to DateTime.current.change({ hour: 23, min: 59 }) do
+              expect { subject }.not_to change(Answer::SmsInformation, :count)
             end
           end
         end
@@ -112,7 +112,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules new sending job' do
-            travel_to question.schedule_in(user_session).change({ hour: 12 }) do
+            travel_to DateTime.current.change({ hour: 12 }) do
               expect { subject }.to have_enqueued_job(described_class)
             end
           end
@@ -122,8 +122,14 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule new sending job' do
-            travel_to question.schedule_in(user_session).change({ hour: 23, min: 59 }) do
+            travel_to DateTime.current.change({ hour: 23, min: 59 }) do
               expect { subject }.not_to have_enqueued_job(described_class)
+            end
+          end
+
+          it 'does not create new answer' do
+            travel_to DateTime.current.change({ hour: 23, min: 59 }) do
+              expect { subject }.not_to change(Answer::SmsInformation, :count)
             end
           end
         end
