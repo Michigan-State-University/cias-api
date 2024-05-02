@@ -19,10 +19,10 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       last_question_index = question_group.questions.order(position: :desc).first.pluck(:position)
 
       question_positions = if last_answer.question.position + questions_per_day > last_question_index
-                           ((last_answer.question.position + 1)..last_question_index).to_a + (0..last_question_index).to_a
-                         else
-                           ((last_answer.question.position + 1)..last_question_index).to_a
-                         end
+                             ((last_answer.question.position + 1)..last_question_index).to_a + (0..last_question_index).to_a
+                           else
+                             ((last_answer.question.position + 1)..last_question_index).to_a
+                           end
 
       positions_to_be_send = question_positions.first(questions_per_day)
 
@@ -33,22 +33,19 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       end
     end
 
-    any_answer_expected = questions_to_be_send_today.map {|elem| elem[:question].type }.include?('Question::Sms')
+    any_answer_expected = questions_to_be_send_today.map { |elem| elem[:question].type }.include?('Question::Sms')
 
-    if any_answer_expected
-      questions_to_be_send_today.reject! {|elem| elem[:question].type.match('Question::SmsInformation')}
-    end
+    questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') } if any_answer_expected
 
     questions_to_be_send_today.each do |elem|
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
                                          .perform_later(user.id, elem[:question].id, user_session.id)
-
     end
 
-    if user_session.user_intervention.intervention.published?
-      UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)
-                                               .perform_later(user_session_id)
-    end
+    return unless user_session.user_intervention.intervention.published?
+
+    UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)
+                                             .perform_later(user_session_id)
   end
 
   private
@@ -57,7 +54,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     user_session
       .answers
       .includes(question: :question_group)
-      .where( question: { question_group: question_group } )
+      .where(question: { question_group: question_group })
       .confirmed
       .unscope(:order)
       .order(:updated_at)
