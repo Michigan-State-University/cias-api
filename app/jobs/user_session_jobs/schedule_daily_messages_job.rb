@@ -37,6 +37,8 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
     questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') } if any_answer_expected
 
+    questions_to_be_send_today.reject! { |elem| elem[:time_to_send] < DateTime.current }
+
     questions_to_be_send_today.each do |elem|
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
                                          .perform_later(user.id, elem[:question].id, user_session.id)
