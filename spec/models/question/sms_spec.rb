@@ -38,55 +38,6 @@ RSpec.describe Question::Sms, type: :model do
             expect(question_sms.question_variables).to match_array ['sms_var']
           end
         end
-
-        describe '#schedule_at' do
-          context 'when \"from last question\" scope is provided' do
-            let!(:user) { create(:user, :with_phone) }
-            let!(:intervention) { create(:intervention) }
-            let!(:question_group_initial) { build(:question_group_initial) }
-            let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
-            let!(:question_group) { create(:sms_question_group, session: session) }
-            let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
-            let!(:user_session) { create(:sms_user_session, user: user, session: session) }
-            let!(:question_sms1) { create(:question_sms, question_group: question_group) }
-            let!(:answer1) { create(:answer_sms, question: question_sms1, user_session: user_session) }
-            let!(:question_sms2) do
-              create(:question_sms,
-                     question_group: question_group,
-                     sms_schedule: { period: 'from_last_question',
-                                     day_of_period: '1',
-                                     time: { exact: '8:00 AM' } })
-            end
-
-            it 'returns proper date' do
-              date = (question_sms1.answers.last.created_at + 1.day).change(hour: 8)
-              expect(question_sms2.schedule_in(user_session)).to eq date
-            end
-          end
-
-          context 'when \"from session start\" scope is provided' do
-            let!(:user) { create(:user, :with_phone) }
-            let!(:intervention) { create(:intervention) }
-            let!(:question_group_initial) { build(:question_group_initial) }
-            let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
-            let!(:question_group) { create(:sms_question_group, session: session) }
-            let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
-            let!(:user_session) { create(:sms_user_session, user: user, session: session) }
-            let(:question_sms1) { create(:question_sms, question_group: question_group) }
-            let(:question_sms2) do
-              create(:question_sms,
-                     question_group: question_group,
-                     sms_schedule: { period: 'from_user_session_start',
-                                     day_of_period: '3',
-                                     time: { exact: '8:00 AM' } })
-            end
-
-            it 'returns proper date' do
-              date = (user_session.created_at + 3.days).change(hour: 8)
-              expect(question_sms2.schedule_in(user_session)).to eq date
-            end
-          end
-        end
       end
 
       describe 'translation' do

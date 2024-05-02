@@ -113,7 +113,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:question_group) { create(:sms_question_group, session: session) }
         let!(:question) { create(:question_sms, question_group: question_group) }
         let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
-        let!(:user_session) { create(:sms_user_session, user: user, session: session) }
+        let!(:user_session) { create(:sms_user_session, user: user, session: session, current_question_id: question.id) }
 
         it 'creates new answer' do
           expect { request }.to change(user_session.answers, :count).by(1)
