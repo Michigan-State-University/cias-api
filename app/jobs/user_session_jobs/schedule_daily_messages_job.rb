@@ -8,17 +8,21 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     user = user_session.user
     session = user_session.session
 
+    # Find all accessible question groups
     accessible_question_groups = calculate_accessible_question_groups_for_user(session.question_groups.order(:position), user_session)
     today_scheduled_question_groups = select_questions_groups_scheduled_for_today(accessible_question_groups)
 
     questions_to_be_send_today = []
 
+    # Find all questions scheduled for today
     today_scheduled_question_groups.each do |question_group|
       last_answer = last_answer_in_question_group(question_group)
       questions_per_day = question_group.sms_schedule['questions_per_day'] || 1
       last_question_index = question_group.questions.order(position: :desc).first.pluck(:position)
 
-      question_positions = if last_answer.question.position + questions_per_day > last_question_index
+      question_positions = if last_answer.question.position == last_question_index
+                             (0..last_question_index)
+                           elsif last_answer.question.position + questions_per_day > last_question_index
                              ((last_answer.question.position + 1)..last_question_index).to_a + (0..last_question_index).to_a
                            else
                              ((last_answer.question.position + 1)..last_question_index).to_a
@@ -33,17 +37,20 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       end
     end
 
+    # Remove all Information questions if there is any question requiring attention
     any_answer_expected = questions_to_be_send_today.map { |elem| elem[:question].type }.include?('Question::Sms')
-
     questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') } if any_answer_expected
 
+    # Remove all questions, that should be send today, but before job execution
     questions_to_be_send_today.reject! { |elem| elem[:time_to_send] < DateTime.current }
 
+    # Schedule all sending jobs
     questions_to_be_send_today.each do |elem|
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
                                          .perform_later(user.id, elem[:question].id, user_session.id)
     end
 
+    # Schedule next job if Intervention is published
     return unless user_session.user_intervention.intervention.published?
 
     UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)
