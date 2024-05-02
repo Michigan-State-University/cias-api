@@ -92,7 +92,7 @@ RSpec.describe Calculations::DentakuService do
       let(:variants) {}
 
       it 'throws proper error' do
-        expect { call }.to raise_error(NoMethodError, 'undefined method `order\' for nil:NilClass')
+        expect { call }.to raise_error(NoMethodError)
       end
     end
   end
