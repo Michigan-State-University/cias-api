@@ -34,9 +34,15 @@ RSpec.describe 'GET /v1/health_clinic/confirm', type: :request do
       let(:invitation_token) { health_clinic_invitation.invitation_token }
 
       it 'confirms health clinic invitation and assign user to the health clinic' do
-        expect { request }.not_to change { health_clinic.reload.user_health_clinics.size }.and \
-          change { health_clinic_invitation.reload.accepted_at }.and \
-            change(health_clinic_invitation, :invitation_token).to(nil)
+        expect { request }.not_to change { health_clinic.reload.user_health_clinics.size }
+      end
+
+      it 'changes accepted at date' do
+        expect { request }.to change { health_clinic_invitation.reload.accepted_at }
+      end
+
+      it 'changes invitation token to nil' do
+        expect { request }.to change { health_clinic_invitation.reload.invitation_token }.to(nil)
       end
 
       it 'redirects to the web app with success message' do
