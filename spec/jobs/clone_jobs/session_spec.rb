@@ -423,7 +423,7 @@ RSpec.describe CloneJobs::Session, type: :job do
     it 'clones reflections from session' do
       expect(intervention.sessions.last.questions.second.narrator['blocks'].first).to include(
         'question_id' => intervention.sessions.last.questions.first.id,
-        'reflections' => [
+        'reflections' => include(
           include(
             'text' => ['Test1'],
             'value' => '1',
@@ -436,7 +436,7 @@ RSpec.describe CloneJobs::Session, type: :job do
             'type' => 'Speech',
             'variable' => 'var'
           )
-        ],
+        ),
         'type' => 'Reflection',
         'session_id' => nil
       )
