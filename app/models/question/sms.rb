@@ -46,26 +46,4 @@ class Question::Sms < Question
   def question_variables
     [body['variable']['name']]
   end
-
-  def schedule_in(user_session)
-    proper_schedule = sms_schedule
-    last_item_datetime = case proper_schedule['period']
-                         when 'from_last_question'
-                           user_session.answers.last.created_at
-                         when 'from_user_session_start'
-                           user_session.created_at
-                         else
-                           DateTime.current
-                         end
-
-    date = last_item_datetime + proper_schedule['day_of_period'].to_i.day
-
-    if proper_schedule['time']['exact']
-      DateTime.parse(proper_schedule['time']['exact']).change(year: date.year, month: date.month, day: date.day)
-    else
-      from = DateTime.parse(proper_schedule['time']['range']['from']).change(year: date.year, month: date.month, day: date.day)
-      to = DateTime.parse(proper_schedule['time']['range']['to']).change(year: date.year, month: date.month, day: date.day)
-      rand(from..to)
-    end
-  end
 end

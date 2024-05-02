@@ -3,6 +3,7 @@
 class QuestionGroup < ApplicationRecord
   has_paper_trail
   extend DefaultValues
+  include FormulaInterface
   include ::Clone
 
   CURRENT_VERSION = '1'
