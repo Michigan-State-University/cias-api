@@ -52,7 +52,6 @@ jobs:
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
-      fail-fast: false
     services:
       database:
         image: postgres:13.0-alpine
