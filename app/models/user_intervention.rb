@@ -5,7 +5,7 @@ class UserIntervention < ApplicationRecord
   belongs_to :user, inverse_of: :user_interventions
   belongs_to :intervention, inverse_of: :user_interventions
   has_many :user_sessions, dependent: :destroy
-  has_many :phone_answers, through: :user_sessions, class_name: 'Answer::Phone'
+  has_many :phone_answers, through: :user_sessions, class_name: 'Answer::Phone', source: :answers
 
   delegate :sessions, to: :intervention
 
