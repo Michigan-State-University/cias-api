@@ -43,7 +43,8 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
       positions_to_be_send.each_with_index do |position, index|
         question = question_group.questions.find_by(position: position)
-        time_to_send = calculate_question_sending_time(get_proper_sending_period(user_session.user_intervention, question_group.sms_schedule), questions_per_day, index)
+        time_to_send = calculate_question_sending_time(get_proper_sending_period(user_session.user_intervention, question_group.sms_schedule),
+                                                       questions_per_day, index)
         questions_to_be_send_today << { question: question, time_to_send: time_to_send }
       end
     end
@@ -113,7 +114,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   def get_proper_sending_period(user_intervention, question_group_schedule)
     if user_intervention.phone_answers.any?
       phone_answer = user_intervention.phone_answers.first
-      time_range = phone_answer.migrated_body&.dig('data', 0, 'value')['time_ranges'].sample
+      time_range = phone_answer.migrated_body.dig('data', 0, 'value')['time_ranges'].sample
       {
         'time' => {
           'range' => {
