@@ -49,7 +49,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
 
         it 'creates new user session' do
           expect { request }.to change(user.user_sessions, :count).by(1)
-          end
+        end
 
         it 'schedules new user session job' do
           expect { request }.to have_enqueued_job(UserSessionJobs::ScheduleDailyMessagesJob)
