@@ -90,6 +90,10 @@ class V1::Sms::Replay
   def create_new_user_session!(session:, user:)
     user_session = V1::UserSessions::CreateService.call(session.id, user.id, nil)
     user_session.save!
-    user_session
+    schedule_user_session_job!(user_session)
+  end
+
+  def schedule_user_session_job!(user_session)
+    UserSessionJobs::ScheduleDailyMessagesJob.perform_later(user_session.id)
   end
 end

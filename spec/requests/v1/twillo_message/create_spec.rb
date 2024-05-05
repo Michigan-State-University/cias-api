@@ -33,7 +33,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
       end
     end
 
-    context 'when sms_code is provided' do
+    context 'when Sms Session Code is provided' do
       let(:params) do
         {
           body: 'SMS_CODE_1',
@@ -49,6 +49,10 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
 
         it 'creates new user session' do
           expect { request }.to change(user.user_sessions, :count).by(1)
+          end
+
+        it 'schedules new user session job' do
+          expect { request }.to have_enqueued_job(UserSessionJobs::ScheduleDailyMessagesJob)
         end
       end
 
