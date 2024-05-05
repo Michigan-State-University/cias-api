@@ -27,7 +27,8 @@ FactoryBot.define do
     sms_schedule do
       {
         period: 'weekly',
-        day_of_period: '1', # Monday
+        day_of_period: ['1'],
+        questions_per_day: 1,
         time: {
           exact: '8:00 AM'
         }

@@ -46,17 +46,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
       context 'when desired question is SmsInformation' do
         let!(:previous_question) { create(:question_sms, question_group: question_group) }
         let!(:previous_question_answer) { create(:answer_sms, question: previous_question, user_session: user_session) }
-        let!(:question) do
-          create(:question_sms_information,
-                 question_group: question_group,
-                 sms_schedule: {
-                   period: 'from_last_question',
-                   day_of_period: '1',
-                   time: {
-                     exact: '8:00 AM'
-                   }
-                 })
-        end
+        let!(:question) { create(:question_sms_information, question_group: question_group) }
 
         it 'does not send sms' do
           expect { subject }.not_to change(Message, :count)
@@ -92,17 +82,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
       context 'when desired question is Sms' do
         let!(:previous_question) { create(:question_sms, question_group: question_group) }
         let!(:previous_question_answer) { create(:answer_sms, question: previous_question, user_session: user_session) }
-        let!(:question) do
-          create(:question_sms,
-                 question_group: question_group,
-                 sms_schedule: {
-                   period: 'from_last_question',
-                   day_of_period: '1',
-                   time: {
-                     exact: '8:00 AM'
-                   }
-                 })
-        end
+        let!(:question) { create(:question_sms, question_group: question_group) }
 
         it 'does not send sms' do
           expect { subject }.not_to change(Message, :count)

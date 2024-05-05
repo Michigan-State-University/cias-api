@@ -3,7 +3,13 @@
   "type": "object",
   "properties": {
     "period": { "type": "string" },
-    "day_of_period": { "type": "string" },
+    "questions_per_day": { "type": "integer" },
+    "day_of_period": {
+      "type": "array",
+      "items": [{
+        "type": "string"
+      }]
+    },
     "time": {
       "type": "object",
       "properties": {

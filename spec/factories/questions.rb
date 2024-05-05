@@ -714,15 +714,6 @@ FactoryBot.define do
         }
       }
     end
-    sms_schedule do
-      {
-        period: 'from_last_question',
-        day_of_period: '1',
-        time: {
-          exact: '8:00 AM'
-        }
-      }
-    end
     sequence(:position) { |s| s }
     association :question_group, factory: :sms_question_group
 
@@ -737,15 +728,6 @@ FactoryBot.define do
     body do
       {
         data: []
-      }
-    end
-    sms_schedule do
-      {
-        period: 'from_last_question',
-        day_of_period: '1',
-        time: {
-          exact: '8:00 AM'
-        }
       }
     end
     sequence(:position) { |s| s }

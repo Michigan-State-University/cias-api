@@ -15,18 +15,6 @@ class Question::SmsInformation < Question
                                          }
                                        }
 
-  attribute :sms_schedule, :jsonb, default: {
-    period: 'from_last_question',
-    day_of_period: '1',
-    time: {
-      exact: '8:00 AM'
-    }
-  }
-  validates :sms_schedule,
-            json: { schema: -> { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
-                    message: ->(err) { err } },
-            if: -> { question_group&.sms_schedule.blank? }
-
   before_validation :assign_default_subtitle
 
   def self.assign_default_values(attr)
