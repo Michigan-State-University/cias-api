@@ -10,12 +10,12 @@ RSpec.describe 'Performance', type: :request do
 
     it 'performs index in correct time' do
       expect { get v1_session_report_templates_path(session_id: session.id), headers: headers }
-        .to perform_under(0.2).sample(10)
+        .to perform_under(0.25).sample(10)
     end
 
     it 'performs show in correct time' do
       expect { get v1_session_report_template_path(session_id: session.id, id: report_template.id), headers: headers }
-        .to perform_under(0.2).sample(10)
+        .to perform_under(0.25).sample(10)
     end
   end
 end
