@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '3.0.6'
+ruby '3.1.4'
 
 gem 'rails', '~> 6.1.7', '>= 6.1.7.5'
 gem 'pg', '~> 1.2'
@@ -38,7 +38,7 @@ gem 'postgresql_cursor'
 gem 'pry-rails'
 gem 'rack-cors'
 gem 'redis'
-gem 'sidekiq', '>= 7.1.3'
+gem 'sidekiq', '>= 7.2.4'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'
@@ -72,7 +72,7 @@ group :development, :test do
   gem 'overcommit', require: false
   gem 'pry-byebug'
   gem 'rack-test'
-  gem 'rubocop', require: false
+  gem 'rubocop', '>= 1.22.3', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false

@@ -46,13 +46,13 @@ RSpec.describe UserSession, type: :model do
           user_session.finish(send_email: false)
           expect(user_intervention.reload.status).to eq('completed')
           expect(user_intervention.completed_sessions).to eq(2)
-          expect(user_intervention.finished_at).not_to eq(nil)
+          expect(user_intervention.finished_at).not_to be_nil
         end
 
         context 'user has been finished before' do
           let(:finished_at) { DateTime.now }
 
-          it 'does not call user schedule service ' do
+          it 'does not call user schedule service' do
             expect(user_session_schedule_service).not_to receive(:schedule)
             user_session.finish
           end
@@ -86,7 +86,7 @@ RSpec.describe UserSession, type: :model do
 
       context 'user session on answer' do
         let(:user_session) { create(:user_session, timeout_job_id: timeout_job_id, session: create(:session, autofinish_enabled: true)) }
-        let(:expected_timestamp) { Time.current + 24.hours }
+        let(:expected_timestamp) { 24.hours.from_now }
         let(:timeout_job_id) { nil }
 
         context 'timeout_job_id is nil' do
@@ -141,7 +141,7 @@ RSpec.describe UserSession, type: :model do
         end
 
         context 'when delay is not default' do
-          let(:expected_timestamp) { Time.current + 72.minutes }
+          let(:expected_timestamp) { 72.minutes.from_now }
 
           before do
             user_session.session.update!(autofinish_delay: 72)
@@ -173,7 +173,7 @@ RSpec.describe UserSession, type: :model do
         user_session.finish(send_email: false)
         expect(user_intervention.status).to eq('completed')
         expect(user_intervention.completed_sessions).to eq(1)
-        expect(user_intervention.finished_at).not_to eq(nil)
+        expect(user_intervention.finished_at).not_to be_nil
       end
     end
 
@@ -232,7 +232,7 @@ RSpec.describe UserSession, type: :model do
         let!(:user_session) { create(:user_session, user: preview_user, user_intervention: user_intervention, health_clinic_id: health_clinic.id) }
 
         it 'allows for health_clinic_id to be nil' do
-          expect(user_session.update!(health_clinic_id: nil)).to eq true
+          expect(user_session.update!(health_clinic_id: nil)).to be true
         end
       end
     end
@@ -243,7 +243,7 @@ RSpec.describe UserSession, type: :model do
       let!(:user_session) { create(:user_session, user_intervention: user_intervention) }
 
       it 'allows for health_clinic_id to be nil' do
-        expect(user_session.update!(health_clinic_id: nil)).to eq true
+        expect(user_session.update!(health_clinic_id: nil)).to be true
       end
     end
   end

@@ -60,6 +60,6 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
       user: user
     )
 
-    expect(chart_statistics.exists?(label: 'Label1', chart: pie_chart)).to eq true
+    expect(chart_statistics.exists?(label: 'Label1', chart: pie_chart)).to be true
   end
 end

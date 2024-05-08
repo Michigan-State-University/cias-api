@@ -97,7 +97,7 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
         context 'when url is invalid' do
           let(:url) { 'invalid path' }
 
-          it 'json response ' do
+          it 'json response' do
             expect(response).to have_http_status(:unprocessable_entity)
           end
 
@@ -111,8 +111,8 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
             it 'JSON contains proper attributes' do
               expect(json_response['url']).to eql(url)
               expect(json_response['title']).to eql('404 Not Found')
-              expect(json_response['description']).to be(nil)
-              expect(json_response['image']).to be(nil)
+              expect(json_response['description']).to be_nil
+              expect(json_response['image']).to be_nil
             end
           end
 

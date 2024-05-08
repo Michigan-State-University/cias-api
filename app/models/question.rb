@@ -17,11 +17,11 @@ class Question < ApplicationRecord
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
 
-  attribute :narrator, :json, default: assign_default_values('narrator')
+  attribute :narrator, :json, default: -> { assign_default_values('narrator') }
   attribute :position, :integer, default: 0
-  attribute :formulas, :json, default: assign_default_values('formulas')
-  attribute :body, :json, default: assign_default_values('body')
-  attribute :original_text, :json, default: assign_default_values('original_text')
+  attribute :formulas, :json, default: -> { assign_default_values('formulas') }
+  attribute :body, :json, default: -> { assign_default_values('body') }
+  attribute :original_text, :json, default: -> { assign_default_values('original_text') }
   attribute :duplicated, :boolean, default: false
 
   has_one_attached :image

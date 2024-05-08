@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::CatMh::TerminateSession < Api::CatMh::Base
-  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/signout"
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/signout".freeze
 
   def call
     result = request(:post, ENDPOINT, params)

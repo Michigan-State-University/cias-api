@@ -33,14 +33,14 @@ RSpec.describe V1::Users::SmsTokens::Send do
     end
 
     it 'returns nil' do
-      expect(subject).to be nil
+      expect(subject).to be_nil
     end
   end
 
   context 'params are proper' do
     it 'returns service' do
       expect(subject).to be service
-      expect(phone.reload.confirmation_code).not_to be nil
+      expect(phone.reload.confirmation_code).not_to be_nil
       expect(user.phone.reload.confirmed?).to be false
     end
   end

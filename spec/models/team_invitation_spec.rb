@@ -43,13 +43,13 @@ RSpec.describe TeamInvitation, type: :model do
       end
 
       it 'team invitation is invalid on create' do
-        expect(team_invitation.valid?(:create)).to eq(false)
+        expect(team_invitation.valid?(:create)).to be(false)
         expect(team_invitation.errors.messages[:user_id]).to include(/already exists/)
       end
 
       it 'team invitation valid on update' do
-        expect(team_invitation.valid?(:update)).to eq(true)
-        expect(not_accepted_team_invitation.valid?(:update)).to eq(true)
+        expect(team_invitation.valid?(:update)).to be(true)
+        expect(not_accepted_team_invitation.valid?(:update)).to be(true)
       end
     end
   end

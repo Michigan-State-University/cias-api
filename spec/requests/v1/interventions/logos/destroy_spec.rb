@@ -22,7 +22,7 @@ RSpec.describe 'DELETE /v1/interventions/:interventions_id/logo', type: :request
       it { expect(response).to have_http_status(:no_content) }
 
       it 'removes attached logo' do
-        expect(intervention.reload.logo.attachment).to eq nil
+        expect(intervention.reload.logo.attachment).to be_nil
       end
     end
   end

@@ -35,19 +35,19 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
           it_behaves_like 'authorized user'
 
           it 'session is deleted' do
-            expect(Session.find_by(id: session.id)).to eq(nil)
+            expect(Session.find_by(id: session.id)).to be_nil
           end
 
           it 'question_group is deleted' do
-            expect(QuestionGroup.find_by(id: question_group.id)).to eq(nil)
+            expect(QuestionGroup.find_by(id: question_group.id)).to be_nil
           end
 
           it 'question is deleted' do
-            expect(Question.find_by(id: questions.last.id)).to eq(nil)
+            expect(Question.find_by(id: questions.last.id)).to be_nil
           end
 
           it 'answer is deleted' do
-            expect(Answer.find_by(id: answers.last.id)).to eq(nil)
+            expect(Answer.find_by(id: answers.last.id)).to be_nil
           end
         end
       end
@@ -79,19 +79,19 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/sessions/:id', type: :
           it { expect(response).to have_http_status(:no_content) }
 
           it 'session is deleted' do
-            expect(Session.find_by(id: session.id)).to eq(nil)
+            expect(Session.find_by(id: session.id)).to be_nil
           end
 
           it 'question_group is deleted' do
-            expect(QuestionGroup.find_by(id: question_group.id)).to eq(nil)
+            expect(QuestionGroup.find_by(id: question_group.id)).to be_nil
           end
 
           it 'question is deleted' do
-            expect(Question.find_by(id: questions.last.id)).to eq(nil)
+            expect(Question.find_by(id: questions.last.id)).to be_nil
           end
 
           it 'answer is deleted' do
-            expect(Answer.find_by(id: answers.last.id)).to eq(nil)
+            expect(Answer.find_by(id: answers.last.id)).to be_nil
           end
         end
 

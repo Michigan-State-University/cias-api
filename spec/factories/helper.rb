@@ -5,7 +5,7 @@ module FactoryHelpers
     path = Rails.root.join(src)
     original_filename = ::File.basename(path)
 
-    content = File.open(path).read
+    content = File.read(path)
     tempfile = Tempfile.open(original_filename)
     tempfile.write content
     tempfile.rewind

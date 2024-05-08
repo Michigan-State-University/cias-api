@@ -103,7 +103,7 @@ RSpec.describe CloneJobs::Session, type: :job do
       let!(:user) { create(:user, :confirmed, :researcher, email_notification: false) }
 
       it "Don't send email" do
-        expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(0)
+        expect { subject }.not_to change { ActionMailer::Base.deliveries.size }
       end
 
       it 'change session counter' do
@@ -423,20 +423,20 @@ RSpec.describe CloneJobs::Session, type: :job do
     it 'clones reflections from session' do
       expect(intervention.sessions.last.questions.second.narrator['blocks'].first).to include(
         'question_id' => intervention.sessions.last.questions.first.id,
-        'reflections' => [
-          include(
-            'text' => ['Test1'],
-            'value' => '1',
-            'type' => 'Speech',
-            'variable' => 'var'
-          ),
-          include(
-            'text' => ['Test2'],
-            'value' => '2',
-            'type' => 'Speech',
-            'variable' => 'var'
-          )
-        ],
+        'reflections' => include(
+          include({
+                    'text' => ['Test1'],
+                    'value' => '1',
+                    'type' => 'Speech',
+                    'variable' => 'var'
+                  }),
+          include({
+                    'text' => ['Test2'],
+                    'value' => '2',
+                    'type' => 'Speech',
+                    'variable' => 'var'
+                  })
+        ),
         'type' => 'Reflection',
         'session_id' => nil
       )
