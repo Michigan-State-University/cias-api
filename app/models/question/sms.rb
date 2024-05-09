@@ -22,7 +22,7 @@ class Question::Sms < Question
     Rails.root.join("#{json_schema_path}/accepted_answers.json").to_s
   }, message: lambda { |err|
     err
-  } }
+  } }, allow_blank: true
 
   def self.assign_default_values(attr)
     super(attr).merge(
