@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Intervention::PredefinedParticipants::SendEmailInvitation do
-  let(:subject) { described_class.call(user) }
+  subject { described_class.call(user) }
+
   let(:intervention) { create(:intervention, :with_predefined_participants) }
   let!(:user) { intervention.predefined_users.first }
 

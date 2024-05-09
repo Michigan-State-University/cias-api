@@ -3,7 +3,7 @@
 class Api::Documo::SendMultipleFaxes
   include Rails.application.routes.url_helpers
 
-  ENDPOINT = "#{ENV.fetch('BASE_DOCUMO_URL')}/v1/faxes/multiple"
+  ENDPOINT = "#{ENV.fetch('BASE_DOCUMO_URL')}/v1/faxes/multiple".freeze
 
   def self.call(fax_numbers, attachments, include_cover_page, fields, logo)
     new(fax_numbers, attachments, include_cover_page, fields, logo).call

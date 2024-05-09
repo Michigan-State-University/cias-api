@@ -32,9 +32,9 @@ class UserSession < ApplicationRecord
 
     case answer.class.name
     when 'Answer::ParticipantReport'
-      obj['value']['receive_report'] && 1 || 0
+      (obj['value']['receive_report'] && 1) || 0
     when 'Answer::Phone'
-      obj['value']['confirmed'] && 1 || 0
+      (obj['value']['confirmed'] && 1) || 0
     when 'Answer::ThirdParty'
       obj['numeric_value']
     end

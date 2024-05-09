@@ -75,7 +75,7 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
     end
 
     it 'returns correct blocked status' do
-      expect(json_response['data']['attributes']['blocked']).to eq(false)
+      expect(json_response['data']['attributes']['blocked']).to be(false)
     end
   end
 end

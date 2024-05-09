@@ -39,48 +39,48 @@ RSpec.describe 'DELETE /v1/organizations/:id', type: :request do
       end
 
       it 'organization is deleted' do
-        expect(Organization.find_by(id: organization.id)).to eq(nil)
+        expect(Organization.find_by(id: organization.id)).to be_nil
       end
 
       it 'intervention admins doesn\'t belongs to organization' do
-        expect(User.find(intervention_admin_id).organizable_id).to eq(nil)
+        expect(User.find(intervention_admin_id).organizable_id).to be_nil
       end
 
       it 'intervention admin active status is false' do
-        expect(User.find(intervention_admin_id).active?).to eq(true)
+        expect(User.find(intervention_admin_id).active?).to be(true)
       end
 
       it 'organization admins doesn\'t belongs to organization' do
-        expect(User.find(organization_admin_id).organizable_id).to eq(nil)
+        expect(User.find(organization_admin_id).organizable_id).to be_nil
       end
 
       it 'organization admin active status is true' do
-        expect(User.find(organization_admin_id).active?).to eq(false)
+        expect(User.find(organization_admin_id).active?).to be(false)
       end
 
       it 'health_system is deleted' do
-        expect(HealthSystem.find_by(id: health_system.id)).to eq(nil)
+        expect(HealthSystem.find_by(id: health_system.id)).to be_nil
       end
 
       it 'health_system admins doesn\'t belongs to health_system' do
-        expect(User.find(health_system_admin_id).organizable_id).to eq(nil)
+        expect(User.find(health_system_admin_id).organizable_id).to be_nil
       end
 
       it 'health_system admin active status is false' do
-        expect(User.find(health_system_admin_id).active?).to eq(false)
+        expect(User.find(health_system_admin_id).active?).to be(false)
       end
 
       it 'health_clinic is deleted' do
-        expect(HealthClinic.find_by(id: health_clinic.id)).to eq(nil)
+        expect(HealthClinic.find_by(id: health_clinic.id)).to be_nil
       end
 
       it 'health_clinic admins doesn\'t belongs to health_clinic' do
-        expect(User.find(health_clinic_admin_id).organizable_id).to eq(nil)
+        expect(User.find(health_clinic_admin_id).organizable_id).to be_nil
         expect(User.find(health_clinic_admin_id).user_health_clinics).to eq([])
       end
 
       it 'health_clinic admin active status is false' do
-        expect(User.find(health_clinic_admin_id).active?).to eq(false)
+        expect(User.find(health_clinic_admin_id).active?).to be(false)
       end
 
       it 'intervention of deleted organization changed field from_deleted_organization from false to true' do

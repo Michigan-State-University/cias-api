@@ -26,9 +26,11 @@ RSpec.describe V1::LiveChat::InviteNavigators do
     let!(:emails) { [researcher.email] }
 
     it {
-      expect { subject }.to change(User, :count).by(0).and change(LiveChat::Interventions::NavigatorInvitation, :count).by(1)
+      expect { subject }.not_to change(User, :count)
       expect(researcher.reload.roles).to include('researcher', 'navigator')
     }
+
+    it { expect { subject }.to change(LiveChat::Interventions::NavigatorInvitation, :count).by(1) }
 
     it { expect { subject }.to have_enqueued_job(Navigators::InvitationJob) }
   end
