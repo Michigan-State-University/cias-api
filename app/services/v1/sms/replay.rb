@@ -110,7 +110,7 @@ class V1::Sms::Replay
     if accepted_answers['predefined']
       accepted_answers['predefined'].include?(answer)
     else
-      (accepted_answers['range']['from'].to_i..accepted_answers['range']['to'].to_i).to_a.include?(answer)
+      (accepted_answers['range']['from'].to_i..accepted_answers['range']['to'].to_i).to_a.map(&:to_s).include?(answer)
     end
   end
 end
