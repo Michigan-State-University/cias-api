@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Api::CatMh::BreakLock < Api::CatMh::Base
-  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/secure/breakLock"
+  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/secure/breakLock".freeze
 
   def initialize(jsession_id, awselb)
     super(jsession_id, awselb)

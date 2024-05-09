@@ -26,7 +26,7 @@ RSpec.describe V1::Users::SmsTokens::Verify do
 
   context 'phone does not exist' do
     it 'confirms phone number' do
-      expect(subject).to be nil
+      expect(subject).to be_nil
     end
   end
 end

@@ -35,7 +35,7 @@ module EnumerateForConcern
       end
 
       define_method("#{field}=") do |value|
-        value = value.reject(&:blank?) if value && multiple
+        value = value.compact_blank if value && multiple
         self[field] = value
       end
 

@@ -44,7 +44,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/access', type: :request 
         end
 
         it 'does not create user account' do
-          expect(User.find_by(email: new_user_email)).to be nil
+          expect(User.find_by(email: new_user_email)).to be_nil
         end
 
         it 'set intervention invitation size correctly' do

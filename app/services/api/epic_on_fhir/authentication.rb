@@ -51,7 +51,7 @@ class Api::EpicOnFhir::Authentication
       sub: CLIENT_ID,
       aud: ENDPOINT,
       jti: SecureRandom.uuid,
-      exp: (Time.zone.now + 5.minutes).to_i
+      exp: 5.minutes.from_now.to_i
     }
   end
 

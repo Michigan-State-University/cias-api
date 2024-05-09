@@ -50,28 +50,28 @@ RSpec.describe 'DELETE /v1/health_systems/:id', type: :request do
       end
 
       it 'health system is deleted' do
-        expect(HealthSystem.find_by(id: health_system.id)).to eq(nil)
+        expect(HealthSystem.find_by(id: health_system.id)).to be_nil
       end
 
       it 'health system admin doesn\'t belong to health system' do
-        expect(User.find(health_system_admin_id).organizable).to eq(nil)
+        expect(User.find(health_system_admin_id).organizable).to be_nil
       end
 
       it 'health_system admin active status is false' do
-        expect(User.find(health_system_admin_id).active?).to eq(false)
+        expect(User.find(health_system_admin_id).active?).to be(false)
       end
 
       it 'health_clinic is deleted' do
-        expect(HealthClinic.find_by(id: health_clinic.id)).to eq(nil)
+        expect(HealthClinic.find_by(id: health_clinic.id)).to be_nil
       end
 
       it 'health_clinic admins doesn\'t belongs to health_clinic' do
-        expect(User.find(health_clinic_admin_id).organizable_id).to eq(nil)
+        expect(User.find(health_clinic_admin_id).organizable_id).to be_nil
         expect(User.find(health_clinic_admin_id).user_health_clinics).to eq([])
       end
 
       it 'health_clinic admin active status is false' do
-        expect(User.find(health_clinic_admin_id).active?).to eq(false)
+        expect(User.find(health_clinic_admin_id).active?).to be(false)
       end
 
       it 'does not change chart statistic count' do

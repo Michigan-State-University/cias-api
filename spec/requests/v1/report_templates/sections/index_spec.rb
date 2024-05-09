@@ -36,29 +36,29 @@ RSpec.describe 'GET /v1/report_templates/:report_template_id/sections', type: :r
         ),
         'relationships' => {
           'variants' => {
-            'data' => [
-              include(
-                'id' => variant1.id,
-                'type' => 'variant'
-              ),
-              include(
-                'id' => variant2.id,
-                'type' => 'variant'
-              )
-            ]
+            'data' => include(
+              include({
+                        'id' => variant1.id,
+                        'type' => 'variant'
+                      }),
+              include({
+                        'id' => variant2.id,
+                        'type' => 'variant'
+                      })
+            )
           }
         }
-      ).and include(
-        'id' => report_template_section2.id.to_s,
-        'type' => 'section',
-        'attributes' => include(
-          'formula' => report_template_section2.formula,
-          'report_template_id' => report_template.id
-        ),
-        'relationships' => {
-          'variants' => { 'data' => [] }
-        }
-      )
+      ).and include({
+                      'id' => report_template_section2.id.to_s,
+                      'type' => 'section',
+                      'attributes' => include({
+                                                'formula' => report_template_section2.formula,
+                                                'report_template_id' => report_template.id
+                                              }),
+                      'relationships' => {
+                        'variants' => { 'data' => [] }
+                      }
+                    })
     end
   end
 

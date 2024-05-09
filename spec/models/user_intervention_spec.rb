@@ -31,7 +31,7 @@ RSpec.describe UserIntervention, type: :model do
           let!(:user_intervention) { create(:user_intervention, user: preview_user, intervention: intervention, health_clinic_id: health_clinic.id) }
 
           it 'allows for health_clinic_id to be nil' do
-            expect(user_intervention.update!(health_clinic_id: nil)).to eq true
+            expect(user_intervention.update!(health_clinic_id: nil)).to be true
           end
         end
       end
@@ -41,7 +41,7 @@ RSpec.describe UserIntervention, type: :model do
         let!(:user_intervention) { create(:user_intervention, intervention: intervention) }
 
         it 'allows for health_clinic_id to be nil' do
-          expect(user_intervention.update!(health_clinic_id: nil)).to eq true
+          expect(user_intervention.update!(health_clinic_id: nil)).to be true
         end
       end
     end

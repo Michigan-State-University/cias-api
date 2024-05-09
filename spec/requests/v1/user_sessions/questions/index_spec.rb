@@ -45,7 +45,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       end
 
       it 'set session as finished' do
-        expect(user_session.reload.finished_at).not_to be(nil)
+        expect(user_session.reload.finished_at).not_to be_nil
       end
     end
 
@@ -609,7 +609,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
             end
 
             it 'has correct warning' do
-              expect(json_response['warning']).to eq(nil)
+              expect(json_response['warning']).to be_nil
             end
           end
         end
@@ -650,7 +650,7 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
           end
 
           it 'returns nil target value' do
-            expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value']).to eq(nil)
+            expect(json_response['data']['attributes']['narrator']['blocks'].first['target_value']).to be_nil
           end
         end
 

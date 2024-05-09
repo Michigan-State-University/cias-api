@@ -72,7 +72,7 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
       let!(:answer) { create(:answer_single, user_session: user_session, question: question, draft: true, alternative_branch: true) }
 
       it 'update answer' do
-        expect { request }.to change(Answer, :count).by(0)
+        expect { request }.not_to change(Answer, :count)
       end
 
       it 'update a flags' do
@@ -101,7 +101,7 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
     end
 
     it 'not add an answer to db' do
-      expect { request }.to change(Answer, :count).by(0)
+      expect { request }.not_to change(Answer, :count)
     end
   end
 end

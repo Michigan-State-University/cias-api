@@ -9,11 +9,11 @@ RSpec.describe 'Csv' do
 
   xcontext 'Retrieve participants' do
     context 'order participants list' do
-      it 'order participants list ' do
+      it 'order participants list' do
       end
     end
 
-    it 'order participants list ' do
+    it 'order participants list' do
     end
   end
 end
