@@ -6,7 +6,7 @@ class Question::Slider < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
   validate :correct_range_format, if: :body_changed?
-  validates :sms_schedule, absence: true
+  validates :accepted_answers, absence: true
 
   before_validation :change_range_to_integers, if: :body_changed?
 

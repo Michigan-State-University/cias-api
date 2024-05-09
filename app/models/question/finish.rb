@@ -6,7 +6,7 @@ class Question::Finish < Question
   attribute :position, :integer, default: 999_999
   attribute :settings, :json, default: -> { assign_default_values('settings').except('start_autofinish_timer') }
 
-  validates :sms_schedule, absence: true
+  validates :accepted_answers, absence: true
 
   after_create_commit :after_commit_callbacks
 

@@ -115,12 +115,33 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:question_group_initial) { build(:question_group_initial) }
         let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
         let!(:question_group) { create(:sms_question_group, session: session) }
-        let!(:question) { create(:question_sms, question_group: question_group) }
         let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
         let!(:user_session) { create(:sms_user_session, user: user, session: session, current_question_id: question.id) }
 
-        it 'creates new answer' do
-          expect { request }.to change(user_session.answers, :count).by(1)
+        context 'when answer is in accepted values' do
+          context 'when there are specific accepted values' do
+            let!(:question) { create(:question_sms, question_group: question_group, accepted_answers: { predefined: %w[1 2] }) }
+
+            it 'creates new answer' do
+              expect { request }.to change(user_session.answers, :count).by(1)
+            end
+          end
+
+          context 'when there is range of accepted values' do
+            let!(:question) { create(:question_sms, question_group: question_group, accepted_answers: { range: { from: '1', to: '3' } }) }
+
+            it 'creates new answer' do
+              expect { request }.to change(user_session.answers, :count).by(1)
+            end
+          end
+        end
+
+        context 'when answer is NOT in accepted values' do
+          let!(:question) { create(:question_sms, question_group: question_group, accepted_answers: { predefined: %w[3 4] }) }
+
+          it 'does not create new answer' do
+            expect { request }.not_to change(user_session.answers, :count)
+          end
         end
       end
 

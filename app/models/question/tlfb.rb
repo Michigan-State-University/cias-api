@@ -3,7 +3,7 @@
 class Question::Tlfb < Question
   attribute :settings, :json, default: -> { {} }
 
-  validates :sms_schedule, absence: true
+  validates :accepted_answers, absence: true
 
   def prepare_to_display(_answers_var_values = nil)
     apply_config(question_group.questions.first.body)

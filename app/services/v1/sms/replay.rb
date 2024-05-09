@@ -76,9 +76,15 @@ class V1::Sms::Replay
 
         question = Question.find(user_session.current_question_id)
 
-        V1::AnswerService.call(@user, user_session.id, question.id,
-                               { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
-        @user.update(pending_sms_answer: false)
+        answer_correct = validate_answer_for_question(question, message)
+
+        if answer_correct
+          V1::AnswerService.call(@user, user_session.id, question.id,
+                                 { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
+          @user.update(pending_sms_answer: false)
+        else
+          SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, nil)
+        end
       else
         SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
       end
@@ -95,5 +101,16 @@ class V1::Sms::Replay
 
   def schedule_user_session_job!(user_session)
     UserSessionJobs::ScheduleDailyMessagesJob.perform_later(user_session.id)
+  end
+
+  def validate_answer_for_question(question, answer)
+    accepted_answers = question.accepted_answers
+    return true if question.accepted_answers.blank?
+
+    if accepted_answers['predefined']
+      accepted_answers['predefined'].include?(answer)
+    else
+      (accepted_answers['range']['from'].to_i..accepted_answers['range']['to'].to_i).to_a.include?(answer)
+    end
   end
 end

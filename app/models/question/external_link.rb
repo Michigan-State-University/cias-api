@@ -5,7 +5,7 @@ class Question::ExternalLink < Question
 
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
-  validates :sms_schedule, absence: true
+  validates :accepted_answers, absence: true
 
   def question_variables
     [body['variable']['name']]

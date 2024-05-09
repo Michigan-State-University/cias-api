@@ -14,6 +14,7 @@ class Question::SmsInformation < Question
                                            start_autofinish_timer: false
                                          }
                                        }
+  validates :accepted_answers, absence: true
 
   before_validation :assign_default_subtitle
 

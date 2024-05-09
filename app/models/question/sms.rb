@@ -16,6 +16,14 @@ class Question::Sms < Question
                                          }
                                        }
 
+  attribute :accepted_answers, :json, default: {}
+
+  validates :accepted_answers, json: { schema: lambda {
+    Rails.root.join("#{json_schema_path}/accepted_answers.json").to_s
+  }, message: lambda { |err|
+    err
+  } }
+
   def self.assign_default_values(attr)
     super(attr).merge(
       { 'proceed_button' => false, 'required' => false }
