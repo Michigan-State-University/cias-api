@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 class V1::QuestionSerializer < V1Serializer
-  attributes :type, :question_group_id, :settings, :position, :title, :subtitle, :narrator, :video_url, :formulas, :body, :original_text, :sms_schedule,
-             :accepted_answers
+  attributes :type, :question_group_id, :settings, :position, :title, :subtitle, :narrator, :video_url, :formulas, :body, :original_text, :accepted_answers
 
   attribute :image_url do |object|
     polymorphic_url(object.image) if object.image.attached?
