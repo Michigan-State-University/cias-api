@@ -48,7 +48,7 @@ class V1::Sms::Replay
   end
 
   def handle_message_with_sms_code
-    session = Session::Sms.find_by(sms_code: message)
+    session = Session::Sms.includes(:intervention).where(intervention: { status: :draft }).find_by(sms_code: message)
     return SmsPlans::SendSmsJob.perform_later(from_number, 'There is no such session', nil, @user&.id) unless session
 
     if @user
