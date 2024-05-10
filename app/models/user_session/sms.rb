@@ -15,4 +15,6 @@ class UserSession::Sms < UserSession
       .order('question_groups.position ASC, questions.position ASC')
       .first
   end
+
+  def on_answer; end
 end
