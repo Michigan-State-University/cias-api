@@ -10,8 +10,8 @@ class Session::Sms < Session
   has_many :questions, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
 
-  validates :sms_code, presence: true, if: -> { published? }
-  validates :sms_code, uniqueness: true, length: { minimum: SMS_CODE_MIN_LENGTH }
+  validates :sms_code, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: -> { published? }
+  validates :sms_code, uniqueness: true
 
   attribute :settings, :json, default: { 'narrator' => { 'voice' => false, 'animation' => false } }
 
