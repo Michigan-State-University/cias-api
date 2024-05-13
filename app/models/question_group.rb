@@ -17,25 +17,15 @@ class QuestionGroup < ApplicationRecord
 
   delegate :ability_to_update_for?, to: :session
 
-  attribute :sms_schedule, :jsonb
-  attribute :formulas, :jsonb, default: []
+  attribute :sms_schedule, :jsonb, default: {
+                                               "time": {},
+                                               "day_of_period": [],
+                                               "questions_per_day": 1
+                                             }
   validates :sms_schedule,
             json: { schema: -> { Rails.root.join('db/schema/_common/sms_schedule.json').to_s },
                     message: ->(err) { err } }, if: -> { session&.type&.match?('Session::Sms') },
             allow_blank: true
-
-  after_initialize :set_default_values
-
-  def set_default_values
-    if session.type === 'Session::Sms'
-      sms_schedule = {
-        "day_of_period": [],
-        "questions_per_day": 1
-      }
-    else
-      sms_schedule = {}
-    end
-  end
 
   def finish?
     type == 'QuestionGroup::Finish'
