@@ -28,12 +28,12 @@ class QuestionGroup < ApplicationRecord
 
   def set_default_values
     if session.type === 'Session::Sms'
-      self.sms_schedule = {
+      sms_schedule = {
         "day_of_period": [],
         "questions_per_day": 1
       }
     else
-      self.sms_schedule = {}
+      sms_schedule = {}
     end
   end
 
