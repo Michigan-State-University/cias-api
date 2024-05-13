@@ -4,6 +4,7 @@
   "properties": {
     "period": { "type": "string" },
     "questions_per_day": { "type": "integer" },
+    "overwrite_user_time_settings": { "type": "boolean" },
     "day_of_period": {
       "type": "array",
       "items": [{
