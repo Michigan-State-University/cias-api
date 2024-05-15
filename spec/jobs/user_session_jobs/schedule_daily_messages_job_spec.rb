@@ -14,10 +14,10 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
 
   describe '#perform_later' do
     let!(:user) { create(:user, :with_phone) }
-    let!(:intervention) { create(:intervention) }
+    let!(:intervention) { create(:intervention, :published) }
     let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention, question_group_initial: question_group_initial) }
     let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
-    let!(:user_session) { create(:sms_user_session, user: user, session: session) }
+    let!(:user_session) { create(:sms_user_session, user: user, session: session, user_intervention: user_intervention) }
 
     context 'when only one question group is created without any formulas and one question per day' do
       let!(:question_group_initial) do

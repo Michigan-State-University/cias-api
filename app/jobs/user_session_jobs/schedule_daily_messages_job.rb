@@ -8,6 +8,9 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     @user = @user_session.user
     @session = @user_session.session
 
+    # Proceed job only if Intervention is published
+    return unless @user_session.user_intervention.intervention.published?
+
     # Find all accessible question groups
     today_scheduled_question_groups = select_questions_groups_scheduled_for_today
 
@@ -60,9 +63,6 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
                                          .perform_later(@user.id, elem[:question].id, @user_session.id)
     end
-
-    # Schedule next job if Intervention is published
-    return unless @user_session.user_intervention.intervention.published?
 
     UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)
                                              .perform_later(user_session_id)
