@@ -2,15 +2,8 @@
 
 class Session::Sms < Session
   SMS_CODE_MIN_LENGTH = 4
-
-  has_many :question_groups, dependent: :destroy, inverse_of: :session, foreign_key: :session_id
-  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain', foreign_key: :session_id
-  has_one :question_group_initial, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Initial', foreign_key: :session_id
-
-  has_many :questions, through: :question_groups
-  has_many :answers, dependent: :destroy, through: :questions
-
   validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: -> { published? }
+  validates :question_group_finish, absence: true
 
   attribute :settings, :json, default: { 'narrator' => { 'voice' => false, 'animation' => false } }
 
