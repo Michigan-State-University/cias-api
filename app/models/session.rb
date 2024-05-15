@@ -23,9 +23,9 @@ class Session < ApplicationRecord
   has_many :users, through: :user_sessions
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :question_groups, dependent: :destroy, inverse_of: :session
-  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain', foreign_key: :session_id
-  has_one :question_group_initial, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Initial', foreign_key: :session_id
-  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish', foreign_key: :session_id
+  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
+  has_one :question_group_initial, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Initial'
+  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
   has_many :questions, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
 
