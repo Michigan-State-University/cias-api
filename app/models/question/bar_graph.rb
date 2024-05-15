@@ -5,8 +5,6 @@ class Question::BarGraph < Question
 
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
-  validates :accepted_answers, absence: true
-
   def question_variables
     [body['variable']['name']]
   end

@@ -10,8 +10,6 @@ class Question::TlfbConfig < Question::Tlfb
     'blocks' => []
   }
 
-  validates :accepted_answers, absence: true
-
   def prepare_to_display(_answers_var_values = nil)
     question_to_display = question_group.questions.second
     question_to_display.apply_config(body)

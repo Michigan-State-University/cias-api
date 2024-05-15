@@ -3,8 +3,6 @@
 class Question::Multiple < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
-  validates :accepted_answers, absence: true
-
   def self.assign_default_values(attr)
     super(attr).merge(
       { 'required' => true }

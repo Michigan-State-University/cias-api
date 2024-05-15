@@ -3,8 +3,6 @@
 class Question::HenryFordInitial < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
-  validates :accepted_answers, absence: true
-
   def csv_header_names
     rename_attrs(csv_decoded_attrs).map { |attr| "henry_ford_health.#{attr}" }
   end

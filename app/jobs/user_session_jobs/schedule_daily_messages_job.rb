@@ -4,32 +4,31 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   queue_as :question_sms
 
   def perform(user_session_id)
-    user_session = UserSession.find(user_session_id)
-    user = user_session.user
-    session = user_session.session
+    @user_session = UserSession.find(user_session_id)
+    @user = @user_session.user
+    @session = @user_session.session
 
     # Find all accessible question groups
-    accessible_question_groups = calculate_accessible_question_groups_for_user(session.question_groups.order(:position), user_session)
-    today_scheduled_question_groups = select_questions_groups_scheduled_for_today(accessible_question_groups)
+    today_scheduled_question_groups = select_questions_groups_scheduled_for_today
 
     questions_to_be_send_today = []
 
     # Find all questions scheduled for today in groups
     today_scheduled_question_groups.each do |question_group|
-      last_answer = last_answer_in_question_group(question_group, user_session)
+      last_answer = last_answer_in_question_group(question_group)
       questions_per_day = question_group.sms_schedule['questions_per_day'] || 1
-      last_question_index = question_group.questions.order(position: :desc).first.position
-      first_question_index = question_group.questions.order(position: :asc).first.position
+      question_group_questions = question_group.questions.order(position: :asc)
+      last_question_index = question_group_questions.last.position
+      first_question_index = question_group_questions.first.position
+      base_range = (first_question_index..last_question_index).to_a
 
       question_positions = if !last_answer || last_answer.question.position == last_question_index
-                             base_range = (first_question_index..last_question_index).to_a
                              positions_range = base_range
                              (questions_per_day / base_range.length.to_f).ceil.to_i.times do
                                positions_range += base_range
                              end
                              positions_range
                            elsif last_answer.question.position + questions_per_day > last_question_index
-                             base_range = (first_question_index..last_question_index).to_a
                              from_current_question_range = ((last_answer.question.position + 1)..last_question_index).to_a
                              ((questions_per_day / base_range.length.to_f).ceil - 1).to_i.times do
                                from_current_question_range += base_range
@@ -43,14 +42,14 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
       positions_to_be_send.each_with_index do |position, index|
         question = question_group.questions.find_by(position: position)
-        time_to_send = calculate_question_sending_time(get_proper_sending_period(user_session.user_intervention, question_group.sms_schedule),
+        time_to_send = calculate_question_sending_time(get_proper_sending_period(@user_session.user_intervention, question_group.sms_schedule),
                                                        questions_per_day, index)
         questions_to_be_send_today << { question: question, time_to_send: time_to_send }
       end
     end
 
     # Remove all Information questions if there is any question requiring attention
-    any_answer_expected = questions_to_be_send_today.map { |elem| elem[:question].type }.include?('Question::Sms')
+    any_answer_expected = questions_to_be_send_today.any? { |elem| elem[:question].type.eql?('Question::Sms') }
     questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') } if any_answer_expected
 
     # Remove all questions, that should be send today, but before job execution - case useful on first job scheduling
@@ -59,11 +58,11 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     # Schedule all sending jobs
     questions_to_be_send_today.each do |elem|
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
-                                         .perform_later(user.id, elem[:question].id, user_session.id)
+                                         .perform_later(@user.id, elem[:question].id, @user_session.id)
     end
 
     # Schedule next job if Intervention is published
-    return unless user_session.user_intervention.intervention.published?
+    return unless @user_session.user_intervention.intervention.published?
 
     UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)
                                              .perform_later(user_session_id)
@@ -71,8 +70,8 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
   private
 
-  def last_answer_in_question_group(question_group, user_session)
-    user_session
+  def last_answer_in_question_group(question_group)
+    @user_session
       .answers
       .includes(question: :question_group)
       .where(question: { question_group: question_group })
@@ -82,26 +81,27 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       .last
   end
 
-  def calculate_accessible_question_groups_for_user(scoped_question_groups, user_session)
-    all_var_values = V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
+  def calculate_accessible_question_groups_for_user(scoped_question_groups)
+    all_var_values = V1::UserInterventionService.new(@user_session.user_intervention_id, @user_session.id).var_values
     scoped_question_groups.select do |question_group|
       formula = question_group.formulas&.first
       formula ? question_group.exploit_formula(all_var_values, formula['payload'], formula['patterns']) : true
     end
   end
 
-  def select_questions_groups_scheduled_for_today(question_groups)
-    QuestionGroup.where(id: question_groups.pluck(:id))
+  def select_questions_groups_scheduled_for_today
+    accessible_question_groups = calculate_accessible_question_groups_for_user(@session.question_groups.order(:position))
+    QuestionGroup.where(id: accessible_question_groups.pluck(:id))
                  .where("sms_schedule ->> 'period' = 'weekly' AND sms_schedule -> 'day_of_period' @> '[\"#{DateTime.current.wday}\"]'")
   end
 
   def calculate_question_sending_time(sms_schedule, questions_per_day, question_index)
-    if sms_schedule['time']['exact']
-      time_of_message = DateTime.parse(sms_schedule['time']['exact'])
+    if sms_schedule.dig('time', 'exact')
+      time_of_message = DateTime.parse(sms_schedule.dig('time', 'exact'))
       DateTime.current.change({ hour: time_of_message.hour, min: time_of_message.minute })
     else
-      from = DateTime.parse(sms_schedule['time']['range']['from'])
-      to = DateTime.parse(sms_schedule['time']['range']['to'])
+      from = DateTime.parse(sms_schedule.dig('time', 'range', 'from'))
+      to = DateTime.parse(sms_schedule.dig('time', 'range', 'to'))
 
       period = (to - from) / questions_per_day
 
@@ -114,7 +114,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   def get_proper_sending_period(user_intervention, question_group_schedule)
     if user_intervention.phone_answers.any? && question_group_schedule['overwrite_user_time_settings']
       phone_answer = user_intervention.phone_answers.first
-      time_range = phone_answer.migrated_body.dig('data', 0, 'value')['time_ranges'].sample
+      time_range = phone_answer.migrated_body.dig('data', 0, 'value', 'time_ranges').sample
       {
         'time' => {
           'range' => {
