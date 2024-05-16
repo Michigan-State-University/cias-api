@@ -6,7 +6,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   def perform(user_id, question_id, user_session_id, is_alert = false)
     user = User.find(user_id)
 
-    return if !is_alert && !user&.sms_notification
+    return if !is_alert && (!user&.sms_notification || !user.predefined_user_parameter&.sms_notification)
 
     question = Question.find(question_id)
     user_session = UserSession::Sms.find(user_session_id)
