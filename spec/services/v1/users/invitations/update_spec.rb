@@ -25,7 +25,7 @@ RSpec.describe V1::Users::Invitations::Update do
     it 'updates user' do
       subject
 
-      expect(user.reload.invitation_token).to be nil
+      expect(user.reload.invitation_token).to be_nil
       expect(user.reload.invitation_accepted_at).to be_present
       expect(user.confirmed_at).to be_present
     end

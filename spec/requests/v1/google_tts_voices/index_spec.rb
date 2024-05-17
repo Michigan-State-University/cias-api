@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'GET  /v1/languages/:language_id/voices', type: :request do
+RSpec.describe 'GET /v1/languages/:language_id/voices', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:team_admin) { create(:user, :confirmed, :team_admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }

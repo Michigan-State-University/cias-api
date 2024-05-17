@@ -76,7 +76,7 @@ RSpec.describe Question::Single, type: :model do
     describe 'fails when body is empty' do
       let(:with_empty) { build(:question_single, :body_data_empty) }
 
-      it { expect(with_empty.save).to eq false }
+      it { expect(with_empty.save).to be false }
     end
   end
 end

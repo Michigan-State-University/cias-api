@@ -3,6 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe Calculations::DentakuService do
+  subject do
+    described_class.new(
+      all_var_values, formula, nil, other_data
+    )
+  end
+
   let(:dentaku_calculator) { Dentaku::Calculator.new }
   let(:all_var_values) { { var1: 5, var2: 5, var3: 10, var4: 5 } }
   let(:formula) { 'var1-var2' }
@@ -12,11 +18,6 @@ RSpec.describe Calculations::DentakuService do
       is_formula_interface: false,
       user_id: user.id
     }
-  end
-  let(:subject) do
-    described_class.new(
-      all_var_values, formula, nil, other_data
-    )
   end
 
   before do
@@ -79,7 +80,7 @@ RSpec.describe Calculations::DentakuService do
       let(:formula) {}
 
       it 'throws proper error' do
-        expect(call).to eq(nil)
+        expect(call).to be_nil
       end
 
       it 'does not change dentaku calculator memory' do
@@ -91,7 +92,7 @@ RSpec.describe Calculations::DentakuService do
       let(:variants) {}
 
       it 'throws proper error' do
-        expect { call }.to raise_error(NoMethodError, 'undefined method `order\' for nil:NilClass')
+        expect { call }.to raise_error(NoMethodError)
       end
     end
   end

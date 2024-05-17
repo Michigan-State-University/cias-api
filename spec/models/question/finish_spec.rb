@@ -19,12 +19,12 @@ RSpec.describe Question::Finish, type: :model do
 
       describe '#variable_clone_prefix' do
         it 'returns nil with empty taken variables' do
-          expect(question_finish.variable_clone_prefix([])).to eq(nil)
+          expect(question_finish.variable_clone_prefix([])).to be_nil
         end
 
         it 'returns nil with passed taken variables' do
           expect(question_finish.variable_clone_prefix(%w[clone_question_slider_var
-                                                          clone1_question_slider_var])).to eq(nil)
+                                                          clone1_question_slider_var])).to be_nil
         end
       end
 

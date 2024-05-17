@@ -23,11 +23,11 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/star', type: :request 
     before { request }
 
     it 'the admin sees the intervention as not starred' do
-      expect(intervention.starred_by?(admin.id)).to eq(false)
+      expect(intervention.starred_by?(admin.id)).to be(false)
     end
 
     it 'the owner still does see their intervention as starred' do
-      expect(intervention.starred_by?(researcher.id)).to eq(true)
+      expect(intervention.starred_by?(researcher.id)).to be(true)
     end
   end
 

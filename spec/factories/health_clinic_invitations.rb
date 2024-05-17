@@ -6,7 +6,7 @@ FactoryBot.define do
     user_id { create(:user, :confirmed, :health_clinic_admin).id }
 
     trait :accepted do
-      accepted_at { Time.current - 2.days }
+      accepted_at { 2.days.ago }
     end
   end
 end

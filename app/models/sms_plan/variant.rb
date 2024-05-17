@@ -8,7 +8,7 @@ class SmsPlan::Variant < ApplicationRecord
 
   CURRENT_VERSION = '1'
 
-  attribute :original_text, :json, default: { 'content' => '' }
+  attribute :original_text, :json, default: -> { { 'content' => '' } }
 
   before_create :assign_position
 

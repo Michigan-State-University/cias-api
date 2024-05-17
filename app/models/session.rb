@@ -29,11 +29,11 @@ class Session < ApplicationRecord
   has_many :questions, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
 
-  attribute :settings, :json, default: assign_default_values('settings')
+  attribute :settings, :json, default: -> { assign_default_values('settings') }
   attribute :position, :integer, default: 1
-  attribute :formulas, :json, default: assign_default_values('formulas')
-  attribute :body, :json, default: assign_default_values('body')
-  attribute :original_text, :json, default: { name: '' }
+  attribute :formulas, :json, default: -> { assign_default_values('formulas') }
+  attribute :body, :json, default: -> { assign_default_values('body') }
+  attribute :original_text, :json, default: -> { { name: '' } }
 
   enum schedule: { days_after: 'days_after',
                    days_after_fill: 'days_after_fill',
@@ -99,7 +99,7 @@ class Session < ApplicationRecord
     end
 
     if intervention.shared_to_invited?
-      emails_without_access = emails - intervention.intervention_accesses.map(&:email).map(&:downcase)
+      emails_without_access = emails - intervention.intervention_accesses.map { |access| access.email&.downcase }
       intervention.give_user_access(emails_without_access)
     end
 
