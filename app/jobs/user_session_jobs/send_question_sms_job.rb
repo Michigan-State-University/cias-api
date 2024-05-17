@@ -3,10 +3,10 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
-  def perform(user_id, question_id, user_session_id, is_alert = false)
+  def perform(user_id, question_id, user_session_id)
     user = User.find(user_id)
 
-    return if !is_alert && (!user&.sms_notification || !user.predefined_user_parameter&.sms_notification)
+    return unless user&.sms_notification || user.predefined_user_parameter&.sms_notification
 
     question = Question.find(question_id)
     user_session = UserSession::Sms.find(user_session_id)
