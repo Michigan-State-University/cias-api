@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Question::SmsInformation < Question
-  attribute :subtitle, :string, default: I18n.t('question.sms.initial.title')
+  attribute :subtitle, :string, default: -> { I18n.t('question.sms.initial.title') }
   attribute :settings, :json, default: lambda {
                                          {
                                            image: false,

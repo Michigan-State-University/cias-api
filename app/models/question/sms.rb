@@ -16,7 +16,7 @@ class Question::Sms < Question
                                          }
                                        }
 
-  attribute :accepted_answers, :json, default: {}
+  attribute :accepted_answers, :json, default: -> { {} }
 
   validates :accepted_answers, json: { schema: lambda {
     Rails.root.join("#{json_schema_path}/accepted_answers.json").to_s

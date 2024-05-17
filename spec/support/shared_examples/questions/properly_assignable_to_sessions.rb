@@ -6,7 +6,7 @@ RSpec.shared_examples 'cannot be assigned to sms session' do
   let(:question_group) { create(:sms_question_group, session: session) }
 
   it 'does not create question' do
-    expect(question.save).to eq false
+    expect(question.save).to be false
   end
 end
 
@@ -16,7 +16,7 @@ RSpec.shared_examples 'can be assigned to sms session' do
   let(:question_group) { create(:sms_question_group, session: session) }
 
   it 'does create question' do
-    expect(question.save).to eq true
+    expect(question.save).to be true
   end
 end
 
@@ -26,7 +26,7 @@ RSpec.shared_examples 'cannot be assigned to classic session' do
   let(:question_group) { create(:question_group, session: session) }
 
   it 'does not create question' do
-    expect(question.save).to eq false
+    expect(question.save).to be false
   end
 end
 
@@ -36,6 +36,6 @@ RSpec.shared_examples 'can be assigned to classic session' do
   let(:question_group) { create(:question_group, session: session) }
 
   it 'does create question' do
-    expect(question.save).to eq true
+    expect(question.save).to be true
   end
 end

@@ -5,7 +5,7 @@ class Session::Sms < Session
   validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: -> { published? }
   validates :question_group_finish, absence: true
 
-  attribute :settings, :json, default: { 'narrator' => { 'voice' => false, 'animation' => false } }
+  attribute :settings, :json, default: -> { { 'narrator' => { 'voice' => false, 'animation' => false } } }
 
   after_commit :create_core_children, on: :create
 

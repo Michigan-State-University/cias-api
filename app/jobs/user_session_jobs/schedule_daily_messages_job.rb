@@ -105,7 +105,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
       period = (to - from) / questions_per_day
 
-      time_range_of_question = (from + question_index * period)..(from + (question_index + 1) * period)
+      time_range_of_question = (from + (question_index * period))..(from + ((question_index + 1) * period))
 
       rand(time_range_of_question)
     end
