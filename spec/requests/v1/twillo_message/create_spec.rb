@@ -43,7 +43,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
       end
 
       context 'when user session with sms code is NOT created' do
-        let!(:intervention) { create(:intervention) }
+        let!(:intervention) { create(:intervention, :published) }
         let!(:session) { create(:sms_session, sms_code: 'SMS_CODE_1', intervention: intervention) }
         let(:user) { create(:user, :with_phone) }
 

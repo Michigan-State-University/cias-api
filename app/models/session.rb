@@ -72,6 +72,10 @@ class Session < ApplicationRecord
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
 
+  def sms_session_type?
+    type.match?('Session::Sms')
+  end
+
   def position_greater_than
     @position_greater_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end

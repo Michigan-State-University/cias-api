@@ -48,14 +48,14 @@ class V1::Sms::Replay
   end
 
   def handle_message_with_sms_code
-    session = Session::Sms.includes(:intervention).where(intervention: { status: :draft }).find_by(sms_code: message)
-    return SmsPlans::SendSmsJob.perform_later(from_number, 'There is no such session', nil, @user&.id) unless session
+    session = Session::Sms.includes(:intervention).where(intervention: { status: :published }).find_by(sms_code: message)
+    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, @user&.id) unless session
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
 
       if user_session
-        SmsPlans::SendSmsJob.perform_later(@user.full_number, 'You are already signed to this session', nil, @user.id)
+        SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.already_signed'), nil, @user.id)
       else
         create_new_user_session!(session: session, user: @user)
       end
@@ -70,7 +70,7 @@ class V1::Sms::Replay
       user_session = UserSession::Sms.find_by(user_id: @user.id)
       if user_session
         unless user_session.current_question_id
-          SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
+          SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, nil)
           return
         end
 
@@ -86,10 +86,10 @@ class V1::Sms::Replay
           SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, nil)
         end
       else
-        SmsPlans::SendSmsJob.perform_later(@user.full_number, 'Wrong message', nil, nil)
+        SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, nil)
       end
     else
-      SmsPlans::SendSmsJob.perform_later(from_number, 'Wrong message', nil, nil)
+      SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.wrong_message'), nil, nil)
     end
   end
 

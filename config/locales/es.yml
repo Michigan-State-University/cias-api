@@ -81,3 +81,7 @@ es:
       ignore_mail_msg: "Si no lo ha solicitado, ignore este correo electrónico.<br /><br />No responda a este correo electrónico, que no acepta mensajes entrantes. Si necesita ayuda con este software, comuníquese con la persona o grupo que lo refirió a este sitio. ¡Gracias!<br /><br />"
       not_reply_with_email: "Si no lo ha solicitado, ignore este correo electrónico.<br />Por favor, no responda a este correo electrónico, que no acepta mensajes entrantes.<br />Puede ponerse en contacto con nosotros directamente en<a href=\"mailto:cias@msu.edu\" style=\"color: #107969; font-weight: 700\">cias@msu.edu</a>. ¡Gracias!<br />"
   phone_verification: "Su código de verificación CIAS es: %{verification_code}"
+  sms:
+    wrong_message: 'Mensaje equivocado'
+    already_signed: 'Ya estás registrado en esta sesión.'
+    session_not_found: 'No existe tal sesión'

@@ -18,30 +18,8 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
     # Find all questions scheduled for today in groups
     today_scheduled_question_groups.each do |question_group|
-      last_answer = last_answer_in_question_group(question_group)
       questions_per_day = question_group.sms_schedule['questions_per_day'] || 1
-      question_group_questions = question_group.questions.order(position: :asc)
-      last_question_index = question_group_questions.last.position
-      first_question_index = question_group_questions.first.position
-      base_range = (first_question_index..last_question_index).to_a
-
-      question_positions = if !last_answer || last_answer.question.position == last_question_index
-                             positions_range = base_range
-                             (questions_per_day / base_range.length.to_f).ceil.to_i.times do
-                               positions_range += base_range
-                             end
-                             positions_range
-                           elsif last_answer.question.position + questions_per_day > last_question_index
-                             from_current_question_range = ((last_answer.question.position + 1)..last_question_index).to_a
-                             ((questions_per_day / base_range.length.to_f).ceil - 1).to_i.times do
-                               from_current_question_range += base_range
-                             end
-                             from_current_question_range
-                           else
-                             ((last_answer.question.position + 1)..last_question_index).to_a
-                           end
-
-      positions_to_be_send = question_positions.first(questions_per_day)
+      positions_to_be_send = get_positions_to_be_send(question_group, questions_per_day)
 
       positions_to_be_send.each_with_index do |position, index|
         question = question_group.questions.find_by(position: position)
@@ -126,5 +104,31 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     else
       question_group_schedule
     end
+  end
+
+  def get_positions_to_be_send(question_group, questions_per_day)
+    last_answer = last_answer_in_question_group(question_group)
+    question_group_questions = question_group.questions.order(position: :asc)
+    last_question_index = question_group_questions.last.position
+    first_question_index = question_group_questions.first.position
+    base_range = (first_question_index..last_question_index).to_a
+
+    question_positions = if !last_answer || last_answer.question.position == last_question_index
+                           positions_range = base_range
+                           (questions_per_day / base_range.length.to_f).ceil.to_i.times do
+                             positions_range += base_range
+                           end
+                           positions_range
+                         elsif last_answer.question.position + questions_per_day > last_question_index
+                           from_current_question_range = ((last_answer.question.position + 1)..last_question_index).to_a
+                           ((questions_per_day / base_range.length.to_f).ceil - 1).to_i.times do
+                             from_current_question_range += base_range
+                           end
+                           from_current_question_range
+                         else
+                           ((last_answer.question.position + 1)..last_question_index).to_a
+                         end
+
+    question_positions.first(questions_per_day)
   end
 end

@@ -390,3 +390,7 @@ en:
       appointments:
         not_found: "Insufficient information for further processing."
   phone_verification: "Your CIAS verification code is: %{verification_code}"
+  sms:
+    wrong_message: 'Wrong message'
+    already_signed: 'You are already signed to this session'
+    session_not_found: 'There is no such session'
