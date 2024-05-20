@@ -18,8 +18,8 @@ class V1::Audio::Regenerate
   end
 
   def call
-    audio = Audio.find_by(sha256: digest)
-    if audio.url == block_audio_url
+    audio = V1::AudioService.call(text, preview: true, language_code: language_code, voice_type: voice_type)
+    if audio&.url == block_audio_url
       Audio::TextToSpeech.new(
         audio,
         text: text,
