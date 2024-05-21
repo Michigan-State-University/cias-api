@@ -81,7 +81,7 @@ class Session < ApplicationRecord
   end
 
   def next_session
-    intervention.sessions.order(position: :asc).find_by('position > ?', position)
+    intervention.sessions.where.not(type: 'Session::Sms').order(position: :asc).find_by('position > ?', position)
   end
 
   def last_session?

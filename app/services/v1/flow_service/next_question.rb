@@ -39,11 +39,6 @@ class V1::FlowService::NextQuestion
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
 
-    if user_session.type == 'UserSession::Sms' && !question
-      user_session.finish
-      return question
-    end
-
     if question.type == 'Question::Finish'
       assign_next_session_id(user_session.session.intervention)
       user_session.finish
@@ -89,7 +84,7 @@ class V1::FlowService::NextQuestion
   def reassign_next_session_for_flexible_intervention(session, intervention)
     return session unless session.nil? || UserSession.exists?(user_id: user_session.user.id, session_id: session.id)
 
-    intervention.sessions.each do |intervention_session|
+    intervention.sessions.where.not(type: 'Session::Sms').each do |intervention_session|
       return intervention_session unless UserSession.exists?(user_id: user_session.user.id, session_id: intervention_session.id)
     end
 
