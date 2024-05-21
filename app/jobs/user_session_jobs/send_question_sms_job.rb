@@ -7,9 +7,9 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     user = User.find(user_id)
 
     should_return = if user.predefined_user_parameter
-                      user.predefined_user_parameter&.sms_notification
+                      !user.predefined_user_parameter&.sms_notification
                     else
-                      user.sms_notification
+                      !user.sms_notification
                     end
 
     return if should_return
