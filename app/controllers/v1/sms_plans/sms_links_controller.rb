@@ -1,6 +1,14 @@
 # frozen_string_literal: true
 
-class V1::SmsLinksController < V1Controller
+class V1::SmsPlans::SmsLinksController < V1Controller
+  def index
+    authorize! :read, sms_link_sms_plan
+
+    collection = sms_link_sms_plan.sms_links
+
+    render json: serialized_response(collection)
+  end
+
   def create
     authorize! :create, SmsLink
     authorize! :create, sms_link_session
