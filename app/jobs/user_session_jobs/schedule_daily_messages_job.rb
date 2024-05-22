@@ -11,6 +11,14 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     # Proceed job only if Intervention is published
     return unless @user_session.user_intervention.intervention.published?
 
+    # Handle Session autoclose
+    should_return = @session.autoclose_at ? false : @session.autoclose_at > DateTime.current
+
+    if should_return
+      @user_session.update(finished_at: @session.autoclose_at)
+    end
+
+    return if should_return
     # Find all accessible question groups
     today_scheduled_question_groups = select_questions_groups_scheduled_for_today
 

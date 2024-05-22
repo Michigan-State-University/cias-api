@@ -67,7 +67,7 @@ class V1::Sms::Replay
 
   def handle_message_with_answer
     if @user
-      user_session = UserSession::Sms.find_by(user_id: @user.id)
+      user_session = UserSession::Sms.includes(:user_intervention).where(user_id: @user.id).where.not(current_question_id: nil, finished_at: nil).first
       if user_session
         unless user_session.current_question_id
           SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, nil)
