@@ -39,6 +39,10 @@ class V1::Sms::Replay
     @response_message ||= Twilio::TwiML::MessagingResponse.new
   end
 
+  def translate_with_intervention_locale(session, key)
+    I18n.with_locale(session.intervention.google_language&.language_code) { I18n.t(key) }
+  end
+
   def delete_messaged_for(number)
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
@@ -48,16 +52,20 @@ class V1::Sms::Replay
   end
 
   def handle_message_with_sms_code
-    session = Session::Sms.includes(:intervention).where(intervention: { status: :published }).find_by(sms_code: message)
-    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, @user&.id) unless session
+    session = SmsCode.find_by(sms_code: message)&.session
+    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found', nil, @user&.id) unless session
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
 
       if user_session
-        SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.already_signed'), nil, @user.id)
+        SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session,'sms.already_signed'), nil, @user.id)
       else
-        create_new_user_session!(session: session, user: @user)
+        if @user.user_interventions.where.not(intervention_id: session.intervention_id).any?
+          SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session, 'sms.cannot_assign_to_many_campaigns'), nil, @user.id)
+        else
+          create_new_user_session!(session: session, user: @user)
+        end
       end
     else
       user = V1::Users::CreateGuest.call(from_number)
@@ -70,7 +78,7 @@ class V1::Sms::Replay
       user_session = UserSession::Sms.includes(:user_intervention).where(user_id: @user.id).where.not(current_question_id: nil, finished_at: nil).first
       if user_session
         unless user_session.current_question_id
-          SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, nil)
+          SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(user_session.session, 'sms.wrong_message'), nil, nil)
           return
         end
 

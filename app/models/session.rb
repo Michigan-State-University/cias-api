@@ -28,6 +28,7 @@ class Session < ApplicationRecord
   has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
   has_many :questions, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
+  has_many :sms_codes
 
   attribute :settings, :json, default: -> { assign_default_values('settings') }
   attribute :position, :integer, default: 1
@@ -71,6 +72,8 @@ class Session < ApplicationRecord
 
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
+
+  accepts_nested_attributes_for :sms_codes
 
   def sms_session_type?
     type.match?('Session::Sms')

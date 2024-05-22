@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_09_192853) do
+ActiveRecord::Schema.define(version: 2024_05_22_142904) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -771,7 +771,6 @@ ActiveRecord::Schema.define(version: 2024_05_09_192853) do
     t.integer "autofinish_delay", default: 1440, null: false
     t.boolean "autoclose_enabled", default: false
     t.datetime "autoclose_at"
-    t.string "sms_code"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -791,6 +790,16 @@ ActiveRecord::Schema.define(version: 2024_05_09_192853) do
     t.index ["health_clinic_id"], name: "index_short_links_on_health_clinic_id"
     t.index ["linkable_type", "linkable_id"], name: "index_short_links_on_linkable"
     t.index ["name"], name: "index_short_links_on_name", unique: true
+  end
+
+  create_table "sms_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "session_id", null: false
+    t.uuid "health_clinic_id"
+    t.string "sms_code"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["health_clinic_id"], name: "index_sms_codes_on_health_clinic_id"
+    t.index ["session_id"], name: "index_sms_codes_on_session_id"
   end
 
   create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1075,6 +1084,8 @@ ActiveRecord::Schema.define(version: 2024_05_09_192853) do
   add_foreign_key "sessions", "cat_mh_time_frames"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
+  add_foreign_key "sms_codes", "health_clinics"
+  add_foreign_key "sms_codes", "sessions"
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
   add_foreign_key "user_log_requests", "users"

@@ -14,9 +14,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     # Handle Session autoclose
     should_return = @session.autoclose_at ? false : @session.autoclose_at > DateTime.current
 
-    if should_return
-      @user_session.update(finished_at: @session.autoclose_at)
-    end
+    @user_session.update(finished_at: @session.autoclose_at) if should_return
 
     return if should_return
     # Find all accessible question groups

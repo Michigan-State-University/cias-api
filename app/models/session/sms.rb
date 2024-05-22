@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Session::Sms < Session
-  SMS_CODE_MIN_LENGTH = 4
-  validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: -> { published? }
   validates :question_group_finish, absence: true
 
   attribute :settings, :json, default: -> { { 'narrator' => { 'voice' => false, 'animation' => false } } }
@@ -78,11 +76,15 @@ class Session::Sms < Session
   end
 
   def create_core_children
-    return if question_group_initial
+    unless sms_codes.any?
+      SmsCode.create!(session_id: id, sms_code: ('A'..'Z').to_a.sample(7).join)
+    end
 
-    qg_initial = ::QuestionGroup::Initial.new(session_id: id)
-    qg_initial.save!
+    unless question_group_initial
+      qg_initial = ::QuestionGroup::Initial.new(session_id: id)
+      qg_initial.save!
 
-    ::Question::SmsInformation.create!(question_group_id: qg_initial.id)
+      ::Question::SmsInformation.create!(question_group_id: qg_initial.id)
+    end
   end
 end

@@ -84,4 +84,5 @@ ar:
   sms:
     wrong_message: 'رسالة خاطئة'
     already_signed: 'لقد قمت بالفعل بتسجيل الدخول إلى هذه الجلسة'
+    cannot_assign_to_many_campaigns: 'لا يمكنك التسجيل في العديد من حملات الرسائل النصية القصيرة'
     session_not_found: '  لا توجد مثل هذه الجلسة'
