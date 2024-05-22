@@ -7,7 +7,7 @@ class Session::CatMh < Session
   has_many :tests, dependent: :destroy, foreign_key: :session_id, inverse_of: :session
   has_many :cat_mh_test_types, through: :tests
 
-  validates :sms_code, absence: true
+  validates :sms_codes, absence: true
   validates :question_groups, absence: true
   validates :question_group_plains, absence: true
   validates :question_group_initial, absence: true

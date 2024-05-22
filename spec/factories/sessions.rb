@@ -52,11 +52,11 @@ FactoryBot.define do
   end
 
   factory :sms_session, class: Session::Sms do
-    sms_code { 'SMS_CODE' }
     sequence(:name) { |s| "session_#{s}" }
     sequence(:variable) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
     association :intervention
+    association :sms_code
 
     trait :with_questions do
       question { create_list(:question, 5) }

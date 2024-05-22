@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Session::Classic < Session
-  validates :sms_code, absence: true
+  validates :sms_codes, absence: true
   validates :question_group_initial, absence: true
 
   after_commit :create_core_children, on: :create
