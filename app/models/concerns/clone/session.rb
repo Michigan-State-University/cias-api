@@ -202,7 +202,7 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_tests
-    return if source.instance_of? Session::Classic
+    return if source.instance_of?(Session::Classic) || source.instance_of?(Session::Sms)
 
     source.cat_mh_test_types.each do |test_type|
       outcome.cat_mh_test_types << test_type
