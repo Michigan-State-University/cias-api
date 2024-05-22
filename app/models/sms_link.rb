@@ -4,6 +4,7 @@ class SmsLink < ApplicationRecord
   # ASSOCIATIONS
   belongs_to :sms_plan
   belongs_to :session
+  has_many :sms_links_users, dependent: :destroy
 
   # VALIDATIONS
   validates :url, :variable, presence: true
@@ -20,10 +21,5 @@ class SmsLink < ApplicationRecord
   # METHODS
   def set_session_id
     self.session_id ||= sms_plan&.session_id
-  end
-
-  def add_timestamp
-    entered_timestamps << Time.current
-    save!
   end
 end
