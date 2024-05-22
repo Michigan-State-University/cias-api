@@ -17,6 +17,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     @user_session.update(finished_at: @session.autoclose_at) if should_return
 
     return if should_return
+
     # Find all accessible question groups
     today_scheduled_question_groups = select_questions_groups_scheduled_for_today
 
