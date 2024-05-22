@@ -28,7 +28,7 @@ class Session < ApplicationRecord
   has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
   has_many :questions, through: :question_groups
   has_many :answers, dependent: :destroy, through: :questions
-  has_many :sms_codes
+  has_many :sms_codes, dependent: :destroy
 
   attribute :settings, :json, default: -> { assign_default_values('settings') }
   attribute :position, :integer, default: 1

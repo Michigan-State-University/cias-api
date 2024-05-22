@@ -78,11 +78,11 @@ class Session::Sms < Session
   def create_core_children
     SmsCode.create!(session_id: id, sms_code: ('A'..'Z').to_a.sample(7).join) unless sms_codes.any?
 
-    unless question_group_initial
-      qg_initial = ::QuestionGroup::Initial.new(session_id: id)
-      qg_initial.save!
+    return if question_group_initial
 
-      ::Question::SmsInformation.create!(question_group_id: qg_initial.id)
-    end
+    qg_initial = ::QuestionGroup::Initial.new(session_id: id)
+    qg_initial.save!
+
+    ::Question::SmsInformation.create!(question_group_id: qg_initial.id)
   end
 end

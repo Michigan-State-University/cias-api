@@ -53,19 +53,18 @@ class V1::Sms::Replay
 
   def handle_message_with_sms_code
     session = SmsCode.find_by(sms_code: message)&.session
-    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found', nil, @user&.id) unless session
+    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, @user&.id) unless session
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
 
       if user_session
-        SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session,'sms.already_signed'), nil, @user.id)
+        SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session, 'sms.already_signed'), nil, @user.id)
+      elsif @user.user_interventions.where.not(intervention_id: session.intervention_id).any?
+        SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session, 'sms.cannot_assign_to_many_campaigns'), nil,
+                                           @user.id)
       else
-        if @user.user_interventions.where.not(intervention_id: session.intervention_id).any?
-          SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session, 'sms.cannot_assign_to_many_campaigns'), nil, @user.id)
-        else
-          create_new_user_session!(session: session, user: @user)
-        end
+        create_new_user_session!(session: session, user: @user)
       end
     else
       user = V1::Users::CreateGuest.call(from_number)
