@@ -12,7 +12,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     return unless @user_session.user_intervention.intervention.published?
 
     # Handle Session autoclose
-    should_return = @session.autoclose_at ? false : @session.autoclose_at > DateTime.current
+    should_return = @session.autoclose_at.nil? ? false : @session.autoclose_at > DateTime.current
 
     @user_session.update(finished_at: @session.autoclose_at) if should_return
 

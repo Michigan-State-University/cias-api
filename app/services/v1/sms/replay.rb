@@ -24,7 +24,7 @@ class V1::Sms::Replay
     end
 
     # Handle incoming message
-    if message.length >= Session::Sms::SMS_CODE_MIN_LENGTH
+    if message.length >= SmsCode::SMS_CODE_MIN_LENGTH
       handle_message_with_sms_code
     else
       handle_message_with_answer

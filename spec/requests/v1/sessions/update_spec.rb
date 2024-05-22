@@ -107,7 +107,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             let(:params) do
               {
                 session: {
-                  sms_code: 'SMS_CODE'
+                  sms_codes_attributes: [{ sms_code: 'SMS_CODE' }]
                 }
               }
             end
@@ -155,7 +155,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             let(:params) do
               {
                 session: {
-                  sms_code: 'SMS_CODE'
+                  sms_codes_attributes: [{ sms_code: 'SMS_CODE' }]
                 }
               }
             end
@@ -175,13 +175,13 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
             {
               session: {
                 name: 'Sms',
-                sms_code: 'SMS_CODE'
+                sms_codes_attributes: [{ sms_code: 'SMS_CODE' }]
               }
             }
           end
 
           it 'updated values are proper' do
-            expect(json_response['data']['attributes']).to include('name' => 'Sms', 'sms_code' => 'SMS_CODE')
+            expect(json_response['data']['attributes']).to include('name' => 'Sms')
           end
         end
       end
