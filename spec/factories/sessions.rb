@@ -56,7 +56,6 @@ FactoryBot.define do
     sequence(:variable) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
     association :intervention
-    association :sms_code
 
     trait :with_questions do
       question { create_list(:question, 5) }
