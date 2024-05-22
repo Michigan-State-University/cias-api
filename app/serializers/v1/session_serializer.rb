@@ -21,7 +21,6 @@ class V1::SessionSerializer < V1Serializer
     object.intervention.user.id
   end
 
-
   attribute :sms_codes_attributes do |object|
     object.sms_codes
   end

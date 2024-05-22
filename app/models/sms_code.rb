@@ -5,7 +5,7 @@ class SmsCode < ApplicationRecord
 
   has_paper_trail
   belongs_to :session, inverse_of: :sms_codes
-  belongs_to :health_clinic, inverse_of: :sms_codes, required: false
+  belongs_to :health_clinic, inverse_of: :sms_codes, optional: true
 
   validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }
 end
