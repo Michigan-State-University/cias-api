@@ -44,7 +44,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
 
       context 'when user session with sms code is NOT created' do
         let!(:intervention) { create(:intervention, :published) }
-        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
         let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention) }
         let(:user) { create(:user, :with_phone) }
 
@@ -59,7 +59,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
 
       context 'when user session with sms code is already created' do
         let!(:intervention) { create(:intervention, :published) }
-        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
         let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention) }
         let(:user) { create(:user, :with_phone) }
         let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
@@ -73,7 +73,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
           let!(:user) { create(:user, :with_phone) }
           let!(:intervention) { create(:intervention, :published) }
           let!(:question_group_initial) { build(:question_group_initial) }
-          let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+          let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
           let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
           let!(:question_group) { create(:sms_question_group, session: session) }
           let!(:question) { create(:question_sms, question_group: question_group) }
@@ -89,7 +89,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
           let!(:user) { create(:user, :with_phone) }
           let!(:intervention) { create(:intervention, :published) }
           let!(:question_group_initial) { build(:question_group_initial) }
-          let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+          let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
           let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
           let!(:question_group) { create(:sms_question_group, session: session) }
           let!(:question) { create(:question_sms, question_group: question_group) }
@@ -117,7 +117,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:user) { create(:user, :with_phone) }
         let!(:intervention) { create(:intervention) }
         let!(:question_group_initial) { build(:question_group_initial) }
-        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
         let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
         let!(:question_group) { create(:sms_question_group, session: session) }
         let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
@@ -154,7 +154,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:user) { create(:user, :with_phone) }
         let!(:intervention) { create(:intervention) }
         let!(:question_group_initial) { build(:question_group_initial) }
-        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
         let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
         let!(:question_group) { create(:sms_question_group, session: session) }
         let!(:question) { create(:question_sms, question_group: question_group) }
@@ -169,7 +169,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
 
       context 'when user session is not created' do
         let!(:intervention) { create(:intervention) }
-        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1' )}
+        let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
         let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention) }
         let(:user) { create(:user, :with_phone) }
 
