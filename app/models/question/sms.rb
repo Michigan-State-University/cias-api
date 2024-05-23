@@ -16,7 +16,14 @@ class Question::Sms < Question
                                          }
                                        }
 
-  attribute :accepted_answers, :json, default: -> { {} }
+  attribute :accepted_answers, :json, default: lambda {
+                                                 {
+                                                   range: {
+                                                     from: '0',
+                                                     to: '100'
+                                                   }
+                                                 }
+                                               }
 
   validates :accepted_answers, json: { schema: lambda {
     Rails.root.join("#{json_schema_path}/accepted_answers.json").to_s
