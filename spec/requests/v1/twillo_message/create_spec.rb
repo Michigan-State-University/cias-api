@@ -47,7 +47,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
         let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }
         let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention) }
         let!(:user) { create(:user, :with_phone) }
-        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention)}
+        let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
 
         it 'creates new user session' do
           expect { request }.to change(user.user_sessions, :count).by(1)

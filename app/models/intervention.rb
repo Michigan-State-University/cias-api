@@ -102,7 +102,7 @@ class Intervention < ApplicationRecord
     elsif paused?
       ::Interventions::PauseJob.perform_later(id)
     elsif closed?
-    SmsCode.where(session_id: session_ids).update_all(active: false)
+      SmsCode.where(session_id: session_ids).update(active: false)
     end
   end
 
