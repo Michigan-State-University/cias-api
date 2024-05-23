@@ -41,4 +41,8 @@ class Question::SmsInformation < Question
 
     self.subtitle = I18n.with_locale(language_code) { I18n.t('question.sms.initial.title') }
   end
+
+  def csv_header_names
+    []
+  end
 end
