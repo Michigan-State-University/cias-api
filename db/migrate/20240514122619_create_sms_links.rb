@@ -2,7 +2,7 @@ class CreateSmsLinks < ActiveRecord::Migration[6.1]
   def change
     create_table :sms_links, id: :uuid, default: 'uuid_generate_v4()', null: false do |t|
       t.string :url, null: false
-      t.string :variable, null: false
+      t.integer :variable_number, null: false
       t.string :type, null: false, default: 'website'
       t.references :session, null: false, foreign_key: true, type: :uuid, index: true
       t.references :sms_plan, null: false, foreign_key: true, type: :uuid, index: true

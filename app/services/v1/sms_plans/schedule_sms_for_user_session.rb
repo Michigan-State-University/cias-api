@@ -59,6 +59,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
     attachment_url = attachment_url(plan)
     content = insert_variables_into_variant(content)
+    content = insert_links_into_variant(content, plan)
     finish_date = plan.end_at
 
     if plan.alert?
