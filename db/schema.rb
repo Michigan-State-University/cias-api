@@ -795,11 +795,13 @@ ActiveRecord::Schema.define(version: 2024_05_22_142904) do
   create_table "sms_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "session_id", null: false
     t.uuid "health_clinic_id"
+    t.boolean "active", default: true
     t.string "sms_code"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["health_clinic_id"], name: "index_sms_codes_on_health_clinic_id"
     t.index ["session_id"], name: "index_sms_codes_on_session_id"
+    t.index ["sms_code"], name: "unique_active_sms_codes", unique: true, where: "(active IS TRUE)"
   end
 
   create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|

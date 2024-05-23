@@ -7,5 +7,5 @@ class SmsCode < ApplicationRecord
   belongs_to :session, inverse_of: :sms_codes
   belongs_to :health_clinic, inverse_of: :sms_codes, optional: true
 
-  validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }
+  validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: ->{ active }
 end
