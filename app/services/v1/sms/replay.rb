@@ -13,7 +13,6 @@ class V1::Sms::Replay
     @message = body.to_s.strip
     @number_prefix = Phonelib.parse(from).country_code
     @national_number = Phonelib.parse(from).national(false)
-    @user = User.left_joins(:phone).find_by(phone: { prefix: "+#{@number_prefix}", number: @national_number })
   end
 
   def call
@@ -55,6 +54,10 @@ class V1::Sms::Replay
     session = SmsCode.find_by(sms_code: message)&.session
     return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, @user&.id) unless session
 
+    intervention_ids = session.intervention.user_intervention_ids
+    possible_user_ids = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number }).pluck(:id)
+    @user = UserIntervention.find_by(id: intervention_ids, user_id: possible_user_ids).user
+
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
 
@@ -73,8 +76,9 @@ class V1::Sms::Replay
   end
 
   def handle_message_with_answer
+    @user = User.left_joins(:phone).find_by(phone: { prefix: "+#{@number_prefix}", number: @national_number })
     if @user
-      user_session = UserSession::Sms.includes(:user_intervention).where(user_id: @user.id).where.not(current_question_id: nil, finished_at: nil).first
+      user_session = UserSession::Sms.where(user_id: @user.id).where.not(current_question_id: nil, finished_at: nil).first
       if user_session
         unless user_session.current_question_id
           SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(user_session.session, 'sms.wrong_message'), nil, nil)
