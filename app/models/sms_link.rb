@@ -17,14 +17,14 @@ class SmsLink < ApplicationRecord
 
   # CALLBACKS
   before_validation :set_session_id
-  before_validation :set_variable
+  before_validation :set_variable_number
 
   # METHODS
   def set_session_id
     self.session_id ||= sms_plan&.session_id
   end
 
-  def set_variable
+  def set_variable_number
     last_number = sms_plan.sms_links.pluck(:variable_number).last.to_i
     self.variable_number = last_number + 1
   end

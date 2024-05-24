@@ -49,12 +49,10 @@ class V1::SmsPlans::SmsLinksController < V1Controller
   end
 
   def sms_link_params
-    params.require(:sms_link_params).permit(
+    params.require(:sms_link).permit(
       :url,
-      :variable,
       :type,
       :sms_plan_id,
-      :session_plan_id,
       :slug
     )
   end
