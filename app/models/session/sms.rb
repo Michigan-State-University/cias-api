@@ -78,7 +78,7 @@ class Session::Sms < Session
   def create_core_children
     if intervention.organization
       intervention.organization.health_clinics.each do |clinic|
-        existing_code = SmsCode.find_by!(session_id: id, health_clinic_id: clinic.id)
+        existing_code = SmsCode.find_by(session_id: id, health_clinic_id: clinic.id)
         SmsCode.create!(session_id: id, sms_code: ('A'..'Z').to_a.sample(7).join, health_clinic_id: clinic.id) unless existing_code
       end
     else
