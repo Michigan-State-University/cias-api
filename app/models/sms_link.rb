@@ -7,10 +7,10 @@ class SmsLink < ApplicationRecord
   has_many :sms_links_users, dependent: :destroy
 
   # VALIDATIONS
-  validates :url, :variable, presence: true
+  validates :url, :variable_number, presence: true
 
   # ENUMS
-  enum type: {
+  enum link_type: {
     website: 'website',
     video: 'video'
   }

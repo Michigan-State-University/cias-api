@@ -2,9 +2,9 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/sms_links', type: :request do
+RSpec.describe 'POST /v1/sms_links', type: :request do
   let(:sms_plan) { create(:sms_plan, no_formula_text: no_formula_text) }
-  let(:request) { post v1_sms_plan_sms_links_path(sms_plan.id), params: params, headers: headers }
+  let(:request) { post v1_sms_links_path, params: params, headers: headers }
   let(:user) { create(:user, :confirmed, :admin) }
   let(:headers) { user.create_new_auth_token }
 
@@ -14,7 +14,7 @@ RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/sms_links', type: :request do
       {
         sms_link: {
           url: 'test.com',
-          type: 'website',
+          link_type: 'website',
           sms_plan_id: sms_plan.id
         }
       }
@@ -30,7 +30,7 @@ RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/sms_links', type: :request do
 
       expect(SmsLink.last).to have_attributes(
         url: 'test.com',
-        type: 'website',
+        link_type: 'website',
         sms_plan_id: sms_plan.id,
         session_id: sms_plan.session.id,
         variable_number: 1

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::SmsPlans::SmsLinksController < V1Controller
+class V1::SmsLinksController < V1Controller
   def index
     authorize! :read, sms_link_sms_plan
 
@@ -11,7 +11,7 @@ class V1::SmsPlans::SmsLinksController < V1Controller
 
   def create
     authorize! :create, SmsLink
-    authorize! :create, sms_link_session
+    authorize! :update, sms_link_session
     authorize! :update, sms_link_sms_plan
 
     return render status: :method_not_allowed if sms_link_session.intervention.published?
@@ -24,13 +24,13 @@ class V1::SmsPlans::SmsLinksController < V1Controller
   def verify
     check_intervention_status
 
-    render json: verify_response
+    render json: verify_response, status: :ok
   end
 
   private
 
   def sms_link_session
-    @sms_link_session ||= Session.find(sms_link_params[:session_id])
+    @sms_link_session ||= sms_link_sms_plan.session
   end
 
   def sms_link_sms_plan
@@ -39,8 +39,8 @@ class V1::SmsPlans::SmsLinksController < V1Controller
 
   def verify_response
     {
-      link_type: sms_links_user.sms_link.type,
-      redirect_data: V1::SmsPlans::SmsLinks::VerifyService.call(sms_links_user)
+      link_type: sms_links_user.sms_link.link_type,
+      redirect_data: V1::SmsLinks::VerifyService.call(sms_links_user)
     }
   end
 
@@ -51,9 +51,8 @@ class V1::SmsPlans::SmsLinksController < V1Controller
   def sms_link_params
     params.require(:sms_link).permit(
       :url,
-      :type,
-      :sms_plan_id,
-      :slug
+      :link_type,
+      :sms_plan_id
     )
   end
 
