@@ -6,6 +6,7 @@ class Session::Sms < Session
   attribute :settings, :json, default: -> { { 'narrator' => { 'voice' => false, 'animation' => false } } }
 
   after_commit :create_core_children, on: :create
+  after_commit :create_sms_codes
 
   def first_question
     question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first
@@ -75,9 +76,9 @@ class Session::Sms < Session
     variables.filter(&:present?)
   end
 
-  def create_core_children
+  def create_sms_codes
     if intervention.organization
-      intervention.organization.health_clinics.each do |clinic|
+      intervention.organization.health_clinics.where(deleted_at: nil).each do |clinic|
         existing_code = SmsCode.find_by(session_id: id, health_clinic_id: clinic.id)
         SmsCode.create!(session_id: id, sms_code: ('A'..'Z').to_a.sample(7).join, health_clinic_id: clinic.id) unless existing_code
       end
@@ -85,7 +86,8 @@ class Session::Sms < Session
       SmsCode.where(session_id: id).where.not(health_clinic_id: nil).destroy_all
       SmsCode.create!(session_id: id, sms_code: ('A'..'Z').to_a.sample(7).join) unless sms_codes.any?
     end
-
+  end
+  def create_core_children
     return if question_group_initial
 
     qg_initial = ::QuestionGroup::Initial.new(session_id: id)

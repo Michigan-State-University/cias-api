@@ -21,5 +21,16 @@ class V1::SessionSerializer < V1Serializer
     object.intervention.user.id
   end
 
-  attribute :sms_codes_attributes, &:sms_codes
+  attribute :sms_codes_attributes do |object|
+    object.sms_codes.map do |sms_code|
+      {
+        id: sms_code.id,
+        sms_code: sms_code.sms_code,
+        clinic: {
+          name: sms_code.health_clinic&.name,
+          deleted_at: sms_code.health_clinic&.deleted_at
+        }
+      }
+    end
+  end
 end
