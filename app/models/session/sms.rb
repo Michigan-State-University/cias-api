@@ -69,7 +69,7 @@ class Session::Sms < Session
   end
 
   def digit_variable_questions
-    %w[Question::Sms Question::SmsInformation]
+    %w[Question::Sms]
   end
 
   def present_variables(variables)

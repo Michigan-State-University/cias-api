@@ -25,13 +25,14 @@ class Intervention::Csv::Harvester
 
   def set_headers
     sessions.order(:position).each do |session|
-      number_of_attempts(session).times do |index|
+      session_attempts = number_of_attempts(session)
+      session_attempts.times do |index|
         session.fetch_variables.each do |question_hash|
-          question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var, index, session.multiple_fill) }
+          question_hash[:variables].each { |var| header << add_session_variable_to_question_variable(session, var, index, session_attempts > 1) }
         end
 
-        header.concat(session_metadata(session, index, session.multiple_fill))
-        header.concat(quick_exit_header(session, index, session.multiple_fill))
+        header.concat(session_metadata(session, index, session_attempts > 1))
+        header.concat(quick_exit_header(session, index, session_attempts > 1))
       end
     end
 
@@ -71,12 +72,13 @@ class Intervention::Csv::Harvester
 
       grouped_user_sessions.second.each do |user_session|
         user_session.answers.each do |answer|
-          set_default_value(user_session, answer, row_index, user_session.number_of_attempts, user_session.session.multiple_fill)
+          answer_attempt = calculate_answer_attempt(answer)
+          set_default_value(user_session, answer, row_index, answer_attempt, number_of_attempts(user_session.session) > 1)
           next if answer.skipped
 
           answer.body_data&.each do |data|
-            var_index = header.index(column_name(user_session.session.multiple_fill, user_session.session, answer.csv_header_name(data),
-                                                 user_session.number_of_attempts))
+            var_index = header.index(column_name(number_of_attempts(user_session.session) > 1, user_session.session, answer.csv_header_name(data),
+                                                 answer_attempt))
 
             next if var_index.blank?
 
@@ -84,13 +86,18 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
           end
         end
-        fill_by_tlfb_research(row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
-        metadata(user_session.session, user_session, row_index, user_session.number_of_attempts, user_session.session.multiple_fill)
-        quick_exit(user_session.session, row_index, user_session, user_session.number_of_attempts, user_session.session.multiple_fill)
+        fill_by_tlfb_research(row_index, user_session, number_of_attempts(user_session.session), number_of_attempts(user_session.session) > 1)
+        metadata(user_session.session, user_session, row_index, number_of_attempts(user_session.session), number_of_attempts(user_session.session) > 1)
+        quick_exit(user_session.session, row_index, user_session, number_of_attempts(user_session.session), number_of_attempts(user_session.session) > 1)
       end
 
       fill_hf_initial_screen(row_index, grouped_user_sessions.second.first)
     end
+  end
+
+  def calculate_answer_attempt(answer)
+    ordered_ids = Answer.where(user_session_id: answer.user_session_id, question_id: answer.question_id).order(:created_at).pluck(:id)
+    ordered_ids.index(answer.id)
   end
 
   def metadata(session, user_session, row_index, approach_number, multiple_fill)
@@ -191,7 +198,13 @@ class Intervention::Csv::Harvester
   end
 
   def number_of_attempts(session)
-    user_sessions.where(session_id: session.id).maximum(:number_of_attempts) || 1
+    user_session_ids = user_sessions.where(session_id: session.id).pluck(:id)
+
+    Answer
+      .where(user_session_id: user_session_ids)
+      .group(:user_session_id, :question_id)
+      .unscope(:order)
+      .pluck("count(question_id) AS answers_count").max || 1
   end
 
   def column_name(multiple_fill, session, suffix, approach_number = nil)
