@@ -204,7 +204,7 @@ class Intervention::Csv::Harvester
       .where(user_session_id: user_session_ids)
       .group(:user_session_id, :question_id)
       .unscope(:order)
-      .pluck("count(question_id) AS answers_count").max || 1
+      .pluck('count(question_id)').max || 1
   end
 
   def column_name(multiple_fill, session, suffix, approach_number = nil)
