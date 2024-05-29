@@ -46,7 +46,7 @@ class V1::Sms::Replay
     @user = User.left_joins(:phone).find_by(phone: { prefix: "+#{@number_prefix}", number: @national_number })
 
     if @user
-      sms_sessions = Session::Sms.where(user_id: @user.id).update(finished_at: DateTime.current)
+      sms_sessions = UserSession::Sms.where(user_id: @user.id).update(finished_at: DateTime.current)
       sms_session_ids = sms_sessions.pluck(:id)
 
       queue = Sidekiq::ScheduledSet.new
@@ -70,7 +70,7 @@ class V1::Sms::Replay
 
     intervention_ids = session.intervention.user_intervention_ids
     possible_user_ids = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number }).pluck(:id)
-    @user = UserIntervention.find_by(id: intervention_ids, user_id: possible_user_ids).user
+    @user = UserIntervention.find_by(id: intervention_ids, user_id: possible_user_ids)&.user
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
