@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::SmsLinksController < V1Controller
+  skip_before_action :authenticate_user!, only: :verify
+
   def index
     authorize! :read, sms_link_sms_plan
 
@@ -22,14 +24,7 @@ class V1::SmsLinksController < V1Controller
   end
 
   def verify
-    check_intervention_status
-
-    res = verify_response
-    if res[:link_type] == 'website'
-      redirect_to sms_links_user.sms_link.url
-    else
-      render json: verify_response, status: :ok
-    end
+    render json: verify_response, status: :ok
   end
 
   private
@@ -44,7 +39,7 @@ class V1::SmsLinksController < V1Controller
 
   def verify_response
     {
-      link_type: sms_links_user.sms_link.link_type,
+      link_type: sms_links_user&.sms_link&.link_type,
       redirect_data: V1::SmsLinks::VerifyService.call(sms_links_user)
     }
   end
@@ -59,16 +54,5 @@ class V1::SmsLinksController < V1Controller
       :link_type,
       :sms_plan_id
     )
-  end
-
-  def check_intervention_status
-    intervention = sms_links_user.sms_link.session.intervention
-    return if intervention.published?
-
-    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_DRAFT' }, :bad_request) if intervention.draft?
-
-    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_PAUSED' }, :bad_request) if intervention.paused?
-
-    raise ComplexException.new(I18n.t('short_link.error.not_available'), { reason: 'INTERVENTION_CLOSED' }, :bad_request)
   end
 end

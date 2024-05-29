@@ -9,7 +9,7 @@ class SmsLinksUser < ApplicationRecord
   before_create :generate_slug
 
   # VALIDATIONS
-  validates :slug, presence: true, uniqueness: true
+  validates :slug, uniqueness: true
 
   # METHODS
   def add_timestamp

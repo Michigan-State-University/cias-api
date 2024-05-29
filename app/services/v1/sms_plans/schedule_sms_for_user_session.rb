@@ -55,6 +55,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
     frequency = plan.frequency
     content = sms_content(plan)
+
     return if content.blank?
 
     attachment_url = attachment_url(plan)
