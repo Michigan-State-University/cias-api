@@ -13,7 +13,7 @@ class Audio::TextToSpeech::Google
 
   def synthesize
     client.synthesize_speech(
-      input: { text: text },
+      input: parse_input,
       voice: voice,
       audio_config: audio_config
     ).audio_content
@@ -47,6 +47,24 @@ class Audio::TextToSpeech::Google
       end
     rescue Oj::ParseError
       ENV['GOOGLE_APPLICATION_CREDENTIALS']
+    end
+  end
+
+  def parse_input
+    if text.include?('esp')
+      ssml = <<-SSML
+        <speak>
+          #{text.gsub(/\besp\b/, '<say-as interpret-as="characters">esp</say-as>')}
+        </speak>
+      SSML
+
+      {
+        ssml: ssml
+      }
+    else
+      {
+        text: text
+      }
     end
   end
 end
