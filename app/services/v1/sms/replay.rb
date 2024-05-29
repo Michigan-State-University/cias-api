@@ -43,6 +43,20 @@ class V1::Sms::Replay
   end
 
   def delete_messaged_for(number)
+    @user = User.left_joins(:phone).find_by(phone: { prefix: "+#{@number_prefix}", number: @national_number })
+
+    if @user
+      sms_sessions = Session::Sms.where(user_id: @user.id).update(finished_at: DateTime.current)
+      sms_session_ids = sms_sessions.pluck(:id)
+
+      queue = Sidekiq::ScheduledSet.new
+      queue.each do |job|
+        job_args = job.args.first
+        job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && sms_session_ids.include?(job_args['arguments'].first)
+        job.delete if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'].first.eql?(@user.id)
+      end
+    end
+
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
       job_args = job.args.first
