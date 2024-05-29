@@ -25,7 +25,7 @@ class V1::SmsLinksController < V1Controller
     check_intervention_status
 
     res = verify_response
-    if res.link_type == 'website'
+    if res[:link_type] == 'website'
       redirect_to sms_links_user.sms_link.url
     else
       render json: verify_response, status: :ok
