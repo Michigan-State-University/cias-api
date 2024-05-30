@@ -81,6 +81,8 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   end
 
   def calculate_question_sending_time(sms_schedule, questions_per_day, question_index)
+    # We need to schedule sms sending time in proper timezone.
+    # ENV name is misleading, as it refers to CSV generation, but it contains proper timezone value related to users location.
     if sms_schedule.dig('time', 'exact')
       time_of_message = DateTime.parse(sms_schedule.dig('time', 'exact'))
       DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).change({ hour: time_of_message.hour, min: time_of_message.minute })
