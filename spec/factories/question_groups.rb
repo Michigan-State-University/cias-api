@@ -26,7 +26,6 @@ FactoryBot.define do
     end
     sms_schedule do
       {
-        period: 'weekly',
         day_of_period: ['1'],
         questions_per_day: 1,
         time: {

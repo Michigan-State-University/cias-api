@@ -77,7 +77,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   def select_questions_groups_scheduled_for_today
     accessible_question_groups = calculate_accessible_question_groups_for_user(@session.question_groups.order(:position))
     QuestionGroup.where(id: accessible_question_groups.pluck(:id))
-                 .where("sms_schedule ->> 'period' = 'weekly' AND sms_schedule -> 'day_of_period' @> '[\"#{DateTime.current.wday}\"]'")
+                 .where("sms_schedule -> 'day_of_period' @> '[\"#{DateTime.current.wday}\"]'")
   end
 
   def calculate_question_sending_time(sms_schedule, questions_per_day, question_index)

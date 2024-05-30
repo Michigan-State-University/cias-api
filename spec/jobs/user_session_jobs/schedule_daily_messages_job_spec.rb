@@ -25,7 +25,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
         build(:question_group_initial,
               formulas: [],
               sms_schedule: {
-                period: 'weekly',
                 day_of_period: ['1'],
                 questions_per_day: 1,
                 time: {
@@ -90,7 +89,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
         build(:question_group_initial,
               formulas: [],
               sms_schedule: {
-                period: 'weekly',
                 day_of_period: ['1'],
                 questions_per_day: 2,
                 time: {
@@ -210,7 +208,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
         build(:question_group_initial,
               formulas: [],
               sms_schedule: {
-                period: 'weekly',
                 day_of_period: ['1'],
                 questions_per_day: 1,
                 time: {
@@ -223,7 +220,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
                session: session,
                formulas: [],
                sms_schedule: {
-                 period: 'weekly',
                  day_of_period: ['1'],
                  questions_per_day: 1,
                  time: {
@@ -356,7 +352,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
         build(:question_group_initial,
               formulas: [],
               sms_schedule: {
-                period: 'weekly',
                 day_of_period: ['1'],
                 questions_per_day: 1,
                 time: {
@@ -374,7 +369,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
                  }
                ],
                sms_schedule: {
-                 period: 'weekly',
                  day_of_period: ['2'],
                  questions_per_day: 1,
                  time: {
@@ -392,7 +386,6 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
                  }
                ],
                sms_schedule: {
-                 period: 'weekly',
                  day_of_period: ['2'],
                  questions_per_day: 1,
                  time: {
