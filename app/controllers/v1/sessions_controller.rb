@@ -118,6 +118,7 @@ class V1::SessionsController < V1Controller
                                     :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
                                     :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time,
                                     :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at,
+                                    :welcome_message, :default_response,
                                     narrator: {}, settings: {}, sms_codes_attributes: %i[id sms_code],
                                     formulas: [
                                       :payload, { patterns: [:match, {

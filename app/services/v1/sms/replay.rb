@@ -95,7 +95,12 @@ class V1::Sms::Replay
       user_session = UserSession::Sms.where(user_id: @user.id).where.not(current_question_id: nil, finished_at: nil).first
       if user_session
         unless user_session.current_question_id
-          SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(user_session.session, 'sms.wrong_message'), nil, nil)
+          SmsPlans::SendSmsJob.perform_later(@user.full_number,
+                                             user_session.session.default_response.empty? ?
+                                               translate_with_intervention_locale(user_session.session, 'sms.wrong_message') :
+                                               user_session.session.default_response,
+                                             nil,
+                                             nil)
           return
         end
 
@@ -123,6 +128,7 @@ class V1::Sms::Replay
     user_session = V1::UserSessions::CreateService.call(session.id, user.id, health_clinic_id)
     user_session.save!
     schedule_user_session_job!(user_session)
+    SmsPlans::SendSmsJob.perform_later(user.full_number, user_session.welcome_message, nil, user.id)
   end
 
   def schedule_user_session_job!(user_session)

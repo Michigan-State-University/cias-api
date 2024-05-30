@@ -2,6 +2,8 @@
 
 class Session::Classic < Session
   validates :sms_codes, absence: true
+  validates :welcome_message, absence: true
+  validates :default_response, absence: true
   validates :question_group_initial, absence: true
 
   after_commit :create_core_children, on: :create
