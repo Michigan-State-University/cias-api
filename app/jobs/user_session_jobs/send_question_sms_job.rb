@@ -3,7 +3,7 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
-  def perform(user_id, question_id, user_session_id)
+  def perform(user_id, question_id, user_session_id, reminder = false)
     user = User.find(user_id)
 
     should_return = if user.predefined_user_parameter
@@ -16,6 +16,13 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
     question = Question.find(question_id)
     user_session = UserSession::Sms.find(user_session_id)
+
+    # Handle case when current sending job is reminder - needs to be executed before handling pending answer flag
+    if reminder
+      send_sms(user.full_number, question.subtitle)
+    end
+
+    return if reminder
 
     # Handle case when user has pending answers - reschedule question in 5 minutes till the end of the day
     if user.pending_sms_answer
@@ -39,10 +46,44 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     else
       # Set pending answer flag
       user.update(pending_sms_answer: true)
+      schedule_question_followups(user, question, user_session)
     end
   end
 
   private
+
+  def schedule_question_followups(user, question, user_session)
+    # Get proper configuration
+    every_number_of_hours = question.sms_reminders.dig('per_hours').to_i
+    for_number_of_days = question.sms_reminders.dig('number_of_days').to_i
+    from = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders.dig('from') || '')
+    to = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders.dig('to') || '')
+
+    return unless every_number_of_hours && for_number_of_days && from && to
+
+    # Prepare all vars for calculation of all reminders
+    reminders_datetimes = [DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE'])]
+    calculated_datetime = reminders_datetimes.last
+    last_possible_reminder = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders.dig('to')) + (for_number_of_days - 1).days
+    index = 1
+
+    # Calculate all possible datetimes
+    while calculated_datetime + every_number_of_hours.hours < last_possible_reminder
+      calculated_datetime = calculated_datetime + every_number_of_hours.hours
+      reminders_datetimes << calculated_datetime if calculated_datetime.hours >= from.hours && calculated_datetime.hours < to.hours
+      index += 1
+    end
+
+    # Remove first element of array, as for calculations we had to add current datetime as first element.
+    # If while loop will not be able to add any new datetimes we will end up with empty array
+    reminders_datetimes.shift(1)
+
+    # Schedule new SMSes sending jobs
+    reminders_datetimes.each do |datetime|
+      UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime)
+                                         .perform_later(user.id, question.id, user_session.id, reminder = true)
+    end
+  end
 
   def send_sms(number, content)
     sms = Message.create(phone: number, body: content, attachment_url: nil)

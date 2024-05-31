@@ -117,6 +117,7 @@ class V1::Sms::Replay
           V1::AnswerService.call(@user, user_session.id, question.id,
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
+          remove_question_followups(@user, question, user_session)
         else
           SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, nil)
         end
@@ -125,6 +126,14 @@ class V1::Sms::Replay
       end
     else
       SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.wrong_message'), nil, nil)
+    end
+  end
+
+  def remove_question_followups(user, question, user_session)
+    queue = Sidekiq::ScheduledSet.new
+    queue.each do |job|
+      job_args = job.args.first
+      job.delete if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'].eql?([user.id, question.id, user_session.id, true])
     end
   end
 

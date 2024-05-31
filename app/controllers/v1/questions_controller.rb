@@ -131,7 +131,8 @@ class V1::QuestionsController < V1Controller
   end
 
   def question_params
-    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, accepted_answers: {}, narrator: {}, settings: {}, formulas: [
+    params.require(:question).permit(:type, :question_group_id, :title, :subtitle, :video_url, accepted_answers: {},
+                                     sms_reminders: {}, narrator: {}, settings: {}, formulas: [
                                        :payload, { patterns: [:match, { target: %i[type probability id] }] }
                                      ], body: {})
   end

@@ -33,7 +33,8 @@ class Question < ApplicationRecord
   has_one :image_blob, through: :image_attachment, class_name: 'ActiveStorage::Blob', source: :blob
 
   validates :title, presence: true, unless: -> { is_a? SmsInformation or is_a? Sms }
-  validates :accepted_answers, absence: true, unless: -> { is_a? SmsInformation or is_a? Sms }
+  validates :accepted_answers, absence: true, unless: -> { is_a? Sms }
+  validates :sms_reminders, absence: true, unless: -> { is_a? Sms }
   validates :type, presence: true
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validates :settings, json: { schema: lambda {

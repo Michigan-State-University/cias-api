@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "per_hours": { "type": "string" },
+    "number_of_days": { "type": "string" },
+    "from": { "type": "string" },
+    "to": { "type": "string" }
+  },
+  "additionalProperties": false
+}

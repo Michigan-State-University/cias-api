@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_05_30_130856) do
+ActiveRecord::Schema.define(version: 2024_05_31_104952) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -686,6 +686,7 @@ ActiveRecord::Schema.define(version: 2024_05_30_130856) do
     t.datetime "updated_at", precision: 6, null: false
     t.jsonb "original_text"
     t.jsonb "accepted_answers"
+    t.jsonb "sms_reminders", default: {}
     t.index ["question_group_id"], name: "index_questions_on_question_group_id"
     t.index ["title"], name: "index_questions_on_title"
     t.index ["type", "question_group_id", "title"], name: "index_questions_on_type_and_question_group_id_and_title", using: :gin
