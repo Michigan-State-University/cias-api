@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
-  subject { described_class.perform_now(user.id, question.id, user_session.id) }
+  subject { described_class.perform_now(user.id, question.id, user_session.id, false) }
 
   before do
     ActiveJob::Base.queue_adapter = :test

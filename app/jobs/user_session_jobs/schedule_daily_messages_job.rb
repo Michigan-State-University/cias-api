@@ -46,7 +46,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     # Schedule all sending jobs
     questions_to_be_send_today.each do |elem|
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
-                                         .perform_later(@user.id, elem[:question].id, @user_session.id)
+                                         .perform_later(@user.id, elem[:question].id, @user_session.id, false)
     end
 
     UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)

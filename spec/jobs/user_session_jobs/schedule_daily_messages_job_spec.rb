@@ -413,7 +413,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           it 'schedules sms sending job' do
             travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
-                                      .with(user.id, question_sms_information.id, user_session.id)
+                                      .with(user.id, question_sms_information.id, user_session.id, false)
             end
           end
         end
@@ -443,7 +443,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           it 'schedules sms sending job' do
             travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
-                                      .with(user.id, question_sms_information.id, user_session.id)
+                                      .with(user.id, question_sms_information.id, user_session.id, false)
             end
           end
         end
@@ -473,7 +473,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           it 'schedules sms sending job' do
             travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
-                                      .with(user.id, question_sms.id, user_session.id)
+                                      .with(user.id, question_sms.id, user_session.id, false)
             end
           end
         end
@@ -509,7 +509,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           it 'schedules sms sending job' do
             travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
-                                      .with(user.id, question_group.questions.order(:position).first.id, user_session.id)
+                                      .with(user.id, question_group.questions.order(:position).first.id, user_session.id, false)
             end
           end
         end

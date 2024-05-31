@@ -3,7 +3,7 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
-  def perform(user_id, question_id, user_session_id, reminder = false)
+  def perform(user_id, question_id, user_session_id, reminder)
     user = User.find(user_id)
 
     should_return = if user.predefined_user_parameter
@@ -28,7 +28,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
       # Skip question if next day
       unless datetime_of_next_job > DateTime.current.end_of_day
-        UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id)
+        UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id, false)
       end
     end
 
