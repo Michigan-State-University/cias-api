@@ -30,7 +30,7 @@ class Clone::Session < Clone::Base
 
   def create_question_groups
     # CAT-MH sessions won't have question groups so it will throw an error if we try to access them
-    return unless source.respond_to?(:question_groups)
+    return unless source.question_groups.any?
 
     destroy_default_finish_question_group
 
