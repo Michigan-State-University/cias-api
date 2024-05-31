@@ -63,13 +63,11 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     reminders_datetimes = [DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE'])]
     calculated_datetime = reminders_datetimes.last
     last_possible_reminder = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders['to']) + (for_number_of_days - 1).days
-    index = 1
 
     # Calculate all possible datetimes
-    while calculated_datetime + every_number_of_hours.hours < last_possible_reminder
-      calculated_datetime += every_number_of_hours.hours
-      reminders_datetimes << calculated_datetime if calculated_datetime.hours >= from.hours && calculated_datetime.hours < to.hours
-      index += 1
+    while calculated_datetime + every_number_of_hours.hour < last_possible_reminder
+      calculated_datetime += every_number_of_hours.hour
+      reminders_datetimes << calculated_datetime if calculated_datetime.hour >= from.hour && calculated_datetime.hour < to.hour
     end
 
     # Remove first element of array, as for calculations we had to add current datetime as first element.
