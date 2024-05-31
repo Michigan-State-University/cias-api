@@ -26,13 +26,13 @@ class Question::Sms < Question
                                                }
 
   attribute :sms_reminders, :json, default: lambda {
-                                                 {
-                                                   per_hours: '',
-                                                   number_of_days: '',
-                                                   from: '',
-                                                   to: ''
-                                                 }
-                                               }
+                                              {
+                                                per_hours: '',
+                                                number_of_days: '',
+                                                from: '',
+                                                to: ''
+                                              }
+                                            }
 
   validates :accepted_answers, json: { schema: lambda {
     Rails.root.join("db/schema/#{self.class.name.underscore}/accepted_answers.json").to_s
