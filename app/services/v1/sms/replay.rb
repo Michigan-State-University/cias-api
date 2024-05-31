@@ -142,7 +142,7 @@ class V1::Sms::Replay
     user_session = V1::UserSessions::CreateService.call(session.id, user.id, health_clinic_id)
     user_session.save!
     schedule_user_session_job!(user_session)
-    SmsPlans::SendSmsJob.perform_later(user.full_number, user_session.session.welcome_message, nil, user.id) unless user_session.session.welcome_message.blank?
+    SmsPlans::SendSmsJob.perform_later(user.full_number, user_session.session.welcome_message, nil, user.id) if user_session.session.welcome_message.present?
   end
 
   def schedule_user_session_job!(user_session)
