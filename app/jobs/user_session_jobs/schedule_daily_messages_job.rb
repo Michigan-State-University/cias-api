@@ -56,14 +56,18 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   private
 
   def last_answer_in_question_group(question_group)
-    @user_session
-      .answers
-      .includes(question: :question_group)
-      .where(question: { question_group: question_group })
-      .confirmed
-      .unscope(:order)
-      .order(:updated_at)
-      .last
+    if question_group.sms_schedule['start_from_first_question']
+      nil
+    else
+      @user_session
+        .answers
+        .includes(question: :question_group)
+        .where(question: { question_group: question_group })
+        .confirmed
+        .unscope(:order)
+        .order(:updated_at)
+        .last
+    end
   end
 
   def calculate_accessible_question_groups_for_user(scoped_question_groups)

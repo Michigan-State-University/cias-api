@@ -3,6 +3,7 @@
   "type": "object",
   "properties": {
     "period": { "type": "string" },
+    "start_from_first_question": { "type": "boolean" },
     "questions_per_day": { "type": "integer" },
     "overwrite_user_time_settings": { "type": "boolean" },
     "day_of_period": {
