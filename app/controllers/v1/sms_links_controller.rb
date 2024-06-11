@@ -40,7 +40,7 @@ class V1::SmsLinksController < V1Controller
   def verify_response
     {
       link_type: sms_links_user&.sms_link&.link_type,
-      redirect_data: V1::SmsLinks::VerifyService.call(sms_links_user)
+      redirect_url: V1::SmsLinks::VerifyService.call(sms_links_user)
     }
   end
 

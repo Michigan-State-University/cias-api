@@ -14,6 +14,6 @@ class V1::SmsLinks::VerifyService
   def call
     sms_links_user&.add_timestamp
 
-    { url: sms_links_user&.sms_link&.url }
+    sms_links_user&.sms_link&.url
   end
 end

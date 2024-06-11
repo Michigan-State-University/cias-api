@@ -38,7 +38,7 @@ RSpec.describe 'POST /v1/sms_links', type: :request do
 
       it 'recieves proper attributes' do
         request
-        expect(json_response).to eq({ 'link_type' => sms_link.link_type, 'redirect_data' => { 'url' => sms_link.url } })
+        expect(json_response).to eq({ 'link_type' => sms_link.link_type, 'redirect_url' => sms_link.url })
       end
     end
   end
