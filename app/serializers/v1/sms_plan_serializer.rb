@@ -8,6 +8,7 @@ class V1::SmsPlanSerializer < V1Serializer
              :include_email, :include_phone_number
   has_many :variants, serializer: V1::SmsPlan::VariantSerializer
   has_many :phones, serializer: V1::PhoneSerializer
+  has_many :sms_links, serializer: V1::SmsLinkSerializer
 
   attribute :end_at do |object|
     object.end_at.strftime('%d/%m/%Y') if object.end_at.present?
@@ -15,5 +16,9 @@ class V1::SmsPlanSerializer < V1Serializer
 
   attribute :no_formula_attachment do |object|
     map_file_data(object.no_formula_attachment) if object.no_formula_attachment.attached?
+  end
+
+  attribute :available_link_variable_number do |sms_plan|
+    sms_plan.sms_links.any? ? sms_plan.sms_links.last.available_variable_number : 1
   end
 end

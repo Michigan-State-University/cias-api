@@ -25,7 +25,10 @@ class SmsLink < ApplicationRecord
   end
 
   def set_variable_number
-    last_number = sms_plan.sms_links.pluck(:variable_number).last.to_i
-    self.variable_number = last_number + 1
+    self.variable_number = available_variable_number
+  end
+
+  def available_variable_number
+    sms_plan.sms_links.pluck(:variable_number).last.to_i + 1
   end
 end
