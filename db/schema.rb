@@ -807,6 +807,31 @@ ActiveRecord::Schema.define(version: 2024_05_31_104952) do
     t.index ["sms_code"], name: "unique_active_sms_codes", unique: true, where: "(active IS TRUE)"
   end
 
+  create_table "sms_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "url", null: false
+    t.integer "variable_number", null: false
+    t.string "link_type", default: "website", null: false
+    t.uuid "session_id", null: false
+    t.uuid "sms_plan_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["session_id"], name: "index_sms_links_on_session_id"
+    t.index ["sms_plan_id", "variable_number"], name: "index_sms_links_on_sms_plan_id_and_variable_number", unique: true
+    t.index ["sms_plan_id"], name: "index_sms_links_on_sms_plan_id"
+  end
+
+  create_table "sms_links_users", force: :cascade do |t|
+    t.string "slug", null: false
+    t.uuid "user_id", null: false
+    t.uuid "sms_link_id", null: false
+    t.string "entered_timestamps", default: [], null: false, array: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["sms_link_id", "user_id"], name: "index_sms_links_users_on_sms_link_id_and_user_id", unique: true
+    t.index ["sms_link_id"], name: "index_sms_links_users_on_sms_link_id"
+    t.index ["user_id"], name: "index_sms_links_users_on_user_id"
+  end
+
   create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "sms_plan_id"
     t.string "formula_match"
@@ -1091,6 +1116,10 @@ ActiveRecord::Schema.define(version: 2024_05_31_104952) do
   add_foreign_key "sessions", "interventions"
   add_foreign_key "sms_codes", "health_clinics"
   add_foreign_key "sms_codes", "sessions"
+  add_foreign_key "sms_links", "sessions"
+  add_foreign_key "sms_links", "sms_plans"
+  add_foreign_key "sms_links_users", "sms_links"
+  add_foreign_key "sms_links_users", "users"
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
   add_foreign_key "user_log_requests", "users"

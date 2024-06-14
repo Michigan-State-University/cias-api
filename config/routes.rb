@@ -199,6 +199,8 @@ Rails.application.routes.draw do
       post 'clone', on: :member
     end
 
+    resources :sms_links, only: %i[index create]
+
     resources :organizations, controller: :organizations do
       scope module: 'organizations' do
         get 'charts_data/generate', to: 'charts_data/charts_data#generate_charts_data'
@@ -299,6 +301,7 @@ Rails.application.routes.draw do
     get '/s/:slug', to: 'links#show', as: :short
     post '/sms/replay', to: 'twillo_message#create', as: :sms_replay
     post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
+    post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
   end
 
   if Rails.env.development?

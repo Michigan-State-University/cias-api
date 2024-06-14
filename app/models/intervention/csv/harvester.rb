@@ -32,6 +32,7 @@ class Intervention::Csv::Harvester
           end
         end
 
+        header.concat(sms_links_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(session_metadata(session, index, multiple_fill_indicator_for(session)))
         header.concat(quick_exit_header(session, index, multiple_fill_indicator_for(session)))
       end
@@ -53,6 +54,17 @@ class Intervention::Csv::Harvester
     return [] unless session.intervention.quick_exit
 
     [column_name(multiple_fill, session, 'metadata.quick_exit', index + 1)]
+  end
+
+  def sms_links_header(session, index, multiple_fill)
+    column_names = []
+    session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
+      sms_plan.sms_links.find_each do |sms_link|
+        column_names << column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.timestamps", index + 1)
+      end
+    end
+
+    column_names
   end
 
   def ignored_types
@@ -87,7 +99,9 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
           end
         end
+
         fill_by_tlfb_research(row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
+        sms_links(user_session.session, user_session, row_index, user_session.number_of_attempts, multiple_fill_indicator_for(user_session.session))
         metadata(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
                  multiple_fill_indicator_for(user_session.session))
         quick_exit(user_session.session, row_index, user_session, calculate_number_of_attempts_for(user_session),
@@ -154,6 +168,18 @@ class Intervention::Csv::Harvester
     session_header_index = header.index(column_name(multiple_fill, session, 'metadata.quick_exit', approach_number))
 
     rows[row_index][session_header_index] = boolean_to_int(user_session.quick_exit) if session_header_index.present?
+  end
+
+  def sms_links(session, user_session, row_index, approach_number, multiple_fill)
+    session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
+      sms_plan.sms_links.find_each do |sms_link|
+        session_header_index = header.index(
+          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.timestamps", approach_number)
+        )
+        user_id = user_session.user_id
+        rows[row_index][session_header_index] = sms_link.sms_links_users.where(user_id: user_id).pluck(:entered_timestamps).flatten.join(' | ')
+      end
+    end
   end
 
   def users
