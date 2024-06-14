@@ -13,7 +13,7 @@ class SmsLinksUser < ApplicationRecord
 
   # METHODS
   def add_timestamp
-    entered_timestamps << Time.current
+    entered_timestamps << Time.current.strftime('%Y/%m/%d %H:%M:%S UTC')
     save!
   end
 

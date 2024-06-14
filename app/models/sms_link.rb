@@ -18,6 +18,7 @@ class SmsLink < ApplicationRecord
   # CALLBACKS
   before_validation :set_session_id
   before_validation :set_variable_number
+  before_validation :add_https_to_url
 
   # METHODS
   def set_session_id
@@ -30,5 +31,9 @@ class SmsLink < ApplicationRecord
 
   def available_variable_number
     sms_plan.sms_links.pluck(:variable_number).last.to_i + 1
+  end
+
+  def add_https_to_url
+    self.url = url.start_with?('http') ? url : "https://#{url}"
   end
 end
