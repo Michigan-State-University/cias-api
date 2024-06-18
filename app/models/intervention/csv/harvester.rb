@@ -58,7 +58,8 @@ class Intervention::Csv::Harvester
     column_names = []
     session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
       sms_plan.sms_links.find_each do |sms_link|
-        column_names << column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.timestamps", index + 1)
+        column_names << [column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.timestamps", index + 1),
+                         column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.totalclicks", index + 1)]
       end
     end
 
@@ -129,8 +130,14 @@ class Intervention::Csv::Harvester
         session_header_index = header.index(
           column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.timestamps", approach_number)
         )
+        total_clicks_index = header.index(
+          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link#{sms_link.variable_number}.totalclicks", approach_number)
+        )
         user_id = user_session.user_id
-        rows[row_index][session_header_index] = sms_link.sms_links_users.where(user_id: user_id).pluck(:entered_timestamps).flatten.join(' | ')
+
+        timestamps = sms_link.sms_links_users.where(user_id: user_id).pluck(:entered_timestamps).flatten
+        rows[row_index][session_header_index] = timestamps.join(' | ')
+        rows[row_index][total_clicks_index] = timestamps.count
       end
     end
   end
