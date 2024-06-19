@@ -77,7 +77,7 @@ class V1::Sms::Replay
 
       if user_session
         SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session, 'sms.already_signed'), nil, @user.id)
-      elsif @user.user_interventions.where.not(intervention_id: session.intervention_id).any?
+      elsif @user.user_sessions.where(type: 'UserSession::Sms').where.not(finished_at: nil).any?
         SmsPlans::SendSmsJob.perform_later(@user.full_number, translate_with_intervention_locale(session, 'sms.cannot_assign_to_many_campaigns'), nil,
                                            @user.id)
       else
