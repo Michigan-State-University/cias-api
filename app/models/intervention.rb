@@ -103,6 +103,7 @@ class Intervention < ApplicationRecord
       ::Interventions::PauseJob.perform_later(id)
     elsif closed?
       SmsCode.where(session_id: session_ids).update(active: false)
+      UserSession.left_joins(:user_intervention).where(user_intervention: { intervention_id: id }).update(finished_at: DateTime.current)
     end
   end
 

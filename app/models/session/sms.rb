@@ -6,7 +6,7 @@ class Session::Sms < Session
   attribute :settings, :json, default: -> { { 'narrator' => { 'voice' => false, 'animation' => false } } }
 
   after_commit :create_core_children, on: :create
-  after_commit :create_sms_codes
+  after_commit :create_sms_codes, on: %i[create update]
 
   def first_question
     question_groups.where('questions_count > 0').order(:position).first.questions.order(:position).first

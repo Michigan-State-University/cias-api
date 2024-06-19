@@ -32,7 +32,7 @@ class V1::SessionService
     session_type_sms = session.sms_session_type?
     session.assign_google_tts_voice(first_session) unless session_type_sms
     session.current_narrator = intervention.current_narrator unless session_type_sms
-    session.position = session_type_sms ? 999_999 : sessions.last&.position.to_i + 1
+    session.position = session_type_sms ? 999_999 : sessions.where.not(type: 'Session::Sms').last&.position.to_i + 1
     session.save!
     session
   end
