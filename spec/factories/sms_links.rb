@@ -6,6 +6,6 @@ FactoryBot.define do
     association(:sms_plan)
     sequence(:url) { 'google.com' }
     sequence(:link_type) { 'website' }
-    sequence(:variable_number) { 1 }
+    sequence(:variable) { |n| "link_variable_#{n}" }
   end
 end

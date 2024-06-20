@@ -52,6 +52,7 @@ class V1::SmsLinksController < V1Controller
     params.require(:sms_link).permit(
       :url,
       :link_type,
+      :variable,
       :sms_plan_id
     )
   end

@@ -44,7 +44,7 @@ module SmsHelper
   def insert_links_into_variant(content, plan)
     plan.sms_links.each do |sms_link|
       sms_links_user = sms_link.sms_links_users.create!(user: user)
-      content.gsub!(".:link#{sms_link.variable_number}:.", "#{ENV.fetch('WEB_URL')}/link/#{sms_links_user.slug}")
+      content.gsub!("::#{sms_link.variable}::", "#{ENV.fetch('WEB_URL')}/link/#{sms_links_user.slug}")
     end
 
     content

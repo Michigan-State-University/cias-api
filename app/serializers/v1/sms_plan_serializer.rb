@@ -17,8 +17,4 @@ class V1::SmsPlanSerializer < V1Serializer
   attribute :no_formula_attachment do |object|
     map_file_data(object.no_formula_attachment) if object.no_formula_attachment.attached?
   end
-
-  attribute :available_link_variable_number do |sms_plan|
-    sms_plan.sms_links.any? ? sms_plan.sms_links.last.available_variable_number : 1
-  end
 end

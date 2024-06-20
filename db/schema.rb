@@ -809,14 +809,14 @@ ActiveRecord::Schema.define(version: 2024_05_31_104952) do
 
   create_table "sms_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "url", null: false
-    t.integer "variable_number", null: false
+    t.string "variable", null: false
     t.string "link_type", default: "website", null: false
     t.uuid "session_id", null: false
     t.uuid "sms_plan_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["session_id"], name: "index_sms_links_on_session_id"
-    t.index ["sms_plan_id", "variable_number"], name: "index_sms_links_on_sms_plan_id_and_variable_number", unique: true
+    t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true
     t.index ["sms_plan_id"], name: "index_sms_links_on_sms_plan_id"
   end
 
