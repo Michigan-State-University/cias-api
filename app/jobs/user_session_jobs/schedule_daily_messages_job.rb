@@ -89,10 +89,10 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     # ENV name is misleading, as it refers to CSV generation, but it contains proper timezone value related to users location.
     if sms_schedule.dig('time', 'exact')
       time_of_message = DateTime.parse(sms_schedule.dig('time', 'exact'))
-      DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).change({ hour: time_of_message.hour, min: time_of_message.minute })
+      DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE'] || @user.time_zone).change({ hour: time_of_message.hour, min: time_of_message.minute })
     else
-      from = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(sms_schedule.dig('time', 'range', 'from'))
-      to = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(sms_schedule.dig('time', 'range', 'to'))
+      from = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE'] || @user.time_zone].parse(sms_schedule.dig('time', 'range', 'from'))
+      to = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE'] || @user.time_zone].parse(sms_schedule.dig('time', 'range', 'to'))
 
       period = (to - from) / questions_per_day
 
