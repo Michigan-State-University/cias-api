@@ -105,15 +105,20 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   def get_proper_sending_period(user_intervention, question_group_schedule)
     if user_intervention.phone_answers.any? && question_group_schedule['overwrite_user_time_settings']
       phone_answer = user_intervention.phone_answers.first
-      time_range = phone_answer.migrated_body.dig('data', 0, 'value', 'time_ranges').sample
-      {
-        'time' => {
-          'range' => {
-            'from' => "#{time_range['from']}:00",
-            'to' => "#{time_range['to']}:00"
+      time_range = phone_answer.migrated_body.dig('data', 0, 'value', 'time_ranges')&.sample
+
+      if time_range
+        {
+          'time' => {
+            'range' => {
+              'from' => "#{time_range['from']}:00",
+              'to' => "#{time_range['to']}:00"
+            }
           }
         }
-      }
+      else
+        question_group_schedule
+      end
     else
       question_group_schedule
     end
