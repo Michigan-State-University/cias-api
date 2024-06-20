@@ -7,7 +7,7 @@ class SmsLink < ApplicationRecord
   has_many :sms_links_users, dependent: :destroy
 
   # VALIDATIONS
-  validates :url, :variable_number, presence: true
+  validates :url, :variable, presence: true, uniqueness: { scope: :sms_plan_id }
 
   # ENUMS
   enum link_type: {
@@ -17,7 +17,6 @@ class SmsLink < ApplicationRecord
 
   # CALLBACKS
   before_validation :set_session_id
-  before_validation :set_variable_number
   before_validation :add_https_to_url
 
   # METHODS
@@ -25,15 +24,9 @@ class SmsLink < ApplicationRecord
     self.session_id ||= sms_plan&.session_id
   end
 
-  def set_variable_number
-    self.variable_number = available_variable_number
-  end
-
-  def available_variable_number
-    sms_plan.sms_links.pluck(:variable_number).last.to_i + 1
-  end
-
   def add_https_to_url
+    return if url.blank?
+
     self.url = url.start_with?('http') ? url : "https://#{url}"
   end
 end
