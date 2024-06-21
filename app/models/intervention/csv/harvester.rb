@@ -133,7 +133,8 @@ class Intervention::Csv::Harvester
         .where(user_session_id: user_session_ids)
         .group(:user_session_id, :question_id)
         .unscope(:order)
-        .pluck('count(question_id)').max
+        .pluck('count(question_id)')
+        .max || 1
     else
       user_sessions.where(session_id: session.id).maximum(:number_of_attempts) || 1
     end
