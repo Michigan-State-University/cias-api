@@ -40,7 +40,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
     if question.type.match?('Question::SmsInformation')
       # Create answer
-      V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [{"value"=>"", "var"=>""}] } })
+      V1::AnswerService.call(user, user_session.id, question.id, { type: 'Answer::SmsInformation', body: { data: [{ 'value' => '', 'var' => '' }] } })
     else
       # Set pending answer flag
       user.update(pending_sms_answer: true)
