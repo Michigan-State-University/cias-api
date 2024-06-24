@@ -669,7 +669,6 @@ DEPENDENCIES
   rails (~> 6.1.7, >= 6.1.7.8)
   rails-html-sanitizer (>= 1.4.4)
   redis
-  rexml (~> 3.2.7)
   rspec-benchmark
   rspec-rails
   rubocop (>= 1.22.3)
