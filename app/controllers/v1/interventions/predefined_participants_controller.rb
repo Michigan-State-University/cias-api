@@ -64,7 +64,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def verify_response
     {
       user: V1::UserSerializer.new(predefined_user_parameter.user).serializable_hash[:data],
-      redirect_url: V1::Intervention::PredefinedParticipants::VerifyService.call(predefined_user_parameter)
+      redirect_data: V1::Intervention::PredefinedParticipants::VerifyService.call(predefined_user_parameter)
     }
   end
 
