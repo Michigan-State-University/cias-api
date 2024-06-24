@@ -472,7 +472,8 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.2.5)
+    rexml (3.2.9)
+      strscan
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
@@ -563,6 +564,7 @@ GEM
       sprockets (>= 3.0.0)
     sql_query (0.7.3)
       activerecord (>= 3.2, <= 7.0)
+    strscan (3.1.0)
     test-prof (1.0.5)
     thor (1.0.1)
     timecop (0.9.4)
@@ -667,6 +669,7 @@ DEPENDENCIES
   rails (~> 6.1.7, >= 6.1.7.8)
   rails-html-sanitizer (>= 1.4.4)
   redis
+  rexml (~> 3.2.7)
   rspec-benchmark
   rspec-rails
   rubocop (>= 1.22.3)

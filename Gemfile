@@ -63,6 +63,7 @@ gem 'sentry-rails', '~> 5.7'
 gem 'jwt', '~> 2.6'
 gem 'grpc', '~> 1.53.2'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
+gem 'rexml', '~> 3.2.7'
 
 group :development, :test do
   gem 'bundler-audit'
