@@ -16,7 +16,9 @@ RSpec.describe 'POST /v1/sms_links', type: :request do
     let(:no_formula_text) { 'Test link: ::variable_1::' }
     let(:params) do
       {
-        slug: sms_links_user.slug
+        sms_link: {
+          slug: sms_links_user.slug
+        }
       }
     end
 
