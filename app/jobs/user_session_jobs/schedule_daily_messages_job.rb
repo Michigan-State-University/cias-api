@@ -41,12 +41,12 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     if any_answer_expected
       questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') }
       # Postpone next questions for preventing race condition
-      sending_times = questions_to_be_send_today.map { |question| question[:time_to_send] }
+      sending_times = questions_to_be_send_today.pluck(:time_to_send)
       should_postpone_next_questions = sending_times.count != sending_times.uniq.count
 
       if should_postpone_next_questions
         questions_to_be_send_today.each_with_index do |question, index|
-          question[:time_to_send] = question[:time_to_send] + index * 20.second
+          question[:time_to_send] = question[:time_to_send] + (index * 20.seconds)
         end
       end
     end

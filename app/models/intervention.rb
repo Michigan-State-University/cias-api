@@ -110,7 +110,7 @@ class Intervention < ApplicationRecord
   def clear_sms_scheduled_jobs!
     user_session_ids = UserSession::Sms.left_joins(:user_intervention).where(user_intervention: { intervention_id: id })
     queue = Sidekiq::ScheduledSet.new
-    UserSession.where(id: user_session_ids).each do |user_session|
+    UserSession.where(id: user_session_ids).find_each do |user_session|
       user_session.update(finished_at: DateTime.current)
       job_params = [user_session.user.id, user_session.id]
       queue.each do |job|
