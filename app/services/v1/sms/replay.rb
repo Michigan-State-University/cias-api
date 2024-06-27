@@ -93,8 +93,8 @@ class V1::Sms::Replay
     @users = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number })
     if @users
       user_session = UserSession::Sms.where(user_id: @users.pluck(:id)).where.not(current_question_id: nil, finished_at: nil).first
-      @user = user_session.user
       if user_session
+        @user = user_session.user
         unless user_session.current_question_id
           default_response = user_session.session.default_response
           SmsPlans::SendSmsJob.perform_later(@user.full_number,
@@ -123,7 +123,7 @@ class V1::Sms::Replay
           SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, @user.id)
         end
       else
-        SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, @user.id)
+        SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.wrong_message'), nil, nil)
       end
     else
       SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.wrong_message'), nil, nil)
