@@ -38,7 +38,18 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
     # Remove all Information questions if there is any question requiring attention
     any_answer_expected = questions_to_be_send_today.any? { |elem| elem[:question].type.eql?('Question::Sms') }
-    questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') } if any_answer_expected
+    if any_answer_expected
+      questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') }
+      # Postpone next questions for preventing race condition
+      sending_times = questions_to_be_send_today.map { |question| question[:time_to_send] }
+      should_postpone_next_questions = sending_times.count != sending_times.uniq.count
+
+      if should_postpone_next_questions
+        questions_to_be_send_today.each_with_index do |question, index|
+          question[:time_to_send] = question[:time_to_send] + index * 20.second
+        end
+      end
+    end
 
     # Remove all questions, that should be send today, but before job execution - case useful on first job scheduling
     questions_to_be_send_today.reject! { |elem| elem[:time_to_send] < DateTime.current }
@@ -103,7 +114,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   end
 
   def get_proper_sending_period(user_intervention, question_group_schedule)
-    if user_intervention.phone_answers.any? && question_group_schedule['overwrite_user_time_settings']
+    if user_intervention.phone_answers.any? && !question_group_schedule['overwrite_user_time_settings']
       phone_answer = user_intervention.phone_answers.first
       time_range = phone_answer.migrated_body.dig('data', 0, 'value', 'time_ranges')&.sample
 

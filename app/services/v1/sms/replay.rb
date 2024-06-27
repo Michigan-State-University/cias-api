@@ -66,7 +66,7 @@ class V1::Sms::Replay
 
   def handle_message_with_sms_code
     session = SmsCode.find_by(sms_code: message)&.session
-    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, @user&.id) unless session
+    return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, nil) unless session
 
     intervention_ids = session.intervention.user_intervention_ids
     possible_user_ids = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number }).pluck(:id)
@@ -90,9 +90,10 @@ class V1::Sms::Replay
   end
 
   def handle_message_with_answer
-    @user = User.left_joins(:phone).find_by(phone: { prefix: "+#{@number_prefix}", number: @national_number })
-    if @user
-      user_session = UserSession::Sms.where(user_id: @user.id).where.not(current_question_id: nil, finished_at: nil).first
+    @users = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number })
+    if @users
+      user_session = UserSession::Sms.where(user_id: @users.pluck(:id)).where.not(current_question_id: nil, finished_at: nil).first
+      @user = user_session.user
       if user_session
         unless user_session.current_question_id
           default_response = user_session.session.default_response
@@ -105,7 +106,7 @@ class V1::Sms::Replay
                                                user_session.session.default_response
                                              end,
                                              nil,
-                                             nil)
+                                             @user.id)
           return
         end
 
@@ -119,10 +120,10 @@ class V1::Sms::Replay
           @user.update(pending_sms_answer: false)
           remove_question_followups(@user, question, user_session)
         else
-          SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, nil)
+          SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, @user.id)
         end
       else
-        SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, nil)
+        SmsPlans::SendSmsJob.perform_later(@user.full_number, I18n.t('sms.wrong_message'), nil, @user.id)
       end
     else
       SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.wrong_message'), nil, nil)
