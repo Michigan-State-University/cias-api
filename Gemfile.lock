@@ -409,7 +409,7 @@ GEM
       slop (>= 4.8.2)
       tty-spinner
     phonelib (0.6.50)
-    postgresql_cursor (0.6.8)
+    postgresql_cursor (0.6.9)
       activerecord (>= 6.0)
     pry (0.13.1)
       coderay (~> 1.1)
@@ -472,8 +472,8 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.2.8)
-      strscan (>= 3.0.9)
+    rexml (3.2.9)
+      strscan
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
@@ -594,7 +594,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    wicked_pdf (2.7.0)
+    wicked_pdf (2.8.0)
       activesupport
     with_env (1.1.0)
     wkhtmltopdf-binary (0.12.6.6)

@@ -45,7 +45,11 @@ class V1::SmsLinksController < V1Controller
   end
 
   def sms_links_user
-    @sms_links_user ||= SmsLinksUser.find_by(slug: params[:slug])
+    @sms_links_user ||= SmsLinksUser.find_by(verify_params)
+  end
+
+  def verify_params
+    params.require(:sms_link).permit(:slug)
   end
 
   def sms_link_params

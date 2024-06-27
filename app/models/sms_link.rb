@@ -27,6 +27,6 @@ class SmsLink < ApplicationRecord
   def add_https_to_url
     return if url.blank?
 
-    self.url = url.start_with?('http') ? url : "https://#{url}"
+    self.url = url.start_with?(%r{\A\w+://}) ? url : "https://#{url}"
   end
 end
