@@ -103,7 +103,20 @@ class Intervention < ApplicationRecord
       ::Interventions::PauseJob.perform_later(id)
     elsif closed?
       SmsCode.where(session_id: session_ids).update(active: false)
-      UserSession.left_joins(:user_intervention).where(user_intervention: { intervention_id: id }).update(finished_at: DateTime.current)
+      clear_sms_scheduled_jobs!
+    end
+  end
+
+  def clear_sms_scheduled_jobs!
+    user_session_ids = UserSession::Sms.left_joins(:user_intervention).where(user_intervention: { intervention_id: id })
+    queue = Sidekiq::ScheduledSet.new
+    UserSession.where(id: user_session_ids).each do |user_session|
+      user_session.update(finished_at: DateTime.current)
+      job_params = [user_session.user.id, user_session.id]
+      queue.each do |job|
+        job.delete if job.args.first['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && (job.args.first['arguments'] & job_params).eql?(job_params)
+        job.delete if job.args.first['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job.args.first['arguments'].eql?([user_session.id])
+      end
     end
   end
 
