@@ -40,7 +40,7 @@ class V1::QuestionGroup::DuplicateWithStructureService
   def create_new_group_in_session(session, selected_group)
     position = session.question_groups.where.not(type: 'QuestionGroup::Finish').last&.position.to_i + 1
     QuestionGroup.create(session_id: session.id, title: I18n.t('duplication_with_structure.question_group_title', source_group_title: selected_group.title),
-                         position: position, type: selected_group.type)
+                         position: position, type: selected_group.type, sms_schedule: selected_group.sms_schedule, formulas: selected_group.formulas)
   end
 
   def create_selected_questions_and_assign_to_group(selected_group, question_ids, question_group)

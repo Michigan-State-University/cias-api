@@ -42,6 +42,6 @@ class Import::Basic::SessionService
       voice_label: session_hash.delete(:voice_label),
       voice_type: session_hash.delete(:voice_type),
       language_code: session_hash.delete(:language_code)
-    ).id
+    )&.id
   end
 end

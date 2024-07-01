@@ -22,6 +22,13 @@ class Session < ApplicationRecord
   has_many :user_sessions, dependent: :destroy, inverse_of: :session
   has_many :users, through: :user_sessions
   has_many :notifications, as: :notifiable, dependent: :destroy
+  has_many :question_groups, dependent: :destroy, inverse_of: :session
+  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain'
+  has_one :question_group_initial, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Initial'
+  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish'
+  has_many :questions, through: :question_groups
+  has_many :answers, dependent: :destroy, through: :questions
+  has_many :sms_codes, dependent: :destroy
 
   attribute :settings, :json, default: -> { assign_default_values('settings') }
   attribute :position, :integer, default: 1
@@ -66,12 +73,18 @@ class Session < ApplicationRecord
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
 
+  accepts_nested_attributes_for :sms_codes
+
+  def sms_session_type?
+    type.match?('Session::Sms')
+  end
+
   def position_greater_than
     @position_greater_than ||= intervention.sessions.where('position > ?', position).order(:position)
   end
 
   def next_session
-    intervention.sessions.order(position: :asc).find_by('position > ?', position)
+    intervention.sessions.where.not(type: 'Session::Sms').order(position: :asc).find_by('position > ?', position)
   end
 
   def last_session?

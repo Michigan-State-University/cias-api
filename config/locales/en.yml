@@ -5,6 +5,9 @@ en:
       file: '%m_%d_%Y'
       report_file: '%m_%d_%Y_%H_%M'
   question:
+    sms:
+      initial:
+        title: 'Enter SMS text here'
     slider:
       invalid_range: 'End value must be larger than the start value'
       range_value_not_a_number: 'Only numbers are permitted on the range endpoint'
@@ -18,6 +21,8 @@ en:
   question_group:
     finish:
       title: Finish Group
+    initial:
+      title: Initial Group
     plain:
       title: Next Group
     tlfb:
@@ -385,3 +390,8 @@ en:
       appointments:
         not_found: "Insufficient information for further processing."
   phone_verification: "Your CIAS verification code is: %{verification_code}"
+  sms:
+    wrong_message: 'Wrong message'
+    already_signed: 'You are already signed to this session'
+    cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns'
+    session_not_found: 'There is no such session'

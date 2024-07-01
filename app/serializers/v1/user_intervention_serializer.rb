@@ -5,7 +5,7 @@ class V1::UserInterventionSerializer < V1Serializer
   attributes :completed_sessions, :status, :last_answer_date, :contain_multiple_fill_session, :health_clinic_id
 
   attribute :sessions_in_intervention do |object|
-    object.sessions.size
+    object.sessions.where.not(type: 'Session::Sms').size
   end
 
   attribute :sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object|

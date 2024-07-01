@@ -6,7 +6,7 @@ class V1::Export::InterventionSerializer < ActiveModel::Serializer
   attributes :quick_exit, :type, :shared_to, :additional_text, :original_text, :current_narrator
 
   has_many :sessions, serializer: V1::Export::SessionSerializer do
-    object.sessions.where(type: 'Session::Classic')
+    object.sessions.where(type: %w[Session::Classic Session::Sms])
   end
   has_many :intervention_accesses, serializer: V1::Export::InterventionAccessSerializer
 

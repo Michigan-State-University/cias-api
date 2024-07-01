@@ -32,7 +32,10 @@ class Question < ApplicationRecord
                              }, class_name: 'ActiveStorage::Attachment', as: :record, inverse_of: :record, dependent: false
   has_one :image_blob, through: :image_attachment, class_name: 'ActiveStorage::Blob', source: :blob
 
-  validates :title, :type, presence: true
+  validates :title, presence: true, unless: -> { is_a? SmsInformation or is_a? Sms }
+  validates :accepted_answers, absence: true, unless: -> { is_a? Sms }
+  validates :sms_reminders, absence: true, unless: -> { is_a? Sms }
+  validates :type, presence: true
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validates :settings, json: { schema: lambda {
                                          Rails.root.join("#{json_schema_path}/settings.json").to_s
@@ -56,6 +59,7 @@ class Question < ApplicationRecord
                                                                  err
                                                                } }
   validate :correct_variable_format
+  validate :properly_assigned
 
   delegate :session, to: :question_group
   delegate :ability_to_update_for?, to: :question_group
@@ -181,6 +185,8 @@ class Question < ApplicationRecord
   end
 
   def initialize_narrator
+    return if %w[Question::Sms Question::SmsInformation].include?(type)
+
     narrator['blocks'] << default_finish_screen_block if type == 'Question::Finish' && narrator['blocks'].empty?
     execute_narrator
   end
@@ -200,6 +206,16 @@ class Question < ApplicationRecord
       next if variable.blank? || special_variable?(variable) || /^([a-zA-Z]|[0-9]+[a-zA-Z_.]+)[a-zA-Z0-9_.\b]*$/.match?(variable)
 
       errors.add(:base, I18n.t('activerecord.errors.models.question_group.question_variable'))
+    end
+  end
+
+  def properly_assigned
+    return true unless question_group
+
+    if session.sms_session_type?
+      errors.add(:base, "Can not add #{type} to #{session.type}") unless type == 'Question::Sms' || type == 'Question::SmsInformation'
+    elsif type == 'Question::Sms' || type == 'Question::SmsInformation'
+      errors.add(:base, "Can not add #{type} to #{session.type}")
     end
   end
 

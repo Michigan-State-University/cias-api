@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '3.1.4'
 
-gem 'rails', '~> 6.1.7', '>= 6.1.7.5'
+gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.6.8'
 
@@ -30,7 +30,7 @@ gem 'google-protobuf', '>= 3.23.4'
 gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
 gem 'metainspector', '~> 5.5'
-gem 'nokogiri', '>= 1.16.2'
+gem 'nokogiri', '>= 1.16.5'
 gem 'oj'
 gem 'pagy', '~> 4.0'
 gem 'phonelib'

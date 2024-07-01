@@ -14,7 +14,7 @@ class V1::SmsPlansController < V1Controller
   def show
     authorize! :read, sms_plan
 
-    render json: V1::SmsPlanSerializer.new(sms_plan, { include: %i[variants phones] })
+    render json: V1::SmsPlanSerializer.new(sms_plan, { include: %i[variants phones sms_links] })
   end
 
   def create

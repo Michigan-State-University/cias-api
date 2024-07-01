@@ -23,8 +23,13 @@ class V1::AnswerService
     if user_session.type == 'UserSession::CatMh'
       answer = cat_mh_api.on_user_answer(user_session, question_id, response(answer_params), duration(user_session))
     else
-      answer = answer_params[:type].constantize
-                                   .find_or_initialize_by(question_id: question_id, user_session_id: user_session_id)
+      if user_session.type == 'UserSession::Sms'
+        answer = answer_params[:type].constantize
+                                     .new(question_id: question_id, user_session_id: user_session_id)
+      else
+        answer = answer_params[:type].constantize
+                                     .find_or_initialize_by(question_id: question_id, user_session_id: user_session_id)
+      end
       answer.assign_attributes(answer_params)
       answer.save!
       answer.on_answer

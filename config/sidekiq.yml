@@ -4,6 +4,7 @@
   - [default,4]
   - [reports,5]
   - [sms_plans, 5]
+  - [question_sms, 5]
   - [mailers,5]
   - [log,1]
   - [active_storage_purge,1]

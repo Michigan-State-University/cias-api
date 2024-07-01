@@ -5,8 +5,8 @@ class SmsPlans::SendSmsJob < ApplicationJob
 
   def perform(number, content, attachment_url, user_id, is_alert = false, _session_id = nil)
     unless is_alert
-      user = User.find(user_id)
-      return unless user&.sms_notification
+      user = User.find(user_id) if user_id
+      return if user && !user.sms_notification
     end
 
     sms = Message.create(phone: number, body: content, attachment_url: attachment_url)

@@ -7,6 +7,13 @@ RSpec.describe Question::Tlfb::TlfbQuestion, type: :model do
     it { should belong_to(:question_group) }
     it { should be_valid }
 
+    describe 'validation of question assignments' do
+      let(:question) { build(:question_name, question_group: question_group) }
+
+      it_behaves_like 'cannot be assigned to sms session'
+      it_behaves_like 'can be assigned to classic session'
+    end
+
     describe 'instance methods' do
       let(:question_tlfb) { create(:question_tlfb_question, :with_substances) }
 
