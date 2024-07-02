@@ -84,7 +84,7 @@ class V1::FlowService::NextQuestion
   def reassign_next_session_for_flexible_intervention(session, intervention)
     return session unless session.nil? || UserSession.exists?(user_id: user_session.user.id, session_id: session.id)
 
-    intervention.sessions.each do |intervention_session|
+    intervention.sessions.where.not(type: 'Session::Sms').each do |intervention_session|
       return intervention_session unless UserSession.exists?(user_id: user_session.user.id, session_id: intervention_session.id)
     end
 

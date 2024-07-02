@@ -10,6 +10,7 @@ FactoryBot.define do
     terms { true }
     roles { %w[researcher] }
     time_zone { 'Europe/Warsaw' }
+    pending_sms_answer { false }
 
     after(:create) do |user|
       user.user_verification_codes.create(code: "verification_code_#{user.uid}", confirmed: true)

@@ -151,7 +151,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_params
-    params.require(:question_group).permit(:title, :session_id, :type)
+    params.require(:question_group).permit(:title, :session_id, :type, formulas: [:payload, { patterns: [:match] }], sms_schedule: {})
   end
 
   def question_group_id
