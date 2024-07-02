@@ -805,6 +805,7 @@ ActiveRecord::Schema.define(version: 2024_07_01_092705) do
     t.index ["health_clinic_id"], name: "index_sms_codes_on_health_clinic_id"
     t.index ["session_id"], name: "index_sms_codes_on_session_id"
     t.index ["sms_code"], name: "unique_active_sms_codes", unique: true, where: "(active IS TRUE)"
+  end
 
   create_table "sms_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "url", null: false
