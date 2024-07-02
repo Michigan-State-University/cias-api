@@ -8,6 +8,7 @@ class V1::SmsPlanSerializer < V1Serializer
              :include_email, :include_phone_number
   has_many :variants, serializer: V1::SmsPlan::VariantSerializer
   has_many :phones, serializer: V1::PhoneSerializer
+  has_many :sms_links, serializer: V1::SmsLinkSerializer
 
   attribute :end_at do |object|
     object.end_at.strftime('%d/%m/%Y') if object.end_at.present?

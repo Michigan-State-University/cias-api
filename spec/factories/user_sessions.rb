@@ -9,6 +9,14 @@ FactoryBot.define do
     multiple_fill { false }
   end
 
+  factory :sms_user_session, class: UserSession::Sms do
+    type { UserSession::Sms }
+    association :user
+    association :session
+    association :user_intervention
+    multiple_fill { false }
+  end
+
   factory :user_session_cat_mh, class: UserSession::CatMh do
     type { UserSession::CatMh }
     association :user

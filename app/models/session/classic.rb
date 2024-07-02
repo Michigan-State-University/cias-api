@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
 class Session::Classic < Session
-  has_many :question_groups, dependent: :destroy, inverse_of: :session, foreign_key: :session_id
-  has_many :question_group_plains, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Plain', foreign_key: :session_id
-  has_one :question_group_finish, dependent: :destroy, inverse_of: :session, class_name: 'QuestionGroup::Finish', foreign_key: :session_id
-
-  has_many :questions, through: :question_groups
-  has_many :answers, dependent: :destroy, through: :questions
+  validates :sms_codes, absence: true
+  validates :welcome_message, absence: true
+  validates :default_response, absence: true
+  validates :question_group_initial, absence: true
 
   after_commit :create_core_children, on: :create
 

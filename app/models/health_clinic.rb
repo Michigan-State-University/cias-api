@@ -12,6 +12,8 @@ class HealthClinic < ApplicationRecord
   has_many :user_sessions, dependent: :destroy
   has_many :invitations, dependent: :destroy
   has_many :short_links, dependent: :destroy
+  has_many :sms_codes, dependent: :destroy
+  has_many :sms_sessions, through: :sms_codes
 
   validates :name, presence: true, uniqueness: { scope: :health_system }
 

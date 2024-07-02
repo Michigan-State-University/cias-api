@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "answer_if_wrong": { "type": "string" },
+    "predefined": {
+      "type": "array",
+      "items": [{
+        "type": "string"
+      }]
+    },
+    "range": {
+      "type": "object",
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

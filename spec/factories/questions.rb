@@ -694,6 +694,50 @@ FactoryBot.define do
     end
   end
 
+  factory :question_sms, class: Question::Sms do
+    subtitle { 'Sms screen' }
+    type { Question::Sms }
+    body do
+      {
+        data: [
+          {
+            payload: '',
+            value: '1'
+          },
+          {
+            payload: 'example2',
+            value: ''
+          }
+        ],
+        variable: {
+          name: 'sms_var'
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group, factory: :sms_question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
+
+  factory :question_sms_information, class: Question::SmsInformation do
+    subtitle { 'Name screen' }
+    type { Question::SmsInformation }
+    body do
+      {
+        data: []
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group, factory: :sms_question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
+
   factory :question_participant_report, class: Question::ParticipantReport do
     title { 'ParticipantReport' }
     type { Question::ParticipantReport }
