@@ -101,9 +101,12 @@ class Intervention::Csv::Harvester
           end
         end
         fill_by_tlfb_research(row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
-        sms_links(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
-        metadata(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
-        quick_exit(user_session.session, row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
+        sms_links(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
+                  multiple_fill_indicator_for(user_session.session))
+        metadata(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
+                 multiple_fill_indicator_for(user_session.session))
+        quick_exit(user_session.session, row_index, user_session, calculate_number_of_attempts_for(user_session),
+                   multiple_fill_indicator_for(user_session.session))
       end
 
       fill_hf_initial_screen(row_index, grouped_user_sessions.second.first)
