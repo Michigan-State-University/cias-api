@@ -62,7 +62,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
             end
           end
 
-          context 'and include type' do
+          context 'and include CatMh type' do
             let(:params) do
               {
                 session: {
@@ -86,6 +86,33 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions', type: :reques
 
             it 'session have correct type' do
               expect(Session.last.type).to eql('Session::CatMh')
+            end
+          end
+
+          context 'and include Sms type' do
+            let(:params) do
+              {
+                session: {
+                  name: 'research_assistant test1',
+                  intervention_id: intervention.id,
+                  body: {
+                    data: [
+                      {
+                        payload: 1,
+                        target: '',
+                        variable: '1'
+                      }
+                    ]
+                  },
+                  type: 'Session::Sms'
+                }
+              }
+            end
+
+            it { expect(response).to have_http_status(:success) }
+
+            it 'session have correct type' do
+              expect(Session.last.type).to eql('Session::Sms')
             end
           end
         end

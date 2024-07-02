@@ -102,6 +102,21 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
               expect(response).to have_http_status(:unprocessable_entity)
             }
           end
+
+          context 'when user tries to set sms_code for Classic Session Type' do
+            let(:params) do
+              {
+                session: {
+                  sms_codes_attributes: [{ sms_code: 'SMS_CODE' }]
+                }
+              }
+            end
+
+            it {
+              request
+              expect(response).to have_http_status(:unprocessable_entity)
+            }
+          end
         end
 
         context 'Session::CatMh' do
@@ -134,6 +149,39 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
                                                                           }
                                                                         ]
                                                                       })
+          end
+
+          context 'when user tries to set sms_code for CatMH Session type' do
+            let(:params) do
+              {
+                session: {
+                  sms_codes_attributes: [{ sms_code: 'SMS_CODE' }]
+                }
+              }
+            end
+
+            it {
+              request
+              expect(response).to have_http_status(:unprocessable_entity)
+            }
+          end
+        end
+
+        context 'Session::Sms' do
+          before { request }
+
+          let(:session) { Session.create(name: 'SmsSession', intervention: intervention, type: 'Session::Sms') }
+          let(:params) do
+            {
+              session: {
+                name: 'Sms',
+                sms_codes_attributes: [{ sms_code: 'SMS_CODE' }]
+              }
+            }
+          end
+
+          it 'updated values are proper' do
+            expect(json_response['data']['attributes']).to include('name' => 'Sms')
           end
         end
       end
