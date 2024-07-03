@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(version: 2024_07_02_133928) do
     t.boolean "alternative_branch", default: false
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
-    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "((created_at > '2024-11-16 13:40:48'::timestamp without time zone) AND (NOT ((type)::text = ANY (ARRAY['Answer::Sms'::text, 'Answer::SmsInformation'::text]))))"
+    t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "((created_at > '2023-11-16 13:40:48'::timestamp without time zone) AND (NOT ((type)::text = ANY (ARRAY['Answer::Sms'::text, 'Answer::SmsInformation'::text]))))"
     t.index ["user_session_id"], name: "index_answers_on_user_session_id"
   end
 
