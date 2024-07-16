@@ -115,7 +115,7 @@ RSpec.describe 'POST /v1/sms/replay', type: :request do
       end
 
       context 'when there is pending question' do
-        let!(:user) { create(:user, :with_phone) }
+        let!(:user) { create(:user, :with_phone, pending_sms_answer: true) }
         let!(:intervention) { create(:intervention) }
         let!(:question_group_initial) { build(:question_group_initial) }
         let!(:sms_code) { build(:sms_code, sms_code: 'SMS_CODE_1') }

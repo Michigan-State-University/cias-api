@@ -92,7 +92,12 @@ class V1::Sms::Replay
   def handle_message_with_answer
     @users = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number })
     if @users
-      user_session = UserSession::Sms.where(user_id: @users.pluck(:id)).where.not(current_question_id: nil, finished_at: nil).first
+      user_session = UserSession::Sms.left_joins(:user)
+                                     .where(user_id: @users.pluck(:id),
+                                            finished_at: nil,
+                                            user: { pending_sms_answer: true })
+                                     .where.not(current_question_id: nil)
+                                     .first
       if user_session
         @user = user_session.user
         unless user_session.current_question_id
@@ -119,8 +124,9 @@ class V1::Sms::Replay
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
           remove_question_followups(@user, question, user_session)
-        else
-          SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil, @user.id)
+        elsif question.accepted_answers['answer_if_wrong']
+          SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil,
+                                             @user.id)
         end
       else
         SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.wrong_message'), nil, nil)
