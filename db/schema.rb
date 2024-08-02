@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_02_133928) do
+ActiveRecord::Schema.define(version: 2024_08_01_065512) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -774,9 +774,11 @@ ActiveRecord::Schema.define(version: 2024_07_02_133928) do
     t.datetime "autoclose_at"
     t.text "welcome_message"
     t.text "default_response"
+    t.bigint "google_language_id"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
+    t.index ["google_language_id"], name: "index_sessions_on_google_language_id"
     t.index ["google_tts_voice_id"], name: "index_sessions_on_google_tts_voice_id"
     t.index ["intervention_id", "name"], name: "index_sessions_on_intervention_id_and_name", using: :gin
     t.index ["intervention_id"], name: "index_sessions_on_intervention_id"
@@ -1112,6 +1114,7 @@ ActiveRecord::Schema.define(version: 2024_07_02_133928) do
   add_foreign_key "sessions", "cat_mh_languages"
   add_foreign_key "sessions", "cat_mh_populations"
   add_foreign_key "sessions", "cat_mh_time_frames"
+  add_foreign_key "sessions", "google_languages"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
   add_foreign_key "sms_codes", "health_clinics"
