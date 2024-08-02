@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::MultipleCharacters::Interventions::ChangeService
-  AVAILABLE_NARRATORS = %w[peedy emmi].freeze
+  AVAILABLE_NARRATORS = %w[peedy emmi crystal].freeze
   private_constant :AVAILABLE_NARRATORS
 
   def initialize(intervention_id, new_character, replacement_animations)
