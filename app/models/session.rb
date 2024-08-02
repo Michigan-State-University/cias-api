@@ -13,6 +13,7 @@ class Session < ApplicationRecord
 
   belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
+  belongs_to :google_language
 
   has_many :sms_plans, dependent: :destroy
 
@@ -48,7 +49,7 @@ class Session < ApplicationRecord
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
   delegate :ability_to_update_for?, to: :intervention
-  delegate :language_code, to: :intervention
+  delegate :language_code, to: :google_language
 
   scope :multiple_fill, -> { where(multiple_fill: true) }
 
@@ -72,6 +73,7 @@ class Session < ApplicationRecord
 
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
+  after_create :assign_default_google_language
 
   accepts_nested_attributes_for :sms_codes
 
@@ -204,6 +206,11 @@ class Session < ApplicationRecord
 
   def assign_default_tts_voice
     self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
+    save!
+  end
+
+  def assign_default_google_language
+    self.google_language = intervention.google_language if google_language.nil? && type == 'Session::Classic'
     save!
   end
 
