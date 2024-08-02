@@ -15,11 +15,11 @@ class V1::UserSessionSerializer < V1Serializer
   end
 
   attribute :language_name do |object|
-    object.session.intervention.google_language.language_name
+    object.session.google_language.language_name
   end
 
   attribute :language_code do |object|
-    object.session.intervention.google_language.language_code
+    object.session.google_language.language_code
   end
 
   attribute :session_id do |object|
