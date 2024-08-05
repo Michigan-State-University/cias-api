@@ -13,7 +13,7 @@ class Session < ApplicationRecord
 
   belongs_to :intervention, inverse_of: :sessions, touch: true, counter_cache: true
   belongs_to :google_tts_voice, optional: true
-  belongs_to :google_language
+  belongs_to :google_language, optional: true
 
   has_many :sms_plans, dependent: :destroy
 
