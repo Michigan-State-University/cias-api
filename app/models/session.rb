@@ -210,7 +210,7 @@ class Session < ApplicationRecord
   end
 
   def assign_default_google_language
-    self.google_language = intervention.google_language if google_language.nil? && type == 'Session::Classic'
+    self.google_language = intervention.google_language if google_language.nil?
     save!
   end
 
