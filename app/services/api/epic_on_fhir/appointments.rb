@@ -22,6 +22,7 @@ class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
       request.headers['Content-Type'] = 'application/json'
       request.params['_format'] = 'json'
       request.params['patient'] = patient_id
+      request.params['service-category'] = 'appointment'
     end
   end
 
