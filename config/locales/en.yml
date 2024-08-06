@@ -392,6 +392,6 @@ en:
   phone_verification: "Your CIAS verification code is: %{verification_code}"
   sms:
     wrong_message: 'Wrong message'
-    already_signed: 'You are already signed to this session'
+    already_signed: 'You are already enrolled in this campaign'
     cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns'
     session_not_found: 'There is no such session'

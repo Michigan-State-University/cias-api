@@ -2,7 +2,7 @@
 
 class V1::MultipleCharacters::Sessions::ChangeService
   SPEECH_ANIMATION_BLOCKS = %w[Speech ReadQuestion Reflection ReflectionFormula].freeze
-  AVAILABLE_NARRATORS = %w[peedy emmi].freeze
+  AVAILABLE_NARRATORS = %w[peedy emmi crystal].freeze
   private_constant :AVAILABLE_NARRATORS
   private_constant :SPEECH_ANIMATION_BLOCKS
 
