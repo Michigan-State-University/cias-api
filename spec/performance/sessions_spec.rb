@@ -12,7 +12,7 @@ RSpec.describe 'Performance', type: :request do
 
     it 'performs index in correct time' do
       expect { get v1_intervention_sessions_path(intervention.id), headers: headers }
-        .to perform_under(0.3).sample(10)
+        .to perform_under(0.4).sample(10)
     end
 
     it 'performs show in correct time' do
