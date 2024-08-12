@@ -72,7 +72,6 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
           it 'JSON contains proper attributes' do
             expect(json_response['url']).to eql(url)
             expect(json_response['title']).to eql(title)
-            p json_response['description']
             expect(json_response['description']).to eql(description)
             expect(json_response['images'].size).to be(1)
           end
