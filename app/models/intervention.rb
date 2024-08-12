@@ -240,8 +240,10 @@ class Intervention < ApplicationRecord
   end
 
   def translate_sessions(translator, source_language_name_short, destination_language_name_short)
+    destination_google_language = GoogleLanguage.find_by(language_code: destination_language_name_short)
     sessions.each do |session|
       session.translate(translator, source_language_name_short, destination_language_name_short)
+      session.update(google_language: destination_google_language)
     end
   end
 
