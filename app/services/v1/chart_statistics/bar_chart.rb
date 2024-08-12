@@ -19,17 +19,17 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       statistics_query = charts_data_collection
-                     .group('chart_statistics.chart_id, chart_statistics.label, period_label, chart.interval_type')
+                     .group('chart_statistics.chart_id, chart_statistics.label, period_label, charts.interval_type')
                      .select("chart_statistics.chart_id,
                               chart_statistics.label,
                               date_trunc((select
                                             case
-                                                when chart.interval_type = 'monthly' then 'month'
-                                                when chart.interval_type = 'quarterly' then 'quarter'
+                                                when charts.interval_type = 'monthly' then 'month'
+                                                when charts.interval_type = 'quarterly' then 'quarter'
                                             end),
                                           chart_statistics.filled_at) AS period_label,
                               COUNT(chart_statistics.label),
-                              chart.interval_type")
+                              charts.interval_type")
                      .to_sql
       results = ActiveRecord::Base.connection.execute(statistics_query).to_a
       results.each do |data_statistic|
