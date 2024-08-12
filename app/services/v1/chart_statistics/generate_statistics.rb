@@ -19,7 +19,8 @@ class V1::ChartStatistics::GenerateStatistics
     numeric_bar_charts_data_collection = charts_data_collection.where(chart_id: numeric_bar_charts.pluck(:id))
 
     percentage_bar_chart_statistics = if percentage_bar_charts.any?
-                                        V1::ChartStatistics::BarChart::Percentage.new(percentage_bar_charts_data_collection, percentage_bar_charts, date_offset).generate
+                                        V1::ChartStatistics::BarChart::Percentage.new(percentage_bar_charts_data_collection, percentage_bar_charts,
+                                                                                      date_offset).generate
                                       else
                                         []
                                       end

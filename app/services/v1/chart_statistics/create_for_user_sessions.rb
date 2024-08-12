@@ -40,6 +40,6 @@ class V1::ChartStatistics::CreateForUserSessions
   end
 
   def chart_session_variables
-    chart.chart_variables.map {|variable| variable.split('.').first}
+    chart.chart_variables.map { |variable| variable.split('.').first }
   end
 end

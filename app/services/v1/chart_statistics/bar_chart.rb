@@ -19,7 +19,7 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       statistics_query = charts_data_collection
-                     .group("chart_statistics.chart_id, chart_statistics.label, period_label, chart.interval_type")
+                     .group('chart_statistics.chart_id, chart_statistics.label, period_label, chart.interval_type')
                      .select("chart_statistics.chart_id,
                               chart_statistics.label,
                               date_trunc((select
@@ -33,7 +33,8 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
                      .to_sql
       results = ActiveRecord::Base.connection.execute(statistics_query).to_a
       results.each do |data_statistic|
-        hash[data_statistic['chart_id']][monthly_or_quarterly_label(data_statistic['interval_type'], data_statistic['period_label'])][data_statistic['label']] = data_statistic['count']
+        hash[data_statistic['chart_id']][monthly_or_quarterly_label(data_statistic['interval_type'], data_statistic['period_label'])][data_statistic['label']] =
+          data_statistic['count']
       end
     end
   end
@@ -73,6 +74,6 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   end
 
   def monthly_or_quarterly_label(interval_type, date)
-    interval_type === 'quarterly' ? "Q#{(date.month / 3.0).ceil} #{date.year}" : date.strftime('%B %Y')
+    interval_type == 'quarterly' ? "Q#{(date.month / 3.0).ceil} #{date.year}" : date.strftime('%B %Y')
   end
 end
