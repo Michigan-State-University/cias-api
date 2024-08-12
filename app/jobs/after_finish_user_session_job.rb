@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AfterFinishUserSessionJob < ApplicationJob
-  queue_as :default
+  queue_as :session_finish
 
   def perform(user_session_id, intervention)
     V1::GeneratedReports::GenerateUserSessionReports.call(

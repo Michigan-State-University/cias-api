@@ -5,7 +5,8 @@ class V1::SessionSerializer < V1Serializer
              :formulas, :intervention_id, :report_templates_count, :sms_plans_count, :variable,
              :days_after_date_variable_name, :google_tts_voice, :type, :cat_mh_language_id, :cat_mh_time_frame_id,
              :cat_mh_population_id, :created_at, :estimated_time, :current_narrator, :multiple_fill,
-             :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at, :welcome_message, :default_response
+             :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at, :welcome_message,
+             :default_response, :google_language_id
 
   has_many :cat_mh_test_types, serializer: V1::CatMh::TestTypeSerializer, if: proc { |record| record.type.eql?('Session::CatMh') }
 
@@ -32,5 +33,13 @@ class V1::SessionSerializer < V1Serializer
         }
       }
     end
+  end
+
+  attribute :language_name do |object|
+    object.google_language.language_name
+  end
+
+  attribute :language_code do |object|
+    object.google_language.language_code
   end
 end
