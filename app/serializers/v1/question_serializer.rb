@@ -17,4 +17,8 @@ class V1::QuestionSerializer < V1Serializer
   attribute :time_ranges, if: proc { |record| record.is_a?(Question::Phone) } do |_object|
     TimeRange.all.order(:position).map { |time_range| { from: time_range.from, to: time_range.to, label: time_range.label } }
   end
+
+  attribute :question_language do |object|
+    object.session&.google_language&.language_code
+  end
 end
