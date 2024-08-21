@@ -49,7 +49,6 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       end
     end
 
-
     # Schedule all sending jobs
     questions_to_be_send_today.each do |elem|
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
