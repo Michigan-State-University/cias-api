@@ -36,23 +36,19 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       end
     end
 
-    # Remove all Information questions if there is any question requiring attention
-    any_answer_expected = questions_to_be_send_today.any? { |elem| elem[:question].type.eql?('Question::Sms') }
-    if any_answer_expected
-      questions_to_be_send_today.reject! { |elem| elem[:question].type.match('Question::SmsInformation') }
-      # Postpone next questions for preventing race condition
-      sending_times = questions_to_be_send_today.pluck(:time_to_send)
-      should_postpone_next_questions = sending_times.count != sending_times.uniq.count
+    # Remove all questions, that should be send today, but before job execution
+    questions_to_be_send_today.reject! { |elem| elem[:time_to_send] < DateTime.current }
 
-      if should_postpone_next_questions
-        questions_to_be_send_today.each_with_index do |question, index|
-          question[:time_to_send] = question[:time_to_send] + (index * 20.seconds)
-        end
+    # Adjust Smses sending times for preventing race condition
+    sending_times = questions_to_be_send_today.pluck(:time_to_send)
+    should_postpone_any_questions = sending_times.count != sending_times.uniq.count
+
+    if should_postpone_any_questions
+      questions_to_be_send_today.each_with_index do |question, index|
+        question[:time_to_send] = question[:time_to_send] + (index * 2.seconds)
       end
     end
 
-    # Remove all questions, that should be send today, but before job execution - case useful on first job scheduling
-    questions_to_be_send_today.reject! { |elem| elem[:time_to_send] < DateTime.current }
 
     # Schedule all sending jobs
     questions_to_be_send_today.each do |elem|
