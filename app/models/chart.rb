@@ -43,4 +43,8 @@ class Chart < ApplicationRecord
   def ability_to_clone?
     true
   end
+
+  def chart_variables
+    formula['payload'].scan(/\w+[.]\w+/)
+  end
 end
