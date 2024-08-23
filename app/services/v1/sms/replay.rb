@@ -124,6 +124,7 @@ class V1::Sms::Replay
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
           remove_question_followups(@user, question, user_session)
+          recalculate_questions_to_be_send(user_session)
         elsif question.accepted_answers['answer_if_wrong']
           SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil,
                                              @user.id)
@@ -142,6 +143,16 @@ class V1::Sms::Replay
       job_args = job.args.first
       job.delete if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'].eql?([user.id, question.id, user_session.id, true])
     end
+  end
+
+  def recalculate_questions_to_be_send(user_session)
+    queue = Sidekiq::ScheduledSet.new
+    queue.each do |job|
+      job_args = job.args.first
+      job.delete if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'][2].eql?(user_session.id)
+      job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'].eql?([user_session.id])
+    end
+    schedule_user_session_job!(user_session)
   end
 
   def create_new_user_session!(session:, user:)
