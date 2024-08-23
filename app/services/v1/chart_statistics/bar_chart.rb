@@ -18,8 +18,24 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   # rubocop:disable Lint/ShadowingOuterLocalVariable
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
-      charts_data_collection.find_each do |data_statistic|
-        hash[data_statistic.chart_id][monthly_or_quarterly_label(data_statistic.chart, data_statistic.filled_at)][data_statistic.label] += 1
+      statistics_query = charts_data_collection
+                           .joins('LEFT JOIN charts ON chart_statistics.chart_id = charts.id')
+                           .group('chart_statistics.chart_id, chart_statistics.label, period_label, charts.interval_type')
+                           .select("chart_statistics.chart_id,
+                                    chart_statistics.label,
+                                    date_trunc((select
+                                                  case
+                                                      when charts.interval_type = 'monthly' then 'month'
+                                                      when charts.interval_type = 'quarterly' then 'quarter'
+                                                  end),
+                                                chart_statistics.filled_at) AS period_label,
+                                    COUNT(chart_statistics.label),
+                                    charts.interval_type")
+                           .to_sql
+      results = ActiveRecord::Base.connection.execute(statistics_query).to_a
+      results.each do |data_statistic|
+        hash[data_statistic['chart_id']][monthly_or_quarterly_key(data_statistic['interval_type'], data_statistic['period_label'])][data_statistic['label']] =
+          data_statistic['count']
       end
     end
   end
@@ -56,6 +72,10 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
 
   def last_month(ordered_data)
     ordered_data&.last&.filled_at
+  end
+
+  def monthly_or_quarterly_key(interval_type, date)
+    interval_type == 'quarterly' ? "Q#{(date.month / 3.0).ceil} #{date.year}" : date.strftime('%B %Y')
   end
 
   def monthly_or_quarterly_label(chart, date)
