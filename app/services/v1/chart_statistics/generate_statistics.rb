@@ -10,9 +10,32 @@ class V1::ChartStatistics::GenerateStatistics
   end
 
   def generate_statistics
-    percentage_bar_chart_statistics = V1::ChartStatistics::BarChart::Percentage.new(charts_data_collection, charts, date_offset).generate
-    numeric_bar_chart_statistics = V1::ChartStatistics::BarChart::Numeric.new(charts_data_collection, charts, date_offset).generate
-    pie_chart_statistics = V1::ChartStatistics::PieChart.new(charts_data_collection, charts).generate
+    pie_charts = charts.pie_chart
+    percentage_bar_charts = charts.percentage_bar_chart
+    numeric_bar_charts = charts.bar_chart
+
+    pie_charts_data_collection = charts_data_collection.where(chart_id: pie_charts.pluck(:id))
+    percentage_bar_charts_data_collection = charts_data_collection.where(chart_id: percentage_bar_charts.pluck(:id))
+    numeric_bar_charts_data_collection = charts_data_collection.where(chart_id: numeric_bar_charts.pluck(:id))
+
+    percentage_bar_chart_statistics = if percentage_bar_charts.any?
+                                        V1::ChartStatistics::BarChart::Percentage.new(percentage_bar_charts_data_collection, percentage_bar_charts,
+                                                                                      date_offset).generate
+                                      else
+                                        []
+                                      end
+
+    numeric_bar_chart_statistics = if numeric_bar_charts.any?
+                                     V1::ChartStatistics::BarChart::Numeric.new(numeric_bar_charts_data_collection, numeric_bar_charts, date_offset).generate
+                                   else
+                                     []
+                                   end
+
+    pie_chart_statistics = if pie_charts.any?
+                             V1::ChartStatistics::PieChart.new(pie_charts_data_collection, pie_charts).generate
+                           else
+                             []
+                           end
 
     percentage_bar_chart_statistics + numeric_bar_chart_statistics + pie_chart_statistics
   end

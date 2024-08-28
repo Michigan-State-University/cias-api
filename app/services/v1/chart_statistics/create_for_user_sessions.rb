@@ -24,7 +24,10 @@ class V1::ChartStatistics::CreateForUserSessions
 
   def user_sessions
     UserSession.joins(session: [intervention: :organization]).where(
-      sessions: { interventions: { organization: organization } }
+      sessions: {
+        interventions: { organization: organization },
+        variable: chart_session_variables
+      }
     ).where.not(finished_at: nil)
   end
 
@@ -34,5 +37,9 @@ class V1::ChartStatistics::CreateForUserSessions
 
   def chart
     @chart ||= Chart.find(chart_id)
+  end
+
+  def chart_session_variables
+    chart.chart_variables.map { |variable| variable.split('.').first }
   end
 end
