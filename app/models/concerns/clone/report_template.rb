@@ -28,11 +28,13 @@ class Clone::ReportTemplate
         new_variant = ReportTemplate::Section::Variant.new(variant.slice(*ReportTemplate::Section::Variant::ATTR_NAMES_TO_COPY))
         new_section.variants << new_variant
 
+        next unless variant.image.attached?
+
         new_variant.image.attach(
           io: StringIO.new(variant.image.download),
           filename: variant.image.filename,
           content_type: variant.image.content_type
-        ) if variant.image.attached?
+        )
       end
     end
     outcome
