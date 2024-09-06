@@ -14,7 +14,13 @@ class V1::GeneratedReports::Create
   def call
     variants_to_generate =
       report_template.sections.map do |section|
-        dentaku_service.evaluate(section.formula, section.variants)
+        missing_variables = dentaku_service.dentaku_calculator.dependencies(section.formula)
+
+        if missing_variables.any?
+          nil
+        else
+          dentaku_service.evaluate(section.formula, section.variants)
+        end
       end
 
     variants_to_generate.compact!
