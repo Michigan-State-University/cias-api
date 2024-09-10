@@ -35,6 +35,7 @@ class Clone::ReportTemplate
           filename: variant.image.filename,
           content_type: variant.image.content_type
         )
+        new_variant.save!
       end
     end
     outcome
