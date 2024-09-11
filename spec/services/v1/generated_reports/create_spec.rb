@@ -113,8 +113,10 @@ RSpec.describe V1::GeneratedReports::Create do
         allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
 
         expect { subject }.to change(GeneratedReport, :count).by(1)
+      end
 
-        expect(dentaku_calculator.memory).to include('var3' => 0, 'var4' => 0)
+      it 'does not initialize missing variables with 0 values' do
+        expect(dentaku_calculator.memory).not_to include('var3' => 0, 'var4' => 0)
       end
     end
 
