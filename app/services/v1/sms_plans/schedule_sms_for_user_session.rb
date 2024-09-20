@@ -19,6 +19,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
     return unless user.sms_notification
     return unless phone.present? && phone.confirmed?
+    
     execute_plans_for('SmsPlan::Normal')
   end
 
