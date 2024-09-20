@@ -20,7 +20,10 @@ RSpec.describe 'POST /v1/user_interventions', type: :request do
     context 'is invalid' do
       let(:request) { post v1_user_interventions_path }
 
-      it_behaves_like 'unauthorized user'
+      it 'returns correct HTTP status code (400 - Bad Request)' do
+        request
+        expect(response).to have_http_status(:bad_request)
+      end
     end
 
     context 'is valid' do
