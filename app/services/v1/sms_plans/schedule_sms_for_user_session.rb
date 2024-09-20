@@ -52,6 +52,16 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     set_frequency(start_time, plan)
   end
 
+  def days_after_user_defined_time_schedule(plan)
+    all_var_values = user_session.all_var_values(include_session_var: false)
+    date_answer = all_var_values[plan.schedule_variable]
+
+    return unless date_answer
+
+    start_time = DateTime.parse(date_answer).next_day(plan.schedule_payload).change(random_time).utc
+    set_frequency(start_time, plan)
+  end
+
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
     frequency = plan.frequency
     content = sms_content(plan)

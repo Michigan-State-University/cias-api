@@ -31,7 +31,8 @@ class SmsPlan < ApplicationRecord
 
   enum schedule: {
     days_after_session_end: 'days_after_session_end',
-    after_session_end: 'after_session_end'
+    after_session_end: 'after_session_end',
+    days_after_user_defined_time: 'days_after_user_defined_time'
   }, _suffix: true
 
   enum frequency: {
