@@ -3,7 +3,7 @@
 class Audio::TextToSpeech::Google
   include Audio::TextToSpeech::Interface
 
-  LINEAR16_VOICE_TYPES = %w[en-US-Journey-D en-US-Journey-F en-US-Journey-O]
+  LINEAR16_VOICE_TYPES = %w[en-US-Journey-D en-US-Journey-F en-US-Journey-O].freeze
 
   attr_reader :text, :voice_type, :language
 
