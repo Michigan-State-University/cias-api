@@ -76,13 +76,25 @@
       .image-spacer {
         width: 60px;
       }
+
+      .ql-align-right {
+          text-align: right;
+      }
+
+      .ql-align-center {
+          text-align: center;
+      }
+
+      .ql-align-left {
+          text-align: left;
+      }
     </style>
   </head>
 
   <body>
     <div class="container">
       <!-- REPORT HEADER -->
-      <div class="header mb-medium" dir='auto'><%= report_template.summary %></div>
+      <div dir='auto'><%= sanitize(report_template.summary, attributes: ['style', 'class']) %></div>
 
       <!-- SINGLE SECTION -->
       <%- variants.each do |variant| %>
@@ -105,7 +117,7 @@
             <tr>
               <!-- TEXT -->
               <td class="d-table-cell">
-                <p class="section-text"><%= sanitize(variant.content) %></p>
+                <p class="section-text"><%= sanitize(variant.content, attributes: ['style', 'class']) %></p>
               </td>
 
             <!-- IMAGE SPACER -->
