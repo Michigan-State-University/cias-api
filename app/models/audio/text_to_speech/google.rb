@@ -3,6 +3,8 @@
 class Audio::TextToSpeech::Google
   include Audio::TextToSpeech::Interface
 
+  LINEAR16_VOICE_TYPES = %w[en-US-Journey-D en-US-Journey-F en-US-Journey-O].freeze
+
   attr_reader :text, :voice_type, :language
 
   def initialize(text, language, voice_type)
@@ -29,7 +31,7 @@ class Audio::TextToSpeech::Google
   end
 
   def audio_config
-    @audio_config ||= { audio_encoding: 'MP3' }
+    @audio_config ||= { audio_encoding: get_proper_encoding(voice_type) }
   end
 
   def client
@@ -47,6 +49,14 @@ class Audio::TextToSpeech::Google
       end
     rescue Oj::ParseError
       ENV['GOOGLE_APPLICATION_CREDENTIALS']
+    end
+  end
+
+  def get_proper_encoding(voice_type)
+    case voice_type
+    when ->(type) { LINEAR16_VOICE_TYPES.include?(type) } then 'LINEAR16'
+    else
+      'MP3'
     end
   end
 end
