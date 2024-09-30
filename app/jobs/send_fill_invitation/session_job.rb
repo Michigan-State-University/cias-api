@@ -23,7 +23,6 @@ class SendFillInvitation::SessionJob < ApplicationJob
       else
         SessionMailer.with(locale: session.language_code).invite_to_session_and_registration(session, email, health_clinic).deliver_now
       end
-
     end
   end
 end
