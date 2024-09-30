@@ -68,7 +68,6 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
   context 'when inviting non-existing users' do
     let!(:non_existing_emails) { ['mike.wazowski@gmail.com'] }
     let!(:emails) { [] }
-    let!(:totally_nonexistent_user) { create(:user, :participant, :confirmed, email: non_existing_emails.first) }
     let!(:invitation_link) do
       I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone',
              domain: ENV['WEB_URL'],
@@ -79,7 +78,7 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
 
     it do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      expect(ActionMailer::Base.deliveries.last.body.decoded.gsub('&amp;', ' ')).to include(invitation_link)
+      expect(ActionMailer::Base.deliveries.last.html_part.body.decoded.gsub('&amp;', ' ')).to include(invitation_link)
     end
   end
 
