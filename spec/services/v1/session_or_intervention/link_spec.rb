@@ -55,8 +55,12 @@ RSpec.describe V1::SessionOrIntervention::Link do
   context 'when user does not exist' do
     let(:email) { 'some@example.com' }
 
-    it {
-      expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
-    }
+    it 'returns link to the session' do
+      expect(subject).to eq(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone',
+                                   domain: ENV['WEB_URL'],
+                                   session_id: session.id,
+                                   intervention_id: intervention.id,
+                                   language_code: intervention.language_code))
+    end
   end
 end
