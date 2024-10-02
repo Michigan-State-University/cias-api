@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Sidekiq.configure_server do |config|
-  if ENV['HEROKU_REDIS'] == 'true'
+  if ENV['REDIS_PROVIDED_BY_HEROKU'] == 'true'
     config.redis = { url: ENV['REDIS_URL'], ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
   else
     config.redis = { url: ENV['REDIS_URL'] }
@@ -9,7 +9,7 @@ Sidekiq.configure_server do |config|
 end
 
 Sidekiq.configure_client do |config|
-  if ENV['HEROKU_REDIS'] == 'true'
+  if ENV['REDIS_PROVIDED_BY_HEROKU'] == 'true'
     config.redis = { url: ENV['REDIS_URL'], ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
   else
     config.redis = { url: ENV['REDIS_URL'] }
