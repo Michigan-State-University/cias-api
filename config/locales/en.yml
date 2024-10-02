@@ -122,6 +122,8 @@ en:
       no_last_name_provided: "Last name not provided"
       no_email_provided: "E-mail not provided"
       no_phone_number_provided: "Phone number not provided"
+    default_response: 'You have entered an incorrect code. Please try again.'
+    welcome_message: 'You are now enrolled. You will start receiving messages soon.'
   users:
     deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
@@ -391,7 +393,7 @@ en:
         not_found: "Insufficient information for further processing."
   phone_verification: "Your CIAS verification code is: %{verification_code}"
   sms:
-    wrong_message: 'Wrong message'
-    already_signed: 'You are already enrolled in this campaign'
-    cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns'
+    wrong_message: 'You have entered an incorrect code. Please try again.'
+    already_signed: 'You are already enrolled in this campaign.'
+    cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns.'
     session_not_found: 'There is no such session'

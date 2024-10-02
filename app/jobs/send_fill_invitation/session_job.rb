@@ -18,7 +18,11 @@ class SendFillInvitation::SessionJob < ApplicationJob
     end
 
     non_existing_users_emails.each do |email|
-      SessionMailer.with(locale: session.language_code).invite_to_session_and_registration(session, email, health_clinic).deliver_now
+      if session.intervention.shared_to_anyone?
+        SessionMailer.with(locale: session.language_code).inform_to_an_email(session, email, health_clinic).deliver_now
+      else
+        SessionMailer.with(locale: session.language_code).invite_to_session_and_registration(session, email, health_clinic).deliver_now
+      end
     end
   end
 end

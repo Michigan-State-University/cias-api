@@ -6,7 +6,7 @@ class V1::SessionOrIntervention::Link
   def initialize(session_or_intervention, health_clinic, email)
     @session_or_intervention = session_or_intervention
     @health_clinic = health_clinic
-    @user = User.find_by!(email: email)
+    @user = User.find_by(email: email)
   end
 
   def self.call(session, health_clinic, email)

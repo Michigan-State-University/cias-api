@@ -71,6 +71,7 @@ class Session < ApplicationRecord
   validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
   validates :autoclose_at, presence: true, if: :autoclose_enabled
 
+  after_initialize :set_sms_defaults
   before_validation :set_default_variable
   after_create :assign_default_tts_voice
   after_create :assign_default_google_language
@@ -133,6 +134,8 @@ class Session < ApplicationRecord
         invitations.create!(email: email, health_clinic_id: health_clinic_id)
       end
     end
+
+    _, non_existing_users_emails = split_emails_exist(emails) if intervention.shared_to_anyone?
 
     SendFillInvitation::SessionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id, intervention_id)
   end
@@ -232,5 +235,12 @@ class Session < ApplicationRecord
       break default_variable unless ::Session.exists?(variable: default_variable, intervention: intervention)
     end
     self.variable = default_variable
+  end
+
+  def set_sms_defaults
+    return unless sms_session_type?
+
+    self.default_response = I18n.t('sessions.default_response')
+    self.welcome_message = I18n.t('sessions.welcome_message')
   end
 end
