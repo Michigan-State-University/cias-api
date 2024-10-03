@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_01_065512) do
+ActiveRecord::Schema.define(version: 2024_09_19_104701) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
@@ -863,6 +863,7 @@ ActiveRecord::Schema.define(version: 2024_08_01_065512) do
     t.boolean "include_last_name"
     t.boolean "include_phone_number"
     t.boolean "include_email"
+    t.string "schedule_variable"
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
