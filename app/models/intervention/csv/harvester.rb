@@ -104,7 +104,7 @@ class Intervention::Csv::Harvester
 
             var_value = answer.csv_row_value(data)
             rows[row_index][var_index] = var_value
-            rows[row_index][var_video_index] = answer.csv_row_video_stats
+            rows[row_index][var_video_index] = answer.csv_row_video_stats if var_video_index
           end
         end
         fill_by_tlfb_research(row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
