@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "next_session_id"
     t.boolean "draft", default: false
     t.boolean "alternative_branch", default: false
-    t.jsonb "video_stats"
+    t.jsonb "video_stats", default: {}
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["type"], name: "index_answers_on_type"
     t.index ["user_session_id", "question_id"], name: "index_answers_on_user_session_id_and_question_id", unique: true, where: "((created_at > '2023-11-16 13:40:48'::timestamp without time zone) AND (NOT ((type)::text = ANY (ARRAY['Answer::Sms'::text, 'Answer::SmsInformation'::text]))))"
