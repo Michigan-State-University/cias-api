@@ -47,7 +47,7 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def answer_params
-    params.require(:answer).permit(:type, body: {}).merge(params.permit(:skipped))
+    params.require(:answer).permit(:type, video_stats: [:video_start, :video_end, video_progress: [:played]], body: {}).merge(params.permit(:skipped))
   end
 
   def question_id

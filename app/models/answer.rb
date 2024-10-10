@@ -38,6 +38,10 @@ class Answer < ApplicationRecord
     data['value']
   end
 
+  def csv_row_video_stats
+    "Video Started: #{video_stats['video_start'] || 'NOT STARTED'},\nVideo Ended: #{video_stats['video_end'] || 'NOT ENDED'},\nProgress: #{(video_stats['video_progress']['played'].to_f * 100).round}%"
+  end
+
   def decrypted_body
     return { 'data' => [] } unless body_ciphertext
 
