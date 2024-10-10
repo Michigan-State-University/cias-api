@@ -39,7 +39,9 @@ class Answer < ApplicationRecord
   end
 
   def csv_row_video_stats
-    "Video Started: #{video_stats['video_start'] || 'NOT STARTED'},\nVideo Ended: #{video_stats['video_end'] || 'NOT ENDED'},\nProgress: #{(video_stats['video_progress']['played'].to_f * 100).round}%"
+    "Video Started: #{video_stats['video_start'] || 'NOT STARTED'}\n"\
+      "Video Ended: #{video_stats['video_end'] || 'NOT ENDED'}\n"\
+      "Progress: #{(video_stats['video_progress']['played'].to_f * 100).round}%"
   end
 
   def decrypted_body

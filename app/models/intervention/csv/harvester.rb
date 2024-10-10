@@ -29,7 +29,10 @@ class Intervention::Csv::Harvester
         session.fetch_variables.each do |question_hash|
           question_hash[:variables].each do |var|
             header << add_session_variable_to_question_variable(session, var, index, multiple_fill_indicator_for(session))
-            header << add_session_variable_to_question_variable(session, var, index, multiple_fill_indicator_for(session)) + '.video_stats' if question_hash[:video_enabled]
+            if question_hash[:video_enabled]
+              header << "#{add_session_variable_to_question_variable(session, var, index,
+                                                                     multiple_fill_indicator_for(session))}.video_stats"
+            end
           end
         end
 
@@ -94,8 +97,8 @@ class Intervention::Csv::Harvester
           answer.body_data&.each do |data|
             var_index = header.index(column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
                                                  answer_attempt))
-            var_video_index = header.index(column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
-                                                 answer_attempt) + '.video_stats')
+            var_video_index = header.index("#{column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
+                                                          answer_attempt)}.video_stats")
 
             next if var_index.blank?
 
