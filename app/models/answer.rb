@@ -39,8 +39,8 @@ class Answer < ApplicationRecord
   end
 
   def csv_row_video_stats
-    "Video Started: #{video_stats.dig(:video_start) || 'NOT STARTED'}\n"\
-      "Video Ended: #{video_stats.dig(:video_end) || 'NOT ENDED'}\n"\
+    "Video Started: #{video_stats['video_start'] || 'NOT STARTED'}\n"\
+      "Video Ended: #{video_stats['video_end'] || 'NOT ENDED'}\n"\
       "Progress: #{(video_stats.dig(:video_progress, :played).to_f * 100).round}%"
   end
 
