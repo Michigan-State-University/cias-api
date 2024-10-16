@@ -73,7 +73,7 @@ class Intervention::Csv::Harvester
     column_names
   end
 
-  def information_only_screen_videos_header(session, index, multiple_fill)
+  def information_only_screen_videos_header(session, _index, multiple_fill)
     column_names = []
 
     session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |_question, index|
