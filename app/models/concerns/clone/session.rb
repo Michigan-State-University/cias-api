@@ -170,7 +170,7 @@ class Clone::Session < Clone::Base
 
       plan.alert_phones.each do |alert_phone|
         new_sms_plan.alert_phones << AlertPhone.new(sms_plan: new_sms_plan, phone: alert_phone.phone)
-        end
+      end
 
       plan.sms_links.each do |sms_link|
         new_sms_plan.sms_links << SmsLink.new(url: sms_link.url, link_type: sms_link.link_type, session: source, variable: sms_link.variable)
