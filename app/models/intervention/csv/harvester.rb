@@ -36,6 +36,7 @@ class Intervention::Csv::Harvester
           end
         end
 
+        header.concat(information_only_screen_videos_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(sms_links_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(session_metadata(session, index, multiple_fill_indicator_for(session)))
         header.concat(quick_exit_header(session, index, multiple_fill_indicator_for(session)))
@@ -67,6 +68,16 @@ class Intervention::Csv::Harvester
         column_names << [column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.timestamps", index + 1),
                          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.totalclicks", index + 1)]
       end
+    end
+
+    column_names
+  end
+
+  def information_only_screen_videos_header(session, _index, multiple_fill)
+    column_names = []
+
+    session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |_question, index|
+      column_names << [column_name(multiple_fill, session, "video_stats.question_information_only_#{index + 1}", index + 1)]
     end
 
     column_names
@@ -108,6 +119,8 @@ class Intervention::Csv::Harvester
           end
         end
         fill_by_tlfb_research(row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
+        information_only_screen_videos(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
+                                       multiple_fill_indicator_for(user_session.session))
         sms_links(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
                   multiple_fill_indicator_for(user_session.session))
         metadata(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
@@ -194,6 +207,18 @@ class Intervention::Csv::Harvester
         rows[row_index][session_header_index] = timestamps.join(' | ')
         rows[row_index][total_clicks_index] = timestamps.count
       end
+    end
+  end
+
+  def information_only_screen_videos(session, user_session, row_index, approach_number, multiple_fill)
+    session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |question, index|
+      video_stats_header_index = header.index(
+        column_name(multiple_fill, session, "video_stats.question_information_only_#{index + 1}", approach_number)
+      )
+
+      answer = question.answers.where(user_session: user_session).first
+
+      rows[row_index][video_stats_header_index] = answer&.csv_row_video_stats || 'Not finished'
     end
   end
 
