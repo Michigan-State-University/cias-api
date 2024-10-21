@@ -39,9 +39,14 @@ class Answer < ApplicationRecord
   end
 
   def csv_row_video_stats
-    "Video Started: #{video_stats['video_start'] || 'NOT STARTED'}\n"\
+    played_seconds = video_stats.dig('video_progress', 'played_seconds').to_f.round
+    progress = (video_stats.dig('video_progress', 'played').to_f * 100).round
+
+    "Video URL: #{question.video_url}\n"\
+      "Video Started: #{video_stats['video_start'] || 'NOT STARTED'}\n"\
       "Video Ended: #{video_stats['video_end'] || 'NOT ENDED'}\n"\
-      "Progress: #{(video_stats.dig(:video_progress, :played).to_f * 100).round}%"
+      "Played seconds: #{played_seconds.zero? ? 'N/A' : played_seconds}\n"\
+      "Progress: #{progress}%"
   end
 
   def decrypted_body
