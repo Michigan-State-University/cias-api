@@ -4,6 +4,7 @@ class Intervention::Csv::Harvester
   include Intervention::Csv::Tlfb
   include DateTimeInterface
   DEFAULT_VALUE = 888
+  VIDEO_STATS_KEYS = [:video_url, :video_start, :video_end, :progress, :played_seconds]
   attr_reader :sessions
   attr_accessor :header, :rows, :users, :user_column
 
@@ -30,8 +31,10 @@ class Intervention::Csv::Harvester
           question_hash[:variables].each do |var|
             header << add_session_variable_to_question_variable(session, var, index, multiple_fill_indicator_for(session))
             if question_hash[:video_enabled]
-              header << "#{add_session_variable_to_question_variable(session, var, index,
-                                                                     multiple_fill_indicator_for(session))}.video_stats"
+              VIDEO_STATS_KEYS.each do |key|
+                header << "#{add_session_variable_to_question_variable(session, var, index,
+                                                                       multiple_fill_indicator_for(session))}.video_stats.#{key}"
+              end
             end
           end
         end
@@ -77,7 +80,9 @@ class Intervention::Csv::Harvester
     column_names = []
 
     session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |_question, index|
-      column_names << [column_name(multiple_fill, session, "video_stats.question_information_only_#{index + 1}", index + 1)]
+      VIDEO_STATS_KEYS.each do |key|
+        column_names << [column_name(multiple_fill, session, "video_stats.question_information_only_#{index + 1}.#{key}", index + 1)]
+      end
     end
 
     column_names
@@ -108,14 +113,18 @@ class Intervention::Csv::Harvester
           answer.body_data&.each do |data|
             var_index = header.index(column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
                                                  answer_attempt))
-            var_video_index = header.index("#{column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
-                                                          answer_attempt)}.video_stats")
 
             next if var_index.blank?
 
             var_value = answer.csv_row_value(data)
             rows[row_index][var_index] = var_value
-            rows[row_index][var_video_index] = answer.csv_row_video_stats if var_video_index
+
+            VIDEO_STATS_KEYS.each do |key|
+              var_video_index = header.index("#{column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
+                                                            answer_attempt)}.video_stats.#{key}")
+
+              rows[row_index][var_video_index] = answer.csv_row_video_stats.dig(key) if var_video_index
+            end
           end
         end
         fill_by_tlfb_research(row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
@@ -212,13 +221,15 @@ class Intervention::Csv::Harvester
 
   def information_only_screen_videos(session, user_session, row_index, approach_number, multiple_fill)
     session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |question, index|
-      video_stats_header_index = header.index(
-        column_name(multiple_fill, session, "video_stats.question_information_only_#{index + 1}", approach_number)
-      )
-
       answer = question.answers.where(user_session: user_session).first
 
-      rows[row_index][video_stats_header_index] = answer&.csv_row_video_stats || 'Not finished'
+      VIDEO_STATS_KEYS.each do |key|
+        video_stats_header_index = header.index(
+          column_name(multiple_fill, session, "video_stats.question_information_only_#{index + 1}.#{key}", approach_number)
+        )
+
+        rows[row_index][video_stats_header_index] = answer&.csv_row_video_stats&.dig(key) || 'Not finished'
+      end
     end
   end
 
