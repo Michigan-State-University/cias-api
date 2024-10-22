@@ -4,7 +4,7 @@ class Intervention::Csv::Harvester
   include Intervention::Csv::Tlfb
   include DateTimeInterface
   DEFAULT_VALUE = 888
-  VIDEO_STATS_KEYS = [:video_url, :video_start, :video_end, :progress, :played_seconds]
+  VIDEO_STATS_KEYS = %i[video_url video_start video_end progress played_seconds].freeze
   attr_reader :sessions
   attr_accessor :header, :rows, :users, :user_column
 
@@ -30,11 +30,11 @@ class Intervention::Csv::Harvester
         session.fetch_variables.each do |question_hash|
           question_hash[:variables].each do |var|
             header << add_session_variable_to_question_variable(session, var, index, multiple_fill_indicator_for(session))
-            if question_hash[:video_enabled]
-              VIDEO_STATS_KEYS.each do |key|
-                header << "#{add_session_variable_to_question_variable(session, var, index,
-                                                                       multiple_fill_indicator_for(session))}.video_stats.#{key}"
-              end
+            next unless question_hash[:video_enabled]
+
+            VIDEO_STATS_KEYS.each do |key|
+              header << "#{add_session_variable_to_question_variable(session, var, index,
+                                                                     multiple_fill_indicator_for(session))}.video_stats.#{key}"
             end
           end
         end
@@ -120,10 +120,12 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
 
             VIDEO_STATS_KEYS.each do |key|
-              var_video_index = header.index("#{column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
+              var_video_index = header.index("#{column_name(multiple_fill_indicator_for(user_session.session),
+                                                            user_session.session,
+                                                            answer.csv_header_name(data),
                                                             answer_attempt)}.video_stats.#{key}")
 
-              rows[row_index][var_video_index] = answer.csv_row_video_stats.dig(key) if var_video_index
+              rows[row_index][var_video_index] = answer.csv_row_video_stats[key] if var_video_index
             end
           end
         end
