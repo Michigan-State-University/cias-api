@@ -88,7 +88,7 @@ class Session::Classic < Session
     filtered = filtered.where(type: digit_variable_questions) if filter_options[:only_digit_variables]
     filtered.filter_map do |question|
       variables = present_variables(question.question_variables)
-      { subtitle: question.subtitle, variables: variables } if variables.present?
+      { subtitle: question.subtitle, variables: variables, video_enabled: question.settings['video'] } if variables.present?
     end
   end
 

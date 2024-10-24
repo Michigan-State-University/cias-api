@@ -152,10 +152,18 @@ class Intervention < ApplicationRecord
     end
 
     Invitation.transaction do
-      User.where(email: emails).find_each do |user|
+      users = User.where(email: emails)
+
+      users.find_each do |user|
         invitations.create!(email: user.email, health_clinic_id: health_clinic_id)
       end
+
+      (emails - users.map(&:email)).each do |email|
+        invitations.create!(email: email, health_clinic_id: health_clinic_id)
+      end
     end
+
+    _, non_existing_users_emails = split_emails_exist(emails) if shared_to_anyone?
 
     SendFillInvitation::InterventionJob.perform_later(id, existing_users_emails || emails, non_existing_users_emails || [], health_clinic_id)
   end

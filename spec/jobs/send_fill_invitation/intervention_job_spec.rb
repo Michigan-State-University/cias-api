@@ -40,17 +40,14 @@ RSpec.describe SendFillInvitation::InterventionJob, type: :job do
     let!(:emails) { [] }
     let!(:totally_nonexistent_user) { create(:user, :participant, :confirmed, email: non_existing_emails.first) }
     let!(:invitation_link) do
-      I18n.t('intervention_mailer.invite_to_intervention_and_registration.invitation_link',
+      I18n.t('intervention_mailer.inform_to_an_email.invitation_link',
              domain: ENV['WEB_URL'],
-             intervention_id: intervention.id,
-             user_role: 'participant',
-             email: non_existing_emails.first,
-             invitation_token: 'token').tr('&', ' ')
+             intervention_id: intervention.id)
     end
 
     it do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      expect(ActionMailer::Base.deliveries.last.body.decoded.gsub('&amp;', ' ')).to include(invitation_link)
+      expect(ActionMailer::Base.deliveries.last.html_part.body).to include(invitation_link)
     end
   end
 end
