@@ -38,6 +38,19 @@ class Answer < ApplicationRecord
     data['value']
   end
 
+  def csv_row_video_stats
+    played_seconds = video_stats.dig('video_progress', 'played_seconds').to_f.round
+    progress = (video_stats.dig('video_progress', 'played').to_f * 100).round
+
+    {
+      video_url: question.video_url,
+      video_start: video_stats['video_start'] || 'NOT STARTED',
+      video_end: video_stats['video_end'] || 'NOT ENDED',
+      played_seconds: played_seconds.zero? ? 'N/A' : played_seconds,
+      progress: "#{progress}%"
+    }
+  end
+
   def decrypted_body
     return { 'data' => [] } unless body_ciphertext
 

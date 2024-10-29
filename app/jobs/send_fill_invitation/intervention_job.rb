@@ -12,7 +12,11 @@ class SendFillInvitation::InterventionJob < ApplicationJob
     end
 
     non_existing_users_emails.each do |email|
-      InterventionMailer.with(locale: intervention.language_code).invite_to_intervention_and_registration(intervention, email, health_clinic).deliver_now
+      if intervention.shared_to_anyone?
+        InterventionMailer.with(locale: intervention.language_code).inform_to_an_email(intervention, email, health_clinic).deliver_now
+      else
+        InterventionMailer.with(locale: intervention.language_code).invite_to_intervention_and_registration(intervention, email, health_clinic).deliver_now
+      end
     end
   end
 end
