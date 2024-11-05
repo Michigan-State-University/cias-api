@@ -472,8 +472,7 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.3.6)
-      strscan
+    rexml (3.3.9)
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
@@ -564,7 +563,6 @@ GEM
       sprockets (>= 3.0.0)
     sql_query (0.7.4)
       activerecord (>= 3.2)
-    strscan (3.1.0)
     test-prof (1.0.5)
     thor (1.0.1)
     timecop (0.9.4)
