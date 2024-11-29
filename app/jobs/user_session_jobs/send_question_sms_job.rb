@@ -3,7 +3,9 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
+  # rubocop:disable Metrics/PerceivedComplexity
   def perform(user_id, question_id, user_session_id, reminder, postponed = false)
+    # rubocop:enable Metrics/PerceivedComplexity
     user = User.find(user_id)
 
     should_return = if user.predefined_user_parameter
@@ -25,7 +27,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     # Handle case when user has pending answers - reschedule sms question in 5 minutes till the end of the day
     outdated_message = false
 
-    if user.pending_sms_answer && question.type === 'Question::Sms'
+    if user.pending_sms_answer && question.type == 'Question::Sms'
       datetime_of_next_job = DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']) + 5.minutes
 
       # Skip question if next day
@@ -36,9 +38,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
       end
     end
 
-    if outdated_message && postponed
-      user.update(pending_sms_answer: false)
-    end
+    user.update(pending_sms_answer: false) if outdated_message && postponed
 
     return if user.pending_sms_answer || outdated_message
 
