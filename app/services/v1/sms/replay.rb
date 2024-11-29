@@ -154,7 +154,7 @@ class V1::Sms::Replay
          job_args['arguments'][4].eql?(false)
         job.delete
       end
-      job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'].eql?([user_session.id])
+      job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'][0].eql?(user_session.id)
     end
     schedule_user_session_job!(user_session)
   end
