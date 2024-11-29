@@ -3,7 +3,7 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
-  def perform(user_id, question_id, user_session_id, reminder)
+  def perform(user_id, question_id, user_session_id, reminder, postponed = false)
     user = User.find(user_id)
 
     should_return = if user.predefined_user_parameter
@@ -22,17 +22,25 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
     return if reminder
 
-    # Handle case when user has pending answers - reschedule question in 5 minutes till the end of the day
-    if user.pending_sms_answer
-      datetime_of_next_job = DateTime.current + 5.minutes
+    # Handle case when user has pending answers - reschedule sms question in 5 minutes till the end of the day
+    outdated_message = false
+
+    if user.pending_sms_answer && question.type === 'Question::Sms'
+      datetime_of_next_job = DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']) + 5.minutes
 
       # Skip question if next day
-      unless datetime_of_next_job > DateTime.current.end_of_day
-        UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id, false)
+      if datetime_of_next_job < DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).end_of_day
+        UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id, false, true)
+      else
+        outdated_message = true
       end
     end
 
-    return if user.pending_sms_answer
+    if outdated_message && postponed
+      user.update(pending_sms_answer: false)
+    end
+
+    return if user.pending_sms_answer || outdated_message
 
     # Handle case with no pending answers, send current question
     send_sms(user.full_number, question.subtitle)
