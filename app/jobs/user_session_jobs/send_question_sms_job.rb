@@ -40,7 +40,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
     user.update(pending_sms_answer: false) if outdated_message && postponed
 
-    return if user.pending_sms_answer || outdated_message
+    return if (user.pending_sms_answer && question.type == 'Question::Sms') || outdated_message
 
     # Handle case with no pending answers, send current question
     send_sms(user.full_number, question.subtitle)
