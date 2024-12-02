@@ -149,8 +149,12 @@ class V1::Sms::Replay
     queue = Sidekiq::ScheduledSet.new
     queue.each do |job|
       job_args = job.args.first
-      job.delete if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'][2].eql?(user_session.id)
-      job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'].eql?([user_session.id])
+      if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' &&
+         job_args['arguments'][2].eql?(user_session.id) &&
+         job_args['arguments'][4].eql?(false)
+        job.delete
+      end
+      job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'][0].eql?(user_session.id)
     end
     schedule_user_session_job!(user_session)
   end
