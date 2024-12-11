@@ -3,8 +3,10 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/PerceivedComplexity
   def perform(user_id, question_id, user_session_id, reminder, postponed = false)
+    # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
     user = User.find(user_id)
 
@@ -39,12 +41,13 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     end
 
     user.update(pending_sms_answer: false) if outdated_message && postponed
+    user_session.update(current_question_id: false) if outdated_message && postponed
 
     return if (user.pending_sms_answer && question.type == 'Question::Sms') || outdated_message
 
     # Handle case with no pending answers, send current question
     send_sms(user.full_number, question.subtitle)
-    user_session.update!(current_question_id: question.id)
+    user_session.update!(current_question_id: question.id) if question.type == 'Question::Sms'
 
     if question.type.match?('Question::SmsInformation')
       # Create answer
