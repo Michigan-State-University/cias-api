@@ -3,8 +3,10 @@
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   queue_as :question_sms
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   # rubocop:disable Metrics/PerceivedComplexity
   def perform(user_id, question_id, user_session_id, reminder, postponed = false)
+    # rubocop:enable Metrics/CyclomaticComplexity
     # rubocop:enable Metrics/PerceivedComplexity
     user = User.find(user_id)
 
