@@ -44,7 +44,7 @@ gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'
 gem 'rack', '>= 2.2.6.3'
 gem 'rack-attack'
-gem 'rails-html-sanitizer', '>= 1.4.4'
+gem 'rails-html-sanitizer', '>= 1.6.1'
 gem 'secure_headers'
 # for encrypt data
 gem 'lockbox'
