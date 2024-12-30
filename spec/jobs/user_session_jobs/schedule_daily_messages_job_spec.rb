@@ -19,6 +19,8 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
     let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
     let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
     let!(:user_session) { create(:sms_user_session, user: user, session: session, user_intervention: user_intervention) }
+    let!(:year) { Date.current.cweek + 1 > 52 ? Date.current.year + 1 : Date.current.year }
+    let!(:week) { (Date.current.cweek + 1) % 52 }
 
     context 'when only one question group is created without any formulas and one question per day' do
       let!(:question_group_initial) do
@@ -40,7 +42,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -50,7 +52,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -66,7 +68,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -76,7 +78,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -104,7 +106,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -114,7 +116,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -130,7 +132,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -140,7 +142,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -156,7 +158,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -166,7 +168,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -185,7 +187,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -195,7 +197,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -236,7 +238,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -246,7 +248,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -265,7 +267,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -275,7 +277,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -294,7 +296,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -304,7 +306,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -329,7 +331,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 1).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 1).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob).at_least(2).times
             end
           end
@@ -339,7 +341,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2) do
+            travel_to DateTime.commercial(year, week, 2) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -411,7 +413,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
                                       .with(user.id, question_sms_information.id, user_session.id, false)
             end
@@ -422,7 +424,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 3) do
+            travel_to DateTime.commercial(year, week, 3) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -441,7 +443,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
                                       .with(user.id, question_sms_information.id, user_session.id, false)
             end
@@ -452,7 +454,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 3) do
+            travel_to DateTime.commercial(year, week, 3) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -471,7 +473,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
                                       .with(user.id, question_sms.id, user_session.id, false)
             end
@@ -482,7 +484,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 3) do
+            travel_to DateTime.commercial(year, week, 3) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end
@@ -507,7 +509,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'schedules sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 2).change({ hour: 7 }) do
+            travel_to DateTime.commercial(year, week, 2).change({ hour: 7 }) do
               expect { subject }.to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
                                       .with(user.id, question_group.questions.order(:position).first.id, user_session.id, false)
             end
@@ -518,7 +520,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule sms sending job' do
-            travel_to DateTime.commercial(Date.current.year, Date.current.cweek + 1, 3) do
+            travel_to DateTime.commercial(year, week, 3) do
               expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
             end
           end

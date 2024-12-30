@@ -108,7 +108,7 @@ RSpec.describe V1::GeneratedReports::ShareToParticipant do
           change { ActionMailer::Base.deliveries.size }.by(1)
 
         expect(participant_report.reload.participant_id).to eq(participant.id)
-        expect(ActionMailer::Base.deliveries.first).to have_attributes(
+        expect(ActionMailer::Base.deliveries.last).to have_attributes(
           to: include(participant.email),
           subject: 'New reports in the system are ready for you'
         )
