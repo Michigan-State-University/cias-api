@@ -19,7 +19,7 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
     let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
     let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
     let!(:user_session) { create(:sms_user_session, user: user, session: session, user_intervention: user_intervention) }
-    let!(:year) { Date.current.cweek + 1 > 52 ? Date.current.year + 1 : Date.current.cweek }
+    let!(:year) { Date.current.cweek + 1 > 52 ? Date.current.year + 1 : Date.current.year }
     let!(:week) { (Date.current.cweek + 1) % 52 }
 
     context 'when only one question group is created without any formulas and one question per day' do
