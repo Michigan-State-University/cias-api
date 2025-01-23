@@ -16,11 +16,7 @@ class V1::Google::TranslationService
   end
 
   def credentials
-    if Rails.env.development?
-      Oj.load_file(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
-    else
-      Oj.load(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
-    end
+    Oj.load_file(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
   rescue Oj::ParseError
     ENV['GOOGLE_APPLICATION_CREDENTIALS']
   end
