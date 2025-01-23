@@ -13,7 +13,9 @@ class User < ApplicationRecord
          :rememberable,
          :timeoutable,
          :trackable,
-         :validatable
+         :validatable,
+         :argon2,
+         argon2_options: { migrate_from_devise_argon2_v1: true }
 
   extend DefaultValues
   include DeviseTokenAuth::Concerns::User
