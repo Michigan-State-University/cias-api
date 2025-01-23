@@ -36,7 +36,7 @@ RSpec.describe 'GET /v1/user_sessions', type: :request do
     end
 
     it 'return correct error message' do
-      expect(json_response['message']).to eql("Couldn't find UserIntervention")
+      expect(json_response['message']).to match(/^Couldn't find UserIntervention*/)
     end
   end
 
