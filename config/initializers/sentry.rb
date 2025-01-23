@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "active_support/parameter_filter"
+
 Sentry.init do |config|
   config.enabled_environments = %w[production]
   config.dsn = ENV['SENTRY_DSN']

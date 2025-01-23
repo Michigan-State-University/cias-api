@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_10_04_130904) do
-
+ActiveRecord::Schema[7.0].define(version: 2025_01_22_154550) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -23,7 +22,7 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "record_id", null: false
     t.string "record_type", null: false
     t.uuid "blob_id", null: false
-    t.datetime "created_at", null: false
+    t.datetime "created_at", precision: nil, null: false
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
@@ -33,8 +32,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "content_type"
     t.text "metadata"
     t.bigint "byte_size", null: false
-    t.string "checksum", null: false
-    t.datetime "created_at", null: false
+    t.string "checksum"
+    t.datetime "created_at", precision: nil, null: false
     t.string "description"
     t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
@@ -49,15 +48,15 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "alert_phones", force: :cascade do |t|
     t.uuid "sms_plan_id", null: false
     t.bigint "phone_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "answers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "type"
     t.uuid "question_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "user_session_id"
     t.text "body_ciphertext"
     t.boolean "skipped", default: false
@@ -74,8 +73,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "audios", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "sha256", null: false
     t.integer "usage_counter", default: 1
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "language"
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
@@ -85,50 +84,50 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
     t.integer "google_tts_voice_id"
     t.integer "cat_mh_language_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_languages", force: :cascade do |t|
     t.integer "language_id"
     t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_populations", force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_test_attributes", force: :cascade do |t|
     t.string "name"
     t.string "variable_type"
     t.string "range"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_test_type_languages", force: :cascade do |t|
     t.integer "cat_mh_language_id"
     t.integer "cat_mh_test_type_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_test_type_time_frames", force: :cascade do |t|
     t.integer "cat_mh_time_frame_id"
     t.integer "cat_mh_test_type_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_test_types", force: :cascade do |t|
     t.string "short_name"
     t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "cat_mh_population_id"
     t.index ["cat_mh_population_id"], name: "index_cat_mh_test_types_on_cat_mh_population_id"
   end
@@ -137,15 +136,15 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.integer "timeframe_id"
     t.string "description"
     t.string "short_name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "cat_mh_variables", force: :cascade do |t|
     t.bigint "cat_mh_test_attribute_id"
     t.bigint "cat_mh_test_type_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["cat_mh_test_attribute_id"], name: "index_cat_mh_variables_on_cat_mh_test_attribute_id"
     t.index ["cat_mh_test_type_id"], name: "index_cat_mh_variables_on_cat_mh_test_type_id"
   end
@@ -157,9 +156,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "health_clinic_id", null: false
     t.uuid "chart_id", null: false
     t.uuid "user_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.datetime "filled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "filled_at", precision: nil
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
@@ -173,23 +172,23 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "status", default: "draft"
     t.jsonb "formula"
     t.uuid "dashboard_section_id"
-    t.datetime "published_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "published_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "chart_type", default: "bar_chart"
     t.boolean "trend_line", default: false, null: false
     t.integer "position", default: 1, null: false
     t.string "interval_type", default: "monthly"
-    t.datetime "date_range_start"
-    t.datetime "date_range_end"
+    t.datetime "date_range_start", precision: nil
+    t.datetime "date_range_end", precision: nil
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
   create_table "clinic_locations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "department", null: false
     t.string "name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "external_id"
     t.string "external_name"
     t.string "epic_identifier", default: ""
@@ -203,8 +202,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.boolean "data_access", default: false, null: false
     t.uuid "user_id", null: false
     t.uuid "intervention_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["intervention_id"], name: "index_collaborators_on_intervention_id"
     t.index ["user_id", "intervention_id"], name: "index_collaborators_on_user_id_and_intervention_id", unique: true
     t.index ["user_id"], name: "index_collaborators_on_user_id"
@@ -212,8 +211,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
 
   create_table "consumption_results", force: :cascade do |t|
     t.jsonb "body"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "day_id", null: false
     t.index ["day_id"], name: "index_consumption_results_on_day_id"
   end
@@ -222,8 +221,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "name"
     t.string "description"
     t.uuid "reporting_dashboard_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "position", default: 1, null: false
     t.index ["name", "reporting_dashboard_id"], name: "index_dashboard_sections_on_name_and_reporting_dashboard_id", unique: true
     t.index ["reporting_dashboard_id"], name: "index_dashboard_sections_on_reporting_dashboard_id"
@@ -233,8 +232,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.date "exact_date", null: false
     t.uuid "user_session_id", null: false
     t.uuid "question_group_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["question_group_id"], name: "index_days_on_question_group_id"
     t.index ["user_session_id"], name: "index_days_on_user_session_id"
   end
@@ -242,8 +241,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "downloaded_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "generated_report_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["generated_report_id"], name: "index_downloaded_reports_on_generated_report_id"
     t.index ["user_id", "generated_report_id"], name: "index_downloaded_reports_on_user_id_and_generated_report_id"
     t.index ["user_id"], name: "index_downloaded_reports_on_user_id"
@@ -252,8 +251,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "e_intervention_admin_organizations", force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "organization_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["organization_id"], name: "index_e_intervention_admin_organizations_on_organization_id"
     t.index ["user_id"], name: "index_e_intervention_admin_organizations_on_user_id"
   end
@@ -261,8 +260,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "events", force: :cascade do |t|
     t.string "name", default: ""
     t.bigint "day_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["day_id"], name: "index_events_on_day_id"
   end
 
@@ -271,8 +270,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "report_template_id"
     t.uuid "user_session_id"
     t.string "report_for", default: "third_party", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "participant_id"
     t.index ["participant_id"], name: "index_generated_reports_on_participant_id"
     t.index ["report_for"], name: "index_generated_reports_on_report_for"
@@ -283,8 +282,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "generated_reports_third_party_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "generated_report_id"
     t.uuid "third_party_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["generated_report_id"], name: "index_reports_third_party_users_on_reports_id"
     t.index ["third_party_id"], name: "index_third_party_users_reports_on_reports_id"
   end
@@ -293,17 +292,17 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.text "queue_name"
     t.integer "priority"
     t.jsonb "serialized_params"
-    t.datetime "scheduled_at"
-    t.datetime "performed_at"
-    t.datetime "finished_at"
+    t.datetime "scheduled_at", precision: nil
+    t.datetime "performed_at", precision: nil
+    t.datetime "finished_at", precision: nil
     t.text "error"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "active_job_id"
     t.text "concurrency_key"
     t.text "cron_key"
     t.uuid "retried_good_job_id"
-    t.datetime "cron_at"
+    t.datetime "cron_at", precision: nil
     t.index ["active_job_id", "created_at"], name: "index_good_jobs_on_active_job_id_and_created_at"
     t.index ["concurrency_key"], name: "index_good_jobs_on_concurrency_key_when_unfinished", where: "(finished_at IS NULL)"
     t.index ["cron_key", "created_at"], name: "index_good_jobs_on_cron_key_and_created_at"
@@ -315,16 +314,16 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "google_languages", force: :cascade do |t|
     t.string "language_code"
     t.string "language_name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.bigint "google_tts_language_id"
     t.index ["google_tts_language_id"], name: "index_google_languages_on_google_tts_language_id"
   end
 
   create_table "google_tts_languages", force: :cascade do |t|
     t.string "language_name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "google_tts_voices", force: :cascade do |t|
@@ -332,8 +331,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "voice_label"
     t.string "voice_type"
     t.string "language_code"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["google_tts_language_id"], name: "index_google_tts_voices_on_google_tts_language_id"
   end
 
@@ -341,9 +340,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id"
     t.uuid "health_clinic_id"
     t.string "invitation_token"
-    t.datetime "accepted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "accepted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["health_clinic_id"], name: "index_health_clinic_invitations_on_health_clinic_id"
     t.index ["invitation_token"], name: "index_health_clinic_invitations_on_invitation_token"
     t.index ["user_id"], name: "index_health_clinic_invitations_on_user_id"
@@ -352,9 +351,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name", null: false
     t.uuid "health_system_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
     t.index ["deleted_at"], name: "index_health_clinics_on_deleted_at"
     t.index ["health_system_id"], name: "index_health_clinics_on_health_system_id"
     t.index ["name", "health_system_id"], name: "index_health_clinics_on_name_and_health_system_id", unique: true
@@ -364,9 +363,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id"
     t.uuid "health_system_id"
     t.string "invitation_token"
-    t.datetime "accepted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "accepted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["health_system_id"], name: "index_health_system_invitations_on_health_system_id"
     t.index ["invitation_token"], name: "index_health_system_invitations_on_invitation_token"
     t.index ["user_id"], name: "index_health_system_invitations_on_user_id"
@@ -375,9 +374,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "health_systems", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name", null: false
     t.uuid "organization_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at", precision: nil
     t.index ["deleted_at"], name: "index_health_systems_on_deleted_at"
     t.index ["name", "organization_id"], name: "index_health_systems_on_name_and_organization_id", unique: true
     t.index ["organization_id"], name: "index_health_systems_on_organization_id"
@@ -397,8 +396,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "dob_bidx"
     t.string "sex_bidx"
     t.string "zip_code_bidx"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "phone_number_ciphertext"
     t.string "phone_number_bidx"
     t.string "phone_type_ciphertext"
@@ -422,23 +421,23 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   end
 
   create_table "imported_files", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "intervention_accesses", force: :cascade do |t|
     t.uuid "intervention_id", null: false
     t.string "email", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["intervention_id"], name: "index_intervention_accesses_on_intervention_id"
   end
 
   create_table "intervention_locations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "intervention_id"
     t.uuid "clinic_location_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["clinic_location_id"], name: "index_intervention_locations_on_clinic_location_id"
     t.index ["intervention_id"], name: "index_intervention_locations_on_intervention_id"
   end
@@ -446,8 +445,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "intervention_navigators", force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "intervention_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["intervention_id"], name: "index_intervention_navigators_on_intervention_id"
     t.index ["user_id"], name: "index_intervention_navigators_on_user_id"
   end
@@ -455,11 +454,11 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "user_id", null: false
-    t.datetime "published_at"
+    t.datetime "published_at", precision: nil
     t.string "status", default: "draft"
     t.string "shared_to", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "organization_id"
     t.bigint "google_language_id", null: false
     t.boolean "from_deleted_organization", default: false, null: false
@@ -481,9 +480,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "current_editor_id"
     t.integer "conversations_count"
     t.string "sensitive_data_state", default: "collected", null: false
-    t.datetime "clear_sensitive_data_scheduled_at"
+    t.datetime "clear_sensitive_data_scheduled_at", precision: nil
     t.integer "navigators_count", default: 0
-    t.datetime "paused_at"
+    t.datetime "paused_at", precision: nil
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -497,8 +496,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "invitations", force: :cascade do |t|
     t.uuid "invitable_id"
     t.string "invitable_type"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "email_ciphertext"
     t.string "email_bidx"
     t.uuid "health_clinic_id"
@@ -509,41 +508,41 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "url"
     t.string "slug"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["url", "slug"], name: "index_links_on_url_and_slug", unique: true
   end
 
   create_table "live_chat_conversations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "intervention_id", null: false
     t.string "current_screen_title"
     t.string "participant_location_history", default: [], null: false, array: true
-    t.datetime "archived_at"
+    t.datetime "archived_at", precision: nil
   end
 
   create_table "live_chat_interlocutors", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "conversation_id", null: false
     t.uuid "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "live_chat_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text "url", null: false
     t.string "display_name", default: "", null: false
     t.uuid "navigator_setup_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "link_for", default: 0
   end
 
   create_table "live_chat_messages", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.text "content_ciphertext", default: "", null: false
     t.uuid "conversation_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "live_chat_interlocutor_id", null: false
     t.boolean "is_read", default: false, null: false
   end
@@ -552,18 +551,18 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "no_navigator_available_message", default: "Welcome to our in-session support!", null: false
     t.string "contact_email", default: "", null: false
     t.uuid "intervention_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "contact_message", default: "You can contact us directly by using details below"
   end
 
   create_table "live_chat_summoning_users", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "intervention_id", null: false
-    t.datetime "unlock_next_call_out_time"
+    t.datetime "unlock_next_call_out_time", precision: nil
     t.boolean "participant_handled", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["intervention_id"], name: "index_live_chat_summoning_users_on_intervention_id"
     t.index ["user_id"], name: "index_live_chat_summoning_users_on_user_id"
   end
@@ -571,9 +570,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "messages", force: :cascade do |t|
     t.text "body", null: false
     t.string "status", default: "new", null: false
-    t.datetime "schedule_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "schedule_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "phone_ciphertext"
     t.string "attachment_url"
   end
@@ -582,9 +581,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.text "email_ciphertext"
     t.string "email_bidx"
     t.uuid "intervention_id"
-    t.datetime "accepted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "accepted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["email_bidx"], name: "index_navigator_invitations_on_email_bidx"
     t.index ["intervention_id"], name: "index_navigator_invitations_on_intervention_id"
   end
@@ -595,8 +594,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.boolean "is_read", default: false
     t.jsonb "data"
     t.uuid "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "event", default: 0, null: false
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
     t.index ["user_id"], name: "index_notifications_on_user_id"
@@ -606,9 +605,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id"
     t.uuid "organization_id"
     t.string "invitation_token"
-    t.datetime "accepted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "accepted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["invitation_token"], name: "index_organization_invitations_on_invitation_token"
     t.index ["organization_id"], name: "index_organization_invitations_on_organization_id"
     t.index ["user_id"], name: "index_organization_invitations_on_user_id"
@@ -616,8 +615,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
 
   create_table "organizations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["name"], name: "index_organizations_on_name", unique: true
   end
 
@@ -627,9 +626,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "prefix", null: false
     t.string "confirmation_code"
     t.boolean "confirmed", default: false, null: false
-    t.datetime "confirmed_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "confirmed_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text "number_ciphertext"
     t.uuid "navigator_setup_id"
     t.string "communication_way"
@@ -643,14 +642,14 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id", null: false
     t.uuid "intervention_id", null: false
     t.uuid "health_clinic_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "auto_invitation", default: false, null: false
-    t.datetime "sms_invitation_sent_at"
+    t.datetime "sms_invitation_sent_at", precision: nil
     t.string "external_id"
     t.boolean "sms_notification", default: false
     t.boolean "email_notification", default: false
-    t.datetime "email_invitation_sent_at"
+    t.datetime "email_invitation_sent_at", precision: nil
     t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
     t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
     t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"
@@ -660,8 +659,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "session_id", null: false
     t.string "title", null: false
     t.bigint "position", default: 0, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "type"
     t.integer "questions_count", default: 0
     t.jsonb "sms_schedule"
@@ -683,8 +682,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "video_url"
     t.jsonb "formulas"
     t.jsonb "body"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.jsonb "original_text"
     t.jsonb "accepted_answers"
     t.jsonb "sms_reminders", default: {}
@@ -701,8 +700,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "formula_match"
     t.string "title"
     t.text "content"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.jsonb "original_text"
     t.integer "position", default: 0, null: false
     t.index ["report_template_section_id", "preview"], name: "index_variants_on_preview_and_section_id"
@@ -712,8 +711,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "report_template_sections", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "formula"
     t.uuid "report_template_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "position", default: 0, null: false
     t.index ["report_template_id"], name: "index_report_template_sections_on_report_template_id"
   end
@@ -723,8 +722,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "report_for", default: "third_party", null: false
     t.uuid "session_id"
     t.text "summary"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.jsonb "original_text"
     t.boolean "has_cover_letter", default: false, null: false
     t.string "cover_letter_logo_type", default: "report_logo", null: false
@@ -739,8 +738,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
 
   create_table "reporting_dashboards", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "organization_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["organization_id"], name: "index_reporting_dashboards_on_organization_id"
   end
 
@@ -753,8 +752,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.integer "schedule_payload"
     t.date "schedule_at"
     t.jsonb "formulas"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.integer "report_templates_count", default: 0
     t.integer "sms_plans_count", default: 0, null: false
     t.integer "last_report_template_number", default: 0
@@ -772,7 +771,7 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.boolean "autofinish_enabled", default: false, null: false
     t.integer "autofinish_delay", default: 1440, null: false
     t.boolean "autoclose_enabled", default: false
-    t.datetime "autoclose_at"
+    t.datetime "autoclose_at", precision: nil
     t.text "welcome_message"
     t.text "default_response"
     t.bigint "google_language_id"
@@ -803,8 +802,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "health_clinic_id"
     t.boolean "active", default: true
     t.string "sms_code"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["health_clinic_id"], name: "index_sms_codes_on_health_clinic_id"
     t.index ["session_id"], name: "index_sms_codes_on_session_id"
     t.index ["sms_code"], name: "unique_active_sms_codes", unique: true, where: "(active IS TRUE)"
@@ -815,8 +814,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "link_type", default: "website", null: false
     t.uuid "session_id", null: false
     t.uuid "sms_plan_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "variable", null: false
     t.index ["session_id"], name: "index_sms_links_on_session_id"
     t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true
@@ -828,8 +827,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id", null: false
     t.uuid "sms_link_id", null: false
     t.string "entered_timestamps", default: [], null: false, array: true
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["sms_link_id", "user_id"], name: "index_sms_links_users_on_sms_link_id_and_user_id", unique: true
     t.index ["sms_link_id"], name: "index_sms_links_users_on_sms_link_id"
     t.index ["user_id"], name: "index_sms_links_users_on_user_id"
@@ -839,8 +838,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "sms_plan_id"
     t.string "formula_match"
     t.text "content"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.jsonb "original_text"
     t.integer "position", default: 0, null: false
     t.index ["sms_plan_id"], name: "index_sms_plan_variants_on_sms_plan_id"
@@ -852,12 +851,12 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "schedule", null: false
     t.integer "schedule_payload", default: 0
     t.string "frequency", default: "once", null: false
-    t.datetime "end_at"
+    t.datetime "end_at", precision: nil
     t.string "formula"
     t.text "no_formula_text"
     t.boolean "is_used_formula", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.jsonb "original_text"
     t.string "type", default: "SmsPlan::Normal", null: false
     t.boolean "include_first_name"
@@ -880,9 +879,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id"
     t.uuid "team_id"
     t.string "invitation_token"
-    t.datetime "accepted_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "accepted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["accepted_at"], name: "index_team_invitations_on_accepted_at"
     t.index ["invitation_token"], name: "index_team_invitations_on_invitation_token", unique: true
     t.index ["user_id", "team_id"], name: "unique_not_accepted_team_invitation", unique: true, where: "(accepted_at IS NULL)"
@@ -890,8 +889,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
 
   create_table "teams", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.uuid "team_admin_id"
     t.index ["name"], name: "index_teams_on_name", unique: true
     t.index ["team_admin_id"], name: "index_teams_on_team_admin_id"
@@ -900,8 +899,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
   create_table "tests", force: :cascade do |t|
     t.uuid "session_id"
     t.bigint "cat_mh_test_type_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["cat_mh_test_type_id"], name: "index_tests_on_cat_mh_test_type_id"
     t.index ["session_id"], name: "index_tests_on_session_id"
   end
@@ -912,15 +911,15 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.integer "position", default: 0, null: false
     t.string "label", null: false
     t.boolean "default", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_health_clinics", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "health_clinic_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["health_clinic_id"], name: "index_user_health_clinics_on_health_clinic_id"
     t.index ["user_id"], name: "index_user_health_clinics_on_user_id"
   end
@@ -931,9 +930,9 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "health_clinic_id"
     t.integer "completed_sessions", default: 0, null: false
     t.string "status", default: "ready_to_start"
-    t.datetime "finished_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "finished_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["health_clinic_id"], name: "index_user_interventions_on_health_clinic_id"
     t.index ["intervention_id", "user_id"], name: "index_user_interventions_on_intervention_id_and_user_id", unique: true, where: "(created_at > '2023-10-25 05:30:04'::timestamp without time zone)"
     t.index ["intervention_id"], name: "index_user_interventions_on_intervention_id"
@@ -948,17 +947,17 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.jsonb "params"
     t.string "user_agent"
     t.inet "remote_ip"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_sessions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.uuid "session_id", null: false
-    t.datetime "finished_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.datetime "last_answer_at"
+    t.datetime "finished_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "last_answer_at", precision: nil
     t.string "timeout_job_id"
     t.uuid "name_audio_id"
     t.uuid "health_clinic_id"
@@ -969,7 +968,7 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "jsession_id"
     t.string "awselb"
     t.uuid "user_intervention_id", null: false
-    t.datetime "scheduled_at"
+    t.datetime "scheduled_at", precision: nil
     t.boolean "quick_exit", default: false
     t.integer "number_of_attempts", default: 1
     t.boolean "started", default: false, null: false
@@ -989,8 +988,8 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.uuid "user_id"
     t.string "code", null: false
     t.boolean "confirmed", default: false, null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_user_verification_codes_on_user_id"
   end
 
@@ -1001,29 +1000,29 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.jsonb "tokens"
     t.boolean "active", default: true, null: false
     t.string "confirmation_token"
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
+    t.datetime "confirmed_at", precision: nil
+    t.datetime "confirmation_sent_at", precision: nil
     t.string "unconfirmed_email"
     t.string "invitation_token"
-    t.datetime "invitation_created_at"
-    t.datetime "invitation_sent_at"
-    t.datetime "invitation_accepted_at"
+    t.datetime "invitation_created_at", precision: nil
+    t.datetime "invitation_sent_at", precision: nil
+    t.datetime "invitation_accepted_at", precision: nil
     t.integer "invitation_limit"
     t.string "invited_by_type"
     t.bigint "invited_by_id"
     t.integer "invitations_count", default: 0
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
+    t.datetime "reset_password_sent_at", precision: nil
     t.boolean "allow_password_change", default: false, null: false
-    t.datetime "remember_created_at"
+    t.datetime "remember_created_at", precision: nil
     t.integer "sign_in_count", default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
+    t.datetime "current_sign_in_at", precision: nil
+    t.datetime "last_sign_in_at", precision: nil
     t.inet "current_sign_in_ip"
     t.inet "last_sign_in_ip"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "sms_notification", default: true, null: false
     t.uuid "team_id"
     t.uuid "preview_session_id"
@@ -1039,7 +1038,7 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "uid_bidx"
     t.string "organizable_type"
     t.boolean "terms", default: false, null: false
-    t.datetime "terms_confirmed_at"
+    t.datetime "terms_confirmed_at", precision: nil
     t.boolean "quick_exit_enabled", default: false, null: false
     t.boolean "online", default: false, null: false
     t.uuid "hfhs_patient_detail_id"
@@ -1067,7 +1066,7 @@ ActiveRecord::Schema.define(version: 2024_10_04_130904) do
     t.string "event", null: false
     t.string "whodunnit"
     t.text "object"
-    t.datetime "created_at"
+    t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
