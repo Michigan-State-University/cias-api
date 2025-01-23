@@ -181,7 +181,7 @@ class Intervention < ApplicationRecord
   end
 
   def cache_key
-    "intervention/#{id}-#{updated_at&.to_s(:number)}"
+    "intervention/#{id}-#{updated_at&.to_fs(:number)}"
   end
 
   def self.detailed_search(params, user)

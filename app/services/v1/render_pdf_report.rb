@@ -56,7 +56,7 @@ class V1::RenderPdfReport
     action_controller.render_to_string(
       template: 'report_templates/report_footer.html.erb',
       locals: {
-        datetime_content: "Completed on #{DateTime.now.to_s(:db)}"
+        datetime_content: "Completed on #{DateTime.now.to_fs(:db)}"
       }
     )
   end

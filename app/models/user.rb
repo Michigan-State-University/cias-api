@@ -202,7 +202,7 @@ class User < ApplicationRecord
   end
 
   def cache_key
-    "user/#{id}-#{updated_at&.to_s(:number)}"
+    "user/#{id}-#{updated_at&.to_fs(:number)}"
   end
 
   def accepted_health_clinic_ids
