@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '3.1.4'
 
-gem 'rails', '~> 6.1.7', '>= 6.1.7.9'
+gem 'rails', '~> 7.0.0'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 5.6.9'
 
@@ -63,6 +63,9 @@ gem 'sentry-rails', '~> 5.7'
 gem 'jwt', '~> 2.6'
 gem 'grpc', '~> 1.53.2'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
+
+# for upgrading rails to 7.0. This line can be removed after upgrading to rails 7.1
+gem 'concurrent-ruby', '1.3.4'
 
 group :development, :test do
   gem 'bundler-audit'
