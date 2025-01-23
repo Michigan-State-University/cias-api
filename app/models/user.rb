@@ -148,7 +148,7 @@ class User < ApplicationRecord
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
-  encrypts :email, :first_name, :last_name, :uid
+  has_encrypted :email, :first_name, :last_name, :uid
   blind_index :email, :uid
 
   # METHODS

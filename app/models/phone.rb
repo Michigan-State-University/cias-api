@@ -14,7 +14,7 @@ class Phone < ApplicationRecord
 
   enum communication_way: { call: 'call', message: 'message' }
 
-  encrypts :number
+  has_encrypted :number
   blind_index :number
 
   def token_correct?(code)
