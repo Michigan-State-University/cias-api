@@ -42,7 +42,7 @@ class V1::Users::InvitationsController < V1Controller
     # and there is no version with !
     return redirect_to_web_app(error: I18n.t('users.invite.not_active')) if user.blank?
 
-    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{invitation_token}&email=#{user.email}&role=#{user.roles.first}"
+    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{invitation_token}&email=#{user.email}&role=#{user.roles.first}", allow_other_host: true
   end
 
   # This endpoint is hit from registration page to register new user from invitation
