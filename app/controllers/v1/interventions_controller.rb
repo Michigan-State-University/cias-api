@@ -59,7 +59,7 @@ class V1::InterventionsController < V1Controller
 
     head :no_content unless intervention_load.conversations_transcript.attached?
 
-    redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention_load.conversations_transcript, only_path: true))
+    redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention_load.conversations_transcript, only_path: true), allow_other_host: true)
   end
 
   def clear_user_data
