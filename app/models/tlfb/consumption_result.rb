@@ -8,7 +8,7 @@ class Tlfb::ConsumptionResult < ApplicationRecord
 
   attribute :body, :json, default: -> { {} }
   validates :body, json: {
-    schema: -> { Rails.root.join("#{json_schema_path}/body.json").to_s },
+    schema: -> { File.read(Rails.root.join("#{json_schema_path}/body.json").to_s) },
     message: ->(err) { err }
   }
 

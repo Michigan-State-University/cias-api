@@ -56,12 +56,12 @@ class Session < ApplicationRecord
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
   validates :settings, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/settings.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/settings.json").to_s)
                                        }, message: lambda { |err|
                                                      err
                                                    } }
   validates :formulas, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/formula.json").to_s)
                                        }, message: lambda { |err|
                                                      err
                                                    } }

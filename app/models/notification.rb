@@ -11,7 +11,7 @@ class Notification < ApplicationRecord
                 new_collaborator_added: 7, start_editing_intervention: 8, stop_editing_intervention: 9, collaborator_removed: 10, sensitive_data_removed: 11 }
 
   validates :data, json: { schema: lambda {
-    Rails.root.join("#{json_schema_path}/notification_data.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/notification_data.json").to_s)
   }, message: lambda { |err|
     err
   } }

@@ -12,7 +12,7 @@ class Chart < ApplicationRecord
   attribute :formula, :json, default: -> { assign_default_values('formula') }
 
   validates :formula, presence: true, json: { schema: lambda {
-                                                        Rails.root.join("#{json_schema_path}/formula.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/formula.json").to_s)
                                                       }, message: lambda { |err|
                                                                     err
                                                                   } }

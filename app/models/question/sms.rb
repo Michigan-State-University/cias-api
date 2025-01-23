@@ -28,13 +28,13 @@ class Question::Sms < Question
   attribute :sms_reminders, :json, default: -> { {} }
 
   validates :accepted_answers, json: { schema: lambda {
-    Rails.root.join("db/schema/#{self.class.name.underscore}/accepted_answers.json").to_s
+    File.read(Rails.root.join("db/schema/#{self.class.name.underscore}/accepted_answers.json").to_s)
   }, message: lambda { |err|
     err
   } }, allow_blank: true
 
   validates :sms_reminders, json: { schema: lambda {
-    Rails.root.join("db/schema/#{self.class.name.underscore}/sms_reminders.json").to_s
+    File.read(Rails.root.join("db/schema/#{self.class.name.underscore}/sms_reminders.json").to_s)
   }, message: lambda { |err|
     err
   } }, allow_blank: true

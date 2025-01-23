@@ -38,23 +38,23 @@ class Question < ApplicationRecord
   validates :type, presence: true
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validates :settings, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/settings.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/settings.json").to_s)
                                        }, message: lambda { |err|
                                                      err
                                                    } }
   validates :narrator, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/narrator.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/narrator.json").to_s)
                                        }, message: lambda { |err|
                                                      err
                                                    } }
   validates :video_url, format: URI::DEFAULT_PARSER.make_regexp(%w[http https]), allow_blank: true
   validates :formulas, json: { schema: lambda {
-                                         Rails.root.join("#{json_schema_path}/formula.json").to_s
+    File.read(Rails.root.join("#{json_schema_path}/formula.json").to_s)
                                        }, message: lambda { |err|
                                                      err
                                                    } }
   validates :body, presence: true, json: { schema: lambda {
-                                                     Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s
+    File.read(Rails.root.join("db/schema/#{self.class.name.underscore}/body.json").to_s)
                                                    }, message: lambda { |err|
                                                                  err
                                                                } }
