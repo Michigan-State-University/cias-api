@@ -206,6 +206,8 @@ GEM
       zlib (~> 2.1)
     faraday-http-cache (2.5.1)
       faraday (>= 0.8)
+    faraday-multipart (1.1.0)
+      multipart-post (~> 2.0)
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
     faraday-retry (2.2.1)
@@ -363,6 +365,7 @@ GEM
     minitest (5.25.4)
     msgpack (1.7.5)
     multi_json (1.15.0)
+    multipart-post (2.4.1)
     nenv (0.3.0)
     nesty (1.0.2)
     net-http (0.6.0)
@@ -635,6 +638,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails
   faker
+  faraday-multipart
   fasterer
   google-cloud-text_to_speech
   google-cloud-translate-v2
