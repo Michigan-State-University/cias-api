@@ -60,4 +60,5 @@ Rails.application.configure do
   config.after_initialize { Bullet.enable = true }
 
   Rails.application.routes.default_url_options[:protocol] = 'https'
+  Rails.application.routes.default_url_options[:host] = 'test.host'
 end
