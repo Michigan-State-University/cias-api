@@ -116,7 +116,13 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
       end
 
       context 'when clinic is deleted' do
-        let(:request) { get v1_health_system_path(deleted_health_system.id), headers: headers }
+        let(:request) { get v1_health_system_path(deleted_health_system.id), headers: headers, params: params }
+        let(:params) { {} }
+        let!(:health_system_admin) do
+          user = health_system.health_system_admins.first
+          user.update(organizable: deleted_health_system)
+          user
+        end
 
         it 'without flag' do
           expect(json_response['message']).to include('Couldn\'t find HealthSystem with')
@@ -127,28 +133,28 @@ RSpec.describe 'GET /v1/health_systems/:id', type: :request do
             {
               with_deleted: true
             }
+          end
 
-            it 'return health system' do
-              expect(json_response['data']).to include(
-                {
-                  'id' => deleted_health_system.id.to_s,
-                  'type' => 'health_system',
-                  'attributes' => {
-                    'name' => deleted_health_system.name,
-                    'organization_id' => organization.id,
-                    'deleted' => false
+          it 'return health system' do
+            expect(json_response['data']).to include(
+              {
+                'id' => deleted_health_system.id.to_s,
+                'type' => 'health_system',
+                'attributes' => {
+                  'name' => deleted_health_system.name,
+                  'organization_id' => organization.id,
+                  'deleted' => true
+                },
+                'relationships' => {
+                  'health_system_admins' => {
+                    'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }]
                   },
-                  'relationships' => {
-                    'health_system_admins' => {
-                      'data' => []
-                    },
-                    'health_clinics' => {
-                      'data' => []
-                    }
+                  'health_clinics' => {
+                    'data' => []
                   }
                 }
-              )
-            end
+              }
+            )
           end
         end
       end

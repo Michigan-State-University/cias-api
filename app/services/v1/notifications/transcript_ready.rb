@@ -49,7 +49,7 @@ class V1::Notifications::TranscriptReady
     {
       id: file.id,
       name: file.blob.filename,
-      url: ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true),
+      url: ENV.fetch('APP_HOSTNAME', nil) + Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true),
       created_at: file.blob.created_at.in_time_zone('UTC')
     }
   end

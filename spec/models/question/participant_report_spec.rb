@@ -48,7 +48,7 @@ RSpec.describe Question::ParticipantReport, type: :model do
         let(:question_participant_report) { create(:question_participant_report, body: { variable: { name: 'htd' }, data: [{ payload: '' }] }) }
 
         it 'returns correct variables' do
-          expect(question_participant_report.question_variables).to match_array ['htd']
+          expect(question_participant_report.question_variables).to contain_exactly('htd')
         end
 
         it 'returns correct amount of variables' do

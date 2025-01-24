@@ -28,7 +28,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::SendSmsInvitation do
     it 'message has expected body' do
       subject
       message = Message.order(:created_at).last
-      expect(message.body).to include("#{ENV['WEB_URL']}/usr/#{user.predefined_user_parameter.slug}")
+      expect(message.body).to include("#{ENV.fetch('WEB_URL', nil)}/usr/#{user.predefined_user_parameter.slug}")
     end
 
     context 'with custom intervention language' do

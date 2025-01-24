@@ -57,7 +57,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper error message' do
-          expect(json_response['data'].pluck('id')).to match_array []
+          expect(json_response['data'].pluck('id')).to be_empty
         end
 
         it 'returns correct invitations list size' do
@@ -105,7 +105,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
         end
 
         it 'returns proper interventions' do
-          expect(json_response['data'].pluck('id')).to match_array []
+          expect(json_response['data'].pluck('id')).to be_empty
         end
 
         it 'returns correct invitations list size' do
@@ -202,7 +202,7 @@ RSpec.describe 'GET /v1/interventions', type: :request do
   end
 
   # make sure its independent of stars of other users
-  ([false, true]).product([false, true]).each do |flag1, flag2|
+  [false, true].product([false, true]).each do |flag1, flag2|
     context 'when filtering by whether an intervention is starred' do
       let!(:starred_intervention) { create(:intervention, user: user) }
       let!(:not_starred_intervention) { create(:intervention, user: user) }

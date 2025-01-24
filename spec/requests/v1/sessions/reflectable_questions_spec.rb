@@ -36,7 +36,7 @@ RSpec.describe 'GET /v1/sessions/:id/reflectable_questions', type: :request do
 
     it 'return only specific attributes' do
       keys = %w[type question_group_id subtitle body session_id]
-      expect(json_response['data'].first['attributes'].keys).to(contain_exactly(*keys))
+      expect(json_response['data'].first['attributes'].keys).to(match_array(keys))
     end
   end
 end

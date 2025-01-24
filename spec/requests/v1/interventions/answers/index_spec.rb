@@ -46,7 +46,7 @@ RSpec.describe 'GET /v1/interventions/:id/answers', type: :request do
     context 'is JSON and parse' do
       before { request }
 
-      let(:parsed_response) { JSON.parse(response.body) }
+      let(:parsed_response) { response.parsed_body }
 
       it 'success to Hash' do
         expect(parsed_response.class).to be(Hash)

@@ -16,7 +16,8 @@ class V1::Interventions::AnswersController < V1Controller
 
     head :no_content unless intervention.reports.attached?
 
-    redirect_to(ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention.newest_report, only_path: true), allow_other_host: true)
+    redirect_to(ENV.fetch('APP_HOSTNAME', nil) + Rails.application.routes.url_helpers.rails_blob_path(intervention.newest_report, only_path: true),
+                allow_other_host: true)
   end
 
   private

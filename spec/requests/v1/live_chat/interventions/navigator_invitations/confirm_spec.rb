@@ -39,7 +39,7 @@ RSpec.describe 'GET /v1/live_chat/navigators/invitations/confirm', type: :reques
       { error: Base64.encode64(I18n.t('live_chat.navigators.invitations.error')) }.to_query
     end
     let(:error_path) do
-      "#{ENV['WEB_URL']}?#{error_message}"
+      "#{ENV.fetch('WEB_URL', nil)}?#{error_message}"
     end
 
     context 'Redirects to web app with correct message' do

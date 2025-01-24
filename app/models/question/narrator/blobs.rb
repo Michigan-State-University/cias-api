@@ -33,7 +33,8 @@ class Question::Narrator::Blobs
   def purge
     return if cloned
 
-    count_hash = Hash.new([])
+    count_hash = {}
+    count_hash.default = []
     ids.tally.each do |id, count|
       count_hash[count] += [id]
     end

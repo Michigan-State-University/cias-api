@@ -40,7 +40,7 @@ class Question::Sms < Question
   } }, allow_blank: true
 
   def self.assign_default_values(attr)
-    super(attr).merge(
+    super.merge(
       { 'proceed_button' => false, 'required' => false }
     )
   end

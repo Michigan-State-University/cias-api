@@ -30,7 +30,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
   end
 
   shared_examples "won't share report with third party" do
-    it 'won\'t share report with third party' do
+    it 'does not share report with third party' do
       expect { subject }.to avoid_changing { GeneratedReportsThirdPartyUser.count }.and \
         avoid_changing { ActionMailer::Base.deliveries.size }.and \
           avoid_changing { User.count }

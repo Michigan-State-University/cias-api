@@ -44,7 +44,7 @@ Rails.application.configure do
   config.log_tags = [:request_id]
 
   # Use a different cache store in production.
-  config.cache_store = :redis_cache_store, { url: ENV['REDIS_URL'], driver: :ruby, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
+  config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL', nil), driver: :ruby, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
 
   # Use a real queuing backend for Active Job (and separate queues per environment).
   # config.active_job.queue_adapter     = :resque
@@ -55,7 +55,7 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
-  config.action_mailer.default_url_options = { host: ENV['DOMAIN_NAME'] }
+  config.action_mailer.default_url_options = { host: ENV.fetch('DOMAIN_NAME', nil) }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.smtp_settings = {
@@ -63,8 +63,8 @@ Rails.application.configure do
     port: 587,
     authentication: :plain,
     enable_starttls_auto: true,
-    domain: ENV['DOMAIN_NAME'],
-    password: ENV['SENDGRID_API_KEY'],
+    domain: ENV.fetch('DOMAIN_NAME', nil),
+    password: ENV.fetch('SENDGRID_API_KEY', nil),
     user_name: 'apikey'
   }
 
@@ -76,7 +76,7 @@ Rails.application.configure do
   config.active_support.deprecation = :notify
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
-  config.log_formatter = ::Logger::Formatter.new
+  config.log_formatter = Logger::Formatter.new
 
   # Use a different logger for distributed setups.
   # require 'syslog/logger'

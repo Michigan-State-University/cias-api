@@ -30,8 +30,8 @@ namespace :db do
       u = User.new(
         first_name: roles.join(' '),
         last_name: Faker::GreekPhilosophers.name,
-        email: "#{roles.last}_#{team.users.count + 1}_#{team_name(team)}_@#{ENV['DOMAIN_NAME']}",
-        password: ENV['USER_PASSWORD'],
+        email: "#{roles.last}_#{team.users.count + 1}_#{team_name(team)}_@#{ENV.fetch('DOMAIN_NAME', nil)}",
+        password: ENV.fetch('USER_PASSWORD', nil),
         roles: roles,
         team_id: team.id
       )

@@ -10,7 +10,7 @@ class Question::Slider < Question
   before_validation :change_range_to_integers, if: :body_changed?
 
   def self.assign_default_values(attr)
-    super(attr).merge(
+    super.merge(
       { 'required' => true, 'show_number' => true }
     )
   end

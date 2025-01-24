@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require "active_support/parameter_filter"
+require 'active_support/parameter_filter'
 
 Sentry.init do |config|
   config.enabled_environments = %w[production]
-  config.dsn = ENV['SENTRY_DSN']
+  config.dsn = ENV.fetch('SENTRY_DSN', nil)
   config.breadcrumbs_logger = %i[active_support_logger http_logger]
 
   # Set tracesSampleRate to 1.0 to capture 100%

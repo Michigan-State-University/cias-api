@@ -27,9 +27,9 @@ require 'rspec/rails'
 # require only the support files necessary.
 #
 # Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
-Dir[Rails.root.join('spec/support/**/*.rb')].each(&method(:require))
+Rails.root.glob('spec/support/**/*.rb').each(&method(:require))
 # Temporary fix for missing cancancan classes in RSpec
-Dir[Rails.root.join('app/models/ability/*.rb')].each(&method(:require))
+Rails.root.glob('app/models/ability/*.rb').each(&method(:require))
 
 # include custom cancan matcher
 require 'support/custom_cancan_matcher'
@@ -54,7 +54,7 @@ RSpec.configure do |config|
 
   include ActionDispatch::TestProcess
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_path = Rails.root.join('spec/fixtures').to_s
 
   # FactoryBot factories
   config.include FactoryBot::Syntax::Methods

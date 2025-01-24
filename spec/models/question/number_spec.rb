@@ -46,7 +46,7 @@ RSpec.describe Question::Number, type: :model do
 
       describe '#question_variables' do
         it 'returns correct variables' do
-          expect(question_number.question_variables).to match_array ['number_var']
+          expect(question_number.question_variables).to contain_exactly('number_var')
         end
 
         it 'returns correct amount of variables' do
