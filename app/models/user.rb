@@ -138,7 +138,7 @@ class User < ApplicationRecord
     end
   }
 
-  validates :avatar, content_type: %w[image/png image/jpeg image/jpg], size: { less_than: 10.megabytes }
+  validates :avatar, content_type: %w[image/png image/jpeg], size: { less_than: 10.megabytes }
 
   # BEFORE/AFTER ACTIONS
   before_save :invalidate_token_after_changes
