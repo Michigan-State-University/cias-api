@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+module Rack
+end
+
 class Rack::HealthCheck
   # It return system details in JSON response.
   #
