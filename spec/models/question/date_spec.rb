@@ -46,7 +46,7 @@ RSpec.describe Question::Date, type: :model do
 
         describe '#question_variables' do
           it 'returns correct variables' do
-            expect(question_date.question_variables).to match_array ['date_var']
+            expect(question_date.question_variables).to contain_exactly('date_var')
           end
 
           it 'returns correct amount of variables' do

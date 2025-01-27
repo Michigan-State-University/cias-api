@@ -33,7 +33,7 @@ class V1::Intervention::PredefinedParticipants::SendSmsInvitation
   end
 
   def link
-    "#{ENV['WEB_URL']}/usr/#{predefined_user_parameter.slug}"
+    "#{ENV.fetch('WEB_URL', nil)}/usr/#{predefined_user_parameter.slug}"
   end
 
   def intervention_name

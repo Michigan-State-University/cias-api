@@ -31,7 +31,7 @@ class V1::Teams::Invite
   end
 
   def user_has_not_correct_role?
-    user&.roles&.exclude?('researcher') && user&.roles&.exclude?('navigator')
+    user&.roles&.exclude?('researcher') && user&.roles.exclude?('navigator')
   end
 
   def user

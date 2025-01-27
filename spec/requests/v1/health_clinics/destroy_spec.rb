@@ -33,7 +33,7 @@ RSpec.describe 'DELETE /v1/health_clinics/:id', type: :request do
 
       it 'return correct organizable and user_health_clinics' do
         expect(health_clinic_admin.reload.organizable_id).to be_nil
-        expect(health_clinic_admin.user_health_clinics).to match_array([])
+        expect(health_clinic_admin.user_health_clinics).to be_empty
       end
 
       it 'returns correct status' do

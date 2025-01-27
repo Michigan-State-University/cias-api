@@ -33,6 +33,6 @@ RSpec.describe 'GET /v1/henry_ford/clinic_locations', type: :request do
 
   it 'has specific keys' do
     expect(json_response['data'].first.keys).to match_array(%w[id type attributes])
-    expect(json_response['data'].first['attributes'].keys).to match_array(['name'])
+    expect(json_response['data'].first['attributes'].keys).to contain_exactly('name')
   end
 end

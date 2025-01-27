@@ -47,7 +47,7 @@ RSpec.describe Question::Currency, type: :model do
 
         describe '#question_variables' do
           it 'returns correct variables' do
-            expect(question_currency.question_variables).to match_array ['currency_var']
+            expect(question_currency.question_variables).to contain_exactly('currency_var')
           end
 
           it 'returns correct amount of variables' do

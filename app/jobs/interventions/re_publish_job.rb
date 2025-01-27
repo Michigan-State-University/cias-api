@@ -12,7 +12,7 @@ class Interventions::RePublishJob < ApplicationJob
   private
 
   def send_scheduled_invitation_from_past(user_sessions, intervention)
-    user_sessions.where(scheduled_at: intervention.paused_at..DateTime.now).each do |user_session|
+    user_sessions.where(scheduled_at: intervention.paused_at..DateTime.now).find_each do |user_session|
       user_session.session.send_link_to_session(user_session.user, user_session.health_clinic)
     end
   end

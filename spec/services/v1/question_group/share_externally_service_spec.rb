@@ -70,7 +70,7 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
 
     it 'sends an email to the researcher' do
       allow(CloneMailer).to receive(:cloned_question_group_activate).with(new_researcher, instance_of(String)).and_return(message_delivery)
-      subject.call
+      expect { subject.call }.not_to raise_error
     end
   end
 
@@ -90,7 +90,7 @@ RSpec.describe V1::QuestionGroup::ShareExternallyService do
 
     it 'sends an email to the researcher' do
       allow(CloneMailer).to receive(:cloned_question_group_activate).with(instance_of(User), instance_of(String)).and_return(message_delivery)
-      subject.call
+      expect { subject.call }.not_to raise_error
     end
   end
 end

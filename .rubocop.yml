@@ -20,9 +20,6 @@ AllCops:
 Bundler/OrderedGems:
   Enabled: false
 
-RSpec/FactoryBot:
-  Enabled: false
-
 Layout/DotPosition:
   Enabled: false
 
@@ -280,6 +277,9 @@ Style/RedundantRegexpEscape:
 Style/RedundantSelfAssignment:
   Enabled: true
 
+Style/SafeNavigationChainLength:
+  Max: 5
+
 Style/SingleArgumentDig:
   Enabled: true
 
@@ -412,12 +412,12 @@ RSpec/VerifiedDoubles:
   Exclude:
     - 'spec/**/*'
 
-RSpec/FilePath:
-  Enabled: true
-
 RSpec/AnyInstance:
   Exclude:
     - 'spec/**/*'
+
+RSpec/IndexedLet:
+  Enabled: false
 
 RSpec/StubbedMock:
   Exclude:

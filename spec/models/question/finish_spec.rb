@@ -46,7 +46,7 @@ RSpec.describe Question::Finish, type: :model do
 
       describe '#question_variables' do
         it 'returns empty variables list' do
-          expect(question_finish.question_variables).to match_array []
+          expect(question_finish.question_variables).to be_empty
         end
       end
     end

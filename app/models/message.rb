@@ -4,5 +4,5 @@ class Message < ApplicationRecord
   has_paper_trail skip: %i[phone]
   validates :phone, :body, presence: true
 
-  encrypts :phone
+  has_encrypted :phone
 end

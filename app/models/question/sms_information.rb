@@ -18,7 +18,7 @@ class Question::SmsInformation < Question
   before_validation :assign_default_subtitle
 
   def self.assign_default_values(attr)
-    super(attr).merge(
+    super.merge(
       { 'proceed_button' => false, 'required' => false }
     )
   end

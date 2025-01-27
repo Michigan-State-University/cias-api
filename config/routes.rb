@@ -313,8 +313,8 @@ Rails.application.routes.draw do
   if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
     scope 'rails' do
       Sidekiq::Web.use Rack::Auth::Basic do |username, password|
-        ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(username), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_USERNAME'])) &
-          ActiveSupport::SecurityUtils.secure_compare(::Digest::SHA256.hexdigest(password), ::Digest::SHA256.hexdigest(ENV['SIDEKIQ_PASSWORD']))
+        ActiveSupport::SecurityUtils.secure_compare(Digest::SHA256.hexdigest(username), Digest::SHA256.hexdigest(ENV.fetch('SIDEKIQ_USERNAME', nil))) &
+          ActiveSupport::SecurityUtils.secure_compare(Digest::SHA256.hexdigest(password), Digest::SHA256.hexdigest(ENV.fetch('SIDEKIQ_PASSWORD', nil)))
       end
       mount Sidekiq::Web => '/workers'
     end

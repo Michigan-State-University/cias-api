@@ -36,7 +36,7 @@ class V1::Intervention::Update
 
   def status_transition_validation
     return if status.blank?
-    return if intervention.public_send("may_#{status}?")
+    return if intervention.public_send(:"may_#{status}?")
 
     raise ActiveRecord::ActiveRecordError,
           I18n.t('activerecord.errors.models.intervention.attributes.status_transition', current_status: intervention.status, new_status: status)

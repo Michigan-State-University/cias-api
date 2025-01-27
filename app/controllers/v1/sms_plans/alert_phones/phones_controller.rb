@@ -9,15 +9,15 @@ class V1::SmsPlans::AlertPhones::PhonesController < V1Controller
     render json: serialized_response(phone, 'Phone'), status: :created
   end
 
-  def destroy
-    phone_load.destroy!
-    head :no_content
-  end
-
   def update
     phone = phone_load
     phone.update!(phone_params)
     render json: serialized_response(phone, 'Phone')
+  end
+
+  def destroy
+    phone_load.destroy!
+    head :no_content
   end
 
   private

@@ -22,19 +22,19 @@ RSpec.describe 'GET /v1/live_chat/intervention/:id/navigator_tab', type: :reques
 
     it 'return correct send_invitations' do
       keys = %w[id email type]
-      expect(json_response['data']['attributes']['sent_invitations'].first.keys).to contain_exactly(*keys)
+      expect(json_response['data']['attributes']['sent_invitations'].first.keys).to match_array(keys)
       expect(json_response['data']['attributes']['sent_invitations'].size).to be(1)
     end
 
     it 'response has correct navigators in the team' do
       keys = %w[id first_name last_name email avatar_url]
-      expect(json_response['data']['attributes']['navigators_in_team'].first.keys).to contain_exactly(*keys)
+      expect(json_response['data']['attributes']['navigators_in_team'].first.keys).to match_array(keys)
       expect(json_response['data']['attributes']['navigators_in_team'].size).to be(1)
     end
 
     it 'response has correct invitations' do
       keys = %w[id first_name last_name email avatar_url]
-      expect(json_response['data']['attributes']['navigators'].first.keys).to contain_exactly(*keys)
+      expect(json_response['data']['attributes']['navigators'].first.keys).to match_array(keys)
       expect(json_response['data']['attributes']['navigators'].size).to be(1)
     end
 

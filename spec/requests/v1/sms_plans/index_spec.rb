@@ -31,7 +31,7 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
       it 'returns sms plans' do
         expect(
           json_response['data'].pluck('id')
-        ).to match_array [sms_plan1.id, sms_plan2.id]
+        ).to contain_exactly(sms_plan1.id, sms_plan2.id)
       end
     end
 
@@ -79,7 +79,7 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
       it "returns correct id's" do
         expect(
           json_response['data'].pluck('id')
-        ).to match_array [sms_alert1.id, sms_alert2.id]
+        ).to contain_exactly(sms_alert1.id, sms_alert2.id)
       end
     end
 
@@ -93,7 +93,7 @@ RSpec.describe 'GET /v1/sms_plans', type: :request do
       it "returns correct id's" do
         expect(
           json_response['data'].pluck('id')
-        ).to match_array [sms_plan1.id, sms_plan2.id]
+        ).to contain_exactly(sms_plan1.id, sms_plan2.id)
       end
     end
   end

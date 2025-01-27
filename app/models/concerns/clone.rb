@@ -12,19 +12,14 @@ module Clone
       return clone_module.new(self, user_id: current_user_id, clean_formulas: clean_formulas, position: position, params: params, hidden: hidden).execute
     end
 
-    cloned_elements = []
-
     _existing_emails, non_existing_emails = split_emails_exist(emails)
     invite_non_existing_users(non_existing_emails, true, [:researcher])
 
     user_ids = User.where(email: emails).limit_to_roles(%w[e_intervention_admin researcher]).pluck(:id)
 
-    user_ids.each do |user_id|
-      cloned_elements.push(
-        clone_module.new(self, { user_id: user_id, clean_formulas: clean_formulas, position: position, hidden: hidden }).execute
-      )
+    user_ids.map do |user_id|
+      clone_module.new(self, { user_id: user_id, clean_formulas: clean_formulas, position: position, hidden: hidden }).execute
     end
-    cloned_elements
   end
 
   private

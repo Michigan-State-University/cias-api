@@ -23,7 +23,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/invitations/:id/resend', 
 
   it 'send invitation' do
     allow(SessionMailer).to receive(:inform_to_an_email).with(session, invitation.email, nil, nil).and_return(message_delivery)
-    request
+    expect { request }.not_to raise_error
   end
 
   it 'return correct http code' do

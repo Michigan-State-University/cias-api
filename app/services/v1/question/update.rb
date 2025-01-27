@@ -48,7 +48,7 @@ class V1::Question::Update
   end
 
   def new_variable_is_taken?(new_variables)
-    return if new_variables.blank?
+    return false if new_variables.blank?
 
     used_variables = question.session.fetch_variables({}, question.id).pluck(:variables).flatten.map(&:downcase)
 

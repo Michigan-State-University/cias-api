@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :user do
     sequence(:first_name) { |s| "first_name_#{s}" }
     sequence(:last_name) { |s| "last_name_#{s}" }
-    sequence(:email) { |s| "email_#{s}@#{ENV['DOMAIN_NAME']}" }
+    sequence(:email) { |s| "email_#{s}@#{ENV.fetch('DOMAIN_NAME', nil)}" }
     sequence(:password) { |s| "GcAbAijoW_#{s}" }
     provider { 'email' }
     terms { true }

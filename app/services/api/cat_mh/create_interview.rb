@@ -5,7 +5,7 @@ class Api::CatMh::CreateInterview
 
   attr_reader :application_id, :organization_id, :subject_id, :number_of_interventions, :tests, :language, :timeframe_id
 
-  ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/createInterview".freeze
+  ENDPOINT = "#{ENV.fetch('BASE_CAT_URL', nil)}/portal/secure/interview/createInterview".freeze
 
   def self.call(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id) # rubocop:disable Metrics/ParameterLists
     new(subject_id, number_of_interventions, application_id, organization_id, tests, language, timeframe_id).call

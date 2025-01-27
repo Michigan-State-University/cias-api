@@ -3,18 +3,18 @@
 class V1::Interventions::ShortLinksController < V1Controller
   skip_before_action :authenticate_user!, only: %i[verify]
 
+  def index
+    authorize! :index, Intervention
+    authorize! :index, intervention_load
+
+    render json: serialized_short_links_with_clinics
+  end
+
   def create
     authorize! :update, Intervention
     authorize! :update, intervention_load
 
     V1::ShortLinks::ManagerService.call(intervention_load, short_links_params)
-
-    render json: serialized_short_links_with_clinics
-  end
-
-  def index
-    authorize! :index, Intervention
-    authorize! :index, intervention_load
 
     render json: serialized_short_links_with_clinics
   end

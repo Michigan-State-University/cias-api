@@ -58,18 +58,20 @@ RSpec.describe 'POST /v1/charts', type: :request do
       it_behaves_like 'permitted user'
 
       context 'when params are invalid' do
+        before { request }
+
         let(:params) do
           {
             chart: {
               name: ''
             }
           }
+        end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_entity) }
 
-          it 'response contains proper error message' do
-            expect(json_response['message']).to eq "Validation failed: Name can't be blank"
-          end
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'Validation failed: Dashboard section must exist'
         end
       end
     end

@@ -47,7 +47,7 @@ RSpec.describe Question::FreeResponse, type: :model do
 
         describe '#question_variables' do
           it 'returns correct variables' do
-            expect(question_free_response.question_variables).to match_array ['free_response_var']
+            expect(question_free_response.question_variables).to contain_exactly('free_response_var')
           end
 
           it 'returns correct amount of variables' do

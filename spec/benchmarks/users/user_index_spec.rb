@@ -9,15 +9,17 @@ RSpec.describe 'Benchmark', type: :request do
 
     it 'gives a proper benchmark' do
       puts "\nEndpoint: v1/users #index"
-      Benchmark.ips do |x|
-        Rails.logger.debug 'v1/users #index'
-        x.config(time: 5, warmup: 2)
+      expect do
+        Benchmark.ips do |x|
+          Rails.logger.debug 'v1/users #index'
+          x.config(time: 5, warmup: 2)
 
-        x.report('GET 5 Users') { get v1_users_path, params: params_small, headers: admin.create_new_auth_token }
-        x.report('GET 10 Users') { get v1_users_path, params: params_large, headers: admin.create_new_auth_token }
+          x.report('GET 5 Users') { get v1_users_path, params: params_small, headers: admin.create_new_auth_token }
+          x.report('GET 10 Users') { get v1_users_path, params: params_large, headers: admin.create_new_auth_token }
 
-        x.compare!
-      end
+          x.compare!
+        end
+      end.not_to raise_error
     end
   end
 end

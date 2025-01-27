@@ -14,13 +14,13 @@ RSpec.describe 'GET /v1/teams/invitations/confirm', type: :request do
     { success: Base64.encode64(I18n.t('teams.invitations.accepted', team_name: team.name)) }.to_query
   end
   let(:success_path) do
-    "#{ENV['WEB_URL']}?#{success_message}"
+    "#{ENV.fetch('WEB_URL', nil)}?#{success_message}"
   end
   let(:error_message) do
     { error: Base64.encode64(I18n.t('teams.invitations.not_found')) }.to_query
   end
   let(:error_path) do
-    "#{ENV['WEB_URL']}?#{error_message}"
+    "#{ENV.fetch('WEB_URL', nil)}?#{error_message}"
   end
 
   context 'when invitation_token is valid' do

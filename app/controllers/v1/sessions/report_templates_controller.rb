@@ -78,7 +78,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   end
 
   def duplicate
-    authorize! :update, session
+    authorize! :update, @session
     return head :forbidden unless @session.ability_to_update_for?(current_v1_user)
 
     duplicated_report = report_template.clone(params: duplicate_params)

@@ -50,6 +50,7 @@ jobs:
     needs: setup_environment
     runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
         chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
     services:

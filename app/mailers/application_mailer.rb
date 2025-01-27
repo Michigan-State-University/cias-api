@@ -3,7 +3,7 @@
 class ApplicationMailer < ActionMailer::Base
   around_action :with_locale, if: -> { params && params[:locale].present? }
 
-  default from: ENV['EMAIL_DEFAULT_FROM']
+  default from: ENV.fetch('EMAIL_DEFAULT_FROM', nil)
   layout 'mailer'
 
   protected

@@ -7,6 +7,18 @@ class V1::Users::InvitationsController < V1Controller
     render json: serialized_response(researchers_not_accepted_invitations, 'User', { only_email: true })
   end
 
+  # This endpoint will be hit from mailer link, thus it needs to be public
+  def edit
+    user = User.where.not(invitation_token: nil).find_by_invitation_token(invitation_token, true)
+
+    # Unfortunetly find_by_invitation_token method doesn't raise exception when there is no user
+    # and there is no version with !
+    return redirect_to_web_app(error: I18n.t('users.invite.not_active')) if user.blank?
+
+    redirect_to "#{ENV.fetch('WEB_URL', nil)}/register?invitation_token=#{invitation_token}&email=#{user.email}&role=#{user.roles.first}",
+                allow_other_host: true
+  end
+
   def create
     authorize! :create, User
 
@@ -32,17 +44,6 @@ class V1::Users::InvitationsController < V1Controller
     else
       render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
     end
-  end
-
-  # This endpoint will be hit from mailer link, thus it needs to be public
-  def edit
-    user = User.where.not(invitation_token: nil).find_by_invitation_token(invitation_token, true) # rubocop:disable Rails/DynamicFindBy
-
-    # Unfortunetly find_by_invitation_token method doesn't raise exception when there is no user
-    # and there is no version with !
-    return redirect_to_web_app(error: I18n.t('users.invite.not_active')) if user.blank?
-
-    redirect_to "#{ENV['WEB_URL']}/register?invitation_token=#{invitation_token}&email=#{user.email}&role=#{user.roles.first}"
   end
 
   # This endpoint is hit from registration page to register new user from invitation

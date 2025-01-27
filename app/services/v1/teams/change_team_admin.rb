@@ -40,7 +40,7 @@ class V1::Teams::ChangeTeamAdmin
   attr_reader :team, :team_admin_id, :current_ability
 
   def able_to_change_team_admin?
-    return if current_ability.blank?
+    return false if current_ability.blank?
 
     current_ability.can?(:change_team_admin, team)
   end

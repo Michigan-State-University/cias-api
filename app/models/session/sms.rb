@@ -73,7 +73,7 @@ class Session::Sms < Session
   end
 
   def present_variables(variables)
-    variables.filter(&:present?)
+    variables.compact_blank
   end
 
   def create_sms_codes

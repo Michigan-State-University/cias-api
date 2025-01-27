@@ -29,18 +29,18 @@ class SmsPlan < ApplicationRecord
     include_first_name include_last_name include_email include_phone_number type
   ].freeze
 
-  enum schedule: {
+  enum :schedule, {
     days_after_session_end: 'days_after_session_end',
     after_session_end: 'after_session_end',
     days_after_user_defined_time: 'days_after_user_defined_time'
-  }, _suffix: true
+  }, suffix: true
 
-  enum frequency: {
+  enum :frequency, {
     once: 'once',
     once_a_day: 'once_a_day',
     once_a_week: 'once_a_week',
     once_a_month: 'once_a_month'
-  }, _suffix: true
+  }, suffix: true
 
   def translate_no_formula_text(translator, source_language_name_short, destination_language_name_short)
     translate_attribute('no_formula_text', no_formula_text, translator, source_language_name_short, destination_language_name_short)

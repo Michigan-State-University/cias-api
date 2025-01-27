@@ -47,7 +47,7 @@ module MetaOperations
     end
 
     def tmp_file # rubocop:disable Lint/DuplicateMethods
-      @tmp_file ||= File.open(Rails.root.join('tmp', filename), 'wb') do |file|
+      @tmp_file ||= Rails.root.join('tmp', filename).open('wb') do |file|
         file.write(stream)
         file.path
       end
@@ -63,7 +63,7 @@ module MetaOperations
     end
 
     def delete_tmp_file
-      File.delete(tmp_file) if File.exist?(tmp_file)
+      FileUtils.rm_f(tmp_file)
     end
   end
 end

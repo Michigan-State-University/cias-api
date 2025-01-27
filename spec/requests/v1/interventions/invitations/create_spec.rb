@@ -37,7 +37,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       end
 
       it 'create correct intervention invitation' do
-        expect(intervention.reload.invitations.map(&:email)).to match_array([invitation_email, participant.email])
+        expect(intervention.reload.invitations.map(&:email)).to contain_exactly(invitation_email, participant.email)
       end
     end
 
@@ -76,7 +76,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
       end
 
       it 'invited emails should be on the list with granted access to intervention' do
-        expect(intervention.reload.intervention_accesses.map(&:email)).to match_array([invitation_email, participant.email])
+        expect(intervention.reload.intervention_accesses.map(&:email)).to contain_exactly(invitation_email, participant.email)
       end
     end
 
@@ -130,8 +130,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
         it 'create correct intervention invites' do
           expect(intervention.reload.invitations.map(&:email)).to match_array(%w[test1@dom.com test2@com.com test3@dom.com
                                                                                  test4@com.com])
-          expect(intervention.reload.invitations.map(&:health_clinic_id).uniq).to match_array([health_clinic1.id,
-                                                                                               health_clinic2.id])
+          expect(intervention.reload.invitations.map(&:health_clinic_id).uniq).to contain_exactly(health_clinic1.id, health_clinic2.id)
         end
       end
 
@@ -182,7 +181,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
         end
 
         it 'creates correct session invites' do
-          expect(session.reload.invitations.map(&:email)).to match_array([invitation_email, participant.email])
+          expect(session.reload.invitations.map(&:email)).to contain_exactly(invitation_email, participant.email)
         end
 
         it 'set correct quick_exit_enabled for user' do
@@ -194,7 +193,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
           let!(:intervention) { create(:intervention, status: intervention_status, user_id: user.id, quick_exit: true, shared_to: 'invited') }
 
           it 'invited emails should be on the list with granted access to intervention' do
-            expect(intervention.reload.intervention_accesses.map(&:email)).to match_array([invitation_email, participant.email])
+            expect(intervention.reload.intervention_accesses.map(&:email)).to contain_exactly(invitation_email, participant.email)
           end
         end
       end
@@ -273,7 +272,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/invitations', type: :req
         end
 
         it 'invitations has information about health clinics' do
-          expect(session.reload.invitations.map(&:health_clinic_id).uniq).to match_array([health_clinic1.id, health_clinic2.id])
+          expect(session.reload.invitations.map(&:health_clinic_id).uniq).to contain_exactly(health_clinic1.id, health_clinic2.id)
         end
 
         it 'returns correct http status' do

@@ -25,7 +25,7 @@ describe 'GET /v1/users/invitations', type: :request do
         request
 
         expect(response).to have_http_status(:found)
-        expect(response).to redirect_to("#{ENV['WEB_URL']}/register?invitation_token=#{invitation_token}&email=#{user_with_pending_invitation.email}&role=researcher") # rubocop:disable Layout/LineLength
+        expect(response).to redirect_to("#{ENV.fetch('WEB_URL', nil)}/register?invitation_token=#{invitation_token}&email=#{user_with_pending_invitation.email}&role=researcher") # rubocop:disable Layout/LineLength
       end
     end
 

@@ -35,7 +35,7 @@ RSpec.describe Question::Sms, type: :model do
           end
 
           it 'returns correct variable names' do
-            expect(question_sms.question_variables).to match_array ['sms_var']
+            expect(question_sms.question_variables).to contain_exactly('sms_var')
           end
         end
       end

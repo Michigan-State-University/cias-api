@@ -24,7 +24,7 @@ RSpec.describe V1::Organizations::Invitations::Create, type: :request do
     it 'send email with correct parameters' do
       allow(OrganizableMailer).to receive(:invite_user).with(invitation_token: 'exampleToken', email: user.email, organizable: organizable,
                                                              organizable_type: 'Organization').and_return(message_delivery)
-      subject
+      expect { subject }.not_to raise_error
     end
 
     context 'when invitation already exists' do
@@ -58,7 +58,7 @@ RSpec.describe V1::Organizations::Invitations::Create, type: :request do
     it 'send email with correct parameters' do
       allow(OrganizableMailer).to receive(:invite_user).with(invitation_token: 'exampleToken', email: user.email, organizable: organizable,
                                                              organizable_type: 'Health System').and_return(message_delivery)
-      subject
+      expect { subject }.not_to raise_error
     end
 
     context 'when invitation already exists' do
@@ -92,7 +92,7 @@ RSpec.describe V1::Organizations::Invitations::Create, type: :request do
     it 'send email with correct parameters' do
       allow(OrganizableMailer).to receive(:invite_user).with(invitation_token: 'exampleToken', email: user.email, organizable: organizable,
                                                              organizable_type: 'Health Clinic').and_return(message_delivery)
-      subject
+      expect { subject }.not_to raise_error
     end
 
     context 'when invitation already exists' do

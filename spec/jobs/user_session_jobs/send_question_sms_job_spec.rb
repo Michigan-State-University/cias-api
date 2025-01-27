@@ -77,13 +77,13 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           include ActiveSupport::Testing::TimeHelpers
 
           it 'does not schedule new sending job' do
-            travel_to DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).change({ hour: 23, min: 59 }) do
+            travel_to DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)).change({ hour: 23, min: 59 }) do
               expect { subject }.not_to have_enqueued_job(described_class)
             end
           end
 
           it 'does not create new answer' do
-            travel_to DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).change({ hour: 23, min: 59 }) do
+            travel_to DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)).change({ hour: 23, min: 59 }) do
               expect { subject }.not_to change(Answer::SmsInformation, :count)
             end
           end

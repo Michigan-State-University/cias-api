@@ -43,12 +43,12 @@ class Audio::TextToSpeech::Google
   def credentials
     @credentials ||= begin
       if Rails.env.development?
-        Oj.load_file(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
+        Oj.load_file(ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil))
       else
-        Oj.load(ENV['GOOGLE_APPLICATION_CREDENTIALS'])
+        Oj.load(ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil))
       end
     rescue Oj::ParseError
-      ENV['GOOGLE_APPLICATION_CREDENTIALS']
+      ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil)
     end
   end
 

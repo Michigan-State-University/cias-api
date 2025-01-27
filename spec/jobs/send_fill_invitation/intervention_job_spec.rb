@@ -29,7 +29,7 @@ RSpec.describe SendFillInvitation::InterventionJob, type: :job do
     it 'return proper body' do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
       expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('intervention_mailer.inform_to_an_email.invitation_link_from_clinic',
-                                                                                  domain: ENV['WEB_URL'],
+                                                                                  domain: ENV.fetch('WEB_URL', nil),
                                                                                   intervention_id: intervention.id,
                                                                                   health_clinic_id: health_clinic.id))
     end
@@ -41,7 +41,7 @@ RSpec.describe SendFillInvitation::InterventionJob, type: :job do
     let!(:totally_nonexistent_user) { create(:user, :participant, :confirmed, email: non_existing_emails.first) }
     let!(:invitation_link) do
       I18n.t('intervention_mailer.inform_to_an_email.invitation_link',
-             domain: ENV['WEB_URL'],
+             domain: ENV.fetch('WEB_URL', nil),
              intervention_id: intervention.id)
     end
 

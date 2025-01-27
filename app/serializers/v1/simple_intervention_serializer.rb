@@ -31,7 +31,7 @@ class V1::SimpleInterventionSerializer < V1Serializer
   end
 
   def self.record_cache_options(options, fieldset, include_list, params)
-    return super(options, fieldset, include_list, params) if params[:current_user_id].blank?
+    return super if params[:current_user_id].blank?
 
     options = options.dup
     options[:namespace] += ":#{params[:current_user_id]}"

@@ -30,10 +30,10 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     outdated_message = false
 
     if user.pending_sms_answer && question.type == 'Question::Sms'
-      datetime_of_next_job = DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']) + 5.minutes
+      datetime_of_next_job = DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)) + 5.minutes
 
       # Skip question if next day
-      if datetime_of_next_job < DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).end_of_day
+      if datetime_of_next_job < DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)).end_of_day
         UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id, false, true)
       else
         outdated_message = true
@@ -65,15 +65,16 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     # Get proper configuration
     every_number_of_hours = question.sms_reminders['per_hours'].to_i
     for_number_of_days = question.sms_reminders['number_of_days'].to_i
-    from = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders['from'] || '')
-    to = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders['to'] || '')
+    from = ActiveSupport::TimeZone[ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)].parse(question.sms_reminders['from'] || '')
+    to = ActiveSupport::TimeZone[ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)].parse(question.sms_reminders['to'] || '')
 
     return unless every_number_of_hours && for_number_of_days && from && to
 
     # Prepare all vars for calculation of all reminders
-    reminders_datetimes = [DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE'])]
+    reminders_datetimes = [DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil))]
     calculated_datetime = reminders_datetimes.last
-    last_possible_reminder = ActiveSupport::TimeZone[ENV['CSV_TIMESTAMP_TIME_ZONE']].parse(question.sms_reminders['to']) + (for_number_of_days - 1).days
+    last_possible_reminder = ActiveSupport::TimeZone[ENV.fetch('CSV_TIMESTAMP_TIME_ZONE',
+                                                               nil)].parse(question.sms_reminders['to']) + (for_number_of_days - 1).days
 
     # Calculate all possible datetimes
     while calculated_datetime + every_number_of_hours.hour < last_possible_reminder

@@ -5,7 +5,7 @@ class Api::CatMh::CheckStatus
 
   attr_reader :application_id, :organization_id, :interview_id, :identifier, :signature
 
-  ENDPOINT = "#{ENV['BASE_CAT_URL']}/portal/secure/interview/status".freeze
+  ENDPOINT = "#{ENV.fetch('BASE_CAT_URL', nil)}/portal/secure/interview/status".freeze
 
   def self.call(interview_id, identifier, signature, application_id, organization_id)
     new(interview_id, identifier, signature, application_id, organization_id).call

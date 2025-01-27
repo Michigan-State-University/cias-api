@@ -22,6 +22,6 @@ module Resource::Position
   end
 
   def response_scope
-    { controller_name.to_s => send("#{controller_name}_scope") }
+    { controller_name.to_s => send(:"#{controller_name}_scope") }
   end
 end

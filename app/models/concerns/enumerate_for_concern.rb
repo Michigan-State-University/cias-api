@@ -34,14 +34,14 @@ module EnumerateForConcern
         values
       end
 
-      define_method("#{field}=") do |value|
+      define_method(:"#{field}=") do |value|
         value = value.compact_blank if value && multiple
         self[field] = value
       end
 
       return unless as_like != field
 
-      alias_method "#{as_like}=", "#{field}="
+      alias_method :"#{as_like}=", :"#{field}="
       alias_method as_like, field
     end
   end

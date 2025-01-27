@@ -17,7 +17,7 @@ class V1::Translations::VariableExclusiveTranslationService
   private
 
   VARIABLE_NAME_PLACEHOLDER_TOKEN = '%%%'
-  VARIABLE_NAME_PATTERN = Regexp.compile(/\.:[a-zA-Z0-9_]*?:\./)
+  VARIABLE_NAME_PATTERN = /\.:[a-zA-Z0-9_]*?:\./
 
   def extract_variable_names(input_string)
     input_string.scan(VARIABLE_NAME_PATTERN)

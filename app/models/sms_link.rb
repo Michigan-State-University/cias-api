@@ -10,7 +10,7 @@ class SmsLink < ApplicationRecord
   validates :url, :variable, presence: true, uniqueness: { scope: :sms_plan_id }
 
   # ENUMS
-  enum link_type: {
+  enum :link_type, {
     website: 'website',
     video: 'video'
   }

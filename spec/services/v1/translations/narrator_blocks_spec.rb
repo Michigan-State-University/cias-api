@@ -28,9 +28,8 @@ RSpec.describe V1::Translations::NarratorBlocks do
     let!(:q_narrator_blocks_types) { create(:question_single, :narrator_blocks_with_cases) }
 
     it 'changed text to speech' do
-      expect(q_narrator_blocks_types.reload.narrator['blocks'].last['reflections'].first['text']).to match_array(
-        ['from=>en to=>pl text=>Working together as an interdisciplinary team, many highly trained health professionals']
-      )
+      expect(q_narrator_blocks_types.reload.narrator['blocks'].last['reflections'].first['text'])
+        .to contain_exactly('from=>en to=>pl text=>Working together as an interdisciplinary team, many highly trained health professionals')
     end
   end
 

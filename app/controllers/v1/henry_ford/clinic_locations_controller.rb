@@ -4,6 +4,6 @@ class V1::HenryFord::ClinicLocationsController < V1Controller
   def index
     authorize! :read, Intervention
 
-    render json: serialized_hash(ClinicLocation.all.order(:name))
+    render json: serialized_hash(ClinicLocation.order(:name))
   end
 end

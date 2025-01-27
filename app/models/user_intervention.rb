@@ -11,7 +11,7 @@ class UserIntervention < ApplicationRecord
 
   validates :health_clinic_id, presence: true, if: -> { intervention_inside_organization? && !preview? }
 
-  enum status: { ready_to_start: 'ready_to_start', in_progress: 'in_progress', completed: 'completed', schedule_pending: 'schedule_pending' }
+  enum :status, { ready_to_start: 'ready_to_start', in_progress: 'in_progress', completed: 'completed', schedule_pending: 'schedule_pending' }
 
   def last_answer_date
     user_sessions.order(last_answer_at: :desc).first
