@@ -4,9 +4,9 @@ source 'https://rubygems.org'
 
 ruby '3.1.4'
 
-gem 'rails', '~> 7.0.0'
+gem 'rails', '~> 7.1.0'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 5.6.9'
+gem 'puma', '~> 6.0'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
