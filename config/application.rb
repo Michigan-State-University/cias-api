@@ -14,7 +14,6 @@ require 'action_mailer/railtie'
 # require "action_text/engine"
 require 'action_view/railtie'
 require 'action_cable/engine'
-# require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
@@ -25,7 +24,12 @@ Bundler.require(*Rails.groups)
 module CiasApi
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 7.1
+
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w(tasks))
 
     # Configuration for the application, engines, and railties goes here.
     #
