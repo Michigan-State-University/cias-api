@@ -48,8 +48,8 @@ RSpec.describe 'GET /v1/interventions/:id/answers', type: :request do
 
       let(:parsed_response) { response.parsed_body }
 
-      it 'success to Hash' do
-        expect(parsed_response.class).to be(Hash)
+      it 'success to HashWithIndifferentAccess' do
+        expect(parsed_response.class).to be(ActiveSupport::HashWithIndifferentAccess)
       end
 
       it 'success message' do
