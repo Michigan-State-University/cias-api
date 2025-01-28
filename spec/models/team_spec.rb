@@ -18,7 +18,7 @@ RSpec.describe Team, type: :model do
 
     context 'name is not unique' do
       let!(:existing_team) { create(:team) }
-      let(:team) { Team.new(name: existing_team.name) }
+      let(:team) { described_class.new(name: existing_team.name) }
 
       it 'team is invalid' do
         expect(team).not_to be_valid

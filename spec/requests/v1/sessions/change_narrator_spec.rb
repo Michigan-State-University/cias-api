@@ -41,9 +41,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/sessions/:id/change_narr
     let(:new_character) { 'emmi' }
     let(:new_animations) do
       ActionController::Parameters.new({
-        'HeadAnimation' => ActionController::Parameters.new({ 'eatCracker' => 'acknowledge' }),
-        'Pause' => ActionController::Parameters.new({ 'standStill' => 'restWeightShift' })
-      }).permit!
+                                         'HeadAnimation' => ActionController::Parameters.new({ 'eatCracker' => 'acknowledge' }),
+                                         'Pause' => ActionController::Parameters.new({ 'standStill' => 'restWeightShift' })
+                                       }).permit!
     end
 
     before do

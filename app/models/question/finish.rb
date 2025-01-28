@@ -6,11 +6,10 @@ class Question::Finish < Question
   attribute :position, :integer, default: 999_999
   attribute :settings, :json, default: -> { assign_default_values('settings').except('start_autofinish_timer') }
 
+  before_validation :assign_default_title_and_subtitle
   after_create :after_commit_callbacks
 
   attr_readonly :position
-
-  before_validation :assign_default_title_and_subtitle
 
   def csv_header_names
     []
