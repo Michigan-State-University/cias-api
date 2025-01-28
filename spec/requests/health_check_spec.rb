@@ -7,7 +7,7 @@ RSpec.describe 'Rack::HealthCheck', type: :request do
     include Rack::Test::Methods
 
     let(:app) do
-      Rack::Builder.parse_file(Rails.root.join('config.ru').to_s).first
+      Rack::Builder.parse_file(Rails.root.join('config.ru').to_s)
     end
 
     before { get '/health_check' }
