@@ -69,7 +69,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
             }
           },
           'formulas' => [{ 'payload' => '', 'patterns' => [] }],
-          'position' => 3,
+          'position' => 1,
           'question_group_id' => question_group.id,
           'narrator' => question.narrator
         )
@@ -119,7 +119,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
             }
           },
           'formulas' => [{ 'payload' => '', 'patterns' => [] }],
-          'position' => 4,
+          'position' => 1,
           'question_group_id' => question_group.id,
           'narrator' => question.narrator
         )
