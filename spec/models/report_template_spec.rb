@@ -19,11 +19,7 @@ RSpec.describe ReportTemplate, type: :model do
     context 'name is not unique in session' do
       let!(:existing_report_template) { create(:report_template) }
       let(:report_template) do
-        build_stubbed(
-          :report_template,
-          name: existing_report_template.name,
-          session: existing_report_template.session
-        )
+        ReportTemplate.new(name: existing_report_template.name, session: existing_report_template.session)
       end
 
       it 'report template is invalid' do
