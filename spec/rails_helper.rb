@@ -54,7 +54,7 @@ RSpec.configure do |config|
 
   include ActionDispatch::TestProcess
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = Rails.root.join('spec/fixtures').to_s
+  config.fixture_paths = Rails.root.join('spec/fixtures').to_s
 
   # FactoryBot factories
   config.include FactoryBot::Syntax::Methods
