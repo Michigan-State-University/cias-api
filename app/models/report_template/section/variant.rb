@@ -14,7 +14,7 @@ class ReportTemplate::Section::Variant < ApplicationRecord
 
   after_create :assign_next_position
 
-  validates :image, content_type: %w[image/png image/jpg image/jpeg],
+  validates :image, content_type: %w[image/png image/jpeg],
                     size: { less_than: 5.megabytes }
 
   scope :to_preview, -> { where(preview: true) }

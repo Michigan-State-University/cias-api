@@ -2,7 +2,6 @@
 
 class Clone::QuestionGroup < Clone::Base
   def execute
-    outcome.position = position || outcome.session.question_groups.size
     clone_questions
     outcome.save!
     outcome

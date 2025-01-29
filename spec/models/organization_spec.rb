@@ -21,7 +21,7 @@ RSpec.describe Organization, type: :model do
 
     context 'name is not unique' do
       let!(:existing_organization) { create(:organization) }
-      let(:organization) { build_stubbed(:organization, name: existing_organization.name) }
+      let(:organization) { described_class.new(name: existing_organization.name) }
 
       it 'team is invalid' do
         expect(organization).not_to be_valid

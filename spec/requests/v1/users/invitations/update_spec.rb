@@ -81,7 +81,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
       end
 
       it 'returns access token in headers' do
-        expect(response.headers.keys).to include('Access-Token', 'Expiry', 'Uid', 'Client', 'Token-Type')
+        expect(response.headers.keys).to include('access-token', 'expiry', 'uid', 'client', 'token-type')
       end
 
       it 'returns verification code in response' do
