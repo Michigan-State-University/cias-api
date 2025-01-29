@@ -66,9 +66,6 @@ gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
 
-# for upgrading rails to 7.0. This line can be removed after upgrading to rails 7.1
-gem 'concurrent-ruby', '1.3.4'
-
 group :development, :test do
   gem 'bundler-audit'
   gem 'bullet'

@@ -659,7 +659,6 @@ DEPENDENCIES
   bump
   bundler-audit
   cancancan
-  concurrent-ruby (= 1.3.4)
   config
   connection_pool
   countries
