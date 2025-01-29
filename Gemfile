@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '3.1.4'
 
-gem 'rails', '~> 7.1.0'
+gem 'rails', '~> 7.2.0'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 6.0'
 
@@ -56,7 +56,7 @@ gem 'countries'
 # for Audit trail and audit log
 gem 'paper_trail'
 # for soft delete
-gem 'paranoia', '~> 2.4', '>= 2.4.3'
+gem 'paranoia'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
