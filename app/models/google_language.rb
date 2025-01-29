@@ -10,6 +10,6 @@ class GoogleLanguage < ApplicationRecord
     end
 
     first_word = language_name.split.first
-    GoogleTtsLanguage.where('language_name like?', "%#{first_word}%")&.first&.google_tts_voices&.standard_voices&.first
+    GoogleTtsLanguage.where('language_name like ?', "%#{first_word}%")&.first&.google_tts_voices&.standard_voices&.first
   end
 end

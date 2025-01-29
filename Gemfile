@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 
 ruby '3.1.4'
 
-gem 'rails', '~> 7.1.0'
+gem 'rails', '~> 7.2.0'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 6.0'
 
@@ -56,7 +56,7 @@ gem 'countries'
 # for Audit trail and audit log
 gem 'paper_trail'
 # for soft delete
-gem 'paranoia', '~> 2.4', '>= 2.4.3'
+gem 'paranoia'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
@@ -65,9 +65,6 @@ gem 'grpc', '~> 1.53.2'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
-
-# for upgrading rails to 7.0. This line can be removed after upgrading to rails 7.1
-gem 'concurrent-ruby', '1.3.4'
 
 group :development, :test do
   gem 'bundler-audit'
