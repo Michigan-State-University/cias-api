@@ -45,13 +45,13 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
 
   context 'when user is permitted' do
     shared_examples 'permitted user' do
-      before { request }
-
       it 'returns correct status' do
+        request
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns proper data' do
+        request
         expect(json_response['data']).to include(
           {
             'id' => health_system.id,
@@ -73,6 +73,7 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
         let(:request) { patch v1_health_system_path(deleted_health_system.id), params: params, headers: headers }
 
         it 'return error message' do
+          request
           expect(json_response['message']).to include('Couldn\'t find HealthSystem with')
         end
 
@@ -87,12 +88,13 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
           end
 
           it 'return forbidden status' do
+            request
             expect(response).to have_http_status(:forbidden)
           end
         end
       end
 
-      context 'when params are invalid', skip: 'behaviour not implemented' do
+      context 'when name in params is empty' do
         let(:params) do
           {
             health_system: {
@@ -101,10 +103,50 @@ RSpec.describe 'PATCH /v1/health_systems/:id', type: :request do
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it 'returns correct status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns proper data' do
+          request
+          expect(json_response['data']).to include(
+            {
+              'id' => health_system.id,
+              'type' => 'health_system',
+              'attributes' => {
+                'name' => health_system.name,
+                'organization_id' => organization.id,
+                'deleted' => false
+              },
+              'relationships' => {
+                'health_system_admins' => { 'data' => [{ 'id' => health_system_admin.id, 'type' => 'user' }] },
+                'health_clinics' => { 'data' => [] }
+              }
+            }
+          )
+        end
+      end
+
+      context 'when params are invalid' do
+        before { create(:health_system, :with_health_system_admin, name: 'Another Health System 1', organization: organization) }
+
+        let(:params) do
+          {
+            health_system: {
+              name: 'Another Health System 1'
+            }
+          }
+        end
+
+        it do
+          request
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
 
         it 'response contains proper error message' do
-          expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+          request
+          expect(json_response['message']).to eq 'Validation failed: Name has already been taken'
         end
       end
     end

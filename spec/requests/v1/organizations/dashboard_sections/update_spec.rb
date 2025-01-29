@@ -65,7 +65,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
         it_behaves_like 'permitted user'
       end
 
-      context 'when params are invalid', skip: 'behaviour not implemented' do
+      context 'when name in params is empty' do
         before { request }
 
         let(:params) do
@@ -76,10 +76,45 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
           }
         end
 
+        it 'returns correct status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'returns proper data' do
+          expect(json_response['data']).to include(
+            {
+              'id' => dashboard_section.id,
+              'type' => 'dashboard_section',
+              'attributes' => {
+                'name' => dashboard_section.name,
+                'description' => dashboard_section.description,
+                'reporting_dashboard_id' => organization.reporting_dashboard.id,
+                'organization_id' => organization.id,
+                'position' => 1
+              }
+            }
+          )
+        end
+      end
+
+      context 'when params are invalid' do
+        before do
+          organization.reporting_dashboard.dashboard_sections.create(name: 'Another Dashboard Section')
+          request
+        end
+
+        let(:params) do
+          {
+            dashboard_section: {
+              name: 'Another Dashboard Section'
+            }
+          }
+        end
+
         it { expect(response).to have_http_status(:unprocessable_entity) }
 
         it 'response contains proper error message' do
-          expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+          expect(json_response['message']).to eq 'Validation failed: Name has already been taken'
         end
       end
     end

@@ -84,7 +84,7 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
             it_behaves_like 'permitted user'
           end
 
-          context 'when params are invalid', skip: 'behaviour not implemented' do
+          context 'when name in params is empty' do
             before { request }
 
             let(:params) do
@@ -95,10 +95,48 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
               }
             end
 
+            it 'returns correct status' do
+              expect(response).to have_http_status(:ok)
+            end
+
+            it 'returns proper data' do
+              expect(json_response['data']).to include(
+                {
+                  'id' => organization.id,
+                  'type' => 'organization',
+                  'attributes' => {
+                    'name' => organization.name
+                  },
+                  'relationships' => { 'e_intervention_admins' => { 'data' => [{ 'id' => e_intervention_admin.id, 'type' => 'user' }] },
+                                       'organization_admins' => { 'data' => [{ 'id' => organization_admin_to_remove.id,
+                                                                               'type' => 'user' }] },
+                                       'health_clinics' => { 'data' => [] },
+                                       'health_systems' => { 'data' => [] },
+                                       'organization_invitations' => { 'data' => [{ 'id' => organization.organization_invitations.first.id,
+                                                                                    'type' => 'organization_invitation' }] } }
+                }
+              )
+            end
+          end
+
+          context 'when params are invalid' do
+            before do
+              create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Another Organization')
+              request
+            end
+
+            let(:params) do
+              {
+                organization: {
+                  name: 'Another Organization'
+                }
+              }
+            end
+
             it { expect(response).to have_http_status(:unprocessable_entity) }
 
             it 'response contains proper error message' do
-              expect(json_response['message']).to eq "Validation failed: Name can't be blank"
+              expect(json_response['message']).to eq 'Validation failed: Name has already been taken'
             end
           end
         end
