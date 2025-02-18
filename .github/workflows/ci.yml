@@ -19,7 +19,7 @@ jobs:
         env:
           RUBYOPT: --jit
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -80,7 +80,7 @@ jobs:
           RUBYOPT: --jit
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}

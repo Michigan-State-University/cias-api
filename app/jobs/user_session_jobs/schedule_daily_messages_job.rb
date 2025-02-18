@@ -58,7 +58,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
                                          .perform_later(@user.id, elem[:question].id, @user_session.id, false)
     end
 
-    UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.midnight + 1.day)
+    UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.in_time_zone(ENV['CSV_TIMESTAMP_TIME_ZONE']).change({ hour: 1 }) + 1.day)
                                              .perform_later(user_session_id, true)
   end
 
