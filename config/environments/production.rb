@@ -105,6 +105,7 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [:id]
 
   Rails.application.routes.default_url_options[:protocol] = 'https'
+  Rails.application.routes.default_url_options[:host] = ENV.fetch('APP_HOSTNAME', nil)
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
