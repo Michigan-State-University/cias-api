@@ -18,13 +18,13 @@ RSpec.describe 'GET /v1/organization/confirm', type: :request do
                                                                            organizable_name: organization.name)) }.to_query
   end
   let(:success_path) do
-    "#{ENV['WEB_URL']}?#{success_message}"
+    "#{ENV.fetch('WEB_URL', nil)}?#{success_message}"
   end
   let(:error_message) do
     { error: Base64.encode64(I18n.t('organizables.invitations.not_found', organizable_type: 'Organization')) }.to_query
   end
   let(:error_path) do
-    "#{ENV['WEB_URL']}?#{error_message}"
+    "#{ENV.fetch('WEB_URL', nil)}?#{error_message}"
   end
   let(:headers) { intervention_admin.create_new_auth_token }
 

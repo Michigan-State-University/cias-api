@@ -22,7 +22,7 @@ RSpec.describe 'POST /v1/interventions/import', type: :request do
       expect(response).to have_http_status(:created)
     end
 
-    skip 'increase Intervention count' do
+    it 'increase Intervention count', skip: 'this test needs refactor/check' do
       expect { request }.to change(Intervention, :count).by 1
     end
   end

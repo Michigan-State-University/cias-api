@@ -46,7 +46,7 @@ RSpec.describe Question::ExternalLink, type: :model do
 
       describe '#question_variables' do
         it 'returns correct variables' do
-          expect(question_external_link.question_variables).to match_array ['external_link_var']
+          expect(question_external_link.question_variables).to contain_exactly('external_link_var')
         end
 
         it 'returns correct amount of variables' do

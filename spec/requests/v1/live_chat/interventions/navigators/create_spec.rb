@@ -41,7 +41,7 @@ RSpec.describe 'POST /v1/live_chat/intervention/:id/navigators', type: :request 
       end
 
       it 'return correct message' do
-        expect(json_response['message']).to include("Couldn\'t find User with 'id'=")
+        expect(json_response['message']).to include("Couldn't find User with 'id'=")
       end
     end
 

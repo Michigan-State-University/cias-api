@@ -7,7 +7,7 @@ class V1::HfhsPatientDetailSerializer < V1Serializer
 
   %i[first_name last_name dob sex phone_number phone_type].each do |attr|
     attribute attr do |object|
-      object.send("provided_#{attr}")
+      object.send(:"provided_#{attr}")
     end
   end
 end

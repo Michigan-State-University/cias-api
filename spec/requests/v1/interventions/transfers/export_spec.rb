@@ -16,7 +16,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/export', type: :request 
       expect(response).to have_http_status(:ok)
     end
 
-    skip 'sends mail' do
+    it 'sends mail', skip: 'this test needs refactor/check' do
       expect { request }.to change(ActionMailer::Base.deliveries, :count).by 1
     end
   end

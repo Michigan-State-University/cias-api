@@ -10,8 +10,8 @@ RSpec.describe V1::SmsPlans::CancelScheduledSmses do
 
   before do
     ActiveJob::Base.queue_adapter = :test
-    SmsPlans::SendSmsJob.set(wait_until: 2.days).perform_later(Faker::PhoneNumber.cell_phone, Faker::Lorem.sentence, nil, user.id, false, session.id)
-    SmsPlans::SendSmsJob.set(wait_until: 2.days).perform_later(Faker::PhoneNumber.cell_phone, Faker::Lorem.sentence, nil, user.id, false, session.id)
+    SmsPlans::SendSmsJob.set(wait_until: 2.days.from_now).perform_later(Faker::PhoneNumber.cell_phone, Faker::Lorem.sentence, nil, user.id, false, session.id)
+    SmsPlans::SendSmsJob.set(wait_until: 2.days.from_now).perform_later(Faker::PhoneNumber.cell_phone, Faker::Lorem.sentence, nil, user.id, false, session.id)
   end
 
   it 'cancels a scheduled job' do

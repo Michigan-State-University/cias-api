@@ -7,9 +7,9 @@ RSpec.describe V1::Translations::Intervention do
     let!(:intervention) { create(:intervention, name: 'Test') }
     let!(:session) { create(:session, intervention: intervention) }
 
-    let_it_be(:tts_language) { create(:google_tts_language, :with_voices, language_name: 'French (France)') }
-    let_it_be(:voice) { tts_language.google_tts_voices.first }
-    let_it_be(:language) { create(:google_language) }
+    let(:tts_language) { create(:google_tts_language, :with_voices, language_name: 'French (France)') }
+    let(:voice) { tts_language.google_tts_voices.first }
+    let(:language) { create(:google_language) }
 
     context 'params are valid' do
       it 'create copy of the Intervention' do

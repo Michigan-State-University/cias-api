@@ -91,19 +91,55 @@ RSpec.describe 'PATCH /v1/health_clinics/:id', type: :request do
         it_behaves_like 'permitted user'
       end
 
-      context 'when params are invalid' do
+      context 'when name in params is empty' do
+        before { request }
+
         let(:params) do
           {
-            health_system: {
+            health_clinic: {
               name: ''
             }
           }
+        end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+        it 'returns correct status' do
+          expect(response).to have_http_status(:ok)
+        end
 
-          it 'response contains proper error message' do
-            expect(json_response['message']).to eq "Validation failed: Name can't be blank"
-          end
+        it 'returns proper data' do
+          expect(json_response['data']).to include(
+            {
+              'type' => 'health_clinic',
+              'attributes' => {
+                'health_system_id' => health_system.id,
+                'name' => health_clinic.name,
+                'deleted' => false
+              },
+              'relationships' => { 'health_clinic_admins' => { 'data' => [] },
+                                   'health_clinic_invitations' => { 'data' => [] } }
+            }
+          )
+        end
+      end
+
+      context 'when params are invalid' do
+        before do
+          create(:health_clinic, name: 'Another Health Clinic', health_system: health_system)
+          request
+        end
+
+        let(:params) do
+          {
+            health_clinic: {
+              name: 'Another Health Clinic'
+            }
+          }
+        end
+
+        it { expect(response).to have_http_status(:unprocessable_entity) }
+
+        it 'response contains proper error message' do
+          expect(json_response['message']).to eq 'Validation failed: Name has already been taken'
         end
       end
     end

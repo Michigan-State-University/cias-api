@@ -14,7 +14,7 @@ class LiveChat::Message < ApplicationRecord
 
   after_create :create_notification
 
-  encrypts :content
+  has_encrypted :content
 
   private
 

@@ -99,7 +99,7 @@ class Api::CatMh
   end
 
   def blocked_cookies?(response)
-    response['error'].eql?("#{ENV['BASE_CAT_URL']}/interview/secure/errorInProgress.html")
+    response['error'].eql?("#{ENV.fetch('BASE_CAT_URL', nil)}/interview/secure/errorInProgress.html")
   end
 
   def session_time_out?(response)

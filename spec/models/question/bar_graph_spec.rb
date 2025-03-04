@@ -48,7 +48,7 @@ RSpec.describe Question::BarGraph, type: :model do
         let(:question_bar_graph) { create(:question_bar_graph, body: { variable: { name: 'htd' }, data: [{ payload: '', value: '' }] }) }
 
         it 'returns correct variables' do
-          expect(question_bar_graph.question_variables).to match_array ['htd']
+          expect(question_bar_graph.question_variables).to contain_exactly('htd')
         end
 
         it 'returns correct amount of variables' do

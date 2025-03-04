@@ -9,6 +9,7 @@ Devise.setup do |config|
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
   # config.secret_key = '5922bed4bba3aa3a260a1ca3c41193ee3f78697a0b589a0f59b9d346dd7c3237fef8afc87ac6e9fef7cacdd7784527c821bc321aea6f642360349e4542b820ff'
+  config.secret_key = Rails.application.secret_key_base
 
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
@@ -275,7 +276,6 @@ Devise.setup do |config|
   # stretches to 10, and copy REST_AUTH_SITE_KEY to pepper).
 
   # Require the `devise-encryptable` gem when using anything other than bcrypt
-  config.encryptor = :argon2
 
   # ==> Scopes configuration
   # Turn scoped views on. Before rendering "sessions/new", it will first check for

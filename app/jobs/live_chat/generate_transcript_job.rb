@@ -19,7 +19,7 @@ class LiveChat::GenerateTranscriptJob < ApplicationJob
 
     return unless user.email_notification
 
-    LiveChat::TranscriptMailer.send("#{object_name.downcase}_transcript", user.email, object).deliver_now
+    LiveChat::TranscriptMailer.send(:"#{object_name.downcase}_transcript", user.email, object).deliver_now
   end
 
   private

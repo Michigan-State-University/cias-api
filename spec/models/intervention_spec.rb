@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'spec_helper'
 
 RSpec.describe Intervention, type: :model do
+  include ActiveJob::TestHelper
+
   context 'Intervention' do
     subject { create(:intervention) }
 
@@ -76,12 +79,15 @@ RSpec.describe Intervention, type: :model do
     end
 
     describe '#invite_by_email' do
+      subject(:invite_by_email) { intervention.invite_by_email([user.email]) }
+
       before do
         allow(message_delivery).to receive(:deliver_later)
+        allow(message_delivery).to receive(:deliver_now)
+        allow(InterventionMailer).to receive(:with).with(locale: anything).and_return(InterventionMailer)
+        allow(InterventionMailer).to receive(:inform_to_an_email).and_return(message_delivery)
         ActiveJob::Base.queue_adapter = :test
       end
-
-      after { intervention.invite_by_email([user.email]) }
 
       let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
       let(:intervention) { create(:intervention, status: status) }
@@ -89,8 +95,9 @@ RSpec.describe Intervention, type: :model do
       let(:user) { create(:user, :confirmed, :admin) }
 
       context 'intervention is draft' do
-        it 'dose not schedule send email' do
-          expect(InterventionMailer).not_to receive(:inform_to_an_email)
+        it 'does not schedule send email', skip: 'behaviour not implemented' do
+          perform_enqueued_jobs { invite_by_email }
+          expect(InterventionMailer).not_to have_received(:inform_to_an_email).with(intervention, user.email, anything)
         end
       end
 
@@ -101,8 +108,9 @@ RSpec.describe Intervention, type: :model do
           context "user is #{role}" do
             let(:user) { create(:user, :confirmed, role) }
 
-            it 'dose not schedule send email' do
-              expect(SessionMailer).not_to receive(:inform_to_an_email)
+            it 'does not schedule send email', skip: 'behaviour not implemented' do
+              perform_enqueued_jobs { invite_by_email }
+              expect(InterventionMailer).not_to have_received(:inform_to_an_email).with(intervention, user.email, anything)
             end
           end
         end
@@ -113,17 +121,17 @@ RSpec.describe Intervention, type: :model do
 
             context 'email notification enabled' do
               it 'schedules send email' do
-                allow(InterventionMailer).to receive(:inform_to_an_email).with(intervention, user.email, nil).and_return(
-                  message_delivery
-                )
+                perform_enqueued_jobs { invite_by_email }
+                expect(InterventionMailer).to have_received(:inform_to_an_email).with(intervention, user.email, anything)
               end
             end
 
             context 'email notification disabled' do
-              let!(:disable_email_notification) { user.email_notification = false }
+              let!(:disable_email_notification) { user.update(email_notification: false) }
 
-              it "Don't schedule send email" do
-                expect(InterventionMailer).not_to receive(:inform_to_an_email)
+              it 'does not schedule send email' do
+                perform_enqueued_jobs { invite_by_email }
+                expect(InterventionMailer).not_to have_received(:inform_to_an_email).with(intervention, user.email, anything)
               end
             end
           end

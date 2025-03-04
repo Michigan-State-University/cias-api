@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
-class HealthCheck
+module Rack
+end
+
+class Rack::HealthCheck
   # It return system details in JSON response.
   #
   # @return [Array] which is compatible with Rack format.

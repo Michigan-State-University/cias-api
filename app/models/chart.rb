@@ -12,14 +12,14 @@ class Chart < ApplicationRecord
   attribute :formula, :json, default: -> { assign_default_values('formula') }
 
   validates :formula, presence: true, json: { schema: lambda {
-                                                        Rails.root.join("#{json_schema_path}/formula.json").to_s
+                                                        File.read(Rails.root.join("#{json_schema_path}/formula.json").to_s)
                                                       }, message: lambda { |err|
                                                                     err
                                                                   } }
 
-  enum status: { draft: 'draft', data_collection: 'data_collection', published: 'published' }
-  enum chart_type: { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
-  enum interval_type: { monthly: 'monthly', quarterly: 'quarterly' } # only for bar charts
+  enum :status, { draft: 'draft', data_collection: 'data_collection', published: 'published' }
+  enum :chart_type, { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
+  enum :interval_type, { monthly: 'monthly', quarterly: 'quarterly' } # only for bar charts
   default_scope { order(:position) }
   after_update_commit :status_change
 

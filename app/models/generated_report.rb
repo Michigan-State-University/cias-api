@@ -20,7 +20,7 @@ class GeneratedReport < ApplicationRecord
 
   validates :pdf_report, content_type: %w[application/pdf]
 
-  enum report_for: {
+  enum :report_for, {
     third_party: 'third_party',
     participant: 'participant',
     henry_ford_health: 'henry_ford_health'

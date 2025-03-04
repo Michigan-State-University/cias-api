@@ -115,7 +115,7 @@ class Session::Classic < Session
   end
 
   def present_variables(variables)
-    variables.filter(&:present?)
+    variables.compact_blank
   end
 
   def create_core_children

@@ -21,13 +21,13 @@ RSpec.describe 'GET /v1/health_system/confirm', type: :request do
                                                                            organizable_name: health_system.name)) }.to_query
   end
   let(:success_path) do
-    "#{ENV['WEB_URL']}?#{success_message}"
+    "#{ENV.fetch('WEB_URL', nil)}?#{success_message}"
   end
   let(:error_message) do
     { error: Base64.encode64(I18n.t('organizables.invitations.not_found', organizable_type: 'Health System')) }.to_query
   end
   let(:error_path) do
-    "#{ENV['WEB_URL']}?#{error_message}"
+    "#{ENV.fetch('WEB_URL', nil)}?#{error_message}"
   end
 
   let(:params) { { invitation_token: invitation_token } }

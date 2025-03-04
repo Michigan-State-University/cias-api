@@ -10,14 +10,16 @@ RSpec.describe 'Benchmark', type: :request do
 
     it 'gives a proper benchmark' do
       puts "\nEndpoint: v1/interventions #index"
-      Benchmark.ips do |x|
-        x.config(time: 5, warmup: 2)
+      expect do
+        Benchmark.ips do |x|
+          x.config(time: 5, warmup: 2)
 
-        x.report('GET 50 Interventions') { get v1_interventions_path, params: params_long, headers: headers }
-        x.report('GET 25 Interventions') { get v1_interventions_path, params: params_short, headers: headers }
+          x.report('GET 50 Interventions') { get v1_interventions_path, params: params_long, headers: headers }
+          x.report('GET 25 Interventions') { get v1_interventions_path, params: params_short, headers: headers }
 
-        x.compare!
-      end
+          x.compare!
+        end
+      end.not_to raise_error
     end
   end
 end

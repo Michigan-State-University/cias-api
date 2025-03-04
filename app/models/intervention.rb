@@ -73,14 +73,14 @@ class Intervention < ApplicationRecord
   scope :filter_by_organization, ->(organization_id) { where(organization_id: organization_id) }
   scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
-  scope :only_not_shared_with_anyone, ->(user_id) { left_joins(:collaborators).where(user_id: user_id, collaborators: { id: nil }) }
+  scope :only_not_shared_with_anyone, ->(user_id) { where.missing(:collaborators).where(user_id: user_id) }
   scope :only_starred_by_me, ->(user) { where(id: user.stars.pluck(:intervention_id)) }
 
-  enum shared_to: { anyone: 'anyone', registered: 'registered', invited: 'invited' }, _prefix: :shared_to
-  enum status: STATUSES
-  enum license_type: { limited: 'limited', unlimited: 'unlimited' }, _prefix: :license_type
-  enum current_narrator: { peedy: 0, emmi: 1, crystal: 2 }
-  enum sensitive_data_state: { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, _prefix: :sensitive_data
+  enum :shared_to, { anyone: 'anyone', registered: 'registered', invited: 'invited' }, prefix: :shared_to
+  enum :status, STATUSES
+  enum :license_type, { limited: 'limited', unlimited: 'unlimited' }, prefix: :license_type
+  enum :current_narrator, { peedy: 0, emmi: 1, crystal: 2 }
+  enum :sensitive_data_state, { collected: 'collected', marked_to_remove: 'marked_to_remove', removed: 'removed' }, prefix: :sensitive_data
 
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
@@ -181,7 +181,7 @@ class Intervention < ApplicationRecord
   end
 
   def cache_key
-    "intervention/#{id}-#{updated_at&.to_s(:number)}"
+    "intervention/#{id}-#{updated_at&.to_fs(:number)}"
   end
 
   def self.detailed_search(params, user)
@@ -221,7 +221,7 @@ class Intervention < ApplicationRecord
   end
 
   def live_chat_validation
-    return if status == 'published' || status == 'draft'
+    return if %w[published draft].include?(status)
 
     errors.add(:base, I18n.t('activerecord.errors.models.intervention.attributes.live_chat_wrong_session_status')) if live_chat_enabled
   end

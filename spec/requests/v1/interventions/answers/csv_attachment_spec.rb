@@ -11,7 +11,7 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/csv_attachment', type: :r
   let(:request) { get v1_fetch_protected_csv_path(intervention.id), headers: headers }
   let(:intervention_owner) { admin }
   let(:user) { researcher }
-  let(:action_path) { ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention.newest_report, only_path: true) }
+  let(:action_path) { ENV.fetch('APP_HOSTNAME', nil) + Rails.application.routes.url_helpers.rails_blob_path(intervention.newest_report, only_path: true) }
 
   context 'when owner of the intervention wants to fetch the intervention csv' do
     before { request }

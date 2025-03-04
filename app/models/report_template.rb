@@ -29,17 +29,17 @@ class ReportTemplate < ApplicationRecord
 
   after_destroy :remove_template_from_third_party_questions
 
-  enum report_for: {
+  enum :report_for, {
     third_party: 'third_party',
     participant: 'participant',
     henry_ford_health: 'henry_ford_health'
   }
 
-  enum cover_letter_logo_type: {
+  enum :cover_letter_logo_type, {
     no_logo: 'no_logo',
     report_logo: 'report_logo',
     custom: 'custom'
-  }, _default: 'report_logo'
+  }, default: 'report_logo'
 
   ATTR_NAMES_TO_COPY = %w[
     name report_for summary

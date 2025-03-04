@@ -35,7 +35,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'Uid' => include('@guest.true')
+          'uid' => include('@guest.true')
         )
       end
     end
@@ -45,7 +45,7 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
 
       it 'response contains generated uid token' do
         expect(response.headers.to_h).to include(
-          'Uid' => user.email
+          'uid' => user.email
         )
       end
     end

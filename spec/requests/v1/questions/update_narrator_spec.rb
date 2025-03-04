@@ -465,11 +465,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
 
         it { expect(response).to have_http_status(:ok) }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -479,11 +479,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'first speech block, then another type' do
         let(:params) { params_speech_another }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -491,11 +491,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'first speech block, another type, speech block' do
         let(:params) { params_speech_another_read_question }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -503,11 +503,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'another type, then speech block' do
         let(:params) { params_another_speech }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -515,11 +515,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'another type, then speech block, another' do
         let(:params) { params_another_reflection_another }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -527,11 +527,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'pause_block' do
         let(:params) { params_pause }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -554,11 +554,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'first speech block, then another type' do
         let(:params) { params_speech_another }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -566,11 +566,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'first speech block, another type, speech block' do
         let(:params) { params_speech_another_read_question }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -578,11 +578,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'another type, then speech block' do
         let(:params) { params_another_speech }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -590,11 +590,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'another type, then speech block, another' do
         let(:params) { params_another_reflection_another }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -602,11 +602,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'pause block' do
         let(:params) { params_pause }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -614,11 +614,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
       context 'reflection_formula block' do
         let(:params) { params_reflection_formula }
 
-        it 'will contains blocks' do
+        it 'containses blocks' do
           expect(narrator['blocks']).to be_present
         end
 
-        it 'will have same blocks as from params' do
+        it 'has same blocks as from params' do
           expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
         end
       end
@@ -632,11 +632,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     context 'less blocks' do
       let(:params) { params_speech }
 
-      it 'will contains blocks' do
+      it 'containses blocks' do
         expect(narrator['blocks']).to be_present
       end
 
-      it 'will have same blocks as from params' do
+      it 'has same blocks as from params' do
         expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
       end
     end
@@ -644,11 +644,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     context 'more blocks' do
       let(:params) { params_speech_another_read_question }
 
-      it 'will contains blocks' do
+      it 'containses blocks' do
         expect(narrator['blocks']).to be_present
       end
 
-      it 'will have same blocks as from params' do
+      it 'has same blocks as from params' do
         expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
       end
     end
@@ -656,11 +656,11 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     context 'equal blocks' do
       let(:params) { params_another_speech }
 
-      it 'will contains blocks' do
+      it 'containses blocks' do
         expect(narrator['blocks']).to be_present
       end
 
-      it 'will have same blocks as from params' do
+      it 'has same blocks as from params' do
         expect(narrator['blocks'].size).to eq(params[:question][:narrator][:blocks].size)
       end
     end

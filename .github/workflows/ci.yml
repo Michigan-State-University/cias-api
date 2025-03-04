@@ -4,7 +4,7 @@ on: push
 jobs:
   setup_environment:
     name: Prepare environment & split tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       test-chunks: ${{ steps.set-test-chunks.outputs.test-chunks }}
       test-chunk-ids: ${{ steps.set-test-chunk-ids.outputs.test-chunk-ids }}
@@ -19,7 +19,7 @@ jobs:
         env:
           RUBYOPT: --jit
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -27,6 +27,7 @@ jobs:
             ${{ runner.os }}-gems-
       - name: Install dependencies
         run: |
+          sudo apt install libffi7
           gem install bundler -v 2.4.22
           bundle config set path 'vendor/bundle'
           bundle install
@@ -48,7 +49,7 @@ jobs:
   test:
     name: Test batch no. ${{ matrix.chunk }}
     needs: setup_environment
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
@@ -80,7 +81,7 @@ jobs:
           RUBYOPT: --jit
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -94,6 +95,7 @@ jobs:
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
         run: |
+          sudo apt install libffi7
           gem install bundler -v "2.2.22"
           bundle config set path 'vendor/bundle'
           bundle install

@@ -8,8 +8,10 @@ class V1::GeneratedReports::ShareToThirdParty
   def initialize(user_session)
     @user_session = user_session
     @third_party_reports = user_session.generated_reports.third_party
-    @third_party_emails_report_template_ids = Hash.new([])
-    @third_party_faxes_report_template_ids = Hash.new({})
+    @third_party_emails_report_template_ids = {}
+    @third_party_emails_report_template_ids.default = []
+    @third_party_faxes_report_template_ids = {}
+    @third_party_faxes_report_template_ids.default = []
     third_party_emails_or_faxes_report_template_ids
   end
 
@@ -108,7 +110,8 @@ class V1::GeneratedReports::ShareToThirdParty
       third_party_emails_report_template_ids[emails] += rep_id if emails.any?
       next unless faxes.any?
 
-      third_party_faxes_report_template_ids[receiver_label] = Hash.new([]) if third_party_faxes_report_template_ids[receiver_label].blank?
+      third_party_faxes_report_template_ids[receiver_label] = {}
+      third_party_faxes_report_template_ids[receiver_label].default = []
       third_party_faxes_report_template_ids[receiver_label][:reports] += rep_id
       third_party_faxes_report_template_ids[receiver_label][:numbers] += faxes
     end

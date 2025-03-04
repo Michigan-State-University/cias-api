@@ -58,6 +58,6 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   end
 
   def selected_files(files_for)
-    setup_load.public_send("#{files_for.singularize}_files")
+    setup_load.public_send(:"#{files_for.singularize}_files")
   end
 end

@@ -6,21 +6,21 @@ class Communication::Sms
 
   def initialize(message_id)
     @sms = Message.find(message_id)
-    @client = Twilio::REST::Client.new(ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_AUTH_TOKEN'])
+    @client = Twilio::REST::Client.new(ENV.fetch('TWILIO_ACCOUNT_SID', nil), ENV.fetch('TWILIO_AUTH_TOKEN', nil))
     @errors = []
   end
 
   def send_message
     if sms.attachment_url.present?
       client.messages.create(
-        from: ENV['TWILIO_FROM'],
+        from: ENV.fetch('TWILIO_FROM', nil),
         to: sms.phone,
         body: sms.body,
         media_url: [sms.attachment_url]
       )
     else
       client.messages.create(
-        from: ENV['TWILIO_FROM'],
+        from: ENV.fetch('TWILIO_FROM', nil),
         to: sms.phone,
         body: sms.body
       )
