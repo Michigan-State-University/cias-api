@@ -5,7 +5,7 @@ class Api::CatMh::Answer < Api::CatMh::Base
 
   attr_reader :question_id, :response, :duration
 
-  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/rest/interview/test/question".freeze
+  ENDPOINT = "#{ENV.fetch('BASE_CAT_URL', nil)}/interview/rest/interview/test/question".freeze
 
   def self.call(jsession_id, awselb, question_id, response, duration)
     new(jsession_id, awselb, question_id, response, duration).call

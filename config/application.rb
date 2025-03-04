@@ -14,7 +14,6 @@ require 'action_mailer/railtie'
 # require "action_text/engine"
 require 'action_view/railtie'
 require 'action_cable/engine'
-# require "sprockets/railtie"
 # require "rails/test_unit/railtie"
 
 # Require the gems listed in Gemfile, including any gems
@@ -25,31 +24,28 @@ Bundler.require(*Rails.groups)
 module CiasApi
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.0
+    config.load_defaults 7.1
 
-    # Settings in config/environments/* take precedence over those specified here.
-    # Application configuration can go into files in config/initializers
-    # -- all .rb files in that directory are automatically loaded after loading
-    # the framework and any gems in your application.
+    # Please, add to the `ignore` list any other `lib` subdirectories that do
+    # not contain `.rb` files, or that should not be reloaded or eager loaded.
+    # Common ones are `templates`, `generators`, or `middleware`, for example.
+    config.autoload_lib(ignore: %w[tasks])
+
+    # Configuration for the application, engines, and railties goes here.
+    #
+    # These settings can be overridden in specific environments using the files
+    # in config/environments, which are processed later.
+    #
+    # config.time_zone = "Central Time (US & Canada)"
+    # config.eager_load_paths << Rails.root.join("extras")
+
+    config.session_store :cookie_store, key: '_interslice_session'
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use config.session_store, config.session_options
 
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
-
-    config.i18n.tap do |i18n|
-      i18n.available_locales = %i[en ar es]
-      i18n.default_locale = :en
-      i18n.enforce_available_locales = false
-      i18n.fallbacks = true
-    end
-
-    config.active_job.queue_adapter = :sidekiq
-    config.filter_parameters << :password_confirmation
-    config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
-    routes.default_url_options = { host: ENV['APP_HOSTNAME'] }
-    config.eager_load_paths += %W[#{config.root}/lib/rack]
-    config.middleware.use ActionDispatch::Flash
-    config.filter_parameters << %i[password password_confirmation email first_name last_name]
   end
 end

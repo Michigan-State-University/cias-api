@@ -11,7 +11,7 @@ RSpec.shared_examples 'authorized user' do
 
   it 'response contains generated uid token' do
     expect(response.headers.to_h).to include(
-      'Uid' => user.email
+      'uid' => user.email
     )
   end
 end

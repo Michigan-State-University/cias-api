@@ -5,7 +5,7 @@ class Invitation < ApplicationRecord
   belongs_to :invitable, polymorphic: true
   belongs_to :health_clinic, optional: true
 
-  encrypts :email
+  has_encrypted :email
   blind_index :email
 
   def resend

@@ -12,9 +12,9 @@ class Phone < ApplicationRecord
   validates :number, presence: true, unless: :alert_phone_exists?, on: %i[save update]
   before_update :remove_confirmation, if: :number_changed?
 
-  enum communication_way: { call: 'call', message: 'message' }
+  enum :communication_way, { call: 'call', message: 'message' }
 
-  encrypts :number
+  has_encrypted :number
   blind_index :number
 
   def token_correct?(code)

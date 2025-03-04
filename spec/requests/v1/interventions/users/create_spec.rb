@@ -40,7 +40,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/access', type: :request 
 
         it 'returns correct email addresses' do
           emails = json_response['data'].map { |invitation| invitation['attributes']['email'] }
-          expect(emails).to match_array([participant.email, new_user_email])
+          expect(emails).to contain_exactly(participant.email, new_user_email)
         end
 
         it 'does not create user account' do

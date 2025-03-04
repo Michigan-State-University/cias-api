@@ -4,16 +4,6 @@ class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[create show_or_create]
   before_action :validate_intervention_status
 
-  def create
-    validate_session_status
-    user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
-    authorize! :create, user_session
-    user_session.save!
-    @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
-
-    render json: serialized_response(user_session), status: :ok
-  end
-
   def show
     validate_session_status
     authorize! :read, UserSession
@@ -24,6 +14,16 @@ class V1::UserSessionsController < V1Controller
 
     user_session.update!(started: true)
     user_session.user_intervention.in_progress!
+  end
+
+  def create
+    validate_session_status
+    user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
+    authorize! :create, user_session
+    user_session.save!
+    @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
+
+    render json: serialized_response(user_session), status: :ok
   end
 
   def show_or_create

@@ -51,7 +51,7 @@ RSpec.describe Question::Phone, type: :model do
         end
 
         it 'returns correct variable names' do
-          expect(question_phone.question_variables).to match_array ['htd']
+          expect(question_phone.question_variables).to contain_exactly('htd')
         end
       end
     end

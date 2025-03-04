@@ -34,7 +34,7 @@ RSpec.describe V1::Intervention::Publish do
     it 'calls correct methods on execute' do
       allow(instance).to receive(:calculate_days_after_schedule)
       allow(instance).to receive(:timestamp_published_at)
-      described_class.new(intervention).execute
+      expect { described_class.new(intervention).execute }.not_to raise_error
     end
 
     it 'schedule autoclose jobs' do

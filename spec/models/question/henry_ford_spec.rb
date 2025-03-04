@@ -35,7 +35,7 @@ RSpec.describe Question::HenryFord, type: :model do
           end
 
           it 'returns correct variable names' do
-            expect(question_henry_ford.question_variables).to match_array ['AUDIT_1']
+            expect(question_henry_ford.question_variables).to contain_exactly('AUDIT_1')
           end
         end
       end

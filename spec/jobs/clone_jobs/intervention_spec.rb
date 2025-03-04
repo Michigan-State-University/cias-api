@@ -84,15 +84,16 @@ RSpec.describe CloneJobs::Intervention, type: :job do
   context 'when the invited reseacher has an activated account' do
     let!(:clone_params) { { email: [user.email] } }
 
+    before { allow(CloneMailer).to receive(:cloned_intervention_activate).and_return(message_delivery) }
+
     it 'does not create a new user account' do
       expect { subject }.not_to change(User, :count)
     end
 
     it 'sends a proper email to the user' do
-      allow(CloneMailer).to receive(:cloned_intervention)
+      expect(CloneMailer).to receive(:cloned_intervention)
                               .with(user, intervention.name,
                                     /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
-                              .and_return(message_delivery)
       subject
     end
   end
@@ -101,15 +102,17 @@ RSpec.describe CloneJobs::Intervention, type: :job do
     let!(:new_researcher) { create(:user, :researcher, :unconfirmed) }
     let!(:clone_params) { { emails: [new_researcher.email] } }
 
+    before { allow(CloneMailer).to receive(:cloned_intervention_activate).and_return(message_delivery) }
+
     it 'does not create a new user account' do
       expect { subject }.not_to change(User, :count)
     end
 
     it 'sends a proper email to the user' do
-      allow(CloneMailer).to receive(:cloned_intervention_activate)
+      expect(CloneMailer).to receive(:cloned_intervention_activate)
                               .with(new_researcher, intervention.name,
                                     /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
-                              .and_return(message_delivery)
+
       subject
     end
   end
@@ -117,15 +120,16 @@ RSpec.describe CloneJobs::Intervention, type: :job do
   context 'when the invited researcher doesn\'t have an account' do
     let!(:clone_params) { { emails: [Faker::Internet.unique.email] } }
 
+    before { allow(CloneMailer).to receive(:cloned_intervention_activate).and_return(message_delivery) }
+
     it 'creates a new researcher account' do
       expect { subject }.to change(User, :count).by(1)
     end
 
     it 'sends a proper email to the researcher' do
-      allow(CloneMailer).to receive(:cloned_intervention_activate)
+      expect(CloneMailer).to receive(:cloned_intervention_activate)
                               .with(instance_of(User), intervention.name,
                                     /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/)
-                              .and_return(message_delivery)
       subject
     end
   end

@@ -11,7 +11,9 @@ RSpec.describe 'GET v1/interventions/:id/generated_conversations_transcript', ty
   let(:request) { get generated_conversations_transcript_v1_intervention_path(intervention.id), headers: headers }
   let(:intervention_owner) { admin }
   let(:user) { researcher }
-  let(:action_path) { ENV['APP_HOSTNAME'] + Rails.application.routes.url_helpers.rails_blob_path(intervention.conversations_transcript, only_path: true) }
+  let(:action_path) do
+    ENV.fetch('APP_HOSTNAME', nil) + Rails.application.routes.url_helpers.rails_blob_path(intervention.conversations_transcript, only_path: true)
+  end
 
   context 'when owner of the intervention wants to fetch the intervention csv' do
     before { request }

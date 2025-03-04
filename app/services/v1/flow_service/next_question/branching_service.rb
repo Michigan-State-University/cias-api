@@ -99,7 +99,7 @@ class V1::FlowService::NextQuestion::BranchingService
     return if next_question.is_a? Hash
 
     question_ids = next_question.position_lower.pluck(:id)
-    user_session.answers.where(draft: true, question_id: question_ids).each do |answer|
+    user_session.answers.where(draft: true, question_id: question_ids).find_each do |answer|
       answer.update!(alternative_branch: true)
     end
   end

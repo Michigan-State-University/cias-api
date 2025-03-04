@@ -46,7 +46,7 @@ RSpec.describe Question::Slider, type: :model do
 
       describe '#question_variables' do
         it 'returns correct variable names list' do
-          expect(question_slider.question_variables).to match_array ['question_slider_var']
+          expect(question_slider.question_variables).to contain_exactly('question_slider_var')
         end
 
         it 'returns correct amount of variables' do

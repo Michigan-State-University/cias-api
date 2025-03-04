@@ -31,7 +31,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     session.sms_plans.limit_to_types(type).each do |plan|
       next unless can_run_plan?(plan)
 
-      send("#{plan.schedule}_schedule", plan)
+      send(:"#{plan.schedule}_schedule", plan)
     end
   end
 

@@ -78,7 +78,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/accesses', type: :reques
       end
 
       it 'returns correct response data' do
-        expect(intervention.reload.intervention_accesses.map(&:email)).to match_array ['example@test.com']
+        expect(intervention.reload.intervention_accesses.map(&:email)).to contain_exactly('example@test.com')
       end
     end
   end

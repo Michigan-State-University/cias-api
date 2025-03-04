@@ -91,7 +91,7 @@ RSpec.describe V1::GeneratedReports::Create do
 
       it 'shares report to third party' do
         allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        subject
+        expect { subject }.not_to raise_error
       end
     end
 
@@ -102,7 +102,7 @@ RSpec.describe V1::GeneratedReports::Create do
 
       it 'does not share report to third party' do
         allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        subject
+        expect { subject }.not_to raise_error
       end
     end
 
@@ -142,7 +142,7 @@ RSpec.describe V1::GeneratedReports::Create do
           ]
         ).and_return('PDF TEMPLATE')
 
-        subject
+        expect { subject }.not_to raise_error
       end
     end
 

@@ -4,12 +4,12 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   before_action :verify_access, except: [:verify]
   skip_before_action :authenticate_user!, only: %i[verify]
 
-  def show
-    render json: serialized_response(predefined_participant)
-  end
-
   def index
     render json: serialized_response(predefined_participants)
+  end
+
+  def show
+    render json: serialized_response(predefined_participant)
   end
 
   def create

@@ -16,7 +16,7 @@ class SummonUsers
         u = User.new(
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,
-          email: "#{role}@#{ENV['DOMAIN_NAME']}",
+          email: "#{role}@#{ENV.fetch('DOMAIN_NAME', nil)}",
           password: 'Password1!',
           roles: [role],
           terms: true

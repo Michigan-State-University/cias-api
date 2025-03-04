@@ -21,7 +21,7 @@ RSpec.describe V1::UserSessions::CreateService do
 
     it 'user has the same language as intervention' do
       subject
-      expect(user.reload.language_code).eql? intervention.language_code
+      expect(user.reload.language_code).to eql intervention.language_code
     end
 
     it 'instantiate user session' do

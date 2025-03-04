@@ -21,7 +21,7 @@ RSpec::Matchers.define :have_abilities do |actions, obj|
     @expected_hash = build_expected_hash(actions, default_expectation: true)
     @obj = obj
     @actual_hash = {}
-    @expected_hash.each do |action, _|
+    @expected_hash.each_key do |action|
       @actual_hash[action] = ability.can?(action, obj)
     end
     @actual_hash == @expected_hash
@@ -33,7 +33,7 @@ RSpec::Matchers.define :have_abilities do |actions, obj|
     "have abilities #{@expected_hash.keys.join(', ')} on #{obj_name}"
   end
 
-  failure_message_for_should do |_ability|
+  failure_message do |_ability|
     obj_name = @obj.class.name
     obj_name = @obj.to_s.capitalize if [Class, Module, Symbol].include?(@obj.class)
     <<~MESSAGE
@@ -53,7 +53,7 @@ RSpec::Matchers.define :not_have_abilities do |actions, obj|
     @expected_hash = build_expected_hash(actions, default_expectation: false)
     @obj = obj
     @actual_hash = {}
-    @expected_hash.each do |action, _|
+    @expected_hash.each_key do |action|
       @actual_hash[action] = ability.can?(action, obj)
     end
     @actual_hash == @expected_hash
@@ -65,7 +65,7 @@ RSpec::Matchers.define :not_have_abilities do |actions, obj|
     "not have abilities #{@expected_hash.keys.join(', ')} on #{obj_name}" if @expected_hash.present?
   end
 
-  failure_message_for_should do |_ability|
+  failure_message do |_ability|
     obj_name = @obj.class.name
     obj_name = @obj.to_s.capitalize if [Class, Module, Symbol].include?(@obj.class)
     <<~MESSAGE

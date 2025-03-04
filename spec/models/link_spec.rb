@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe Link, type: :model do
-  it { validate_uniqueness_of(:slug) }
-  it { validate_presence_of(:url) }
-  it { validate_length_of(:length).is_at_least(3) }
-  it { validate_length_of(:length).is_at_most(255) }
+  it { should validate_uniqueness_of(:slug) }
+  it { should validate_presence_of(:url) }
   it { should allow_value('https://picsum.photos/200').for(:url) }
 
   describe 'callbacks' do

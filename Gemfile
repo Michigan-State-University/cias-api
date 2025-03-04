@@ -4,9 +4,9 @@ source 'https://rubygems.org'
 
 ruby '3.1.4'
 
-gem 'rails', '~> 6.1.7', '>= 6.1.7.9'
+gem 'rails', '~> 7.2.0'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 5.6.9'
+gem 'puma', '~> 6.0'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
@@ -56,13 +56,15 @@ gem 'countries'
 # for Audit trail and audit log
 gem 'paper_trail'
 # for soft delete
-gem 'paranoia', '~> 2.4', '>= 2.4.3'
+gem 'paranoia'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.7'
 gem 'jwt', '~> 2.6'
 gem 'grpc', '~> 1.53.2'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
+# for faraday multipart
+gem 'faraday-multipart'
 
 group :development, :test do
   gem 'bundler-audit'

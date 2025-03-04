@@ -1,16 +1,6 @@
 # frozen_string_literal: true
 
 class V1::LiveChat::Interventions::LinksController < V1Controller
-  def update
-    authorize! :update, Intervention
-    authorize! :update, intervention_load
-    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
-
-    link = link_load
-    link.update!(link_params)
-    head :ok
-  end
-
   def create
     authorize! :update, Intervention
     authorize! :create, intervention_load
@@ -20,6 +10,16 @@ class V1::LiveChat::Interventions::LinksController < V1Controller
     LiveChat::Interventions::Link.create!(link_params.merge(navigator_setup_id: navigator_setup.id))
     render json: V1::LiveChat::Interventions::NavigatorSetupSerializer.new(navigator_setup, { include: %i[participant_links navigator_links phone] }),
            status: :created
+  end
+
+  def update
+    authorize! :update, Intervention
+    authorize! :update, intervention_load
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
+
+    link = link_load
+    link.update!(link_params)
+    head :ok
   end
 
   def destroy

@@ -6,7 +6,7 @@ class Question::ThirdParty < Question
   before_save :downcase_third_party_emails
 
   def self.assign_default_values(attr)
-    super(attr).merge(
+    super.merge(
       { 'required' => false }
     )
   end

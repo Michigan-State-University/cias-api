@@ -31,7 +31,7 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
       expect(
         ActionMailer::Base.deliveries.last.html_part.body.decoded.gsub('&amp;', ' ')
       ).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
-                          domain: ENV['WEB_URL'],
+                          domain: ENV.fetch('WEB_URL', nil),
                           intervention_id: intervention.id,
                           session_id: session.id,
                           health_clinic_id: health_clinic.id,
@@ -45,7 +45,7 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
       it do
         expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
         expect(ActionMailer::Base.deliveries.last.html_part.body).to include(I18n.t('session_mailer.inform_to_an_email.invitation_link',
-                                                                                    domain: ENV['WEB_URL'],
+                                                                                    domain: ENV.fetch('WEB_URL', nil),
                                                                                     intervention_id: intervention.id,
                                                                                     session_id: session.id,
                                                                                     health_clinic_id: health_clinic.id,
@@ -61,7 +61,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
 
     it do
       expect { subject }.to change { ActionMailer::Base.deliveries.size }.by(1)
-      expect(ActionMailer::Base.deliveries.last.html_part.body).to include("#{ENV['WEB_URL']}/usr/#{predefined_participant.predefined_user_parameter.slug}")
+      expect(ActionMailer::Base.deliveries.last.html_part.body).to include("#{ENV.fetch('WEB_URL',
+                                                                                        nil)}/usr/#{predefined_participant.predefined_user_parameter.slug}")
     end
   end
 
@@ -70,7 +71,7 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
     let!(:emails) { [] }
     let!(:invitation_link) do
       I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone',
-             domain: ENV['WEB_URL'],
+             domain: ENV.fetch('WEB_URL', nil),
              session_id: session.id,
              intervention_id: session.intervention_id,
              language_code: session.language_code)
