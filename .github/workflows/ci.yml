@@ -4,7 +4,7 @@ on: push
 jobs:
   setup_environment:
     name: Prepare environment & split tests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     outputs:
       test-chunks: ${{ steps.set-test-chunks.outputs.test-chunks }}
       test-chunk-ids: ${{ steps.set-test-chunk-ids.outputs.test-chunk-ids }}
@@ -27,8 +27,7 @@ jobs:
             ${{ runner.os }}-gems-
       - name: Install dependencies
         run: |
-          wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-          sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+          sudo apt install libffi7
           gem install bundler -v 2.4.22
           bundle config set path 'vendor/bundle'
           bundle install
@@ -50,7 +49,7 @@ jobs:
   test:
     name: Test batch no. ${{ matrix.chunk }}
     needs: setup_environment
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
@@ -96,8 +95,7 @@ jobs:
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
         run: |
-          wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
-          sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+          sudo apt install libffi7
           gem install bundler -v "2.2.22"
           bundle config set path 'vendor/bundle'
           bundle install
