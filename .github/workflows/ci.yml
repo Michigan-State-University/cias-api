@@ -48,7 +48,7 @@ jobs:
   test:
     name: Test batch no. ${{ matrix.chunk }}
     needs: setup_environment
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
