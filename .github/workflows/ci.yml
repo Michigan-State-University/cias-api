@@ -27,6 +27,7 @@ jobs:
             ${{ runner.os }}-gems-
       - name: Install dependencies
         run: |
+          sudo apt install libffi7
           gem install bundler -v 2.4.22
           bundle config set path 'vendor/bundle'
           bundle install
@@ -94,6 +95,7 @@ jobs:
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
         run: |
+          sudo apt install libffi7
           gem install bundler -v "2.2.22"
           bundle config set path 'vendor/bundle'
           bundle install
