@@ -47,5 +47,12 @@ module CiasApi
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    config.active_job.queue_adapter = :sidekiq
+    config.filter_parameters << :password_confirmation
+    config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
+    routes.default_url_options = { host: ENV['APP_HOSTNAME'] }
+    config.middleware.use ActionDispatch::Flash
+    config.filter_parameters << %i[password password_confirmation email first_name last_name]
   end
 end
