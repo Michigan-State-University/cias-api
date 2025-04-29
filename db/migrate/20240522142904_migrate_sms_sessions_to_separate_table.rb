@@ -9,7 +9,7 @@ class MigrateSmsSessionsToSeparateTable < ActiveRecord::Migration[6.1]
       t.timestamps
     end
 
-    Session.where.not(sms_code: nil).all.each do |session|
+    AuxiliarySession.where.not(sms_code: nil).all.each do |session|
       SmsCode.create!(sms_code: session.sms_code, session_id: session.id, active: true)
     end
 
@@ -24,7 +24,7 @@ class MigrateSmsSessionsToSeparateTable < ActiveRecord::Migration[6.1]
   def down
     add_column :sessions, :sms_code, :string
 
-    Session.left_joins(:sms_codes).where.not(sms_codes: {sms_code: nil}).each do |session|
+    AuxiliarySession.left_joins(:sms_codes).where.not(sms_codes: {sms_code: nil}).each do |session|
       session.update!(sms_code: session.sms_codes.first.sms_code)
     end
 
@@ -33,5 +33,9 @@ class MigrateSmsSessionsToSeparateTable < ActiveRecord::Migration[6.1]
     SQL
 
     drop_table :sms_codes
+  end
+
+  class AuxiliarySession < ApplicationRecord
+    self.table_name = 'sessions'
   end
 end
