@@ -59,7 +59,6 @@ module CiasApi
     config.filter_parameters << :password_confirmation
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
     routes.default_url_options = { host: ENV.fetch('APP_HOSTNAME', nil) }
-    config.eager_load_paths += %W[#{config.root}/lib/rack]
     config.middleware.use ActionDispatch::Flash
     config.filter_parameters << %i[password password_confirmation email first_name last_name]
   end
