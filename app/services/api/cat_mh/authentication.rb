@@ -3,7 +3,7 @@
 class Api::CatMh::Authentication
   attr_reader :signature, :identifier
 
-  ENDPOINT = "#{ENV['BASE_CAT_URL']}/interview/signin".freeze
+  ENDPOINT = "#{ENV.fetch('BASE_CAT_URL', nil)}/interview/signin".freeze
 
   def self.call(identifier, signature)
     new(identifier, signature).call

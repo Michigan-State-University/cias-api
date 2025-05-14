@@ -9,7 +9,7 @@ module Multilang
         "#{match} tab-#{full_lang_name}"
       end
     else
-      super(code, full_lang_name)
+      super
     end
   end
 end

@@ -6,7 +6,7 @@ class Question::Single < Question
   attribute :settings, :json, default: -> { assign_default_values('settings') }
 
   def self.assign_default_values(attr)
-    super(attr).merge(
+    super.merge(
       { 'proceed_button' => true, 'required' => true }
     )
   end

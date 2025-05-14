@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Question::Update do
-  subject { described_class.call(question, params) }\
+  subject { described_class.call(question, params) }
 
   let(:question_group) { create(:question_group) }
   let(:question) { create(:question_slider, question_group: question_group) }

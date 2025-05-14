@@ -91,12 +91,14 @@ RSpec.describe Session, type: :model do
       end
 
       describe '#send_link_to_session' do
+        subject(:send_link_to_session) { session.send_link_to_session(user) }
+
         before do
           allow(message_delivery).to receive(:deliver_later)
+          allow(SessionMailer).to receive(:with).with(locale: anything).and_return(SessionMailer)
+          allow(SessionMailer).to receive(:inform_to_an_email).and_return(message_delivery)
           ActiveJob::Base.queue_adapter = :test
         end
-
-        after { session.send_link_to_session(user) }
 
         let(:message_delivery) { instance_double(ActionMailer::MessageDelivery) }
         let(:intervention) { create(:intervention, status: status) }
@@ -109,7 +111,8 @@ RSpec.describe Session, type: :model do
               let(:user) { create(:user, :confirmed, role) }
 
               it 'dose not schedule send email' do
-                expect(SessionMailer).not_to receive(:inform_to_an_email)
+                send_link_to_session
+                expect(SessionMailer).not_to have_received(:inform_to_an_email)
               end
             end
           end
@@ -122,7 +125,8 @@ RSpec.describe Session, type: :model do
                 let(:user) { create(:user, :confirmed, role) }
 
                 it 'dose not schedule send email' do
-                  expect(SessionMailer).not_to receive(:inform_to_an_email)
+                  send_link_to_session
+                  expect(SessionMailer).not_to have_received(:inform_to_an_email)
                 end
               end
             end
@@ -133,9 +137,8 @@ RSpec.describe Session, type: :model do
 
                 context 'email notification enabled' do
                   it 'schedules send email' do
-                    allow(SessionMailer).to receive(:inform_to_an_email).with(session, user.email, nil).and_return(
-                      message_delivery
-                    )
+                    send_link_to_session
+                    expect(SessionMailer).to have_received(:inform_to_an_email)
                   end
                 end
 

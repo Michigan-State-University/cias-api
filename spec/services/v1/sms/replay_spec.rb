@@ -15,7 +15,7 @@ RSpec.describe V1::Sms::Replay do
 
     before do
       10.times do |delay|
-        SmsPlans::SendSmsJob.set(wait_until: (delay + 1).days).perform_later(from, 'example content', nil, user.id, false, session.id)
+        SmsPlans::SendSmsJob.set(wait_until: (delay + 1).days.from_now).perform_later(from, 'example content', nil, user.id, false, session.id)
       end
     end
 

@@ -35,7 +35,7 @@ class V1::RenderPdfReport
 
   def report_template_html
     action_controller.render_to_string(
-      template: 'report_templates/report_preview.html.erb',
+      template: 'report_templates/report_preview',
       locals: {
         report_template: report_template,
         variants: variants_to_generate
@@ -45,7 +45,7 @@ class V1::RenderPdfReport
 
   def report_header_html
     action_controller.render_to_string(
-      template: 'report_templates/report_header.html.erb',
+      template: 'report_templates/report_header',
       locals: {
         report_template: report_template
       }
@@ -54,9 +54,9 @@ class V1::RenderPdfReport
 
   def report_footer_html
     action_controller.render_to_string(
-      template: 'report_templates/report_footer.html.erb',
+      template: 'report_templates/report_footer',
       locals: {
-        datetime_content: "Completed on #{DateTime.now.to_s(:db)}"
+        datetime_content: "Completed on #{DateTime.now.to_fs(:db)}"
       }
     )
   end

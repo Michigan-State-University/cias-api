@@ -39,14 +39,14 @@ RSpec.describe V1::ReportTemplates::GeneratePdfPreview do
     context 'email notification enabled' do
       it 'runs mailer with created PDF preview' do
         expect(action_controller_double).to receive(:render_to_string).with(
-          template: 'report_templates/report_preview.html.erb',
+          template: 'report_templates/report_preview',
           locals: {
             report_template: report_template,
             variants: match_array(variants_to_preview)
           }
         )
         expect(action_controller_double).to receive(:render_to_string).with(
-          template: 'report_templates/report_header.html.erb',
+          template: 'report_templates/report_header',
           locals: {
             report_template: report_template
           }

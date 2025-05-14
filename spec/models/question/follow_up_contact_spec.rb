@@ -46,7 +46,7 @@ RSpec.describe Question::FollowUpContact, type: :model do
 
       describe '#question_variables' do
         it 'returns correct variables' do
-          expect(question_follow_up_contact.question_variables).to match_array ['follow_up_contact_var']
+          expect(question_follow_up_contact.question_variables).to contain_exactly('follow_up_contact_var')
         end
 
         it 'returns correct amount of variables' do

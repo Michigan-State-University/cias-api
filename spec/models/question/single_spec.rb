@@ -35,7 +35,7 @@ RSpec.describe Question::Single, type: :model do
           end
 
           it 'returns correct variable names' do
-            expect(question_single.question_variables).to match_array ['single_var']
+            expect(question_single.question_variables).to contain_exactly('single_var')
           end
         end
       end

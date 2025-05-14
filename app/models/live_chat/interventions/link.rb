@@ -7,7 +7,7 @@ class LiveChat::Interventions::Link < ApplicationRecord
   validates :url, length: { maximum: 2048 }
   default_scope { order(created_at: :desc) }
 
-  enum link_for: { participants: 0, navigators: 1 }
+  enum :link_for, { participants: 0, navigators: 1 }
 
   scope :for_participants, -> { where(link_for: :participant) }
   scope :for_navigators, -> { where(link_for: :navigators) }

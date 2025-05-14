@@ -5,7 +5,7 @@ namespace :docs do
   namespace :build do
     task v1: :environment do
       Bundler.with_unbundled_env do
-        Dir.chdir 'docs/v1' do
+        Dir.chdir 'docs/v1' do # rubocop:disable ThreadSafety/DirChdir
           `bundle exec middleman build --clean`
         end
       end

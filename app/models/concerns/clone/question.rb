@@ -4,7 +4,6 @@ class Clone::Question < Clone::Base
   def execute
     attach_image
     clean_outcome_formulas if clean_formulas
-    outcome.position = position || outcome.question_group.questions.size
     outcome.save!
     outcome
   end

@@ -12,6 +12,6 @@ RSpec.describe SessionJobs::AutocloseSessionJob, type: :job do
 
   it 'run finish on each user session' do
     subject
-    expect(user_sessions.map(&:finished_at).compact!).eql? 3
+    expect(user_sessions.map(&:reload).filter_map(&:finished_at).size).to be(3)
   end
 end

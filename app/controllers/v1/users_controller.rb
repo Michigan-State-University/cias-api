@@ -116,7 +116,7 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    if (current_v1_user.roles & %w[researcher team_admin]).present? && current_v1_user.id != user_id
+    if current_v1_user.roles.intersect?(%w[researcher team_admin]) && current_v1_user.id != user_id
       params.require(:user).permit(
         :active
       )

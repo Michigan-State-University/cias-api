@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe HealthCheck do
+RSpec.describe Rack::HealthCheck do
   let(:result)        { described_class.new.call({})  }
   let(:status)        { result.first                  }
   let(:json_response) { JSON.parse(result.last.first) }

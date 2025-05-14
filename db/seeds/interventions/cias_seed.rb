@@ -3,7 +3,7 @@
 require 'factory_bot_rails'
 require 'faker'
 
-require_relative './seed_helpers'
+require_relative 'seed_helpers'
 
 NUM_OF_RESEARCHERS = 2
 NUM_OF_PARTICIPANTS = 6
@@ -34,7 +34,7 @@ class DBSeed
   create_participants_and_researchers(NUM_OF_PARTICIPANTS, NUM_OF_RESEARCHERS)
 
   admin_email = "cias-team+admin_#{ENV.fetch('APP_HOSTNAME')}@htdevelopers.com".gsub(/[^0-9A-Za-z_\-@.+]/, '')
-  admin_password = ENV['CIAS_ADMIN_PASSWORD']
+  admin_password = ENV.fetch('CIAS_ADMIN_PASSWORD', nil)
   unless User.find_by(email: admin_email)
     example_user = create_user('admin', admin_email, admin_password)
     example_user.confirm

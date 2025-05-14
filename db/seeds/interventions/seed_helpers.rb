@@ -67,12 +67,8 @@ def assign_data_to_answer(answer, question)
   end
   data << { var: var_name, value: value }
 
-  if question.type == 'Question::Grid' || question.type == 'Question::Multiple'
-    data = []
-    var_name = question.question_variables
-    var_name.each do |var|
-      data << { 'var' => var, 'value' => rand(1..5).to_s }
-    end
+  if ['Question::Grid', 'Question::Multiple'].include?(question.type)
+    data = question.question_variables.map { |var| { 'var' => var, 'value' => rand(1..5).to_s } }
   end
 
   add_data_to_answer_body(answer, data)
