@@ -22,7 +22,13 @@ module FileHelper
       extension: blob.filename.extension,
       content_type: blob.content_type,
       description: blob.description,
-      file: Base64.encode64(blob.download)
+      file: download_and_encode_file(blob)
     }
+  end
+
+  def download_and_encode_file(blob)
+    Base64.encode64(blob.download)
+  rescue StandardError
+    nil
   end
 end
