@@ -18,12 +18,17 @@ module FileHelper
     return unless file.attached?
 
     blob = file.blob
-    {
-      extension: blob.filename.extension,
-      content_type: blob.content_type,
-      description: blob.description,
-      file: download_and_encode_file(blob)
-    }
+    encoded_file = download_and_encode_file(blob)
+    if encoded_file.present?
+      {
+        extension: blob.filename.extension,
+        content_type: blob.content_type,
+        description: blob.description,
+        file: encoded_file
+      }
+    else
+      {}
+    end
   end
 
   def download_and_encode_file(blob)
