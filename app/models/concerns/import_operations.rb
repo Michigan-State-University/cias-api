@@ -6,7 +6,7 @@ module ImportOperations
   end
 
   def import_file(img)
-    return if img.blank?
+    return if img.blank? || img[:file].nil?
 
     {
       io: StringIO.new(Base64.decode64(img[:file])),
