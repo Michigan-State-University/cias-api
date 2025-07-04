@@ -18,6 +18,7 @@ class V1::Google::TranslationService
   def credentials
     Oj.load_file(ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil))
   rescue Oj::ParseError
-    Oj.load(ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil))
+    ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil)
+    # Oj.load(ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil))
   end
 end
