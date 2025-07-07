@@ -30,7 +30,9 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
       next if target['id'].blank?
 
       if target['type'].include?('Question')
-        target_question = Question.find(target['id'])
+        target_question = Question.find_by(id: target['id'])
+        next if target_question.nil?
+
         target_question_group_position = target_question.question_group.position
         location = object_location(target_question, :question_group_position, target_question_group_position)
       elsif target['type'].include?('Session')
@@ -46,7 +48,9 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
     reflection_target_locations = []
     reflections = question.narrator['blocks'].filter { |block| block['type'] == 'Reflection' }
     reflections.each do |reflection|
-      target_question = Question.find(reflection['question_id'])
+      target_question = Question.find_by(id: reflection['question_id'])
+      next if target_question.nil?
+
       target_question_group_position = target_question.question_group.position
       reflection_target_locations << object_location(target_question, :question_group_position, target_question_group_position)
     end

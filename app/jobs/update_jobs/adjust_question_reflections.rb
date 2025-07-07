@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class UpdateJobs::AdjustQuestionReflections < CloneJob
-  def perform(question, prev_variable_name)
+  def perform(question, prev_variable_name, current_variable_name)
     reflectable_questions(question, prev_variable_name).each do |q|
       q.narrator['blocks'].each do |block|
         next if block['reflections'].nil?
 
         block['reflections'].each do |reflection|
-          reflection['variable'] = question.body['variable']['name']
+          reflection['variable'] = current_variable_name
         end
 
         q.save!
