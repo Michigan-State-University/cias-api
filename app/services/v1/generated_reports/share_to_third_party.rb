@@ -40,7 +40,7 @@ class V1::GeneratedReports::ShareToThirdParty
                                .new_report_available(user.email, num_of_generated_reports).deliver_now
         end
       else
-        SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email, num_of_generated_reports, locale: user_session.session.language_code)
+        SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email, num_of_generated_reports, user_session.session.language_code)
       end
     end
   end
