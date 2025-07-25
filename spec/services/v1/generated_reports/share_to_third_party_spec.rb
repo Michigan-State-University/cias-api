@@ -50,7 +50,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
                                                                 .with(
                                                                   new_user.email,
                                                                   number_of_generated_reports,
-                                                                  { locale: user_session.session.language_code }
+                                                                  user_session.session.language_code
                                                                 )
 
       expect(new_user).to have_attributes(

@@ -31,6 +31,9 @@ Rails.root.glob('spec/support/**/*.rb').each(&method(:require))
 # Temporary fix for missing cancancan classes in RSpec
 Rails.root.glob('app/models/ability/*.rb').each(&method(:require))
 
+# Set queue_adapter to test in order to use for example: have_been_enqueued method in specs
+ActiveJob::Base.queue_adapter = :test
+
 # include custom cancan matcher
 require 'support/custom_cancan_matcher'
 require 'support/custom_report_variant_matcher'
