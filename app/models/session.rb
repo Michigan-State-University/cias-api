@@ -48,6 +48,7 @@ class Session < ApplicationRecord
   delegate :published?, to: :intervention
   delegate :draft?, to: :intervention
   delegate :ability_to_update_for?, to: :intervention
+  delegate :skip_warning_screen, to: :intervention
   delegate :language_code, to: :google_language
 
   scope :multiple_fill, -> { where(multiple_fill: true) }

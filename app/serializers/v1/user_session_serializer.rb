@@ -49,4 +49,8 @@ class V1::UserSessionSerializer < V1Serializer
   attribute :live_chat_enabled do |object|
     object.session.intervention.live_chat_enabled
   end
+
+  attribute :skip_warning_screen do |object|
+    object.session.intervention.skip_warning_screen
+  end
 end
