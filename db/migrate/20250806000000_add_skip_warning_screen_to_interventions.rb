@@ -2,6 +2,6 @@
 
 class AddSkipWarningScreenToInterventions < ActiveRecord::Migration[6.1]
   def change
-    add_column :interventions, :skip_warning_screen, :boolean, default: false, null: false
+    add_column :interventions, :skip_warning_screen, :boolean, default: true, null: false
   end
 end
