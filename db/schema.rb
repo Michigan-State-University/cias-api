@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_08_06_000000) do
+ActiveRecord::Schema[7.2].define(version: 2025_08_13_103722) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -483,7 +483,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_08_06_000000) do
     t.datetime "clear_sensitive_data_scheduled_at", precision: nil
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
-    t.boolean "skip_warning_screen", default: true, null: false
+    t.boolean "warning_screen_enabled"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin

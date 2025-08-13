@@ -1,3 +1,8 @@
 <%= I18n.t('session_mailer.inform_to_an_email.body', session_name: @session.name) %>
 
-<%= I18n.t('session_mailer.inform_to_an_email.invitation_link', domain: ENV['WEB_URL'], intervention_id: @session.intervention_id, session_id: @session.id, language_code: @session.language_code) %>
+<%= I18n.t('session_mailer.inform_to_an_email.invitation_link',
+      domain: ENV.fetch('WEB_URL', nil),
+      intervention_id: @session.intervention_id,
+      session_id: @session.id,
+      language_code: @session.language_code,
+      warning_screen_enabled: @session.warning_screen_enabled) %>

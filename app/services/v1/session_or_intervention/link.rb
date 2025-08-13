@@ -29,13 +29,15 @@ class V1::SessionOrIntervention::Link
          I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone',
                 domain: ENV.fetch('WEB_URL', nil), session_id: session.id,
                 intervention_id: session.intervention_id,
-                language_code: session.language_code)
+                language_code: session.language_code,
+                warning_screen_enabled: session.warning_screen_enabled)
        else
          I18n.t('session_mailer.inform_to_an_email.invitation_link_for_anyone_from_clinic',
                 domain: ENV.fetch('WEB_URL', nil), session_id: session.id,
                 intervention_id: session.intervention_id,
                 health_clinic_id: health_clinic.id,
-                language_code: session.language_code)
+                language_code: session.language_code,
+                warning_screen_enabled: session.warning_screen_enabled)
        end)
     else
       (if health_clinic.nil?
@@ -43,13 +45,15 @@ class V1::SessionOrIntervention::Link
                 domain: ENV.fetch('WEB_URL', nil),
                 intervention_id: session.intervention_id,
                 session_id: session.id,
-                language_code: session.language_code)
+                language_code: session.language_code,
+                warning_screen_enabled: session.warning_screen_enabled)
        else
          I18n.t('session_mailer.inform_to_an_email.invitation_link_from_clinic',
                 domain: ENV.fetch('WEB_URL', nil),
                 intervention_id: session.intervention_id, session_id: session.id,
                 health_clinic_id: health_clinic.id,
-                language_code: session.language_code)
+                language_code: session.language_code,
+                warning_screen_enabled: session.warning_screen_enabled)
        end)
     end
   end
