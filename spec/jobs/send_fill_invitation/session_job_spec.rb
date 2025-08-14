@@ -35,7 +35,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
                           intervention_id: intervention.id,
                           session_id: session.id,
                           health_clinic_id: health_clinic.id,
-                          language_code: intervention.language_code).tr('&', ' '))
+                          language_code: intervention.language_code,
+                          warning_screen_enabled: intervention.warning_screen_enabled).tr('&', ' ')
     end
 
     context 'shared to registered sends correct email' do
@@ -49,7 +50,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
                                                                                     intervention_id: intervention.id,
                                                                                     session_id: session.id,
                                                                                     health_clinic_id: health_clinic.id,
-                                                                                    language_code: intervention.language_code))
+                                                                                    language_code: intervention.language_code,
+                                                                                    warning_screen_enabled: intervention.warning_screen_enabled)
       end
     end
   end
@@ -74,7 +76,8 @@ RSpec.describe SendFillInvitation::SessionJob, type: :job do
              domain: ENV.fetch('WEB_URL', nil),
              session_id: session.id,
              intervention_id: session.intervention_id,
-             language_code: session.language_code)
+             language_code: session.language_code,
+             warning_screen_enabled: session.warning_screen_enabled)
     end
 
     it do

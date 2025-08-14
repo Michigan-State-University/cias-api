@@ -16,7 +16,8 @@ RSpec.describe V1::SessionOrIntervention::Link do
                                  domain: ENV.fetch('WEB_URL', nil),
                                  session_id: session.id,
                                  intervention_id: intervention.id,
-                                 language_code: intervention.language_code))
+                                 language_code: intervention.language_code,
+                                 warning_screen_enabled: intervention.warning_screen_enabled))
   end
 
   context 'link as information about health clinic' do
@@ -28,7 +29,8 @@ RSpec.describe V1::SessionOrIntervention::Link do
                                    session_id: session.id,
                                    intervention_id: intervention.id,
                                    health_clinic_id: health_clinic.id,
-                                   language_code: intervention.language_code))
+                                   language_code: intervention.language_code,
+                                   warning_screen_enabled: intervention.warning_screen_enabled))
     end
   end
 
@@ -40,7 +42,8 @@ RSpec.describe V1::SessionOrIntervention::Link do
                                    domain: ENV.fetch('WEB_URL', nil),
                                    intervention_id: intervention.id,
                                    session_id: session.id,
-                                   language_code: intervention.language_code))
+                                   language_code: intervention.language_code,
+                                   warning_screen_enabled: intervention.warning_screen_enabled))
     end
   end
 
@@ -60,7 +63,8 @@ RSpec.describe V1::SessionOrIntervention::Link do
                                    domain: ENV.fetch('WEB_URL', nil),
                                    session_id: session.id,
                                    intervention_id: intervention.id,
-                                   language_code: intervention.language_code))
+                                   language_code: intervention.language_code,
+                                   warning_screen_enabled: intervention.warning_screen_enabled))
     end
   end
 end
