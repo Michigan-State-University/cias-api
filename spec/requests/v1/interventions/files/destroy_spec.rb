@@ -26,7 +26,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/files/:id', type: :req
       it { expect(response).to have_http_status(:not_found) }
 
       it 'response have correct message' do
-        expect(json_response['message']).to include("Couldn't find ActiveStorage::Attachment with 'id'=#{file_id}")
+        expect(json_response['message']).to include("Couldn't find ActiveStorage::Attachment with 'id'=\"#{file_id}\"")
       end
     end
   end
