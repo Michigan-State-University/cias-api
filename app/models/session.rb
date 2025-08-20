@@ -239,7 +239,7 @@ class Session < ApplicationRecord
   def set_sms_defaults
     return unless sms_session_type?
 
-    self.default_response = I18n.t('sessions.default_response')
-    self.welcome_message = I18n.t('sessions.welcome_message')
+    self.default_response ||= I18n.t('sessions.default_response')
+    self.welcome_message ||= I18n.t('sessions.welcome_message')
   end
 end
