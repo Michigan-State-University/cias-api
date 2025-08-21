@@ -33,7 +33,6 @@ class V1::GeneratedReports::ShareToThirdParty
     third_party_users.each do |user|
       next if user.deactivated? || !user.email_notification
 
-      # byebug
       num_of_generated_reports = number_of_generated_reports[user.email]
       if user.confirmed?
         if num_of_generated_reports.positive?
@@ -41,7 +40,6 @@ class V1::GeneratedReports::ShareToThirdParty
                                .new_report_available(user.email, num_of_generated_reports).deliver_now
         end
       else
-        # byebug
         SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email, user_session.session.language_code, num_of_generated_reports)
       end
     end
