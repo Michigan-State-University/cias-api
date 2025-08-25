@@ -102,7 +102,8 @@ group :test do
   gem 'action-cable-testing', '~> 0.6.1'
   gem 'rspec-benchmark'
   gem 'benchmark-ips'
-  gem 'webmock'
+  gem 'webmock'# only version that is working on AWS
+  gem 'wkhtmltopdf-heroku', '2.12.6.0'
 end
 
 group :production do
