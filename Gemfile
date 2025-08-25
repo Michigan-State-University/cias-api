@@ -93,7 +93,7 @@ end
 
 group :test, :production do
   # only version that is working on AWS
-  gem 'wkhtmltopdf-heroku', '2.12.6.0'
+  gem 'wkhtmltopdf-heroku', '3.0.0'
 end
 
 group :test do
