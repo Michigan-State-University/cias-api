@@ -638,7 +638,7 @@ GEM
       ostruct
     with_env (1.1.0)
     wkhtmltopdf-binary (0.12.6.8)
-    wkhtmltopdf-heroku (2.12.6.0)
+    wkhtmltopdf-heroku (3.0.0)
     xml-simple (1.1.9)
       rexml
     zeitwerk (2.6.18)
@@ -732,7 +732,7 @@ DEPENDENCIES
   webmock
   wicked_pdf
   wkhtmltopdf-binary
-  wkhtmltopdf-heroku (= 2.12.6.0)
+  wkhtmltopdf-heroku (= 3.0.0)
 
 RUBY VERSION
    ruby 3.1.4p223
