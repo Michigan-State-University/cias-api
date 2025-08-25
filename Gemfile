@@ -91,6 +91,11 @@ group :development do
   gem 'wkhtmltopdf-binary'
 end
 
+group :test, :production do
+  # only version that is working on AWS
+  gem 'wkhtmltopdf-heroku', '2.12.6.0'
+end
+
 group :test do
   gem 'factory_bot_rails'
   gem 'rspec-rails'
@@ -107,6 +112,4 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
-  # only version that is working on AWS
-  gem 'wkhtmltopdf-heroku', '2.12.6.0'
 end
