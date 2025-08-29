@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       registrations: 'v1/auth/registrations',
       sessions: 'v1/auth/sessions'
     }
+    resource :ping, only: [:show], controller: :pings
 
     concern :narrator_changeable do |options|
       member do
