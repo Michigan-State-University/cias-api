@@ -276,6 +276,8 @@ Rails.application.routes.draw do
         resources :messages, only: %i[index], controller: 'conversations/messages'
       end
 
+      get 'ping', to: 'conversations#ping'
+
       scope '/intervention/:id', as: :intervention do
         resources :navigators, controller: 'interventions/navigators', only: %i[index destroy create], param: :navigator_id
         resource :navigator_setup, only: %i[show update], controller: 'interventions/navigator_setups'

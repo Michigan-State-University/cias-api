@@ -15,7 +15,7 @@ class NotificationChannel < ApplicationCable::Channel
 
   def unsubscribed
     stop_all_streams
-    current_user.update!(online: false)
+    current_user.reload.update!(online: false)
     update_navigator_availability
   end
 
