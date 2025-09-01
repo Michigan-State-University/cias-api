@@ -17,7 +17,6 @@ Rails.application.routes.draw do
       registrations: 'v1/auth/registrations',
       sessions: 'v1/auth/sessions'
     }
-    resource :ping, only: [:show], controller: :pings
 
     concern :narrator_changeable do |options|
       member do
@@ -276,6 +275,8 @@ Rails.application.routes.draw do
         post 'generate_transcript', controller: '/v1/live_chat/conversations'
         resources :messages, only: %i[index], controller: 'conversations/messages'
       end
+
+      get 'ping', to: 'conversations#ping'
 
       scope '/intervention/:id', as: :intervention do
         resources :navigators, controller: 'interventions/navigators', only: %i[index destroy create], param: :navigator_id

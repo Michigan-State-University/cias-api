@@ -30,6 +30,10 @@ class V1::LiveChat::ConversationsController < V1Controller
     render status: :created
   end
 
+  def ping
+    render json: { message: 'Reauthentication successful' }, status: :ok
+  end
+
   private
 
   def can_generate_transcript?
