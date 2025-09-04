@@ -18,6 +18,10 @@ Rails.application.routes.draw do
       sessions: 'v1/auth/sessions'
     }
 
+    scope :auth do
+      get 'ping', to: '/v1#ping'
+    end
+
     concern :narrator_changeable do |options|
       member do
         resources :change_narrator,
@@ -275,8 +279,6 @@ Rails.application.routes.draw do
         post 'generate_transcript', controller: '/v1/live_chat/conversations'
         resources :messages, only: %i[index], controller: 'conversations/messages'
       end
-
-      get 'ping', to: 'conversations#ping'
 
       scope '/intervention/:id', as: :intervention do
         resources :navigators, controller: 'interventions/navigators', only: %i[index destroy create], param: :navigator_id

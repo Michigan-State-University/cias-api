@@ -32,6 +32,10 @@ class V1Controller < ApplicationController
     end
   end
 
+  def ping
+    render json: { status: 'ok', timestamp: Time.current }
+  end
+
   private
 
   def authenticate_user!
