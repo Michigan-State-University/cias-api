@@ -33,7 +33,7 @@ class V1Controller < ApplicationController
   end
 
   def ping
-    render json: { status: 'ok', timestamp: Time.current }
+    render json: { status: 'Reauthentication successful', timestamp: Time.current }
   end
 
   private
