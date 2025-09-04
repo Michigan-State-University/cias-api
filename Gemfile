@@ -30,7 +30,7 @@ gem 'google-protobuf', '~> 3.25.5'
 gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
 gem 'metainspector', '~> 5.5'
-gem 'nokogiri', '>= 1.18.8'
+gem 'nokogiri', '>= 1.18.9'
 gem 'oj'
 gem 'pagy', '~> 4.0'
 gem 'phonelib'
@@ -42,7 +42,7 @@ gem 'sidekiq', '>= 7.2.4'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'
-gem 'rack', '>= 3.1.12'
+gem 'rack', '>= 3.1.16'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.6.1'
 gem 'secure_headers'
@@ -91,6 +91,11 @@ group :development do
   gem 'wkhtmltopdf-binary'
 end
 
+group :test, :production do
+  # only version that is working on AWS
+  gem 'wkhtmltopdf-heroku', '3.0.0'
+end
+
 group :test do
   gem 'factory_bot_rails'
   gem 'rspec-rails'
@@ -107,6 +112,4 @@ end
 
 group :production do
   gem 'aws-sdk-s3'
-  # only version that is working on AWS
-  gem 'wkhtmltopdf-heroku', '2.12.6.0'
 end

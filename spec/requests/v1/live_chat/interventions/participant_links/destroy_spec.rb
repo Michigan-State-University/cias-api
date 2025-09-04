@@ -41,7 +41,7 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigator_setups/participa
     it 'return correct status and msg' do
       request
       expect(response).to have_http_status(:not_found)
-      expect(json_response['message']).to include("Couldn't find Intervention with 'id'=#{intervention.id}")
+      expect(json_response['message']).to include("Couldn't find Intervention with 'id'=\"#{intervention.id}\"")
     end
   end
 
