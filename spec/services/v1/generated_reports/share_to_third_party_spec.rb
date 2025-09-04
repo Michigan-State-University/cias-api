@@ -49,8 +49,8 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
       expect(SendNewReportNotificationJob).to have_been_enqueued.at(30.seconds.from_now)
                                                                 .with(
                                                                   new_user.email,
-                                                                  number_of_generated_reports,
-                                                                  { locale: user_session.session.language_code }
+                                                                  user_session.session.language_code,
+                                                                  number_of_generated_reports
                                                                 )
 
       expect(new_user).to have_attributes(

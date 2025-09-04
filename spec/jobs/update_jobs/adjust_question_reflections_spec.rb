@@ -2,7 +2,7 @@
 
 RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
   include ActiveJob::TestHelper
-  subject { described_class.perform_now(question1, prev_variable) }
+  subject { described_class.perform_now(question1, prev_variable, current_variable) }
 
   let(:default_narrator_settings) do
     {
@@ -65,6 +65,7 @@ RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
 
   context 'when Reflectable Question variable changes' do
     let!(:prev_variable) { 'var' }
+    let!(:current_variable) { 'new_var' }
 
     before do
       question1.update!(
@@ -73,7 +74,7 @@ RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
             { payload: 'a1', value: '1' },
             { payload: 'a2', value: '2' }
           ],
-          variable: { name: 'new_var' }
+          variable: { name: current_variable }
         }
       )
       subject
@@ -84,7 +85,7 @@ RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
         question2.reload.narrator['blocks'].pluck('reflections').map do |reflection|
           reflection.pluck('variable')
         end.flatten
-      ).to include('new_var', 'new_var')
+      ).to include(current_variable, current_variable)
     end
   end
 end
