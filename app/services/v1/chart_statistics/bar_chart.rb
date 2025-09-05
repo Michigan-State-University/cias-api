@@ -15,7 +15,6 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
     periodical_statistics(aggregated_data, patterns, default_pattern, chart)
   end
 
-  # rubocop:disable Lint/ShadowingOuterLocalVariable
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
       statistics_query = charts_data_collection

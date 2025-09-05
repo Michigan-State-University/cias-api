@@ -6,6 +6,7 @@ class V1::LiveChat::Conversations::GenerateTranscript
   include CsvHelper
   include DateTimeInterface
   include CsvHelper
+
   attr_reader :csv_content
 
   def self.call(record)

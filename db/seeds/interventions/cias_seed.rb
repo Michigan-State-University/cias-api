@@ -31,6 +31,7 @@ return puts '# Will not pollute database. Generator is disabled on this environm
 
 class DBSeed
   extend FactoryBot::Syntax::Methods
+
   create_participants_and_researchers(NUM_OF_PARTICIPANTS, NUM_OF_RESEARCHERS)
 
   admin_email = "cias-team+admin_#{ENV.fetch('APP_HOSTNAME')}@htdevelopers.com".gsub(/[^0-9A-Za-z_\-@.+]/, '')

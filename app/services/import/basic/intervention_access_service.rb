@@ -2,6 +2,7 @@
 
 class Import::Basic::InterventionAccessService
   include ImportOperations
+
   def self.call(intervention_id, access_hash)
     new(
       intervention_id,

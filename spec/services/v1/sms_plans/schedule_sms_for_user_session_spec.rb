@@ -3,6 +3,7 @@
 RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   include ActiveJob::TestHelper
   include Rails.application.routes.url_helpers
+
   subject { described_class.call(user_session) }
 
   let(:intervention) { create(:intervention, :published) }

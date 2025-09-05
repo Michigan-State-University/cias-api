@@ -62,7 +62,9 @@ class V1::GeneratedReports::ShareToParticipant
   end
 
   def participant_report_answer
-    @participant_report_answer ||= Answer.find_by(
+    return @participant_report_answer if defined?(@participant_report_answer)
+
+    @participant_report_answer = Answer.find_by(
       type: 'Answer::ParticipantReport',
       user_session_id: user_session.id
     )

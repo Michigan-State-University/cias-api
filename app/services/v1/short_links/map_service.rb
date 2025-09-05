@@ -51,7 +51,9 @@ class V1::ShortLinks::MapService
   end
 
   def user_intervention
-    @user_intervention ||= UserIntervention.find_by(user_id: current_user&.id, intervention_id: intervention.id)
+    return @user_intervention if defined?(@user_intervention)
+
+    @user_intervention = UserIntervention.find_by(user_id: current_user&.id, intervention_id: intervention.id)
   end
 
   def check_intervention_status

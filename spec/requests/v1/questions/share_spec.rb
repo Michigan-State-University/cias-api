@@ -89,7 +89,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
           expect(response[:data]).to be_nil
         end
 
-        include_examples 'records are created'
+        it_behaves_like 'records are created'
       end
 
       context 'when user is team admin' do
@@ -106,7 +106,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
             expect(response[:data]).to be_nil
           end
 
-          include_examples 'records are created'
+          it_behaves_like 'records are created'
         end
 
         context 'one researcher isn\'t from team' do
@@ -124,7 +124,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
             expect(response).to have_http_status(:not_found)
           end
 
-          include_examples 'no records created'
+          it_behaves_like 'no records created'
         end
       end
 
@@ -138,7 +138,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
             expect(response).to have_http_status(:not_found)
           end
 
-          include_examples 'no records created'
+          it_behaves_like 'no records created'
         end
 
         context 'when researcher belongs to team' do
@@ -153,7 +153,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
               expect(response[:data]).to be_nil
             end
 
-            include_examples 'records are created'
+            it_behaves_like 'records are created'
           end
 
           context 'when params are improper' do
@@ -171,7 +171,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
                 expect(response).to have_http_status(:not_found)
               end
 
-              include_examples 'no records created'
+              it_behaves_like 'no records created'
             end
 
             context 'one question doesn\'t belong to current researcher' do
@@ -195,7 +195,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
                 expect(response).to have_http_status(:not_found)
               end
 
-              include_examples 'no records created'
+              it_behaves_like 'no records created'
             end
 
             context 'params are not given' do
@@ -212,7 +212,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
                   expect(response).to have_http_status(:not_found)
                 end
 
-                include_examples 'no records created'
+                it_behaves_like 'no records created'
               end
 
               context 'only researchers_ids are given' do
@@ -228,7 +228,7 @@ RSpec.describe 'POST /v1/questions/share', type: :request do
                   expect(response).to have_http_status(:not_found)
                 end
 
-                include_examples 'no records created'
+                it_behaves_like 'no records created'
               end
             end
           end

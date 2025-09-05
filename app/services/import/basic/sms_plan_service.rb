@@ -2,6 +2,7 @@
 
 class Import::Basic::SmsPlanService
   include ImportOperations
+
   attr_reader :session_id, :sms_plan_hash
 
   def self.call(session_id, sms_plan_hash)

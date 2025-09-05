@@ -45,7 +45,9 @@ class V1::SmsLinksController < V1Controller
   end
 
   def sms_links_user
-    @sms_links_user ||= SmsLinksUser.find_by(verify_params)
+    return @sms_links_user if defined?(@sms_links_user)
+
+    @sms_links_user = SmsLinksUser.find_by(verify_params)
   end
 
   def verify_params

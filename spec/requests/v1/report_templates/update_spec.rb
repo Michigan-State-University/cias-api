@@ -150,7 +150,7 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
 
     it 'correctly deletes report template id from third party questions' do
       request
-      expect(third_party_question.reload.body_data.map { |data| data['report_template_ids'] }).to all(eq [other_report_template.id])
+      expect(third_party_question.reload.body_data.pluck('report_template_ids')).to all(eq [other_report_template.id])
     end
   end
 end
