@@ -68,9 +68,9 @@ class V1::Sms::Replay
     session = SmsCode.find_by(sms_code: message)&.session
     return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, nil) unless session
 
-    intervention_ids = session.intervention.user_intervention_ids
+    user_intervention_ids = session.intervention.user_intervention_ids
     possible_user_ids = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number }).pluck(:id)
-    @user = UserIntervention.find_by(id: intervention_ids, user_id: possible_user_ids)&.user
+    @user = UserIntervention.find_by(id: user_intervention_ids, user_id: possible_user_ids)&.user
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
