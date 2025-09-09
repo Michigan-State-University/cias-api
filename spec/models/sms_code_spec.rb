@@ -26,7 +26,7 @@ RSpec.describe SmsCode, type: :model do
       end
 
       it 'does not validate uniqueness of sms_code' do
-        existing_sms_code = create(:sms_code, sms_code: 'DUPLICATE', active: false)
+        create(:sms_code, sms_code: 'DUPLICATE', active: false)
         subject.sms_code = 'DUPLICATE'
         expect(subject).to be_valid
       end
