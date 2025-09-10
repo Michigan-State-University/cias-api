@@ -27,10 +27,9 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
   end
 
   def generate_hash
-    Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, label| hash[label] = 0 } }.tap do |hash|
+    Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |label_hash, label| label_hash[label] = 0 } }.tap do |hash|
       statistics = charts_data_collection.group(:chart_id, :label).pluck('chart_statistics.chart_id, chart_statistics.label, COUNT(chart_statistics.label)')
       statistics.each { |data_statistic| hash[data_statistic[0]][data_statistic[1]] = data_statistic[2] }
     end
   end
-  # rubocop:enable Lint/ShadowingOuterLocalVariable
 end

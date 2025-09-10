@@ -16,7 +16,13 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   end
 
   def generate_hash
-    Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, date| hash[date] = Hash.new { |hash, label| hash[label] = 0 } } }.tap do |hash|
+    nested_hash = Hash.new do |hash, chart_id|
+      hash[chart_id] = Hash.new do |date_hash, date|
+        date_hash[date] = Hash.new { |label_hash, label| label_hash[label] = 0 }
+      end
+    end
+
+    nested_hash.tap do |hash|
       statistics_query = charts_data_collection
                            .joins('LEFT JOIN charts ON chart_statistics.chart_id = charts.id')
                            .group('chart_statistics.chart_id, chart_statistics.label, period_label, charts.interval_type')
@@ -38,7 +44,6 @@ class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
       end
     end
   end
-  # rubocop:enable Lint/ShadowingOuterLocalVariable
 
   def periodical_statistics(aggregated_data, patterns, default_pattern, chart)
     statistics = []
