@@ -171,7 +171,7 @@ class V1::Sms::Replay
     UserSessionJobs::ScheduleDailyMessagesJob.perform_later(user_session.id)
   end
 
-  def validate_answer_for_question(question, answer)
+  def validate_answer_for_question?(question, answer)
     accepted_answers = question.accepted_answers
     return true if question.accepted_answers.blank?
 

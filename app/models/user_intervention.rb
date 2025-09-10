@@ -21,7 +21,7 @@ class UserIntervention < ApplicationRecord
     user_sessions.select('DISTINCT ON("session_id") *').order(:session_id, created_at: :desc, id: :desc)
   end
 
-  def contain_multiple_fill_session
+  def contain_multiple_fill_session?
     sessions.multiple_fill.any?
   end
 

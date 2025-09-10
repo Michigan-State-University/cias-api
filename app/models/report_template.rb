@@ -78,7 +78,7 @@ class ReportTemplate < ApplicationRecord
     end
   end
 
-  def report_for_changed_from_third_party
+  def report_for_changed_from_third_party?
     changes_to_save['report_for']&.first == 'third_party'
   end
 end
