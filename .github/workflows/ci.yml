@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt install libffi7
-          gem install bundler -v 2.4.22
+          gem install bundler -v 2.6.9
           bundle config set path 'vendor/bundle'
           bundle install
 
