@@ -85,4 +85,4 @@ es:
     wrong_message: 'Mensaje equivocado'
     already_signed: 'Ya estás registrado en esta sesión'
     cannot_assign_to_many_campaigns: 'No puedes estar inscrito en muchas campañas de SMS'
-    session_not_found: 'No existe tal sesión'
+    session_not_found: "¡Uy! Ese código no coincide con ninguno de nuestros planes de texto. Revisa la ortografía y asegúrate de que las letras estén en mayúsculas y minúsculas."
