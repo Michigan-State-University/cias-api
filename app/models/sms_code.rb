@@ -9,9 +9,9 @@ class SmsCode < ApplicationRecord
   belongs_to :health_clinic, inverse_of: :sms_codes, optional: true
 
   validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: -> { active }
-  validate :status_cannot_be_start_or_stop, if: -> { active }
+  validate :sms_code_cannot_be_protected_word, if: -> { active }
 
-  def status_cannot_be_start_or_stop
+  def sms_code_cannot_be_protected_word
     return if sms_code.blank?
     return unless TWILIO_SPECIAL_CODES.any? { |v| sms_code.casecmp?(v) }
 
