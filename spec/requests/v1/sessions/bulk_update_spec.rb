@@ -86,12 +86,12 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', 
       end
 
       it 'returns unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:not_found)
       end
 
       it 'returns error message' do
         response_body = response.parsed_body
-        expect(response_body['message']).to eq('Validation failed: Some sessions not found or unauthorized')
+        expect(response_body['message']).to eq('Some sessions not found or unauthorized')
       end
     end
 
@@ -114,7 +114,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', 
       end
 
       it 'returns unprocessable entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:not_found)
       end
     end
 

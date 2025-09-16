@@ -90,11 +90,7 @@ class V1::SessionsController < V1Controller
 
     sessions_to_update = session_service.sessions.where(id: session_ids)
 
-    if sessions_to_update.count != session_ids.count
-      session = Session.new
-      session.errors.add(:base, 'Some sessions not found or unauthorized')
-      raise ActiveRecord::RecordInvalid, session
-    end
+    raise ActiveRecord::RecordNotFound, 'Some sessions not found or unauthorized' if sessions_to_update.count != session_ids.count
 
     SqlQuery.new(
       'resource/session_bulk_update',
