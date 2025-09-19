@@ -7,6 +7,7 @@ class Clone::SmsPlan < Clone::Base
       outcome.save!
       create_sms_variants
       create_alert_phones
+      create_sms_links
     end
     outcome
   end
@@ -24,6 +25,12 @@ class Clone::SmsPlan < Clone::Base
 
     source.alert_phones.each do |alert_phone|
       outcome.alert_phones << AlertPhone.new(sms_plan: outcome, phone: alert_phone.phone)
+    end
+  end
+
+  def create_sms_links
+    source.sms_links.each do |sms_link|
+      outcome.sms_links << SmsLink.new(sms_plan: outcome, url: sms_link.url, link_type: sms_link.link_type, variable: sms_link.variable)
     end
   end
 end
