@@ -33,7 +33,7 @@ class Hl7::PatientDataMapper
   private
 
   def date_now
-    DateTime.now.strftime('%Y%m%d%H%M')
+    DateTime.now.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
   end
 
   def dob_in_correct_format

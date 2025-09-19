@@ -39,7 +39,7 @@ class Hl7::ReportMapper
   end
 
   def finish_date
-    report.created_at.strftime('%Y%m%d%H%M')
+    report.created_at.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
   end
 
   def hfhs_patient_id

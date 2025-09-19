@@ -34,6 +34,6 @@ class Hl7::AnswersMapper
   end
 
   def date_of_answer
-    @date_of_answer ||= user_session.finished_at.strftime('%Y%m%d%H%M')
+    @date_of_answer ||= user_session.finished_at.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
   end
 end

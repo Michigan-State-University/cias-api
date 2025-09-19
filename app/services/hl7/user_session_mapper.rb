@@ -36,6 +36,6 @@ class Hl7::UserSessionMapper
   end
 
   def finished_date
-    user_session.finished_at.strftime('%Y%m%d%H%M')
+    user_session.finished_at.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
   end
 end
