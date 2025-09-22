@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', type: :request do
+RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/update_all_schedules', type: :request do
   let(:admin) { create(:user, :confirmed, :admin) }
   let(:researcher) { create(:user, :confirmed, :researcher) }
   let(:participant) { create(:user, :confirmed, :participant) }
@@ -15,25 +15,14 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', 
 
   let(:valid_params) do
     {
-      sessions: [
-        {
-          id: session1.id,
-          schedule: 'after_fill',
-          schedule_payload: nil,
-          schedule_at: nil
-        },
-        {
-          id: session2.id,
-          schedule: 'exact_date',
-          schedule_payload: nil,
-          schedule_at: '2025-12-25T10:00:00Z'
-        }
-      ]
+      schedule: 'after_fill',
+      schedule_payload: nil,
+      schedule_at: nil
     }
   end
 
   let(:request) do
-    patch "/v1/interventions/#{intervention.id}/sessions/bulk_update",
+    patch "/v1/interventions/#{intervention.id}/sessions/update_all_schedules",
           params: valid_params,
           headers: headers
   end
@@ -46,84 +35,38 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', 
         expect(response).to have_http_status(:success)
       end
 
-      it 'updates the sessions' do
+      it 'updates all sessions with the same schedule' do
         session1.reload
         session2.reload
+        session3.reload
 
         expect(session1.schedule).to eq('after_fill')
-        expect(session2.schedule).to eq('exact_date')
-        expect(session2.schedule_at.to_date).to eq(Date.parse('2025-12-25'))
+        expect(session2.schedule).to eq('after_fill')
+        expect(session3.schedule).to eq('after_fill')
       end
 
-      it 'returns updated sessions in response' do
+      it 'returns all updated sessions in response' do
         response_body = response.parsed_body
         expect(response_body['data']).to be_an(Array)
-        expect(response_body['data'].length).to eq(2)
+        expect(response_body['data'].length).to eq(3)
 
         session_ids = response_body['data'].pluck('id')
-        expect(session_ids).to contain_exactly(session1.id, session2.id)
+        expect(session_ids).to contain_exactly(session1.id, session2.id, session3.id)
       end
     end
 
-    context 'when session does not belong to intervention' do
-      let(:other_intervention) { create(:intervention) }
-      let(:other_session) { create(:session, intervention: other_intervention) }
-      let(:invalid_params) do
+    context 'with schedule_at parameter' do
+      let(:schedule_params) do
         {
-          sessions: [
-            {
-              id: other_session.id,
-              schedule: 'after_fill'
-            }
-          ]
+          schedule: 'exact_date',
+          schedule_payload: nil,
+          schedule_at: '2025-12-25T10:00:00Z'
         }
       end
 
       before do
-        patch "/v1/interventions/#{intervention.id}/sessions/bulk_update",
-              params: invalid_params,
-              headers: headers
-      end
-
-      it 'returns unprocessable entity status' do
-        expect(response).to have_http_status(:not_found)
-      end
-
-      it 'returns error message' do
-        response_body = response.parsed_body
-        expect(response_body['message']).to eq('Some sessions not found or unauthorized')
-      end
-    end
-
-    context 'when session id does not exist' do
-      let(:invalid_params) do
-        {
-          sessions: [
-            {
-              id: 'non-existent-id',
-              schedule: 'after_fill'
-            }
-          ]
-        }
-      end
-
-      before do
-        patch "/v1/interventions/#{intervention.id}/sessions/bulk_update",
-              params: invalid_params,
-              headers: headers
-      end
-
-      it 'returns unprocessable entity status' do
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context 'when no sessions provided' do
-      let(:empty_params) { { sessions: [] } }
-
-      before do
-        patch "/v1/interventions/#{intervention.id}/sessions/bulk_update",
-              params: empty_params,
+        patch "/v1/interventions/#{intervention.id}/sessions/update_all_schedules",
+              params: schedule_params,
               headers: headers
       end
 
@@ -131,9 +74,52 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', 
         expect(response).to have_http_status(:success)
       end
 
-      it 'returns empty array' do
-        response_body = response.parsed_body
-        expect(response_body['data']).to eq([])
+      it 'updates all sessions with the same schedule_at' do
+        session1.reload
+        session2.reload
+        session3.reload
+
+        expect(session1.schedule).to eq('exact_date')
+        expect(session2.schedule).to eq('exact_date')
+        expect(session3.schedule).to eq('exact_date')
+        expect(session1.schedule_at.to_date).to eq(Date.parse('2025-12-25'))
+        expect(session2.schedule_at.to_date).to eq(Date.parse('2025-12-25'))
+        expect(session3.schedule_at.to_date).to eq(Date.parse('2025-12-25'))
+      end
+    end
+
+    context 'with nested session parameters' do
+      let(:nested_params) do
+        {
+          session: {
+            schedule: 'days_after',
+            schedule_payload: 5,
+            schedule_at: nil
+          }
+        }
+      end
+
+      before do
+        patch "/v1/interventions/#{intervention.id}/sessions/update_all_schedules",
+              params: nested_params,
+              headers: headers
+      end
+
+      it 'returns success status' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'updates all sessions with nested parameters' do
+        session1.reload
+        session2.reload
+        session3.reload
+
+        expect(session1.schedule).to eq('days_after')
+        expect(session2.schedule).to eq('days_after')
+        expect(session3.schedule).to eq('days_after')
+        expect(session1.schedule_payload).to eq(5)
+        expect(session2.schedule_payload).to eq(5)
+        expect(session3.schedule_payload).to eq(5)
       end
     end
   end
@@ -168,8 +154,8 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/bulk_update', 
 
     before { request }
 
-    it 'returns not found status' do
-      expect(response).to have_http_status(:not_found)
+    it 'returns forbidden status' do
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

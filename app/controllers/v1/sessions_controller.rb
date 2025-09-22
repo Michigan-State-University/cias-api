@@ -79,25 +79,14 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(questions, 'ReflectableQuestion')
   end
 
-  def bulk_update
+  def update_all_schedules
     authorize! :update, Session
+    authorize! :update, intervention
 
     return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
 
-    session_ids = bulk_update_params[:sessions].pluck(:id)
-
-    return render json: serialized_response([]) if session_ids.empty?
-
-    sessions_to_update = session_service.sessions.where(id: session_ids)
-
-    raise ActiveRecord::RecordNotFound, 'Some sessions not found or unauthorized' if sessions_to_update.count != session_ids.count
-
-    SqlQuery.new(
-      'resource/session_bulk_update',
-      values: bulk_update_params[:sessions]
-    ).execute
-
-    updated_sessions = session_service.sessions.where(id: session_ids).order(:position)
+    update_attributes = schedule_update_params.to_h
+    updated_sessions = session_service.update_all_schedules(update_attributes)
 
     render json: serialized_response(updated_sessions)
   end
@@ -158,7 +147,12 @@ class V1::SessionsController < V1Controller
     session_params.except(:cat_tests)
   end
 
-  def bulk_update_params
-    params.permit(sessions: %i[id schedule schedule_payload schedule_at])
+  def schedule_update_params
+    # Handle both flat and nested parameter formats
+    if params[:session].present?
+      params.require(:session).permit(:schedule, :schedule_payload, :schedule_at)
+    else
+      params.permit(:schedule, :schedule_payload, :schedule_at)
+    end
   end
 end
