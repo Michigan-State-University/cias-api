@@ -87,41 +87,6 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/update_all_sch
         expect(session3.schedule_at.to_date).to eq(Date.parse('2025-12-25'))
       end
     end
-
-    context 'with nested session parameters' do
-      let(:nested_params) do
-        {
-          session: {
-            schedule: 'days_after',
-            schedule_payload: 5,
-            schedule_at: nil
-          }
-        }
-      end
-
-      before do
-        patch "/v1/interventions/#{intervention.id}/sessions/update_all_schedules",
-              params: nested_params,
-              headers: headers
-      end
-
-      it 'returns success status' do
-        expect(response).to have_http_status(:success)
-      end
-
-      it 'updates all sessions with nested parameters' do
-        session1.reload
-        session2.reload
-        session3.reload
-
-        expect(session1.schedule).to eq('days_after')
-        expect(session2.schedule).to eq('days_after')
-        expect(session3.schedule).to eq('days_after')
-        expect(session1.schedule_payload).to eq(5)
-        expect(session2.schedule_payload).to eq(5)
-        expect(session3.schedule_payload).to eq(5)
-      end
-    end
   end
 
   context 'when user is admin' do

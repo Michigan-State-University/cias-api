@@ -85,8 +85,8 @@ class V1::SessionsController < V1Controller
 
     return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
 
-    update_attributes = schedule_update_params.to_h
-    updated_sessions = session_service.update_all_schedules(update_attributes)
+    update_attributes = params.permit(:schedule, :schedule_payload, :schedule_at)
+    updated_sessions = session_service.update_all_schedules(update_attributes.to_h)
 
     render json: serialized_response(updated_sessions)
   end
@@ -145,14 +145,5 @@ class V1::SessionsController < V1Controller
 
   def session_params_for_create
     session_params.except(:cat_tests)
-  end
-
-  def schedule_update_params
-    # Handle both flat and nested parameter formats
-    if params[:session].present?
-      params.require(:session).permit(:schedule, :schedule_payload, :schedule_at)
-    else
-      params.permit(:schedule, :schedule_payload, :schedule_at)
-    end
   end
 end
