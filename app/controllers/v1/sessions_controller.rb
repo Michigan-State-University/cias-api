@@ -88,7 +88,7 @@ class V1::SessionsController < V1Controller
     update_attributes = params.permit(:schedule, :schedule_payload, :schedule_at)
     updated_sessions = session_service.update_all_schedules(update_attributes.to_h)
 
-    render json: serialized_response(updated_sessions)
+    render json: serialized_response(updated_sessions.reload)
   end
 
   private
