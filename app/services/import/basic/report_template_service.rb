@@ -2,6 +2,7 @@
 
 class Import::Basic::ReportTemplateService
   include ImportOperations
+
   def self.call(session_id, report_template_hash)
     new(
       session_id,

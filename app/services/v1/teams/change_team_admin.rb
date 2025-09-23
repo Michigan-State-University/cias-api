@@ -61,6 +61,6 @@ class V1::Teams::ChangeTeamAdmin
   end
 
   def current_admin_of_one_team?
-    current_team_admin.admins_teams.count == 1
+    current_team_admin.admins_teams.one?
   end
 end

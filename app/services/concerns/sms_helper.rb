@@ -85,7 +85,9 @@ module SmsHelper
   end
 
   def phone_answer
-    @phone_answer ||= user_session.answers.find_by(type: 'Answer::Phone')
+    return @phone_answer if defined?(@phone_answer)
+
+    @phone_answer = user_session.answers.find_by(type: 'Answer::Phone')
   end
 
   def session

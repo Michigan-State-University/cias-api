@@ -2,6 +2,7 @@
 
 class Import::Basic::ReportTemplateSectionService
   include ImportOperations
+
   def self.call(report_template_id, section_hash)
     new(
       report_template_id,

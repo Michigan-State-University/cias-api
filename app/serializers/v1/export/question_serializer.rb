@@ -3,6 +3,7 @@
 class V1::Export::QuestionSerializer < ActiveModel::Serializer
   include FileHelper
   include ExportHelper
+
   attributes :type, :settings, :position, :title, :subtitle, :narrator, :video_url, :formulas, :body, :original_text
 
   attribute :duplicated do

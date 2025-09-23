@@ -2,6 +2,7 @@
 
 class V1::Export::ReportTemplateVariantSerializer < ActiveModel::Serializer
   include FileHelper
+
   attributes :preview, :formula_match, :title, :content, :original_text
 
   attribute :image do

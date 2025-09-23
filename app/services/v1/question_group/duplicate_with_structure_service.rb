@@ -73,11 +73,11 @@ class V1::QuestionGroup::DuplicateWithStructureService
                                                                                                                                    session.intervention)
   end
 
-  def uniq_question_already_in_session(question, session)
+  def uniq_question_already_in_session?(question, session)
     session.questions.where(type: question.type).any? && question.type.in?(Question::UNIQUE_IN_SESSION)
   end
 
-  def validate_hfhs_access_and_uniqueness(question, intervention)
+  def validate_hfhs_access_and_uniqueness?(question, intervention)
     return true unless question.type.eql?('Question::HenryFordInitial')
     return false unless intervention.hfhs_access?
 

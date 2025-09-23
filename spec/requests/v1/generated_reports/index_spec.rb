@@ -89,7 +89,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
       it 'return participant report' do
         expect(json_response['reports_size']).to eq(1)
-        expect(json_response['data'].map { |data| data['id'] }).to include(participant_report.id.to_s)
+        expect(json_response['data'].pluck('id')).to include(participant_report.id.to_s)
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
       it 'return third party report' do
         expect(json_response['reports_size']).to eq(1)
-        expect(json_response['data'].map { |data| data['id'] }).to include(third_party_report.id.to_s)
+        expect(json_response['data'].pluck('id')).to include(third_party_report.id.to_s)
       end
     end
 
@@ -122,7 +122,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
         it 'returns list of report templates for a session' do
           expect(json_response['data'].size).to eq(1)
-          expect(json_response['data'].map { |data| data['id'] }).to include(participant_report.id.to_s).and \
+          expect(json_response['data'].pluck('id')).to include(participant_report.id.to_s).and \
             not_include(third_party_report.id.to_s)
         end
       end
@@ -136,7 +136,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
 
         it 'returns list of report templates for a session' do
           expect(json_response['data'].size).to eq(1)
-          expect(json_response['data'].map { |data| data['id'] }).to include(third_party_report.id.to_s).and \
+          expect(json_response['data'].pluck('id')).to include(third_party_report.id.to_s).and \
             not_include(participant_report.id.to_s)
         end
       end
@@ -204,7 +204,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
       it 'returns good first page' do
         expect(json_response['data'].size).to eq(1)
         expect(json_response['reports_size']).to eq(2)
-        expect(json_response['data'].map { |data| data['id'] }).to include(participant_report.id.to_s)
+        expect(json_response['data'].pluck('id')).to include(participant_report.id.to_s)
       end
     end
 
@@ -226,7 +226,7 @@ RSpec.describe 'GET /v1/generated_reports', type: :request do
       it 'returns good second page' do
         expect(json_response['data'].size).to eq(1)
         expect(json_response['reports_size']).to eq(2)
-        expect(json_response['data'].map { |data| data['id'] }).to include(third_party_report.id.to_s)
+        expect(json_response['data'].pluck('id')).to include(third_party_report.id.to_s)
       end
     end
   end

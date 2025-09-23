@@ -2,6 +2,7 @@
 
 class Import::Basic::ReportTemplateVariantService
   include ImportOperations
+
   def self.call(section_id, variant_hash)
     new(
       section_id,

@@ -102,15 +102,15 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
     user = user_session.user
     result = +'' # mutable empty string
-    if plan.include_full_name? && (user.first_name.present? && user.last_name.present?)
+    if plan.include_full_name? && user.first_name.present? && user.last_name.present?
       result << "#{user.full_name}\n"
     else
       # only one of these should be valid because we handle both include checks as separate statements
-      result << ("#{user.first_name.presence || I18n.t('sessions.sms_alerts.no_first_name_provided')}\n") if plan.include_first_name
-      result << ("#{user.last_name.presence || I18n.t('sessions.sms_alerts.no_last_name_provided')}\n") if plan.include_last_name
+      result << "#{user.first_name.presence || I18n.t('sessions.sms_alerts.no_first_name_provided')}\n" if plan.include_first_name
+      result << "#{user.last_name.presence || I18n.t('sessions.sms_alerts.no_last_name_provided')}\n" if plan.include_last_name
     end
-    result << ("#{user_email(user) || I18n.t('sessions.sms_alerts.no_email_provided')}\n") if plan.include_email
-    result << ("#{user.phone.present? ? user.phone.full_number : I18n.t('sessions.sms_alerts.no_phone_number_provided')}\n") if plan.include_phone_number
+    result << "#{user_email(user) || I18n.t('sessions.sms_alerts.no_email_provided')}\n" if plan.include_email
+    result << "#{user.phone.present? ? user.phone.full_number : I18n.t('sessions.sms_alerts.no_phone_number_provided')}\n" if plan.include_phone_number
     result + current_content
   end
 

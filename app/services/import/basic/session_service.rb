@@ -2,6 +2,7 @@
 
 class Import::Basic::SessionService
   include ImportOperations
+
   def self.call(intervention_id, session_hash)
     new(
       intervention_id,

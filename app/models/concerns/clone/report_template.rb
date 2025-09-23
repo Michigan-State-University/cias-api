@@ -6,7 +6,7 @@ class Clone::ReportTemplate
   def initialize(source, options)
     @source = source
     @outcome = @source.dup
-    @set_flag = options[:set_flag].nil? ? true : options.delete(:set_flag)
+    @set_flag = options[:set_flag].nil? || options.delete(:set_flag)
     options.delete(:session_variables)
     options.delete(:clean_formulas)
     options.delete(:hidden)

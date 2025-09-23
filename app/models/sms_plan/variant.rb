@@ -2,6 +2,7 @@
 
 class SmsPlan::Variant < ApplicationRecord
   include ::TranslationAuxiliaryMethods
+
   has_paper_trail
   belongs_to :sms_plan
   has_one_attached :attachment, dependent: :purge_later

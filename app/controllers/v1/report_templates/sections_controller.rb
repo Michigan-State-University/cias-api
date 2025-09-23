@@ -2,6 +2,7 @@
 
 class V1::ReportTemplates::SectionsController < V1Controller
   include Reorder
+
   load_and_authorize_resource :report_template
 
   def index

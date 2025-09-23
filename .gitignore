@@ -19,3 +19,4 @@ coverage/
 .DS_Store
 credentials_google.json
 certificates/
+dump.rdb

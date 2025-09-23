@@ -23,7 +23,7 @@ class LiveChat::Conversation < ApplicationRecord
       where(intervention_navigators: { user_id: user.id })
   }
 
-  def archived
+  def archived?
     !archived_at.nil?
   end
 

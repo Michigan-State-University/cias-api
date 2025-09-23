@@ -2,6 +2,7 @@
 
 class V1::LiveChat::Interventions::NavigatorsController < V1Controller
   include MessageHandler
+
   def index
     authorize! :read, Intervention
 

@@ -4,6 +4,7 @@ class BaseSerializer
   extend ActionDispatch::Routing::UrlFor
   extend Rails.application.routes.url_helpers
   include Rails.application.routes.url_helpers
+
   Oj.default_options = { mode: :rails }
 
   def initialize(obj)

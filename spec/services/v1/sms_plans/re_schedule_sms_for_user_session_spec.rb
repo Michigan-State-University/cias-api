@@ -2,6 +2,7 @@
 
 RSpec.describe V1::SmsPlans::ReScheduleSmsForUserSession do
   include ActiveJob::TestHelper
+
   subject { described_class.call(user_session) }
 
   let(:intervention) { create(:intervention, status: 'published', paused_at: 5.days.ago) }

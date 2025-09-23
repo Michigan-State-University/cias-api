@@ -14,10 +14,10 @@ class V1::Translations::VariableExclusiveTranslationService
     insert_variable_names(new_text, variable_names)
   end
 
-  private
-
   VARIABLE_NAME_PLACEHOLDER_TOKEN = '%%%'
   VARIABLE_NAME_PATTERN = /\.:[a-zA-Z0-9_]*?:\./
+
+  private
 
   def extract_variable_names(input_string)
     input_string.scan(VARIABLE_NAME_PATTERN)

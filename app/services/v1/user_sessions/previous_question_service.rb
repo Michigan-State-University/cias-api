@@ -17,7 +17,7 @@ class V1::UserSessions::PreviousQuestionService
   def call
     raise CatMh::ActionNotAvailable, I18n.t('user_sessions.errors.previous_question') if user_session.type == 'UserSession::CatMh'
 
-    @previous_answer = user_session.answers.where('created_at < ? AND draft = false', (answer&.created_at || DateTime.now))&.last
+    @previous_answer = user_session.answers.where('created_at < ? AND draft = false', answer&.created_at || DateTime.now)&.last
     Answer.where(question_id: previous_answer.question_id, user_session_id: user_session.id).update_all(draft: true) if previous_answer.present? # rubocop:disable Rails/SkipsModelValidations
 
     question = reflection_service.call(previous_question)

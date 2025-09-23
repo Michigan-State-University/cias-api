@@ -40,7 +40,7 @@ RSpec.shared_examples 'check change narrator service' do
 
     it do
       subject
-      expect(question.reload.narrator['blocks'].map { |b| b['animation'] }).to match(%w[pointDown listen congratulate restWeightShift acknowledge])
+      expect(question.reload.narrator['blocks'].pluck('animation')).to match(%w[pointDown listen congratulate restWeightShift acknowledge])
     end
   end
 

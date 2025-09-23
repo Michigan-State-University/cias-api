@@ -14,7 +14,7 @@ describe Api::Documo::SendMultipleFaxes do
   let(:fields) { {} }
 
   it 'service return status and body received from the API' do
-    stub_request(:post, "#{ENV.fetch('BASE_DOCUMO_URL')}/v1/faxes/multiple".to_s)
+    stub_request(:post, "#{ENV.fetch('BASE_DOCUMO_URL')}/v1/faxes/multiple")
       .to_return(status: 200, body: File.read('spec/fixtures/integrations/documo/send_multiple_faxes.json'))
     expect(subject.keys).to match_array(%i[status body])
     expect(subject[:status]).to eq 200

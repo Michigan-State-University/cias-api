@@ -2,6 +2,7 @@
 
 class V1::Export::SessionSerializer < ActiveModel::Serializer
   include ExportHelper
+
   attributes :settings, :position, :name, :schedule, :schedule_payload, :schedule_at, :formulas, :variable,
              :days_after_date_variable_name, :type, :original_text, :estimated_time, :multiple_fill, :body, :current_narrator,
              :welcome_message, :default_response, :google_language_id

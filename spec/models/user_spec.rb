@@ -140,11 +140,11 @@ describe User, type: :model do
     let(:user) { build_stubbed(:user, :health_system_admin) }
 
     context 'user belongs to health system' do
-      include_examples 'with health system'
+      it_behaves_like 'with health system'
     end
 
     context 'user doesn\'t belong to health system' do
-      include_examples 'without health system'
+      it_behaves_like 'without health system'
     end
   end
 
@@ -152,24 +152,24 @@ describe User, type: :model do
     let(:user) { build_stubbed(:user, :health_clinic_admin) }
 
     context 'user belongs to health clinic' do
-      include_examples 'with health clinic'
+      it_behaves_like 'with health clinic'
     end
 
     context 'user doesn\'t belong to health clinic' do
-      include_examples 'without health clinic'
+      it_behaves_like 'without health clinic'
     end
   end
 
   context 'user has role researcher' do
     let(:user) { build_stubbed(:user, :researcher) }
 
-    include_examples 'without team admin validations'
+    it_behaves_like 'without team admin validations'
   end
 
   context 'user has role guest' do
     let(:user) { build_stubbed(:user, :guest) }
 
-    include_examples 'without team admin validations'
+    it_behaves_like 'without team admin validations'
 
     context 'after create don\'t send a welcome email' do
       it {
@@ -201,13 +201,13 @@ describe User, type: :model do
   context 'user has role admin' do
     let(:user) { build_stubbed(:user, :admin) }
 
-    include_examples 'without team admin validations'
+    it_behaves_like 'without team admin validations'
   end
 
   context 'user has role participant' do
     let(:user) { build_stubbed(:user, :participant) }
 
-    include_examples 'without team admin validations'
+    it_behaves_like 'without team admin validations'
   end
 
   describe 'navigator' do
