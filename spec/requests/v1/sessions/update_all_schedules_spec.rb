@@ -15,9 +15,11 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/update_all_sch
 
   let(:valid_params) do
     {
-      schedule: 'after_fill',
-      schedule_payload: nil,
-      schedule_at: nil
+      session: {
+        schedule: 'after_fill',
+        schedule_payload: nil,
+        schedule_at: nil
+      }
     }
   end
 
@@ -58,9 +60,11 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/update_all_sch
     context 'with schedule_at parameter' do
       let(:schedule_params) do
         {
-          schedule: 'exact_date',
-          schedule_payload: nil,
-          schedule_at: '2025-12-25T10:00:00Z'
+          session: {
+            schedule: 'exact_date',
+            schedule_payload: nil,
+            schedule_at: '2025-12-25T10:00:00Z'
+          }
         }
       end
 

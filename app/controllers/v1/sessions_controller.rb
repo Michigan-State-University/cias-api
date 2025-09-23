@@ -85,7 +85,7 @@ class V1::SessionsController < V1Controller
 
     return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
 
-    update_attributes = params.permit(:schedule, :schedule_payload, :schedule_at)
+    update_attributes = params.require(:session).permit(:schedule, :schedule_payload, :schedule_at)
     updated_sessions = session_service.update_all_schedules(update_attributes.to_h)
 
     render json: serialized_response(updated_sessions.reload)
