@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Hl7::PatientDataMapper
+class Hl7::PatientDataMapper < Hl7::BaseMapper
   FIRST_SEGMENT_TYPE = 'MSH' # Message Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/MSH
   ENCODING_CHARACTERS = '^~\\&' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.2
   MSH_SENDING_APPLICATION = 'HTD' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.3
@@ -15,8 +15,8 @@ class Hl7::PatientDataMapper
   end
 
   def initialize(user_id, user_session_id, msh_message_type, msh_trigger_event)
+    super(user_session_id)
     @user = User.find(user_id)
-    @user_session = UserSession.find(user_session_id)
     @msh_message_type = msh_message_type # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0076
     @msh_trigger_event = msh_trigger_event # https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0003
   end
@@ -28,12 +28,12 @@ class Hl7::PatientDataMapper
     # rubocop:enable Layout/LineLength
   end
 
-  attr_reader :user, :user_session, :msh_message_type, :msh_trigger_event
+  attr_reader :user, :msh_message_type, :msh_trigger_event
 
   private
 
   def date_now
-    DateTime.now.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
+    DateTime.now.in_time_zone(report_timezone).strftime('%Y%m%d%H%M')
   end
 
   def dob_in_correct_format

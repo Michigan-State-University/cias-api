@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Hl7::ReportMapper
+class Hl7::ReportMapper < Hl7::BaseMapper
   FIRST_SEGMENT_TYPE = 'PV1' # Patient Visit -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/PV1
   PATIENT_CLASS = 'O' # Outpatient -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0004
 
@@ -18,8 +18,8 @@ class Hl7::ReportMapper
   end
 
   def initialize(generated_report_id, user_session_id)
+    super(user_session_id)
     @report = GeneratedReport.find(generated_report_id)
-    @user_session = UserSession.find(user_session_id)
   end
 
   def call
@@ -30,7 +30,7 @@ class Hl7::ReportMapper
     ]
   end
 
-  attr_reader :report, :user_session
+  attr_reader :report
 
   private
 
@@ -39,7 +39,7 @@ class Hl7::ReportMapper
   end
 
   def finish_date
-    report.created_at.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
+    report.created_at.in_time_zone(report_timezone).strftime('%Y%m%d%H%M')
   end
 
   def hfhs_patient_id

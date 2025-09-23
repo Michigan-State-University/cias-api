@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Hl7::UserSessionMapper
+class Hl7::UserSessionMapper < Hl7::BaseMapper
   FIRST_SEGMENT_TYPE = 'PV1' # Patient Visit -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/PV1
   PATIENT_CLASS = 'O' # 	Outpatient -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0004
 
@@ -14,10 +14,6 @@ class Hl7::UserSessionMapper
     new(user_session_id).call
   end
 
-  def initialize(user_session_id)
-    @user_session = UserSession.find(user_session_id)
-  end
-
   def call
     [
       Hl7::PatientDataMapper.call(user_session.user.id, user_session.id, MSH_MESSAGE_TYPE, MSH_TRIGGER_EVENT),
@@ -27,8 +23,6 @@ class Hl7::UserSessionMapper
     ].flatten
   end
 
-  attr_reader :user_session
-
   private
 
   def visit_id
@@ -36,6 +30,6 @@ class Hl7::UserSessionMapper
   end
 
   def finished_date
-    user_session.finished_at.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')
+    user_session.finished_at.in_time_zone(report_timezone).strftime('%Y%m%d%H%M')
   end
 end
