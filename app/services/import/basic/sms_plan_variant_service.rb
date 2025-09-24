@@ -2,6 +2,7 @@
 
 class Import::Basic::SmsPlanVariantService
   include ImportOperations
+
   attr_reader :sms_plan_variant_hash, :sms_plan_id, :position
 
   def self.call(sms_plan_id, sms_plan_variant_hash)

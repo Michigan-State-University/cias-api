@@ -2,6 +2,7 @@
 
 class Ability::Admin < Ability::Base
   include Ability::Generic::CollaboratorsAccess
+
   def definition
     super
     admin if role?(class_name)

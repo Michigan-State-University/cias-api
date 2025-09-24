@@ -2,6 +2,7 @@
 
 class V1::LiveChat::Interventions::HelpingMaterialsSerializer < V1Serializer
   include FileHelper
+
   attributes :id
 
   has_many :navigator_links, serializer: V1::LiveChat::Interventions::LinkSerializer

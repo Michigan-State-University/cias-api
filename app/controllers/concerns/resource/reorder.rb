@@ -2,6 +2,7 @@
 
 module Resource::Reorder
   extend ActiveSupport::Concern
+
   included do
     def move
       authorize! :update, reorder_scope_class

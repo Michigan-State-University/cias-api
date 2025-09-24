@@ -27,7 +27,7 @@ class V1::Notifications::TranscriptReady
     if object.is_a?(LiveChat::Conversation)
       {
         conversation_id: object.id,
-        archived: object.archived,
+        archived: object.archived?,
         transcript: object.transcript.attached? ? map_file_data(object.transcript) : nil
       }
     else

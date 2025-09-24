@@ -2,6 +2,7 @@
 
 RSpec.describe CloneJobs::Session, type: :job do
   include ActiveJob::TestHelper
+
   subject { described_class.perform_now(user, session) }
 
   let!(:user) { create(:user, :confirmed, :researcher) }

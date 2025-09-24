@@ -117,9 +117,9 @@ class V1::Sms::Replay
 
         question = Question.find(user_session.current_question_id)
 
-        answer_correct = validate_answer_for_question(question, message)
+        is_answer_correct = validate_answer_for_question?(question, message)
 
-        if answer_correct
+        if is_answer_correct
           V1::AnswerService.call(@user, user_session.id, question.id,
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
@@ -171,7 +171,7 @@ class V1::Sms::Replay
     UserSessionJobs::ScheduleDailyMessagesJob.perform_later(user_session.id)
   end
 
-  def validate_answer_for_question(question, answer)
+  def validate_answer_for_question?(question, answer)
     accepted_answers = question.accepted_answers
     return true if question.accepted_answers.blank?
 
