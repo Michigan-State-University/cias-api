@@ -14,7 +14,7 @@ describe Hl7::UserSessionMapper do
   let!(:question2) { create(:question_henry_ford, question_group: question_group) }
   let!(:answer1) { create(:answer_henry_ford, user_session: user_session, question: question1) }
   let!(:answer2) { create(:answer_henry_ford, user_session: user_session, question: question2) }
-  let(:finished_date) { user_session.finished_at.strftime('%Y%m%d%H%M') }
+  let(:finished_date) { user_session.finished_at.in_time_zone(ENV.fetch('HFH_REPORT_TIMEZONE', nil)).strftime('%Y%m%d%H%M') }
 
   context 'return correct data' do
     it {

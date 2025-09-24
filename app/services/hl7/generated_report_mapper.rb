@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Hl7::GeneratedReportMapper
+class Hl7::GeneratedReportMapper < Hl7::BaseMapper
   MSH_MESSAGE_TYPE = 'MDM' # Medical document management -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0076
   MSH_TRIGGER_EVENT = 'T02' # MDM/ACK - Original document notification and content -> https://hl7-definition.caristix.com/v2/HL7v2.5/Tables/0003
 
@@ -9,7 +9,7 @@ class Hl7::GeneratedReportMapper
   end
 
   def initialize(user_session_id, report_id)
-    @user_session = UserSession.find(user_session_id)
+    super(user_session_id)
     @report_id = report_id
   end
 
@@ -20,5 +20,5 @@ class Hl7::GeneratedReportMapper
     ].flatten
   end
 
-  attr_reader :user_session, :report_id
+  attr_reader :report_id
 end
