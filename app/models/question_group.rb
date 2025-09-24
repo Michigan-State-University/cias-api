@@ -17,19 +17,28 @@ class QuestionGroup < ApplicationRecord
 
   delegate :ability_to_update_for?, to: :session
 
-  attribute :sms_schedule, :jsonb, default: lambda {
-                                              {
-                                                time: {},
-                                                day_of_period: [],
-                                                questions_per_day: 1
-                                              }
-                                            }
+  attribute :sms_schedule, :jsonb
+
+  after_initialize :set_default_sms_schedule, if: :new_record?
   validates :sms_schedule,
             json: { schema: -> { File.read(Rails.root.join('db/schema/_common/sms_schedule.json').to_s) },
-                    message: ->(err) { err } }, if: -> { session&.type&.match?('Session::Sms') },
+                    message: ->(err) { err } }, if: -> { session&.type&.match?('Session::Sms') && !type.eql?('QuestionGroup::Initial') },
             allow_blank: true
 
   def finish?
     type == 'QuestionGroup::Finish'
+  end
+
+  private
+
+  def set_default_sms_schedule
+    return unless session&.type&.match?('Session::Sms')
+    return if sms_schedule.present?
+
+    self.sms_schedule = {
+      time: {},
+      day_of_period: [],
+      questions_per_day: 1
+    }
   end
 end

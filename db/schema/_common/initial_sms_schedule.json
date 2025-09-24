@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "period": { "type": "string" },
+    "start_from_first_question": { "type": "boolean" },
+    "questions_per_day": { "type": "integer" },
+    "number_of_repetitions": { "type": "integer" },
+    "overwrite_user_time_settings": { "type": "boolean" },
+    "day_of_period": {
+      "type": "array",
+      "items": [{
+        "type": "string"
+      }]
+    },
+    "time": {
+      "type": "object",
+      "properties": {
+        "exact": {
+          "type": "string"
+        },
+        "range": {
+          "type": "object",
+          "properties": {
+            "from": { "type": "string" },
+            "to": { "type": "string" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
