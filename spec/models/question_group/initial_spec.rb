@@ -42,7 +42,7 @@ RSpec.describe QuestionGroup::Initial, type: :model do
           questions_per_day: 2,
           number_of_repetitions: 3,
           overwrite_user_time_settings: false,
-          day_of_period: ['1', '3'],
+          day_of_period: %w[1 3],
           time: {
             exact: '9:00 AM'
           }
@@ -101,8 +101,8 @@ RSpec.describe QuestionGroup::Initial, type: :model do
 
     it 'orders by position' do
       groups = session.question_groups.reload
-      expect(groups.first).to eq initial_group  # position 0
-      expect(groups.second).to eq regular_group  # position 1
+      expect(groups.first).to eq initial_group # position 0
+      expect(groups.second).to eq regular_group # position 1
     end
   end
 end

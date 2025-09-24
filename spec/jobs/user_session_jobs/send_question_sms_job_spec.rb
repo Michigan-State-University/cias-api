@@ -108,15 +108,15 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           let!(:last_question) { create(:question_sms_information, question_group: question_group_initial, position: 2) }
 
           it 'increments number_of_repetitions when last question in initial group' do
-            expect {
+            expect do
               described_class.perform_now(user.id, last_question.id, user_session.id, false)
-            }.to change { user_session.reload.number_of_repetitions }.by(1)
+            end.to change { user_session.reload.number_of_repetitions }.by(1)
           end
 
           it 'does not increment number_of_repetitions when not last question in initial group' do
-            expect {
+            expect do
               described_class.perform_now(user.id, first_question.id, user_session.id, false)
-            }.not_to change { user_session.reload.number_of_repetitions }
+            end.not_to change { user_session.reload.number_of_repetitions }
           end
         end
 
@@ -124,9 +124,9 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           regular_question_group = create(:sms_question_group, session: session)
           regular_question = create(:question_sms, question_group: regular_question_group)
 
-          expect {
+          expect do
             described_class.perform_now(user.id, regular_question.id, user_session.id, false)
-          }.not_to change { user_session.reload.number_of_repetitions }
+          end.not_to change { user_session.reload.number_of_repetitions }
         end
       end
 
