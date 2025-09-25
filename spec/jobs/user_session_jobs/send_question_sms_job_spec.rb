@@ -108,8 +108,9 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           let!(:last_question) { create(:question_sms_information, question_group: question_group_initial, position: 2) }
 
           it 'increments number_of_repetitions when last question in initial group' do
+            lest_question_in_group = question_group_initial.questions.order(:position).last
             expect do
-              described_class.perform_now(user.id, last_question.id, user_session.id, false)
+              described_class.perform_now(user.id, lest_question_in_group.id, user_session.id, false)
             end.to change { user_session.reload.number_of_repetitions }.by(1)
           end
 
