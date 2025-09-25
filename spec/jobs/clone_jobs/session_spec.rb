@@ -437,8 +437,7 @@ RSpec.describe CloneJobs::Session, type: :job do
                     'variable' => 'var'
                   })
         ),
-        'type' => 'Reflection',
-        'session_id' => nil
+        'type' => 'Reflection'
       )
     end
   end
