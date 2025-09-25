@@ -421,7 +421,7 @@ RSpec.describe CloneJobs::Session, type: :job do
       subject
       intervention.reload
       blocks = intervention.sessions.last.questions.second.narrator['blocks']
-      
+
       expect(blocks).to include(
         a_hash_including(
           'question_id' => intervention.sessions.last.questions.first.id,
