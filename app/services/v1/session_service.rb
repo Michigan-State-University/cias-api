@@ -51,6 +51,16 @@ class V1::SessionService
     session_load(session_id).destroy! if intervention.draft?
   end
 
+  def update_all_schedules(schedule_attributes)
+    return sessions.order(:position) if schedule_attributes.empty?
+
+    # rubocop:disable Rails/SkipsModelValidations
+    intervention.sessions.update_all(schedule_attributes)
+    # rubocop:enable Rails/SkipsModelValidations
+
+    sessions.order(:position)
+  end
+
   def duplicate(session_id, new_intervention_id)
     new_intervention = Intervention.accessible_by(user.ability).find(new_intervention_id)
     old_session = session_load(session_id)
