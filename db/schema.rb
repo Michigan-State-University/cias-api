@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -159,11 +159,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "filled_at", precision: nil
+    t.uuid "user_session_id"
+    t.boolean "v2_record", default: false
+    t.boolean "regenerated", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
     t.index ["organization_id"], name: "index_chart_statistics_on_organization_id"
     t.index ["user_id"], name: "index_chart_statistics_on_user_id"
+    t.index ["user_session_id"], name: "index_chart_statistics_on_user_session_id"
   end
 
   create_table "charts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1082,6 +1086,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "chart_statistics", "user_sessions"
   add_foreign_key "collaborators", "interventions"
   add_foreign_key "collaborators", "users"
   add_foreign_key "consumption_results", "days"

@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::CreateForUserSessions
-  def self.call(chart_id)
-    new(chart_id).call
+  def self.call(chart_id, regenerate = false)
+    new(chart_id, regenerate).call
   end
 
-  def initialize(chart_id)
+  def initialize(chart_id, regenerate = false)
     @chart_id = chart_id
+    @regenerate = regenerate
   end
 
   def call
@@ -14,13 +15,13 @@ class V1::ChartStatistics::CreateForUserSessions
     user_sessions.each do |user_session|
       next if user_session.session.intervention.draft?
 
-      V1::ChartStatistics::Create.call(chart, user_session, organization)
+      V1::ChartStatistics::Create.call(chart, user_session, organization, regenerate)
     end
   end
 
   private
 
-  attr_reader :chart_id
+  attr_reader :chart_id, :regenerate
 
   def user_sessions
     UserSession.joins(session: [intervention: :organization]).where(
