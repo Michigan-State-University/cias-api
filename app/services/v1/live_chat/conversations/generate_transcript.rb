@@ -6,6 +6,7 @@ class V1::LiveChat::Conversations::GenerateTranscript
   include CsvHelper
   include DateTimeInterface
   include CsvHelper
+
   attr_reader :csv_content
 
   def self.call(record)
@@ -58,6 +59,6 @@ class V1::LiveChat::Conversations::GenerateTranscript
   end
 
   def conversation_duration(conversation)
-    conversation.archived ? time_diff(conversation.created_at, conversation.updated_at) : nil
+    conversation.archived? ? time_diff(conversation.created_at, conversation.updated_at) : nil
   end
 end

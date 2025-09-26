@@ -36,7 +36,7 @@ class V1::LiveChat::ConversationsController < V1Controller
     conversation = conversation_load
     return true unless conversation.transcript.attached?
 
-    conversation.archived ? (conversation.transcript.blob.created_at < conversation.archived_at) : true
+    conversation.archived? ? (conversation.transcript.blob.created_at < conversation.archived_at) : true
   end
 
   def conversation_load

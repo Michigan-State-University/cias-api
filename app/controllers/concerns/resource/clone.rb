@@ -2,6 +2,7 @@
 
 module Resource::Clone
   extend ActiveSupport::Concern
+
   included do
     def clone
       authorize! :update, model_constant

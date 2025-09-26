@@ -2,6 +2,7 @@
 
 class V1::LiveChat::Navigators::InvitationsController < V1Controller
   include MessageHandler
+
   skip_before_action :authenticate_user!, only: %i[confirm]
 
   def index
