@@ -15,6 +15,8 @@ class V1::ReportTemplates::GeneratePdfPreviewsController < V1Controller
   private
 
   def report_template
-    @report_template ||= ReportTemplate.accessible_by(current_ability).find_by(id: params[:report_template_id])
+    return @report_template if defined?(@report_template)
+
+    @report_template = ReportTemplate.accessible_by(current_ability).find_by(id: params[:report_template_id])
   end
 end

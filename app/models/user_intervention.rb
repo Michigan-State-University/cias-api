@@ -21,9 +21,11 @@ class UserIntervention < ApplicationRecord
     user_sessions.select('DISTINCT ON("session_id") *').order(:session_id, created_at: :desc, id: :desc)
   end
 
+  # rubocop:disable Naming/PredicateMethod
   def contain_multiple_fill_session
     sessions.multiple_fill.any?
   end
+  # rubocop:enable Naming/PredicateMethod
 
   def preview?
     user.role?('preview_session')

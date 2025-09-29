@@ -16,7 +16,7 @@ class V1::Intervention::PredefinedParticipants::VerifyService
       intervention_id: predefined_user_parameters.intervention_id,
       session_id: available_now_session(intervention, user_intervention)&.id,
       health_clinic_id: health_clinic_id,
-      multiple_fill_session_available: multiple_fill_session_available(user_intervention),
+      multiple_fill_session_available: multiple_fill_session_available?(user_intervention),
       user_intervention_id: user_intervention.id,
       lang: intervention.language_code
     }

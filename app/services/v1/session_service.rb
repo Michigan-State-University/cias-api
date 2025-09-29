@@ -51,6 +51,16 @@ class V1::SessionService
     session_load(session_id).destroy! if intervention.draft?
   end
 
+  def update_all_schedules(schedule_attributes)
+    return sessions.order(:position) if schedule_attributes.empty?
+
+    # rubocop:disable Rails/SkipsModelValidations
+    intervention.sessions.update_all(schedule_attributes)
+    # rubocop:enable Rails/SkipsModelValidations
+
+    sessions.order(:position)
+  end
+
   def duplicate(session_id, new_intervention_id)
     new_intervention = Intervention.accessible_by(user.ability).find(new_intervention_id)
     old_session = session_load(session_id)
@@ -73,7 +83,7 @@ class V1::SessionService
     intervention.sessions.order(:position)&.first
   end
 
-  def same_as_intervention_language(session_voice)
+  def same_as_intervention_language?(session_voice)
     voice_name = session_voice.google_tts_language.language_name
     google_lang_name = intervention.google_language.language_name
     # chinese languages are the only ones not following the convention so this check is needed...

@@ -79,6 +79,17 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(questions, 'ReflectableQuestion')
   end
 
+  def update_all_schedules
+    authorize! :update, Session
+    authorize! :update, intervention
+
+    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
+
+    updated_sessions = session_service.update_all_schedules(session_schedule_params.to_h)
+
+    render json: serialized_response(updated_sessions.reload)
+  end
+
   private
 
   def variable_filter_options
@@ -133,5 +144,9 @@ class V1::SessionsController < V1Controller
 
   def session_params_for_create
     session_params.except(:cat_tests)
+  end
+
+  def session_schedule_params
+    params.require(:session).permit(:schedule, :schedule_payload, :schedule_at)
   end
 end

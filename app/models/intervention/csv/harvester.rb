@@ -3,6 +3,7 @@
 class Intervention::Csv::Harvester
   include Intervention::Csv::Tlfb
   include DateTimeInterface
+
   DEFAULT_VALUE = 888
   VIDEO_STATS_KEYS = %i[video_url video_start video_end progress played_seconds].freeze
   attr_reader :sessions

@@ -8,7 +8,7 @@ class Api::EpicOnFhir::BaseService
 
     parsed_response = JSON.parse(response.body).deep_symbolize_keys
 
-    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.patient.not_found') if not_found_condition(parsed_response)
+    raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.patient.not_found') if not_found_condition?(parsed_response)
 
     parsed_response
   end
@@ -27,7 +27,7 @@ class Api::EpicOnFhir::BaseService
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
 
-  def not_found_condition(_response)
+  def not_found_condition?(_response)
     raise NotImplementedError, "subclass did not define #{__method__}"
   end
 end

@@ -33,9 +33,7 @@ RSpec.describe 'PATCH /v1/report_templates/:report_template_id/move_sections', t
     end
 
     it 'return sections in correct position' do
-      expect(json_response['included'].map do |section|
-               section['id']
-             end).to eql([report_template_section1.id, report_template_section3.id, report_template_section2.id])
+      expect(json_response['included'].pluck('id')).to eql([report_template_section1.id, report_template_section3.id, report_template_section2.id])
     end
   end
 
