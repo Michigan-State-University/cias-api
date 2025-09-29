@@ -46,8 +46,13 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     return if (user.pending_sms_answer && question.type == 'Question::Sms') || outdated_message
 
     # Handle case with no pending answers, send current question
+    return if number_of_repetitions_ended?(user_session)
+
     send_sms(user.full_number, question.subtitle)
-    user_session.update!(current_question_id: question.id) if question.type == 'Question::Sms'
+    user_session.assign_attributes(current_question_id: question.id) if question.type == 'Question::Sms'
+    user_session.assign_attributes(number_of_repetitions: (user_session.number_of_repetitions || 0) + 1) if should_increment_number_or_repetition?(question)
+
+    user_session.save!
 
     if question.type.match?('Question::SmsInformation')
       # Create answer
@@ -60,6 +65,27 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   end
 
   private
+
+  def number_of_repetitions_ended?(user_session)
+    initial_question_group = user_session.session.question_group_initial
+    return false if initial_question_group&.sms_schedule.blank?
+
+    max_repetitions = initial_question_group.sms_schedule['number_of_repetitions'].to_i
+    return false if max_repetitions.zero?
+
+    user_session.number_of_repetitions >= max_repetitions
+  end
+
+  def should_increment_number_or_repetition?(question)
+    return false unless question.question_group.type.eql?('QuestionGroup::Initial')
+    return false unless last_question_in_the_group?(question)
+
+    true
+  end
+
+  def last_question_in_the_group?(question)
+    question.question_group.questions.order(:position).last.id.eql?(question.id)
+  end
 
   def schedule_question_followups(user, question, user_session)
     # Get proper configuration

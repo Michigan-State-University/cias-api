@@ -421,23 +421,28 @@ RSpec.describe CloneJobs::Session, type: :job do
     it 'clones reflections from session' do
       subject
       intervention.reload
-      expect(intervention.sessions.last.questions.second.narrator['blocks'].first).to include(
-        'question_id' => intervention.sessions.last.questions.first.id,
-        'reflections' => include(
-          include({
-                    'text' => ['Test1'],
-                    'value' => '1',
-                    'type' => 'Speech',
-                    'variable' => 'var'
-                  }),
-          include({
-                    'text' => ['Test2'],
-                    'value' => '2',
-                    'type' => 'Speech',
-                    'variable' => 'var'
-                  })
-        ),
-        'type' => 'Reflection'
+      blocks = intervention.sessions.last.questions.second.narrator['blocks']
+
+      expect(blocks).to include(
+        a_hash_including(
+          'question_id' => intervention.sessions.last.questions.first.id,
+          'reflections' => array_including(
+            a_hash_including(
+              'text' => ['Test1'],
+              'value' => '1',
+              'type' => 'Speech',
+              'variable' => 'var'
+            ),
+            a_hash_including(
+              'text' => ['Test2'],
+              'value' => '2',
+              'type' => 'Speech',
+              'variable' => 'var'
+            )
+          ),
+          'type' => 'Reflection',
+          'action' => 'NO_ACTION'
+        )
       )
     end
   end
