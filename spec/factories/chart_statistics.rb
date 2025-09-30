@@ -5,6 +5,7 @@ FactoryBot.define do
     sequence(:label) { |s| "label_#{s}" }
     association(:organization)
     association(:user)
+    association(:user_session)
     association(:health_system)
     association(:health_clinic)
     association(:chart)
