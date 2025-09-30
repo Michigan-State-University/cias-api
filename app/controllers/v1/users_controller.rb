@@ -2,6 +2,7 @@
 
 class V1::UsersController < V1Controller
   include BlankParams
+
   skip_before_action :authenticate_user!, only: %i[confirm_logging_code confirm_terms]
 
   def index

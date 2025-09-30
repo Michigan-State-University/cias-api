@@ -70,7 +70,7 @@ class V1::QuestionGroup::ShareService
   def validate_uniqueness(question, question_group)
     return unless question.type.in?(Question::UNIQUE_IN_SESSION)
 
-    return unless question_type_exist_in_session(question, question_group)
+    return unless question_type_exist_in_session?(question, question_group)
 
     raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type)
   end
@@ -83,7 +83,7 @@ class V1::QuestionGroup::ShareService
     raise ActiveRecord::ActiveRecordError, (I18n.t 'duplication_with_structure.hfhs.access_violation')
   end
 
-  def question_type_exist_in_session(question, question_group)
+  def question_type_exist_in_session?(question, question_group)
     question_group.session.questions.where(type: question.type).any?
   end
 end

@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class V1::Translations::VariableExclusiveTranslationService
+  VARIABLE_NAME_PLACEHOLDER_TOKEN = '%%%'
+  VARIABLE_NAME_PATTERN = /\.:[a-zA-Z0-9_]*?:\./
+
   def initialize(translation_service)
     @translator = translation_service
   end
@@ -15,9 +18,6 @@ class V1::Translations::VariableExclusiveTranslationService
   end
 
   private
-
-  VARIABLE_NAME_PLACEHOLDER_TOKEN = '%%%'
-  VARIABLE_NAME_PATTERN = /\.:[a-zA-Z0-9_]*?:\./
 
   def extract_variable_names(input_string)
     input_string.scan(VARIABLE_NAME_PATTERN)
