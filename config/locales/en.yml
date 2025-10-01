@@ -128,6 +128,7 @@ en:
       no_phone_number_provided: "Phone number not provided"
     default_response: 'You have entered an incorrect code. Please try again.'
     welcome_message: 'You are now enrolled. You will start receiving messages soon.'
+    completion_message: 'Thank you for completing this session!'
   users:
     deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
