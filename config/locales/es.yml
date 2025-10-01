@@ -7,6 +7,9 @@ es:
       title: '<h2>Escriba aquí el título</h2>'
   sessions:
     reminder: "¡Hola! Su próxima sesión ya está disponible. Por favor, haga clic en el enlace de abajo para continuar su progreso en %{intervention_name} %{link}"
+    default_response: 'Ha introducido un código incorrecto. Inténtelo de nuevo.'
+    welcome_message: 'Ya estás inscrito. Pronto recibirás mensajes.'
+    completion_message: '¡Gracias por completar esta sesión!'
   predefined_participant:
     invitation: "¡Hola! Por favor, haga clic en el enlace de abajo para comenzar o continuar su progreso en %{intervention_name} %{link}"
   generated_report_mailer:
