@@ -15,6 +15,7 @@ class LiveChat::Message < ApplicationRecord
   after_create :create_notification
 
   has_encrypted :content
+  audited except: %i[content content_ciphertext]
 
   private
 

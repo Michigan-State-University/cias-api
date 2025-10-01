@@ -5,6 +5,7 @@ class Invitation < ApplicationRecord
   belongs_to :invitable, polymorphic: true
   belongs_to :health_clinic, optional: true
 
+  audited except: %i[email email_ciphertext]
   has_encrypted :email
   blind_index :email
 
