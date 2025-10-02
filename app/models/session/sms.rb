@@ -18,6 +18,10 @@ class Session::Sms < Session
     end
   end
 
+  def wdays_of_initial_group
+    question_group_initial.sms_schedule['day_of_period']
+  end
+
   def session_variables
     [].tap do |array|
       question_groups.each do |question_group|

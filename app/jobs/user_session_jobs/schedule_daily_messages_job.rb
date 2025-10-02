@@ -2,6 +2,7 @@
 
 class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   queue_as :question_sms
+  DELAY_BETWEEN_QUESTIONS_IN_SECONDS = 10
 
   def perform(user_session_id, should_reset_user_pending_flag = false)
     @user_session = UserSession.find(user_session_id)
@@ -48,8 +49,12 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
     if should_postpone_any_questions
       questions_to_be_send_today.each_with_index do |question, index|
-        question[:time_to_send] = question[:time_to_send] + (index * 10.seconds)
+        question[:time_to_send] = question[:time_to_send] + (index * DELAY_BETWEEN_QUESTIONS_IN_SECONDS.seconds)
       end
+    end
+
+    if questions_to_be_send_today.blank? && last_day_of_user_session?
+      send_finish_message
     end
 
     # Schedule all sending jobs
@@ -64,6 +69,31 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   end
 
   private
+
+  def send_finish_message
+    UserSessionJobs::SendGoodbyeMessageJob.
+      set(wait_until: DateTime.now + UserSessionJobs::ScheduleDailyMessagesJob::DELAY_BETWEEN_QUESTIONS_IN_SECONDS.seconds).
+      perform_later(user_session.id)
+  end
+
+  def last_day_of_user_session?
+    #CASE A: when we should stop sending questions as max number of repetitions reached
+    #
+
+    # CASE B: when we should send questions only until end of cycle (until next question group scheduled)
+    return false unless @user_session.session.wdays_of_initial_group.include?((DateTime.current.wday+1).to_s)
+
+    true
+  end
+
+  def max_repetitions
+    @max_repetitions ||= begin
+                           initial_question_group = @user_session.session.question_group_initial
+                           return 0 if initial_question_group&.sms_schedule.blank?
+
+                           initial_question_group.sms_schedule['number_of_repetitions'].to_i
+                         end
+  end
 
   def last_answer_in_question_group(question_group)
     if question_group.sms_schedule['start_from_first_question']

@@ -49,6 +49,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     return if number_of_repetitions_ended?(user_session)
 
     send_sms(user.full_number, question.subtitle)
+    send_finish_message if last_question_in_user_session?(user_session, question)
     user_session.assign_attributes(current_question_id: question.id) if question.type == 'Question::Sms'
     user_session.assign_attributes(number_of_repetitions: (user_session.number_of_repetitions || 0) + 1) if should_increment_number_or_repetition?(question)
 
@@ -66,14 +67,49 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
 
   private
 
+  def last_question_in_user_session?(user_session, question)
+    # CASE A: where we should exhausted questions from the group
+    # if max_repetitions(user_session) == user_session.number_of_repetitions - 1 //last iteration
+    #   question.question_group.questions.order(:position).last.id.eql?(question.id)
+    # else
+    #   false
+    # end
+    # CASE B: when we should send questions only until end of cycle (until next question group scheduled)
+    return false unless user_session.session.wdays_of_initial_group.include?((DateTime.current.wday+1).to_s)
+    return false if more_msgs_scheduled_for_today?(user_session)
+
+    true
+  end
+
+  def send_finish_message
+    return if user.pending_sms_answer?
+
+    UserSessionJobs::SendGoodbyeMessageJob.
+      set(wait_until: DateTime.now + UserSessionJobs::ScheduleDailyMessagesJob::DELAY_BETWEEN_QUESTIONS_IN_SECONDS.seconds).
+      perform_later(user_session.id)
+  end
+
+  def more_msgs_scheduled_for_today?(user_session)
+    queue = Sidekiq::ScheduledSet.new
+    queue.any? do |job|
+      job_args = job.args.first
+      job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'][2].eql?(user_session.id)
+    end
+  end
+
   def number_of_repetitions_ended?(user_session)
-    initial_question_group = user_session.session.question_group_initial
-    return false if initial_question_group&.sms_schedule.blank?
+    return false if max_repetitions(user_session).zero?
 
-    max_repetitions = initial_question_group.sms_schedule['number_of_repetitions'].to_i
-    return false if max_repetitions.zero?
+    user_session.number_of_repetitions >= max_repetitions(user_session)
+  end
 
-    user_session.number_of_repetitions >= max_repetitions
+  def max_repetitions(user_session)
+    @max_repetitions ||= begin
+      initial_question_group = user_session.session.question_group_initial
+      return 0 if initial_question_group&.sms_schedule.blank?
+
+      initial_question_group.sms_schedule['number_of_repetitions'].to_i
+    end
   end
 
   def should_increment_number_or_repetition?(question)
