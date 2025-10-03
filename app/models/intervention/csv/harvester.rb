@@ -106,13 +106,16 @@ class Intervention::Csv::Harvester
       predefined_user_data(row_index, grouped_user_sessions.second.first.user)
 
       grouped_user_sessions.second.each do |user_session|
-        user_session.answers.each do |answer|
-          answer_attempt = calculate_answer_attempt(answer)
-          set_default_value(user_session, answer, row_index, answer_attempt, multiple_fill_indicator_for(user_session.session))
+        number_of_attempts = calculate_number_of_attempts_for(user_session)
+        multiple_fill_indicator_for_session = multiple_fill_indicator_for(user_session.session)
+        user_session_answers = user_session.answers
+        user_session_answers.each do |answer|
+          answer_attempt = calculate_answer_attempt(answer, user_session_answers)
+          set_default_value(user_session, answer, row_index, answer_attempt, multiple_fill_indicator_for_session)
           next if answer.skipped
 
           answer.body_data&.each do |data|
-            var_index = header.index(column_name(multiple_fill_indicator_for(user_session.session), user_session.session, answer.csv_header_name(data),
+            var_index = header.index(column_name(multiple_fill_indicator_for_session, user_session.session, answer.csv_header_name(data),
                                                  answer_attempt))
 
             next if var_index.blank?
@@ -121,7 +124,7 @@ class Intervention::Csv::Harvester
             rows[row_index][var_index] = var_value
 
             VIDEO_STATS_KEYS.each do |key|
-              var_video_index = header.index("#{column_name(multiple_fill_indicator_for(user_session.session),
+              var_video_index = header.index("#{column_name(multiple_fill_indicator_for_session,
                                                             user_session.session,
                                                             answer.csv_header_name(data),
                                                             answer_attempt)}.video_stats.#{key}")
@@ -130,15 +133,11 @@ class Intervention::Csv::Harvester
             end
           end
         end
-        fill_by_tlfb_research(row_index, user_session, calculate_number_of_attempts_for(user_session), multiple_fill_indicator_for(user_session.session))
-        information_only_screen_videos(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
-                                       multiple_fill_indicator_for(user_session.session))
-        sms_links(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
-                  multiple_fill_indicator_for(user_session.session))
-        metadata(user_session.session, user_session, row_index, calculate_number_of_attempts_for(user_session),
-                 multiple_fill_indicator_for(user_session.session))
-        quick_exit(user_session.session, row_index, user_session, calculate_number_of_attempts_for(user_session),
-                   multiple_fill_indicator_for(user_session.session))
+        fill_by_tlfb_research(row_index, user_session, number_of_attempts, multiple_fill_indicator_for_session)
+        information_only_screen_videos(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
+        sms_links(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
+        metadata(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
+        quick_exit(user_session.session, row_index, user_session, number_of_attempts, multiple_fill_indicator_for_session)
       end
 
       fill_hf_initial_screen(row_index, grouped_user_sessions.second.first)
@@ -163,9 +162,9 @@ class Intervention::Csv::Harvester
     end
   end
 
-  def calculate_answer_attempt(answer)
+  def calculate_answer_attempt(answer, user_session_answers)
     if answer.user_session.session.type == 'Session::Sms'
-      ordered_ids = Answer.where(user_session_id: answer.user_session_id, question_id: answer.question_id).order(:created_at).pluck(:id)
+      ordered_ids = user_session_answers.where(question_id: answer.question_id).order(:created_at).pluck(:id)
       ordered_ids.index(answer.id)
     else
       answer.user_session.number_of_attempts
@@ -174,7 +173,7 @@ class Intervention::Csv::Harvester
 
   def number_of_attempts(session)
     if session.type == 'Session::Sms'
-      user_session_ids = user_sessions.where(session_id: session.id).pluck(:id)
+      user_session_ids = user_sessions.where(session_id: session.id).select(:id)
 
       Answer
         .where(user_session_id: user_session_ids)
