@@ -61,7 +61,7 @@ Rails.application.configure do
   # "info" includes generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
   # want to log everything, set the level to "debug".
-  config.log_level = :debug
+  config.log_level = :warn
 
   # Use a different cache store in production.
   config.cache_store = :redis_cache_store, { url: ENV.fetch('REDIS_URL', nil), driver: :ruby, ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
