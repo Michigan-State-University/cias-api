@@ -81,6 +81,10 @@ en:
             user_id:
               already_exists: already exists
         session:
+          sms_code:
+            attributes:
+              sms_code:
+                protected_code: 'This code is reserved and cannot be used'
           attributes:
             variable:
               already_exists: already exists
@@ -396,4 +400,4 @@ en:
     wrong_message: 'You have entered an incorrect code. Please try again.'
     already_signed: 'You are already enrolled in this campaign.'
     cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns.'
-    session_not_found: 'There is no such session'
+    session_not_found: "Oops! That code doesn't match any of our text plans. Check the spelling and make sure the letters are in the correct case (uppercase/lowercase)"

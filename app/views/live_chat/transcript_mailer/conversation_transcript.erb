@@ -212,7 +212,7 @@
                             <tbody>
                             <tr>
                               <td align="center" bgcolor="#107969" role="presentation" style="border:1px solid #107969;border-radius:100px;cursor:auto;mso-padding-alt:10px 25px;background:#107969;" valign="middle">
-                                <a href="<%= "#{ENV['WEB_URL']}/live-chat#{@conversation.archived ? '/archive' : ''}?conversation_id=#{@conversation.id}".html_safe %>" style="display:inline-block;background:#107969;color:#FFFFFF;font-family:DM Sans, Helvetica, Arial;font-size:16px;font-weight:700;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:100px;" target="_blank">
+                                <a href="<%= "#{ENV['WEB_URL']}/live-chat#{@conversation.archived? ? '/archive' : ''}?conversation_id=#{@conversation.id}".html_safe %>" style="display:inline-block;background:#107969;color:#FFFFFF;font-family:DM Sans, Helvetica, Arial;font-size:16px;font-weight:700;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:100px;" target="_blank">
                                   <! -- BUTTON START -->
                                   <%= I18n.t('transcript_mailer.open_inbox') %>
                                   <! -- BUTTON END -->

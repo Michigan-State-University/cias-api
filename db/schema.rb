@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_19_143020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -974,6 +974,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.boolean "started", default: false, null: false
     t.boolean "multiple_fill", default: false, null: false
     t.uuid "current_question_id"
+    t.integer "number_of_repetitions", default: 0, null: false
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"

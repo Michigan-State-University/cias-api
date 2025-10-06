@@ -2,6 +2,7 @@
 
 class Import::Basic::QuestionGroupService
   include ImportOperations
+
   def self.call(session_id, question_group_hash)
     new(
       session_id,

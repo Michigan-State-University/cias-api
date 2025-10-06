@@ -2,6 +2,7 @@
 
 module Resource::Position
   extend ActiveSupport::Concern
+
   included do
     def position
       authorize! :update, model_constant

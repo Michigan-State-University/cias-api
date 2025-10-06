@@ -2,6 +2,7 @@
 
 RSpec.describe UpdateJobs::AdjustQuestionReflections, type: :job do
   include ActiveJob::TestHelper
+
   subject { described_class.perform_now(question1, prev_variable, current_variable) }
 
   let(:default_narrator_settings) do

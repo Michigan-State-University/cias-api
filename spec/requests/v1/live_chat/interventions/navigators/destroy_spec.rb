@@ -76,7 +76,7 @@ RSpec.describe 'DELETE /v1/live_chat/intervention/:id/navigators/:navigator_id',
 
     it 'correctly archives all active conversations from navigator' do
       request
-      expect(navigator_conversations.each(&:reload).map(&:archived)).to eq [true, true, true]
+      expect(navigator_conversations.each(&:reload).map(&:archived?)).to eq [true, true, true]
     end
   end
 end

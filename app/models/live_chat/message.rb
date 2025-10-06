@@ -19,7 +19,7 @@ class LiveChat::Message < ApplicationRecord
   private
 
   def conversation_archived?
-    errors.add(:base, I18n.t('activerecord.errors.models.live_chat.message.sent_in_archived_conversation')) if conversation&.archived
+    errors.add(:base, I18n.t('activerecord.errors.models.live_chat.message.sent_in_archived_conversation')) if conversation&.archived?
   end
 
   def create_notification

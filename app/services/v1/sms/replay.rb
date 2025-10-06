@@ -68,9 +68,9 @@ class V1::Sms::Replay
     session = SmsCode.find_by(sms_code: message)&.session
     return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, nil) unless session
 
-    intervention_ids = session.intervention.user_intervention_ids
+    user_intervention_ids = session.intervention.user_intervention_ids
     possible_user_ids = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number }).pluck(:id)
-    @user = UserIntervention.find_by(id: intervention_ids, user_id: possible_user_ids)&.user
+    @user = UserIntervention.find_by(id: user_intervention_ids, user_id: possible_user_ids)&.user
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
@@ -117,9 +117,9 @@ class V1::Sms::Replay
 
         question = Question.find(user_session.current_question_id)
 
-        answer_correct = validate_answer_for_question(question, message)
+        is_answer_correct = validate_answer_for_question?(question, message)
 
-        if answer_correct
+        if is_answer_correct
           V1::AnswerService.call(@user, user_session.id, question.id,
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
@@ -171,7 +171,7 @@ class V1::Sms::Replay
     UserSessionJobs::ScheduleDailyMessagesJob.perform_later(user_session.id)
   end
 
-  def validate_answer_for_question(question, answer)
+  def validate_answer_for_question?(question, answer)
     accepted_answers = question.accepted_answers
     return true if question.accepted_answers.blank?
 

@@ -37,6 +37,8 @@ class V1::HealthClinics::InviteHealthClinicAdmin
   end
 
   def user
-    @user ||= User.find_by(email: email)
+    return @user if defined?(@user)
+
+    @user = User.find_by(email: email)
   end
 end

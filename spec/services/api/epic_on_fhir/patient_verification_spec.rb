@@ -5,6 +5,7 @@ require 'webmock/rspec'
 
 describe Api::EpicOnFhir::PatientVerification do
   include WebMock::API
+
   WebMock.enable!
 
   subject { described_class.call(first_name, last_name, birth_date, phone_number, phone_type, postal_code, mrn) }

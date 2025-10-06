@@ -2,6 +2,7 @@
 
 class Import::Basic::InterventionService
   include ImportOperations
+
   def self.call(user_id, intervention_hash)
     new(
       user_id,
@@ -41,7 +42,9 @@ class Import::Basic::InterventionService
   private
 
   def google_language
-    @google_language ||= GoogleLanguage.find_by(
+    return @google_language if defined?(@google_language)
+
+    @google_language = GoogleLanguage.find_by(
       language_name: intervention_hash.delete(:language_name),
       language_code: intervention_hash.delete(:language_code)
     )
