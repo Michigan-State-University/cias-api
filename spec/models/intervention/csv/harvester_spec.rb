@@ -1098,5 +1098,173 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
     end
+
+    context 'when session is Session::Sms' do
+      let!(:intervention) { create(:intervention) }
+      let(:session) { create(:sms_session, intervention: intervention) }
+      let!(:user_session) { create(:sms_user_session, user: user, session: session) }
+      let!(:question_group) { create(:sms_question_group, session: session, position: 1) }
+
+      context 'when single question with single attempt' do
+        let!(:question_body) do
+          {
+            'data' => [
+              { 'value' => '1', 'payload' => 'Option 1' },
+              { 'value' => '2', 'payload' => 'Option 2' }
+            ],
+            'variable' => { 'name' => 'sms_test' }
+          }
+        end
+        let!(:answer_body) do
+          {
+            'data' => [
+              {
+                'var' => 'sms_test',
+                'value' => '1'
+              }
+            ]
+          }
+        end
+        let!(:question) { create(:question_sms, question_group: question_group, body: question_body, position: 1) }
+        let!(:answer) { create(:answer_sms, question: question, body: answer_body, user_session: user_session) }
+
+        it 'save variables and metadata to csv without approach_number prefix' do
+          subject.collect
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.sms_test", "#{session.variable}.metadata.session_start",
+                                        "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.answers.first.created_at, nil,
+                                       nil]]
+        end
+      end
+
+      context 'when multiple attempts for same question' do
+        let!(:question_body) do
+          {
+            'data' => [
+              { 'value' => '1', 'payload' => 'Option 1' },
+              { 'value' => '2', 'payload' => 'Option 2' }
+            ],
+            'variable' => { 'name' => 'sms_test' }
+          }
+        end
+        let!(:answer1_body) do
+          {
+            'data' => [
+              {
+                'var' => 'sms_test',
+                'value' => '1'
+              }
+            ]
+          }
+        end
+        let!(:answer2_body) do
+          {
+            'data' => [
+              {
+                'var' => 'sms_test',
+                'value' => '2'
+              }
+            ]
+          }
+        end
+        let!(:question) { create(:question_sms, question_group: question_group, body: question_body, position: 1) }
+        let!(:answer1) { create(:answer_sms, question: question, body: answer1_body, user_session: user_session, created_at: 1.hour.ago) }
+        let!(:answer2) { create(:answer_sms, question: question, body: answer2_body, user_session: user_session, created_at: 30.minutes.ago) }
+
+        it 'saves variables with approach_number prefix when multiple attempts exist' do
+          subject.collect
+          p subject.header
+          p subject.rows
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.approach_number_1.sms_test", "#{session.variable}.approach_number_1.metadata.session_start",
+                                        "#{session.variable}.approach_number_1.metadata.session_end", "#{session.variable}.approach_number_1.metadata.session_duration",
+                                        "#{session.variable}.approach_number_2.sms_test", "#{session.variable}.approach_number_2.metadata.session_start",
+                                        "#{session.variable}.approach_number_2.metadata.session_end", "#{session.variable}.approach_number_2.metadata.session_duration"]
+          expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', nil, nil, nil, '2', answer1.created_at, nil, nil]]
+        end
+
+        it 'correctly assigns attempt numbers starting from 1, not 0' do
+          subject.collect
+          expect(subject.header).to include("#{session.variable}.approach_number_1.sms_test")
+          expect(subject.header).to include("#{session.variable}.approach_number_2.sms_test")
+          expect(subject.header).not_to include("#{session.variable}.approach_number_0.sms_test")
+        end
+      end
+
+      context 'when multiple users with different attempt counts' do
+        let!(:user2) { create(:user, :confirmed, :admin) }
+        let!(:user_session2) { create(:sms_user_session, user: user2, session: session) }
+        let!(:question_body) do
+          {
+            'data' => [
+              { 'value' => '1', 'payload' => 'Option 1' }
+            ],
+            'variable' => { 'name' => 'sms_test' }
+          }
+        end
+        let!(:question) { create(:question_sms, question_group: question_group, body: question_body, position: 1) }
+        let!(:user1_answer1) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session, created_at: 2.hours.ago) }
+        let!(:user1_answer2) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session, created_at: 1.hour.ago) }
+        let!(:user2_answer1) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session2, created_at: 30.minutes.ago) }
+
+        it 'generates headers based on maximum attempts across all users' do
+          subject.collect
+          expect(subject.header).to include("#{session.variable}.approach_number_1.sms_test")
+          expect(subject.header).to include("#{session.variable}.approach_number_2.sms_test")
+          expect(subject.rows.length).to eq(2)
+
+          attempt1_index = subject.header.index("#{session.variable}.approach_number_1.sms_test")
+          attempt2_index = subject.header.index("#{session.variable}.approach_number_2.sms_test")
+
+          user1_row = subject.rows.find { |row| row[0] == user.id }
+          expect(user1_row[attempt1_index]).to eq('1')
+          expect(user1_row[attempt2_index]).to eq('1')
+
+          user2_row = subject.rows.find { |row| row[0] == user2.id }
+          expect(user2_row[attempt1_index]).to eq('1')
+          expect(user2_row[attempt2_index]).to be_nil
+        end
+      end
+
+      context 'when mixed session types in intervention' do
+        let!(:classic_session) { create(:session, intervention: intervention, position: 2) }
+        let!(:classic_question_group) { create(:question_group_plain, session: classic_session) }
+        let!(:classic_question_body) do
+          {
+            'data' => [
+              { 'value' => '1', 'payload' => '' },
+              { 'value' => '2', 'payload' => '' }
+            ],
+            'variable' => { 'name' => 'classic_test' }
+          }
+        end
+        let!(:classic_question) { create(:question_single, question_group: classic_question_group, body: classic_question_body, position: 1) }
+        let!(:classic_user_session) { create(:user_session, user: user, session: classic_session) }
+        let!(:classic_answer) { create(:answer_single, question: classic_question, body: { 'data' => [{ 'var' => 'classic_test', 'value' => '1' }] }, user_session: classic_user_session) }
+
+        # SMS session setup
+        let!(:sms_question_body) do
+          {
+            'data' => [
+              { 'value' => '1', 'payload' => 'Option 1' }
+            ],
+            'variable' => { 'name' => 'sms_test' }
+          }
+        end
+        let!(:sms_question) { create(:question_sms, question_group: question_group, body: sms_question_body, position: 1) }
+        let!(:sms_answer) { create(:answer_sms, question: sms_question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session) }
+
+        it 'correctly handles both session types in same CSV' do
+          subject.collect
+          expect(subject.header).to include("#{session.variable}.sms_test")  # SMS session variable
+          expect(subject.header).to include("#{classic_session.variable}.classic_test")  # Classic session variable
+
+          expect(subject.header).to include("#{session.variable}.metadata.session_start")
+          expect(subject.header).to include("#{classic_session.variable}.metadata.session_start")
+
+          expect(subject.rows.length).to eq(1)
+          expect(subject.rows.first[0]).to eq(user.id)
+        end
+      end
+    end
   end
 end

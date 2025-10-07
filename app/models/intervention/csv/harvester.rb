@@ -165,7 +165,7 @@ class Intervention::Csv::Harvester
   def calculate_answer_attempt(answer, user_session_answers)
     if answer.user_session.session.type == 'Session::Sms'
       ordered_ids = user_session_answers.where(question_id: answer.question_id).order(:created_at).pluck(:id)
-      ordered_ids.index(answer.id)
+      ordered_ids.index(answer.id) + 1
     else
       answer.user_session.number_of_attempts
     end
