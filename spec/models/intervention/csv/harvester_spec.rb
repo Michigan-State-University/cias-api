@@ -1175,10 +1175,14 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           p subject.header
           p subject.rows
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.approach_number_1.sms_test", "#{session.variable}.approach_number_1.metadata.session_start",
-                                        "#{session.variable}.approach_number_1.metadata.session_end", "#{session.variable}.approach_number_1.metadata.session_duration",
-                                        "#{session.variable}.approach_number_2.sms_test", "#{session.variable}.approach_number_2.metadata.session_start",
-                                        "#{session.variable}.approach_number_2.metadata.session_end", "#{session.variable}.approach_number_2.metadata.session_duration"]
+          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.approach_number_1.sms_test",
+                                        "#{session.variable}.approach_number_1.metadata.session_start",
+                                        "#{session.variable}.approach_number_1.metadata.session_end",
+                                        "#{session.variable}.approach_number_1.metadata.session_duration",
+                                        "#{session.variable}.approach_number_2.sms_test",
+                                        "#{session.variable}.approach_number_2.metadata.session_start",
+                                        "#{session.variable}.approach_number_2.metadata.session_end",
+                                        "#{session.variable}.approach_number_2.metadata.session_duration"]
           expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', nil, nil, nil, '2', answer1.created_at, nil, nil]]
         end
 
@@ -1202,9 +1206,18 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           }
         end
         let!(:question) { create(:question_sms, question_group: question_group, body: question_body, position: 1) }
-        let!(:user1_answer1) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session, created_at: 2.hours.ago) }
-        let!(:user1_answer2) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session, created_at: 1.hour.ago) }
-        let!(:user2_answer1) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session2, created_at: 30.minutes.ago) }
+        let!(:user1_answer1) do
+          create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session,
+                              created_at: 2.hours.ago)
+        end
+        let!(:user1_answer2) do
+          create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session,
+                              created_at: 1.hour.ago)
+        end
+        let!(:user2_answer1) do
+          create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session2,
+                              created_at: 30.minutes.ago)
+        end
 
         it 'generates headers based on maximum attempts across all users' do
           subject.collect
@@ -1239,7 +1252,10 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
         let!(:classic_question) { create(:question_single, question_group: classic_question_group, body: classic_question_body, position: 1) }
         let!(:classic_user_session) { create(:user_session, user: user, session: classic_session) }
-        let!(:classic_answer) { create(:answer_single, question: classic_question, body: { 'data' => [{ 'var' => 'classic_test', 'value' => '1' }] }, user_session: classic_user_session) }
+        let!(:classic_answer) do
+          create(:answer_single, question: classic_question, body: { 'data' => [{ 'var' => 'classic_test', 'value' => '1' }] },
+                                 user_session: classic_user_session)
+        end
 
         # SMS session setup
         let!(:sms_question_body) do
@@ -1251,12 +1267,14 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           }
         end
         let!(:sms_question) { create(:question_sms, question_group: question_group, body: sms_question_body, position: 1) }
-        let!(:sms_answer) { create(:answer_sms, question: sms_question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session) }
+        let!(:sms_answer) do
+          create(:answer_sms, question: sms_question, body: { 'data' => [{ 'var' => 'sms_test', 'value' => '1' }] }, user_session: user_session)
+        end
 
         it 'correctly handles both session types in same CSV' do
           subject.collect
-          expect(subject.header).to include("#{session.variable}.sms_test")  # SMS session variable
-          expect(subject.header).to include("#{classic_session.variable}.classic_test")  # Classic session variable
+          expect(subject.header).to include("#{session.variable}.sms_test") # SMS session variable
+          expect(subject.header).to include("#{classic_session.variable}.classic_test") # Classic session variable
 
           expect(subject.header).to include("#{session.variable}.metadata.session_start")
           expect(subject.header).to include("#{classic_session.variable}.metadata.session_start")
