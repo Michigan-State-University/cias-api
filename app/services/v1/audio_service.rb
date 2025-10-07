@@ -15,7 +15,7 @@ class V1::AudioService
   end
 
   def call
-    return if text.nil?
+    return if text.blank?
 
     digest = prepare_audio_digest
     audio = Audio.find_by(sha256: digest)
