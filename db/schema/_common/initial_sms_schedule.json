@@ -6,6 +6,7 @@
     "start_from_first_question": { "type": "boolean" },
     "questions_per_day": { "type": "integer" },
     "number_of_repetitions": { "type": ["integer", "null"] },
+    "messages_after_limit": { "type": ["integer", "null"] },
     "overwrite_user_time_settings": { "type": "boolean" },
     "day_of_period": {
       "type": "array",

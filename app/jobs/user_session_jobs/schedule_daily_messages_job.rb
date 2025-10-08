@@ -8,6 +8,8 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
     @user = @user_session.user
     @session = @user_session.session
 
+    return if @user_session.finished_at.present?
+
     # Reset user pending answer flag
     @user.update(pending_sms_answer: false) if should_reset_user_pending_flag
 

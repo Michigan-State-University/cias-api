@@ -17,4 +17,10 @@ class UserSession::Sms < UserSession
   end
 
   def on_answer; end
+
+  def finish
+    return if finished_at
+
+    update(finished_at: DateTime.current)
+  end
 end
