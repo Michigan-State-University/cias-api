@@ -78,7 +78,8 @@ RSpec.describe UserSession::Sms, type: :model do
 
   describe '#last_answer' do
     let(:user) { create(:user, :confirmed, :participant) }
-    let(:sms_user_session) { create(:sms_user_session, user: user) }
+    let(:session) { create(:sms_session) }
+    let(:sms_user_session) { create(:sms_user_session, user: user, session: session) }
     let(:question1) { create(:question_sms, question_group: sms_user_session.session.question_groups.first) }
     let(:question2) { create(:question_sms, question_group: sms_user_session.session.question_groups.first) }
 
@@ -96,7 +97,7 @@ RSpec.describe UserSession::Sms, type: :model do
     context 'when there are unconfirmed answers' do
       let!(:unconfirmed_answer) do
         create(:answer_sms, user_session: sms_user_session, question: question1,
-                            updated_at: DateTime.current, confirmed: false)
+                            updated_at: DateTime.current)
       end
 
       it 'only considers confirmed answers' do
@@ -128,12 +129,22 @@ RSpec.describe UserSession::Sms, type: :model do
   end
 
   describe '#finish' do
+    before do
+      ActiveJob::Base.queue_adapter = :test
+    end
+
     context 'when not already finished' do
       it 'sets finished_at timestamp' do
         expect(sms_user_session.finished_at).to be_nil
         sms_user_session.finish
         expect(sms_user_session.finished_at).to be_present
         expect(sms_user_session.finished_at).to be_within(1.second).of(DateTime.current)
+      end
+
+      it 'enqueues SendGoodbyeMessageJob' do
+        expect do
+          sms_user_session.finish
+        end.to have_enqueued_job(UserSessionJobs::SendGoodbyeMessageJob).with(sms_user_session.id)
       end
     end
 
@@ -146,6 +157,12 @@ RSpec.describe UserSession::Sms, type: :model do
         original_finished_at = sms_user_session.finished_at
         sms_user_session.finish
         expect(sms_user_session.finished_at).to eq(original_finished_at)
+      end
+
+      it 'does not enqueue SendGoodbyeMessageJob' do
+        expect do
+          sms_user_session.finish
+        end.not_to have_enqueued_job(UserSessionJobs::SendGoodbyeMessageJob)
       end
     end
   end
