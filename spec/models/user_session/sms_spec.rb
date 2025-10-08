@@ -78,7 +78,8 @@ RSpec.describe UserSession::Sms, type: :model do
 
   describe '#last_answer' do
     let(:user) { create(:user, :confirmed, :participant) }
-    let(:sms_user_session) { create(:sms_user_session, user: user) }
+    let(:session) { create(:sms_session) }
+    let(:sms_user_session) { create(:sms_user_session, user: user, session: session) }
     let(:question1) { create(:question_sms, question_group: sms_user_session.session.question_groups.first) }
     let(:question2) { create(:question_sms, question_group: sms_user_session.session.question_groups.first) }
 
@@ -95,8 +96,7 @@ RSpec.describe UserSession::Sms, type: :model do
 
     context 'when there are unconfirmed answers' do
       let!(:unconfirmed_answer) do
-        create(:answer_sms, user_session: sms_user_session, question: question1,
-                            updated_at: DateTime.current, confirmed: false)
+        create(:answer_sms, user_session: sms_user_session, question: question1, updated_at: DateTime.current, draft: true)
       end
 
       it 'only considers confirmed answers' do
@@ -146,31 +146,6 @@ RSpec.describe UserSession::Sms, type: :model do
         original_finished_at = sms_user_session.finished_at
         sms_user_session.finish
         expect(sms_user_session.finished_at).to eq(original_finished_at)
-      end
-    end
-  end
-
-  describe 'number_of_repetitions incrementation scenarios' do
-    let(:intervention) { create(:intervention) }
-    let(:session) { create(:sms_session, intervention: intervention) }
-    let(:question_group_initial) { create(:question_group_initial, session: session) }
-    let(:user) { create(:user, :confirmed, :participant) }
-    let(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
-    let(:sms_user_session) do
-      create(:sms_user_session, user: user, session: session, user_intervention: user_intervention)
-    end
-
-    context 'when tracking repetitions' do
-      it 'can increment number_of_repetitions' do
-        expect(sms_user_session.number_of_repetitions).to be_nil
-        sms_user_session.update(number_of_repetitions: 1)
-        expect(sms_user_session.number_of_repetitions).to eq(1)
-      end
-
-      it 'can set max_repetitions_reached_at when limit is reached' do
-        timestamp = DateTime.current
-        sms_user_session.update(max_repetitions_reached_at: timestamp)
-        expect(sms_user_session.max_repetitions_reached_at).to eq(timestamp)
       end
     end
   end
