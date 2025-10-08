@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_06_080939) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -777,6 +777,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_06_080939) do
     t.text "welcome_message"
     t.text "default_response"
     t.bigint "google_language_id"
+    t.text "completion_message"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
