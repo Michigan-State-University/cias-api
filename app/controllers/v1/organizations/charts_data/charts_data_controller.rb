@@ -76,7 +76,7 @@ class V1::Organizations::ChartsData::ChartsDataController < V1Controller
     if ENV.fetch('USE_CHART_V2_RECORDS', nil) == '1'
       data_collection = data_collection&.where(v2_record: true)
     else
-      data_collection = data_collection&.where(regenerate: false)
+      data_collection = data_collection&.where(regenerated: false)
     end
     data_collection = data_collection&.by_health_clinic_ids(clinic_ids) if clinic_ids.present?
     data_collection = data_collection&.where(chart_id: chart_id) if chart_id.present?
