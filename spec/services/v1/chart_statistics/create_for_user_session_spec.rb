@@ -155,8 +155,9 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          @answer1 = create(:answer_single, user_session: user_session, body: { data: [{ var: 'color', value: '1' }] })
-          @answer2 = create(:answer_single, user_session: user_session, body: { data: [{ var: 'sport', value: '1' }] })
+          @user_session = UserSession.find_by(session_id: session.id, user_id: user.id, health_clinic_id: health_clinic.id)
+          @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
+          @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '1' }] })
         end
       end
 
