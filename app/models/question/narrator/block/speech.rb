@@ -22,6 +22,8 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
       audio = V1::AudioService.call(text,
                                     language_code: question.session.google_tts_voice.language_code,
                                     voice_type: question.session.google_tts_voice.voice_type)
+      next if audio.nil?
+
       block['sha256'][index_block] = audio.sha256
       generate_url(audio, text)
     end
