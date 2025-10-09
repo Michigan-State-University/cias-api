@@ -674,7 +674,7 @@ DEPENDENCIES
   bootsnap (>= 1.9.3)
   bullet
   bump
-  bundler (~> 2.4.0)
+  bundler (~> 2.4.22)
   bundler-audit
   cancancan
   config
