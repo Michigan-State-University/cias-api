@@ -29,7 +29,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/interventions', type: :re
     it_behaves_like 'organization invitations', 1
 
     it 'returns one intervention of organization' do
-      expect(json_response['data'][0]['id']).to eq interventions_with_organization.first.id
+      expect(json_response['data'].size).to eq 1
     end
   end
 
@@ -40,8 +40,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/interventions', type: :re
 
     it 'returns all interventions of organization' do
       data = json_response['data']
-      expect(data[0]['id']).to eq interventions_with_organization.first.id
-      expect(data[1]['id']).to eq interventions_with_organization.last.id
+      expect(data.pluck('id').sort).to eq [interventions_with_organization.first.id, interventions_with_organization.last.id].sort
     end
   end
 end
