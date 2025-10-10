@@ -70,8 +70,6 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
           'color' => '#E2B1F4'
         } }
     end
-    let_it_be(:session) { create(:session, intervention: intervention, variable: session_var) }
-    let_it_be(:user_session) { create(:user_session, session: session, user: user, health_clinic: health_clinic) }
     let_it_be(:pie_chart1) do
       create(:chart, formula: formula1, dashboard_section: dashboard_section, status: 'published', published_at: Time.current,
                      chart_type: Chart.chart_types[:pie_chart])
@@ -93,7 +91,8 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          @user_session = user_session
+          session = create(:session, intervention: intervention, variable: session_var)
+          @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
           @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
           @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '1' }] })
         end
@@ -107,7 +106,6 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
           organization: organization,
           health_system: health_system,
           health_clinic: health_clinic,
-          user_session: @user_session,
           user: user
         )
 
@@ -122,7 +120,8 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          @user_session = user_session
+          session = create(:session, intervention: intervention, variable: session_var)
+          @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
           @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
         end
       end
