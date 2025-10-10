@@ -27,7 +27,7 @@ module SmsCampaign::FinishUserSessionHelper
   end
 
   def number_of_messages_sent_in_last_cycle(user_session)
-    number_of_messages_sent_in_last_cycle ||= Message
+    @number_of_messages_sent_in_last_cycle ||= Message
       .where(
         question_id: user_session.session.questions.select(:id),
         created_at: user_session.max_repetitions_reached_at..Time.current
