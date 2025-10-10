@@ -47,7 +47,7 @@ class Audio::TextToSpeech::Google
       else
         Oj.load(ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil))
       end
-    rescue Oj::ParseError, JSON::ParserError
+    rescue Oj::ParseError
       ENV.fetch('GOOGLE_APPLICATION_CREDENTIALS', nil)
     end
   end
