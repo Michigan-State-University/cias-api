@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::Create
-  def self.call(chart, user_session, organization)
-    new(chart, user_session, organization).call
+  def self.call(chart, user_session, organization, regenerate = false)
+    new(chart, user_session, organization, regenerate).call
   end
 
-  def initialize(chart, user_session, organization)
+  def initialize(chart, user_session, organization, regenerate = false)
     @chart = chart
     @user_session = user_session
     @organization = organization
+    @regenerate = regenerate
   end
 
   def call
@@ -25,7 +26,7 @@ class V1::ChartStatistics::Create
       chart: chart,
       user: user_session.user,
       user_session: user_session,
-      v2_record: true # To be deleted after making sure that chart restore works properly
+      v2_record: regenerate # To be deleted after making sure that chart restore works properly
     )
     chart_statistic.filled_at = user_session.finished_at || DateTime.current
     chart_statistic.save!
@@ -33,7 +34,7 @@ class V1::ChartStatistics::Create
 
   private
 
-  attr_reader :chart, :user_session, :organization
+  attr_reader :chart, :user_session, :organization, :regenerate
 
   def label
     result = calculated_formula
