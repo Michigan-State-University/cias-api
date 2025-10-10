@@ -133,29 +133,28 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     end
 
     context 'when exists chart statistic with specific fields' do
-      let_it_be(:session) { create(:session, intervention: intervention, variable: session_var) }
-      let_it_be(:user_session) { create(:user_session, session: session, user: user, health_clinic: health_clinic, finished_at: filled_at) }
       let!(:chart_statistic) do
-        create(:chart_statistic, label: 'Label1', organization: organization, health_system: health_system, user_session: user_session,
+        create(:chart_statistic, label: 'Label1', organization: organization, health_system: health_system,
                                  health_clinic: health_clinic, chart: pie_chart1, user: user, filled_at: filled_at)
       end
       let!(:chart_statistic2) do
-        create(:chart_statistic, label: 'Other', organization: organization, health_system: health_system, user_session: user_session,
+        create(:chart_statistic, label: 'Other', organization: organization, health_system: health_system,
                                  health_clinic: health_clinic, chart: pie_chart2, user: user, filled_at: filled_at)
       end
       let!(:chart_statistic3) do
-        create(:chart_statistic, label: 'Matched', organization: organization, health_system: health_system, user_session: user_session,
+        create(:chart_statistic, label: 'Matched', organization: organization, health_system: health_system,
                                  health_clinic: health_clinic, chart: bar_chart1, user: user, filled_at: filled_at)
       end
       let!(:chart_statistic4) do
-        create(:chart_statistic, label: 'NotMatched', organization: organization, health_system: health_system, user_session: user_session,
+        create(:chart_statistic, label: 'NotMatched', organization: organization, health_system: health_system,
                                  health_clinic: health_clinic, chart: bar_chart2, user: user, filled_at: filled_at)
       end
 
       before_all do
         RSpec::Mocks.with_temporary_scope do
           allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
-          @user_session = user_session
+          session = create(:session, intervention: intervention, variable: session_var)
+          @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic, finished_at: filled_at)
           @answer1 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
           @answer2 = create(:answer_single, user_session: @user_session, body: { data: [{ var: 'sport', value: '1' }] })
         end
