@@ -25,7 +25,7 @@ class V1::ChartStatistics::Create
       chart: chart,
       user: user_session.user,
       user_session: user_session,
-      v2_record: true, # To be deleted after making sure that chart restore works properly
+      v2_record: true # To be deleted after making sure that chart restore works properly
     )
     chart_statistic.filled_at = user_session.finished_at || DateTime.current
     chart_statistic.save!
