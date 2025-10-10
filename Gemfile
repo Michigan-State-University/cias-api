@@ -66,6 +66,7 @@ gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
 gem 'audited'
+gem 'uri', '>= 1.0.4'
 
 group :development, :test do
   gem 'bundler-audit'
