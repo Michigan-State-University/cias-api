@@ -742,6 +742,7 @@ DEPENDENCIES
   test-prof
   timecop
   twilio-ruby (~> 6.0.1)
+  uri (>= 1.0.4)
   webmock
   wicked_pdf
   wkhtmltopdf-binary
