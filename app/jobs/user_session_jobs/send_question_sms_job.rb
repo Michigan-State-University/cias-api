@@ -50,7 +50,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     # Handle case with no pending answers, send current question
 
     send_sms(user.full_number, question)
-    finish_user_session_if_that_was_last_question(user_session, question) if question.type == 'Question::SmsInformation'
+    finish_user_session_if_that_was_last_question(user_session, question)
     user_session.assign_attributes(current_question_id: question.id) if question.type == 'Question::Sms'
     user_session.assign_attributes(number_of_repetitions: (user_session.number_of_repetitions || 0) + 1) if should_increment_number_or_repetition?(question)
 
