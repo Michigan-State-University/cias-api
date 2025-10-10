@@ -30,7 +30,7 @@ namespace :google_tts_languages do
         usage_hash = Hash.new(1)
 
         voices.each do |voice_type|
-          voice_standard = voice_type.name.split('-')[2].downcase
+          voice_standard = voice_type.name.split('-')[2]&.downcase
           voice_gender = voice_type.ssml_gender.to_s.downcase
           voice_hash = "#{voice_standard}-#{voice_gender}"
           voice_name = "#{voice_hash}-#{usage_hash[voice_hash]}"
