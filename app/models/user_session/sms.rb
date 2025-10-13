@@ -22,5 +22,6 @@ class UserSession::Sms < UserSession
     return if finished_at
 
     update(finished_at: DateTime.current)
+    UserSessionJobs::SendGoodbyeMessageJob.perform_later(id)
   end
 end
