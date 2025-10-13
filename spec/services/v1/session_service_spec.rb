@@ -80,4 +80,53 @@ RSpec.describe V1::SessionService, type: :service do
       end
     end
   end
+
+  describe '#update with variable changes' do
+    subject { service.update(session.id, params) }
+
+    let(:session) { create(:session, intervention: intervention, variable: 'old_var') }
+    let(:params) { { name: 'Updated Session', variable: 'new_var' } }
+
+    it 'updates session attributes' do
+      result = subject
+      expect(result.name).to eq('Updated Session')
+      expect(result.variable).to eq('new_var')
+    end
+
+    it 'enqueues job to adjust session variable references when variable changes' do
+      expect(UpdateJobs::AdjustSessionVariableReferences)
+        .to receive(:perform_later)
+        .with(session.id, 'old_var', 'new_var')
+
+      subject
+    end
+
+    context 'when variable name does not change' do
+      let(:params) { { name: 'Updated Session', variable: 'old_var' } }
+
+      it 'does not enqueue formula adjustment job' do
+        expect(UpdateJobs::AdjustSessionVariableReferences).not_to receive(:perform_later)
+        subject
+      end
+    end
+
+    context 'when old variable is blank' do
+      let(:session) { create(:session, intervention: intervention, variable: nil) }
+      let(:params) { { variable: 'new_var' } }
+
+      it 'does not enqueue formula adjustment job' do
+        expect(UpdateJobs::AdjustSessionVariableReferences).not_to receive(:perform_later)
+        subject
+      end
+    end
+
+    context 'when new variable is blank' do
+      let(:params) { { variable: nil } }
+
+      it 'does not enqueue formula adjustment job' do
+        expect(UpdateJobs::AdjustSessionVariableReferences).not_to receive(:perform_later)
+        subject
+      end
+    end
+  end
 end

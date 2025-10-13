@@ -40,10 +40,21 @@ class V1::SessionService
   def update(session_id, session_params)
     sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
+
+    previous_variable = session.variable
+    new_variable = session_params[:variable] || session.variable
+
+    if variable_changed?(previous_variable, new_variable) && session.intervention.formula_update_in_progress?
+      raise ActiveRecord::RecordNotSaved, I18n.t('session.error.formula_update_in_progress')
+    end
+
     session.assign_attributes(session_params.except(:cat_tests))
     session_type_sms = session.sms_session_type?
     assign_cat_tests_to_session(session, session_params) unless session_type_sms
     session.integral_update
+
+    adjust_variable_references(session, previous_variable, session.variable) if variable_changed?(previous_variable, session.variable)
+
     session
   end
 
@@ -115,5 +126,17 @@ class V1::SessionService
 
   def sanitize_estimated_time_param(params)
     params[:estimated_time] = params[:estimated_time].to_i if params[:estimated_time].present?
+  end
+
+  def variable_changed?(old_variable, new_variable)
+    old_variable.present? && new_variable.present? && old_variable != new_variable
+  end
+
+  def adjust_variable_references(session, old_variable, new_variable)
+    UpdateJobs::AdjustSessionVariableReferences.perform_later(
+      session.id,
+      old_variable,
+      new_variable
+    )
   end
 end
