@@ -71,8 +71,8 @@ class Session < ApplicationRecord
   validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
   validates :autoclose_at, presence: true, if: :autoclose_enabled
 
-  after_create :set_sms_defaults
   before_validation :set_default_variable
+  after_create :set_sms_defaults
   after_create :assign_default_tts_voice
   after_create :assign_default_google_language
 
