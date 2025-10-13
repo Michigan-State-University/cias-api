@@ -18,6 +18,10 @@ en:
     error:
       published_intervention: 'Cannot update question in the published intervention'
       not_uniq_variable: 'This variable name is already in use!'
+      formula_update_in_progress: 'Cannot update variable while formula update is in progress. Please try again in a few moments.'
+  session:
+    error:
+      formula_update_in_progress: 'Cannot update session variable while formula update is in progress. Please try again in a few moments.'
   question_group:
     finish:
       title: Finish Group
