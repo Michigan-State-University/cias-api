@@ -15,6 +15,7 @@ class Session < ApplicationRecord
   belongs_to :google_tts_voice, optional: true
   belongs_to :google_language, optional: true
 
+  has_many :sms_links, dependent: :destroy
   has_many :sms_plans, dependent: :destroy
 
   has_many :invitations, as: :invitable, dependent: :destroy
