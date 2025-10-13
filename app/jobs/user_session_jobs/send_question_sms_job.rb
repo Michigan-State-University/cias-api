@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
+  include SmsCampaign::FinishUserSessionHelper
+
   queue_as :question_sms
 
   # rubocop:disable Metrics/CyclomaticComplexity
@@ -22,7 +24,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     user_session = UserSession::Sms.find(user_session_id)
 
     # Handle case when current sending job is reminder - needs to be executed before handling pending answer flag
-    send_sms(user.full_number, question.subtitle) if reminder
+    send_sms(user.full_number, question) if reminder
 
     return if reminder
 
@@ -46,9 +48,9 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     return if (user.pending_sms_answer && question.type == 'Question::Sms') || outdated_message
 
     # Handle case with no pending answers, send current question
-    return if number_of_repetitions_ended?(user_session)
 
-    send_sms(user.full_number, question.subtitle)
+    send_sms(user.full_number, question)
+    finish_user_session_if_that_was_last_question(user_session, question)
     user_session.assign_attributes(current_question_id: question.id) if question.type == 'Question::Sms'
     user_session.assign_attributes(number_of_repetitions: (user_session.number_of_repetitions || 0) + 1) if should_increment_number_or_repetition?(question)
 
@@ -65,16 +67,6 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
   end
 
   private
-
-  def number_of_repetitions_ended?(user_session)
-    initial_question_group = user_session.session.question_group_initial
-    return false if initial_question_group&.sms_schedule.blank?
-
-    max_repetitions = initial_question_group.sms_schedule['number_of_repetitions'].to_i
-    return false if max_repetitions.zero?
-
-    user_session.number_of_repetitions >= max_repetitions
-  end
 
   def should_increment_number_or_repetition?(question)
     return false unless question.question_group.type.eql?('QuestionGroup::Initial')
@@ -119,8 +111,8 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     end
   end
 
-  def send_sms(number, content)
-    sms = Message.create(phone: number, body: content, attachment_url: nil)
+  def send_sms(number, question)
+    sms = Message.create(phone: number, body: question.subtitle, attachment_url: nil, question: question)
     Communication::Sms.new(sms.id).send_message
   end
 end
