@@ -105,4 +105,131 @@ RSpec.describe QuestionGroup::Initial, type: :model do
       expect(groups.second).to eq regular_group # position 1
     end
   end
+
+  describe '#set_default_sms_schedule' do
+    context 'when creating a new QuestionGroup::Initial for SMS session' do
+      let(:sms_session) { create(:sms_session) }
+
+      context 'when sms_schedule is not present' do
+        it 'sets default sms_schedule with messages_after_limit' do
+          question_group = described_class.new(session: sms_session)
+
+          expect(question_group.sms_schedule).to eq({
+                                                      'time' => {},
+                                                      'day_of_period' => [],
+                                                      'questions_per_day' => 1,
+                                                      'messages_after_limit' => 7
+                                                    })
+        end
+
+        it 'includes messages_after_limit field in default schedule' do
+          question_group = described_class.new(session: sms_session)
+
+          expect(question_group.sms_schedule['messages_after_limit']).to eq(7)
+        end
+      end
+
+      context 'when sms_schedule is already present' do
+        it 'does not override existing sms_schedule' do
+          existing_schedule = {
+            'time' => { 'exact' => '10:00 AM' },
+            'day_of_period' => %w[1 3],
+            'questions_per_day' => 2,
+            'messages_after_limit' => 5
+          }
+
+          question_group = described_class.new(
+            session: sms_session,
+            sms_schedule: existing_schedule
+          )
+
+          expect(question_group.sms_schedule).to eq(existing_schedule)
+        end
+      end
+    end
+  end
+
+  describe 'messages_after_limit validation' do
+    let(:sms_session) { create(:sms_session) }
+    let(:question_group_initial) { build(:question_group_initial, session: sms_session) }
+
+    context 'with valid messages_after_limit values' do
+      it 'accepts integer values' do
+        question_group_initial.sms_schedule = {
+          period: 'weekly',
+          questions_per_day: 1,
+          messages_after_limit: 10,
+          day_of_period: ['1'],
+          time: { exact: '8:00 AM' }
+        }
+
+        expect(question_group_initial).to be_valid
+      end
+
+      it 'accepts null values' do
+        question_group_initial.sms_schedule = {
+          period: 'weekly',
+          questions_per_day: 1,
+          messages_after_limit: nil,
+          day_of_period: ['1'],
+          time: { exact: '8:00 AM' }
+        }
+
+        expect(question_group_initial).to be_valid
+      end
+
+      it 'accepts zero as valid integer' do
+        question_group_initial.sms_schedule = {
+          period: 'weekly',
+          questions_per_day: 1,
+          messages_after_limit: 0,
+          day_of_period: ['1'],
+          time: { exact: '8:00 AM' }
+        }
+
+        expect(question_group_initial).to be_valid
+      end
+    end
+
+    context 'with invalid messages_after_limit values' do
+      it 'rejects string values' do
+        question_group_initial.sms_schedule = {
+          period: 'weekly',
+          questions_per_day: 1,
+          messages_after_limit: 'invalid',
+          day_of_period: ['1'],
+          time: { exact: '8:00 AM' }
+        }
+
+        expect(question_group_initial).not_to be_valid
+        expect(question_group_initial.errors[:sms_schedule]).to be_present
+      end
+
+      it 'rejects boolean values' do
+        question_group_initial.sms_schedule = {
+          period: 'weekly',
+          questions_per_day: 1,
+          messages_after_limit: true,
+          day_of_period: ['1'],
+          time: { exact: '8:00 AM' }
+        }
+
+        expect(question_group_initial).not_to be_valid
+        expect(question_group_initial.errors[:sms_schedule]).to be_present
+      end
+
+      it 'rejects float values' do
+        question_group_initial.sms_schedule = {
+          period: 'weekly',
+          questions_per_day: 1,
+          messages_after_limit: 7.5,
+          day_of_period: ['1'],
+          time: { exact: '8:00 AM' }
+        }
+
+        expect(question_group_initial).not_to be_valid
+        expect(question_group_initial.errors[:sms_schedule]).to be_present
+      end
+    end
+  end
 end

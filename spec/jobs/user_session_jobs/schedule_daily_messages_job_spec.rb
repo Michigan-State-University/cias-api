@@ -22,6 +22,28 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
     let!(:year) { Date.current.cweek + 1 > 52 ? Date.current.year + 1 : Date.current.year }
     let!(:week) { (Date.current.cweek + 1) % 52 }
 
+    context 'when user_session is already finished' do
+      let!(:question_group_initial) do
+        build(:question_group_initial,
+              formulas: [],
+              sms_schedule: {
+                day_of_period: ['1'],
+                questions_per_day: 1,
+                time: {
+                  exact: '8:00 AM'
+                }
+              })
+      end
+
+      before do
+        user_session.update(finished_at: 1.day.ago)
+      end
+
+      it 'returns early without scheduling any jobs' do
+        expect { subject }.not_to have_enqueued_job(UserSessionJobs::SendQuestionSmsJob)
+      end
+    end
+
     context 'when only one question group is created without any formulas and one question per day' do
       let!(:question_group_initial) do
         build(:question_group_initial,

@@ -8,6 +8,9 @@ es:
   sessions:
     reminder: "¡Hola! Su próxima sesión ya está disponible. Por favor, haga clic en el enlace de abajo para continuar su progreso en %{intervention_name} %{link}"
   predefined_participant:
+    default_response: 'Ha introducido un código incorrecto. Inténtelo de nuevo.'
+    welcome_message: 'Ya estás inscrito. Pronto recibirás mensajes.'
+    completion_message: '¡Gracias por completar esta sesión!'
     invitation: "¡Hola! Por favor, haga clic en el enlace de abajo para comenzar o continuar su progreso en %{intervention_name} %{link}"
   generated_report_mailer:
     new_report_available:
