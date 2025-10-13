@@ -24,6 +24,7 @@ class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferen
         old_cross_session_pattern = "#{source_session_var}.#{old_variable_name}"
         new_cross_session_pattern = "#{source_session_var}.#{new_variable_name}"
 
+        update_question_formulas_scoped(source_session, old_cross_session_pattern, new_cross_session_pattern, exclude_source_session: true)
         update_session_formulas_scoped(source_session, old_cross_session_pattern, new_cross_session_pattern, exclude_source_session: true)
         update_question_group_formulas_scoped(source_session, old_cross_session_pattern, new_cross_session_pattern, exclude_source_session: true)
         update_question_narrator_formulas_scoped(source_session, old_cross_session_pattern, new_cross_session_pattern, exclude_source_session: true)

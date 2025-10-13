@@ -17,6 +17,7 @@ class UpdateJobs::AdjustSessionVariableReferences < UpdateJobs::VariableReferenc
 
         patterns_to_update.zip(new_patterns).each do |old_pattern, new_pattern|
           update_question_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
+          update_question_narrator_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
           update_session_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
           update_question_group_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
           update_report_template_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)

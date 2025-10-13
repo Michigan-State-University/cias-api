@@ -130,6 +130,8 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       it 'updates question formulas in source session' do
         expect_any_instance_of(described_class).to receive(:update_question_formulas_scoped)
           .with(session, old_variable_name, new_variable_name, exclude_source_session: false)
+        expect_any_instance_of(described_class).to receive(:update_question_formulas_scoped)
+          .with(session, "#{session.variable}.#{old_variable_name}", "#{session.variable}.#{new_variable_name}", exclude_source_session: true)
 
         perform_job
       end
@@ -198,6 +200,8 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
           expect_any_instance_of(described_class).to receive(:update_report_template_formulas_scoped)
             .with(session, old_variable_name, new_variable_name, exclude_source_session: false)
           # Phase 2: Cross-session references
+          expect_any_instance_of(described_class).to receive(:update_question_formulas_scoped)
+            .with(session, old_pattern, new_pattern, exclude_source_session: true)
           expect_any_instance_of(described_class).to receive(:update_session_formulas_scoped)
             .with(session, old_pattern, new_pattern, exclude_source_session: true)
           expect_any_instance_of(described_class).to receive(:update_question_group_formulas_scoped)

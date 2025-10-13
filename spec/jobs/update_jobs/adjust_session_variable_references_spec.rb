@@ -107,6 +107,9 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
           expect_any_instance_of(described_class).to receive(:update_question_formulas_scoped)
             .with(session, old_pattern, new_pattern, exclude_source_session: true)
 
+          expect_any_instance_of(described_class).to receive(:update_question_narrator_formulas_scoped)
+            .with(session, old_pattern, new_pattern, exclude_source_session: true)
+
           expect_any_instance_of(described_class).to receive(:update_session_formulas_scoped)
             .with(session, old_pattern, new_pattern, exclude_source_session: true)
 
