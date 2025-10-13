@@ -14,6 +14,7 @@ class Phone < ApplicationRecord
 
   enum :communication_way, { call: 'call', message: 'message' }
 
+  audited except: %i[number number_ciphertext]
   has_encrypted :number
   blind_index :number
 

@@ -5,5 +5,6 @@ class Message < ApplicationRecord
   validates :phone, :body, presence: true
   belongs_to :question, optional: true
 
+  audited except: %i[phone phone_ciphertext]
   has_encrypted :phone
 end

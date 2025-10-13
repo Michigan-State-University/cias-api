@@ -81,6 +81,28 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
   end
 
+  create_table "audits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.uuid "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.jsonb "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
+  end
+
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
     t.integer "google_tts_voice_id"
     t.integer "cat_mh_language_id"
@@ -159,11 +181,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "filled_at", precision: nil
+    t.uuid "user_session_id"
+    t.boolean "v2_record", default: false
+    t.boolean "regenerated", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
     t.index ["organization_id"], name: "index_chart_statistics_on_organization_id"
     t.index ["user_id"], name: "index_chart_statistics_on_user_id"
+    t.index ["user_session_id"], name: "index_chart_statistics_on_user_session_id"
   end
 
   create_table "charts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1087,6 +1113,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "chart_statistics", "user_sessions"
   add_foreign_key "collaborators", "interventions"
   add_foreign_key "collaborators", "users"
   add_foreign_key "consumption_results", "days"
