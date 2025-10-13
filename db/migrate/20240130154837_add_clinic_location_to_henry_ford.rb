@@ -3,7 +3,7 @@ class AddClinicLocationToHenryFord < ActiveRecord::Migration[6.1]
     add_new_clinic_location_to_henry_ford!
   end
 
-  class AuxiliaryClinicLocation < ApplicationRecord
+  class AuxiliaryClinicLocation < ActiveRecord::Base
     self.table_name = 'clinic_locations'
   end
 
