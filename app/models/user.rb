@@ -148,6 +148,7 @@ class User < ApplicationRecord
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
+  audited except: %i[email email_ciphertext first_name first_name_ciphertext last_name last_name_ciphertext uid uid_ciphertext tokens]
   has_encrypted :email, :first_name, :last_name, :uid
   blind_index :email, :uid
 

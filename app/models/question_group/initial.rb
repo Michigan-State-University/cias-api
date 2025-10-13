@@ -12,4 +12,17 @@ class QuestionGroup::Initial < QuestionGroup
             allow_blank: true
 
   attr_readonly :position
+
+  private
+
+  def set_default_sms_schedule
+    return if sms_schedule.present?
+
+    self.sms_schedule = {
+      time: {},
+      day_of_period: [],
+      questions_per_day: 1,
+      messages_after_limit: 7
+    }
+  end
 end

@@ -2,11 +2,14 @@
 
 class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   queue_as :question_sms
+  DELAY_BETWEEN_QUESTIONS_IN_SECONDS = 10
 
   def perform(user_session_id, should_reset_user_pending_flag = false)
     @user_session = UserSession.find(user_session_id)
     @user = @user_session.user
     @session = @user_session.session
+
+    return if @user_session.finished_at.present?
 
     # Reset user pending answer flag
     @user.update(pending_sms_answer: false) if should_reset_user_pending_flag
@@ -48,7 +51,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
     if should_postpone_any_questions
       questions_to_be_send_today.each_with_index do |question, index|
-        question[:time_to_send] = question[:time_to_send] + (index * 10.seconds)
+        question[:time_to_send] = question[:time_to_send] + (index * DELAY_BETWEEN_QUESTIONS_IN_SECONDS.seconds)
       end
     end
 

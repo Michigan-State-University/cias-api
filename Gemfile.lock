@@ -101,6 +101,9 @@ GEM
     argon2-kdf (0.3.1)
       fiddle
     ast (2.4.3)
+    audited (5.8.0)
+      activerecord (>= 5.2, < 8.2)
+      activesupport (>= 5.2, < 8.2)
     aws-eventstream (1.4.0)
     aws-partitions (1.1172.0)
     aws-sdk-core (3.233.0)
@@ -670,6 +673,7 @@ DEPENDENCIES
   activejob-cancel
   activerecord_json_validator
   activestorage (>= 6.1.4.7)
+  audited
   aws-sdk-s3
   benchmark-ips
   blind_index
