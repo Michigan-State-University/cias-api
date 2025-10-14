@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -79,6 +79,28 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+  end
+
+  create_table "audits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.uuid "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.jsonb "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
   end
 
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
@@ -578,6 +600,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
     t.datetime "updated_at", null: false
     t.text "phone_ciphertext"
     t.string "attachment_url"
+    t.uuid "question_id"
+    t.index ["question_id"], name: "index_messages_on_question_id"
   end
 
   create_table "navigator_invitations", force: :cascade do |t|
@@ -778,6 +802,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
     t.text "welcome_message"
     t.text "default_response"
     t.bigint "google_language_id"
+    t.text "completion_message"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -978,6 +1003,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
     t.boolean "multiple_fill", default: false, null: false
     t.uuid "current_question_id"
     t.integer "number_of_repetitions", default: 0, null: false
+    t.datetime "max_repetitions_reached_at"
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
@@ -1111,6 +1137,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_09_26_111049) do
   add_foreign_key "live_chat_navigator_setups", "interventions"
   add_foreign_key "live_chat_summoning_users", "interventions"
   add_foreign_key "live_chat_summoning_users", "users"
+  add_foreign_key "messages", "questions"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "predefined_user_parameters", "health_clinics"
   add_foreign_key "predefined_user_parameters", "interventions"
