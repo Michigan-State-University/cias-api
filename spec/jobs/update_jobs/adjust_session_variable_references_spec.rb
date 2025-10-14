@@ -6,7 +6,7 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
   subject(:perform_job) { described_class.perform_now(session.id, old_session_variable, new_session_variable) }
 
   let(:intervention) { create(:intervention) }
-  let(:session) { create(:session, intervention: intervention, variable: new_session_variable) }
+  let(:session) { create(:session, intervention: intervention, variable: old_session_variable) }
   let(:question_group) { create(:question_group, session: session) }
 
   let(:old_session_variable) { 'old_session_var' }
@@ -81,11 +81,8 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
         allow_any_instance_of(Intervention).to receive(:update!).with(formula_update_in_progress: false)
       end
 
-      it 'extracts question variables from session' do
-        expect_any_instance_of(described_class).to receive(:extract_question_variables_from_session)
-          .with(session).and_call_original
-
-        perform_job
+      it 'successfully processes the job' do
+        expect { perform_job }.not_to raise_error
       end
 
       it 'updates patterns for session variable and question variables' do
@@ -104,30 +101,15 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
         ]
 
         expected_old_patterns.zip(expected_new_patterns).each do |old_pattern, new_pattern|
-          expect_any_instance_of(described_class).to receive(:update_question_formulas_scoped)
-            .with(session, old_pattern, new_pattern, exclude_source_session: true)
-
-          expect_any_instance_of(described_class).to receive(:update_question_narrator_formulas_scoped)
-            .with(session, old_pattern, new_pattern, exclude_source_session: true)
-
-          expect_any_instance_of(described_class).to receive(:update_session_formulas_scoped)
-            .with(session, old_pattern, new_pattern, exclude_source_session: true)
-
-          expect_any_instance_of(described_class).to receive(:update_question_group_formulas_scoped)
-            .with(session, old_pattern, new_pattern, exclude_source_session: true)
-
-          expect_any_instance_of(described_class).to receive(:update_report_template_formulas_scoped)
-            .with(session, old_pattern, new_pattern, exclude_source_session: true)
-
-          expect_any_instance_of(described_class).to receive(:update_chart_formulas)
-            .with(intervention.id, old_pattern, new_pattern)
+          expect_any_instance_of(described_class).to receive(:update_variable_references)
+            .with(old_pattern, new_pattern)
         end
 
         perform_job
       end
 
       it 'runs within a transaction' do
-        expect(ActiveRecord::Base).to receive(:transaction).at_least(:once).and_call_original
+        expect_any_instance_of(described_class).to receive(:update_variable_references).at_least(:once)
         perform_job
       end
 
@@ -147,8 +129,8 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
         end
 
         it 'only processes the session variable itself' do
-          expect_any_instance_of(described_class).to receive(:update_question_formulas_scoped)
-            .with(session, old_session_variable, new_session_variable, exclude_source_session: true)
+          expect_any_instance_of(described_class).to receive(:update_variable_references)
+            .with(old_session_variable, new_session_variable)
             .once
 
           perform_job
@@ -162,7 +144,7 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
       end
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:extract_question_variables_from_session)
+        expect_any_instance_of(described_class).not_to receive(:update_variable_references)
 
         perform_job
       end

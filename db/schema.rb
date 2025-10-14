@@ -485,7 +485,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_06_000001) do
     t.datetime "paused_at", precision: nil
     t.boolean "formula_update_in_progress", default: false, null: false
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
-    t.index ["formula_update_in_progress"], name: "index_interventions_on_formula_update_in_progress"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
