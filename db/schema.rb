@@ -183,7 +183,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
     t.datetime "filled_at", precision: nil
     t.uuid "user_session_id"
     t.boolean "v2_record", default: false
-    t.boolean "regenerated", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
