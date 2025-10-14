@@ -94,7 +94,7 @@ jobs:
           GIT_AUTHOR_EMAIL: ci@ci.ci
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
-          USE_CHART_V2_RECORDS: 1
+          USE_CHART_V2_RECORDS: '1'
         run: |
           sudo apt install libffi7
           gem install bundler -v "2.4.22"
