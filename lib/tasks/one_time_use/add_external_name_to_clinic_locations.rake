@@ -4,7 +4,7 @@ namespace :one_time_use do
   desc ''
   task add_external_name_to_clinic_locations: :environment do
     begin
-      ClinicLocation.reset_column_information
+      AuxiliaryClinicLocation.reset_column_information
     rescue StandardError
       nil
     end
@@ -42,12 +42,16 @@ namespace :one_time_use do
     ]
 
     p 'dropping MILFORD WOMEN\'S HEALTH location...'
-    ClinicLocation.find_by(name: 'MILFORD WOMEN\'S HEALTH'.downcase, external_id: 1010880007)&.destroy
+    AuxiliaryClinicLocation.find_by(name: 'MILFORD WOMEN\'S HEALTH'.downcase, external_id: 1010880007)&.destroy
 
     p 'Adding external name to clinic locations...'
 
     locations.each do |location|
-      ClinicLocation.find_by(name: location[:name].downcase, department: 'HFMC')&.update!(external_name: location[:external_name].downcase, department: location[:department])
+      AuxiliaryClinicLocation.find_by(name: location[:name].downcase, department: 'HFMC')&.update!(external_name: location[:external_name].downcase, department: location[:department])
     end
+  end
+
+  class AuxiliaryClinicLocation < ActiveRecord::Base
+    self.table_name = 'clinic_locations'
   end
 end
