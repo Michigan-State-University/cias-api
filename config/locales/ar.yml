@@ -7,6 +7,9 @@ ar:
       title: '<h2>أدخل العنوان هنا</h2>'
   sessions:
     reminder: "%{link} %{intervention_name} مرحبًا! جلستك القادمة متاحة الآن! الرجاء النقر على الرابط أدناه لمواصلة تقدمك في"
+    default_response: 'لقد أدخلت رمزًا خاطئًا. يُرجى المحاولة مرة أخرى.'
+    welcome_message: 'أنت الآن مسجل. ستبدأ بتلقي الرسائل قريبًا.'
+    completion_message: 'شكرا لك على إكمال هذه الجلسة!'
   predefined_participant:
     invitation: "%{link} %{intervention_name} مرحبًا! يرجى النقر فوق الرابط أدناه لبدء أو متابعة تقدمك في"
   generated_report_mailer:

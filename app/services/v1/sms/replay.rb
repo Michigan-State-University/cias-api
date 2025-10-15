@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
 class V1::Sms::Replay
+  include SmsCampaign::FinishUserSessionHelper
+
   attr_reader :from_number, :to_number, :message
 
   def self.call(from, to, body)
@@ -124,7 +127,7 @@ class V1::Sms::Replay
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
           remove_question_followups(@user, question, user_session)
-          recalculate_questions_to_be_send(user_session)
+          schedule_or_finish(user_session)
         elsif question.accepted_answers['answer_if_wrong']
           SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil,
                                              @user.id)
@@ -181,4 +184,13 @@ class V1::Sms::Replay
       (accepted_answers['range']['from'].to_i..accepted_answers['range']['to'].to_i).to_a.map(&:to_s).include?(answer)
     end
   end
+
+  def schedule_or_finish(user_session)
+    if was_last_question_in_user_session?(user_session)
+      user_session.finish
+    else
+      recalculate_questions_to_be_send(user_session)
+    end
+  end
 end
+# rubocop:enable Metrics/ClassLength

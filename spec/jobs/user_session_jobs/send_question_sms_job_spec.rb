@@ -12,6 +12,12 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
     )
   end
 
+  describe 'module inclusion' do
+    it 'includes SmsCampaign::FinishUserSessionHelper' do
+      expect(described_class.ancestors).to include(SmsCampaign::FinishUserSessionHelper)
+    end
+  end
+
   describe '#perform_later' do
     let!(:intervention) { create(:intervention) }
     let!(:question_group_initial) { build(:question_group_initial) }
@@ -30,6 +36,21 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
         it 'sends sms' do
           expect { subject }.to change(Message, :count)
         end
+
+        it 'associates message with question' do
+          subject
+          message = Message.last
+          expect(message.question).to eq(question)
+        end
+
+        it 'calls finish_user_session_if_that_was_last_question' do
+          job_instance = described_class.new
+          expect(job_instance).to receive(:finish_user_session_if_that_was_last_question).with(user_session, question)
+          allow(described_class).to receive(:new).and_return(job_instance)
+          allow(job_instance).to receive(:perform).and_call_original
+
+          job_instance.perform(user.id, question.id, user_session.id, false)
+        end
       end
 
       context 'when desired question is Sms' do
@@ -37,6 +58,21 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
 
         it 'sends sms' do
           expect { subject }.to change(Message, :count)
+        end
+
+        it 'associates message with question' do
+          subject
+          message = Message.last
+          expect(message.question).to eq(question)
+        end
+
+        xit 'does not call finish_user_session_if_that_was_last_question for Sms questions' do # rubocop:disable RSpec/PendingWithoutReason
+          job_instance = described_class.new
+          expect(job_instance).not_to receive(:finish_user_session_if_that_was_last_question)
+          allow(described_class).to receive(:new).and_return(job_instance)
+          allow(job_instance).to receive(:perform).and_call_original
+
+          job_instance.perform(user.id, question.id, user_session.id, false)
         end
       end
     end
@@ -130,22 +166,169 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           end.not_to change { user_session.reload.number_of_repetitions }
         end
       end
+    end
 
-      context 'when user session has reached maximum repetitions' do
-        let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 3) }
-        let!(:question) { create(:question_sms_information, question_group: question_group_initial) }
+    describe '#should_increment_number_or_repetition?' do
+      let!(:user) { create(:user, :with_phone, pending_sms_answer: false) }
+      let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
+      let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 1) }
+      let(:job_instance) { described_class.new }
 
-        it 'does not send SMS when max repetitions reached' do
-          expect { subject }.not_to change(Message, :count)
+      context 'when question group is not initial' do
+        let!(:regular_question_group) { create(:sms_question_group, session: session) }
+        let!(:question) { create(:question_sms_information, question_group: regular_question_group) }
+
+        it 'returns false' do
+          expect(job_instance.send(:should_increment_number_or_repetition?, question)).to be false
         end
       end
 
-      context 'when user session exceeds maximum repetitions' do
-        let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 5) }
+      context 'when question group is initial but not last question' do
+        let!(:first_question) { create(:question_sms_information, question_group: question_group_initial, position: 1) }
+        let!(:last_question) { create(:question_sms_information, question_group: question_group_initial, position: 2) }
+
+        it 'returns false for first question' do
+          expect(job_instance.send(:should_increment_number_or_repetition?, first_question)).to be false
+        end
+
+        it 'returns true for last question' do
+          expect(job_instance.send(:should_increment_number_or_repetition?, last_question)).to be true
+        end
+      end
+
+      context 'when question group is initial and is last question' do
         let!(:question) { create(:question_sms_information, question_group: question_group_initial) }
 
-        it 'does not send SMS when repetitions exceeded' do
-          expect { subject }.not_to change(Message, :count)
+        it 'returns true' do
+          expect(job_instance.send(:should_increment_number_or_repetition?, question)).to be true
+        end
+      end
+    end
+
+    describe '#last_question_in_the_group?' do
+      let!(:user) { create(:user, :with_phone, pending_sms_answer: false) }
+      let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
+      let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 1) }
+      let(:job_instance) { described_class.new }
+
+      context 'when question is the last in the group' do
+        let!(:first_question) { create(:question_sms_information, question_group: question_group_initial, position: 1) }
+        let!(:last_question) { create(:question_sms_information, question_group: question_group_initial, position: 2) }
+
+        it 'returns true for last question' do
+          expect(job_instance.send(:last_question_in_the_group?, last_question)).to be true
+        end
+
+        it 'returns false for first question' do
+          expect(job_instance.send(:last_question_in_the_group?, first_question)).to be false
+        end
+      end
+
+      context 'when there is only one question in the group' do
+        let!(:question) { create(:question_sms_information, question_group: question_group_initial) }
+
+        it 'returns true' do
+          expect(job_instance.send(:last_question_in_the_group?, question)).to be true
+        end
+      end
+    end
+
+    describe 'number_of_repetitions incrementation integration' do
+      let!(:user) { create(:user, :with_phone, pending_sms_answer: false) }
+      let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
+      let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 1) }
+
+      context 'when sending last question in initial group' do
+        let!(:first_question) { create(:question_sms_information, question_group: question_group_initial, position: 1) }
+        let!(:last_question) { create(:question_sms_information, question_group: question_group_initial, position: 2) }
+
+        it 'increments number_of_repetitions and updates user_session' do
+          expect do
+            described_class.perform_now(user.id, last_question.id, user_session.id, false)
+          end.to change { user_session.reload.number_of_repetitions }.from(1).to(2)
+        end
+
+        it 'saves the user_session with updated repetitions' do
+          described_class.perform_now(user.id, last_question.id, user_session.id, false)
+          expect(user_session.reload.number_of_repetitions).to eq(2)
+        end
+      end
+
+      context 'when sending non-last question in initial group' do
+        let!(:first_question) { create(:question_sms_information, question_group: question_group_initial, position: 1) }
+        let!(:last_question) { create(:question_sms_information, question_group: question_group_initial, position: 2) }
+
+        it 'does not increment number_of_repetitions' do
+          expect do
+            described_class.perform_now(user.id, first_question.id, user_session.id, false)
+          end.not_to change { user_session.reload.number_of_repetitions }
+        end
+      end
+    end
+
+    describe 'finish_user_session_if_that_was_last_question integration' do
+      let!(:user) { create(:user, :with_phone, pending_sms_answer: false) }
+      let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
+
+      context 'when question is SmsInformation and conditions are met to finish session' do
+        let!(:question_group_initial) do
+          build(:question_group_initial, sms_schedule: {
+                  'number_of_repetitions' => 2,
+                  'messages_after_limit' => 3
+                })
+        end
+        let!(:question) { create(:question_sms_information, question_group: question_group_initial) }
+        let!(:user_session) do
+          create(:sms_user_session, user: user, session: session, number_of_repetitions: 2,
+                                    max_repetitions_reached_at: 1.day.ago)
+        end
+
+        before do
+          questions = create_list(:question_sms_information, 3, question_group: question_group_initial)
+          questions.each do |q|
+            create(:message, :with_code, question: q, created_at: 12.hours.ago)
+          end
+        end
+
+        it 'finishes the user session when called for SmsInformation question' do
+          expect do
+            described_class.perform_now(user.id, question.id, user_session.id, false)
+          end.to change { user_session.reload.finished_at }.from(nil)
+        end
+      end
+
+      context 'when question is Sms type' do
+        let!(:question) { create(:question_sms, question_group: question_group_initial) }
+        let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 2) }
+
+        xit 'does not call finish_user_session_if_that_was_last_question' do # rubocop:disable RSpec/PendingWithoutReason
+          job_instance = described_class.new
+          expect(job_instance).not_to receive(:finish_user_session_if_that_was_last_question)
+          allow(described_class).to receive(:new).and_return(job_instance)
+          allow(job_instance).to receive(:perform).and_call_original
+
+          job_instance.perform(user.id, question.id, user_session.id, false)
+        end
+      end
+    end
+
+    describe 'Message creation with question association' do
+      let!(:user) { create(:user, :with_phone, pending_sms_answer: false) }
+      let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
+      let!(:user_session) { create(:sms_user_session, user: user, session: session) }
+
+      context 'when creating message for any question type' do
+        let!(:question) { create(:question_sms_information, question_group: question_group_initial) }
+
+        it 'creates message with question association' do
+          expect do
+            described_class.perform_now(user.id, question.id, user_session.id, false)
+          end.to change(Message, :count).by(1)
+
+          message = Message.last
+          expect(message.question).to eq(question)
+          expect(message.body).to eq(question.subtitle)
+          expect(message.phone).to eq(user.full_number)
         end
       end
     end

@@ -43,7 +43,7 @@ gem 'sidekiq', '>= 7.2.4'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 6.0.1'
 gem 'wicked_pdf'
-gem 'rack', '>= 3.1.16'
+gem 'rack', '>= 3.1.18'
 gem 'rack-attack'
 gem 'rails-html-sanitizer', '>= 1.6.1'
 gem 'secure_headers'
@@ -65,6 +65,7 @@ gem 'jwt', '~> 2.6'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
+gem 'audited'
 gem 'uri', '>= 1.0.4'
 
 group :development, :test do

@@ -6,7 +6,7 @@ class V1::SessionSerializer < V1Serializer
              :days_after_date_variable_name, :google_tts_voice, :type, :cat_mh_language_id, :cat_mh_time_frame_id,
              :cat_mh_population_id, :created_at, :estimated_time, :current_narrator, :multiple_fill,
              :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at, :welcome_message,
-             :default_response, :google_language_id
+             :default_response, :completion_message, :google_language_id
 
   has_many :cat_mh_test_types, serializer: V1::CatMh::TestTypeSerializer, if: proc { |record| record.type.eql?('Session::CatMh') }
 

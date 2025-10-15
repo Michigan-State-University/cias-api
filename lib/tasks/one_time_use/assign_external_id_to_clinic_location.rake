@@ -5,7 +5,7 @@ namespace :one_time_use do
   task assign_external_id_to_clinic_location: :environment do
     begin
       ClinicLocation.reset_column_information
-      rescue StandardError
+    rescue StandardError
         nil
     end
 
@@ -45,9 +45,13 @@ namespace :one_time_use do
     p 'Searching and updating locations by external id...'
 
     locations.each do |location|
-      ClinicLocation.find_or_initialize_by(name: location[:name].downcase, department: 'HFMC').update!(external_id: location[:id])
+      AuxiliaryClinicLocation.find_or_initialize_by(name: location[:name].downcase, department: 'HFMC').update!(external_id: location[:id])
     end
 
     p 'DONE!'
+  end
+
+  class AuxiliaryClinicLocation < ActiveRecord::Base
+    self.table_name = 'clinic_locations'
   end
 end
