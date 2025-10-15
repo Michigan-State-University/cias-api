@@ -395,6 +395,13 @@ en:
         not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
         not_found: "Insufficient information for further processing."
+  henry_ford:
+    error:
+      barcode:
+        pattern_not_found: "Unable to find patient ID pattern in barcode"
+        patient_id_empty: "Patient ID is empty in barcode"
+      patient:
+        multiple_found: "Multiple patients found - ambiguous patient identification"
   phone_verification: "Your CIAS verification code is: %{verification_code}"
   sms:
     wrong_message: 'You have entered an incorrect code. Please try again.'

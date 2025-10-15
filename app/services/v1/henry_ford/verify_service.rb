@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
+class V1::HenryFord::VerifyService
+  include V1::HenryFord::EpicPatientResourceExtractor
+
   SYSTEM_IDENTIFIER = ENV.fetch('EPIC_ON_FHIR_SYSTEM_IDENTIFIER')
 
   def self.call(user, patient_params, session_id)
@@ -34,34 +36,6 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def epic_first_name
-    @patient[:entry][0][:resource][:name][0][:given][0]
-  end
-
-  def epic_last_name
-    @patient[:entry][0][:resource][:name][0][:family]
-  end
-
-  def epic_sex
-    @patient[:entry][0][:resource][:gender][0].upcase
-  end
-
-  def epic_phone_number
-    @patient[:entry][0][:resource][:telecom][0][:value]
-  end
-
-  def epic_phone_type
-    @patient[:entry][0][:resource][:telecom][0][:use]
-  end
-
-  def epic_zip_code
-    @patient[:entry][0][:resource][:address].detect { |address| address[:use].eql?('home') }&.dig(:postalCode) || zip_code
-  end
-
-  def epic_dob
-    @patient[:entry][0][:resource][:birthDate]
-  end
-
   def parsed_dob
     return if dob.blank?
 
@@ -78,7 +52,7 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
 
   def system_identifier_details
     @system_identifier_details ||= patient.dig(:entry, 0, :resource, :identifier)
-                      .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
+                                          .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
   end
 
   def hfhs_visit_id
@@ -106,8 +80,8 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
                          &.downcase.to_s
 
     location = available_locations
-                   .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
-                   .first
+                 .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
+                 .first
 
     appointment_location_id = location.epic_identifier
     location.update!(auxiliary_epic_identifier: location_identifer)
@@ -118,10 +92,10 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
 
   def verify_by_identifier(appointment)
     appointment_location_id = appointment
-                               .dig(:resource, :participant)
-                               .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
-                               &.dig(:actor, :reference)
-                               &.to_s
+                                .dig(:resource, :participant)
+                                .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                                &.dig(:actor, :reference)
+                                &.to_s
 
     appointment_location_auxiliary_id = appointment_location_id.sub('Location/', '')
     [available_locations.where(auxiliary_epic_identifier: appointment_location_auxiliary_id).first, appointment_location_auxiliary_id]
@@ -130,13 +104,13 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
   def create_or_find_resource!
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,
-      first_name: epic_first_name,
-      last_name: epic_last_name,
-      dob: Date.parse(epic_dob),
-      sex: epic_sex,
-      zip_code: epic_zip_code,
-      phone_type: epic_phone_type,
-      phone_number: epic_phone_number,
+      first_name: epic_first_name(@patient),
+      last_name: epic_last_name(@patient),
+      dob: epic_dob(@patient),
+      sex: epic_sex(@patient),
+      zip_code: epic_zip_code(@patient),
+      phone_type: epic_phone_type(@patient),
+      phone_number: epic_phone_number(@patient),
       provided_first_name: first_name,
       provided_last_name: last_name,
       provided_dob: dob,
@@ -165,10 +139,10 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
                    &.dig(:actor, :display)
 
       location_identifier = appointment
-                               &.dig(:resource, :participant)
-                               &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }
-                               &.dig(:actor, :reference)
-                               &.sub('Location/', '')
+                              &.dig(:resource, :participant)
+                              &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }
+                              &.dig(:actor, :reference)
+                              &.sub('Location/', '')
 
       valid_appointment?(location, location_identifier, parsed_date)
     end
