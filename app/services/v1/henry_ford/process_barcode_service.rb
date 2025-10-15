@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../../exceptions/henry_ford/barcode_parsing_error'
-
 class V1::HenryFord::ProcessBarcodeService
   def self.call(verify_code_params)
     new(verify_code_params).call
