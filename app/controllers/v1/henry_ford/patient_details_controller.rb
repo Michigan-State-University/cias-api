@@ -11,7 +11,7 @@ class V1::HenryFord::PatientDetailsController < V1Controller
   def verify_by_code
     authorize! :read, UserSession
 
-    result = V1::HenryFord::HandleBarCodeService.call(params)
+    result = V1::HenryFord::HandleBarCodeService.call(verify_code_params)
 
     render json: serialized_hash(result, HfhsPatientDetail)
   end
