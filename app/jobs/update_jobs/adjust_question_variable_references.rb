@@ -8,7 +8,6 @@ class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferen
 
     return if old_variable_name == new_variable_name
     return if old_variable_name.blank? || new_variable_name.blank?
-    return if question.question_variables.first == new_variable_name
 
     with_formula_update_lock(source_session.intervention_id) do
       ActiveRecord::Base.transaction do

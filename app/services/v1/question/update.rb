@@ -48,6 +48,7 @@ class V1::Question::Update
 
   def changed_variables(previous_variables)
     previous_variables.zip(question_variables).filter_map do |prev_var, curr_var|
+      next if prev_var.nil? || curr_var.nil?
       next if prev_var['name'] == curr_var['name']
 
       [prev_var['name'], curr_var['name']]
@@ -55,36 +56,14 @@ class V1::Question::Update
   end
 
   def changed_variables_preview(previous_variables, params)
-    # Get what the new variables would be based on the params
-    new_vars = new_variables_from_params(params)
+    new_vars = question.extract_variables_from_params(params)
     return [] if new_vars.empty?
 
     previous_variables.zip(new_vars).filter_map do |prev_var, new_var|
+      next if prev_var.nil? || new_var.nil?
       next if prev_var['name'] == new_var['name']
 
       [prev_var['name'], new_var['name']]
-    end
-  end
-
-  def new_variables_from_params(params)
-    case question.type
-    when 'Question::Single'
-      variable_name = params.dig(:body, :variable, :name)
-      return [] if variable_name.nil?
-
-      [{ 'name' => variable_name }]
-    when 'Question::Multiple'
-      data = params.dig(:body, :data)
-      return [] if data.nil?
-
-      data.filter_map { |row| { 'name' => row.dig(:variable, :name) } }
-    when 'Question::Grid'
-      rows = params.dig(:body, :data)&.first&.dig(:payload, :rows)
-      return [] if rows.nil?
-
-      rows.filter_map { |row| { 'name' => row.dig(:variable, :name) } if row.dig(:variable, :name).present? }
-    else
-      []
     end
   end
 

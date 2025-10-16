@@ -8,7 +8,6 @@ class UpdateJobs::AdjustSessionVariableReferences < UpdateJobs::VariableReferenc
 
     return if old_session_variable == new_session_variable
     return if old_session_variable.blank? || new_session_variable.blank?
-    return if session.variable == new_session_variable
 
     with_formula_update_lock(session.intervention_id) do
       ActiveRecord::Base.transaction do

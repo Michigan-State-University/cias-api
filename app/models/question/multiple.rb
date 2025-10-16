@@ -35,4 +35,14 @@ class Question::Multiple < Question
   def question_variables
     body['data'].map { |data| data['variable']['name'] }
   end
+
+  def extract_variables_from_params(params)
+    data = params.dig(:body, :data)
+    return [] if data.blank?
+
+    data.filter_map do |row|
+      name = row.dig(:variable, :name)
+      { 'name' => name } if name.present?
+    end
+  end
 end
