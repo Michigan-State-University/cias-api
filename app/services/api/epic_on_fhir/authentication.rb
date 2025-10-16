@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Api::EpicOnFhir::Authentication2
+class Api::EpicOnFhir::Authentication
   ENDPOINT = ENV.fetch('EPIC_ON_FHIR_AUTHENTICATION_ENDPOINT')
   AUTHENTICATION_ALGORITHM = ENV.fetch('EPIC_ON_FHIR_AUTHENTICATION_ALGORITHM')
   KID = ENV.fetch('EPIC_ON_FHIR_KID')

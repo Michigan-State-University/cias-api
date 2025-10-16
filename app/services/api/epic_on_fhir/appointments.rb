@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Api::EpicOnFhir::Appointments2 < Api::EpicOnFhir::BaseService
+class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
   ENDPOINT = ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT')
 
   def self.call(patient_id)
