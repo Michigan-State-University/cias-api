@@ -83,6 +83,10 @@ module ExceptionHandler
     rescue_from ActiveModel::ForbiddenAttributesError do |exc|
       render json: msg(exc), status: :forbidden
     end
+
+    rescue_from ConcurrentEditException do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
   end
 
   private

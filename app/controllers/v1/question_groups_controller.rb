@@ -19,7 +19,7 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :create, QuestionGroup
     authorize! :update, session_load
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::CreateService.call(question_group_params, questions_scope, new_questions_params, session_load)
     SqlQuery.new('question_group/question_group_pure_empty').execute
@@ -32,7 +32,7 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :update, QuestionGroup
     authorize! :update, question_group_load
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::UpdateService.call(question_group_load, question_group_params)
 
@@ -43,7 +43,7 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :destroy, QuestionGroup
     authorize! :destroy, question_group_load
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = question_group_load
     question_group.destroy! unless question_group.finish?
@@ -55,7 +55,7 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :update, QuestionGroup
     authorize! :update, question_group_load
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::QuestionsChangeService.call(question_group_load, questions_scope)
 
@@ -83,7 +83,7 @@ class V1::QuestionGroupsController < V1Controller
     authorize! :create, QuestionGroup
     authorize! :update, load_session
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     duplicated_groups = V1::QuestionGroup::DuplicateWithStructureService.call(load_session, duplicate_here_params[:question_groups])
 
@@ -101,7 +101,7 @@ class V1::QuestionGroupsController < V1Controller
     session = Session.find(session_id)
     authorize! :update, session
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     V1::QuestionGroup::ShareInternallyService.call([session], duplicate_internally_params[:question_groups])
     head :created

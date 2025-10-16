@@ -402,3 +402,5 @@ en:
     already_signed: 'You are already enrolled in this campaign.'
     cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns.'
     session_not_found: "Oops! That code doesn't match any of our text plans. Check the spelling and make sure the letters are in the correct case (uppercase/lowercase)"
+  exceptions:
+    concurrent_edit: 'Cannot modify intervention with multiple collaborators. Please ensure no other users are currently editing this intervention and that you have enabled editing mode for all relevant sessions before making changes.'
