@@ -28,4 +28,8 @@ module V1::HenryFord::EpicPatientResourceExtractor
   def epic_phone_number(resource)
     resource[:entry][0][:resource][:telecom][0][:value]
   end
+
+  def epic_patient_id(resource)
+    resource[:entry][0][:resource][:id]
+  end
 end

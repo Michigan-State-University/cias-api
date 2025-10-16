@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_10_112942) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -442,6 +442,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_10_112942) do
     t.string "provided_phone_type_bidx"
     t.string "provided_phone_number_bidx"
     t.boolean "pending", default: false, null: false
+    t.string "epic_id"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end

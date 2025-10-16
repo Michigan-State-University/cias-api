@@ -34,7 +34,8 @@ class V1::HenryFord::HandleBarCodeService
       sex: epic_sex(epic_response),
       zip_code: epic_zip_code(epic_response),
       phone_type: epic_phone_type(epic_response),
-      phone_number: epic_phone_number(epic_response)
+      phone_number: epic_phone_number(epic_response),
+      epic_id: epic_patient_id(epic_response)
     )
     resource.update!(pending: true)
     resource
