@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
+class Api::EpicOnFhir::Appointments2 < Api::EpicOnFhir::BaseService
   ENDPOINT = ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT')
 
   def self.call(patient_id)
@@ -17,7 +17,9 @@ class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
   private
 
   def request
-    Faraday.get(ENDPOINT) do |request|
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+
+    connection.get do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/json'
       request.params['_format'] = 'json'

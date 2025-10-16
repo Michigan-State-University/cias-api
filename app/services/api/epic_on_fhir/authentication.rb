@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Api::EpicOnFhir::Authentication
+class Api::EpicOnFhir::Authentication2
   ENDPOINT = ENV.fetch('EPIC_ON_FHIR_AUTHENTICATION_ENDPOINT')
   AUTHENTICATION_ALGORITHM = ENV.fetch('EPIC_ON_FHIR_AUTHENTICATION_ALGORITHM')
   KID = ENV.fetch('EPIC_ON_FHIR_KID')
@@ -13,7 +13,9 @@ class Api::EpicOnFhir::Authentication
   end
 
   def call
-    response = Faraday.post(ENDPOINT) do |request|
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+
+    response = connection.post do |request|
       request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       request.body = URI.encode_www_form(params)
     end
