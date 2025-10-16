@@ -88,6 +88,7 @@ ar:
       barcode:
         pattern_not_found: "غير قادر على العثور على نمط معرف المريض في الباركود"
         patient_id_empty: "معرف المريض فارغ في الباركود"
+        paring_error: "غير قادر على تحليل معرف المريض من الباركود"
       patient:
         multiple_found: "تم العثور على مرضى متعددين - تعريف غامض للمريض"
   phone_verification: "رمز التحقق CIAS الخاص بك هو: %{verification_code}"

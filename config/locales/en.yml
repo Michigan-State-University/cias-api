@@ -401,6 +401,7 @@ en:
       barcode:
         pattern_not_found: "Unable to find patient ID pattern in barcode"
         patient_id_empty: "Patient ID is empty in barcode"
+        paring_error: 'Unable to parse patient ID from barcode'
       patient:
         multiple_found: "Multiple patients found - ambiguous patient identification"
   phone_verification: "Your CIAS verification code is: %{verification_code}"
