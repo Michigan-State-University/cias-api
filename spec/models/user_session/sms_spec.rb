@@ -37,11 +37,11 @@ RSpec.describe UserSession::Sms, type: :model do
       expect(sms_user_session).to be_valid
     end
 
-    xit 'allows max_repetitions_reached_at to be a datetime' do # rubocop:disable RSpec/PendingWithoutReason
+    it 'allows max_repetitions_reached_at to be a datetime' do
       timestamp = DateTime.current
       sms_user_session.max_repetitions_reached_at = timestamp
       expect(sms_user_session).to be_valid
-      expect(sms_user_session.max_repetitions_reached_at).to eq(timestamp)
+      expect(sms_user_session.max_repetitions_reached_at.strftime('%Y-%m-%d %H:%M:%S')).to eq(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
     end
   end
 
