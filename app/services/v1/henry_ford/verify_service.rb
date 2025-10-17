@@ -19,13 +19,18 @@ class V1::HenryFord::VerifyService
   attr_accessor :resource
 
   def call
-    @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code, mrn)
-    @appointments = Api::EpicOnFhir::Appointments.call(epic_patient_id)
+    if patient_params[:hfhs_patient_detail_id].present?
+      @resource = HfhsPatientDetail.find(patient_params[:hfhs_patient_detail_id])
+      confirm_resource!
+    else
+      @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code, mrn)
+      create_or_find_resource!
+    end
 
-    create_or_find_resource!
+    @appointments = Api::EpicOnFhir::Appointments.call(@resource.epic_id)
+    @resource.update!(visit_id: hfhs_visit_id)
     assign_patient_details!
-
-    resource
+    @resource
   end
 
   private
@@ -40,10 +45,6 @@ class V1::HenryFord::VerifyService
     return if dob.blank?
 
     Date.parse(dob).strftime('%Y-%m-%d')
-  end
-
-  def epic_patient_id
-    patient.dig(:entry, 0, :resource, :id)
   end
 
   def hfhs_patient_id
@@ -101,6 +102,10 @@ class V1::HenryFord::VerifyService
     [available_locations.where(auxiliary_epic_identifier: appointment_location_auxiliary_id).first, appointment_location_auxiliary_id]
   end
 
+  def confirm_resource!
+    @resource.update!(pending: false)
+  end
+
   def create_or_find_resource!
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,
@@ -117,9 +122,9 @@ class V1::HenryFord::VerifyService
       provided_sex: sex,
       provided_zip: zip_code,
       provided_phone_type: phone_type,
-      provided_phone_number: phone_number
+      provided_phone_number: phone_number,
+      epic_id: epic_patient_id(@patient)
     )
-    resource.update!(visit_id: hfhs_visit_id)
   end
 
   def assign_patient_details!
