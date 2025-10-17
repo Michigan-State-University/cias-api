@@ -66,7 +66,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           expect(message.question).to eq(question)
         end
 
-        it 'does not call finish user session if that wasn\'t last question for Sms questions' do # rubocop:disable RSpec/PendingWithoutReason
+        it 'does not call finish user session if that wasn\'t last question for Sms questions' do
           described_class.perform_now(user.id, question.id, user_session.id, false)
           expect(user_session.reload.finished_at).to be_nil
         end
@@ -297,7 +297,7 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
         let!(:question) { create(:question_sms, question_group: question_group_initial) }
         let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 2) }
 
-        it 'does not call finish_user_session_if_that_was_last_question' do # rubocop:disable RSpec/PendingWithoutReason
+        it 'does not call finish_user_session_if_that_was_last_question' do
           described_class.perform_now(user.id, question.id, user_session.id, false)
           expect(user_session.reload.finished_at).to be_nil
         end
