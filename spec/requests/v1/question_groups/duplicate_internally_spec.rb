@@ -124,7 +124,9 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
       end
 
       it 'returns correct error message' do
-        expect(json_response['message']).to eq('Cannot modify intervention with multiple collaborators. Please ensure no other users are currently editing this intervention and that you have enabled editing mode for all relevant sessions before making changes.')
+        expect(json_response['message']).to eq('Cannot modify intervention with multiple collaborators. ' \
+                                               'Please ensure no other users are currently editing this intervention and that you have enabled ' \
+                                               'editing mode for all relevant sessions before making changes.')
       end
     end
   end
