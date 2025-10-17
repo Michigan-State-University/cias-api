@@ -8,7 +8,7 @@ RSpec.shared_examples 'collaboration mode - only one editor at the same time' do
     before { request }
 
     it {
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:unprocessable_content)
     }
   end
 end
