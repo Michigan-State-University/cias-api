@@ -95,6 +95,10 @@ module ExceptionHandler
       Sentry.capture_exception(exc)
       render json: msg(exc), status: :forbidden
     end
+
+    rescue_from ConcurrentEditException do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
   end
 
   private
