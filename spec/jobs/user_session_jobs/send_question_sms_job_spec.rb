@@ -66,13 +66,9 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
           expect(message.question).to eq(question)
         end
 
-        xit 'does not call finish_user_session_if_that_was_last_question for Sms questions' do # rubocop:disable RSpec/PendingWithoutReason
-          job_instance = described_class.new
-          expect(job_instance).not_to receive(:finish_user_session_if_that_was_last_question)
-          allow(described_class).to receive(:new).and_return(job_instance)
-          allow(job_instance).to receive(:perform).and_call_original
-
-          job_instance.perform(user.id, question.id, user_session.id, false)
+        it 'does not call finish user session if that wasn\'t last question for Sms questions' do # rubocop:disable RSpec/PendingWithoutReason
+          described_class.perform_now(user.id, question.id, user_session.id, false)
+          expect(user_session.reload.finished_at).to be_nil
         end
       end
     end
@@ -301,13 +297,9 @@ RSpec.describe UserSessionJobs::SendQuestionSmsJob, type: :job do
         let!(:question) { create(:question_sms, question_group: question_group_initial) }
         let!(:user_session) { create(:sms_user_session, user: user, session: session, number_of_repetitions: 2) }
 
-        xit 'does not call finish_user_session_if_that_was_last_question' do # rubocop:disable RSpec/PendingWithoutReason
-          job_instance = described_class.new
-          expect(job_instance).not_to receive(:finish_user_session_if_that_was_last_question)
-          allow(described_class).to receive(:new).and_return(job_instance)
-          allow(job_instance).to receive(:perform).and_call_original
-
-          job_instance.perform(user.id, question.id, user_session.id, false)
+        it 'does not call finish_user_session_if_that_was_last_question' do # rubocop:disable RSpec/PendingWithoutReason
+          described_class.perform_now(user.id, question.id, user_session.id, false)
+          expect(user_session.reload.finished_at).to be_nil
         end
       end
     end
