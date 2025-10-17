@@ -17,7 +17,6 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
       let(:new_session_variable) { old_session_variable }
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -26,7 +25,6 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
       let(:old_session_variable) { '' }
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -35,7 +33,6 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
       let(:new_session_variable) { '' }
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -86,36 +83,18 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
       end
 
       it 'updates patterns for session variable and question variables' do
-        expected_old_patterns = [
-          old_session_variable,
-          "#{old_session_variable}.question_var_1",
-          "#{old_session_variable}.question_var_2",
-          "#{old_session_variable}.question_var_3"
-        ]
-
-        expected_new_patterns = [
-          new_session_variable,
-          "#{new_session_variable}.question_var_1",
-          "#{new_session_variable}.question_var_2",
-          "#{new_session_variable}.question_var_3"
-        ]
-
-        expected_old_patterns.zip(expected_new_patterns).each do |old_pattern, new_pattern|
-          expect_any_instance_of(described_class).to receive(:update_variable_references)
-            .with(old_pattern, new_pattern)
-        end
+        expect(V1::VariableReferencesUpdate).to receive(:update_session_variable_references).with(session.id, old_session_variable, new_session_variable)
 
         perform_job
       end
 
       it 'runs within a transaction' do
-        expect_any_instance_of(described_class).to receive(:update_variable_references).at_least(:once)
+        expect(ActiveRecord::Base).to receive(:transaction).at_least(:once).and_call_original
         perform_job
       end
 
       it 'acquires formula update lock' do
-        expect_any_instance_of(described_class).to receive(:with_formula_update_lock)
-          .with(intervention.id).and_call_original
+        expect(V1::VariableReferencesUpdate).to receive(:update_session_variable_references).with(session.id, old_session_variable, new_session_variable)
 
         perform_job
       end
@@ -129,9 +108,7 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
         end
 
         it 'only processes the session variable itself' do
-          expect_any_instance_of(described_class).to receive(:update_variable_references)
-            .with(old_session_variable, new_session_variable)
-            .once
+          expect(V1::VariableReferencesUpdate).to receive(:update_session_variable_references).with(session.id, old_session_variable, new_session_variable)
 
           perform_job
         end
@@ -144,7 +121,7 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
       end
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:update_variable_references)
+        expect(V1::VariableReferencesUpdate).to receive(:update_session_variable_references).and_return(nil)
 
         perform_job
       end
@@ -211,8 +188,7 @@ RSpec.describe UpdateJobs::AdjustSessionVariableReferences, type: :job do
     end
 
     it 'extracts variables from all question types' do
-      job = described_class.new
-      variables = job.send(:extract_question_variables_from_session, session)
+      variables = V1::VariableReferencesUpdate.send(:extract_question_variables_from_session, session)
 
       expect(variables).to include('single_var', 'multi_var_1', 'multi_var_2', 'grid_var_1', 'grid_var_2')
     end

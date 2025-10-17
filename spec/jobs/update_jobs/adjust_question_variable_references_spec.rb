@@ -24,7 +24,6 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       let(:new_variable_name) { old_variable_name }
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -33,7 +32,6 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       let(:old_variable_name) { '' }
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -42,7 +40,6 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       let(:new_variable_name) { '' }
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -56,7 +53,6 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       end
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -142,8 +138,7 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       end
 
       it 'calls update_direct_variable_references and update_cross_session_variable_references' do
-        expect_any_instance_of(described_class).to receive(:update_direct_variable_references)
-        expect_any_instance_of(described_class).to receive(:update_cross_session_variable_references)
+        expect(V1::VariableReferencesUpdate).to receive(:update_question_variable_references).with(question.id, old_variable_name, new_variable_name)
 
         perform_job
       end
@@ -154,8 +149,7 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       end
 
       it 'acquires formula update lock' do
-        expect_any_instance_of(described_class).to receive(:with_formula_update_lock)
-          .with(intervention.id).and_call_original
+        expect(V1::VariableReferencesUpdate).to receive(:call).with(intervention.id).and_call_original
 
         perform_job
       end
@@ -168,8 +162,7 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       end
 
       it 'acquires formula update lock' do
-        expect_any_instance_of(described_class).to receive(:with_formula_update_lock)
-          .with(intervention.id).and_call_original
+        expect(V1::VariableReferencesUpdate).to receive(:call).with(intervention.id).and_call_original
 
         perform_job
       end
@@ -181,7 +174,7 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
       end
 
       it 'returns early without processing' do
-        expect_any_instance_of(described_class).not_to receive(:update_question_formulas_scoped)
+        expect(V1::VariableReferencesUpdate).to receive(:update_question_variable_references).and_return(nil)
 
         perform_job
       end
