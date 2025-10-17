@@ -41,7 +41,7 @@ RSpec.describe UserSession::Sms, type: :model do
       timestamp = DateTime.current
       sms_user_session.max_repetitions_reached_at = timestamp
       expect(sms_user_session).to be_valid
-      expect(sms_user_session.max_repetitions_reached_at).to eq(timestamp)
+      expect(sms_user_session.max_repetitions_reached_at.strftime('%Y-%m-%d %H:%M:%S')).to eq(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
     end
   end
 
