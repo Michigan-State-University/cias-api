@@ -283,6 +283,11 @@ class User < ApplicationRecord
     super
   end
 
+  # Exclude migrated_first_name, migrated_last_name, migrated_email, migrated_uid from audited changes
+  def audited_changes
+    super.except('migrated_first_name', 'migrated_last_name', 'migrated_email', 'migrated_uid')
+  end
+
   private
 
   def send_welcome_email

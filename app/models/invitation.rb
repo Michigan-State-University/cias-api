@@ -22,4 +22,9 @@ class Invitation < ApplicationRecord
     end
     :ok
   end
+
+  # Exclude migrated_email from audited changes
+  def audited_changes
+    super.except('migrated_email')
+  end
 end

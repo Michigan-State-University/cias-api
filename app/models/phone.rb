@@ -38,6 +38,11 @@ class Phone < ApplicationRecord
     prefix + number
   end
 
+  # Exclude migrated_number from audited changes
+  def audited_changes
+    super.except('migrated_number')
+  end
+
   private
 
   def alert_phone_exists?
