@@ -9,6 +9,7 @@ class V1::Auth::ConfirmationsController < DeviseTokenAuth::ConfirmationsControll
 
   # Due to changes in Rails 7, we need to add allow_other_host while redirecting
   def redirect_options
-    @redirect_url&.start_with?(ENV.fetch('WEB_URL', nil)) ? { allow_other_host: true } : {}
+    redirect_url = @redirect_url || params[:redirect_url]
+    redirect_url&.start_with?(ENV.fetch('WEB_URL', nil)) ? { allow_other_host: true } : {}
   end
 end
