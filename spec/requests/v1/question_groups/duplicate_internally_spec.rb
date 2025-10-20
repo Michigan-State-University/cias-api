@@ -97,5 +97,37 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
         expect(response).to have_http_status(:not_found)
       end
     end
+
+    context 'fail when target intervention has multiple collaborators' do
+      let(:other_intervention) { create(:intervention, :with_collaborators, user: user) }
+
+      let(:params) do
+        {
+          question_groups: [
+            {
+              id: question_groups[0].id,
+              question_ids: [questions[0].id, questions[1].id]
+            },
+            {
+              id: question_groups[2].id,
+              question_ids: [questions[6].id]
+            }
+          ],
+          session_id: target_session.id
+        }
+      end
+
+      before { request }
+
+      it 'returns unprocessable_entity status' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'returns correct error message' do
+        expect(json_response['message']).to eq('Cannot modify intervention with multiple collaborators. ' \
+                                               'Please ensure no other users are currently editing this intervention and that you have enabled ' \
+                                               'editing mode for all relevant sessions before making changes.')
+      end
+    end
   end
 end

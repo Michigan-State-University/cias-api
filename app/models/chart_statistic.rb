@@ -6,6 +6,7 @@ class ChartStatistic < ApplicationRecord
   belongs_to :health_system
   belongs_to :health_clinic
   belongs_to :user
+  belongs_to :user_session
   belongs_to :chart
 
   scope :filled_between, ->(date_range) { where(filled_at: date_range) }

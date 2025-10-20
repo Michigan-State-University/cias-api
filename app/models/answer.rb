@@ -24,6 +24,7 @@ class Answer < ApplicationRecord
 
   scope :hfhs, -> { where(type: Answer::HenryFord.name) }
 
+  audited except: %i[body body_ciphertext video_stats migrated_body decrypted_body]
   has_encrypted :body, type: :json, migrating: true
 
   default_scope { order(:created_at) }

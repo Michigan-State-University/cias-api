@@ -15,6 +15,7 @@ class Session < ApplicationRecord
   belongs_to :google_tts_voice, optional: true
   belongs_to :google_language, optional: true
 
+  has_many :sms_links, dependent: :destroy
   has_many :sms_plans, dependent: :destroy
 
   has_many :invitations, as: :invitable, dependent: :destroy
@@ -70,8 +71,8 @@ class Session < ApplicationRecord
   validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
   validates :autoclose_at, presence: true, if: :autoclose_enabled
 
-  after_initialize :set_sms_defaults
   before_validation :set_default_variable
+  after_create :set_sms_defaults
   after_create :assign_default_tts_voice
   after_create :assign_default_google_language
 
@@ -241,5 +242,6 @@ class Session < ApplicationRecord
 
     self.default_response ||= I18n.t('sessions.default_response')
     self.welcome_message ||= I18n.t('sessions.welcome_message')
+    self.completion_message ||= I18n.t('sessions.completion_message')
   end
 end
