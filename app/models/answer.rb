@@ -28,8 +28,9 @@ class Answer < ApplicationRecord
   has_encrypted :body, type: :json, migrating: true
 
   # Exclude migrated_body and decrypted_body from audited changes
-  def audited_changes
-    super.except('migrated_body', 'decrypted_body')
+  def audited_changes(changes = nil)
+    changes ||= super
+    changes.except('migrated_body', 'decrypted_body')
   end
 
   default_scope { order(:created_at) }
