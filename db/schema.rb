@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -182,7 +182,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_08_115913) do
     t.datetime "updated_at", null: false
     t.datetime "filled_at", precision: nil
     t.uuid "user_session_id"
-    t.boolean "v2_record", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"

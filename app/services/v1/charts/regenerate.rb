@@ -13,7 +13,7 @@ class V1::Charts::Regenerate
   def call
     ChartStatistic.where(chart_id: chart_ids).destroy_all if replace
     chart_ids.each do |chart_id|
-      V1::ChartStatistics::CreateForUserSessions.call(chart_id, true)
+      V1::ChartStatistics::CreateForUserSessions.call(chart_id)
     end
   end
 
