@@ -441,8 +441,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_113649) do
     t.string "provided_zip_bidx"
     t.string "provided_phone_type_bidx"
     t.string "provided_phone_number_bidx"
-    t.boolean "pending", default: false, null: false
-    t.string "epic_id"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end
