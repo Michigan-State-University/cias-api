@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../../services/v1/sms/sms_events_helper'
-
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
-  include SmsEventHelper
+  include SmsCampaign::SmsEventsHelper
   include SmsCampaign::FinishUserSessionHelper
 
   queue_as :question_sms

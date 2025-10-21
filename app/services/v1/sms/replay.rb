@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-require_relative '../sms/sms_events_helper'
-
 # rubocop:disable Metrics/ClassLength
 class V1::Sms::Replay
   include SmsCampaign::FinishUserSessionHelper
-  include ::SmsEventHelper
+  include SmsCampaign::SmsEventsHelper
 
   attr_reader :from_number, :to_number, :message
 

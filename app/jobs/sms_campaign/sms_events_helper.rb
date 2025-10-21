@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # rubocop:disable Metrics/ModuleLength
-module SmsEventHelper
+module SmsCampaign::SmsEventsHelper
   def log_start_session(user_session)
     SmsCampaignEvent.create!(
       event_type: 'user_session_created',

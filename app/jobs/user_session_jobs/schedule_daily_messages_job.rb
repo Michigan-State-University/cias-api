@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require_relative '../../services/v1/sms/sms_events_helper'
-
 class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
-  include ::SmsEventHelper
+  include SmsCampaign::SmsEventsHelper
 
   queue_as :question_sms
   DELAY_BETWEEN_QUESTIONS_IN_SECONDS = 10
