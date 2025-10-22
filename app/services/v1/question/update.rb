@@ -16,14 +16,14 @@ class V1::Question::Update
 
     previous_var = question_variables
 
-    changed_vars = changed_variables_preview(previous_var, question_params)
+    changed_vars = changed_variables(previous_var, question_params)
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress') if !changed_vars.empty? && formula_update_in_progress?
 
     question.assign_attributes(question_params.except(:type))
     question.execute_narrator
     question.save!
 
-    adjust_variable_references(previous_var)
+    adjust_variable_references(changed_vars)
 
     question
   end
@@ -33,8 +33,7 @@ class V1::Question::Update
   attr_reader :question_params
   attr_accessor :question
 
-  def adjust_variable_references(previous_variables)
-    changed_vars = changed_variables(previous_variables)
+  def adjust_variable_references(changed_vars)
     return if changed_vars.empty?
 
     changed_vars.each do |old_var, new_var|
@@ -46,16 +45,7 @@ class V1::Question::Update
     end
   end
 
-  def changed_variables(previous_variables)
-    previous_variables.zip(question_variables).filter_map do |prev_var, curr_var|
-      next if prev_var.nil? || curr_var.nil?
-      next if prev_var['name'] == curr_var['name']
-
-      [prev_var['name'], curr_var['name']]
-    end
-  end
-
-  def changed_variables_preview(previous_variables, params)
+  def changed_variables(previous_variables, params)
     new_vars = question.extract_variables_from_params(params)
     return [] if new_vars.empty?
 
