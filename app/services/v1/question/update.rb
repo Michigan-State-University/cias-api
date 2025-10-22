@@ -15,10 +15,16 @@ class V1::Question::Update
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.not_uniq_variable') if new_variable_is_taken?(new_variables)
 
     previous_var = question_variables
+
+    changed_vars = changed_variables(previous_var, question_params)
+    raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress') if !changed_vars.empty? && formula_update_in_progress?
+
     question.assign_attributes(question_params.except(:type))
     question.execute_narrator
     question.save!
-    adjust_reflections(previous_var)
+
+    adjust_variable_references(changed_vars)
+
     question
   end
 
@@ -27,25 +33,36 @@ class V1::Question::Update
   attr_reader :question_params
   attr_accessor :question
 
-  def adjust_reflections(previous_variables)
-    previous_variables.zip(question_variables).each do |previous_variable, variable|
-      next if previous_variable['name'] == variable['name']
+  def adjust_variable_references(changed_vars)
+    return if changed_vars.empty?
 
-      UpdateJobs::AdjustQuestionReflections.perform_later(question, previous_variable['name'], variable['name'])
+    changed_vars.each do |old_var, new_var|
+      UpdateJobs::AdjustQuestionVariableReferences.perform_later(
+        question.id,
+        old_var,
+        new_var
+      )
     end
   end
 
-  def question_variables
-    case question.type
-    when 'Question::Single'
-      [question.body['variable']]
-    when 'Question::Multiple'
-      question.body['data'].pluck('variable')
-    when 'Question::Grid'
-      question.body['data'].first['payload']['rows'].pluck('variable')
-    else
-      []
+  def changed_variables(previous_variables, params)
+    new_vars = question.extract_variables_from_params(params)
+    return [] if new_vars.empty?
+
+    previous_variables.zip(new_vars).filter_map do |prev_var, new_var|
+      next if prev_var.nil? || new_var.nil?
+      next if prev_var['name'] == new_var['name']
+
+      [prev_var['name'], new_var['name']]
     end
+  end
+
+  def formula_update_in_progress?
+    question.session.intervention.formula_update_in_progress?
+  end
+
+  def question_variables
+    question.question_variables.map { |var| { 'name' => var } }
   end
 
   def new_variables

@@ -39,4 +39,14 @@ class Question::Grid < Question
   def question_variables
     body['data'].flat_map { |data| data['payload']['rows'].map { |row| row['variable']['name'] } }
   end
+
+  def extract_variables_from_params(params)
+    rows = params.dig(:body, :data, 0, :payload, :rows)
+    return [] if rows.blank?
+
+    rows.filter_map do |row|
+      name = row.dig(:variable, :name)
+      { 'name' => name } if name.present?
+    end
+  end
 end
