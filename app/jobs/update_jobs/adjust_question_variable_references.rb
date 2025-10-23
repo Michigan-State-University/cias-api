@@ -7,6 +7,11 @@ class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferen
 
     question = Question.find(question_id)
 
+    if question.nil?
+      Rails.logger.warn "[#{self.class.name}] Skipping job, Question with ID #{question_id} not found."
+      return
+    end
+
     with_formula_update_lock(question.session.intervention_id) do
       V1::VariableReferences::QuestionService.call(
         question_id,
