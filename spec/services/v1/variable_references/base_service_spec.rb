@@ -61,7 +61,11 @@ RSpec.describe V1::VariableReferences::BaseService, type: :service do
     describe '#build_jsonb_formula_update_sql' do
       it 'builds correct SQL for updating formulas' do
         base_query = double
-        allow(base_query).to receive_message_chain(:select, :where, :to_sql).and_return('SELECT questions.id FROM questions WHERE questions.id = 1')
+        select_double = double
+        where_double = double
+        allow(base_query).to receive(:select).and_return(select_double)
+        allow(select_double).to receive(:where).and_return(where_double)
+        allow(where_double).to receive(:to_sql).and_return('SELECT questions.id FROM questions WHERE questions.id = 1')
 
         sql = service.build_jsonb_formula_update_sql('questions', 'old_var', 'new_var', base_query)
 

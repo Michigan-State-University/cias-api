@@ -62,8 +62,8 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
       it 'executes the update in a transaction' do
         expect(ActiveRecord::Base).to receive(:transaction).and_yield
 
-        allow(service).to receive(:patterns_to_update).and_return(['old_session_var', 'old_session_var.var1'])
-        allow(service).to receive(:new_patterns).and_return(['new_session_var', 'new_session_var.var1'])
+        allow(service).to receive_messages(patterns_to_update: ['old_session_var', 'old_session_var.var1'],
+                                           new_patterns: ['new_session_var', 'new_session_var.var1'])
         allow(service).to receive(:update_variable_references)
 
         expect(Rails.logger).to receive(:info).with(/Service completed successfully/)
@@ -74,8 +74,7 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
       it 'calls update_variable_references for each pattern pair' do
         allow(ActiveRecord::Base).to receive(:transaction).and_yield
 
-        allow(service).to receive(:patterns_to_update).and_return(%w[pattern1 pattern2])
-        allow(service).to receive(:new_patterns).and_return(%w[new_pattern1 new_pattern2])
+        allow(service).to receive_messages(patterns_to_update: %w[pattern1 pattern2], new_patterns: %w[new_pattern1 new_pattern2])
 
         expect(service).to receive(:update_variable_references).with('pattern1', 'new_pattern1')
         expect(service).to receive(:update_variable_references).with('pattern2', 'new_pattern2')
@@ -172,7 +171,7 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
 
     describe '#extract_question_variables_from_session' do
       it 'executes the correct SQL query' do
-        expect(ActiveRecord::Base.connection).to receive(:exec_query).with(
+        allow(ActiveRecord::Base.connection).to receive(:exec_query).with(
           a_string_matching(/WITH session_questions AS/),
           'SQL',
           [session.id]
