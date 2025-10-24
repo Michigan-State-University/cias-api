@@ -9,6 +9,7 @@ class Intervention < ApplicationRecord
   include TranslationAuxiliaryMethods
   include MessageHandler
   extend DefaultValues
+  include SanitizationHelper
 
   CURRENT_VERSION = '1'
 
@@ -85,6 +86,7 @@ class Intervention < ApplicationRecord
   before_validation :assign_default_google_language
   before_save :create_navigator_setup, if: -> { live_chat_enabled && navigator_setup.nil? }
   before_save :remove_short_links, if: :will_save_change_to_organization_id?
+  before_save :sanitize_and_escape_name, if: :will_save_change_to_name?
   before_update :cascade_access_type_change, if: :shared_to_changed?
   after_update_commit :status_change, :hf_access_change
 
@@ -298,5 +300,9 @@ class Intervention < ApplicationRecord
     scope = scope.only_shared_by_me(user.id) if params[:only_shared_by_me].present?
     scope = scope.only_not_shared_with_anyone(user.id) if params[:only_not_shared_with_anyone].present?
     scope
+  end
+
+  def sanitize_and_escape_name
+    self.name = sanitize_string(name)
   end
 end
