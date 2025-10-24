@@ -111,11 +111,15 @@ RSpec.describe V1::SessionService, type: :service do
     end
 
     context 'when old variable is blank' do
-      let(:session) { create(:session, intervention: intervention, variable: nil) }
+      before do
+        session.update_column(:variable, nil)
+      end
+
       let(:params) { { variable: 'new_var' } }
 
       it 'does not enqueue formula adjustment job' do
-        expect(UpdateJobs::AdjustSessionVariableReferences).not_to receive(:perform_later)
+        expect(UpdateJobs::AdjustSessionVariableReferences)
+          .not_to receive(:perform_later)
         subject
       end
     end
@@ -123,8 +127,14 @@ RSpec.describe V1::SessionService, type: :service do
     context 'when new variable is blank' do
       let(:params) { { variable: nil } }
 
+      before do
+        allow(service).to receive(:session_load).with(session.id).and_return(session)
+        allow(session).to receive(:integral_update)
+      end
+
       it 'does not enqueue formula adjustment job' do
-        expect(UpdateJobs::AdjustSessionVariableReferences).not_to receive(:perform_later)
+        expect(UpdateJobs::AdjustSessionVariableReferences)
+          .not_to receive(:perform_later)
         subject
       end
     end
