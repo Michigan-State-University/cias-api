@@ -24,13 +24,13 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
   let!(:url2) { 'amazon.com' }
   let(:title) { 'Active Record Migrations — Ruby on Rails Guides' }
   let(:description) do
-    'Migrations are a feature of Active Record that allows you to evolve your '\
-      'database schema over time. Rather than write schema modifications in pure SQL, '\
-      'migrations allow you to use a Ruby Domain Specific Language (DSL) to describe changes '\
-      'to your tables.After reading this guide, you will know: '\
-      'Which generators you can use to create migrations. '\
-      'Which methods Active Record provides to manipulate your database. '\
-      'How to change existing migrations and update your schema. '\
+    'Migrations are a feature of Active Record that allows you to evolve your ' \
+      'database schema over time. Rather than write schema modifications in pure SQL, ' \
+      'migrations allow you to use a Ruby Domain Specific Language (DSL) to describe changes ' \
+      'to your tables.After reading this guide, you will know: ' \
+      'Which generators you can use to create migrations. ' \
+      'Which methods Active Record provides to manipulate your database. ' \
+      'How to change existing migrations and update your schema. ' \
       'How migrations relate to schema.rb. How to maintain referential integrity.'
   end
   let(:title2) { 'Amazon.com' }
