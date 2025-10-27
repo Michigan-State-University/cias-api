@@ -27,6 +27,12 @@ class Answer < ApplicationRecord
   audited except: %i[body body_ciphertext video_stats migrated_body decrypted_body]
   has_encrypted :body, type: :json, migrating: true
 
+  # Exclude migrated_body and decrypted_body from audited changes
+  def audited_changes(changes = nil)
+    changes ||= super
+    changes.except('migrated_body', 'decrypted_body')
+  end
+
   default_scope { order(:created_at) }
 
   def on_answer; end

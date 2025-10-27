@@ -13,7 +13,9 @@ class Api::EpicOnFhir::Authentication
   end
 
   def call
-    response = Faraday.post(ENDPOINT) do |request|
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+
+    response = connection.post do |request|
       request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       request.body = URI.encode_www_form(params)
     end

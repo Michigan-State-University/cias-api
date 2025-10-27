@@ -28,6 +28,13 @@ class Question::Slider < Question
     [body['variable']['name']]
   end
 
+  def extract_variables_from_params(params)
+    variable_name = params.dig(:body, :variable, :name)
+    return [] if variable_name.blank?
+
+    [{ 'name' => variable_name }]
+  end
+
   private
 
   def original_payload(row)

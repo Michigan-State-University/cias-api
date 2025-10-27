@@ -24,7 +24,9 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
   private
 
   def request
-    Faraday.post(ENDPOINT) do |request|
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+
+    connection.post do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
       request.headers['Content-Type'] = 'application/fhir+json'
       request.headers['Accept'] = 'application/fhir+json'
