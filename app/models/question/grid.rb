@@ -45,8 +45,8 @@ class Question::Grid < Question
     return [] if rows.blank?
 
     rows.filter_map do |row|
-      name = row.dig(:variable, :name)
-      { 'name' => name } if name.present?
+      variable_name = row.dig(:variable, :name)
+      { 'name' => variable_name } if variable_name.present?
     end
   end
 end

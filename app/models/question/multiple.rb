@@ -41,8 +41,8 @@ class Question::Multiple < Question
     return [] if data.blank?
 
     data.filter_map do |row|
-      name = row.dig(:variable, :name)
-      { 'name' => name } if name.present?
+      variable_name = row.dig(:variable, :name)
+      { 'name' => variable_name } if variable_name.present?
     end
   end
 end
