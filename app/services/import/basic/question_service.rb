@@ -20,12 +20,18 @@ class Import::Basic::QuestionService
 
   def call
     question_hash.delete(:relations_data)
-    question = Question.create!(question_hash.merge({ question_group_id: question_group_id, image: import_file(image) }))
-    add_description!(question) unless image.nil?
+    question = Question.create!(question_hash.merge({ question_group_id: question_group_id }))
+    attach_image_directly(question) if image.present?
+
     question
   end
 
   private
+
+  def attach_image_directly(question)
+    import_file_directly(question, :image, image)
+    add_description!(question)
+  end
 
   def add_description!(question)
     question.image_blob&.update(description: image[:description])
