@@ -23,7 +23,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
         {
           invitation: {
             invitation_token: invitation_token,
-            password: 'kytdhdn#@!',
+            password: 'kytdhdn#@!12',
             password_confirmation: 'kytdhdn#@!',
             first_name: 'Jhon',
             last_name: 'Doe'
@@ -46,7 +46,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
         {
           invitation: {
             invitation_token: 'INVALID_TOKEN',
-            password: 'kytdhdn#@!',
+            password: 'kytdhdn#@!12',
             password_confirmation: 'kytdhdn#@!',
             first_name: 'Jhon',
             last_name: 'Doe'
@@ -67,7 +67,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
         {
           invitation: {
             invitation_token: invitation_token,
-            password: 'kytdhdn#@!',
+            password: 'kytdhdn#@!123',
             password_confirmation: 'kytdhdn#@!',
             first_name: 'Jhon',
             last_name: 'Doe'
