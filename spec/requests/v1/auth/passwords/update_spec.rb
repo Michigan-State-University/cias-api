@@ -5,7 +5,7 @@ require 'rails_helper'
 describe 'PATCH /v1/auth/password', type: :request do
   let(:current_user) { create(:user, :admin, password: 'SomePassword1!') }
   let(:current_password) { 'SomePassword1!' }
-  let(:password) { 'ComplPass1!' }
+  let(:password) { 'ComplPass12!' }
   let(:password_confirmation) { password }
   let(:params) do
     {
