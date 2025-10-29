@@ -7,7 +7,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
     {
       email: 'test@test.com',
       password: 'password123!',
-      password_confirmation: 'password',
+      password_confirmation: 'password123!',
       first_name: 'first name',
       last_name: 'last name',
       terms: true,
@@ -39,7 +39,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
       {
         email: 'test@test.com',
         password: 'password123!',
-        password_confirmation: 'password',
+        password_confirmation: 'password123!',
         first_name: 'first name',
         last_name: 'last name',
         terms: false,
