@@ -19,7 +19,10 @@ class V1::HenryFord::VerifyService
   attr_accessor :resource
 
   def call
-    if patient_params[:hfhs_patient_detail_id].present?
+    if patient_params[:id].present?
+      @resource = HfhsPatientDetail.find(patient_params[:id])
+      confirm_resource!
+    elsif patient_params[:hfhs_patient_detail_id].present?
       @resource = HfhsPatientDetail.find(patient_params[:hfhs_patient_detail_id])
       confirm_resource!
     else
