@@ -334,4 +334,33 @@ RSpec.describe Intervention, type: :model do
       end
     end
   end
+
+  describe 'name sanitization' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let(:intervention) { build(:intervention, user: user) }
+
+    context 'with clean text' do
+      it 'keeps the name unchanged' do
+        intervention.name = 'Example name'
+        intervention.save!
+        expect(intervention.reload.name).to eq('Example name')
+      end
+    end
+
+    context 'with only allowed <b> tag' do
+      it 'sanitizes but keeps the <b> tag content' do
+        intervention.name = '<b>Example name</b>'
+        intervention.save!
+        expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
+      end
+    end
+
+    context 'with script tag' do
+      it 'removes script tag and sanitizes remaining HTML' do
+        intervention.name = '<script>alert(1)</script><b>Example name</b>'
+        intervention.save!
+        expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
+      end
+    end
+  end
 end

@@ -13,6 +13,7 @@ class Interventions::ImportJob < ApplicationJob
       get_import_service_class(intervention_hash, Intervention).call(user_id, intervention_hash)
     rescue ActiveRecord::RecordInvalid, ActiveRecord::SubclassNotFound, ActiveModel::UnknownAttributeError
       create_email_and_notification!(user_id)
+      raise ActiveRecord::Rollback
     end
   ensure
     imported_file.destroy!

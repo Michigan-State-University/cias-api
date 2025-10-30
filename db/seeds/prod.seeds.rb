@@ -23,7 +23,7 @@ class CreateProdUsers
           first_name: 'Admin',
           last_name: 'Account',
           email: email,
-          password: 'Password1!',
+          password: 'Password123!',
           roles: ['admin']
         )
         u.confirm

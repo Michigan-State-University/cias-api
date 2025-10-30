@@ -333,6 +333,10 @@ GEM
       activesupport (>= 4.2)
     jwt (2.10.2)
       base64
+    kredis (1.8.0)
+      activemodel (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      redis (>= 4.2, < 6)
     language_server-protocol (3.17.0.5)
     launchy (3.1.1)
       addressable (~> 2.8)
@@ -364,6 +368,8 @@ GEM
     loofah (2.24.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    loofah-activerecord (2.0.0)
+      loofah (>= 1.0.0)
     lumberjack (1.4.2)
     mail (2.8.1)
       mini_mime (>= 0.1.1)
@@ -705,11 +711,13 @@ DEPENDENCIES
   jmespath (>= 1.6.1)
   jsonapi-serializer
   jwt (~> 2.6)
+  kredis (~> 1.5)
   letter_opener_web
   license_finder
   lockbox
   logstop
   loofah (>= 2.19.1)
+  loofah-activerecord (~> 2.0)
   metainspector (~> 5.5)
   nokogiri (>= 1.18.9)
   oj

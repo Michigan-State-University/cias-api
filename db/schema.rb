@@ -507,6 +507,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
     t.datetime "clear_sensitive_data_scheduled_at", precision: nil
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
+    t.boolean "formula_update_in_progress", default: false, null: false
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -822,6 +823,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
     t.index ["health_clinic_id"], name: "index_short_links_on_health_clinic_id"
     t.index ["linkable_type", "linkable_id"], name: "index_short_links_on_linkable"
     t.index ["name"], name: "index_short_links_on_name", unique: true
+  end
+
+  create_table "sms_campaign_events", force: :cascade do |t|
+    t.jsonb "event_data", default: {}, null: false
+    t.string "event_type", null: false
+    t.uuid "user_session_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_session_id"], name: "index_sms_campaign_events_on_user_session_id"
   end
 
   create_table "sms_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1149,6 +1159,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
   add_foreign_key "sessions", "google_languages"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
+  add_foreign_key "sms_campaign_events", "user_sessions"
   add_foreign_key "sms_codes", "health_clinics"
   add_foreign_key "sms_codes", "sessions"
   add_foreign_key "sms_links", "sessions"
