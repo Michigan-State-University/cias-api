@@ -4,6 +4,8 @@ class ApplicationController < ActionController::API
   before_action :user_params, if: :devise_controller?
   include Log
 
+  rate_limit to: ENV.fetch('RATE_LIMIT_TO', 100).to_i, within: 1.minute
+
   protected
 
   def user_params
