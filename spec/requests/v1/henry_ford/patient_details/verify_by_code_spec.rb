@@ -95,7 +95,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
         expect(json_response).to have_key('data')
         expect(json_response['data']).to have_key('id')
         expect(json_response['data']).to have_key('type')
-        expect(json_response['data']['type']).to eq('hfhs_patient_detail')
+        expect(json_response['data']['type']).to eq('hfhs_patient_detail_anonymized')
       end
 
       it 'creates patient detail record with correct data' do
@@ -127,7 +127,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
 
       it 'creates patient detail record' do
         json_response = response.parsed_body
-        expect(json_response['data']['type']).to eq('hfhs_patient_detail')
+        expect(json_response['data']['type']).to eq('hfhs_patient_detail_anonymized')
       end
     end
 
