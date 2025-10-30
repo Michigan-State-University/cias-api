@@ -26,8 +26,11 @@ class V1::HenryFord::HandleBarCodeService
   private
 
   def create_draft_patient_record(epic_response)
-    resource = HfhsPatientDetail.find_or_create_by!(
-      patient_id: hfhs_patient_id(epic_response),
+    resource = HfhsPatientDetail.find_or_initialize_by(
+      patient_id: hfhs_patient_id(epic_response)
+    )
+
+    resource.assign_attributes(
       first_name: epic_first_name(epic_response),
       last_name: epic_last_name(epic_response),
       dob: epic_dob(epic_response),
@@ -35,9 +38,11 @@ class V1::HenryFord::HandleBarCodeService
       zip_code: epic_zip_code(epic_response),
       phone_type: epic_phone_type(epic_response),
       phone_number: epic_phone_number(epic_response),
-      epic_id: epic_patient_id(epic_response)
+      epic_id: epic_patient_id(epic_response),
+      pending: true
     )
-    resource.update!(pending: true)
+
+    resource.save!
     resource
   end
 

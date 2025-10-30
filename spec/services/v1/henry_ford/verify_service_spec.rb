@@ -68,7 +68,7 @@ RSpec.describe V1::HenryFord::VerifyService do
     end
   end
 
-  context 'when hfhs_patient_detail_id is provided' do
+  context 'when id is provided' do
     let!(:existing_patient_detail) do
       create(:hfhs_patient_detail,
              patient_id: '89010892',
@@ -85,7 +85,7 @@ RSpec.describe V1::HenryFord::VerifyService do
 
     let(:params) do
       {
-        hfhs_patient_detail_id: existing_patient_detail.id
+        id: existing_patient_detail.id
       }
     end
 
@@ -129,10 +129,10 @@ RSpec.describe V1::HenryFord::VerifyService do
     end
   end
 
-  context 'when hfhs_patient_detail_id is provided but record not found' do
+  context 'when id is provided but record not found' do
     let(:params) do
       {
-        hfhs_patient_detail_id: 'non-existent-id'
+        id: 'non-existent-id'
       }
     end
 
