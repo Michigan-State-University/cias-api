@@ -13,6 +13,8 @@ class RemoveV2RecordFieldFromChartStatistics < ActiveRecord::Migration[7.2]
   private
 
   def remove_legacy_records
-    AuxiliaryChartStatistic.where(v2_record: false).delete_all
+    if AuxiliaryChartStatistic.where(v2_record: true).any?
+      AuxiliaryChartStatistic.where(v2_record: false, user_session_id: nil).delete_all
+    end
   end
 end
