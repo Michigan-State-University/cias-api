@@ -333,6 +333,10 @@ GEM
       activesupport (>= 4.2)
     jwt (2.10.2)
       base64
+    kredis (1.8.0)
+      activemodel (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      redis (>= 4.2, < 6)
     language_server-protocol (3.17.0.5)
     launchy (3.1.1)
       addressable (~> 2.8)
@@ -705,6 +709,7 @@ DEPENDENCIES
   jmespath (>= 1.6.1)
   jsonapi-serializer
   jwt (~> 2.6)
+  kredis (~> 1.5)
   letter_opener_web
   license_finder
   lockbox
