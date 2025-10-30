@@ -21,6 +21,8 @@ class UserSession < ApplicationRecord
   def all_var_values(include_session_var: true)
     answers.confirmed.each_with_object({}) do |answer, var_values|
       answer.body_data.each do |obj|
+        next if obj['var'].nil?
+
         key = include_session_var ? "#{session.variable}.#{obj['var'].tr('/', '')}" : obj['var'].tr('/', '')
         var_values[key] = map_to_numeric_value(obj, answer)
       end
