@@ -27,7 +27,7 @@ describe 'PATCH /v1/auth/password', type: :request do
     end
 
     it 'changes password' do
-      expect(current_user.reload.valid_password?('ComplPass1!')).to be true
+      expect(current_user.reload.valid_password?('ComplPass12!')).to be true
     end
   end
 
