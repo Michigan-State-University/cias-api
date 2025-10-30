@@ -15,15 +15,22 @@ class V1::Question::Update
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.not_uniq_variable') if new_variable_is_taken?(new_variables)
 
     previous_var = question_variables
-
     changed_vars = changed_variables(previous_var, question_params)
-    raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress') if !changed_vars.empty? && formula_update_in_progress?
+
+    previous_answer_options = question.question_answers
+    new_answer_options = question.extract_answers_from_params(question_params)
+    changed_answers_options = changed_answer_options(previous_answer_options, new_answer_options)
+
+    if (!changed_vars.empty? || !changed_answers_options.empty?) && formula_update_in_progress?
+      raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress')
+    end
 
     question.assign_attributes(question_params.except(:type))
     question.execute_narrator
     question.save!
 
     adjust_variable_references(changed_vars)
+    adjust_answer_options_references(changed_answers_options)
 
     question
   end
@@ -45,6 +52,15 @@ class V1::Question::Update
     end
   end
 
+  def adjust_answer_options_references(changed_answer_options)
+    return if changed_answer_options.empty?
+
+    UpdateJobs::AdjustQuestionAnswerOptions.perform_later(
+      question.id,
+      changed_answer_options
+    )
+  end
+
   def changed_variables(previous_variables, params)
     new_vars = question.extract_variables_from_params(params)
     return [] if new_vars.empty?
@@ -55,6 +71,24 @@ class V1::Question::Update
 
       [prev_var['name'], new_var['name']]
     end
+  end
+
+  def changed_answer_options(old_options, new_options)
+    old_map = old_options.to_h { |opt| [opt['name'], opt['payload']] }
+    new_map = new_options.to_h { |opt| [opt['name'], opt['payload']] }
+
+    changes = {}
+
+    old_map.each do |var_name, old_payload|
+      new_payload = new_map[var_name]
+
+      next if old_payload.blank? || new_payload.blank? || old_payload == new_payload
+
+      changes[var_name] ||= {}
+      changes[var_name][old_payload] = new_payload
+    end
+
+    changes
   end
 
   def formula_update_in_progress?

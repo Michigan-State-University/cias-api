@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferencesUpdateJob
-  def perform(question_id, old_variable_name, new_variable_name)
-    return if old_variable_name == new_variable_name
-    return if old_variable_name.blank? || new_variable_name.blank?
+class UpdateJobs::AdjustQuestionAnswerOptions < UpdateJobs::VariableReferencesUpdateJob
+  def perform(question_id, changed_answer_values)
+    return if changed_answer_values.blank?
 
-    question = Question.find(question_id)
-
+    question = Question.find_by(id: question_id)
     if question.nil?
       Rails.logger.warn "[#{self.class.name}] Skipping job, Question with ID #{question_id} not found."
       return
@@ -19,10 +17,9 @@ class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferen
     end
 
     with_formula_update_lock(intervention_id) do
-      V1::VariableReferences::QuestionService.call(
+      V1::VariableReferences::AnswerOptionsService.call(
         question_id,
-        old_variable_name,
-        new_variable_name
+        changed_answer_values
       )
     end
   end

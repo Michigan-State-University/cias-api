@@ -49,4 +49,32 @@ class Question::Grid < Question
       { 'name' => variable_name } if variable_name.present?
     end
   end
+
+  def question_answers
+    rows = body.dig('data', 0, 'payload', 'rows')
+    return [] if rows.blank?
+
+    rows.filter_map do |row|
+      var_name = row.dig('variable', 'name')
+      payload_text = row['payload']
+
+      next if var_name.blank?
+
+      { 'name' => var_name, 'payload' => payload_text }
+    end
+  end
+
+  def extract_answers_from_params(params)
+    rows = params.dig(:body, :data, 0, :payload, :rows)
+    return [] if rows.blank?
+
+    rows.filter_map do |row|
+      var_name = row.dig(:variable, :name)
+      payload_text = row[:payload]
+
+      next if var_name.blank?
+
+      { 'name' => var_name, 'payload' => payload_text }
+    end
+  end
 end
