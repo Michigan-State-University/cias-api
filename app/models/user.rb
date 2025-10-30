@@ -148,6 +148,8 @@ class User < ApplicationRecord
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
+  audited except: %i[email email_ciphertext first_name first_name_ciphertext last_name last_name_ciphertext uid uid_ciphertext
+                     migrated_first_name migrated_last_name migrated_email migrated_uid tokens]
   has_encrypted :email, :first_name, :last_name, :uid
   blind_index :email, :uid
 
@@ -279,6 +281,12 @@ class User < ApplicationRecord
     return user if user.tap(&:valid?).errors.messages_for(:email).include? 'is not an email'
 
     super
+  end
+
+  # Exclude migrated_first_name, migrated_last_name, migrated_email, migrated_uid from audited changes
+  def audited_changes(changes = nil)
+    changes ||= super
+    changes.except('migrated_first_name', 'migrated_last_name', 'migrated_email', 'migrated_uid')
   end
 
   private

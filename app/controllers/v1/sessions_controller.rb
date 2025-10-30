@@ -79,6 +79,17 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(questions, 'ReflectableQuestion')
   end
 
+  def update_all_schedules
+    authorize! :update, Session
+    authorize! :update, intervention
+
+    return head :forbidden unless intervention.ability_to_update_for?(current_v1_user)
+
+    updated_sessions = session_service.update_all_schedules(session_schedule_params.to_h)
+
+    render json: serialized_response(updated_sessions.reload)
+  end
+
   private
 
   def variable_filter_options
@@ -118,7 +129,7 @@ class V1::SessionsController < V1Controller
                                     :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
                                     :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time,
                                     :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at,
-                                    :welcome_message, :default_response, :google_language_id,
+                                    :welcome_message, :completion_message, :default_response, :google_language_id,
                                     narrator: {}, settings: {}, sms_codes_attributes: %i[id sms_code],
                                     formulas: [
                                       :payload, { patterns: [:match, {
@@ -133,5 +144,9 @@ class V1::SessionsController < V1Controller
 
   def session_params_for_create
     session_params.except(:cat_tests)
+  end
+
+  def session_schedule_params
+    params.require(:session).permit(:schedule, :schedule_payload, :schedule_at)
   end
 end

@@ -5,8 +5,8 @@ namespace :google_tts_languages do
   task :fetch,  [:update] => :environment do |_, args|
     args.with_defaults(update: false)
     unless args.update
-      GoogleTtsLanguage.delete_all
-      GoogleTtsVoice.delete_all
+      AuxiliaryGoogleTtsLanguage.delete_all
+      AuxiliaryGoogleTtsVoice.delete_all
     end
     text_to_speech_client = Google::Cloud::TextToSpeech.text_to_speech do |tts|
       tts.credentials = credentials
@@ -18,25 +18,25 @@ namespace :google_tts_languages do
     end
     languages_hash = prepare_languages_hash
 
-    p "Voices count before: #{GoogleTtsVoice.count}"
+    p "Voices count before: #{AuxiliaryGoogleTtsVoice.count}"
 
     p 'Starting to fetch google tts languages ang google tts voices...'
 
     ActiveRecord::Base.transaction do
       hash.each do |language, voices|
         language_name = prepare_language_name(language, languages_hash)
-        tts_language = GoogleTtsLanguage.find_or_create_by!(language_name: language_name)
+        tts_language = AuxiliaryGoogleTtsLanguage.find_or_create_by!(language_name: language_name)
 
         usage_hash = Hash.new(1)
 
         voices.each do |voice_type|
-          voice_standard = voice_type.name.split('-')[2].downcase
+          voice_standard = voice_type.name.split('-')[2]&.downcase
           voice_gender = voice_type.ssml_gender.to_s.downcase
           voice_hash = "#{voice_standard}-#{voice_gender}"
           voice_name = "#{voice_hash}-#{usage_hash[voice_hash]}"
           usage_hash[voice_hash] += 1
 
-          GoogleTtsVoice.find_or_create_by!(
+          AuxiliaryGoogleTtsVoice.find_or_create_by!(
             voice_label: voice_name.capitalize,
             voice_type: voice_type.name,
             language_code: language,
@@ -48,8 +48,20 @@ namespace :google_tts_languages do
       end
     end
 
-    p "Voices count after: #{GoogleTtsVoice.count}"
+    p "Voices count after: #{AuxiliaryGoogleTtsVoice.count}"
     p 'Finished fetch google tts languages ang google tts voices successfully!'
+  end
+
+  class AuxiliaryGoogleTtsVoice < ActiveRecord::Base
+    self.table_name = 'google_tts_voices'
+
+    belongs_to :google_tts_language, class_name: 'AuxiliaryGoogleTtsLanguage'
+  end
+
+  class AuxiliaryGoogleTtsLanguage < ActiveRecord::Base
+    self.table_name = 'google_tts_languages'
+
+    has_many :google_tts_voices, foreign_key: :google_tts_language_id, class_name: 'AuxiliaryGoogleTtsVoice'
   end
 
   def credentials

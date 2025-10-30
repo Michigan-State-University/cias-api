@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
 class V1::Sms::Replay
+  include SmsCampaign::FinishUserSessionHelper
+  include SmsCampaign::SmsEventsHelper
+
   attr_reader :from_number, :to_number, :message
 
   def self.call(from, to, body)
@@ -68,9 +72,9 @@ class V1::Sms::Replay
     session = SmsCode.find_by(sms_code: message)&.session
     return SmsPlans::SendSmsJob.perform_later(from_number, I18n.t('sms.session_not_found'), nil, nil) unless session
 
-    intervention_ids = session.intervention.user_intervention_ids
+    user_intervention_ids = session.intervention.user_intervention_ids
     possible_user_ids = User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number }).pluck(:id)
-    @user = UserIntervention.find_by(id: intervention_ids, user_id: possible_user_ids)&.user
+    @user = UserIntervention.find_by(id: user_intervention_ids, user_id: possible_user_ids)&.user
 
     if @user
       user_session = UserSession::Sms.find_by(session_id: session.id, user_id: @user.id)
@@ -117,14 +121,14 @@ class V1::Sms::Replay
 
         question = Question.find(user_session.current_question_id)
 
-        answer_correct = validate_answer_for_question(question, message)
+        is_answer_correct = validate_answer_for_question?(question, message)
 
-        if answer_correct
+        if is_answer_correct
           V1::AnswerService.call(@user, user_session.id, question.id,
                                  { type: 'Answer::Sms', body: { data: [{ value: message, var: question.body['variable']['name'] }] } })
           @user.update(pending_sms_answer: false)
           remove_question_followups(@user, question, user_session)
-          recalculate_questions_to_be_send(user_session)
+          schedule_or_finish(user_session)
         elsif question.accepted_answers['answer_if_wrong']
           SmsPlans::SendSmsJob.perform_later(@user.full_number, question.accepted_answers['answer_if_wrong'], nil,
                                              @user.id)
@@ -139,23 +143,41 @@ class V1::Sms::Replay
 
   def remove_question_followups(user, question, user_session)
     queue = Sidekiq::ScheduledSet.new
+    number_of_deleted_job = 0
     queue.each do |job|
       job_args = job.args.first
-      job.delete if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'].eql?([user.id, question.id, user_session.id, true])
+      if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' && job_args['arguments'].eql?([user.id, question.id, user_session.id, true])
+        job.delete
+        number_of_deleted_job += 1
+      end
     end
+    log_received_correct_answer(
+      user_session,
+      {
+        question_id: question.id,
+        number_of_deleted_followup_jobs: number_of_deleted_job
+      }
+    )
   end
 
   def recalculate_questions_to_be_send(user_session)
     queue = Sidekiq::ScheduledSet.new
+    details = { deleted_jobs: [] }
     queue.each do |job|
       job_args = job.args.first
       if job_args['job_class'] == 'UserSessionJobs::SendQuestionSmsJob' &&
          job_args['arguments'][2].eql?(user_session.id) &&
          job_args['arguments'][4].eql?(false)
         job.delete
+        details[:deleted_jobs] << job_args
       end
-      job.delete if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'][0].eql?(user_session.id)
+
+      if job_args['job_class'] == 'UserSessionJobs::ScheduleDailyMessagesJob' && job_args['arguments'][0].eql?(user_session.id)
+        job.delete
+        details[:deleted_jobs] << job_args
+      end
     end
+    log_cancelled_sms_jobs(user_session, details)
     schedule_user_session_job!(user_session)
   end
 
@@ -163,15 +185,17 @@ class V1::Sms::Replay
     health_clinic_id = session.intervention.organization_id ? session.sms_code.health_clinic_id : nil
     user_session = V1::UserSessions::CreateService.call(session.id, user.id, health_clinic_id)
     user_session.save!
+    log_start_session(user_session)
     schedule_user_session_job!(user_session)
     SmsPlans::SendSmsJob.perform_later(user.full_number, user_session.session.welcome_message, nil, user.id) if user_session.session.welcome_message.present?
   end
 
   def schedule_user_session_job!(user_session)
     UserSessionJobs::ScheduleDailyMessagesJob.perform_later(user_session.id)
+    log_scheduled_daily_message_job(user_session)
   end
 
-  def validate_answer_for_question(question, answer)
+  def validate_answer_for_question?(question, answer)
     accepted_answers = question.accepted_answers
     return true if question.accepted_answers.blank?
 
@@ -181,4 +205,14 @@ class V1::Sms::Replay
       (accepted_answers['range']['from'].to_i..accepted_answers['range']['to'].to_i).to_a.map(&:to_s).include?(answer)
     end
   end
+
+  def schedule_or_finish(user_session)
+    if was_last_question_in_user_session?(user_session)
+      user_session.finish
+      log_user_session_finished(user_session)
+    else
+      recalculate_questions_to_be_send(user_session)
+    end
+  end
 end
+# rubocop:enable Metrics/ClassLength

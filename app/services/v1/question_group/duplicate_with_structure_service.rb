@@ -68,16 +68,16 @@ class V1::QuestionGroup::DuplicateWithStructureService
   def validate_uniqueness_of_question(question, session)
     return unless question.type.in?(Question::UNIQUE_IN_SESSION)
 
-    raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session(question, session)
-    raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness(question,
-                                                                                                                                   session.intervention)
+    raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session?(question, session)
+    raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness?(question,
+                                                                                                                                    session.intervention)
   end
 
-  def uniq_question_already_in_session(question, session)
+  def uniq_question_already_in_session?(question, session)
     session.questions.where(type: question.type).any? && question.type.in?(Question::UNIQUE_IN_SESSION)
   end
 
-  def validate_hfhs_access_and_uniqueness(question, intervention)
+  def validate_hfhs_access_and_uniqueness?(question, intervention)
     return true unless question.type.eql?('Question::HenryFordInitial')
     return false unless intervention.hfhs_access?
 

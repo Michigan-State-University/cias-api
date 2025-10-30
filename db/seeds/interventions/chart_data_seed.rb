@@ -143,8 +143,6 @@ def create_e_intervention_admin_organization!(user, organization)
   )
 end
 
-private
-
 def clear_table_cache
   ActiveRecord::Base.connection.query_cache.clear
   (ActiveRecord::Base.connection.tables - %w[schema_migrations versions]).each do |table|

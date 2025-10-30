@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_20_113649) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -79,6 +79,28 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.string "voice_type"
     t.index ["sha256", "language", "voice_type"], name: "index_audios_on_sha256_and_language_and_voice_type", unique: true
     t.index ["sha256"], name: "index_audios_on_sha256", unique: true
+  end
+
+  create_table "audits", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "auditable_id"
+    t.string "auditable_type"
+    t.integer "associated_id"
+    t.string "associated_type"
+    t.uuid "user_id"
+    t.string "user_type"
+    t.string "username"
+    t.string "action"
+    t.jsonb "audited_changes"
+    t.integer "version", default: 0
+    t.string "comment"
+    t.string "remote_address"
+    t.string "request_uuid"
+    t.datetime "created_at"
+    t.index ["associated_type", "associated_id"], name: "associated_index"
+    t.index ["auditable_type", "auditable_id", "version"], name: "auditable_index"
+    t.index ["created_at"], name: "index_audits_on_created_at"
+    t.index ["request_uuid"], name: "index_audits_on_request_uuid"
+    t.index ["user_id", "user_type"], name: "user_index"
   end
 
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
@@ -159,11 +181,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "filled_at", precision: nil
+    t.uuid "user_session_id"
+    t.boolean "v2_record", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
     t.index ["organization_id"], name: "index_chart_statistics_on_organization_id"
     t.index ["user_id"], name: "index_chart_statistics_on_user_id"
+    t.index ["user_session_id"], name: "index_chart_statistics_on_user_session_id"
   end
 
   create_table "charts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -483,6 +508,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.datetime "clear_sensitive_data_scheduled_at", precision: nil
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
+    t.boolean "formula_update_in_progress", default: false, null: false
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -575,6 +601,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.datetime "updated_at", null: false
     t.text "phone_ciphertext"
     t.string "attachment_url"
+    t.uuid "question_id"
+    t.index ["question_id"], name: "index_messages_on_question_id"
   end
 
   create_table "navigator_invitations", force: :cascade do |t|
@@ -775,6 +803,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.text "welcome_message"
     t.text "default_response"
     t.bigint "google_language_id"
+    t.text "completion_message"
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -795,6 +824,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.index ["health_clinic_id"], name: "index_short_links_on_health_clinic_id"
     t.index ["linkable_type", "linkable_id"], name: "index_short_links_on_linkable"
     t.index ["name"], name: "index_short_links_on_name", unique: true
+  end
+
+  create_table "sms_campaign_events", force: :cascade do |t|
+    t.jsonb "event_data", default: {}, null: false
+    t.string "event_type", null: false
+    t.uuid "user_session_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_session_id"], name: "index_sms_campaign_events_on_user_session_id"
   end
 
   create_table "sms_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -974,6 +1012,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
     t.boolean "started", default: false, null: false
     t.boolean "multiple_fill", default: false, null: false
     t.uuid "current_question_id"
+    t.integer "number_of_repetitions", default: 0, null: false
+    t.datetime "max_repetitions_reached_at"
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
@@ -1082,6 +1122,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_test_types"
   add_foreign_key "cat_mh_test_type_time_frames", "cat_mh_time_frames"
+  add_foreign_key "chart_statistics", "user_sessions"
   add_foreign_key "collaborators", "interventions"
   add_foreign_key "collaborators", "users"
   add_foreign_key "consumption_results", "days"
@@ -1106,6 +1147,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
   add_foreign_key "live_chat_navigator_setups", "interventions"
   add_foreign_key "live_chat_summoning_users", "interventions"
   add_foreign_key "live_chat_summoning_users", "users"
+  add_foreign_key "messages", "questions"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "predefined_user_parameters", "health_clinics"
   add_foreign_key "predefined_user_parameters", "interventions"
@@ -1118,6 +1160,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_22_154550) do
   add_foreign_key "sessions", "google_languages"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
+  add_foreign_key "sms_campaign_events", "user_sessions"
   add_foreign_key "sms_codes", "health_clinics"
   add_foreign_key "sms_codes", "sessions"
   add_foreign_key "sms_links", "sessions"

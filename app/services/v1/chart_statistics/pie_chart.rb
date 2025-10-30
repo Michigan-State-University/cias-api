@@ -26,7 +26,6 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
     charts.where(chart_type: 'pie_chart')
   end
 
-  # rubocop:disable Lint/ShadowingOuterLocalVariable
   def generate_hash
     Hash.new { |hash, chart_id| hash[chart_id] = Hash.new { |hash, label| hash[label] = 0 } }.tap do |hash|
       statistics = charts_data_collection.group(:chart_id, :label).pluck('chart_statistics.chart_id, chart_statistics.label, COUNT(chart_statistics.label)')

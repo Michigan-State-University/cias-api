@@ -5,14 +5,17 @@ module ExceptionHandler
 
   included do
     rescue_from ActiveRecord::ActiveRecordError do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :bad_request
     end
 
     rescue_from ActionController::ParameterMissing do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :bad_request
     end
 
     rescue_from ActiveRecord::RecordInvalid do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :unprocessable_entity
     end
 
@@ -21,18 +24,22 @@ module ExceptionHandler
     end
 
     rescue_from ActiveRecord::RecordNotUnique do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ActiveRecord::RecordNotSaved do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ActiveRecord::Rollback do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ActiveRecord::SubclassNotFound do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :bad_request
     end
 
@@ -41,10 +48,12 @@ module ExceptionHandler
     end
 
     rescue_from Dentaku::Error do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :unprocessable_entity
     end
 
     rescue_from ArgumentError do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :unprocessable_entity
     end
 
@@ -63,6 +72,7 @@ module ExceptionHandler
     end
 
     rescue_from ComplexException do |exc|
+      Sentry.capture_exception(exc)
       message = { message: exc.message, details: exc.additional_information }
 
       render json: message, status: exc.status_code || :unprocessable_entity
@@ -73,6 +83,7 @@ module ExceptionHandler
     end
 
     rescue_from EpicOnFhir::UnexpectedError do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :bad_request
     end
 
@@ -81,7 +92,12 @@ module ExceptionHandler
     end
 
     rescue_from ActiveModel::ForbiddenAttributesError do |exc|
+      Sentry.capture_exception(exc)
       render json: msg(exc), status: :forbidden
+    end
+
+    rescue_from ConcurrentEditException do |exc|
+      render json: msg(exc), status: :unprocessable_entity
     end
   end
 

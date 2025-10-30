@@ -2,6 +2,7 @@
 
 RSpec.describe DuplicateJobs::Session, type: :job do
   include ActiveJob::TestHelper
+
   subject { described_class.perform_now(user, session.id, new_intervention.id) }
 
   let!(:user) { create(:user, :confirmed, :researcher) }

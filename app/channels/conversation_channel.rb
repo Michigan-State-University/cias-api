@@ -174,7 +174,9 @@ class ConversationChannel < ApplicationCable::Channel
   end
 
   def summoning_user(user_id, intervention_id)
-    @summoning_user ||= LiveChat::SummoningUser.find_by(user_id: user_id, intervention_id: intervention_id)
+    return @summoning_user if defined?(@summoning_user)
+
+    @summoning_user = LiveChat::SummoningUser.find_by(user_id: user_id, intervention_id: intervention_id)
   end
 
   def intervention_id

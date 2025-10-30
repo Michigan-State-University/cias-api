@@ -40,15 +40,36 @@ class V1::SessionService
   def update(session_id, session_params)
     sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
+
+    previous_variable = session.variable
+    new_variable = session_params[:variable] || session.variable
+
+    if variable_changed?(previous_variable, new_variable) && session.intervention.formula_update_in_progress?
+      raise ActiveRecord::RecordNotSaved, I18n.t('session.error.formula_update_in_progress')
+    end
+
     session.assign_attributes(session_params.except(:cat_tests))
     session_type_sms = session.sms_session_type?
     assign_cat_tests_to_session(session, session_params) unless session_type_sms
     session.integral_update
+
+    adjust_variable_references(session, previous_variable, session.variable) if variable_changed?(previous_variable, session.variable)
+
     session
   end
 
   def destroy(session_id)
     session_load(session_id).destroy! if intervention.draft?
+  end
+
+  def update_all_schedules(schedule_attributes)
+    return sessions.order(:position) if schedule_attributes.empty?
+
+    # rubocop:disable Rails/SkipsModelValidations
+    intervention.sessions.update_all(schedule_attributes)
+    # rubocop:enable Rails/SkipsModelValidations
+
+    sessions.order(:position)
   end
 
   def duplicate(session_id, new_intervention_id)
@@ -73,7 +94,7 @@ class V1::SessionService
     intervention.sessions.order(:position)&.first
   end
 
-  def same_as_intervention_language(session_voice)
+  def same_as_intervention_language?(session_voice)
     voice_name = session_voice.google_tts_language.language_name
     google_lang_name = intervention.google_language.language_name
     # chinese languages are the only ones not following the convention so this check is needed...
@@ -105,5 +126,17 @@ class V1::SessionService
 
   def sanitize_estimated_time_param(params)
     params[:estimated_time] = params[:estimated_time].to_i if params[:estimated_time].present?
+  end
+
+  def variable_changed?(old_variable, new_variable)
+    old_variable.present? && new_variable.present? && old_variable != new_variable
+  end
+
+  def adjust_variable_references(session, old_variable, new_variable)
+    UpdateJobs::AdjustSessionVariableReferences.perform_later(
+      session.id,
+      old_variable,
+      new_variable
+    )
   end
 end

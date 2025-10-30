@@ -5,6 +5,7 @@ class Invitation < ApplicationRecord
   belongs_to :invitable, polymorphic: true
   belongs_to :health_clinic, optional: true
 
+  audited except: %i[email email_ciphertext migrated_email]
   has_encrypted :email
   blind_index :email
 
@@ -20,5 +21,11 @@ class Invitation < ApplicationRecord
       InterventionMailer.with(locale: invitable.language_code).inform_to_an_email(invitable, email, health_clinic).deliver_later
     end
     :ok
+  end
+
+  # Exclude migrated_email from audited changes
+  def audited_changes(changes = nil)
+    changes ||= super
+    changes.except('migrated_email')
   end
 end

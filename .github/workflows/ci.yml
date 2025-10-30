@@ -15,7 +15,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.1.4
+          ruby-version: 3.1.7
         env:
           RUBYOPT: --jit
 
@@ -76,7 +76,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
-          ruby-version: 3.1.4
+          ruby-version: 3.1.7
         env:
           RUBYOPT: --jit
       - run: cp .env.template .env
@@ -89,14 +89,14 @@ jobs:
             ${{ runner.os }}-gems-
       - name: Build
         env:
-          BUNDLER_VERSION: 2.2.22
+          BUNDLER_VERSION: 2.4.22
           DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@localhost:5432/cias_test
           GIT_AUTHOR_EMAIL: ci@ci.ci
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
         run: |
           sudo apt install libffi7
-          gem install bundler -v "2.2.22"
+          gem install bundler -v "2.4.22"
           bundle config set path 'vendor/bundle'
           bundle install
           bundle exec rails db:create db:schema:load --trace

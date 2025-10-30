@@ -3,6 +3,8 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  audited
+
   ATTRS_NO_TO_SERIALIZE = %w[id user_id created_at updated_at].freeze
 
   def self.attrs_to_nil

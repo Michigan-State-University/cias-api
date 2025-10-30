@@ -19,7 +19,7 @@ RSpec.describe ReportTemplate::Section::Variant, type: :model do
       variants.each do |variant|
         variant.translate_title(translator, source_language_short, destination_language_short)
         results << variant.title.include?(
-          "from=>#{source_language_short} to=>#{destination_language_short} text=>#{variant.original_text['title']}".to_s
+          "from=>#{source_language_short} to=>#{destination_language_short} text=>#{variant.original_text['title']}"
         )
       end
       expect(results).to all(be_truthy)
