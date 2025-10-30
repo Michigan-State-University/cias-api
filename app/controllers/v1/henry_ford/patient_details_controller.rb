@@ -19,7 +19,7 @@ class V1::HenryFord::PatientDetailsController < V1Controller
   private
 
   def patient_detail_params
-    params.require(:hfhs_patient_data).permit(:id, :first_name, :last_name, :dob, :sex, :zip_code, :phone_number, :phone_type, :mrn, :hfhs_patient_detail_id)
+    params.require(:hfhs_patient_data).permit(:id, :first_name, :last_name, :dob, :sex, :zip_code, :phone_number, :phone_type, :mrn)
   end
 
   def verify_code_params
