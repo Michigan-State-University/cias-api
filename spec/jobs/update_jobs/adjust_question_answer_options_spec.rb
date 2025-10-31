@@ -49,7 +49,6 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptions, type: :job do
 
     context 'when question has no intervention_id' do
       before do
-        # We need to find the question first, then stub its session
         allow(Question).to receive(:find_by).with(id: question_id).and_return(question)
         allow(question).to receive(:session).and_return(nil)
       end
