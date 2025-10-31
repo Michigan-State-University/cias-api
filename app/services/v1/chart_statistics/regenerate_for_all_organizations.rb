@@ -27,10 +27,10 @@ class V1::ChartStatistics::RegenerateForAllOrganizations
 
     if chart_ids.size > batch_size
       chart_ids.each_slice(batch_size) do |batch_ids|
-        RegenerateChartsJob.perform_later(batch_ids, replace: replace)
+        RegenerateChartsJob.perform_later(batch_ids, replace)
       end
     else
-      RegenerateChartsJob.perform_later(chart_ids, replace: replace)
+      RegenerateChartsJob.perform_later(chart_ids, replace)
     end
   end
 end
