@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe UpdateJobs::AdjustQuestionAnswerOptions, type: :job do
+RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
   include ActiveJob::TestHelper
 
   subject(:perform_job) { described_class.perform_now(question_id, changed_answer_values) }

@@ -55,7 +55,7 @@ class V1::Question::Update
   def adjust_answer_options_references(changed_answer_options)
     return if changed_answer_options.empty?
 
-    UpdateJobs::AdjustQuestionAnswerOptions.perform_later(
+    UpdateJobs::AdjustQuestionAnswerOptionsReferences.perform_later(
       question.id,
       changed_answer_options
     )

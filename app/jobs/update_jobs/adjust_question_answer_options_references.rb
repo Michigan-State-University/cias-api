@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UpdateJobs::AdjustQuestionAnswerOptions < UpdateJobs::VariableReferencesUpdateJob
+class UpdateJobs::AdjustQuestionAnswerOptionsReferences < UpdateJobs::VariableReferencesUpdateJob
   def perform(question_id, changed_answer_values)
     return if changed_answer_values.blank?
 

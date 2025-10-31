@@ -28,7 +28,7 @@ RSpec.describe V1::Question::Update do
       it 'does not enqueue an answer options job' do
         expect do
           perform_service
-        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptions)
+        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences)
       end
     end
 
@@ -65,10 +65,10 @@ RSpec.describe V1::Question::Update do
 
       let(:expected_changes) { { 'var2' => { 'Old Text 2' => 'NEW TEXT 2' } } }
 
-      it 'enqueues the AdjustQuestionAnswerOptions job with correct changes' do
+      it 'enqueues the AdjustQuestionAnswerOptionsReferences job with correct changes' do
         expect do
           perform_service
-        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptions).with(
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
           question.id,
           expected_changes
         )
@@ -95,7 +95,7 @@ RSpec.describe V1::Question::Update do
       it 'does not enqueue the job' do
         expect do
           perform_service
-        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptions)
+        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences)
       end
     end
 
@@ -120,7 +120,7 @@ RSpec.describe V1::Question::Update do
       it 'does not enqueue the job' do
         expect do
           perform_service
-        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptions)
+        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences)
       end
     end
   end
