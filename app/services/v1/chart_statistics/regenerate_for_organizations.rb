@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
-class V1::ChartStatistics::RegenerateForAllOrganizations
-  attr_reader :replace, :batch_size
+class V1::ChartStatistics::RegenerateForOrganizations
+  attr_reader :replace, :batch_size, :organization_ids
 
-  def self.call(replace: true, batch_size: 30)
-    new(replace, batch_size).call
+  def self.call(organization_ids, replace: true, batch_size: 30)
+    new(organization_ids, replace, batch_size).call
   end
 
-  def initialize(replace = true, batch_size = 30)
+  def initialize(organization_ids, replace = true, batch_size = 30)
+    @organization_ids = organization_ids
     @replace = replace
     @batch_size = batch_size
   end
 
   def call
-    Organization.find_each do |organization|
+    Organization.where(id: organization_ids).find_each do |organization|
       regenerate_for_organization(organization)
     end
   end
