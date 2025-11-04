@@ -8,6 +8,7 @@ class Session < ApplicationRecord
   include InvitationInterface
   include Translate
   include ::TranslationAuxiliaryMethods
+  include SanitizationHelper
 
   CURRENT_VERSION = '1'
 
@@ -72,6 +73,7 @@ class Session < ApplicationRecord
   validates :autoclose_at, presence: true, if: :autoclose_enabled
 
   before_validation :set_default_variable
+  before_save :sanitize_and_escape_name, if: :will_save_change_to_name?
   after_create :set_sms_defaults
   after_create :assign_default_tts_voice
   after_create :assign_default_google_language
@@ -243,5 +245,9 @@ class Session < ApplicationRecord
     self.default_response ||= I18n.t('sessions.default_response')
     self.welcome_message ||= I18n.t('sessions.welcome_message')
     self.completion_message ||= I18n.t('sessions.completion_message')
+  end
+
+  def sanitize_and_escape_name
+    self.name = sanitize_string(name)
   end
 end
