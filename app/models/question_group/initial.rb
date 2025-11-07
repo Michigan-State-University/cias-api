@@ -6,6 +6,23 @@ class QuestionGroup::Initial < QuestionGroup
 
   attribute :title, :string, default: -> { I18n.t('question_group.initial.title') }
   attribute :position, :integer, default: 0
+  validates :sms_schedule,
+            json: { schema: -> { File.read(Rails.root.join('db/schema/_common/initial_sms_schedule.json').to_s) },
+                    message: ->(err) { err } }, if: -> { session&.type&.match?('Session::Sms') },
+            allow_blank: true
 
   attr_readonly :position
+
+  private
+
+  def set_default_sms_schedule
+    return if sms_schedule.present?
+
+    self.sms_schedule = {
+      time: {},
+      day_of_period: [],
+      questions_per_day: 1,
+      messages_after_limit: 7
+    }
+  end
 end

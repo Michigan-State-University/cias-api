@@ -14,7 +14,11 @@ namespace :one_time_use do
     ]
 
     range_details.each do |range|
-      TimeRange.create(range)
+      AuxiliaryTimeRange.create(range)
     end
+  end
+
+  class AuxiliaryTimeRange < ActiveRecord::Base
+    self.table_name = 'time_ranges'
   end
 end

@@ -97,9 +97,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
         it 'return narrator block with type Reflection' do
           request
           expect(
-            json_response['data']['attributes']['narrator']['blocks'].map do |block|
-              block['type']
-            end
+            json_response['data']['attributes']['narrator']['blocks'].pluck('type')
           ).to include('ReflectionFormula')
         end
       end

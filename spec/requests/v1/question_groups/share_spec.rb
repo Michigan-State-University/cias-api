@@ -100,7 +100,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
           expect(shared_question_group.reload.questions[6].position).to eq first_question_position + 6
         end
 
-        include_examples 'cleared branching, variables and speech blocks'
+        it_behaves_like 'cleared branching, variables and speech blocks'
       end
 
       context 'when user clones questions from current question_group' do
@@ -196,10 +196,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
           expect(response).to have_http_status(:ok)
         end
 
-        include_examples 'titles are the same'
-        include_examples 'question number is proper'
-        include_examples 'positions are proper'
-        include_examples 'cleared branching, variables and speech blocks'
+        it_behaves_like 'titles are the same'
+        it_behaves_like 'question number is proper'
+        it_behaves_like 'positions are proper'
+        it_behaves_like 'cleared branching, variables and speech blocks'
       end
 
       context 'when ids are duplicated' do
@@ -219,10 +219,10 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
           expect(response).to have_http_status(:ok)
         end
 
-        include_examples 'titles are the same'
-        include_examples 'question number is proper'
-        include_examples 'positions are proper'
-        include_examples 'cleared branching, variables and speech blocks'
+        it_behaves_like 'titles are the same'
+        it_behaves_like 'question number is proper'
+        it_behaves_like 'positions are proper'
+        it_behaves_like 'cleared branching, variables and speech blocks'
       end
     end
 
@@ -249,7 +249,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
             expect(response).to have_http_status(:not_found)
           end
 
-          include_examples 'constant shared_question_group'
+          it_behaves_like 'constant shared_question_group'
         end
 
         context 'when intervention is published' do
@@ -267,7 +267,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
             expect(response).to have_http_status(:forbidden)
           end
 
-          include_examples 'constant shared_question_group'
+          it_behaves_like 'constant shared_question_group'
         end
       end
 
@@ -288,7 +288,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
             expect(response).to have_http_status(:not_found)
           end
 
-          include_examples 'constant shared_question_group'
+          it_behaves_like 'constant shared_question_group'
         end
 
         context 'when one id of question groups is invalid' do

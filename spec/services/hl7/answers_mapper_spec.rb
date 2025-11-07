@@ -31,7 +31,7 @@ describe Hl7::AnswersMapper do
       }
     ] })
   end
-  let(:date_of_answer) { user_session.finished_at.strftime('%Y%m%d%H%M') }
+  let(:date_of_answer) { user_session.finished_at.in_time_zone(ENV.fetch('HFH_REPORT_TIMEZONE', nil)).strftime('%Y%m%d%H%M') }
 
   context 'return correct data' do
     it {

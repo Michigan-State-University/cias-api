@@ -83,7 +83,7 @@ class Api::EpicOnFhir::PatientVerification < Api::EpicOnFhir::BaseService
     parameters.to_json
   end
 
-  def not_found_condition(response)
+  def not_found_condition?(response)
     response[:total] != 1
   end
 end

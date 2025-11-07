@@ -19,7 +19,7 @@ class V1::QuestionGroup::ShareService
 
   def share(shared_question_group_id, question_group_ids, question_ids, current_user)
     raise CanCan::AccessDenied if question_group_intervention_published?
-    raise CanCan::AccessDenied unless intervention.ability_to_update_for?(current_user)
+    raise ConcurrentEditException unless intervention.ability_to_update_for?(current_user)
 
     shared_question_group = question_group_load(shared_question_group_id)
 
@@ -70,7 +70,7 @@ class V1::QuestionGroup::ShareService
   def validate_uniqueness(question, question_group)
     return unless question.type.in?(Question::UNIQUE_IN_SESSION)
 
-    return unless question_type_exist_in_session(question, question_group)
+    return unless question_type_exist_in_session?(question, question_group)
 
     raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type)
   end
@@ -83,7 +83,7 @@ class V1::QuestionGroup::ShareService
     raise ActiveRecord::ActiveRecordError, (I18n.t 'duplication_with_structure.hfhs.access_violation')
   end
 
-  def question_type_exist_in_session(question, question_group)
+  def question_type_exist_in_session?(question, question_group)
     question_group.session.questions.where(type: question.type).any?
   end
 end

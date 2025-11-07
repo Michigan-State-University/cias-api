@@ -18,6 +18,10 @@ en:
     error:
       published_intervention: 'Cannot update question in the published intervention'
       not_uniq_variable: 'This variable name is already in use!'
+      formula_update_in_progress: 'Cannot update question variable while references update is in progress. Please try again in a few moments.'
+  session:
+    error:
+      formula_update_in_progress: 'Cannot update session variable while references update is in progress. Please try again in a few moments.'
   question_group:
     finish:
       title: Finish Group
@@ -81,6 +85,10 @@ en:
             user_id:
               already_exists: already exists
         session:
+          sms_code:
+            attributes:
+              sms_code:
+                protected_code: 'This code is reserved and cannot be used'
           attributes:
             variable:
               already_exists: already exists
@@ -124,6 +132,7 @@ en:
       no_phone_number_provided: "Phone number not provided"
     default_response: 'You have entered an incorrect code. Please try again.'
     welcome_message: 'You are now enrolled. You will start receiving messages soon.'
+    completion_message: 'Thank you for completing this session!'
   users:
     deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
@@ -396,4 +405,6 @@ en:
     wrong_message: 'You have entered an incorrect code. Please try again.'
     already_signed: 'You are already enrolled in this campaign.'
     cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns.'
-    session_not_found: 'There is no such session'
+    session_not_found: "Oops! That code doesn't match any of our text plans. Check the spelling and make sure the letters are in the correct case (uppercase/lowercase)"
+  exceptions:
+    concurrent_edit: 'Cannot modify intervention with multiple collaborators. Please ensure no other users are currently editing this intervention and that you have enabled editing mode for all relevant sessions before making changes.'

@@ -105,7 +105,7 @@ RSpec.describe 'GET /v1/organizations', type: :request do
       end
 
       it 'returns data in correct order' do
-        result = json_response['data'].map { |org_json| org_json['id'] }
+        result = json_response['data'].pluck('id')
         expect(result).to eq(expected_organization_order)
       end
 

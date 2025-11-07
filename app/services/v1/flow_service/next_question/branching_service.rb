@@ -2,6 +2,7 @@
 
 class V1::FlowService::NextQuestion::BranchingService
   include FlowServiceHelper
+
   NO_BRANCHING_TARGET = 'NoBranchingTarget'
   RANDOMIZATION_MISS_MATCH = 'RandomizationMissMatch'
   FORBIDDEN_BRANCHING_TO_CAT_MH_SESSION = 'ForbiddenBranchingToCatMhSession'
