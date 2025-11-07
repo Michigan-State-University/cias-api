@@ -1,25 +1,38 @@
 # frozen_string_literal: true
 
 class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
+  include SmsCampaign::SmsEventsHelper
+
   queue_as :question_sms
+  DELAY_BETWEEN_QUESTIONS_IN_SECONDS = 10
 
   def perform(user_session_id, should_reset_user_pending_flag = false)
     @user_session = UserSession.find(user_session_id)
     @user = @user_session.user
     @session = @user_session.session
 
+    if @user_session.finished_at.present?
+      log_earlier_termination(@user_session, 'User session already finished')
+      return
+    end
+
     # Reset user pending answer flag
     @user.update(pending_sms_answer: false) if should_reset_user_pending_flag
 
     # Proceed job only if Intervention is published
-    return unless @user_session.user_intervention.intervention.published?
+    unless @user_session.user_intervention.intervention.published?
+      log_earlier_termination(@user_session, 'Intervention is not published')
+      return
+    end
 
     # Handle Session autoclose
     should_return = @session.autoclose_at.nil? ? false : @session.autoclose_at > DateTime.current
 
-    @user_session.update(finished_at: @session.autoclose_at) if should_return
-
-    return if should_return
+    if should_return
+      @user_session.update(finished_at: @session.autoclose_at)
+      log_earlier_termination(@user_session, 'Session autoclose time reached')
+      return
+    end
 
     # Find all accessible question groups
     today_scheduled_question_groups = select_questions_groups_scheduled_for_today
@@ -48,7 +61,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
 
     if should_postpone_any_questions
       questions_to_be_send_today.each_with_index do |question, index|
-        question[:time_to_send] = question[:time_to_send] + (index * 10.seconds)
+        question[:time_to_send] = question[:time_to_send] + (index * DELAY_BETWEEN_QUESTIONS_IN_SECONDS.seconds)
       end
     end
 
@@ -57,10 +70,12 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: elem[:time_to_send])
                                          .perform_later(@user.id, elem[:question].id, @user_session.id, false)
     end
+    log_messages_scheduled_today(@user_session, questions_to_be_send_today)
 
-    UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE'))
-                                                                      .change({ hour: 1 }) + 1.day)
-                                             .perform_later(user_session_id, true)
+    scheduled_at = DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE'))
+                           .change({ hour: 1 }) + 1.day
+    UserSessionJobs::ScheduleDailyMessagesJob.set(wait_until: scheduled_at).perform_later(user_session_id, true)
+    log_scheduled_daily_message_job(@user_session, { scheduled_at: scheduled_at })
   end
 
   private

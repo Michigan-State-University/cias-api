@@ -5,7 +5,7 @@ require 'google/cloud/translate/v2'
 namespace :google_languages do
   desc 'Fetch supported languages by Google'
   task fetch: :environment do
-    GoogleLanguage.delete_all
+    AuxiliaryGoogleLanguage.delete_all
 
     translate = Google::Cloud::Translate::V2.new(credentials: credentials)
     languages = translate.languages 'en'
@@ -14,12 +14,16 @@ namespace :google_languages do
 
     ActiveRecord::Base.transaction do
       languages.each do |language|
-        GoogleLanguage.create!(language_name: language.name, language_code: language.code)
+        AuxiliaryGoogleLanguage.create!(language_name: language.name, language_code: language.code)
         p "Created #{language.name}"
       end
     end
 
     p 'Finished fetch google languages successfully!'
+  end
+
+  class AuxiliaryGoogleLanguage < ActiveRecord::Base
+    self.table_name = 'google_languages'
   end
 
   def credentials

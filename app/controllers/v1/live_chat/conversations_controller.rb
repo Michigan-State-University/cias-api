@@ -30,17 +30,13 @@ class V1::LiveChat::ConversationsController < V1Controller
     render status: :created
   end
 
-  def ping
-    render json: { message: 'Reauthentication successful' }, status: :ok
-  end
-
   private
 
   def can_generate_transcript?
     conversation = conversation_load
     return true unless conversation.transcript.attached?
 
-    conversation.archived ? (conversation.transcript.blob.created_at < conversation.archived_at) : true
+    conversation.archived? ? (conversation.transcript.blob.created_at < conversation.archived_at) : true
   end
 
   def conversation_load

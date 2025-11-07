@@ -2,6 +2,7 @@
 
 class Import::Basic::InterventionService
   include ImportOperations
+
   def self.call(user_id, intervention_hash)
     new(
       user_id,
@@ -21,8 +22,8 @@ class Import::Basic::InterventionService
 
   def call
     accesses = intervention_hash.delete(:intervention_accesses)
-    @intervention = Intervention.create!(intervention_hash.merge({ user_id: user.id, google_language: google_language, logo: import_file(logo) }))
-    add_logo_description! if logo.present?
+    @intervention = Intervention.create!(intervention_hash.merge({ user_id: user.id, google_language: google_language }))
+    attache_logo_directly! if logo.present?
 
     accesses&.each do |intervention_access_hash|
       get_import_service_class(intervention_access_hash, InterventionAccess).call(intervention.id, intervention_access_hash)
@@ -40,8 +41,15 @@ class Import::Basic::InterventionService
 
   private
 
+  def attache_logo_directly!
+    import_file_directly(intervention, :logo, logo)
+    add_logo_description!
+  end
+
   def google_language
-    @google_language ||= GoogleLanguage.find_by(
+    return @google_language if defined?(@google_language)
+
+    @google_language = GoogleLanguage.find_by(
       language_name: intervention_hash.delete(:language_name),
       language_code: intervention_hash.delete(:language_code)
     )

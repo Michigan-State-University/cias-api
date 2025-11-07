@@ -22,7 +22,7 @@ class Question::Narrator::Blobs
     self
   end
 
-  def remove(digest)
+  def remove?(digest)
     return true if cloned
 
     digest_index = ids.index(digest)

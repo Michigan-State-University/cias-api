@@ -15,11 +15,12 @@ class LiveChat::Message < ApplicationRecord
   after_create :create_notification
 
   has_encrypted :content
+  audited except: %i[content content_ciphertext]
 
   private
 
   def conversation_archived?
-    errors.add(:base, I18n.t('activerecord.errors.models.live_chat.message.sent_in_archived_conversation')) if conversation&.archived
+    errors.add(:base, I18n.t('activerecord.errors.models.live_chat.message.sent_in_archived_conversation')) if conversation&.archived?
   end
 
   def create_notification

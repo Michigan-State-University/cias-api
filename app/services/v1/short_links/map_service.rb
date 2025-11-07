@@ -23,7 +23,7 @@ class V1::ShortLinks::MapService
         intervention_id: intervention.id,
         session_id: available_now_session(intervention, user_intervention)&.id,
         health_clinic_id: short_link.health_clinic_id,
-        multiple_fill_session_available: multiple_fill_session_available(user_intervention),
+        multiple_fill_session_available: multiple_fill_session_available?(user_intervention),
         user_intervention_id: user_intervention&.id,
         lang: intervention.language_code
       }
@@ -51,7 +51,9 @@ class V1::ShortLinks::MapService
   end
 
   def user_intervention
-    @user_intervention ||= UserIntervention.find_by(user_id: current_user&.id, intervention_id: intervention.id)
+    return @user_intervention if defined?(@user_intervention)
+
+    @user_intervention = UserIntervention.find_by(user_id: current_user&.id, intervention_id: intervention.id)
   end
 
   def check_intervention_status

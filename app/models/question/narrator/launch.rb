@@ -2,6 +2,7 @@
 
 class Question::Narrator::Launch
   include BlockHelper
+
   attr_reader :question, :outdated_files
   attr_accessor :narrator
 

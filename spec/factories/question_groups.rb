@@ -22,12 +22,26 @@ FactoryBot.define do
   factory :sms_question_group, class: QuestionGroup do
     title { Faker::Name.name }
     association(:session, factory: :sms_session)
-    factory :question_group_initial, class: QuestionGroup::Initial do
-    end
     sms_schedule do
       {
         day_of_period: ['1'],
         questions_per_day: 1,
+        time: {
+          exact: '8:00 AM'
+        }
+      }
+    end
+  end
+
+  factory :question_group_initial, class: QuestionGroup::Initial do
+    association(:session, factory: :sms_session)
+    sms_schedule do
+      {
+        period: 'weekly',
+        start_from_first_question: true,
+        questions_per_day: 1,
+        number_of_repetitions: 3,
+        day_of_period: ['1'],
         time: {
           exact: '8:00 AM'
         }

@@ -28,7 +28,7 @@ class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
     end
   end
 
-  def not_found_condition(response)
+  def not_found_condition?(response)
     response[:total].zero?
   end
 end

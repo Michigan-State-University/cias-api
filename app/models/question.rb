@@ -170,6 +170,10 @@ class Question < ApplicationRecord
     []
   end
 
+  def extract_variables_from_params(_params)
+    []
+  end
+
   def first_question?
     session.first_question == self
   end

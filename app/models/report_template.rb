@@ -4,6 +4,7 @@ class ReportTemplate < ApplicationRecord
   include Translate
   include ::TranslationAuxiliaryMethods
   include Clone
+
   has_paper_trail
   extend DefaultValues
 
@@ -25,7 +26,7 @@ class ReportTemplate < ApplicationRecord
 
   delegate :ability_to_update_for?, to: :session
 
-  before_update :remove_template_from_third_party_questions, if: :report_for_changed_from_third_party
+  before_update :remove_template_from_third_party_questions, if: :report_for_changed_from_third_party?
 
   after_destroy :remove_template_from_third_party_questions
 
@@ -77,7 +78,7 @@ class ReportTemplate < ApplicationRecord
     end
   end
 
-  def report_for_changed_from_third_party
+  def report_for_changed_from_third_party?
     changes_to_save['report_for']&.first == 'third_party'
   end
 end
