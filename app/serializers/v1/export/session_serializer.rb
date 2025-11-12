@@ -40,6 +40,8 @@ class V1::Export::SessionSerializer < ActiveModel::Serializer
       next if target['id'].blank?
 
       target_session = Session.find(target['id'])
+      next if target_session.nil?
+
       location = object_location(target_session)
       branch_target_locations << location unless branch_target_locations.include?(location)
     end
