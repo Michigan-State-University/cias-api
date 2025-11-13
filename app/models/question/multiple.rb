@@ -50,12 +50,12 @@ class Question::Multiple < Question
     data = body['data']
     return [] if data.blank?
 
-    data.filter_map do |row|
-      var_name = row.dig('variable', 'name')
+    data.map do |row|
+      var_name = row.dig('variable', 'name').presence
       payload_text = row['payload']
-      next if var_name.blank?
+      value = row.dig('variable', 'value')
 
-      { 'name' => var_name, 'payload' => payload_text }
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
     end
   end
 
@@ -66,12 +66,12 @@ class Question::Multiple < Question
     data = source_body[:data]
     return [] if data.blank?
 
-    data.filter_map do |row|
-      var_name = row.dig(:variable, :name)
+    data.map do |row|
+      var_name = row.dig(:variable, :name).presence
       payload_text = row[:payload]
-      next if var_name.blank?
+      value = row.dig(:variable, :value)
 
-      { 'name' => var_name, 'payload' => payload_text }
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
     end
   end
 end

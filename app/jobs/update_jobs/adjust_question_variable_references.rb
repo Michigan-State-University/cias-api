@@ -12,13 +12,7 @@ class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferen
       return
     end
 
-    intervention_id = question.session&.intervention_id
-    if intervention_id.blank?
-      Rails.logger.warn "[#{self.class.name}] Skipping job, Question #{question.id} has no valid Intervention ID to lock."
-      return
-    end
-
-    with_formula_update_lock(intervention_id) do
+    with_formula_update_lock(question.session.intervention_id) do
       V1::VariableReferences::QuestionService.call(
         question_id,
         old_variable_name,

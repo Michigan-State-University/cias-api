@@ -63,14 +63,15 @@ RSpec.describe V1::Question::Update do
         }
       end
 
-      let(:expected_changes) { { 'var2' => { 'Old Text 2' => 'NEW TEXT 2' } } }
-
-      it 'enqueues the AdjustQuestionAnswerOptionsReferences job with correct changes' do
+      it 'enqueues the AdjustQuestionAnswerOptionsReferences job with detected changes' do
         expect do
           perform_service
         end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
           question.id,
-          expected_changes
+          [{ 'variable' => 'var2', 'old_payload' => 'Old Text 2', 'new_payload' => 'NEW TEXT 2', 'value' => '2' }],
+          [],
+          [],
+          { changed: {}, new: {}, deleted: {} }
         )
       end
 
@@ -117,10 +118,307 @@ RSpec.describe V1::Question::Update do
         }
       end
 
-      it 'does not enqueue the job' do
+      it 'enqueues the job with the change (variables are empty but payload changed)' do
         expect do
           perform_service
-        end.not_to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences)
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [{ 'old_payload' => 'Old Text 1', 'new_payload' => 'NEW TEXT 1', 'value' => '1' }],
+          [],
+          [],
+          { changed: {}, new: {}, deleted: {} }
+        )
+      end
+    end
+
+    context 'when a new answer option is added' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              { variable: { name: 'var1', value: '1' }, payload: 'Old Text 1' },
+              { variable: { name: 'var2', value: '2' }, payload: 'Old Text 2' },
+              { variable: { name: 'var3', value: '3' }, payload: 'New Text 3' }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with new options' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [{ 'variable' => 'var3', 'payload' => 'New Text 3', 'value' => '3' }],
+          [],
+          { changed: {}, new: {}, deleted: {} }
+        )
+      end
+    end
+
+    context 'when an answer option is deleted' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              { variable: { name: 'var1', value: '1' }, payload: 'Old Text 1' }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with deleted options' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [],
+          [{ 'variable' => 'var2', 'payload' => 'Old Text 2', 'value' => '2' }],
+          { changed: {}, new: {}, deleted: {} }
+        )
+      end
+    end
+
+    context 'when both value and payload change' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              { variable: { name: 'var1', value: '1' }, payload: 'Old Text 1' },
+              { variable: { name: 'var2', value: '2_new' }, payload: 'NEW TEXT 2' }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with value and payload changes' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [{ 'variable' => 'var2', 'old_payload' => 'Old Text 2', 'new_payload' => 'NEW TEXT 2', 'value' => '2', 'new_value' => '2_new' }],
+          [],
+          [],
+          { changed: {}, new: {}, deleted: {} }
+        )
+      end
+    end
+  end
+
+  context 'with Grid question updates' do
+    let(:question) do
+      create(:question_grid, question_group: question_group, body: {
+               'data' => [
+                 {
+                   'payload' => {
+                     'rows' => [
+                       { 'payload' => 'Row 1', 'variable' => { 'name' => 'row1' } },
+                       { 'payload' => 'Row 2', 'variable' => { 'name' => 'row2' } }
+                     ],
+                     'columns' => [
+                       { 'payload' => 'Col A', 'variable' => { 'value' => 'a' } },
+                       { 'payload' => 'Col B', 'variable' => { 'value' => 'b' } }
+                     ]
+                   }
+                 }
+               ]
+             })
+    end
+
+    context 'when a row is added' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              {
+                payload: {
+                  rows: [
+                    { payload: 'Row 1', variable: { name: 'row1' } },
+                    { payload: 'Row 2', variable: { name: 'row2' } },
+                    { payload: 'Row 3', variable: { name: 'row3' } }
+                  ],
+                  columns: [
+                    { payload: 'Col A', variable: { value: 'a' } },
+                    { payload: 'Col B', variable: { value: 'b' } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with new row' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [{ 'variable' => nil, 'payload' => 'Row 3' }],
+          [],
+          { changed: {}, new: {}, deleted: {} }
+        )
+      end
+    end
+
+    context 'when a column is added' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              {
+                payload: {
+                  rows: [
+                    { payload: 'Row 1', variable: { name: 'row1' } },
+                    { payload: 'Row 2', variable: { name: 'row2' } }
+                  ],
+                  columns: [
+                    { payload: 'Col A', variable: { value: 'a' } },
+                    { payload: 'Col B', variable: { value: 'b' } },
+                    { payload: 'Col C', variable: { value: 'c' } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with new column' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [],
+          [],
+          { changed: {}, new: { 'c' => 'Col C' }, deleted: {} }
+        )
+      end
+    end
+
+    context 'when a column payload changes' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              {
+                payload: {
+                  rows: [
+                    { payload: 'Row 1', variable: { name: 'row1' } },
+                    { payload: 'Row 2', variable: { name: 'row2' } }
+                  ],
+                  columns: [
+                    { payload: 'Col A', variable: { value: 'a' } },
+                    { payload: 'Col B UPDATED', variable: { value: 'b' } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with changed column' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [],
+          [],
+          { changed: { 'b' => { 'old' => 'Col B', 'new' => 'Col B UPDATED' } }, new: {}, deleted: {} }
+        )
+      end
+    end
+
+    context 'when a row is deleted' do
+      let(:params) do
+        {
+          body: {
+            data: [
+              {
+                payload: {
+                  rows: [
+                    { payload: 'Row 1', variable: { name: 'row1' } }
+                  ],
+                  columns: [
+                    { payload: 'Col A', variable: { value: 'a' } },
+                    { payload: 'Col B', variable: { value: 'b' } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with deleted row' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [],
+          [{ 'variable' => nil, 'payload' => 'Row 2' }],
+          { changed: {}, new: {}, deleted: {} }
+        )
+      end
+    end
+
+    context 'when a column is deleted' do
+      let(:question) do
+        create(:question_grid, question_group: question_group, body: {
+                 'data' => [
+                   {
+                     'payload' => {
+                       'rows' => [
+                         { 'payload' => 'Row 1', 'variable' => { 'name' => 'row1' } },
+                         { 'payload' => 'Row 2', 'variable' => { 'name' => 'row2' } }
+                       ],
+                       'columns' => [
+                         { 'payload' => 'Col A', 'variable' => { 'value' => 'a' } },
+                         { 'payload' => 'Col B', 'variable' => { 'value' => 'b' } },
+                         { 'payload' => 'Col C', 'variable' => { 'value' => 'c' } }
+                       ]
+                     }
+                   }
+                 ]
+               })
+      end
+      let(:params) do
+        {
+          body: {
+            data: [
+              {
+                payload: {
+                  rows: [
+                    { payload: 'Row 1', variable: { name: 'row1' } },
+                    { payload: 'Row 2', variable: { name: 'row2' } }
+                  ],
+                  columns: [
+                    { payload: 'Col A', variable: { value: 'a' } },
+                    { payload: 'Col B', variable: { value: 'b' } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      end
+
+      it 'enqueues the job with deleted column' do
+        expect do
+          perform_service
+        end.to have_enqueued_job(UpdateJobs::AdjustQuestionAnswerOptionsReferences).with(
+          question.id,
+          [],
+          [],
+          [],
+          { changed: {}, new: {}, deleted: { 'c' => 'Col C' } }
+        )
       end
     end
   end

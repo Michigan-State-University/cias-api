@@ -54,13 +54,12 @@ class Question::Grid < Question
     rows = body.dig('data', 0, 'payload', 'rows')
     return [] if rows.blank?
 
-    rows.filter_map do |row|
-      var_name = row.dig('variable', 'name')
+    rows.map do |row|
+      var_name = row.dig('variable', 'name').presence
       payload_text = row['payload']
+      value = row['value']
 
-      next if var_name.blank?
-
-      { 'name' => var_name, 'payload' => payload_text }
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
     end
   end
 
@@ -68,13 +67,36 @@ class Question::Grid < Question
     rows = params.dig(:body, :data, 0, :payload, :rows)
     return [] if rows.blank?
 
-    rows.filter_map do |row|
-      var_name = row.dig(:variable, :name)
+    rows.map do |row|
+      var_name = row.dig(:variable, :name).presence
       payload_text = row[:payload]
+      value = row[:value]
 
-      next if var_name.blank?
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
+    end
+  end
 
-      { 'name' => var_name, 'payload' => payload_text }
+  def question_columns
+    columns = body.dig('data', 0, 'payload', 'columns')
+    return [] if columns.blank?
+
+    columns.map do |col|
+      value = col.dig('variable', 'value')
+      payload_text = col['payload']
+
+      { 'value' => value, 'payload' => payload_text }
+    end
+  end
+
+  def extract_columns_from_params(params)
+    columns = params.dig(:body, :data, 0, :payload, :columns)
+    return [] if columns.blank?
+
+    columns.map do |col|
+      value = col.dig(:variable, :value)
+      payload_text = col[:payload]
+
+      { 'value' => value, 'payload' => payload_text }
     end
   end
 end
