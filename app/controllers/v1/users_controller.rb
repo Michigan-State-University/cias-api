@@ -58,6 +58,7 @@ class V1::UsersController < V1Controller
     result = V1::Users::Verifications::Confirm.call(verification_code_params, email_params)
     if result.present?
       if params[:remember_browser]
+        domain = ENV.fetch('WEB_URL', nil)&.split('//')&.last&.split(':')&.first
 
         cookies[:verification_code] = {
           value: result,
@@ -65,7 +66,7 @@ class V1::UsersController < V1Controller
           secure: true,
           same_site: :lax,
           expires: 30.days.from_now,
-          domain: nil
+          domain: domain
         }
       end
 
