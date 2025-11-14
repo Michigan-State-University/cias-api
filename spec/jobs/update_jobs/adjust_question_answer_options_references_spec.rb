@@ -3,7 +3,15 @@
 RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
   include ActiveJob::TestHelper
 
-  subject(:perform_job) { described_class.perform_now(question_id, changed_answer_values) }
+  subject(:perform_job) do
+    described_class.perform_now(
+      question_id,
+      changed_answer_values,
+      new_answer_options,
+      deleted_answer_options,
+      grid_columns
+    )
+  end
 
   let(:intervention) { create(:intervention) }
   let(:session) { create(:session, intervention: intervention) }
@@ -11,6 +19,9 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
   let(:question) { create(:question_multiple, question_group: question_group) }
   let(:question_id) { question.id }
   let(:changed_answer_values) { { 'var1' => { 'old_payload' => 'new_payload' } } }
+  let(:new_answer_options) { {} }
+  let(:deleted_answer_options) { {} }
+  let(:grid_columns) { { changed: {}, new: {}, deleted: {} } }
 
   before do
     stub_const('V1::VariableReferences::AnswerOptionsService', class_double(V1::VariableReferences::AnswerOptionsService, call: true))
@@ -62,7 +73,13 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
 
     context 'with valid data' do
       it 'calls AnswerOptionsService with correct arguments and a lock' do
-        expect(V1::VariableReferences::AnswerOptionsService).to receive(:call).with(question.id, changed_answer_values)
+        expect(V1::VariableReferences::AnswerOptionsService).to receive(:call).with(
+          question.id,
+          changed_answer_values,
+          new_answer_options,
+          deleted_answer_options,
+          grid_columns
+        )
         expect_any_instance_of(described_class).to receive(:with_formula_update_lock).with(question.session.intervention_id).and_call_original
 
         perform_job
