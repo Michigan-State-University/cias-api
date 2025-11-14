@@ -64,7 +64,7 @@ class V1::UsersController < V1Controller
           value: result,
           httponly: true,
           secure: true,
-          same_site: :lax,
+          same_site: :none,
           expires: 30.days.from_now,
           domain: domain
         }
