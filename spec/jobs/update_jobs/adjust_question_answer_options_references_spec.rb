@@ -56,7 +56,7 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
     end
 
     context 'with valid data' do
-      it 'calls AnswerOptionsService with correct arguments and a lock' do
+      it 'calls AnswerOptionsService with correct arguments (no lock, runs independently)' do
         expect(V1::VariableReferences::AnswerOptionsService).to receive(:call).with(
           question.id,
           changed_answer_values,
@@ -64,7 +64,6 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
           deleted_answer_options,
           grid_columns
         )
-        expect_any_instance_of(described_class).to receive(:with_formula_update_lock).with(question.session.intervention_id).and_call_original
 
         perform_job
       end
