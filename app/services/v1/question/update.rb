@@ -11,6 +11,7 @@ class V1::Question::Update
     @question_params = question_params
   end
 
+  # rubocop:disable Rails/SkipsModelValidations
   def call
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.published_intervention') if question.session.published?
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.not_uniq_variable') if new_variable_is_taken?(new_variables)
@@ -90,6 +91,7 @@ class V1::Question::Update
       end
     end
   end
+  # rubocop:enable Rails/SkipsModelValidations
 
   private
 
