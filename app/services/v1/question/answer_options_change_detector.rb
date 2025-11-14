@@ -53,7 +53,7 @@ class V1::Question::AnswerOptionsChangeDetector
   def detect_column_changes(old_columns, new_columns)
     # Check if there are duplicate values in old or new columns
     # If so, we must use payload matching instead of value matching
-    use_payload_matching = has_duplicate_values?(old_columns) || has_duplicate_values?(new_columns)
+    use_payload_matching = duplicate_values?(old_columns) || duplicate_values?(new_columns)
 
     return detect_column_changes_by_payload(old_columns, new_columns) if use_payload_matching
 
@@ -106,7 +106,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
   def detect_new_columns(old_columns, new_columns)
     # Check if there are duplicate values
-    use_payload_matching = has_duplicate_values?(old_columns) || has_duplicate_values?(new_columns)
+    use_payload_matching = duplicate_values?(old_columns) || duplicate_values?(new_columns)
 
     return detect_new_columns_by_payload(old_columns, new_columns) if use_payload_matching
 
@@ -126,7 +126,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
   def detect_new_columns_by_payload(old_columns, new_columns)
     new_cols = {}
-    old_payloads = old_columns.map { |col| col['payload'] }
+    old_payloads = old_columns.pluck('payload')
 
     new_columns.each do |new_col|
       next if old_payloads.include?(new_col['payload'])
@@ -139,7 +139,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
   def detect_deleted_columns(old_columns, new_columns)
     # Check if there are duplicate values
-    use_payload_matching = has_duplicate_values?(old_columns) || has_duplicate_values?(new_columns)
+    use_payload_matching = duplicate_values?(old_columns) || duplicate_values?(new_columns)
 
     return detect_deleted_columns_by_payload(old_columns, new_columns) if use_payload_matching
 
@@ -159,7 +159,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
   def detect_deleted_columns_by_payload(old_columns, new_columns)
     deleted_cols = {}
-    new_payloads = new_columns.map { |col| col['payload'] }
+    new_payloads = new_columns.pluck('payload')
 
     old_columns.each do |old_col|
       next if new_payloads.include?(old_col['payload'])
@@ -179,7 +179,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
     # Check if there are duplicate values in old or new options
     # If so, we must use payload matching only
-    use_payload_matching = has_duplicate_values?(old_options) || has_duplicate_values?(new_options)
+    use_payload_matching = duplicate_values?(old_options) || duplicate_values?(new_options)
 
     old_options.each do |old_opt|
       old_payload = old_opt['payload']
@@ -217,7 +217,7 @@ class V1::Question::AnswerOptionsChangeDetector
     nil
   end
 
-  def has_duplicate_values?(options)
+  def duplicate_values?(options)
     value_counts = options.each_with_object(Hash.new(0)) { |opt, counts| counts[opt['value']] += 1 }
     value_counts.values.any? { |count| count > 1 }
   end
@@ -245,7 +245,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
     # Check if there are duplicate values in old or new options
     # If so, we must skip value matching
-    use_value_matching = !has_duplicate_values?(old_options) && !has_duplicate_values?(new_options)
+    use_value_matching = !duplicate_values?(old_options) && !duplicate_values?(new_options)
 
     old_options.each do |old_opt|
       old_var = old_opt['name']
@@ -395,7 +395,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
     # Check if there are duplicate values in old or new options
     # If so, we must use payload matching only
-    use_payload_matching = has_duplicate_values?(old_options) || has_duplicate_values?(new_options)
+    use_payload_matching = duplicate_values?(old_options) || duplicate_values?(new_options)
 
     old_options.each do |old_opt|
       payload = old_opt['payload']
@@ -427,7 +427,7 @@ class V1::Question::AnswerOptionsChangeDetector
 
     # Check if there are duplicate values in old or new options
     # If so, we must skip value matching
-    use_value_matching = !has_duplicate_values?(old_options) && !has_duplicate_values?(new_options)
+    use_value_matching = !duplicate_values?(old_options) && !duplicate_values?(new_options)
 
     old_options.each do |old_opt|
       var_name = old_opt['name']
