@@ -13,39 +13,47 @@ RSpec.describe UpdateJobs::AdjustQuestionVariableReferences, type: :job do
   let(:new_variable_name) { 'updated_var' }
 
   describe '#perform' do
+    before do
+      # Set the lock as held (simulating that the service acquired it)
+      session.update!(formula_update_in_progress: true)
+    end
+
     context 'when variables are identical' do
       let(:new_variable_name) { old_variable_name }
 
-      it 'skips processing when variables are identical' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
+      it 'skips processing but still releases the lock' do
+        expect(V1::VariableReferences::QuestionService).not_to receive(:call)
         perform_job
+        expect(session.reload.formula_update_in_progress?).to be false
       end
     end
 
     context 'when old variable name is blank' do
       let(:old_variable_name) { '' }
 
-      it 'skips processing when old variable name is blank' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
+      it 'skips processing but still releases the lock' do
+        expect(V1::VariableReferences::QuestionService).not_to receive(:call)
         perform_job
+        expect(session.reload.formula_update_in_progress?).to be false
       end
     end
 
     context 'when new variable name is blank' do
       let(:new_variable_name) { '' }
 
-      it 'skips processing when new variable name is blank' do
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
+      it 'skips processing but still releases the lock' do
+        expect(V1::VariableReferences::QuestionService).not_to receive(:call)
         perform_job
+        expect(session.reload.formula_update_in_progress?).to be false
       end
     end
 
     context 'with valid variable change' do
-      it 'calls QuestionService with correct arguments' do
+      it 'calls QuestionService with correct arguments and releases the lock' do
         expect(V1::VariableReferences::QuestionService).to receive(:call).with(question.id, old_variable_name, new_variable_name)
-        expect_any_instance_of(described_class).to receive(:with_formula_update_lock).with(question.session.intervention_id).and_call_original
 
         perform_job
+        expect(session.reload.formula_update_in_progress?).to be false
       end
     end
   end
