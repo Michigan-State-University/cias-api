@@ -45,4 +45,33 @@ class Question::Multiple < Question
       { 'name' => variable_name } if variable_name.present?
     end
   end
+
+  def question_answers
+    data = body['data']
+    return [] if data.blank?
+
+    data.map do |row|
+      var_name = row.dig('variable', 'name').presence
+      payload_text = row['payload']
+      value = row.dig('variable', 'value')
+
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
+    end
+  end
+
+  def extract_answers_from_params(params)
+    source_body = params[:body]
+    return [] if source_body.blank?
+
+    data = source_body[:data]
+    return [] if data.blank?
+
+    data.map do |row|
+      var_name = row.dig(:variable, :name).presence
+      payload_text = row[:payload]
+      value = row.dig(:variable, :value)
+
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
+    end
+  end
 end

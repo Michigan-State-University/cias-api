@@ -174,6 +174,14 @@ class Question < ApplicationRecord
     []
   end
 
+  def question_answers
+    []
+  end
+
+  def extract_answers_from_params(_params)
+    []
+  end
+
   def first_question?
     session.first_question == self
   end
