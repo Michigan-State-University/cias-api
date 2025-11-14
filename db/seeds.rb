@@ -17,7 +17,7 @@ class SummonUsers
           first_name: role,
           last_name: Faker::GreekPhilosophers.name,
           email: "#{role}@#{ENV.fetch('DOMAIN_NAME', nil)}",
-          password: 'Password1!',
+          password: 'Password123!',
           roles: [role],
           terms: true
         )
