@@ -15,13 +15,34 @@ class V1::Question::Update
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.not_uniq_variable') if new_variable_is_taken?(new_variables)
 
     previous_var = question_variables
-    changed_vars = changed_variables(previous_var, question_params)
-
     previous_answer_options = question.question_answers
-    new_answer_options = question.extract_answers_from_params(question_params)
-    changed_answers_options = changed_answer_options(previous_answer_options, new_answer_options)
 
-    jobs_need_queuing = !changed_vars.empty? || !changed_answers_options.empty?
+    new_answer_options = question.extract_answers_from_params(question_params)
+
+    changed_vars = if previous_answer_options.size == new_answer_options.size
+                     changed_variables(previous_var, question_params)
+                   else
+                     []
+                   end
+
+    detector = V1::Question::AnswerOptionsChangeDetector.new(question)
+    changed_answers_options, new_answers_to_add, deleted_answers = detect_answer_option_changes(
+      detector,
+      previous_answer_options,
+      new_answer_options
+    )
+
+    if question.is_a?(Question::Grid)
+      changed_columns, new_columns_to_add, deleted_columns = detect_grid_column_changes(detector)
+    else
+      changed_columns = {}
+      new_columns_to_add = {}
+      deleted_columns = {}
+    end
+
+    jobs_need_queuing = !changed_vars.empty? || !changed_answers_options.empty? ||
+                        !new_answers_to_add.empty? || !deleted_answers.empty? ||
+                        !changed_columns.empty? || !new_columns_to_add.empty? || !deleted_columns.empty?
     lock_acquired = false
     intervention_id = question.session.intervention_id # Cache for ensure block
 
@@ -48,7 +69,16 @@ class V1::Question::Update
 
       # Enqueue jobs *after* save is successful
       adjust_variable_references(changed_vars)
-      adjust_answer_options_references(changed_answers_options)
+      adjust_answer_options_references(
+        changed_answers_options,
+        new_answers_to_add,
+        deleted_answers,
+        {
+          changed: changed_columns,
+          new: new_columns_to_add,
+          deleted: deleted_columns
+        }
+      )
 
       # If we get here, everything is successful.
       # The lock is intentionally left HELD for the jobs to release.
@@ -99,12 +129,34 @@ class V1::Question::Update
     end
   end
 
-  def adjust_answer_options_references(changed_answer_options)
-    return if changed_answer_options.empty?
+  def adjust_answer_options_references(
+    changed_answer_options,
+    new_answer_options,
+    deleted_answer_options,
+    grid_columns = {}
+  )
+    changed_columns = grid_columns[:changed] || {}
+    new_columns = grid_columns[:new] || {}
+    deleted_columns = grid_columns[:deleted] || {}
+
+    if changed_answer_options.empty? && new_answer_options.empty? &&
+       deleted_answer_options.empty? && changed_columns.empty? &&
+       new_columns.empty? && deleted_columns.empty?
+      return
+    end
+
+    serialized_grid_columns = {
+      changed: changed_columns,
+      new: new_columns,
+      deleted: deleted_columns
+    }
 
     UpdateJobs::AdjustQuestionAnswerOptionsReferences.perform_later(
       question.id,
-      changed_answer_options
+      changed_answer_options,
+      new_answer_options,
+      deleted_answer_options,
+      serialized_grid_columns
     )
   end
 
@@ -118,24 +170,6 @@ class V1::Question::Update
 
       [prev_var['name'], new_var['name']]
     end
-  end
-
-  def changed_answer_options(old_options, new_options)
-    old_map = old_options.to_h { |opt| [opt['name'], opt['payload']] }
-    new_map = new_options.to_h { |opt| [opt['name'], opt['payload']] }
-
-    changes = {}
-
-    old_map.each do |var_name, old_payload|
-      new_payload = new_map[var_name]
-
-      next if old_payload.blank? || new_payload.blank? || old_payload == new_payload
-
-      changes[var_name] ||= {}
-      changes[var_name][old_payload] = new_payload
-    end
-
-    changes
   end
 
   def formula_update_in_progress?
@@ -165,5 +199,46 @@ class V1::Question::Update
     used_variables = question.session.fetch_variables({}, question.id).pluck(:variables).flatten.map(&:downcase)
 
     used_variables.any? { |variable| new_variables.include?(variable) }
+  end
+
+  def detect_answer_option_changes(detector, old_options, new_options)
+    old_size = old_options.size
+    new_size = new_options.size
+
+    changed = []
+    new_added = []
+    deleted = []
+
+    if old_size == new_size
+      changed = detector.detect_changes(old_options, new_options)
+    elsif old_size < new_size
+      new_added = detector.detect_new_options(old_options, new_options)
+    elsif old_size > new_size
+      deleted = detector.detect_deleted_options(old_options, new_options)
+    end
+
+    [changed, new_added, deleted]
+  end
+
+  def detect_grid_column_changes(detector)
+    previous_columns = question.question_columns
+    new_columns = question.extract_columns_from_params(question_params)
+
+    old_col_size = previous_columns.size
+    new_col_size = new_columns.size
+
+    changed = {}
+    new_added = {}
+    deleted = {}
+
+    if old_col_size == new_col_size
+      changed = detector.detect_column_changes(previous_columns, new_columns)
+    elsif old_col_size < new_col_size
+      new_added = detector.detect_new_columns(previous_columns, new_columns)
+    elsif old_col_size > new_col_size
+      deleted = detector.detect_deleted_columns(previous_columns, new_columns)
+    end
+
+    [changed, new_added, deleted]
   end
 end
