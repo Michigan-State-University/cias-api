@@ -11,6 +11,7 @@ class V1::Question::Update
     @question_params = question_params
   end
 
+  # rubocop:disable Rails/SkipsModelValidations
   def call
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.published_intervention') if question.session.published?
     raise ActiveRecord::RecordNotSaved, I18n.t('question.error.not_uniq_variable') if new_variable_is_taken?(new_variables)
@@ -41,28 +42,56 @@ class V1::Question::Update
       deleted_columns = {}
     end
 
-    if (!changed_vars.empty? || !changed_answers_options.empty?) && formula_update_in_progress?
-      raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress')
+    variable_jobs_need_queuing = !changed_vars.empty?
+    lock_acquired = false
+    jobs_enqueued = false
+    session_id = question.session.id
+
+    begin
+      if variable_jobs_need_queuing
+        lock_count = Session
+                       .where(id: session_id, formula_update_in_progress: false)
+                       .update_all(formula_update_in_progress: true, updated_at: Time.current)
+
+        if lock_count.zero?
+          Rails.logger.warn "[V1::Question::Update] Failed to acquire lock for session #{session_id} - already locked"
+          raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress')
+        end
+        lock_acquired = true
+      end
+
+      question.assign_attributes(question_params.except(:type))
+      question.execute_narrator
+      question.save!
+
+      adjust_variable_references(changed_vars)
+      adjust_answer_options_references(
+        changed_answers_options,
+        new_answers_to_add,
+        deleted_answers,
+        {
+          changed: changed_columns,
+          new: new_columns_to_add,
+          deleted: deleted_columns
+        }
+      )
+
+      jobs_enqueued = true
+      question
+    rescue StandardError => e
+      Rails.logger.error "[V1::Question::Update] FAILED TO SAVE: #{e.message}"
+      Rails.logger.error "[V1::Question::Update] Backtrace: #{e.backtrace.join("\n")}"
+      Rails.logger.error "[V1::Question::Update] VALIDATION FAILED: #{e.record.errors.full_messages.join(', ')}" if e.is_a?(ActiveRecord::RecordInvalid)
+
+      raise e
+    ensure
+      if lock_acquired && !jobs_enqueued
+        Rails.logger.warn "[V1::Question::Update] Releasing formula_update_in_progress lock for session #{session_id} due to failed job enqueue"
+        Session.where(id: session_id).update_all(formula_update_in_progress: false, updated_at: Time.current)
+      end
     end
-
-    question.assign_attributes(question_params.except(:type))
-    question.execute_narrator
-    question.save!
-
-    adjust_variable_references(changed_vars)
-    adjust_answer_options_references(
-      changed_answers_options,
-      new_answers_to_add,
-      deleted_answers,
-      {
-        changed: changed_columns,
-        new: new_columns_to_add,
-        deleted: deleted_columns
-      }
-    )
-
-    question
   end
+  # rubocop:enable Rails/SkipsModelValidations
 
   private
 
@@ -122,10 +151,6 @@ class V1::Question::Update
 
       [prev_var['name'], new_var['name']]
     end
-  end
-
-  def formula_update_in_progress?
-    question.session.intervention.formula_update_in_progress?
   end
 
   def question_variables

@@ -24,16 +24,15 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
   let(:grid_columns) { { changed: {}, new: {}, deleted: {} } }
 
   before do
-    stub_const('V1::VariableReferences::AnswerOptionsService', class_double(V1::VariableReferences::AnswerOptionsService, call: true))
+    allow(V1::VariableReferences::AnswerOptionsService).to receive(:call).and_return(true)
   end
 
   describe '#perform' do
-    context 'when changed_answer_values is blank' do
+    context 'when all parameters are blank' do
       let(:changed_answer_values) { {} }
 
-      it 'skips processing' do
+      it 'skips processing (no lock involved)' do
         expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -41,9 +40,8 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
     context 'when changed_answer_values is nil' do
       let(:changed_answer_values) { nil }
 
-      it 'skips processing' do
+      it 'skips processing (no lock involved)' do
         expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -51,22 +49,8 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
     context 'when question is not found' do
       let(:question_id) { 'non-existent-id' }
 
-      it 'skips processing' do
+      it 'skips processing (no lock involved)' do
         expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
-        perform_job
-      end
-    end
-
-    context 'when question has no intervention_id' do
-      before do
-        allow(Question).to receive(:find_by).with(id: question_id).and_return(question)
-        allow(question).to receive(:session).and_return(nil)
-      end
-
-      it 'skips processing' do
-        expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end

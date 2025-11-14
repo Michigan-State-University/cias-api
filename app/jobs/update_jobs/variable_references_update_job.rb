@@ -1,32 +1,43 @@
 # frozen_string_literal: true
 
+# rubocop:disable Rails/SkipsModelValidations
 class UpdateJobs::VariableReferencesUpdateJob < CloneJob
-  retry_on ActiveRecord::Deadlocked, wait: 5.seconds, attempts: 3
-  retry_on ActiveRecord::LockWaitTimeout, wait: 5.seconds, attempts: 3
+  sidekiq_retries_exhausted do |msg, _ex|
+    question_id = msg['args'].first
+    question = Question.find_by(id: question_id)
+    session_id = question&.session&.id
+
+    if session_id
+      Session.where(id: session_id).update_all(formula_update_in_progress: false, updated_at: Time.current)
+    else
+      Rails.logger.error "[#{name}] Job failed permanently and could not find session_id to release lock. Args: #{msg['args']}"
+    end
+  end
 
   private
 
-  def with_formula_update_lock(intervention_id)
-    # rubocop:disable Rails/SkipsModelValidations
-    lock_acquired = Intervention
-          .where(id: intervention_id, formula_update_in_progress: false)
-          .update_all(formula_update_in_progress: true, updated_at: Time.current)
+  def with_formula_update_lock(session_id)
+    session = Session.find_by(id: session_id)
 
-    if lock_acquired.zero?
-      Rails.logger.warn "[#{self.class.name}] Skipping job, formula update already in progress for intervention #{intervention_id}."
+    if session.nil?
+      Rails.logger.warn "[#{self.class.name}] Skipping job, Session #{session_id} not found."
+      return
+    end
+
+    unless session.formula_update_in_progress?
+      Rails.logger.warn "[#{self.class.name}] Skipping job, formula update lock not held for session #{session_id}"
       return
     end
 
     begin
-      intervention = Intervention.find(intervention_id)
-      yield intervention
+      yield session
     rescue StandardError => e
-      Rails.logger.error "[#{self.class.name}] Failed to update formula references: #{e.message}"
+      Rails.logger.error "[#{self.class.name}] Failed to update formula references, will retry. Lock remains held. Error: #{e.message}"
       Rails.logger.error "[#{self.class.name}] Backtrace: #{e.backtrace.join("\n")}"
-      raise
-    ensure
-      Intervention.where(id: intervention_id).update_all(formula_update_in_progress: false, updated_at: Time.current)
+      raise e
     end
-    # rubocop:enable Rails/SkipsModelValidations
+
+    Session.where(id: session_id).update_all(formula_update_in_progress: false, updated_at: Time.current)
   end
 end
+# rubocop:enable Rails/SkipsModelValidations

@@ -44,7 +44,7 @@ class V1::SessionService
     previous_variable = session.variable
     new_variable = session_params[:variable] || session.variable
 
-    if variable_changed?(previous_variable, new_variable) && session.intervention.formula_update_in_progress?
+    if variable_changed?(previous_variable, new_variable) && session.formula_update_in_progress?
       raise ActiveRecord::RecordNotSaved, I18n.t('session.error.formula_update_in_progress')
     end
 
