@@ -521,15 +521,20 @@ class V1::VariableReferences::AnswerOptionsService < V1::VariableReferences::Bas
                       # Update payload, variable, AND value
                       escaped_new_var = ActiveRecord::Base.connection.quote(new_variable.to_json)
                       escaped_new_val = ActiveRecord::Base.connection.quote(new_value.to_json)
-                      "jsonb_set(jsonb_set(jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb), '{variable}', #{escaped_new_var}::jsonb), '{value}', #{escaped_new_val}::jsonb)"
+                      # Build nested jsonb_set calls
+                      step1 = "jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb)"
+                      step2 = "jsonb_set(#{step1}, '{variable}', #{escaped_new_var}::jsonb)"
+                      "jsonb_set(#{step2}, '{value}', #{escaped_new_val}::jsonb)"
                     elsif new_variable
                       # Update payload AND variable
                       escaped_new_var = ActiveRecord::Base.connection.quote(new_variable.to_json)
-                      "jsonb_set(jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb), '{variable}', #{escaped_new_var}::jsonb)"
+                      step1 = "jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb)"
+                      "jsonb_set(#{step1}, '{variable}', #{escaped_new_var}::jsonb)"
                     elsif new_value
                       # Update payload AND value
                       escaped_new_val = ActiveRecord::Base.connection.quote(new_value.to_json)
-                      "jsonb_set(jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb), '{value}', #{escaped_new_val}::jsonb)"
+                      step1 = "jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb)"
+                      "jsonb_set(#{step1}, '{value}', #{escaped_new_val}::jsonb)"
                     else
                       # Only update payload
                       "jsonb_set(reflection_item, '{payload}', #{json_new_payload}::jsonb)"

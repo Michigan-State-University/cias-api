@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
 class V1::Question::Update
   def self.call(question, question_params)
     new(question, question_params).call
@@ -193,3 +194,4 @@ class V1::Question::Update
     [changed, new_added, deleted]
   end
 end
+# rubocop:enable Metrics/ClassLength
