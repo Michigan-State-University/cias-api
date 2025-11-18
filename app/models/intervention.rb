@@ -129,10 +129,10 @@ class Intervention < ApplicationRecord
     ::Question::HenryFordInitial.joins(:question_group).where(question_groups: { session: sessions }).delete_all
   end
 
-  def export_answers_as(type:)
+  def export_answers_as(type:, period:)
     raise ArgumentError, 'Undefined type of data export.' unless %w[csv].include?(type.downcase)
 
-    ::Intervention::Csv.call(self)
+    ::Intervention::Csv.call(self, period)
   end
 
   def integral_update
