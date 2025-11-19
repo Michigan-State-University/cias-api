@@ -71,6 +71,7 @@ class Intervention < ApplicationRecord
   scope :indexing, ->(ids) { where(id: ids) }
   scope :limit_to_statuses, ->(statuses) { where(status: statuses) if statuses.present? }
   scope :filter_by_name, ->(name) { where('lower(name) like ?', "%#{name.downcase}%") if name.present? }
+  scope :filter_by_name_or_note, ->(keyword) { filter_by_name(keyword).or(where('lower(note) like ?', "%#{keyword.downcase}%")) if keyword.present? }
   scope :filter_by_organization, ->(organization_id) { where(organization_id: organization_id) }
   scope :only_shared_with_me, ->(user_id) { joins(:collaborators).where(collaborators: { user_id: user_id }) }
   scope :only_shared_by_me, ->(user_id) { joins(:collaborators).where(user_id: user_id) }
@@ -191,7 +192,7 @@ class Intervention < ApplicationRecord
     scope = scope.limit_to_statuses(params[:statuses])
     scope = scope.filter_by_organization(params[:organization_id]) if params[:organization_id].present?
     scope = scope.only_starred_by_me(user) if params[:starred].present?
-    scope.filter_by_name(params[:name])
+    scope.filter_by_name_or_note(params[:name])
   end
 
   def cat_sessions_validation
