@@ -21,4 +21,8 @@ class V1::QuestionSerializer < V1Serializer
   attribute :question_language do |object|
     object.session&.google_language&.language_code
   end
+
+  attribute :session_multiple_fill, if: proc { |record| record.is_a?(Question::Finish) } do |object|
+    object.session&.multiple_fill || false
+  end
 end
