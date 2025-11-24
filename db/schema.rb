@@ -509,6 +509,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
     t.boolean "formula_update_in_progress", default: false, null: false
+    t.string "note"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
