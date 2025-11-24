@@ -42,7 +42,9 @@ module MetaOperations
       @filename ||= if options[:filename]
                       "#{options[:filename]}.#{options[:ext]}"
                     else
-                      "#{timestamp}_#{add_to.name.parameterize.underscore[..12]}.#{options[:ext]}"
+                      filename = "#{timestamp}_#{add_to.name.parameterize.underscore[..12]}"
+                      filename += "_#{options[:suffix]}" if options[:suffix].present?
+                      "#{filename}.#{options[:ext]}"
                     end
     end
 
