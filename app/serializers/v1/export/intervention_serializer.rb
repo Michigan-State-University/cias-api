@@ -3,7 +3,7 @@
 class V1::Export::InterventionSerializer < ActiveModel::Serializer
   include FileHelper
 
-  attributes :quick_exit, :type, :shared_to, :additional_text, :original_text, :current_narrator
+  attributes :quick_exit, :type, :shared_to, :additional_text, :original_text, :current_narrator, :note
 
   has_many :sessions, serializer: V1::Export::SessionSerializer do
     object.sessions.where(type: %w[Session::Classic Session::Sms])
