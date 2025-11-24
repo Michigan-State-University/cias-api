@@ -7,7 +7,7 @@ class V1::InterventionSerializer < V1Serializer
   attributes :id, :user_id, :type, :name, :status, :shared_to, :organization_id, :google_language_id,
              :created_at, :updated_at, :published_at, :sensitive_data_state, :clear_sensitive_data_scheduled_at,
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
-             :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled, :hfhs_access
+             :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled, :hfhs_access, :note
 
   has_many :sessions, serializer: V1::SessionSerializer
   has_many :clinic_locations, serializer: V1::ClinicLocationSerializer

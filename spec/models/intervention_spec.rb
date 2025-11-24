@@ -51,6 +51,16 @@ RSpec.describe Intervention, type: :model do
     end
   end
 
+  describe 'filters' do
+    let!(:interventions) { create_list(:intervention, 5) }
+    let!(:intervention_with_name) { create(:intervention, name: 'Special Intervention') }
+    let!(:intervention_with_note) { create(:intervention, note: 'Special Intervention') }
+
+    it 'filters by name or note' do
+      expect(described_class.filter_by_name_or_note('Special')).to contain_exactly(intervention_with_name, intervention_with_note)
+    end
+  end
+
   describe 'instance methods' do
     describe 'translation' do
       let(:intervention) { create(:intervention_with_logo, name: 'New intervention') }
