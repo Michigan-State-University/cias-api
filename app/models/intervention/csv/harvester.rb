@@ -6,11 +6,12 @@ class Intervention::Csv::Harvester
 
   DEFAULT_VALUE = 888
   VIDEO_STATS_KEYS = %i[video_url video_start video_end progress played_seconds].freeze
-  attr_reader :sessions
+  attr_reader :sessions, :period
   attr_accessor :header, :rows, :users, :user_column
 
-  def initialize(sessions)
+  def initialize(sessions, period)
     @sessions = sessions
+    @period = period
     @header = []
     @rows = []
     @users = {}
@@ -245,7 +246,11 @@ class Intervention::Csv::Harvester
   end
 
   def user_sessions
-    @user_sessions ||= UserSession.where(session_id: session_ids).includes(:user)
+    @user_sessions ||= if period.present?
+                         UserSession.where(session_id: session_ids).where(created_at: period).includes(:user)
+                       else
+                         UserSession.where(session_id: session_ids).includes(:user)
+                       end
   end
 
   def initialize_row
