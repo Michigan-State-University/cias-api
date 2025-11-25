@@ -7,12 +7,7 @@ class V1::Interventions::AnswersController < V1Controller
     requested_at = Time.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', 'UTC'))
     day_format = ActiveSupport::Inflector.ordinalize(requested_at.day)
     formatted_requested_at = requested_at.strftime("%B #{day_format}, %Y %H:%M %Z")
-    CsvJob::Answers.perform_later(
-      current_v1_user.id,
-      intervention_id,
-      formatted_requested_at,
-      period_of_time_params
-    )
+    CsvJob::Answers.perform_later(current_v1_user.id, intervention_id, formatted_requested_at)
     render json: { message: I18n.t('interventions.answers.index.csv') }
   end
 
@@ -33,9 +28,5 @@ class V1::Interventions::AnswersController < V1Controller
 
   def intervention_id
     params.require(:intervention_id)
-  end
-
-  def period_of_time_params
-    params.permit(:start_datetime, :end_datetime, :timezone)
   end
 end

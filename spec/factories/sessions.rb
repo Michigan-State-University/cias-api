@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :session, class: Session::Classic do
     sequence(:name) { |s| "session_#{s}" }
-    sequence(:variable) { |s| "session_#{s}_#{SecureRandom.hex}" }
+    sequence(:variable) { |s| "session_#{s}" }
     sequence(:position) { |s| s }
     association :intervention
 
