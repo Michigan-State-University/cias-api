@@ -49,11 +49,11 @@ class V1::Question::Update
 
     begin
       if variable_jobs_need_queuing
-        lock_count = Session
+        lock_acquired = Session
                        .where(id: session_id, formula_update_in_progress: false)
                        .update_all(formula_update_in_progress: true, updated_at: Time.current)
 
-        if lock_count.zero?
+        unless lock_acquired
           Rails.logger.warn "[V1::Question::Update] Failed to acquire lock for session #{session_id} - already locked"
           raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress')
         end

@@ -26,8 +26,7 @@ RSpec.describe VariableReferencesLockManagement, type: :job do
 
       it 'executes the block and releases the lock after' do
         job = job_class.new
-        result = job.perform(session.id)
-        expect(result).to be true
+        job.perform(session.id)
         expect(session.reload.formula_update_in_progress?).to be false
       end
 

@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
-class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferencesUpdateJob
+class UpdateJobs::AdjustQuestionVariableReferences < CloneJob
+  include VariableReferencesLockManagement
+
   def perform(question_id, old_variable_name, new_variable_name)
+    @question_id = question_id
     Rails.logger.info "[#{self.class.name}] Starting job for question #{question_id}: '#{old_variable_name}' -> '#{new_variable_name}'"
 
     question = Question.find_by(id: question_id)
@@ -21,5 +24,12 @@ class UpdateJobs::AdjustQuestionVariableReferences < UpdateJobs::VariableReferen
         new_variable_name
       )
     end
+  end
+
+  private
+
+  def session_id_for_lock_cleanup
+    question = Question.find_by(id: @question_id)
+    question&.session&.id
   end
 end
