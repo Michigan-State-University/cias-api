@@ -52,49 +52,44 @@ class Question::Grid < Question
 
   def question_answers
     rows = body.dig('data', 0, 'payload', 'rows')
-    return [] if rows.blank?
-
-    rows.map do |row|
-      var_name = row.dig('variable', 'name').presence
-      payload_text = row['payload']
-      value = row['value']
-
-      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
-    end
+    map_rows_to_answers(rows)
   end
 
   def extract_answers_from_params(params)
     rows = params.dig(:body, :data, 0, :payload, :rows)
+    map_rows_to_answers(rows)
+  end
+
+  def question_columns
+    columns = body.dig('data', 0, 'payload', 'columns')
+    map_columns_to_hash(columns)
+  end
+
+  def extract_columns_from_params(params)
+    columns = params.dig(:body, :data, 0, :payload, :columns)
+    map_columns_to_hash(columns)
+  end
+
+  private
+
+  def map_rows_to_answers(rows)
     return [] if rows.blank?
 
     rows.map do |row|
-      var_name = row.dig(:variable, :name).presence
-      payload_text = row[:payload]
-      value = row[:value]
+      var_name = row.dig('variable', 'name').presence || row.dig(:variable, :name).presence
+      payload_text = row['payload'] || row[:payload]
+      value = row['value'] || row[:value]
 
       { 'name' => var_name, 'payload' => payload_text, 'value' => value }
     end
   end
 
-  def question_columns
-    columns = body.dig('data', 0, 'payload', 'columns')
+  def map_columns_to_hash(columns)
     return [] if columns.blank?
 
     columns.map do |col|
-      value = col.dig('variable', 'value')
-      payload_text = col['payload']
-
-      { 'value' => value, 'payload' => payload_text }
-    end
-  end
-
-  def extract_columns_from_params(params)
-    columns = params.dig(:body, :data, 0, :payload, :columns)
-    return [] if columns.blank?
-
-    columns.map do |col|
-      value = col.dig(:variable, :value)
-      payload_text = col[:payload]
+      value = col.dig('variable', 'value') || col.dig(:variable, :value)
+      payload_text = col['payload'] || col[:payload]
 
       { 'value' => value, 'payload' => payload_text }
     end
