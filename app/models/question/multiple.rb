@@ -48,7 +48,15 @@ class Question::Multiple < Question
 
   def question_answers
     data = body['data']
-    map_rows_to_answers(data)
+    return [] if data.blank?
+
+    data.map do |row|
+      var_name = row.dig('variable', 'name').presence
+      payload_text = row['payload']
+      value = row.dig('variable', 'value')
+
+      { 'name' => var_name, 'payload' => payload_text, 'value' => value }
+    end
   end
 
   def extract_answers_from_params(params)
@@ -56,18 +64,12 @@ class Question::Multiple < Question
     return [] if source_body.blank?
 
     data = source_body[:data]
-    map_rows_to_answers(data)
-  end
-
-  private
-
-  def map_rows_to_answers(data)
     return [] if data.blank?
 
     data.map do |row|
-      var_name = row.dig('variable', 'name').presence || row.dig(:variable, :name).presence
-      payload_text = row['payload'] || row[:payload]
-      value = row.dig('variable', 'value') || row.dig(:variable, :value)
+      var_name = row.dig(:variable, :name).presence
+      payload_text = row[:payload]
+      value = row.dig(:variable, :value)
 
       { 'name' => var_name, 'payload' => payload_text, 'value' => value }
     end
