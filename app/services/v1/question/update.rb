@@ -125,7 +125,7 @@ class V1::Question::Update
   end
 
   def formula_update_in_progress?
-    question.session.intervention.formula_update_in_progress?
+    question.session.formula_update_in_progress?
   end
 
   def question_variables
