@@ -44,6 +44,7 @@ class V1::VariableReferences::SessionService < V1::VariableReferences::BaseServi
     update_question_group_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
     update_session_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
     update_report_template_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
+    update_sms_plan_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
     update_chart_formulas(session.intervention_id, old_pattern, new_pattern)
   end
 

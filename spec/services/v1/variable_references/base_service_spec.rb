@@ -108,5 +108,28 @@ RSpec.describe V1::VariableReferences::BaseService, type: :service do
         expect(service.sanitize_like_pattern('var%_\\')).to eq('var\\%\\_\\\\')
       end
     end
+
+    describe '#update_sms_plan_formulas_scoped' do
+      let!(:sms_plan) { create(:sms_plan, session: session, formula: 'text {{old_var}}', no_formula_text: 'text .:old_var:.') }
+
+      it 'updates both formula and no_formula_text' do
+        service.update_sms_plan_formulas_scoped(session, 'old_var', 'new_var')
+        sms_plan.reload
+        expect(sms_plan.formula).to eq('text {{new_var}}')
+        expect(sms_plan.no_formula_text).to eq('text .:new_var:.')
+      end
+
+      context 'with cross-session variables' do
+        let!(:cross_sms_plan) { create(:sms_plan, session: session, formula: 'text {{s1.old_var}}', no_formula_text: 'text .:s1.old_var:.') }
+
+        it 'updates cross-session references correctly' do
+          service.update_sms_plan_formulas_scoped(session, 's1.old_var', 's1.new_var')
+
+          cross_sms_plan.reload
+          expect(cross_sms_plan.formula).to eq('text {{s1.new_var}}')
+          expect(cross_sms_plan.no_formula_text).to eq('text .:s1.new_var:.')
+        end
+      end
+    end
   end
 end
