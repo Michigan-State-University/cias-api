@@ -29,6 +29,7 @@ module VariableReferencesLockManagement
       rescue StandardError => e
         Rails.logger.error "[#{job_class.name}] Failed to release lock on retry exhaustion: #{e.message}"
         Rails.logger.error "[#{job_class.name}] Args: #{msg['args']}"
+        Sentry.capture_exception(e)
       end
     end
   end
