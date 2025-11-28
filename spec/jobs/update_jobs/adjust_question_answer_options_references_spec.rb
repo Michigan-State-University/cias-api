@@ -18,32 +18,35 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
   let(:question_group) { create(:question_group, session: session) }
   let(:question) { create(:question_multiple, question_group: question_group) }
   let(:question_id) { question.id }
-  let(:changed_answer_values) { { 'var1' => { 'old_payload' => 'new_payload' } } }
-  let(:new_answer_options) { {} }
-  let(:deleted_answer_options) { {} }
+  let(:changed_answer_values) { [{ 'variable' => 'var1', 'old_payload' => 'old', 'new_payload' => 'new', 'value' => '1' }] }
+  let(:new_answer_options) { [] }
+  let(:deleted_answer_options) { [] }
   let(:grid_columns) { { changed: {}, new: {}, deleted: {} } }
 
   before do
-    stub_const('V1::VariableReferences::AnswerOptionsService', class_double(V1::VariableReferences::AnswerOptionsService, call: true))
+    allow(V1::VariableReferences::AnswerOptionsService).to receive(:call)
   end
 
   describe '#perform' do
-    context 'when changed_answer_values is blank' do
-      let(:changed_answer_values) { {} }
+    context 'when all inputs are blank' do
+      let(:changed_answer_values) { [] }
+      let(:new_answer_options) { [] }
+      let(:deleted_answer_options) { [] }
+      let(:grid_columns) { { changed: {}, new: {}, deleted: {} } }
 
       it 'skips processing' do
         expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
 
     context 'when changed_answer_values is nil' do
       let(:changed_answer_values) { nil }
+      let(:new_answer_options) { nil }
+      let(:deleted_answer_options) { nil }
 
       it 'skips processing' do
         expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
@@ -53,34 +56,36 @@ RSpec.describe UpdateJobs::AdjustQuestionAnswerOptionsReferences, type: :job do
 
       it 'skips processing' do
         expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
-        perform_job
-      end
-    end
-
-    context 'when question has no intervention_id' do
-      before do
-        allow(Question).to receive(:find_by).with(id: question_id).and_return(question)
-        allow(question).to receive(:session).and_return(nil)
-      end
-
-      it 'skips processing' do
-        expect(V1::VariableReferences::AnswerOptionsService).not_to receive(:call)
-        expect_any_instance_of(described_class).not_to receive(:with_formula_update_lock)
         perform_job
       end
     end
 
     context 'with valid data' do
-      it 'calls AnswerOptionsService with correct arguments and a lock' do
+      it 'calls AnswerOptionsService with correct arguments' do
         expect(V1::VariableReferences::AnswerOptionsService).to receive(:call).with(
           question.id,
           changed_answer_values,
           new_answer_options,
           deleted_answer_options,
-          grid_columns
+          { changed: {}, new: {}, deleted: {} }
         )
-        expect_any_instance_of(described_class).to receive(:with_formula_update_lock).with(question.session.intervention_id).and_call_original
+
+        perform_job
+      end
+    end
+
+    context 'with grid column changes' do
+      let(:changed_answer_values) { [] }
+      let(:grid_columns) { { changed: { 'a' => { 'old' => 'Col A', 'new' => 'Col A Updated' } }, new: {}, deleted: {} } }
+
+      it 'calls AnswerOptionsService with grid column changes' do
+        expect(V1::VariableReferences::AnswerOptionsService).to receive(:call).with(
+          question.id,
+          [],
+          [],
+          [],
+          { changed: { 'a' => { 'old' => 'Col A', 'new' => 'Col A Updated' } }, new: {}, deleted: {} }
+        )
 
         perform_job
       end

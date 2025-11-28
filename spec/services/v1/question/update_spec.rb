@@ -423,7 +423,7 @@ RSpec.describe V1::Question::Update do
     end
   end
 
-  context 'when formula update is in progress' do
+  context 'when formula update is in progress (session locked)' do
     let(:question) do
       create(:question_multiple, question_group: question_group, body: {
                'data' => [
@@ -433,7 +433,8 @@ RSpec.describe V1::Question::Update do
     end
 
     before do
-      allow_any_instance_of(described_class).to receive(:formula_update_in_progress?).and_return(true)
+      # Simulate another process already holding the lock
+      session.update!(formula_update_in_progress: true)
     end
 
     context 'when variable names are changed' do
@@ -447,12 +448,12 @@ RSpec.describe V1::Question::Update do
         }
       end
 
-      it 'raises a RecordNotSaved error' do
+      it 'raises a RecordNotSaved error because lock cannot be acquired' do
         expect { perform_service }.to raise_error(ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress'))
       end
     end
 
-    context 'when answer options are changed' do
+    context 'when only answer options are changed (no variable change)' do
       let(:params) do
         {
           body: {
@@ -463,8 +464,9 @@ RSpec.describe V1::Question::Update do
         }
       end
 
-      it 'raises a RecordNotSaved error' do
-        expect { perform_service }.to raise_error(ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress'))
+      it 'succeeds because no lock is needed for answer option changes only' do
+        expect { perform_service }.not_to raise_error
+        expect(question.reload.body['data'][0]['payload']).to eq('New Text')
       end
     end
   end

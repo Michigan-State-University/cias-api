@@ -76,7 +76,6 @@ class V1::VariableReferences::AnswerOptionsService < V1::VariableReferences::Bas
     @source_session ||= question.session
   end
 
-  # Execute SQL for both session scopes: source session and other sessions in intervention
   def execute_for_both_session_types
     [false, true].each do |exclude_source|
       base_query = build_question_base_query(source_session, exclude_source)

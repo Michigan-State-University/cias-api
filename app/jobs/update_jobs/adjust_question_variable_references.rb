@@ -12,7 +12,7 @@ class UpdateJobs::AdjustQuestionVariableReferences < CloneJob
       return
     end
 
-    with_formula_update_lock(question.session.intervention_id) do
+    with_formula_update_lock(question.session.id) do
       next if old_variable_name == new_variable_name
       next if old_variable_name.blank? || new_variable_name.blank?
 

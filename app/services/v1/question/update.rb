@@ -48,15 +48,17 @@ class V1::Question::Update
 
     begin
       if variable_jobs_need_queuing
+        # rubocop:disable Rails/SkipsModelValidations
         lock_acquired = Session
-                       .where(id: session_id, formula_update_in_progress: false)
-                       .update_all(formula_update_in_progress: true, updated_at: Time.current)
+                        .where(id: session_id, formula_update_in_progress: false)
+                        .update_all(formula_update_in_progress: true, updated_at: Time.current)
+                        .positive?
+        # rubocop:enable Rails/SkipsModelValidations
 
         unless lock_acquired
           Rails.logger.warn "[V1::Question::Update] Failed to acquire lock for session #{session_id} - already locked"
           raise ActiveRecord::RecordNotSaved, I18n.t('question.error.formula_update_in_progress')
         end
-        lock_acquired = true
       end
 
       question.assign_attributes(question_params.except(:type))
@@ -86,7 +88,9 @@ class V1::Question::Update
     ensure
       if lock_acquired && !jobs_enqueued
         Rails.logger.warn "[V1::Question::Update] Releasing formula_update_in_progress lock for session #{session_id} due to failed job enqueue"
+        # rubocop:disable Rails/SkipsModelValidations
         Session.where(id: session_id).update_all(formula_update_in_progress: false, updated_at: Time.current)
+        # rubocop:enable Rails/SkipsModelValidations
       end
     end
   end

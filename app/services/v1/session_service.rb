@@ -43,19 +43,44 @@ class V1::SessionService
 
     previous_variable = session.variable
     new_variable = session_params[:variable] || session.variable
+    variable_changing = variable_changed?(previous_variable, new_variable)
 
-    if variable_changed?(previous_variable, new_variable) && session.formula_update_in_progress?
-      raise ActiveRecord::RecordNotSaved, I18n.t('session.error.formula_update_in_progress')
+    lock_acquired = false
+    jobs_enqueued = false
+
+    begin
+      if variable_changing
+        # rubocop:disable Rails/SkipsModelValidations
+        lock_acquired = Session.where(id: session.id, formula_update_in_progress: false)
+                               .update_all(formula_update_in_progress: true, updated_at: Time.current)
+                               .positive?
+        # rubocop:enable Rails/SkipsModelValidations
+
+        raise ActiveRecord::RecordNotSaved, I18n.t('session.error.formula_update_in_progress') unless lock_acquired
+
+        session.formula_update_in_progress = true
+      end
+
+      session.assign_attributes(session_params.except(:cat_tests))
+      session_type_sms = session.sms_session_type?
+      assign_cat_tests_to_session(session, session_params) unless session_type_sms
+      session.integral_update
+
+      if variable_changing
+        adjust_variable_references(session, previous_variable, session.variable)
+        jobs_enqueued = true
+      end
+
+      session
+    rescue StandardError => e
+      if lock_acquired && !jobs_enqueued
+        Rails.logger.warn "[V1::SessionService] Releasing formula_update_in_progress lock for session #{session.id} due to failure"
+        # rubocop:disable Rails/SkipsModelValidations
+        Session.where(id: session.id).update_all(formula_update_in_progress: false, updated_at: Time.current)
+        # rubocop:enable Rails/SkipsModelValidations
+      end
+      raise e
     end
-
-    session.assign_attributes(session_params.except(:cat_tests))
-    session_type_sms = session.sms_session_type?
-    assign_cat_tests_to_session(session, session_params) unless session_type_sms
-    session.integral_update
-
-    adjust_variable_references(session, previous_variable, session.variable) if variable_changed?(previous_variable, session.variable)
-
-    session
   end
 
   def destroy(session_id)
@@ -133,6 +158,7 @@ class V1::SessionService
   end
 
   def adjust_variable_references(session, old_variable, new_variable)
+    Rails.logger.info "[DEBUG_SESSION_VAR] Enqueuing AdjustSessionVariableReferences for session #{session.id}. Old: '#{old_variable}', New: '#{new_variable}'"
     UpdateJobs::AdjustSessionVariableReferences.perform_later(
       session.id,
       old_variable,
