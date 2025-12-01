@@ -59,4 +59,13 @@ class V1::VariableReferences::BaseService
     update_sql = build_text_formula_update_sql('report_template_sections', 'formula', old_var, new_var, base_query)
     ActiveRecord::Base.connection.execute(update_sql)
   end
+
+  def update_days_after_date_variable_references(old_var, new_var)
+    update_sql = <<-SQL.squish
+      UPDATE sessions
+      SET days_after_date_variable_name = #{ActiveRecord::Base.connection.quote(new_var)}
+      WHERE days_after_date_variable_name = #{ActiveRecord::Base.connection.quote(old_var)}
+    SQL
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
 end
