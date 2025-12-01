@@ -83,7 +83,7 @@ class V1::Question::Update
       Rails.logger.error "[V1::Question::Update] FAILED TO SAVE: #{e.message}"
       Rails.logger.error "[V1::Question::Update] Backtrace: #{e.backtrace.join("\n")}"
       Rails.logger.error "[V1::Question::Update] VALIDATION FAILED: #{e.record.errors.full_messages.join(', ')}" if e.is_a?(ActiveRecord::RecordInvalid)
-
+      Sentry.capture_exception(e)
       raise e
     ensure
       if lock_acquired && !jobs_enqueued
