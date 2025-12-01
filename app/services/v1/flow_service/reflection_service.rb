@@ -45,14 +45,15 @@ class V1::FlowService::ReflectionService
       current_variable = reflection_variable(block, reflection['variable'])
       matched_reflections.push(reflection) if all_var_values.key?(current_variable) && all_var_values[current_variable].eql?(reflection['value'])
     end
+
     matched_reflections
   end
 
   def reflection_variable(block, variable)
-    block['session_id'].present? ? "#{Session.find(block['session_id']).variable}.#{variable}" : variable
+    block['session_id'].present? ? "#{Session.find(block['session_id']).variable}.#{variable}" : "#{user_session.session.variable}.#{variable}"
   end
 
   def all_var_values
-    @all_var_values ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values
+    @all_var_values ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values(true)
   end
 end
