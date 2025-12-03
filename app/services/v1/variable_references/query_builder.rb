@@ -53,4 +53,16 @@ module V1::VariableReferences::QueryBuilder
                                                                          .where(sessions: { id: session.id })
                                                  end
   end
+
+  def build_sms_plan_base_query(session, exclude_source_session)
+    @sms_plan_base_query ||= {}
+    key = [session.id, exclude_source_session]
+    @sms_plan_base_query[key] ||= if exclude_source_session
+                                    SmsPlan.joins(session: :intervention)
+                                           .where(interventions: { id: session.intervention_id })
+                                           .where.not(sessions: { id: session.id })
+                                  else
+                                    SmsPlan.where(session_id: session.id)
+                                  end
+  end
 end
