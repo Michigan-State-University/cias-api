@@ -290,6 +290,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.index ["day_id"], name: "index_events_on_day_id"
   end
 
+  create_table "folders", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_folders_on_user_id"
+  end
+
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "report_template_id"
@@ -509,7 +517,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
     t.string "note"
+    t.uuid "folder_id"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
+    t.index ["folder_id"], name: "index_interventions_on_folder_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -914,6 +924,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.index ["user_id"], name: "index_stars_on_user_id"
   end
 
+  create_table "tag_interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "tag_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["intervention_id"], name: "index_tag_interventions_on_intervention_id"
+    t.index ["tag_id", "intervention_id"], name: "index_tag_interventions_on_tag_id_and_intervention_id", unique: true
+    t.index ["tag_id"], name: "index_tag_interventions_on_tag_id"
+  end
+
+  create_table "tags", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
+  end
+
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "team_id"
@@ -1132,8 +1159,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
   add_foreign_key "downloaded_reports", "generated_reports"
   add_foreign_key "downloaded_reports", "users"
   add_foreign_key "events", "days"
+  add_foreign_key "folders", "users"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
+  add_foreign_key "interventions", "folders"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
@@ -1170,6 +1199,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
   add_foreign_key "sms_links_users", "users"
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
+  add_foreign_key "tag_interventions", "interventions"
+  add_foreign_key "tag_interventions", "tags"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
