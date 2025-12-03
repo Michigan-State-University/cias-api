@@ -290,6 +290,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.index ["day_id"], name: "index_events_on_day_id"
   end
 
+  create_table "folders", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_folders_on_user_id"
+  end
+
   create_table "generated_reports", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "name"
     t.uuid "report_template_id"
@@ -509,7 +517,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
     t.string "note"
+    t.uuid "folder_id"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
+    t.index ["folder_id"], name: "index_interventions_on_folder_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
     t.index ["name"], name: "index_interventions_on_name"
@@ -1149,8 +1159,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
   add_foreign_key "downloaded_reports", "generated_reports"
   add_foreign_key "downloaded_reports", "users"
   add_foreign_key "events", "days"
+  add_foreign_key "folders", "users"
   add_foreign_key "google_languages", "google_tts_languages"
   add_foreign_key "intervention_accesses", "interventions"
+  add_foreign_key "interventions", "folders"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"
   add_foreign_key "interventions", "users"
