@@ -69,6 +69,15 @@ class V1::VariableReferences::BaseService
     ActiveRecord::Base.connection.execute(update_sql)
   end
 
+  def update_days_after_date_session_variable_references(old_var, new_var)
+    update_sql = <<-SQL.squish
+      UPDATE sessions
+      SET days_after_date_variable_name = REPLACE(days_after_date_variable_name, #{ActiveRecord::Base.connection.quote(old_var)}, #{ActiveRecord::Base.connection.quote(new_var)})
+      WHERE days_after_date_variable_name ILIKE #{ActiveRecord::Base.connection.quote("#{old_var}%")}
+    SQL
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
+
   def update_sms_plan_formulas_scoped(session, old_var, new_var, exclude_source_session: false)
     base_query = build_sms_plan_base_query(session, exclude_source_session)
 
