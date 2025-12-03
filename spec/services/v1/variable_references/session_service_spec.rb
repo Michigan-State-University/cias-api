@@ -198,6 +198,7 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
         expect(service).to receive(:update_report_template_formulas_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
         expect(service).to receive(:update_sms_plan_formulas_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
         expect(service).to receive(:update_chart_formulas).with(session.intervention_id, 'old_pattern', 'new_pattern')
+        expect(service).to receive(:update_days_after_date_session_variable_references).with('old_session_var', 'new_session_var')
 
         service.update_variable_references('old_pattern', 'new_pattern')
       end
