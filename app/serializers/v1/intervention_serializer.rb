@@ -11,6 +11,7 @@ class V1::InterventionSerializer < V1Serializer
 
   has_many :sessions, serializer: V1::SessionSerializer
   has_many :clinic_locations, serializer: V1::ClinicLocationSerializer
+  has_many :tags, serializer: V1::TagSerializer
 
   cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours) # temporary length, might be a subject to change
 
@@ -93,13 +94,5 @@ class V1::InterventionSerializer < V1Serializer
     object.files.map do |file|
       map_file_data(file)
     end
-  end
-
-  def self.record_cache_options(options, fieldset, include_list, params)
-    return super if params[:current_user_id].blank?
-
-    options = options.dup
-    options[:namespace] += ":#{params[:current_user_id]}"
-    options
   end
 end

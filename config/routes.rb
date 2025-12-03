@@ -56,6 +56,7 @@ Rails.application.routes.draw do
     end
 
     resources :preview_session_users, only: :create
+    resources :tags, only: :index
 
     post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
@@ -83,6 +84,9 @@ Rails.application.routes.draw do
         get 'permission', to: 'collaborators#show'
         post 'star', to: 'stars#create', as: :create_star
         delete 'star', to: 'stars#destroy', as: :destroy_star
+        resources :tags, only: %i[destroy] do
+          post 'assign', on: :collection
+        end
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
