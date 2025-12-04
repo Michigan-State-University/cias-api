@@ -54,6 +54,7 @@ class V1::FlowService::ReflectionService
   end
 
   def all_var_values
-    @all_var_values ||= V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id).var_values(true)
+    user_intervention_service = V1::UserInterventionService.new(user_session.user_intervention_id, user_session.id)
+    @all_var_values ||= user_intervention_service.var_values(true).deep_merge(user_intervention_service.var_values)
   end
 end
