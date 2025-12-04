@@ -180,6 +180,26 @@ module V1::VariableReferences::SqlBuilder
     SQL
   end
 
+  def build_variant_content_update_sql(table_name, old_var, new_var, base_query)
+    escaped_new = ActiveRecord::Base.connection.quote(new_var)
+    regex_pattern = ActiveRecord::Base.connection.quote("\\m#{Regexp.escape(old_var)}\\M")
+
+    content_column = "#{table_name}.content"
+
+    id_subquery = base_query.select("#{table_name}.id")
+                            .where("#{content_column} LIKE ?", "%#{sanitize_like_pattern(old_var)}%")
+                            .to_sql
+
+    <<~SQL.squish
+      UPDATE #{table_name}
+      SET content = regexp_replace(#{table_name}.content, #{regex_pattern}, #{escaped_new}, 'g'),
+          updated_at = NOW()
+      WHERE #{table_name}.id IN (
+        #{id_subquery}
+      )
+    SQL
+  end
+
   def sanitize_like_pattern(pattern)
     pattern.gsub(/[%_\\]/) { |char| "\\#{char}" }
   end

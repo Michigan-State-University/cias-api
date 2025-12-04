@@ -60,6 +60,12 @@ class V1::VariableReferences::BaseService
     ActiveRecord::Base.connection.execute(update_sql)
   end
 
+  def update_report_template_sections_scoped(session, old_var, new_var, exclude_source_session: false)
+    base_query = build_report_template_variant_base_query(session, exclude_source_session)
+    update_sql = build_variant_content_update_sql('report_template_section_variants', old_var, new_var, base_query)
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
+
   def update_days_after_date_variable_references(old_var, new_var)
     update_sql = <<-SQL.squish
       UPDATE sessions
