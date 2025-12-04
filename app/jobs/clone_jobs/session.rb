@@ -5,7 +5,7 @@ class CloneJobs::Session < CloneJob
     intervention = session.intervention
     position = intervention.sessions.order(:position).last.position + 1
     params = { variable: "cloned_#{session.variable}_#{position}" }
-    cloned_session = session.clone(params: params, clean_formulas: false)
+    cloned_session = session.clone(params: params, clean_formulas: false, position: position)
 
     return unless user.email_notification
 
