@@ -3,6 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe UserSessionJobs::SendGoodbyeMessageJob, type: :job do
+  before do
+    allow_any_instance_of(Communication::Sms).to receive(:send_message).and_return(
+      {
+        status: 200
+      }
+    )
+  end
+
   describe '#perform' do
     subject(:perform_job) { described_class.perform_now(user_session.id) }
 
