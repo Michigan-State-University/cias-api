@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Tag < ApplicationRecord
+  CURRENT_VERSION = '1'
+
   validates :name, presence: true, uniqueness: true
 
   has_many :tag_interventions, dependent: :destroy
