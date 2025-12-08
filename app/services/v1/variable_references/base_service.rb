@@ -86,5 +86,9 @@ class V1::VariableReferences::BaseService
 
     update_no_formula_sql = build_text_formula_update_sql('sms_plans', 'no_formula_text', old_var, new_var, base_query)
     ActiveRecord::Base.connection.execute(update_no_formula_sql)
+
+    variant_base_query = build_sms_plan_variant_base_query(session, exclude_source_session)
+    update_variant_content_sql = build_text_formula_update_sql('sms_plan_variants', 'content', old_var, new_var, variant_base_query)
+    ActiveRecord::Base.connection.execute(update_variant_content_sql)
   end
 end

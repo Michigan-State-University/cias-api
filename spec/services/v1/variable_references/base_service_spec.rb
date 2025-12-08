@@ -130,6 +130,27 @@ RSpec.describe V1::VariableReferences::BaseService, type: :service do
           expect(cross_sms_plan.no_formula_text).to eq('text .:s1.new_var:.')
         end
       end
+
+      context 'with sms_plan variants' do
+        let!(:sms_plan_with_formula) { create(:sms_plan, session: session, formula: 'var1', is_used_formula: true) }
+        let!(:variant) { create(:sms_plan_variant, sms_plan: sms_plan_with_formula, content: 'text .:old_var:.', formula_match: '=') }
+
+        it 'updates variant content' do
+          service.update_sms_plan_formulas_scoped(session, 'old_var', 'new_var')
+          variant.reload
+          expect(variant.content).to eq('text .:new_var:.')
+        end
+
+        context 'with cross-session variables in variants' do
+          let!(:cross_variant) { create(:sms_plan_variant, sms_plan: sms_plan_with_formula, content: 'text .:s1.old_var:.', formula_match: '<') }
+
+          it 'updates cross-session references in variant content' do
+            service.update_sms_plan_formulas_scoped(session, 's1.old_var', 's1.new_var')
+            cross_variant.reload
+            expect(cross_variant.content).to eq('text .:s1.new_var:.')
+          end
+        end
+      end
     end
   end
 end
