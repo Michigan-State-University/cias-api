@@ -120,16 +120,7 @@ class V1::Question::AnswerOptionsChangeDetectors::GridDetector < V1::Question::A
 
     # Safe to use value-based matching when no duplicates
     old_values = old_columns.pluck('value')
-    new_map = new_columns.index_by { |col| col['value'] }
-
-    new_cols = {}
-    new_map.each do |value, col|
-      next if old_values.include?(value)
-
-      new_cols[value] = col['payload']
-    end
-
-    new_cols
+    new_columns.reject { |c| old_values.include?(c['value']) }
   end
 
   def detect_deleted_columns(old_columns, new_columns)
