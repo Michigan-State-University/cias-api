@@ -133,7 +133,6 @@ class V1::Question::Update
       new: new_columns,
       deleted: deleted_columns
     }
-    #byebug
 
     UpdateJobs::AdjustQuestionAnswerOptionsReferences.perform_later(
       question.id,
@@ -211,7 +210,6 @@ class V1::Question::Update
     new_added = {}
     deleted = {}
 
-    #byebug
     if old_col_size == new_col_size
       changed = detector.detect_column_changes(previous_columns, new_columns)
     elsif old_col_size < new_col_size
