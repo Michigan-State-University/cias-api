@@ -36,9 +36,9 @@ class V1::Question::Update
     if question.is_a?(Question::Grid)
       changed_columns, new_columns_to_add, deleted_columns = detect_grid_column_changes(detector)
     else
-      changed_columns = {}
-      new_columns_to_add = {}
-      deleted_columns = {}
+      changed_columns = []
+      new_columns_to_add = []
+      deleted_columns = []
     end
 
     variable_jobs_need_queuing = !changed_vars.empty?
@@ -133,6 +133,7 @@ class V1::Question::Update
       new: new_columns,
       deleted: deleted_columns
     }
+    #byebug
 
     UpdateJobs::AdjustQuestionAnswerOptionsReferences.perform_later(
       question.id,
@@ -210,6 +211,7 @@ class V1::Question::Update
     new_added = {}
     deleted = {}
 
+    #byebug
     if old_col_size == new_col_size
       changed = detector.detect_column_changes(previous_columns, new_columns)
     elsif old_col_size < new_col_size
