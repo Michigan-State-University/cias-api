@@ -32,6 +32,8 @@ class V1::Users::Verifications::Confirm
   end
 
   def e2e_verification_code?
+    return false if Rails.env.production?
+
     e2e_code = ENV.fetch('E2E_VERIFICATION_CODE', nil)
     e2e_code.present? && verification_code == e2e_code
   end
