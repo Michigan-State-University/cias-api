@@ -26,7 +26,14 @@ class V1::Users::Verifications::Confirm
   end
 
   def code_expired?
+    return false if e2e_verification_code?
+
     user_verification_code.created_at + 30.minutes < Time.current
+  end
+
+  def e2e_verification_code?
+    e2e_code = ENV.fetch('E2E_VERIFICATION_CODE', nil)
+    e2e_code.present? && verification_code == e2e_code
   end
 
   def user_verification_code
