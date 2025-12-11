@@ -102,7 +102,7 @@ RSpec.describe V1::Users::Verifications::Create do
 
     context 'when in non-production environment' do
       before do
-        allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('test'))
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('test')
       end
 
       it 'does not expire the E2E verification code' do
@@ -117,7 +117,7 @@ RSpec.describe V1::Users::Verifications::Create do
 
     context 'when in production environment' do
       before do
-        allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('production'))
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('production')
         allow(UserMailer).to receive(:send_verification_login_code).and_return(message_delivery)
       end
 

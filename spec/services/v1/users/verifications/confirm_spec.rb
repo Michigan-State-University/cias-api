@@ -58,7 +58,7 @@ RSpec.describe V1::Users::Verifications::Confirm do
 
     context 'when in non-production environment' do
       before do
-        allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('test'))
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('test')
       end
 
       it 'confirms the E2E verification code even if expired' do
@@ -72,7 +72,7 @@ RSpec.describe V1::Users::Verifications::Confirm do
 
     context 'when in production environment' do
       before do
-        allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new('production'))
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('production')
       end
 
       it 'does not confirm the expired E2E verification code' do
