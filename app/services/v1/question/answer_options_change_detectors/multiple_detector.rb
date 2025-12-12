@@ -56,36 +56,22 @@ class V1::Question::AnswerOptionsChangeDetectors::MultipleDetector < V1::Questio
   end
 
   def detect_deleted_options(old_options, new_options)
-    results = []
-    remaining_new_options = new_options.dup
+    remaining_old_options = old_options.dup
 
     # Check if there are duplicate values in old or new options
     # If so, we must skip value matching
     use_value_matching = !duplicate_values?(old_options) && !duplicate_values?(new_options)
 
-    old_options.each do |old_opt|
-      var_name = old_opt['name']
-      payload = old_opt['payload']
-      value = old_opt['value']
+    new_options.each do |new_opt|
+      match = find_matching_option(new_opt, remaining_old_options, use_value_matching)
 
-      match = find_matching_option(old_opt, remaining_new_options, use_value_matching)
+      next if match.blank?
 
-      if match
-        # Remove the matched option so it can't be matched again
-        remaining_new_options.delete_at(remaining_new_options.index(match))
-        next
-      end
-
-      next if payload.blank?
-
-      results << {
-        'variable' => var_name,
-        'payload' => payload,
-        'value' => use_value_matching ? value : nil
-      }
+      # Remove the matched option so it can't be matched again
+      remaining_old_options.delete_at(remaining_old_options.index(match))
     end
 
-    results
+    remaining_old_options
   end
 
   private

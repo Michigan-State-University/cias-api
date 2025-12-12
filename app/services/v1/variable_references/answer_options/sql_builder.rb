@@ -200,7 +200,7 @@ module V1::VariableReferences::AnswerOptions::SqlBuilder
     return nil if new_columns.blank? || rows.blank?
 
     new_reflections = []
-    new_columns.each do |column_value, column_payload|
+    new_columns.pluck('value', 'payload').each do |column_value, column_payload|
       rows.each do |row|
         row_payload = normalize_payload(row['payload'])
         normalized_column = normalize_payload(column_payload)

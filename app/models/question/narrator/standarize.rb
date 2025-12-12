@@ -28,11 +28,11 @@ class Question::Narrator::Standarize < SimpleDelegator
   end
 
   def standarize_block(reflection)
-    reflection['text'].compact!
-    reflection['text'].reject!(&:empty?)
-    reflection['sha256'].compact!
-    reflection['sha256'].reject!(&:empty?)
-    reflection['audio_urls'].compact!
-    reflection['audio_urls'].reject!(&:empty?)
+    reflection['text']&.compact!
+    reflection['text']&.reject!(&:empty?)
+    reflection['sha256']&.compact!
+    reflection['sha256']&.reject!(&:empty?)
+    reflection['audio_urls']&.compact!
+    reflection['audio_urls']&.reject!(&:empty?)
   end
 end
