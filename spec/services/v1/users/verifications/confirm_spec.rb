@@ -44,4 +44,44 @@ RSpec.describe V1::Users::Verifications::Confirm do
       expect { subject }.to raise_exception(ActiveRecord::RecordNotFound)
     end
   end
+
+  describe 'E2E verification code bypass' do
+    let(:e2e_code) { 'e2e_test_bypass_code' }
+    let(:verification_code) { e2e_code }
+    let!(:user) { create(:user) }
+
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('E2E_VERIFICATION_CODE', nil).and_return(e2e_code)
+      user.user_verification_codes.create!(code: e2e_code, confirmed: false, created_at: current_time - 2.hours)
+    end
+
+    context 'when in non-production environment' do
+      before do
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('test')
+      end
+
+      it 'confirms the E2E verification code even if expired' do
+        expect { subject }.to change { user.reload.user_verification_codes.find_by(code: e2e_code).confirmed }.from(false).to(true)
+      end
+
+      it 'returns the verification code' do
+        expect(subject).to eq(e2e_code)
+      end
+    end
+
+    context 'when in production environment' do
+      before do
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('production')
+      end
+
+      it 'does not confirm the expired E2E verification code' do
+        expect { subject }.not_to change { user.reload.user_verification_codes.find_by(code: e2e_code).confirmed }
+      end
+
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+  end
 end
