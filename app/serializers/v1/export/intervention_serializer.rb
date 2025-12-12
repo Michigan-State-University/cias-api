@@ -9,6 +9,7 @@ class V1::Export::InterventionSerializer < ActiveModel::Serializer
     object.sessions.where(type: %w[Session::Classic Session::Sms])
   end
   has_many :intervention_accesses, serializer: V1::Export::InterventionAccessSerializer
+  has_many :tags, serializer: V1::Export::TagSerializer
 
   attribute :name do
     "Imported #{object.name}"

@@ -14,7 +14,10 @@ class V1::InterventionsController < V1Controller
   end
 
   def show
-    render json: serialized_response(intervention_load, controller_name.classify, params: { current_user_id: current_v1_user.id })
+    render json: V1::InterventionSerializer.new(
+      intervention_load,
+      { include: [:tags], params: { current_user_id: current_v1_user.id } }
+    ).serializable_hash.to_json
   end
 
   def create
@@ -82,13 +85,13 @@ class V1::InterventionsController < V1Controller
     @interventions_scope ||= Intervention.accessible_by(current_ability)
                                          .with_attached_logo
                                          .includes(%i[user reports_attachments files_attachments google_language logo_attachment logo_blob collaborators
-                                                      conversations_transcript_attachment])
+                                                      conversations_transcript_attachment tags])
                                          .only_visible
   end
 
   def sorted_interventions_scope
     @sorted_interventions_scope ||= Intervention.accessible_by(current_ability)
-                                                .includes(%i[user collaborators])
+                                                .includes(%i[user collaborators tags])
                                                 .joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
                                                         ON user_stars.intervention_id = interventions.id")
                                                 .order('user_stars.user_id', 'interventions.created_at DESC')

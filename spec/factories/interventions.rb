@@ -25,6 +25,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_tags do
+      after(:build) do |intervention|
+        intervention.tags << create_list(:tag, 3)
+      end
+    end
+
     trait :with_navigators do
       after(:build) do |intervention|
         intervention.navigators << create(:user, :confirmed, :navigator)

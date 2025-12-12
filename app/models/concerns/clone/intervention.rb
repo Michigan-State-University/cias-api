@@ -11,6 +11,7 @@ class Clone::Intervention < Clone::Base
     clear_cat_mh_settings!
     clear_hfhs_settings!
     outcome.save!
+    assign_tags
     create_sessions
     reassign_branching
     outcome.update!(is_hidden: hidden)
@@ -26,6 +27,10 @@ class Clone::Intervention < Clone::Base
 
     outcome.logo.attach(source.logo.blob)
     outcome.logo_blob.update!(description: source.logo_blob.description)
+  end
+
+  def assign_tags
+    outcome.tags << source.tags
   end
 
   def create_sessions
