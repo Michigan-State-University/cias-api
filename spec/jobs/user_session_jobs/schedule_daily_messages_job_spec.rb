@@ -19,8 +19,9 @@ RSpec.describe UserSessionJobs::ScheduleDailyMessagesJob, type: :job do
     let!(:session) { create(:sms_session, sms_codes: [sms_code], intervention: intervention, question_group_initial: question_group_initial) }
     let!(:user_intervention) { create(:user_intervention, user: user, intervention: intervention) }
     let!(:user_session) { create(:sms_user_session, user: user, session: session, user_intervention: user_intervention) }
-    let!(:year) { Date.current.cweek + 1 > 52 ? Date.current.year + 1 : Date.current.year }
-    let!(:week) { (Date.current.cweek + 1) % 52 }
+    let!(:next_week_date) { Date.current + 1.week }
+    let!(:year) { next_week_date.cwyear }
+    let!(:week) { next_week_date.cweek }
 
     context 'when user_session is already finished' do
       let!(:question_group_initial) do
