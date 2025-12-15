@@ -399,7 +399,7 @@ RSpec.describe V1::Question::AnswerOptionsChangeDetector, type: :service do
         it 'detects the deleted option' do
           result = detector.detect_deleted_options(old_options, new_options)
           expect(result.size).to eq(1)
-          expect(result.first['variable']).to eq('var2')
+          expect(result.first['name']).to eq('var2')
           expect(result.first['payload']).to eq('<p>Option 2</p>')
           expect(result.first['value']).to eq('2')
         end
@@ -522,7 +522,9 @@ RSpec.describe V1::Question::AnswerOptionsChangeDetector, type: :service do
 
       it 'detects the new column' do
         result = detector.detect_new_columns(old_columns, new_columns)
-        expect(result['2']).to eq('<p>Column 2</p>')
+        expect(result.size).to eq(1)
+        expect(result.first['value']).to eq('2')
+        expect(result.first['payload']).to eq('<p>Column 2</p>')
       end
     end
 

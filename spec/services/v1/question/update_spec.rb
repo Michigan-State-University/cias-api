@@ -71,7 +71,7 @@ RSpec.describe V1::Question::Update do
           [{ 'variable' => 'var2', 'old_payload' => 'Old Text 2', 'new_payload' => 'NEW TEXT 2', 'value' => '2' }],
           [],
           [],
-          { changed: {}, new: {}, deleted: {} }
+          { changed: [], new: [], deleted: [] }
         )
       end
 
@@ -126,7 +126,7 @@ RSpec.describe V1::Question::Update do
           [{ 'old_payload' => 'Old Text 1', 'new_payload' => 'NEW TEXT 1', 'value' => '1' }],
           [],
           [],
-          { changed: {}, new: {}, deleted: {} }
+          { changed: [], new: [], deleted: [] }
         )
       end
     end
@@ -152,7 +152,7 @@ RSpec.describe V1::Question::Update do
           [],
           [{ 'variable' => 'var3', 'payload' => 'New Text 3', 'value' => '3' }],
           [],
-          { changed: {}, new: {}, deleted: {} }
+          { changed: [], new: [], deleted: [] }
         )
       end
     end
@@ -175,8 +175,8 @@ RSpec.describe V1::Question::Update do
           question.id,
           [],
           [],
-          [{ 'variable' => 'var2', 'payload' => 'Old Text 2', 'value' => '2' }],
-          { changed: {}, new: {}, deleted: {} }
+          [{ 'name' => 'var2', 'payload' => 'Old Text 2', 'value' => '2' }],
+          { changed: [], new: [], deleted: [] }
         )
       end
     end
@@ -201,7 +201,7 @@ RSpec.describe V1::Question::Update do
           [{ 'variable' => 'var2', 'old_payload' => 'Old Text 2', 'new_payload' => 'NEW TEXT 2', 'value' => '2', 'new_value' => '2_new' }],
           [],
           [],
-          { changed: {}, new: {}, deleted: {} }
+          { changed: [], new: [], deleted: [] }
         )
       end
     end
@@ -294,7 +294,7 @@ RSpec.describe V1::Question::Update do
           [],
           [],
           [],
-          { changed: {}, new: { 'c' => 'Col C' }, deleted: {} }
+          { changed: {}, new: [{ 'value' => 'c', 'payload' => 'Col C' }], deleted: {} }
         )
       end
     end
