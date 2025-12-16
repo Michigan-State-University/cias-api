@@ -914,6 +914,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.index ["user_id"], name: "index_stars_on_user_id"
   end
 
+  create_table "tag_interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "tag_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["intervention_id"], name: "index_tag_interventions_on_intervention_id"
+    t.index ["tag_id", "intervention_id"], name: "index_tag_interventions_on_tag_id_and_intervention_id", unique: true
+    t.index ["tag_id"], name: "index_tag_interventions_on_tag_id"
+  end
+
+  create_table "tags", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
+  end
+
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "team_id"
@@ -1170,6 +1187,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
   add_foreign_key "sms_links_users", "users"
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
+  add_foreign_key "tag_interventions", "interventions"
+  add_foreign_key "tag_interventions", "tags"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
