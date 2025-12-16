@@ -78,6 +78,8 @@ class Session < ApplicationRecord
   after_create :assign_default_tts_voice
   after_create :assign_default_google_language
 
+  alias_attribute :generated_report_count, :generated_reports_count
+
   accepts_nested_attributes_for :sms_codes
 
   def sms_session_type?
