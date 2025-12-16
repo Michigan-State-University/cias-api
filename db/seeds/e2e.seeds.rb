@@ -12,24 +12,24 @@ class CreateE2EUsers
     private
 
     def create_e2e_users
+      user_count = ENV.fetch('E2E_WORKER_COUNT', 5).to_i
+
       e2e_roles.each do |role|
-        email = "e2e_#{role}@example.com"
-
-        next if User.find_by(email: email)
-
-        user = User.new(
-          first_name: 'E2E',
-          last_name: role.titleize,
-          email: email,
-          password: E2E_PASSWORD,
-          roles: [role],
-          terms: true
-        )
-        user.confirm
-        user.save!
-        user.user_verification_codes.create!(code: E2E_VERIFICATION_CODE, confirmed: true)
-
-        puts "Created e2e user: #{email}" # rubocop:disable Rails/Output
+        user_count.times do |i|
+          email = "e2e_#{role}_#{i}@example.com"
+          User.find_or_create_by!(email: email) do |user|
+            user.first_name = 'E2E'
+            user.last_name = "#{role.titleize}#{i}"
+            user.email = email
+            user.password = E2E_PASSWORD
+            user.roles = [role]
+            user.terms = true
+            user.confirm
+            user.save!
+            user.user_verification_codes.create!(code: E2E_VERIFICATION_CODE, confirmed: true)
+            puts "Created e2e user: #{email}" # rubocop:disable Rails/Output
+          end
+        end
       end
     end
 
