@@ -51,6 +51,21 @@ RSpec.describe Intervention, type: :model do
     end
   end
 
+  describe 'filters' do
+    let!(:interventions) { create_list(:intervention, 5) }
+    let!(:intervention_with_name) { create(:intervention, name: 'Special Intervention') }
+    let!(:intervention_with_note) { create(:intervention, note: 'Special Intervention') }
+    let!(:intervention_with_tag) { create(:intervention, :with_tags) }
+
+    it 'filters by name or note' do
+      expect(described_class.filter_by_name_or_note('Special')).to contain_exactly(intervention_with_name, intervention_with_note)
+    end
+
+    it 'filter by tags' do
+      expect(described_class.filter_by_tags([intervention_with_tag.tags.first.id])).to contain_exactly(intervention_with_tag)
+    end
+  end
+
   describe 'instance methods' do
     describe 'translation' do
       let(:intervention) { create(:intervention_with_logo, name: 'New intervention') }

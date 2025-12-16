@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_16_121405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -507,7 +507,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
     t.datetime "clear_sensitive_data_scheduled_at", precision: nil
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
-    t.boolean "formula_update_in_progress", default: false, null: false
+    t.string "note"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -803,6 +803,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
     t.text "default_response"
     t.bigint "google_language_id"
     t.text "completion_message"
+    t.boolean "formula_update_in_progress", default: false, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -910,6 +911,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
     t.index ["intervention_id"], name: "index_stars_on_intervention_id"
     t.index ["user_id", "intervention_id"], name: "index_stars_on_user_id_and_intervention_id", unique: true
     t.index ["user_id"], name: "index_stars_on_user_id"
+  end
+
+  create_table "tag_interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "tag_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["intervention_id"], name: "index_tag_interventions_on_intervention_id"
+    t.index ["tag_id", "intervention_id"], name: "index_tag_interventions_on_tag_id_and_intervention_id", unique: true
+    t.index ["tag_id"], name: "index_tag_interventions_on_tag_id"
+  end
+
+  create_table "tags", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1168,6 +1186,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_20_125505) do
   add_foreign_key "sms_links_users", "users"
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
+  add_foreign_key "tag_interventions", "interventions"
+  add_foreign_key "tag_interventions", "tags"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"

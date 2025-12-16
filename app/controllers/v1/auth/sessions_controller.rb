@@ -7,6 +7,7 @@ class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
   include Resource
   prepend Auth::Default
   include Log
+  include ActionController::Cookies
 
   def verify_account_integrity
     @resource = User.find_by(email: params[:email])
@@ -18,7 +19,7 @@ class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
                                  { reason: 'TERMS_NOT_ACCEPTED', require_fields: @resource.slice(:first_name, :last_name, :terms, :roles) }, :forbidden)
     end
 
-    return unless V1::Users::Verifications::Create.call(@resource, request.headers['Verification-Code'])
+    return unless V1::Users::Verifications::Create.call(@resource, cookies['verification_code'] || params[:verification_code])
 
     raise ComplexException.new(I18n.t('activerecord.errors.models.user.2fa_code_needed'), { reason: '2FA_NEEDED' }, :forbidden)
   end
