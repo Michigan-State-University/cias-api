@@ -36,9 +36,9 @@ class V1::Question::Update
     if question.is_a?(Question::Grid)
       changed_columns, new_columns_to_add, deleted_columns = detect_grid_column_changes(detector)
     else
-      changed_columns = {}
-      new_columns_to_add = {}
-      deleted_columns = {}
+      changed_columns = []
+      new_columns_to_add = []
+      deleted_columns = []
     end
 
     variable_jobs_need_queuing = !changed_vars.empty?
