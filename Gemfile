@@ -13,7 +13,7 @@ gem 'activejob-cancel'
 gem 'activerecord_json_validator'
 gem 'activestorage', '>= 6.1.4.7'
 gem 'active_storage_validations'
-gem 'active_model_serializers', '~> 0.10.0'
+gem 'active_model_serializers', '~> 0.10.16'
 gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
