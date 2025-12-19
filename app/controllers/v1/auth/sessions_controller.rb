@@ -19,7 +19,7 @@ class V1::Auth::SessionsController < DeviseTokenAuth::SessionsController
                                  { reason: 'TERMS_NOT_ACCEPTED', require_fields: @resource.slice(:first_name, :last_name, :terms, :roles) }, :forbidden)
     end
 
-    return unless V1::Users::Verifications::Create.call(@resource, cookies['verification_code'] || params[:verification_code])
+    return unless V1::Users::Verifications::Create.call(@resource, params[:verification_code] || cookies['verification_code'])
 
     raise ComplexException.new(I18n.t('activerecord.errors.models.user.2fa_code_needed'), { reason: '2FA_NEEDED' }, :forbidden)
   end
