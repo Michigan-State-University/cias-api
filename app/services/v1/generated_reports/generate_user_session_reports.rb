@@ -30,7 +30,7 @@ class V1::GeneratedReports::GenerateUserSessionReports
   attr_reader :user_session
 
   def update_generated_reports_count
-    session.update(generated_reports_count: GeneratedReport.joins(:user_session).where(user_sessions: { session_id: session.id }).size)
+    session.update(generated_report_count: GeneratedReport.joins(:user_session).where(user_sessions: { session_id: session.id }).size)
   end
 
   def dentaku_service

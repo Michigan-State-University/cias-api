@@ -12,7 +12,7 @@ class V1::SessionService
 
   def sessions(include_multiple_sessions = true)
     include_multiple_sessions = ActiveModel::Type::Boolean.new.cast(include_multiple_sessions)
-    include_multiple_sessions = true if include_multiple_sessions.blank?
+    include_multiple_sessions = true if include_multiple_sessions.nil?
 
     basic_scope = intervention.sessions.includes(:google_language, sms_codes: :health_clinic, intervention: %i[user logo_attachment])
     basic_scope = basic_scope.where(multiple_fill: false) unless include_multiple_sessions

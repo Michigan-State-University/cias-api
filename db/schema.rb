@@ -805,7 +805,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_16_083149) do
     t.bigint "google_language_id"
     t.text "completion_message"
     t.boolean "formula_update_in_progress", default: false, null: false
-    t.integer "generated_reports_count", default: 0, null: false
+    t.integer "generated_report_count", default: 0, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

@@ -93,10 +93,9 @@ class V1::InterventionsController < V1Controller
 
   def sorted_interventions_scope
     @sorted_interventions_scope ||= Intervention.accessible_by(current_ability)
-                                                .includes(%i[user collaborators tags])
-                                                .joins("LEFT JOIN (SELECT * FROM stars WHERE user_id = '#{current_v1_user.id}') AS user_stars
-                                                        ON user_stars.intervention_id = interventions.id")
-                                                .order('user_stars.user_id', 'interventions.created_at DESC')
+                                                .joins("LEFT JOIN stars AS user_stars ON user_stars.intervention_id = interventions.id AND user_stars.user_id = '#{current_v1_user.id}'") # rubocop:disable Layout/LineLength
+                                                .order(Arel.sql('(user_stars.id IS NOT NULL) DESC'), 'interventions.created_at DESC')
+                                                .order('interventions.created_at DESC')
                                                 .only_visible
   end
 

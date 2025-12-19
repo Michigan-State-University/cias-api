@@ -1,12 +1,12 @@
 class AddGeneratedReportCounterToSession < ActiveRecord::Migration[7.2]
   def up
-    add_column :sessions, :generated_reports_count, :integer, default: 0, null: false
+    add_column :sessions, :generated_report_count, :integer, default: 0, null: false
 
     reversible do |dir|
       dir.up do
         sql = <<-SQL.squish
           UPDATE sessions
-          SET generated_reports_count = (
+          SET generated_report_count = (
             SELECT COUNT(*)
             FROM generated_reports
             INNER JOIN user_sessions ON user_sessions.id = generated_reports.user_session_id
@@ -20,6 +20,6 @@ class AddGeneratedReportCounterToSession < ActiveRecord::Migration[7.2]
   end
 
   def down
-    remove_column :sessions, :generated_reports_count
+    remove_column :sessions, :generated_report_count
   end
 end
