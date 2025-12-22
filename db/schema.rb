@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_16_121405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -182,7 +182,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.datetime "updated_at", null: false
     t.datetime "filled_at", precision: nil
     t.uuid "user_session_id"
-    t.boolean "v2_record", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
@@ -805,6 +804,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_28_063337) do
     t.bigint "google_language_id"
     t.text "completion_message"
     t.boolean "formula_update_in_progress", default: false, null: false
+    t.integer "generated_report_count", default: 0, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"

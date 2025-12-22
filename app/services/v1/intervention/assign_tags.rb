@@ -27,20 +27,13 @@ class V1::Intervention::AssignTags
   attr_reader :intervention, :tag_ids, :tag_names
   attr_accessor :tags_to_add
 
-  def tag
-    @tag ||= if tag_id.present?
-               Tag.find_by(id: tag_id)
-             else
-               Tag.find_or_create_by(name: tag_name)
-             end
-  end
-
   def create_missing_tags!
     return if tag_names.blank?
 
     @tags_to_add = tags_to_add.to_a
 
     tag_names.each do |name|
+      name = name&.strip
       next if name.blank?
 
       new_tag = Tag.find_or_create_by(name: name)
