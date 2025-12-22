@@ -680,7 +680,7 @@ DEPENDENCIES
   activerecord_json_validator
   activestorage (>= 6.1.4.7)
   audited
-  aws-sdk-s3
+  aws-sdk-s3 (>= 1.208.0)
   benchmark-ips
   blind_index
   bootsnap (>= 1.9.3)
