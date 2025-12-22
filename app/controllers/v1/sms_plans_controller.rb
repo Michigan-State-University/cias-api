@@ -60,7 +60,7 @@ class V1::SmsPlansController < V1Controller
   end
 
   def sms_plans_scope
-    SmsPlan.accessible_by(current_v1_user.ability)
+    SmsPlan.accessible_by(current_v1_user.ability).includes(:variants, :phones, :sms_links)
   end
 
   def sms_plan
