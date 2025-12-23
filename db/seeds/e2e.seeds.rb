@@ -1,8 +1,14 @@
 # frozen_string_literal: true
 
 class CreateE2EUsers
-  E2E_VERIFICATION_CODE = ENV.fetch('E2E_VERIFICATION_CODE', 'e2e_verification_code')
-  E2E_PASSWORD = ENV.fetch('E2E_PASSWORD', 'e2e_password')
+  begin
+    E2E_VERIFICATION_CODE = ENV.fetch('E2E_VERIFICATION_CODE')
+    E2E_PASSWORD = ENV.fetch('E2E_PASSWORD')
+    E2E_WORKER_COUNT = ENV.fetch('E2E_WORKER_COUNT').to_i
+  rescue KeyError => e
+    puts "Error: Required environment variable #{e.key} is not set" # rubocop:disable Rails/Output
+    exit 1
+  end
 
   class << self
     def call
@@ -12,7 +18,7 @@ class CreateE2EUsers
     private
 
     def create_e2e_users
-      user_count = ENV.fetch('E2E_WORKER_COUNT', 5).to_i
+      user_count = E2E_WORKER_COUNT
 
       e2e_roles.each do |role|
         user_count.times do |i|
