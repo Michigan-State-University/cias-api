@@ -9,16 +9,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV.fetch('CI_E2E_WEB_URL', nil)
-    resource '*',
-             headers: :any,
-             credentials: true,
-             expose: %w[Access-Token Expiry Token-Type Uid Client End-To-End-Secure-Token],
-             methods: %i[delete get options patch post put]
-  end
-
-  allow do
-    origins ENV.fetch('WEB_URL', nil)
+    origins '*'
     resource '*',
              headers: :any,
              credentials: true,
