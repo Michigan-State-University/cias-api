@@ -43,7 +43,7 @@ gem 'redis'
 gem 'kredis', '~> 1.5'
 gem 'sidekiq', '>= 7.2.4'
 gem 'sql_query'
-gem 'twilio-ruby', '~> 6.0.1'
+gem 'twilio-ruby', '~> 7.9.0'
 gem 'wicked_pdf'
 gem 'rack', '>= 3.1.18'
 gem 'rack-attack'
@@ -115,5 +115,5 @@ group :test do
 end
 
 group :production do
-  gem 'aws-sdk-s3'
+  gem 'aws-sdk-s3', '>= 1.208.0'
 end

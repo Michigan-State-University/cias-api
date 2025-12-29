@@ -2,7 +2,7 @@
 
 class UserIntervention < ApplicationRecord
   has_paper_trail
-  belongs_to :user, inverse_of: :user_interventions
+  belongs_to :user, inverse_of: :user_interventions, class_name: 'User'
   belongs_to :intervention, inverse_of: :user_interventions
   has_many :user_sessions, dependent: :destroy
   has_many :phone_answers, through: :user_sessions, class_name: 'Answer::Phone', source: :answers
