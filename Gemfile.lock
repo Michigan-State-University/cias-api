@@ -724,7 +724,7 @@ DEPENDENCIES
   oj
   overcommit
   pagy (~> 4.0)
-  paper_trail
+  paper_trail (~> 17.0.0)
   paranoia
   pg (~> 1.2)
   pgsync
