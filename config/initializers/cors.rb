@@ -9,7 +9,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV.fetch('WEB_URL', nil)
+    origins '*'
     resource '*',
              headers: :any,
              credentials: true,
