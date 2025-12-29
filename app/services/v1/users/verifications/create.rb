@@ -26,9 +26,18 @@ class V1::Users::Verifications::Create
   end
 
   def code_expired?
+    return false if e2e_verification_code?
+
     expired = verification_code.created_at + 30.days < Time.current
     verification_code.delete if expired
     expired
+  end
+
+  def e2e_verification_code?
+    return false if ENV.fetch('APP_ENVIRONMENT', nil) == 'production'
+
+    e2e_code = ENV.fetch('E2E_VERIFICATION_CODE', nil)
+    e2e_code.present? && verification_code_from_headers == e2e_code
   end
 
   def verification_code

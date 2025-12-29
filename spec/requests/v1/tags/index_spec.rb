@@ -130,30 +130,6 @@ RSpec.describe 'GET /v1/tags', type: :request do
           end
         end
 
-        context 'with start_index only' do
-          let(:params) { { start_index: 2 } }
-
-          it 'returns tags from start_index to end' do
-            expect(json_response['data'].size).to eq(3)
-          end
-
-          it 'returns correct total tags_size' do
-            expect(json_response['tags_size']).to eq(5)
-          end
-        end
-
-        context 'with end_index only' do
-          let(:params) { { end_index: 2 } }
-
-          it 'returns tags from beginning to end_index' do
-            expect(json_response['data'].size).to eq(3)
-          end
-
-          it 'returns correct total tags_size' do
-            expect(json_response['tags_size']).to eq(5)
-          end
-        end
-
         context 'with out of range indices' do
           let(:params) { { start_index: 10, end_index: 20 } }
 

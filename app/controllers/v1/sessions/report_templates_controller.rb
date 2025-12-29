@@ -94,7 +94,7 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   end
 
   def report_templates_scope
-    @report_templates_scope ||= @session.report_templates.includes([:logo_attachment])
+    @report_templates_scope ||= @session.report_templates.includes(%i[logo_attachment sections variants])
   end
 
   def report_template_included_scope

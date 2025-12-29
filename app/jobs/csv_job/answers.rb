@@ -7,9 +7,9 @@ class CsvJob::Answers < CsvJob
     user = User.find(user_id)
     start_datetime = safe_parse(period_of_time_params[:start_datetime], period_of_time_params[:timezone])
     end_datetime = safe_parse(period_of_time_params[:end_datetime], period_of_time_params[:timezone])
-    period_ot_time = define_period_of_time(start_datetime, end_datetime)
+    period_of_time = define_period_of_time(start_datetime, end_datetime)
     intervention = Intervention.find(intervention_id)
-    csv_content = intervention.export_answers_as(type: module_name, period: period_ot_time)
+    csv_content = intervention.export_answers_as(type: module_name, period: period_of_time)
     MetaOperations::FilesKeeper.new(
       stream: csv_content, add_to: intervention,
       macro: :reports, ext: :csv, type: 'text/csv', user: user, suffix: suffix_filename(start_datetime, end_datetime)

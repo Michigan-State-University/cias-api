@@ -23,7 +23,7 @@ class Intervention::Csv
   private
 
   def data_scope(intervention)
-    intervention.sessions.order(:position)
+    intervention.sessions.includes(:intervention, :questions, sms_plans: :sms_links).order(:position)
   end
 
   def collect_data
