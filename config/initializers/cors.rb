@@ -9,7 +9,11 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*'
+    allowed_origins = [ENV.fetch('WEB_URL', nil)].compact
+    additional_origins = ENV.fetch('ADDITIONAL_CORS_ORIGINS', '').split(',').map(&:strip).reject(&:empty?)
+    allowed_origins.concat(additional_origins)
+
+    origins allowed_origins
     resource '*',
              headers: :any,
              credentials: true,
