@@ -57,7 +57,7 @@ gem 'blind_index'
 gem 'logstop'
 gem 'countries'
 # for Audit trail and audit log
-gem 'paper_trail'
+gem 'paper_trail', '~> 17.0.0'
 # for soft delete
 gem 'paranoia'
 # for logging errors

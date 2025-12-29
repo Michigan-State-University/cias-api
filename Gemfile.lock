@@ -428,8 +428,8 @@ GEM
       iniparse (~> 1.4)
       rexml (>= 3.3.9)
     pagy (4.11.0)
-    paper_trail (16.0.0)
-      activerecord (>= 6.1)
+    paper_trail (17.0.0)
+      activerecord (>= 7.1)
       request_store (~> 1.4)
     parallel (1.27.0)
     paranoia (3.0.1)
@@ -629,7 +629,7 @@ GEM
     test-prof (1.4.4)
     thor (1.4.0)
     timecop (0.9.10)
-    timeout (0.4.3)
+    timeout (0.6.0)
     tomlrb (2.0.3)
     tsort (0.2.0)
     tty-cursor (0.7.1)
@@ -724,7 +724,7 @@ DEPENDENCIES
   oj
   overcommit
   pagy (~> 4.0)
-  paper_trail
+  paper_trail (~> 17.0.0)
   paranoia
   pg (~> 1.2)
   pgsync
