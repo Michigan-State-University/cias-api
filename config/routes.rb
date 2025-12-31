@@ -72,6 +72,7 @@ Rails.application.routes.draw do
         resources :predefined_participants do
           post 'send_sms_invitation', on: :member
           post 'send_email_invitation', on: :member
+          post 'bulk_create', on: :collection
         end
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy] do
