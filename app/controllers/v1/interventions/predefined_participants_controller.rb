@@ -83,7 +83,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_users_parameters
     params.require(:predefined_users).permit(
-      :intervention_id,
       participants: [
         :first_name,
         :last_name,
