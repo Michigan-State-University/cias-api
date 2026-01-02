@@ -25,6 +25,7 @@ class Question < ApplicationRecord
   attribute :duplicated, :boolean, default: false
 
   has_one_attached :image
+  has_many_attached :answer_images
   has_many_attached :speeches
 
   has_one :image_attachment, lambda {
