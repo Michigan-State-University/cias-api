@@ -170,6 +170,9 @@ Rails.application.routes.draw do
     scope 'questions/:question_id', as: 'question' do
       scope module: 'questions' do
         resource :images, only: %i[create destroy update]
+        resource :answer_images, only: %i[create]
+        delete 'answer_images/:answer_id', to: 'answer_images#destroy', as: :destroy_answer_image
+        patch 'answer_images/:answer_id', to: 'answer_images#update', as: :update_answer_image
       end
     end
 

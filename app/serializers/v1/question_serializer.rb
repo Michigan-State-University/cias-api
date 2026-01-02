@@ -12,6 +12,16 @@ class V1::QuestionSerializer < V1Serializer
     object.image_blob.description if object.image_blob.present?
   end
 
+  attribute :answer_images do |object|
+    object.answer_images.map do |answer_image|
+      {
+        url: polymorphic_url(answer_image),
+        alt: answer_image.blob.description,
+        answer_id: answer_image.metadata['answer_id']
+      }
+    end
+  end
+
   attribute :first_question, &:first_question?
 
   attribute :time_ranges, if: proc { |record| record.is_a?(Question::Phone) } do |_object|
