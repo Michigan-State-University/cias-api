@@ -17,7 +17,7 @@ class ApplicationController < ActionController::API
 
   def require_custom_header
     return if ActiveSupport::SecurityUtils.secure_compare(
-      request.headers['End-To-End-Secure-Token'],
+      request.headers['Additional-Origin-Secure-Token'],
       ENV.fetch('ADDITIONAL_ORIGIN_SECURE_TOKEN', '')
     )
 
