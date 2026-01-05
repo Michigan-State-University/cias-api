@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::API
-  before_action :require_custom_header, if: :e2e_origin?
+  before_action :require_custom_header, if: :additional_origin?
   before_action :user_params, if: :devise_controller?
   include Log
 
@@ -18,13 +18,14 @@ class ApplicationController < ActionController::API
   def require_custom_header
     return if ActiveSupport::SecurityUtils.secure_compare(
       request.headers['End-To-End-Secure-Token'],
-      ENV.fetch('CI_E2E_TOKEN', '')
+      ENV.fetch('ADDITIONAL_ORIGIN_SECURE_TOKEN', '')
     )
 
     render json: { error: 'Forbidden' }, status: :forbidden
   end
 
-  def e2e_origin?
-    request.headers['Origin'] == ENV.fetch('CI_E2E_WEB_URL', '')
+  def additional_origin?
+    additional_origins = ENV.fetch('ADDITIONAL_CORS_ORIGINS', '').split(',').map(&:strip).reject(&:empty?)
+    additional_origins.include?(request.headers['Origin'])
   end
 end
