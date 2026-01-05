@@ -31,6 +31,24 @@ module FileHelper
     end
   end
 
+  def export_files(files)
+    return [] unless files.attached?
+
+    files.map do |file|
+      blob = file.blob
+      encoded_file = download_and_encode_file(blob)
+      next if encoded_file.blank?
+
+      {
+        extension: blob.filename.extension,
+        content_type: blob.content_type,
+        description: blob.description,
+        file: encoded_file,
+        metadata: file.metadata
+      }
+    end
+  end
+
   def download_and_encode_file(blob)
     Base64.encode64(blob.download)
   rescue StandardError

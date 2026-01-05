@@ -9,6 +9,7 @@ module ImportOperations
     file_data = import_file(img)
     blob = ActiveStorage::Blob.create_and_upload!(io: file_data[:io], filename: file_data[:filename], content_type: file_data[:content_type])
     resource.public_send(key).attach(blob)
+    blob
   end
 
   def import_file(img)
