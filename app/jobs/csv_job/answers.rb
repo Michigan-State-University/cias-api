@@ -52,7 +52,7 @@ class CsvJob::Answers < CsvJob
   def safe_parse(datetime_as_string, timezone = 'UTC')
     return nil if datetime_as_string.blank?
 
-    datetime_as_string.to_datetime.in_time_zone(timezone)
+    Time.find_zone(timezone).parse(datetime_as_string)
   rescue StandardError
     nil
   end
