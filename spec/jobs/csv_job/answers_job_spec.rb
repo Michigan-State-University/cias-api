@@ -36,7 +36,7 @@ RSpec.describe CsvJob::Answers, type: :job do
         result = job_instance.send(:safe_parse, '2024-01-15 10:30:00', 'Europe/Warsaw')
         expect(result).to be_a(ActiveSupport::TimeWithZone)
         expect(result.zone).to eq('CET')
-        expect(result.in_time_zone('Europe/Warsaw').hour).to eq(11)
+        expect(result.in_time_zone('Europe/Warsaw').hour).to eq(10)
       end
     end
 
