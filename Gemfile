@@ -62,7 +62,7 @@ gem 'paper_trail', '~> 17.0.0'
 gem 'paranoia'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
-gem 'sentry-rails', '~> 5.7'
+gem 'sentry-rails', '~> 5.28'
 gem 'jwt', '~> 2.6'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
