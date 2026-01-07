@@ -11,14 +11,11 @@ class V1::Intervention::PredefinedParticipants::BulkCreateService
   end
 
   def call
-    created_users = []
     ActiveRecord::Base.transaction do
-      params.each do |participant_params|
-        user = V1::Intervention::PredefinedParticipants::CreateService.new(intervention, participant_params).call
-        created_users << user
+      params.map do |participant_params|
+        V1::Intervention::PredefinedParticipants::CreateService.new(intervention, participant_params).call
       end
     end
-    created_users
   end
 
   private
