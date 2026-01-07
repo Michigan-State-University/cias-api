@@ -111,8 +111,19 @@ module SmsHelper
     @value_provided_by_the_user ||= phone_answer&.migrated_body&.dig('data', 0, 'value')
   end
 
-  def random_time
-    time_range = if time_ranges_defined_by_user.blank?
+  def random_time(plan)
+    if plan.sms_send_time_type_specific_time?
+      specific_time = plan.sms_send_time_details
+      time = Time.zone.parse(specific_time[:time])
+      return {
+        hour: time.hour,
+        min: time.min
+      }
+    end
+
+    time_range = if plan.sms_send_time_type_time_range?
+                   plan.sms_send_time_details
+                 elsif time_ranges_defined_by_user.blank?
                    TimeRange.default_range
                  else
                    time_ranges_defined_by_user.sample

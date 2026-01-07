@@ -4,6 +4,18 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   include Rails.application.routes.url_helpers
   include ::SmsHelper
 
+  INTERVENTION_URL_REGEX = %r{
+  #{Regexp.escape(ENV.fetch('WEB_URL'))}
+  /interventions/
+  [^/\s]+
+  (?:
+    /invite
+    |
+    /sessions/[^/\s]+/fill
+  )
+  (?:\?[^\s]*)?
+}x
+
   def self.call(user_session)
     new(user_session).call
   end
@@ -46,9 +58,16 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def days_after_session_end_schedule(plan)
-    return after_session_end_schedule(plan) if plan.schedule_payload.zero?
+    if plan.schedule_payload.zero?
+      return after_session_end_schedule(plan) if plan.sms_send_time_type_preferred_by_participant?
 
-    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time).utc
+      expected_time_of_message = now_in_timezone.change(random_time(plan)).utc
+      return after_session_end_schedule(plan) if expected_time_of_message.past?
+
+      set_frequency(expected_time_of_message, plan)
+    end
+
+    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time(plan)).utc
     set_frequency(start_time, plan)
   end
 
@@ -58,7 +77,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
     return unless date_answer
 
-    start_time = DateTime.parse(date_answer).next_day(plan.schedule_payload).change(random_time).utc
+    start_time = DateTime.parse(date_answer).next_day(plan.schedule_payload).change(random_time(plan)).utc
     set_frequency(start_time, plan)
   end
 
@@ -71,6 +90,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     attachment_url = attachment_url(plan)
     content = insert_variables_into_variant(content)
     content = insert_links_into_variant(content, plan)
+    content = add_predefined_participant_indicator_to_invitation_link(content)
     finish_date = plan.end_at
 
     if plan.alert?
@@ -91,7 +111,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
       end
 
       while date.to_date <= finish_date.to_date
-        send_sms(date.change(random_time).utc, content, attachment_url)
+        send_sms(date.change(random_time(plan)).utc, content, attachment_url)
         date = date.next_day(number_days[frequency])
       end
     end
@@ -124,5 +144,22 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def now_in_timezone
     @now_in_timezone ||= Time.use_zone(timezone) { Time.current }
+  end
+
+  def add_predefined_participant_indicator_to_invitation_link(content)
+    return content unless user.role?('predefined_participant')
+
+    pid = user.predefined_user_parameter.slug
+    content.gsub(INTERVENTION_URL_REGEX) do |url|
+      uri = URI.parse(url)
+
+      params = URI.decode_www_form(uri.query || '')
+      params << ['pid', pid] unless params.any? { |k, _| k == 'pid' }
+
+      uri.query = URI.encode_www_form(params)
+      uri.to_s
+    rescue URI::InvalidURIError
+      url
+    end
   end
 end

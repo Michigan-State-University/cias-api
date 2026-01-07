@@ -42,6 +42,12 @@ class SmsPlan < ApplicationRecord
     once_a_month: 'once_a_month'
   }, suffix: true
 
+  enum :sms_send_time_type, {
+    preferred_by_participant: 'preferred_by_participant',
+    specific_time: 'specific_time',
+    time_range: 'time_range'
+  }, prefix: true
+
   def translate_no_formula_text(translator, source_language_name_short, destination_language_name_short)
     translate_attribute('no_formula_text', no_formula_text, translator, source_language_name_short, destination_language_name_short)
   end
