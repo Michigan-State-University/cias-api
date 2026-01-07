@@ -442,7 +442,7 @@ GEM
       pg (>= 0.18.2)
       slop (>= 4.10.1)
       tty-spinner
-    phonelib (0.10.12)
+    phonelib (0.10.15)
     postgresql_cursor (0.6.9)
       activerecord (>= 6.0)
     pp (0.6.3)
