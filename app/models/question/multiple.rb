@@ -5,7 +5,7 @@ class Question::Multiple < Question
 
   def self.assign_default_values(attr)
     super.merge(
-      { 'required' => true }
+      { 'required' => true, 'none_of_above' => false }
     )
   end
 
