@@ -9,6 +9,9 @@
         {
           "type": "object",
           "properties": {
+            "id": {
+              "type": "string"
+            },
             "payload": {
               "type": "string"
             },
