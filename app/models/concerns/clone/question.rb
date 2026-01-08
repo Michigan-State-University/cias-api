@@ -18,10 +18,19 @@ class Clone::Question < Clone::Base
   end
 
   def generate_new_answer_ids
-    return unless source.type.in?(%w[Question::Single Question::Multiple Question::ThirdParty])
+    return unless source.type.in?(%w[Question::Single Question::Multiple Question::ThirdParty Question::Grid])
 
-    outcome.body['data'].each do |answer|
-      answer['id'] = SecureRandom.uuid
+    if source.type == 'Question::Grid'
+      outcome.body.dig('data', 0, 'payload', 'rows').each do |row|
+        row['id'] = SecureRandom.uuid
+      end
+      outcome.body.dig('data', 0, 'payload', 'columns').each do |row|
+        row['id'] = SecureRandom.uuid
+      end
+    else
+      outcome.body['data'].each do |answer|
+        answer['id'] = SecureRandom.uuid
+      end
     end
   end
 
