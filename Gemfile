@@ -63,7 +63,7 @@ gem 'paranoia'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.28'
-gem 'jwt', '~> 2.6'
+gem 'jwt', '~> 3.1'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
