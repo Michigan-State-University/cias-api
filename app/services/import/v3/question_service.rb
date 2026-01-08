@@ -20,7 +20,7 @@ class Import::V3::QuestionService < Import::Basic::QuestionService
   private
 
   def attach_answer_images(question)
-    answer_images&.each do |answer_image|
+    added_images = answer_images&.map do |answer_image|
       blob = import_file_directly(question, :answer_images, answer_image)
       answer_id = answer_image[:metadata][:answer_id]
       blob.metadata['answer_id'] = answer_id
@@ -28,9 +28,13 @@ class Import::V3::QuestionService < Import::Basic::QuestionService
       blob.save
 
       answer_index = question.body&.dig('data')&.find_index { |answer| answer['id'].eql?(answer_id) }
-      next if answer_image.blank?
+      next if answer_index.blank?
 
-      question.body['data'][answer_index]['image_id'] = blob.attachment_ids.first
+      { answer_index: answer_index, attachment_id: blob.attachment_ids.first }
+    end
+
+    added_images.compact.each do |img|
+      question.body['data'][img[:answer_index]]['image_id'] = img[:attachment_id]
     end
     question.save!
   end
