@@ -114,7 +114,7 @@ module SmsHelper
   def random_time(plan)
     if plan.sms_send_time_type_specific_time?
       specific_time = plan.sms_send_time_details
-      time = Time.zone.parse(specific_time[:time])
+      time = Time.zone.parse(specific_time['time'])
       return {
         hour: time.hour,
         min: time.min

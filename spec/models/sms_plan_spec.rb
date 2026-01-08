@@ -8,6 +8,15 @@ RSpec.describe SmsPlan, type: :model do
   it { should have_many(:alert_phones) }
   it { should have_many(:phones) }
 
+  it {
+    expect(subject).to define_enum_for(:sms_send_time_type).
+      with_values(
+        preferred_by_participant: 'preferred_by_participant',
+        specific_time: 'specific_time',
+        time_range: 'time_range'
+      ).with_prefix(:sms_send_time_type).backed_by_column_of_type(:string)
+  }
+
   context 'validations' do
     context 'when are params are valid' do
       let!(:sms_plan) { build_stubbed(:sms_plan) }
