@@ -26,7 +26,7 @@ class SmsPlan < ApplicationRecord
 
   ATTR_NAMES_TO_COPY = %w[
     name schedule schedule_payload frequency end_at formula no_formula_text is_used_formula
-    include_first_name include_last_name include_email include_phone_number type
+    include_first_name include_last_name include_email include_phone_number type sms_send_time_type sms_send_time_details
   ].freeze
 
   enum :schedule, {
