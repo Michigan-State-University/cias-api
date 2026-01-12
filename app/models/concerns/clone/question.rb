@@ -2,11 +2,11 @@
 
 class Clone::Question < Clone::Base
   def execute
-    attach_image
     generate_new_answer_ids
-    attach_answer_images
     clean_outcome_formulas if clean_formulas
     outcome.save!
+    attach_answer_images
+    attach_image
     assign_answer_images_to_correct_answers
     outcome
   end
@@ -14,7 +14,15 @@ class Clone::Question < Clone::Base
   private
 
   def attach_image
-    outcome.image.attach(source.image.blob) if source.image.attachment
+    return unless source.image.attached?
+
+    blob = ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new(source.image.download),
+      filename: source.image.filename,
+      content_type: source.image.content_type
+    )
+    blob.update!(description: source.image_blob.description)
+    outcome.image.attach(blob)
   end
 
   def generate_new_answer_ids

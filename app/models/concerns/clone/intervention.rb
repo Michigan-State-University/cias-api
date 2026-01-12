@@ -17,6 +17,7 @@ class Clone::Intervention < Clone::Base
     outcome.update!(is_hidden: hidden)
     reset_cache_counters
     attach_logo
+    attach_files
     outcome
   end
 
@@ -25,8 +26,18 @@ class Clone::Intervention < Clone::Base
   def attach_logo
     return unless source.logo.attachment
 
-    outcome.logo.attach(source.logo.blob)
+    outcome.logo.attach(io: StringIO.new(source.logo.download),
+                        filename: source.logo.filename,
+                        content_type: source.logo.content_type)
     outcome.logo_blob.update!(description: source.logo_blob.description)
+  end
+
+  def attach_files
+    return unless source.files.attached?
+
+    source.files.find_each do |file|
+      outcome.files.attach(file.blob)
+    end
   end
 
   def assign_tags
