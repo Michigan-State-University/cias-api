@@ -94,6 +94,10 @@ FactoryBot.define do
         end
       end
     end
+
+    trait :with_attached_logo do
+      logo { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
+    end
   end
 
   factory :intervention_with_logo, class: Intervention do
