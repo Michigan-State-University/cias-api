@@ -23,6 +23,19 @@ RSpec.describe Question, type: :model do
     end
   end
 
+  context 'clone' do
+    let(:question) { create(:question_single) }
+
+    it 'copied image should be independent from the original image' do
+      question.image_blob.update(description: 'example description')
+      cloned_question = question.clone
+      expect(cloned_question.image_blob.description).to eq(question.image_blob.description)
+
+      question.image_blob.update(description: 'new description')
+      expect(cloned_question.image_blob.description).not_to eq(question.image_blob.description)
+    end
+  end
+
   describe 'instance methods' do
     let(:question) { create(:question_single) }
 
