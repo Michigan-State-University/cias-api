@@ -12,7 +12,7 @@ class Question < ApplicationRecord
 
   UNIQUE_IN_SESSION = %w[Question::Name Question::ParticipantReport Question::ThirdParty Question::Phone
                          Question::HenryFordInitial].freeze
-  CURRENT_VERSION = '2'
+  CURRENT_VERSION = '3'
 
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
@@ -25,6 +25,7 @@ class Question < ApplicationRecord
   attribute :duplicated, :boolean, default: false
 
   has_one_attached :image
+  has_many_attached :answer_images
   has_many_attached :speeches
 
   has_one :image_attachment, lambda {
@@ -152,6 +153,21 @@ class Question < ApplicationRecord
     image_blob.description = new_description
 
     image_blob.save!
+  end
+
+  def translate_answer_images_description(translator, source_language_name_short, destination_language_name_short)
+    return unless answer_images.attached?
+
+    original_text['answer_images'] = []
+
+    answer_images.each do |answer_image|
+      original_description = answer_image.blob.description
+      next if original_description.blank?
+
+      original_text['answer_images'] << { answer_id: answer_image.metadata['answer_id'], description: original_description }
+      new_description = translator.translate(original_description, source_language_name_short, destination_language_name_short)
+      answer_image.blob.update(description: new_description)
+    end
   end
 
   def translate_body(_translator, _source_language_name_short, _destination_language_name_short) end

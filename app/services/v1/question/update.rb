@@ -61,6 +61,7 @@ class V1::Question::Update
         end
       end
 
+      extend_question_params(question_params)
       question.assign_attributes(question_params.except(:type))
       question.execute_narrator
       question.save!
@@ -99,6 +100,28 @@ class V1::Question::Update
 
   attr_reader :question_params
   attr_accessor :question
+
+  def extend_question_params(question_params)
+    if question.type.in?(questions_with_multiple_simple_answer)
+      question_params.dig(:body, :data)&.each do |answer_params|
+        answer_params[:id] = SecureRandom.uuid if answer_params[:id].blank?
+      end
+    elsif question.type == Question::Grid.name
+      question_params.dig(:body, :data)&.each do |data|
+        data.dig(:payload, :rows).each do |row|
+          row[:id] = SecureRandom.uuid if row[:id].blank?
+        end
+
+        data.dig(:payload, :columns)&.each do |col|
+          col[:id] = SecureRandom.uuid if col[:id].blank?
+        end
+      end
+    end
+  end
+
+  def questions_with_multiple_simple_answer
+    @questions_with_multiple_simple_answer ||= %w[Question::Single Question::Multiple Question::ThirdParty]
+  end
 
   def adjust_variable_references(changed_vars)
     return if changed_vars.empty?
