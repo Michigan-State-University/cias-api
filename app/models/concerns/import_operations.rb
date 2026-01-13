@@ -15,8 +15,11 @@ module ImportOperations
   def import_file(img)
     return if img.blank? || img[:file].nil?
 
+    decoded_data = Base64.decode64(img[:file])
+    decoded_data = Zlib::Inflate.inflate(decoded_data) if img[:compressed]
+
     {
-      io: StringIO.new(Base64.decode64(img[:file])),
+      io: StringIO.new(decoded_data),
       content_type: img[:content_type],
       filename: "#{SecureRandom.hex}.#{img[:extension]}"
     }
