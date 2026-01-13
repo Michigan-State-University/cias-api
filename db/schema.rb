@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_02_135619) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_06_103135) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -903,6 +903,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_02_135619) do
     t.boolean "include_phone_number"
     t.boolean "include_email"
     t.string "schedule_variable"
+    t.string "sms_send_time_type", default: "preferred_by_participant", null: false
+    t.jsonb "sms_send_time_details", default: {}
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 

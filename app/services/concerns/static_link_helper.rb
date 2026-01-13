@@ -14,7 +14,7 @@ module StaticLinkHelper
     return intervention.sessions.order(:position).first if user_sessions.blank?
 
     next_session = user_sessions.where.not(finished_at: nil).last.session.next_session
-    next_user_session = UserSession.find_by(session_id: next_session.id)
+    next_user_session = UserSession.find_by(session_id: next_session&.id)
 
     return next_session if next_user_session.blank?
     return nil if next_user_session.scheduled_at&.future?
