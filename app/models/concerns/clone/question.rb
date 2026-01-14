@@ -48,6 +48,7 @@ class Clone::Question < Clone::Base
     source.answer_images.each do |answer_image|
       source_answer_id = answer_image.metadata['answer_id']
       source_answer_index = source.body&.dig('data')&.find_index { |answer| answer['id'].eql?(source_answer_id) }
+      next if source_answer_index.blank?
 
       outcome_answer_id = outcome.body&.dig('data')&.at(source_answer_index)&.dig('id')
 
