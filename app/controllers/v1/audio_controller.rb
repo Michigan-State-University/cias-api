@@ -40,11 +40,11 @@ class V1::AudioController < V1Controller
   end
 
   def audio_params
-    params.require(:audio).permit(:text, :user_session_id, :google_tts_voice_id)
+    params.expect(audio: %i[text user_session_id google_tts_voice_id])
   end
 
   def regenerate_audio_params
-    params.require(:audio).permit(:question_id, :session_id, :block_index, :reflection_index, :audio_index)
+    params.expect(audio: %i[question_id session_id block_index reflection_index audio_index])
   end
 
   def text

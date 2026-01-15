@@ -18,7 +18,7 @@ module Resource::Reorder
   protected
 
   def reorder_params
-    params.require(controller_name.singularize.to_sym).permit(position: %i[id position])
+    params.expect(controller_name.singularize.to_sym => [position: %i[id position]])
   end
 
   def reorder_response
