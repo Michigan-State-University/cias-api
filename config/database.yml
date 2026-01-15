@@ -1,7 +1,7 @@
 default: &default
   adapter: postgresql
   host: localhost
-  pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 4 } %>
+  pool: <%= (2 * ENV.fetch('RAILS_MAX_THREADS', 4).to_i) + 5 %>
   encoding: unicode
 
 development:

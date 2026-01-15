@@ -23,7 +23,7 @@ class Import::Basic::ReportTemplateService
     report_template_sections = report_template_hash.delete(:sections)
     report_template = ReportTemplate.create!(report_template_hash.merge({ session_id: session_id }))
     import_file_directly(report_template, :logo, logo) if logo.present?
-    import_file_directly(report_template, :cover_letter_custom_logo, cover_letter_custom_logo) if logo.present?
+    import_file_directly(report_template, :cover_letter_custom_logo, cover_letter_custom_logo) if cover_letter_custom_logo.present?
     report_template_sections&.each do |report_template_section_hash|
       get_import_service_class(report_template_section_hash, ReportTemplate::Section).call(report_template.id, report_template_section_hash)
     end

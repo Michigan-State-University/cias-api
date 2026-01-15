@@ -5,7 +5,7 @@ class V1::SmsPlanSerializer < V1Serializer
 
   attributes :session_id, :name, :schedule, :schedule_payload, :frequency, :formula,
              :no_formula_text, :is_used_formula, :original_text, :type, :include_first_name, :include_last_name,
-             :include_email, :include_phone_number, :schedule_variable
+             :include_email, :include_phone_number, :schedule_variable, :sms_send_time_type, :sms_send_time_details
   has_many :variants, serializer: V1::SmsPlan::VariantSerializer
   has_many :phones, serializer: V1::PhoneSerializer
   has_many :sms_links, serializer: V1::SmsLinkSerializer

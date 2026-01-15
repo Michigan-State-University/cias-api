@@ -61,7 +61,8 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
             'data' => [
               {
                 'payload' => '',
-                'value' => ''
+                'value' => '',
+                'id' => anything
               }
             ],
             'variable' => {
@@ -111,7 +112,8 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
             'data' => [
               {
                 'payload' => '',
-                'value' => ''
+                'value' => '',
+                'id' => anything
               }
             ],
             'variable' => {
