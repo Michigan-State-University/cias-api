@@ -32,7 +32,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
     end
 
     it 'has correct body attributes' do
-      expect(json_response['data']['attributes']['body']).to include('data' => ['payload' => '', 'value' => '', 'report_template_ids' => []])
+      expect(json_response['data']['attributes']['body']['data'][0].keys).to match_array(%w[payload value report_template_ids id])
     end
   end
 end

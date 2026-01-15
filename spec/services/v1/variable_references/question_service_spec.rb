@@ -126,6 +126,7 @@ RSpec.describe V1::VariableReferences::QuestionService, type: :service do
         expect(service).to receive(:update_question_group_formulas_scoped).with(session, 'old_var', 'new_var', exclude_source_session: false)
         expect(service).to receive(:update_session_formulas_scoped).with(session, 'old_var', 'new_var', exclude_source_session: false)
         expect(service).to receive(:update_report_template_formulas_scoped).with(session, 'old_var', 'new_var', exclude_source_session: false)
+        expect(service).to receive(:update_sms_plan_formulas_scoped).with(session, 'old_var', 'new_var', exclude_source_session: false)
 
         service.update_direct_variable_references
       end
@@ -143,7 +144,10 @@ RSpec.describe V1::VariableReferences::QuestionService, type: :service do
         expect(service).to receive(:update_session_formulas_scoped).with(session, 'session_var.old_var', 'session_var.new_var', exclude_source_session: true)
         expect(service).to receive(:update_report_template_formulas_scoped).with(session, 'session_var.old_var', 'session_var.new_var',
                                                                                  exclude_source_session: true)
+        expect(service).to receive(:update_sms_plan_formulas_scoped).with(session, 'session_var.old_var', 'session_var.new_var',
+                                                                          exclude_source_session: true)
         expect(service).to receive(:update_chart_formulas).with(session.intervention_id, 'session_var.old_var', 'session_var.new_var')
+        expect(service).to receive(:update_days_after_date_variable_references).with('session_var.old_var', 'session_var.new_var')
 
         service.update_cross_session_variable_references
       end
