@@ -72,6 +72,7 @@ Rails.application.routes.draw do
         resources :predefined_participants do
           post 'send_sms_invitation', on: :member
           post 'send_email_invitation', on: :member
+          post 'bulk_create', on: :collection
         end
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy] do
@@ -170,6 +171,9 @@ Rails.application.routes.draw do
     scope 'questions/:question_id', as: 'question' do
       scope module: 'questions' do
         resource :images, only: %i[create destroy update]
+        resource :answer_images, only: %i[create]
+        delete 'answer_images/:answer_id', to: 'answer_images#destroy', as: :destroy_answer_image
+        patch 'answer_images/:answer_id', to: 'answer_images#update', as: :update_answer_image
       end
     end
 

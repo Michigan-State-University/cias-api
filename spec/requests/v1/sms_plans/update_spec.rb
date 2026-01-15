@@ -66,6 +66,99 @@ RSpec.describe 'PATCH /v1/sms_plans/:id', type: :request do
         end
       end
 
+      context 'when updating to specific_time type' do
+        let(:params) do
+          {
+            sms_plan: {
+              sms_send_time_type: 'specific_time',
+              sms_send_time_details: { time: '15:45' }
+            }
+          }
+        end
+
+        it 'returns :ok status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'updates sms_send_time_type to specific_time' do
+          expect { request }.to change { sms_plan.reload.sms_send_time_type }
+                                  .from('preferred_by_participant')
+                                  .to('specific_time')
+        end
+
+        it 'updates sms_send_time_details' do
+          expect { request }.to change { sms_plan.reload.sms_send_time_details }
+                                  .from({})
+                                  .to({ 'time' => '15:45' })
+        end
+
+        it 'returns correct data in response' do
+          request
+
+          expect(json_response['data']['attributes']).to include(
+            'sms_send_time_type' => 'specific_time',
+            'sms_send_time_details' => { 'time' => '15:45' }
+          )
+        end
+      end
+
+      context 'when updating to time_range type' do
+        let(:params) do
+          {
+            sms_plan: {
+              sms_send_time_type: 'time_range',
+              sms_send_time_details: { from: '10', to: '14' }
+            }
+          }
+        end
+
+        it 'returns :ok status' do
+          request
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'updates sms_send_time_type to time_range' do
+          expect { request }.to change { sms_plan.reload.sms_send_time_type }
+                                  .from('preferred_by_participant')
+                                  .to('time_range')
+        end
+
+        it 'updates sms_send_time_details' do
+          expect { request }.to change { sms_plan.reload.sms_send_time_details }
+                                  .from({})
+                                  .to({ 'from' => '10', 'to' => '14' })
+        end
+      end
+
+      context 'when updating existing specific_time details' do
+        let(:sms_plan) do
+          create(:sms_plan,
+                 session: session,
+                 sms_send_time_type: 'specific_time',
+                 sms_send_time_details: { time: '10:00' })
+        end
+
+        let(:params) do
+          {
+            sms_plan: {
+              sms_send_time_details: { time: '16:30' }
+            }
+          }
+        end
+
+        it 'updates the time details' do
+          expect { request }.to change { sms_plan.reload.sms_send_time_details }
+                                  .from({ 'time' => '10:00' })
+                                  .to({ 'time' => '16:30' })
+        end
+
+        it 'preserves the sms_send_time_type' do
+          expect { request }.not_to change { sms_plan.reload.sms_send_time_type }
+          expect(sms_plan.sms_send_time_type).to eq('specific_time')
+        end
+      end
+
       context 'when user wants to add image' do
         let(:params) do
           {

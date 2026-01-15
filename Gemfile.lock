@@ -331,7 +331,7 @@ GEM
     jsonapi-renderer (0.2.2)
     jsonapi-serializer (2.2.0)
       activesupport (>= 4.2)
-    jwt (2.10.2)
+    jwt (3.1.2)
       base64
     kredis (1.8.0)
       activemodel (>= 6.0.0)
@@ -445,7 +445,7 @@ GEM
       pg (>= 0.18.2)
       slop (>= 4.10.1)
       tty-spinner
-    phonelib (0.10.12)
+    phonelib (0.10.15)
     postgresql_cursor (0.6.9)
       activerecord (>= 6.0)
     pp (0.6.3)
@@ -713,7 +713,7 @@ DEPENDENCIES
   hiredis
   jmespath (>= 1.6.1)
   jsonapi-serializer
-  jwt (~> 2.6)
+  jwt (~> 3.1)
   kredis (~> 1.5)
   letter_opener_web
   license_finder

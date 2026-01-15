@@ -20,6 +20,14 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     render json: serialized_response(predefined_user), status: :created
   end
 
+  def bulk_create
+    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
+
+    predefined_users = V1::Intervention::PredefinedParticipants::BulkCreateService.call(intervention_load, predefined_users_parameters)
+
+    render json: serialized_response(predefined_users), status: :created
+  end
+
   def update
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
@@ -71,6 +79,20 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def predefined_user_parameters
     params.expect(predefined_user: [:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, :external_id, :email,
                                     :sms_notification, :email_notification, { phone_attributes: %i[iso prefix number] }])
+  end
+
+  def predefined_users_parameters
+    params.require(:predefined_users).permit(
+      participants: [
+        :first_name,
+        :last_name,
+        :email,
+        :external_id,
+        :email_notification,
+        :sms_notification,
+        { phone_attributes: %i[iso prefix number] }
+      ]
+    )
   end
 
   def intervention_load

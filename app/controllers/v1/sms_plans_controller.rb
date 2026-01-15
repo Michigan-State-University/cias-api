@@ -71,7 +71,7 @@ class V1::SmsPlansController < V1Controller
     params.expect(
       sms_plan: %i[name schedule schedule_payload frequency session_id end_at formula no_formula_text
                    is_used_formula type include_first_name include_last_name include_email
-                   include_phone_number no_formula_attachment schedule_variable]
+                   include_phone_number no_formula_attachment schedule_variable sms_send_time_type sms_send_time_details]
     )
   end
 end
