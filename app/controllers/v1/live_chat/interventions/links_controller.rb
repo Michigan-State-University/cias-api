@@ -34,7 +34,7 @@ class V1::LiveChat::Interventions::LinksController < V1Controller
   private
 
   def link_params
-    params.require(:link).permit(:url, :display_name, :link_for)
+    params.expect(link: %i[url display_name link_for])
   end
 
   def link_load

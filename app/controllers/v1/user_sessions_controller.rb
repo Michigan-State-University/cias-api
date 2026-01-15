@@ -79,7 +79,7 @@ class V1::UserSessionsController < V1Controller
   end
 
   def user_session_params
-    params.require(:user_session).permit(:session_id, :health_clinic_id)
+    params.expect(user_session: %i[session_id health_clinic_id])
   end
 
   def session_id

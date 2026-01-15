@@ -80,12 +80,12 @@ class V1::Users::InvitationsController < V1Controller
   end
 
   def accept_invitation_params
-    params.require(:invitation).permit(:invitation_token, :password, :password_confirmation, :first_name, :last_name,
-                                       :time_zone, :terms, :email)
+    params.expect(invitation: %i[invitation_token password password_confirmation first_name last_name
+                                 time_zone terms email])
   end
 
   def invited_email
-    params.require(:invitation).permit(:email)[:email]
+    params.expect(invitation: [:email])[:email]
   end
 
   def invitation_token

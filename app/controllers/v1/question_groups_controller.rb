@@ -151,7 +151,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_params
-    params.require(:question_group).permit(:title, :session_id, :type, formulas: [:payload, { patterns: [:match] }], sms_schedule: {})
+    params.expect(question_group: [:title, :session_id, :type, { formulas: [:payload, { patterns: [:match] }], sms_schedule: {} }])
   end
 
   def question_group_id
@@ -167,7 +167,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_groups_positions_params
-    params.require(:question_groups).permit(positions: %i[id position])
+    params.expect(question_groups: [positions: %i[id position]])
   end
 
   def question_group_response(question_groups)

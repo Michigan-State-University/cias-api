@@ -68,10 +68,10 @@ class V1::SmsPlansController < V1Controller
   end
 
   def sms_plan_params
-    params.require(:sms_plan).permit(
-      :name, :schedule, :schedule_payload, :frequency, :session_id, :end_at, :formula, :no_formula_text,
-      :is_used_formula, :type, :include_first_name, :include_last_name, :include_email,
-      :include_phone_number, :no_formula_attachment, :schedule_variable
+    params.expect(
+      sms_plan: %i[name schedule schedule_payload frequency session_id end_at formula no_formula_text
+                   is_used_formula type include_first_name include_last_name include_email
+                   include_phone_number no_formula_attachment schedule_variable]
     )
   end
 end

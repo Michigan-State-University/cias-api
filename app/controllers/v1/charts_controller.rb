@@ -48,7 +48,7 @@ class V1::ChartsController < V1Controller
   end
 
   def chart_params
-    params.require(:chart).permit(:name, :description, :chart_type, :trend_line, :status, :dashboard_section_id,
-                                  :interval_type, :date_range_start, :date_range_end, formula: {})
+    params.expect(chart: [:name, :description, :chart_type, :trend_line, :status, :dashboard_section_id,
+                          :interval_type, :date_range_start, :date_range_end, { formula: {} }])
   end
 end

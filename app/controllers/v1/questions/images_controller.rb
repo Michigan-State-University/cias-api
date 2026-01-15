@@ -31,6 +31,6 @@ class V1::Questions::ImagesController < V1Controller
   end
 
   def question_params
-    params.require(:image).permit(:file, :image_alt)
+    params.expect(image: %i[file image_alt])
   end
 end

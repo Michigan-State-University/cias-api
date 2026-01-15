@@ -63,7 +63,7 @@ class V1::SmsPlans::VariantsController < V1Controller
   end
 
   def variant_params
-    params.require(:variant).permit(:formula_match, :content, :attachment)
+    params.expect(variant: %i[formula_match content attachment])
   end
 
   def ability_to_update?

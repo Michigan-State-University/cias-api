@@ -35,7 +35,7 @@ class V1::Interventions::FilesController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(files: [])
+    params.expect(intervention: [files: []])
   end
 
   def files

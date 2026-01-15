@@ -35,7 +35,7 @@ class V1::Tlfb::EventsController < V1Controller
   end
 
   def event_params
-    params.require(:event).permit(:name, :exact_date, :user_session_id, :question_group_id)
+    params.expect(event: %i[name exact_date user_session_id question_group_id])
   end
 
   def exact_date

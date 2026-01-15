@@ -127,17 +127,17 @@ class V1::SessionsController < V1Controller
   end
 
   def session_params
-    params.require(:session).permit(:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
-                                    :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
-                                    :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time,
-                                    :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at,
-                                    :welcome_message, :completion_message, :default_response, :google_language_id,
-                                    narrator: {}, settings: {}, sms_codes_attributes: %i[id sms_code],
-                                    formulas: [
-                                      :payload, { patterns: [:match, {
-                                        target: %i[type probability id]
-                                      }] }
-                                    ], cat_tests: [])
+    params.expect(session: [:name, :schedule, :schedule_payload, :schedule_at, :position, :variable, :type,
+                            :intervention_id, :days_after_date_variable_name, :google_tts_voice_id, :multiple_fill,
+                            :cat_mh_language_id, :cat_mh_time_frame_id, :cat_mh_population_id, :estimated_time,
+                            :autofinish_enabled, :autofinish_delay, :autoclose_enabled, :autoclose_at,
+                            :welcome_message, :completion_message, :default_response, :google_language_id,
+                            { narrator: {}, settings: {}, sms_codes_attributes: %i[id sms_code],
+                              formulas: [
+                                :payload, { patterns: [:match, {
+                                  target: %i[type probability id]
+                                }] }
+                              ], cat_tests: [] }])
   end
 
   def intervention
@@ -149,6 +149,6 @@ class V1::SessionsController < V1Controller
   end
 
   def session_schedule_params
-    params.require(:session).permit(:schedule, :schedule_payload, :schedule_at)
+    params.expect(session: %i[schedule schedule_payload schedule_at])
   end
 end

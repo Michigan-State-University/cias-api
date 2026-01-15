@@ -32,6 +32,6 @@ class V1::Users::AvatarsController < V1Controller
   end
 
   def avatar_params
-    params.require(:avatar).permit(:file)
+    params.expect(avatar: [:file])
   end
 end
