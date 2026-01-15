@@ -82,8 +82,8 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def predefined_users_parameters
-    params.require(:predefined_users).permit(
-      participants: [
+    params.expect(
+      predefined_users: [participants: [
         :first_name,
         :last_name,
         :email,
@@ -91,7 +91,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
         :email_notification,
         :sms_notification,
         { phone_attributes: %i[iso prefix number] }
-      ]
+      ]]
     )
   end
 
