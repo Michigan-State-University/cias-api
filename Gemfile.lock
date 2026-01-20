@@ -633,7 +633,7 @@ GEM
     tty-cursor (0.7.1)
     tty-spinner (0.9.3)
       tty-cursor (~> 0.7)
-    twilio-ruby (7.9.0)
+    twilio-ruby (7.9.1)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
@@ -754,7 +754,7 @@ DEPENDENCIES
   sql_query
   test-prof
   timecop
-  twilio-ruby (~> 7.9.0)
+  twilio-ruby (~> 7.9.1)
   uri (>= 1.1.1)
   webmock
   wicked_pdf
