@@ -14,13 +14,7 @@ class V1::GeneratedReports::Create
   def call
     variants_to_generate =
       report_template.sections.map do |section|
-        missing_variables = dentaku_service.dentaku_calculator.dependencies(section.formula)
-
-        if missing_variables.any?
-          nil
-        else
-          dentaku_service.evaluate(section.formula, section.variants)
-        end
+        evaluate_section(section)
       end
 
     variants_to_generate.compact!
@@ -48,6 +42,18 @@ class V1::GeneratedReports::Create
   private
 
   attr_reader :report_template, :user_session, :dentaku_service, :user_intervention_service
+
+  def evaluate_section(section)
+    missing_variables = dentaku_service.dentaku_calculator.dependencies(section.formula)
+
+    if missing_variables.any?
+      nil
+    else
+      dentaku_service.evaluate(section.formula, section.variants)
+    end
+  rescue Dentaku::ParseError, Dentaku::TokenizerError
+    nil
+  end
 
   def render_pdf_report(variants_to_generate)
     V1::RenderPdfReport.call(
