@@ -225,10 +225,10 @@ RSpec.describe V1::GeneratedReports::Create do
     context 'when one section has an invalid formula but others are valid' do
       it 'logs the error for invalid section' do
         allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
-        
+
         expect(Rails.logger).to receive(:error).with(/Invalid formula in section #{invalid_section.id}/)
         expect(Rails.logger).to receive(:error).with(/Formula: var1 var2/)
-        
+
         subject
       end
 
@@ -259,7 +259,7 @@ RSpec.describe V1::GeneratedReports::Create do
 
       it 'logs errors for all invalid sections' do
         expect(Rails.logger).to receive(:error).at_least(:twice)
-        
+
         subject
       end
 
@@ -285,7 +285,7 @@ RSpec.describe V1::GeneratedReports::Create do
       it 'catches tokenizer error and logs it' do
         expect(Rails.logger).to receive(:error).with(/Invalid formula/)
         expect(Rails.logger).to receive(:error).with(/Formula:/)
-        
+
         subject
       end
 
