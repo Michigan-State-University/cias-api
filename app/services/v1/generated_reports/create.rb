@@ -51,7 +51,9 @@ class V1::GeneratedReports::Create
     else
       dentaku_service.evaluate(section.formula, section.variants)
     end
-  rescue Dentaku::ParseError, Dentaku::TokenizerError
+  rescue Dentaku::ParseError, Dentaku::TokenizerError => e
+    Rails.logger.error("Invalid formula in section #{section.id} of report template #{report_template.id}: #{e.message}")
+    Rails.logger.error("Formula: #{section.formula}")
     nil
   end
 

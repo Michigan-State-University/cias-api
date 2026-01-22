@@ -194,4 +194,104 @@ RSpec.describe V1::GeneratedReports::Create do
           avoid_changing(ActiveStorage::Blob, :count)
     end
   end
+
+  context 'when sections have invalid formulas' do
+    before_all do
+      RSpec::Mocks.with_temporary_scope do
+        allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+
+        intervention = create(:intervention)
+        session = create(:session, intervention: intervention)
+        @invalid_user_session = create(:user_session, session: session)
+        @invalid_report_template = create(:report_template, session: session)
+        @invalid_section = create(:report_template_section, report_template: @invalid_report_template,
+                                                            formula: 'var1 var2')
+        @valid_section = create(:report_template_section, report_template: @invalid_report_template,
+                                                          formula: 'var1+var2')
+        @invalid_variant = create(:report_template_section_variant, report_template_section: @invalid_section,
+                                                                    formula_match: '=10')
+        @valid_variant = create(:report_template_section_variant, report_template_section: @valid_section,
+                                                                  formula_match: '=10')
+      end
+    end
+
+    let(:user_session) { @invalid_user_session }
+    let(:report_template) { @invalid_report_template }
+    let(:invalid_section) { @invalid_section }
+    let(:valid_section) { @valid_section }
+    let(:invalid_variant) { @invalid_variant }
+    let(:valid_variant) { @valid_variant }
+
+    context 'when one section has an invalid formula but others are valid' do
+      it 'logs the error for invalid section' do
+        allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+        
+        expect(Rails.logger).to receive(:error).with(/Invalid formula in section #{invalid_section.id}/)
+        expect(Rails.logger).to receive(:error).with(/Formula: var1 var2/)
+        
+        subject
+      end
+
+      it 'creates report with valid sections only' do
+        allow(V1::RenderPdfReport).to receive(:call).with(
+          report_template: report_template,
+          variants_to_generate: [variant_with_content(valid_variant.content)]
+        ).and_return('PDF TEMPLATE')
+
+        expect { subject }.to change(GeneratedReport, :count).by(1)
+      end
+    end
+
+    context 'when all sections have invalid formulas' do
+      before_all do
+        RSpec::Mocks.with_temporary_scope do
+          @all_invalid_report = create(:report_template, session: @invalid_user_session.session)
+          @invalid_section1 = create(:report_template_section, report_template: @all_invalid_report,
+                                                               formula: 'var1 >= var2 >= var3')
+          @invalid_section2 = create(:report_template_section, report_template: @all_invalid_report,
+                                                               formula: 'invalid formula text')
+          create(:report_template_section_variant, report_template_section: @invalid_section1, formula_match: '=10')
+          create(:report_template_section_variant, report_template_section: @invalid_section2, formula_match: '=10')
+        end
+      end
+
+      let(:report_template) { @all_invalid_report }
+
+      it 'logs errors for all invalid sections' do
+        expect(Rails.logger).to receive(:error).at_least(:twice)
+        
+        subject
+      end
+
+      it 'does not create a report' do
+        expect { subject }.to avoid_changing(GeneratedReport, :count).and \
+          avoid_changing(ActiveStorage::Attachment, :count).and \
+            avoid_changing(ActiveStorage::Blob, :count)
+      end
+    end
+
+    context 'when section has tokenizer error' do
+      before_all do
+        RSpec::Mocks.with_temporary_scope do
+          @tokenizer_report = create(:report_template, session: @invalid_user_session.session)
+          @tokenizer_section = create(:report_template_section, report_template: @tokenizer_report,
+                                                                formula: '(var1=1) . invalid text')
+          create(:report_template_section_variant, report_template_section: @tokenizer_section, formula_match: '=10')
+        end
+      end
+
+      let(:report_template) { @tokenizer_report }
+
+      it 'catches tokenizer error and logs it' do
+        expect(Rails.logger).to receive(:error).with(/Invalid formula/)
+        expect(Rails.logger).to receive(:error).with(/Formula:/)
+        
+        subject
+      end
+
+      it 'does not create a report' do
+        expect { subject }.to avoid_changing(GeneratedReport, :count)
+      end
+    end
+  end
 end
