@@ -24,7 +24,7 @@ class V1::NarratorController < V1Controller
   end
 
   def narrator_params
-    params.require(:narrator).permit(:name, replaced_animations: {})
+    params.expect(narrator: [:name, { replaced_animations: {} }])
   end
 
   def new_narrator

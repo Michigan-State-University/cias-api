@@ -11,7 +11,7 @@ class V1::HenryFord::PatientDetailsController < V1Controller
   private
 
   def patient_detail_params
-    params.require(:hfhs_patient_data).permit(:first_name, :last_name, :dob, :sex, :zip_code, :phone_number, :phone_type, :mrn)
+    params.expect(hfhs_patient_data: %i[first_name last_name dob sex zip_code phone_number phone_type mrn])
   end
 
   def session_id

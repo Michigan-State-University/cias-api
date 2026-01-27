@@ -51,15 +51,15 @@ class V1::SmsLinksController < V1Controller
   end
 
   def verify_params
-    params.require(:sms_link).permit(:slug)
+    params.expect(sms_link: [:slug])
   end
 
   def sms_link_params
-    params.require(:sms_link).permit(
-      :url,
-      :link_type,
-      :variable,
-      :sms_plan_id
+    params.expect(
+      sms_link: %i[url
+                   link_type
+                   variable
+                   sms_plan_id]
     )
   end
 end

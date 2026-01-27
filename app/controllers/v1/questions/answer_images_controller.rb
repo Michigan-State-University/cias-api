@@ -32,10 +32,10 @@ class V1::Questions::AnswerImagesController < V1Controller
   end
 
   def answer_id
-    params.require(:image).permit(:answer_id)[:answer_id]
+    params.expect(image: [:answer_id])[:answer_id]
   end
 
   def question_params
-    params.require(:image).permit(:file, :image_alt, :answer_id)
+    params.expect(image: %i[file image_alt answer_id])
   end
 end

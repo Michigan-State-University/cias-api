@@ -41,7 +41,7 @@ class V1::Interventions::LogosController < V1Controller
   end
 
   def intervention_params
-    params.require(:logo).permit(:file, :alt)
+    params.expect(logo: %i[file alt])
   end
 
   def intervention_published?

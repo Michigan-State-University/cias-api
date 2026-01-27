@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '3.3.8'
 gem 'bundler', '~> 2.4.22'
 
-gem 'rails', '~> 7.2.0'
+gem 'rails', '~> 8.1.1'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 6.0'
 
@@ -72,7 +72,7 @@ gem 'uri', '>= 1.1.1'
 
 group :development, :test do
   gem 'bundler-audit'
-  gem 'bullet'
+  gem 'bullet', '~> 8.1'
   gem 'dotenv-rails'
   gem 'fasterer', require: false
   gem 'overcommit', require: false

@@ -21,7 +21,7 @@ class V1::Interventions::TransfersController < V1Controller
   private
 
   def intervention_import_params
-    params.require(:imported_file).permit(:file)
+    params.expect(imported_file: [:file])
   end
 
   def intervention_export_params

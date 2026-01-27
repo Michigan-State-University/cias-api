@@ -37,7 +37,7 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   end
 
   def file_params
-    params.require(:navigator_setup).permit(:files_for, files: [])
+    params.expect(navigator_setup: [:files_for, { files: [] }])
   end
 
   def intervention_load

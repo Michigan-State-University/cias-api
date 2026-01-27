@@ -52,7 +52,7 @@ class V1::LiveChat::ConversationsController < V1Controller
   end
 
   def conversation_params
-    params.require(:conversation).permit(:intervention_id, user_ids: [])
+    params.expect(conversation: [:intervention_id, { user_ids: [] }])
   end
 
   def intervention_id

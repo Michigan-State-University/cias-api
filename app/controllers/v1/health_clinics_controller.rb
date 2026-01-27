@@ -52,7 +52,7 @@ class V1::HealthClinicsController < V1Controller
   end
 
   def clinic_params
-    params.require(:health_clinic).permit(:name, :health_system_id)
+    params.expect(health_clinic: %i[name health_system_id])
   end
 
   def with_deleted?
