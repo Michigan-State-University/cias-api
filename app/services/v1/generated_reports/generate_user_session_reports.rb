@@ -54,7 +54,21 @@ class V1::GeneratedReports::GenerateUserSessionReports
   end
 
   def report_templates
-    session.report_templates.includes(:variants, sections: [variants: [image_attachment: :blob]])
+    ids = third_party_selected_template_ids
+    templates = session.report_templates.includes(:variants, sections: [variants: [image_attachment: :blob]])
+
+    if ids.present?
+      templates.where(report_for: 'participant')
+               .or(templates.where(report_for: 'third_party', id: ids))
+    else
+      templates.where(report_for: 'participant')
+    end
+  end
+
+  def third_party_selected_template_ids
+    Answer::ThirdParty.where(user_session_id: user_session.id).flat_map do |answer|
+      answer.body_data&.first&.dig('report_template_ids') || []
+    end.uniq
   end
 
   def all_var_values
