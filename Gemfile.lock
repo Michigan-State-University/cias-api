@@ -425,7 +425,9 @@ GEM
       childprocess (>= 0.6.3, < 6)
       iniparse (~> 1.4)
       rexml (>= 3.3.9)
-    pagy (4.11.0)
+    pagy (43.2.6)
+      json
+      yaml
     paper_trail (17.0.0)
       activerecord (>= 7.1)
       request_store (~> 1.4)
@@ -664,6 +666,7 @@ GEM
     wkhtmltopdf-heroku (3.0.0)
     xml-simple (1.1.9)
       rexml
+    yaml (0.4.0)
     zeitwerk (2.7.4)
     zlib (3.2.1)
 
@@ -721,7 +724,7 @@ DEPENDENCIES
   nokogiri (>= 1.18.9)
   oj
   overcommit
-  pagy (~> 4.0)
+  pagy (~> 43.2)
   paper_trail (~> 17.0.0)
   paranoia
   pg (~> 1.2)
