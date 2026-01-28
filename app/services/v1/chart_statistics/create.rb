@@ -13,7 +13,23 @@ class V1::ChartStatistics::Create
 
   def call
     return if health_clinic.nil?
-    return if dentaku_service.exist_missing_variables?
+
+    if dentaku_service.exist_missing_variables?
+      missing_vars = dentaku_service.dentaku_calculator.dependencies(formula['payload'])
+      invalid_vars = chart.validate_formula_variables(missing_vars, user_session.session.intervention)
+
+      if invalid_vars.any?
+        Rails.logger.error(
+          "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
+          "chart formula references variables that don't exist in any session question: " \
+          "invalid_variables=#{invalid_vars.inspect}"
+        )
+        return
+      end
+
+      valid_vars = missing_vars - invalid_vars
+      Rails.logger.info("ChartStatistics::Create chart_id=#{chart.id}: missing variables from unselected options (will be set to 0): #{valid_vars.inspect}")
+    end
     return if zero_division_error?
     return unless inside_date_range?
 
