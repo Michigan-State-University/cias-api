@@ -264,6 +264,7 @@ RSpec.describe CloneJobs::Session, type: :job do
             'position' => 4,
             'body' => {
               'data' => [{
+                'id' => anything,
                 'payload' => '',
                 'value' => '',
                 'report_template_ids' => [outcome_report_templates.where(name: last_third_party_report_template.name).last.id]

@@ -61,7 +61,15 @@ class V1::UserInterventionsController < V1Controller
   end
 
   def user_intervention_scope
-    UserIntervention.joins(:intervention)
+    UserIntervention.includes(:user, intervention: [:intervention_accesses, { files_attachments: :blob }])
+                    .accessible_by(current_ability)
+                    .order(created_at: :desc)
+                    .where(intervention: { status: %w[published paused] })
+  end
+
+  def user_intervention_extended_scope
+    UserIntervention.includes(:user, :user_sessions,
+                              intervention: [{ sessions: %i[sms_codes google_language] }, :intervention_accesses, { files_attachments: :blob }])
                     .accessible_by(current_ability)
                     .order(created_at: :desc)
                     .where(intervention: { status: %w[published paused] })

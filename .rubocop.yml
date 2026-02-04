@@ -6,7 +6,7 @@ require:
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.1.7
+  TargetRubyVersion: 3.3.8
   Exclude:
     - 'bin/*'
     - 'db/schema.rb'
@@ -156,6 +156,11 @@ Metrics/ParameterLists:
   Exclude:
     - 'app/services/api/epic_on_fhir/patient_verification.rb'
     - 'app/jobs/sms_plans/send_sms_job.rb'
+
+Metrics/ModuleLength:
+  Enabled: true
+  Exclude:
+    - 'app/services/concerns/sms_helper.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

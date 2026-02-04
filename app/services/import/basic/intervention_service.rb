@@ -14,10 +14,11 @@ class Import::Basic::InterventionService
     @user = User.find(user_id)
     @logo = intervention_hash.delete(:logo)
     @sessions_hash = intervention_hash.delete(:sessions)
+    @tags_hash = intervention_hash.delete(:tags)
     @intervention_hash = intervention_hash
   end
 
-  attr_reader :user, :logo, :intervention_hash, :sessions_hash
+  attr_reader :user, :logo, :intervention_hash, :sessions_hash, :tags_hash
   attr_accessor :intervention
 
   def call
@@ -31,6 +32,10 @@ class Import::Basic::InterventionService
 
     sessions_hash&.each do |session_hash|
       get_import_service_class(session_hash, Session).call(intervention.id, session_hash)
+    end
+
+    tags_hash&.each do |tag_hash|
+      get_import_service_class(tag_hash, Tag).call(intervention.id, tag_hash)
     end
 
     set_branching_and_reflections!

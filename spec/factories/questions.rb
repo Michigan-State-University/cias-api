@@ -126,6 +126,32 @@ FactoryBot.define do
       }
     end
     association :question_group
+
+    trait :with_dashboard_button do
+      settings do
+        {
+          image: false,
+          video: false,
+          title: true,
+          subtitle: true,
+          narrator_skippable: false,
+          show_dashboard_button: true
+        }
+      end
+    end
+
+    trait :without_dashboard_button do
+      settings do
+        {
+          image: false,
+          video: false,
+          title: true,
+          subtitle: true,
+          narrator_skippable: false,
+          show_dashboard_button: false
+        }
+      end
+    end
   end
 
   factory :question_follow_up_contact, class: Question::FollowUpContact do

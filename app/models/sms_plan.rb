@@ -26,7 +26,7 @@ class SmsPlan < ApplicationRecord
 
   ATTR_NAMES_TO_COPY = %w[
     name schedule schedule_payload frequency end_at formula no_formula_text is_used_formula
-    include_first_name include_last_name include_email include_phone_number type
+    include_first_name include_last_name include_email include_phone_number type sms_send_time_type sms_send_time_details
   ].freeze
 
   enum :schedule, {
@@ -41,6 +41,12 @@ class SmsPlan < ApplicationRecord
     once_a_week: 'once_a_week',
     once_a_month: 'once_a_month'
   }, suffix: true
+
+  enum :sms_send_time_type, {
+    preferred_by_participant: 'preferred_by_participant',
+    specific_time: 'specific_time',
+    time_range: 'time_range'
+  }, prefix: true
 
   def translate_no_formula_text(translator, source_language_name_short, destination_language_name_short)
     translate_attribute('no_formula_text', no_formula_text, translator, source_language_name_short, destination_language_name_short)

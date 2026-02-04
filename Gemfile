@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '3.1.7'
+ruby '3.3.8'
 gem 'bundler', '~> 2.4.22'
 
 gem 'rails', '~> 7.2.0'
@@ -13,7 +13,7 @@ gem 'activejob-cancel'
 gem 'activerecord_json_validator'
 gem 'activestorage', '>= 6.1.4.7'
 gem 'active_storage_validations'
-gem 'active_model_serializers', '~> 0.10.0'
+gem 'active_model_serializers', '~> 0.10.16'
 gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
@@ -43,7 +43,7 @@ gem 'redis'
 gem 'kredis', '~> 1.5'
 gem 'sidekiq', '>= 7.2.4'
 gem 'sql_query'
-gem 'twilio-ruby', '~> 6.0.1'
+gem 'twilio-ruby', '~> 7.9.0'
 gem 'wicked_pdf'
 gem 'rack', '>= 3.1.18'
 gem 'rack-attack'
@@ -57,18 +57,18 @@ gem 'blind_index'
 gem 'logstop'
 gem 'countries'
 # for Audit trail and audit log
-gem 'paper_trail'
+gem 'paper_trail', '~> 17.0.0'
 # for soft delete
 gem 'paranoia'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
-gem 'sentry-rails', '~> 5.7'
-gem 'jwt', '~> 2.6'
+gem 'sentry-rails', '~> 5.28'
+gem 'jwt', '~> 3.1'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
 gem 'audited'
-gem 'uri', '>= 1.0.4'
+gem 'uri', '>= 1.1.1'
 
 group :development, :test do
   gem 'bundler-audit'
@@ -115,5 +115,5 @@ group :test do
 end
 
 group :production do
-  gem 'aws-sdk-s3'
+  gem 'aws-sdk-s3', '>= 1.208.0'
 end

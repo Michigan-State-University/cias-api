@@ -106,6 +106,8 @@ class V1::SessionsController < V1Controller
 
   def sessions_scope
     session_service.sessions(params[:include_multiple_sessions])
+                   .includes(:sms_codes, :google_language,
+                             intervention: %i[logo_attachment user])
   end
 
   def session_id

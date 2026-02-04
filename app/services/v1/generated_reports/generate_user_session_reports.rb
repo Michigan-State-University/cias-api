@@ -19,6 +19,7 @@ class V1::GeneratedReports::GenerateUserSessionReports
     end
 
     user_session.reload
+    update_generated_reports_count
 
     V1::GeneratedReports::ShareToParticipant.call(user_session)
     V1::GeneratedReports::ShareToThirdParty.call(user_session)
@@ -27,6 +28,10 @@ class V1::GeneratedReports::GenerateUserSessionReports
   private
 
   attr_reader :user_session
+
+  def update_generated_reports_count
+    session.update(generated_report_count: GeneratedReport.joins(:user_session).where(user_sessions: { session_id: session.id }).size)
+  end
 
   def dentaku_service
     @dentaku_service ||= Calculations::DentakuService.new(all_var_values)
@@ -41,7 +46,7 @@ class V1::GeneratedReports::GenerateUserSessionReports
   end
 
   def session
-    user_session.session
+    @session ||= user_session.session
   end
 
   def answers
@@ -49,7 +54,21 @@ class V1::GeneratedReports::GenerateUserSessionReports
   end
 
   def report_templates
-    session.report_templates.includes(:variants, sections: [variants: [image_attachment: :blob]])
+    ids = third_party_selected_template_ids
+    templates = session.report_templates.includes(:variants, sections: [variants: [image_attachment: :blob]])
+
+    if ids.present?
+      templates.where(report_for: 'participant')
+               .or(templates.where(report_for: 'third_party', id: ids))
+    else
+      templates.where(report_for: 'participant')
+    end
+  end
+
+  def third_party_selected_template_ids
+    Answer::ThirdParty.where(user_session_id: user_session.id).flat_map do |answer|
+      answer.body_data&.first&.dig('report_template_ids') || []
+    end.uniq
   end
 
   def all_var_values

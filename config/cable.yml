@@ -11,3 +11,5 @@ production:
   # required for load balancer usage on production
   url: <%= ENV.fetch("CABLE_REDIS_URL") { ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } } %>
   channel_prefix: cias-api_production
+  ssl_params:
+    verify_mode: <%= ENV.fetch("REDIS_SSL_VERIFY", "false") == "true" ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE %>

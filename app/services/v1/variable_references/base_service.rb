@@ -59,4 +59,42 @@ class V1::VariableReferences::BaseService
     update_sql = build_text_formula_update_sql('report_template_sections', 'formula', old_var, new_var, base_query)
     ActiveRecord::Base.connection.execute(update_sql)
   end
+
+  def update_report_template_sections_scoped(session, old_var, new_var, exclude_source_session: false)
+    base_query = build_report_template_variant_base_query(session, exclude_source_session)
+    update_sql = build_variant_content_update_sql('report_template_section_variants', old_var, new_var, base_query)
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
+
+  def update_days_after_date_variable_references(old_var, new_var)
+    update_sql = <<-SQL.squish
+      UPDATE sessions
+      SET days_after_date_variable_name = #{ActiveRecord::Base.connection.quote(new_var)}
+      WHERE days_after_date_variable_name = #{ActiveRecord::Base.connection.quote(old_var)}
+    SQL
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
+
+  def update_days_after_date_session_variable_references(old_var, new_var)
+    update_sql = <<-SQL.squish
+      UPDATE sessions
+      SET days_after_date_variable_name = REPLACE(days_after_date_variable_name, #{ActiveRecord::Base.connection.quote(old_var)}, #{ActiveRecord::Base.connection.quote(new_var)})
+      WHERE days_after_date_variable_name ILIKE #{ActiveRecord::Base.connection.quote("#{old_var}%")}
+    SQL
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
+
+  def update_sms_plan_formulas_scoped(session, old_var, new_var, exclude_source_session: false)
+    base_query = build_sms_plan_base_query(session, exclude_source_session)
+
+    update_formula_sql = build_text_formula_update_sql('sms_plans', 'formula', old_var, new_var, base_query)
+    ActiveRecord::Base.connection.execute(update_formula_sql)
+
+    update_no_formula_sql = build_text_formula_update_sql('sms_plans', 'no_formula_text', old_var, new_var, base_query)
+    ActiveRecord::Base.connection.execute(update_no_formula_sql)
+
+    variant_base_query = build_sms_plan_variant_base_query(session, exclude_source_session)
+    update_variant_content_sql = build_text_formula_update_sql('sms_plan_variants', 'content', old_var, new_var, variant_base_query)
+    ActiveRecord::Base.connection.execute(update_variant_content_sql)
+  end
 end
