@@ -44,7 +44,10 @@ class V1::VariableReferences::SessionService < V1::VariableReferences::BaseServi
     update_question_group_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
     update_session_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
     update_report_template_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
+    update_report_template_sections_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
+    update_sms_plan_formulas_scoped(session, old_pattern, new_pattern, exclude_source_session: true)
     update_chart_formulas(session.intervention_id, old_pattern, new_pattern)
+    update_days_after_date_session_variable_references(@old_session_variable, @new_session_variable)
   end
 
   def extract_question_variables_from_session(session)

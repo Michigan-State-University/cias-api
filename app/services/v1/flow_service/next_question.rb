@@ -39,10 +39,7 @@ class V1::FlowService::NextQuestion
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
 
-    if question.type == 'Question::Finish'
-      assign_next_session_id(user_session.session.intervention)
-      user_session.finish
-    end
+    handle_finish_screen if question.type == 'Question::Finish'
 
     return question unless user_session.user.role?('predefined_participant')
     return question unless question.is_a?(Question::ParticipantReport)
@@ -50,7 +47,13 @@ class V1::FlowService::NextQuestion
     question_group = question.question_group
     question = question_group.questions.find_by(position: (question.position + 1))
     question ||= user_session.session.question_groups.where('position > ?', question_group.position).order(:position).first.questions.order(:position).first
+    handle_finish_screen if question.type == 'Question::Finish'
     question
+  end
+
+  def handle_finish_screen
+    assign_next_session_id(user_session.session.intervention)
+    user_session.finish
   end
 
   def assign_next_session_id(intervention)

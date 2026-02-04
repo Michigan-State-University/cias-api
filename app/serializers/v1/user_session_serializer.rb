@@ -1,17 +1,16 @@
 # frozen_string_literal: true
 
 class V1::UserSessionSerializer < V1Serializer
-  attributes :finished_at, :last_answer_at, :type, :user_intervention_id, :filled_out_count, :started
+  attributes :finished_at, :last_answer_at, :type, :user_intervention_id, :filled_out_count, :started, :session_id
 
   attribute :logo_url do |object|
-    intervention_id = Session.find(object.session_id).intervention_id
-    url_for(Intervention.find(intervention_id).logo) if Intervention.find(intervention_id).logo.attached?
+    logo = object.session.intervention.logo
+    url_for(logo) if logo.attached?
   end
 
   attribute :image_alt do |object|
-    intervention_id = Session.find(object.session_id).intervention_id
-    intervention = Intervention.find(intervention_id)
-    intervention.logo_blob.description if intervention.logo_blob.present?
+    logo_blob = object.session.intervention.logo_blob
+    logo_blob.description if logo_blob.present?
   end
 
   attribute :language_name do |object|
@@ -20,10 +19,6 @@ class V1::UserSessionSerializer < V1Serializer
 
   attribute :language_code do |object|
     object.session.google_language.language_code
-  end
-
-  attribute :session_id do |object|
-    object.session.id
   end
 
   attribute :session_name do |object|

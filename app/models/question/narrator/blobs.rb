@@ -47,6 +47,8 @@ class Question::Narrator::Blobs
   private
 
   def body(block)
+    return if block['sha256'].blank?
+
     ids.concat(block['sha256'])
   end
 

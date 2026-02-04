@@ -95,6 +95,87 @@ RSpec.describe 'POST /v1/sms_plans', type: :request do
         expect(response).to have_http_status(:created)
       end
     end
+
+    context 'with defined specific_time sms_send_time_type' do
+      let(:params) do
+        {
+          sms_plan: {
+            name: 'sms plan with specific time',
+            session_id: session.id,
+            schedule: SmsPlan.schedules[:after_session_end],
+            frequency: SmsPlan.frequencies[:once],
+            no_formula_text: 'test text',
+            is_used_formula: false,
+            type: 'SmsPlan::Normal',
+            sms_send_time_type: 'specific_time',
+            sms_send_time_details: { time: '14:30' }
+          }
+        }
+      end
+
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates sms plan with specific_time type' do
+        expect { request }.to change(SmsPlan, :count).by(1)
+        expect(SmsPlan.find(response.parsed_body['data']['id'])).to have_attributes(
+          sms_send_time_type: 'specific_time',
+          sms_send_time_details: { 'time' => '14:30' }
+        )
+      end
+
+      it 'returns correct data in response' do
+        request
+
+        expect(json_response['data']['attributes']).to include(
+          'sms_send_time_type' => 'specific_time',
+          'sms_send_time_details' => { 'time' => '14:30' }
+        )
+      end
+    end
+
+    context 'when creating sms plan with time_range type' do
+      let(:params) do
+        {
+          sms_plan: {
+            name: 'sms plan with time range',
+            session_id: session.id,
+            schedule: SmsPlan.schedules[:after_session_end],
+            frequency: SmsPlan.frequencies[:once],
+            no_formula_text: 'test text',
+            is_used_formula: false,
+            type: 'SmsPlan::Normal',
+            sms_send_time_type: 'time_range',
+            sms_send_time_details: { from: '9', to: '17' }
+          }
+        }
+      end
+
+      it 'returns :created status' do
+        request
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'creates sms plan with time_range type' do
+        expect { request }.to change(SmsPlan, :count).by(1)
+
+        expect(SmsPlan.find(response.parsed_body['data']['id'])).to have_attributes(
+          sms_send_time_type: 'time_range',
+          sms_send_time_details: { 'from' => '9', 'to' => '17' }
+        )
+      end
+
+      it 'returns correct data in response' do
+        request
+
+        expect(json_response['data']['attributes']).to include(
+          'sms_send_time_type' => 'time_range',
+          'sms_send_time_details' => { 'from' => '9', 'to' => '17' }
+        )
+      end
+    end
   end
 
   context 'when params are invalid' do

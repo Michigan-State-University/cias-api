@@ -9,6 +9,7 @@ class Clone::SmsPlan < Clone::Base
       create_alert_phones
       create_sms_links
     end
+    attach_no_formula_attachment
     outcome
   end
 
@@ -16,8 +17,15 @@ class Clone::SmsPlan < Clone::Base
 
   def create_sms_variants
     source.variants.find_each do |variant|
-      outcome.variants << SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
+      newly_created_variant = SmsPlan::Variant.create(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY).merge(sms_plan_id: outcome.id))
+      newly_created_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
     end
+  end
+
+  def attach_no_formula_attachment
+    return unless source.no_formula_attachment.attached?
+
+    outcome.no_formula_attachment.attach(source.no_formula_attachment.blob)
   end
 
   def create_alert_phones

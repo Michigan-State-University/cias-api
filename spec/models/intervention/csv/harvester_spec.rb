@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Intervention::Csv::Harvester, type: :model do
-  subject { described_class.new(intervention.sessions) }
+  subject { described_class.new(intervention.sessions, nil) }
 
   let(:user) { create(:user, :confirmed, :admin) }
 
@@ -679,7 +679,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
 
         context 'when more than 1 session is finished' do
-          subject { described_class.new(intervention1.sessions) }
+          subject { described_class.new(intervention1.sessions, nil) }
 
           let!(:question_body) do
             {
@@ -1281,6 +1281,240 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
           expect(subject.rows.length).to eq(1)
           expect(subject.rows.first[0]).to eq(user.id)
+        end
+      end
+    end
+
+    describe 'private methods' do
+      let!(:intervention) { create(:intervention) }
+      let(:sms_session) { create(:sms_session, intervention: intervention) }
+      let(:classic_session) { create(:session, intervention: intervention, multiple_fill: true) }
+      let(:classic_session_no_fill) { create(:session, intervention: intervention, multiple_fill: false) }
+      let!(:sms_user_session) { create(:sms_user_session, user: user, session: sms_session) }
+      let!(:classic_user_session) { create(:user_session, user: user, session: classic_session, number_of_attempts: 2) }
+      let!(:question_group) { create(:sms_question_group, session: sms_session, position: 1) }
+      let!(:question) do
+        create(:question_sms, question_group: question_group,
+                              body: { 'data' => [{ 'value' => '1', 'payload' => 'Option 1' }], 'variable' => { 'name' => 'test' } },
+                              position: 1)
+      end
+
+      describe '#multiple_fill_indicator_for' do
+        context 'when session is Session::Sms' do
+          context 'with single attempt' do
+            let!(:answer) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session) }
+
+            it 'returns false when only one attempt exists' do
+              subject.collect
+              expect(subject.send(:multiple_fill_indicator_for, sms_session)).to be(false)
+            end
+          end
+
+          context 'with multiple attempts' do
+            let!(:answer1) do
+              create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session,
+                                  created_at: 2.hours.ago)
+            end
+            let!(:answer2) do
+              create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '2' }] }, user_session: sms_user_session,
+                                  created_at: 1.hour.ago)
+            end
+
+            it 'returns true when multiple attempts exist' do
+              subject.collect
+              expect(subject.send(:multiple_fill_indicator_for, sms_session)).to be(true)
+            end
+          end
+        end
+
+        context 'when session is Session::Classic' do
+          it 'returns the value of session.multiple_fill when true' do
+            subject.collect
+            expect(subject.send(:multiple_fill_indicator_for, classic_session)).to be(true)
+          end
+
+          it 'returns the value of session.multiple_fill when false' do
+            subject.collect
+            expect(subject.send(:multiple_fill_indicator_for, classic_session_no_fill)).to be(false)
+          end
+        end
+      end
+
+      describe '#calculate_number_of_attempts_for' do
+        context 'when user_session is for Session::Sms' do
+          let!(:answer1) do
+            create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session,
+                                created_at: 2.hours.ago)
+          end
+          let!(:answer2) do
+            create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '2' }] }, user_session: sms_user_session,
+                                created_at: 1.hour.ago)
+          end
+
+          it 'calculates attempts based on answer count, not number_of_attempts attribute' do
+            subject.collect
+            expect(subject.send(:calculate_number_of_attempts_for, sms_user_session)).to eq(2)
+          end
+        end
+
+        context 'when user_session is for Session::Classic' do
+          it 'returns the number_of_attempts attribute value' do
+            subject.collect
+            expect(subject.send(:calculate_number_of_attempts_for, classic_user_session)).to eq(2)
+          end
+        end
+      end
+
+      describe '#calculate_answer_attempt' do
+        context 'when answer belongs to Session::Sms' do
+          let!(:answer1) do
+            create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session,
+                                created_at: 3.hours.ago)
+          end
+          let!(:answer2) do
+            create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '2' }] }, user_session: sms_user_session,
+                                created_at: 2.hours.ago)
+          end
+          let!(:answer3) do
+            create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '3' }] }, user_session: sms_user_session,
+                                created_at: 1.hour.ago)
+          end
+
+          it 'calculates attempt number based on created_at order starting from 1' do
+            subject.collect
+            user_session_answers = sms_user_session.answers
+
+            expect(subject.send(:calculate_answer_attempt, answer1, user_session_answers)).to eq(1)
+            expect(subject.send(:calculate_answer_attempt, answer2, user_session_answers)).to eq(2)
+            expect(subject.send(:calculate_answer_attempt, answer3, user_session_answers)).to eq(3)
+          end
+
+          it 'handles answers in non-sequential creation order' do
+            subject.collect
+            # Even if we fetch them out of order, they should be numbered by created_at
+            user_session_answers = sms_user_session.answers
+
+            expect(subject.send(:calculate_answer_attempt, answer3, user_session_answers)).to eq(3)
+            expect(subject.send(:calculate_answer_attempt, answer1, user_session_answers)).to eq(1)
+            expect(subject.send(:calculate_answer_attempt, answer2, user_session_answers)).to eq(2)
+          end
+        end
+
+        context 'when answer belongs to Session::Classic' do
+          let!(:classic_question_group) { create(:question_group_plain, session: classic_session) }
+          let!(:classic_question) do
+            create(:question_single, question_group: classic_question_group,
+                                     body: { 'data' => [{ 'value' => '1', 'payload' => '' }], 'variable' => { 'name' => 'classic_test' } }, position: 1)
+          end
+          let!(:classic_answer) do
+            create(:answer_single, question: classic_question, body: { 'data' => [{ 'var' => 'classic_test', 'value' => '1' }] },
+                                   user_session: classic_user_session)
+          end
+
+          it 'returns the user_session number_of_attempts attribute' do
+            subject.collect
+            user_session_answers = classic_user_session.answers
+
+            expect(subject.send(:calculate_answer_attempt, classic_answer, user_session_answers)).to eq(2)
+          end
+        end
+      end
+
+      describe '#number_of_attempts' do
+        context 'when session is Session::Sms' do
+          context 'with single attempt per question' do
+            let!(:answer) { create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session) }
+
+            it 'returns 1' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, sms_session)).to eq(1)
+            end
+          end
+
+          context 'with multiple attempts per question' do
+            let!(:answer1) do
+              create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session,
+                                  created_at: 2.hours.ago)
+            end
+            let!(:answer2) do
+              create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '2' }] }, user_session: sms_user_session,
+                                  created_at: 1.hour.ago)
+            end
+            let!(:answer3) do
+              create(:answer_sms, question: question, body: { 'data' => [{ 'var' => 'test', 'value' => '3' }] }, user_session: sms_user_session,
+                                  created_at: 30.minutes.ago)
+            end
+
+            it 'returns the maximum number of answers per question' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, sms_session)).to eq(3)
+            end
+          end
+
+          context 'with multiple questions and different attempt counts' do
+            let!(:question2) do
+              create(:question_sms, question_group: question_group,
+                                    body: { 'data' => [{ 'value' => '1', 'payload' => 'Option 1' }], 'variable' => { 'name' => 'test2' } },
+                                    position: 2)
+            end
+            let!(:answer1_q1) do
+              create(:answer_sms, question: question,
+                                  body: { 'data' => [{ 'var' => 'test', 'value' => '1' }] }, user_session: sms_user_session,
+                                  created_at: 3.hours.ago)
+            end
+            let!(:answer2_q1) do
+              create(:answer_sms, question: question,
+                                  body: { 'data' => [{ 'var' => 'test', 'value' => '2' }] }, user_session: sms_user_session,
+                                  created_at: 2.hours.ago)
+            end
+            let!(:answer1_q2) do
+              create(:answer_sms, question: question2,
+                                  body: { 'data' => [{ 'var' => 'test2', 'value' => '1' }] }, user_session: sms_user_session,
+                                  created_at: 1.hour.ago)
+            end
+
+            it 'returns the maximum attempt count across all questions' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, sms_session)).to eq(2)
+            end
+          end
+
+          context 'with no user sessions' do
+            let(:empty_sms_session) { create(:sms_session, intervention: intervention) }
+
+            it 'returns 1 as default' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, empty_sms_session)).to eq(1)
+            end
+          end
+        end
+
+        context 'when session is Session::Classic' do
+          context 'with single user session' do
+            it 'returns the maximum number_of_attempts from user_sessions' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, classic_session)).to eq(2)
+            end
+          end
+
+          context 'with multiple user sessions with different attempt numbers' do
+            let!(:user2) { create(:user, :confirmed, :admin) }
+            let!(:classic_user_session2) { create(:user_session, user: user2, session: classic_session, number_of_attempts: 5) }
+
+            it 'returns the highest number_of_attempts' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, classic_session)).to eq(5)
+            end
+          end
+
+          context 'with no user sessions' do
+            let(:empty_classic_session) { create(:session, intervention: intervention) }
+
+            it 'returns 1 as default' do
+              subject.collect
+              expect(subject.send(:number_of_attempts, empty_classic_session)).to eq(1)
+            end
+          end
         end
       end
     end

@@ -63,7 +63,7 @@ Our goal is for cost to never be a barrier. This code is available to anyone at 
 - `$ git clone git@github.com:Michigan-State-University/cias-api.git`
 - `$ cd cias-api`
 - `$ cp .env.template .env`
-- Install `ruby 3.1.7`
+- Install `ruby 3.3.8`
 - Install `PostgreSQL`
 - Install `bundler`
 - Create database user
@@ -78,7 +78,7 @@ Our goal is for cost to never be a barrier. This code is available to anyone at 
 
 ## PRODUCTION SETUP
 
-- Install `ruby 3.1.7`
+- Install `ruby 3.3.8`
 - Install `PostgreSQL`
 - Install `bundler`
 - Create database user

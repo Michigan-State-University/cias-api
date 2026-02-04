@@ -36,10 +36,19 @@ class V1::QuestionGroup::CreateService
     return if questions_params.blank?
 
     questions_params.each do |question_params|
+      extend_question_params(question_params)
       Question.create!(question_group_id: question_group.id,
                        position: question_group.questions.last&.position.to_i + 1,
                        **question_params.permit(:type, :title, :subtitle, :video_url, narrator: {}, settings: {},
                                                                                       formula: {}, body: {}))
+    end
+  end
+
+  def extend_question_params(question_params)
+    return unless question_params['type'].in?(%w[Question::Single Question::Multiple Question::ThirdParty])
+
+    question_params.dig(:body, :data).each do |answer_params|
+      answer_params[:id] = SecureRandom.uuid
     end
   end
 end
