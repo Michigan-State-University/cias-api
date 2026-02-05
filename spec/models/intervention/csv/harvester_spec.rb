@@ -1518,5 +1518,112 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
     end
+
+    describe 'SMS phone number tracking' do
+      context 'when intervention contains SMS session' do
+        subject { described_class.new(intervention.sessions, nil) }
+
+        let!(:intervention) { create(:intervention) }
+        let(:sms_session) { create(:sms_session, intervention: intervention) }
+        let!(:sms_user_session) do
+          create(:sms_user_session, user: user, session: sms_session,
+                                    sms_phone_prefix: '+1',
+                                    sms_phone_number: '5551234567')
+        end
+
+        it 'includes sms_participant.phone_number header' do
+          subject.collect
+          expect(subject.header).to include('sms_participant.phone_number')
+        end
+
+        it 'populates phone number in the row data' do
+          subject.collect
+          phone_index = subject.header.index('sms_participant.phone_number')
+          expect(subject.rows.first[phone_index]).to eq('+15551234567')
+        end
+      end
+
+      context 'when intervention contains only classic sessions' do
+        subject { described_class.new(intervention.sessions, nil) }
+
+        let!(:intervention) { create(:intervention) }
+        let(:classic_session) { create(:session, intervention: intervention) }
+        let!(:classic_user_session) { create(:user_session, user: user, session: classic_session) }
+
+        it 'does not include sms_participant.phone_number header' do
+          subject.collect
+          expect(subject.header).not_to include('sms_participant.phone_number')
+        end
+      end
+
+      context 'when SMS user session has no phone data' do
+        subject { described_class.new(intervention.sessions, nil) }
+
+        let!(:intervention) { create(:intervention) }
+        let(:sms_session) { create(:sms_session, intervention: intervention) }
+        let!(:sms_user_session) do
+          create(:sms_user_session, user: user, session: sms_session,
+                                    sms_phone_prefix: nil,
+                                    sms_phone_number: nil)
+        end
+
+        it 'includes the header but has nil value' do
+          subject.collect
+          expect(subject.header).to include('sms_participant.phone_number')
+          phone_index = subject.header.index('sms_participant.phone_number')
+          expect(subject.rows.first[phone_index]).to be_nil
+        end
+      end
+
+      context 'when user has multiple SMS sessions with phone data' do
+        subject { described_class.new(intervention.sessions, nil) }
+
+        let!(:intervention) { create(:intervention) }
+        let(:sms_session1) { create(:sms_session, intervention: intervention, position: 1) }
+        let(:sms_session2) { create(:sms_session, intervention: intervention, position: 2) }
+        let!(:sms_user_session1) do
+          create(:sms_user_session, user: user, session: sms_session1,
+                                    sms_phone_prefix: '+1',
+                                    sms_phone_number: '5551234567')
+        end
+        let!(:sms_user_session2) do
+          create(:sms_user_session, user: user, session: sms_session2,
+                                    sms_phone_prefix: '+1',
+                                    sms_phone_number: '5559876543')
+        end
+
+        it 'uses phone number from first SMS session with phone data' do
+          subject.collect
+          phone_index = subject.header.index('sms_participant.phone_number')
+          # Should use the first non-nil phone number found
+          expect(subject.rows.first[phone_index]).to eq('+15551234567')
+        end
+      end
+
+      context 'when intervention has mixed session types' do
+        subject { described_class.new(intervention.sessions, nil) }
+
+        let!(:intervention) { create(:intervention) }
+        let(:classic_session) { create(:session, intervention: intervention, position: 1) }
+        let(:sms_session) { create(:sms_session, intervention: intervention, position: 2) }
+        let!(:classic_user_session) { create(:user_session, user: user, session: classic_session) }
+        let!(:sms_user_session) do
+          create(:sms_user_session, user: user, session: sms_session,
+                                    sms_phone_prefix: '+48',
+                                    sms_phone_number: '555777888')
+        end
+
+        it 'includes sms_participant.phone_number header' do
+          subject.collect
+          expect(subject.header).to include('sms_participant.phone_number')
+        end
+
+        it 'correctly populates phone data from SMS session' do
+          subject.collect
+          phone_index = subject.header.index('sms_participant.phone_number')
+          expect(subject.rows.first[phone_index]).to eq('+48555777888')
+        end
+      end
+    end
   end
 end

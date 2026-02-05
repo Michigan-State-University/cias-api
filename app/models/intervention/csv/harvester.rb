@@ -49,6 +49,7 @@ class Intervention::Csv::Harvester
     end
 
     header.unshift(hf_headers(sessions))
+    header.unshift(sms_phone_headers(sessions))
     header.unshift(predefined_user_headers(sessions))
     header.flatten!
     header.unshift(:email)
@@ -105,6 +106,7 @@ class Intervention::Csv::Harvester
       initialize_row
       set_user_data(row_index, grouped_user_sessions.second.first)
       predefined_user_data(row_index, grouped_user_sessions.second.first.user)
+      sms_phone_data(row_index, grouped_user_sessions.second)
 
       grouped_user_sessions.second.each do |user_session|
         number_of_attempts = calculate_number_of_attempts_for(user_session)
@@ -296,6 +298,24 @@ class Intervention::Csv::Harvester
 
       rows[row_index][var_index] = user.send(column)
     end
+  end
+
+  def sms_phone_headers(sessions)
+    return [] unless sessions.any? { |session| session.type == 'Session::Sms' }
+
+    ['sms_participant.phone_number']
+  end
+
+  def sms_phone_data(row_index, grouped_user_sessions)
+    var_index = header.index('sms_participant.phone_number')
+    return if var_index.nil?
+
+    # Find the first SMS user session with phone data
+    sms_user_session = grouped_user_sessions.find do |user_session|
+      user_session.is_a?(UserSession::Sms) && user_session.sms_full_number.present?
+    end
+
+    rows[row_index][var_index] = sms_user_session&.sms_full_number
   end
 
   def fill_hf_initial_screen(row_index, user_session)
