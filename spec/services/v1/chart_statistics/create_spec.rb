@@ -289,4 +289,78 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
   end
+
+  describe 'formula error handling' do
+    let(:user_session_finished_at) { DateTime.now }
+
+    context 'when formula has syntax errors' do
+      let(:formula) do
+        {
+          'payload' => 'session_var.fruit + * 5', # Invalid syntax
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the error with chart details' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /ChartStatistics::Create SKIPPED chart_id=#{chart.id}.*formula evaluation failed/
+        )
+      end
+
+      it 'returns nil to allow other processing to continue' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'when formula has tokenizer errors' do
+      let(:formula) do
+        {
+          'payload' => 'session_var.fruit +++', # Tokenizer error
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the formula that caused the error' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /Formula: session_var\.fruit \+\+\+/
+        )
+      end
+    end
+
+    context 'when formula references undefined function' do
+      let(:formula) do
+        {
+          'payload' => 'INVALID_FUNC(session_var.fruit)', # Undefined function
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the error message' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /formula evaluation failed.*#{chart.name}/
+        )
+      end
+    end
+  end
 end

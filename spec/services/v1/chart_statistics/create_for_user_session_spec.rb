@@ -182,4 +182,81 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
       expect { subject }.not_to change(ChartStatistic, :count)
     end
   end
+
+  context 'when one chart has formula errors but others are valid' do
+    let_it_be(:good_formula) do
+      { 'payload' => "#{session_var}.color",
+        'patterns' => [
+          {
+            'match' => '=1',
+            'label' => 'Valid',
+            'color' => '#C766EA'
+          }
+        ],
+        'default_pattern' => {
+          'label' => 'Other',
+          'color' => '#E2B1F4'
+        } }
+    end
+
+    let_it_be(:bad_formula) do
+      { 'payload' => 'session_var.color + * invalid', # Invalid syntax
+        'patterns' => [
+          {
+            'match' => '=1',
+            'label' => 'Bad',
+            'color' => '#C766EA'
+          }
+        ],
+        'default_pattern' => {
+          'label' => 'Other',
+          'color' => '#E2B1F4'
+        } }
+    end
+
+    before_all do
+      RSpec::Mocks.with_temporary_scope do
+        allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+        session = create(:session, intervention: intervention, variable: session_var)
+        question_group = create(:question_group, session: session)
+        create(:question_single, question_group: question_group,
+                                 body: { data: [{ payload: 'Red', value: '1' }], variable: { name: 'color' } })
+        @user_session = create(:user_session, session: session, user: user, health_clinic: health_clinic)
+        create(:answer_single, user_session: @user_session, body: { data: [{ var: 'color', value: '1' }] })
+      end
+    end
+
+    let_it_be(:good_chart1) do
+      create(:chart, formula: good_formula, dashboard_section: dashboard_section, status: 'published',
+                     published_at: Time.current, chart_type: Chart.chart_types[:pie_chart])
+    end
+
+    let_it_be(:bad_chart) do
+      create(:chart, formula: bad_formula, dashboard_section: dashboard_section, status: 'published',
+                     published_at: Time.current, chart_type: Chart.chart_types[:pie_chart], name: 'Bad Chart')
+    end
+
+    let_it_be(:good_chart2) do
+      create(:chart, formula: good_formula, dashboard_section: dashboard_section, status: 'published',
+                     published_at: Time.current, chart_type: Chart.chart_types[:bar_chart])
+    end
+
+    it 'creates chart statistics for valid charts and skips the invalid one' do
+      # Should create 2 chart statistics (good_chart1 and good_chart2)
+      # Should skip bad_chart due to formula error
+      expect { subject }.to change(ChartStatistic, :count).by(2)
+    end
+
+    it 'logs error for the invalid chart' do
+      allow(Rails.logger).to receive(:error)
+      subject
+      expect(Rails.logger).to have_received(:error).with(
+        /ChartStatistics::Create SKIPPED chart_id=#{bad_chart.id}.*formula evaluation failed.*Bad Chart/
+      )
+    end
+
+    it 'does not raise an exception' do
+      expect { subject }.not_to raise_error
+    end
+  end
 end
