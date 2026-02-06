@@ -242,8 +242,6 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     end
 
     it 'creates chart statistics for valid charts and skips the invalid one' do
-      # Should create 2 chart statistics (good_chart1 and good_chart2)
-      # Should skip bad_chart due to formula error
       expect { subject }.to change(ChartStatistic, :count).by(2)
     end
 
