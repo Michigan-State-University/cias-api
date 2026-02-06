@@ -1130,9 +1130,9 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
 
         it 'save variables and metadata to csv without approach_number prefix' do
           subject.collect
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.sms_test", "#{session.variable}.metadata.session_start",
+          expect(subject.header).to eq [:user_id, :email, 'sms_participant.phone_number', "#{session.variable}.sms_test", "#{session.variable}.metadata.session_start",
                                         "#{session.variable}.metadata.session_end", "#{session.variable}.metadata.session_duration"]
-          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, '1', answer.user_session.answers.first.created_at, nil,
+          expect(subject.rows).to eq [[answer.user_session.user_id, answer.user_session.user.email, nil, '1', answer.user_session.answers.first.created_at, nil,
                                        nil]]
         end
       end
@@ -1175,7 +1175,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
           subject.collect
           p subject.header
           p subject.rows
-          expect(subject.header).to eq [:user_id, :email, "#{session.variable}.approach_number_1.sms_test",
+          expect(subject.header).to eq [:user_id, :email, 'sms_participant.phone_number', "#{session.variable}.approach_number_1.sms_test",
                                         "#{session.variable}.approach_number_1.metadata.session_start",
                                         "#{session.variable}.approach_number_1.metadata.session_end",
                                         "#{session.variable}.approach_number_1.metadata.session_duration",
@@ -1183,7 +1183,7 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
                                         "#{session.variable}.approach_number_2.metadata.session_start",
                                         "#{session.variable}.approach_number_2.metadata.session_end",
                                         "#{session.variable}.approach_number_2.metadata.session_duration"]
-          expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, '1', nil, nil, nil, '2', answer1.created_at, nil, nil]]
+          expect(subject.rows).to eq [[user_session.user_id, user_session.user.email, nil, '1', nil, nil, nil, '2', answer1.created_at, nil, nil]]
         end
 
         it 'correctly assigns attempt numbers starting from 1, not 0' do
