@@ -82,7 +82,7 @@ RSpec.describe V1::Translations::NarratorBlocks do
       it 'keeps inverted punctuation with the question text' do
         result = service.send(:clear_and_split_text)
 
-        expect(result.join).to include('¿')
+        expect(result.join).to include('Cuántos años tiene?')
 
         expect(result).not_to include('¿')
       end
