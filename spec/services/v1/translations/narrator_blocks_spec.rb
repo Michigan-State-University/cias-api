@@ -135,7 +135,9 @@ RSpec.describe V1::Translations::NarratorBlocks do
           next unless block['audio_urls']
 
           expect(block['audio_urls']).not_to include(nil),
-                                             "Block #{block_idx} (type: #{block['type']}) has nil audio URLs. Text: #{block['text'].inspect}, Audio URLs: #{block['audio_urls'].inspect}"
+                                             "Block #{block_idx} (type: #{block['type']}) has nil audio URLs. " \
+                                             "Text: #{block['text'].inspect}, " \
+                                             "Audio URLs: #{block['audio_urls'].inspect}"
 
           block['audio_urls'].each do |url|
             expect(url).not_to be_nil
@@ -154,7 +156,9 @@ RSpec.describe V1::Translations::NarratorBlocks do
           next unless block['text'] && block['audio_urls']
 
           expect(block['audio_urls'].length).to eq(block['text'].length),
-                                                "Mismatch: #{block['text'].length} texts but #{block['audio_urls'].length} audio URLs. Text: #{block['text'].inspect}"
+                                                "Mismatch: #{block['text'].length} texts but " \
+                                                "#{block['audio_urls'].length} audio URLs. " \
+                                                "Text: #{block['text'].inspect}"
         end
       end
     end
