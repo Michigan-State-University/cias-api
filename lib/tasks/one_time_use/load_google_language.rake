@@ -18,7 +18,7 @@ namespace :google_languages do
         p "Created #{language.name}"
       end
     end
-  
+
     p 'Finished fetch google languages successfully!'
   end
 
