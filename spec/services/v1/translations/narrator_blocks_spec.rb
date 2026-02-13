@@ -55,10 +55,10 @@ RSpec.describe V1::Translations::NarratorBlocks do
 
       it 'splits text correctly without creating punctuation-only elements' do
         result = service.send(:clear_and_split_text)
-        
+
         expect(result).to be_an(Array)
         expect(result).not_to be_empty
-        
+
         result.each do |part|
           stripped = part.tr('¿¡,!.?', '').strip
           expect(stripped).not_to be_empty, "Found punctuation-only element: #{part.inspect}"
@@ -69,21 +69,21 @@ RSpec.describe V1::Translations::NarratorBlocks do
     context 'with Spanish inverted question mark at start' do
       let(:subtitle) { '<p>¿Cuántos años tiene?</p>' }
 
-      it 'should NOT create a standalone ¿ element' do
+      it 'does not create a standalone ¿ element' do
         result = service.send(:clear_and_split_text)
-        
+
         expect(result).to be_an(Array)
-        
+
         punctuation_only = result.select { |part| part.tr('¿¡,!.?', '').strip.empty? }
-        expect(punctuation_only).to be_empty, 
-          "Found punctuation-only elements: #{punctuation_only.inspect}. Full result: #{result.inspect}"
+        expect(punctuation_only).to be_empty,
+                                    "Found punctuation-only elements: #{punctuation_only.inspect}. Full result: #{result.inspect}"
       end
 
-      it 'should keep inverted punctuation with the question text' do
+      it 'keeps inverted punctuation with the question text' do
         result = service.send(:clear_and_split_text)
-        
+
         expect(result.join).to include('¿')
-        
+
         expect(result).not_to include('¿')
       end
     end
@@ -91,27 +91,27 @@ RSpec.describe V1::Translations::NarratorBlocks do
     context 'with Spanish inverted exclamation mark' do
       let(:subtitle) { '<p>¡Bienvenido a la encuesta!</p>' }
 
-      it 'should NOT create a standalone ¡ element' do
+      it 'does not create a standalone ¡ element' do
         result = service.send(:clear_and_split_text)
-        
+
         punctuation_only = result.select { |part| part.tr('¿¡,!.?', '').strip.empty? }
         expect(punctuation_only).to be_empty,
-          "Found punctuation-only elements: #{punctuation_only.inspect}. Full result: #{result.inspect}"
+                                    "Found punctuation-only elements: #{punctuation_only.inspect}. Full result: #{result.inspect}"
       end
     end
 
     context 'with multiple sentences in Spanish' do
       let(:subtitle) { '<p>¿Cómo está? Gracias por participar. ¡Bienvenido!</p>' }
 
-      it 'should split sentences but not create punctuation-only elements' do
+      it 'splits sentences but not create punctuation-only elements' do
         result = service.send(:clear_and_split_text)
-        
+
         expect(result).to be_an(Array)
         expect(result.length).to be > 1
-        
+
         punctuation_only = result.select { |part| part.tr('¿¡,!.?', '').strip.empty? }
         expect(punctuation_only).to be_empty,
-          "Found punctuation-only elements: #{punctuation_only.inspect}. Full result: #{result.inspect}"
+                                    "Found punctuation-only elements: #{punctuation_only.inspect}. Full result: #{result.inspect}"
       end
     end
 
@@ -125,18 +125,18 @@ RSpec.describe V1::Translations::NarratorBlocks do
         )
       end
 
-      it 'should not generate nil audio URLs after translation' do
+      it 'does not generate nil audio URLs after translation' do
         described_class.call(question, translator, source_language_name_short, destination_language_name_short)
-        
+
         question.reload
         narrator_blocks = question.narrator['blocks']
-        
+
         narrator_blocks.each_with_index do |block, block_idx|
           next unless block['audio_urls']
-          
+
           expect(block['audio_urls']).not_to include(nil),
-            "Block #{block_idx} (type: #{block['type']}) has nil audio URLs. Text: #{block['text'].inspect}, Audio URLs: #{block['audio_urls'].inspect}"
-          
+                                             "Block #{block_idx} (type: #{block['type']}) has nil audio URLs. Text: #{block['text'].inspect}, Audio URLs: #{block['audio_urls'].inspect}"
+
           block['audio_urls'].each do |url|
             expect(url).not_to be_nil
             expect(url).to be_a(String)
@@ -146,15 +146,15 @@ RSpec.describe V1::Translations::NarratorBlocks do
 
       it 'audio URLs count should match text elements count' do
         described_class.call(question, translator, source_language_name_short, destination_language_name_short)
-        
+
         question.reload
         narrator_blocks = question.narrator['blocks']
-        
+
         narrator_blocks.each do |block|
           next unless block['text'] && block['audio_urls']
-          
+
           expect(block['audio_urls'].length).to eq(block['text'].length),
-            "Mismatch: #{block['text'].length} texts but #{block['audio_urls'].length} audio URLs. Text: #{block['text'].inspect}"
+                                                "Mismatch: #{block['text'].length} texts but #{block['audio_urls'].length} audio URLs. Text: #{block['text'].inspect}"
         end
       end
     end
