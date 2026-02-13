@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_06_103135) do
+ActiveRecord::Schema[7.2].define(version: 2026_02_05_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -1034,10 +1034,14 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_06_103135) do
     t.uuid "current_question_id"
     t.integer "number_of_repetitions", default: 0, null: false
     t.datetime "max_repetitions_reached_at"
+    t.string "sms_phone_prefix"
+    t.text "sms_phone_number_ciphertext"
+    t.string "sms_phone_number_bidx"
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
+    t.index ["sms_phone_number_bidx"], name: "index_user_sessions_on_sms_phone_number_bidx"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-25 05:30:04'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"

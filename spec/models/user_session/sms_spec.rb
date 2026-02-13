@@ -43,11 +43,116 @@ RSpec.describe UserSession::Sms, type: :model do
       expect(sms_user_session).to be_valid
       expect(sms_user_session.max_repetitions_reached_at.strftime('%Y-%m-%d %H:%M:%S')).to eq(timestamp.strftime('%Y-%m-%d %H:%M:%S'))
     end
+
+    it 'has sms_phone_prefix attribute' do
+      expect(sms_user_session).to respond_to(:sms_phone_prefix)
+      expect(sms_user_session).to respond_to(:sms_phone_prefix=)
+    end
+
+    it 'has sms_phone_number attribute' do
+      expect(sms_user_session).to respond_to(:sms_phone_number)
+      expect(sms_user_session).to respond_to(:sms_phone_number=)
+    end
+
+    it 'allows sms_phone_prefix to be set' do
+      sms_user_session.sms_phone_prefix = '+1'
+      expect(sms_user_session).to be_valid
+      expect(sms_user_session.sms_phone_prefix).to eq('+1')
+    end
+
+    it 'allows sms_phone_number to be set' do
+      sms_user_session.sms_phone_number = '5551234567'
+      expect(sms_user_session).to be_valid
+      expect(sms_user_session.sms_phone_number).to eq('5551234567')
+    end
   end
 
   describe 'inheritance' do
     it 'inherits from UserSession' do
       expect(described_class.superclass).to eq(UserSession)
+    end
+  end
+
+  describe '#sms_full_number' do
+    context 'when both prefix and number are present' do
+      before do
+        sms_user_session.sms_phone_prefix = '+1'
+        sms_user_session.sms_phone_number = '5551234567'
+      end
+
+      it 'returns the concatenated full phone number' do
+        expect(sms_user_session.sms_full_number).to eq('+15551234567')
+      end
+    end
+
+    context 'when prefix is blank' do
+      before do
+        sms_user_session.sms_phone_prefix = nil
+        sms_user_session.sms_phone_number = '5551234567'
+      end
+
+      it 'returns nil' do
+        expect(sms_user_session.sms_full_number).to be_nil
+      end
+    end
+
+    context 'when number is blank' do
+      before do
+        sms_user_session.sms_phone_prefix = '+1'
+        sms_user_session.sms_phone_number = nil
+      end
+
+      it 'returns nil' do
+        expect(sms_user_session.sms_full_number).to be_nil
+      end
+    end
+
+    context 'when both prefix and number are blank' do
+      before do
+        sms_user_session.sms_phone_prefix = nil
+        sms_user_session.sms_phone_number = nil
+      end
+
+      it 'returns nil' do
+        expect(sms_user_session.sms_full_number).to be_nil
+      end
+    end
+
+    context 'with international phone formats' do
+      it 'handles Polish numbers' do
+        sms_user_session.sms_phone_prefix = '+48'
+        sms_user_session.sms_phone_number = '555777888'
+        expect(sms_user_session.sms_full_number).to eq('+48555777888')
+      end
+
+      it 'handles UK numbers' do
+        sms_user_session.sms_phone_prefix = '+44'
+        sms_user_session.sms_phone_number = '7911123456'
+        expect(sms_user_session.sms_full_number).to eq('+447911123456')
+      end
+    end
+  end
+
+  describe 'encryption' do
+    it 'encrypts the sms_phone_number field' do
+      sms_user_session.sms_phone_number = '5551234567'
+      sms_user_session.save!
+      sms_user_session.reload
+
+      # Verify the decrypted value is correct
+      expect(sms_user_session.sms_phone_number).to eq('5551234567')
+
+      # Verify the ciphertext exists (encrypted storage)
+      expect(sms_user_session.sms_phone_number_ciphertext).to be_present
+      expect(sms_user_session.sms_phone_number_ciphertext).not_to eq('5551234567')
+    end
+
+    it 'creates blind index for sms_phone_number' do
+      sms_user_session.sms_phone_number = '5551234567'
+      sms_user_session.save!
+      sms_user_session.reload
+
+      expect(sms_user_session.sms_phone_number_bidx).to be_present
     end
   end
 

@@ -90,6 +90,9 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
         :external_id,
         :email_notification,
         :sms_notification,
+        :health_clinic_id,
+        :health_clinic_name,
+        :health_system_name,
         { phone_attributes: %i[iso prefix number] }
       ]
     )
