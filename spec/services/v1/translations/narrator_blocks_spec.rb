@@ -121,7 +121,7 @@ RSpec.describe V1::Translations::NarratorBlocks do
 
       before do
         allow(V1::AudioService).to receive(:call).and_return(
-          instance_double('Audio', sha256: 'test_hash', url: '/test/audio.mp3')
+          instance_double(Audio, sha256: 'test_hash', url: '/test/audio.mp3')
         )
       end
 
