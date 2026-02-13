@@ -13,11 +13,11 @@ namespace :one_time_use do
   class AuxiliarySmsPlan < ActiveRecord::Base
     self.table_name = 'sms_plans'
 
-    has_many :variants, class_name: 'AuxiliarySmsVariant', foreign_key: 'sms_plan_id'
+    has_many :variants, class_name: 'AuxiliarySmsPlanVariant', foreign_key: 'sms_plan_id'
   end
 
-  class AuxiliarySmsVariant < ActiveRecord::Base
-    self.table_name = 'sms_variants'
+  class AuxiliarySmsPlanVariant < ActiveRecord::Base
+    self.table_name = 'sms_plan_variants'
 
     belongs_to :sms_plan, class_name: 'AuxiliarySmsPlan', foreign_key: 'sms_plan_id'
   end
