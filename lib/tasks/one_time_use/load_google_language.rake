@@ -13,12 +13,13 @@ namespace :google_languages do
     p 'Starting to fetch google languages...'
 
     ActiveRecord::Base.transaction do
-      languages.each do |language|        
+      languages.each do |language|
         AuxiliaryGoogleLanguage.create!(language_name: language.name, language_code: language.code)
         p "Created #{language.name}"
       end
     end
-
+  
+    p 'Finished fetch google languages successfully!'
   end
 
   class AuxiliaryGoogleLanguage < ActiveRecord::Base
