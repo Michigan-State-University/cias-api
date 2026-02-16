@@ -17,7 +17,14 @@ class V1::ChartStatistics::CreateForUserSession
     charts.each do |chart|
       next if chart.status == 'draft'
 
-      V1::ChartStatistics::Create.call(chart, user_session, organization)
+      begin
+        V1::ChartStatistics::Create.call(chart, user_session, organization)
+      rescue StandardError => e
+        Rails.logger.error(
+          "ChartStatistics::CreateForUserSession FAILED for chart_id=#{chart.id}, " \
+          "user_session_id=#{user_session.id}: #{e.class} - #{e.message}"
+        )
+      end
     end
   end
 
