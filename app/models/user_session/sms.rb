@@ -1,7 +1,16 @@
 # frozen_string_literal: true
 
 class UserSession::Sms < UserSession
+  has_encrypted :sms_phone_number
+  blind_index :sms_phone_number
+
   delegate :first_question, :autofinish_enabled, :autofinish_delay, :questions, to: :session
+
+  def sms_full_number
+    return nil if sms_phone_prefix.blank? || sms_phone_number.blank?
+
+    "#{sms_phone_prefix}#{sms_phone_number}"
+  end
 
   def last_answer
     answers.confirmed.unscope(:order).order(:updated_at).last
