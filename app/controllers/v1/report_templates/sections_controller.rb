@@ -78,11 +78,11 @@ class V1::ReportTemplates::SectionsController < V1Controller
   end
 
   def section_params
-    params.require(:section).permit(:formula)
+    params.expect(section: [:formula])
   end
 
   def position_params
-    params.require(:section).permit(position: %i[id position])
+    params.expect(section: [position: %i[id position]])
   end
 
   def ability_to_update?

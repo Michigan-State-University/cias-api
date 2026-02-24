@@ -76,7 +76,7 @@ class V1::UserInterventionsController < V1Controller
   end
 
   def user_intervention_params
-    params.require(:user_intervention).permit(:intervention_id, :health_clinic_id)
+    params.expect(user_intervention: %i[intervention_id health_clinic_id])
   end
 
   def intervention_id

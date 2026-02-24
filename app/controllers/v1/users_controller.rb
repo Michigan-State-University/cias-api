@@ -128,23 +128,23 @@ class V1::UsersController < V1Controller
 
   def user_params
     if current_v1_user.roles.intersect?(%w[researcher team_admin]) && current_v1_user.id != user_id
-      params.require(:user).permit(
-        :active
+      params.expect(
+        user: [:active]
       )
     else
-      params.require(:user).permit(
-        :first_name,
-        :last_name,
-        :email,
-        :sms_notification,
-        :email_notification,
-        :time_zone,
-        :active,
-        :feedback_completed,
-        :description,
-        :organizable_id,
-        roles: [],
-        phone_attributes: %i[iso prefix number]
+      params.expect(
+        user: [:first_name,
+               :last_name,
+               :email,
+               :sms_notification,
+               :email_notification,
+               :time_zone,
+               :active,
+               :feedback_completed,
+               :description,
+               :organizable_id,
+               { roles: [],
+                 phone_attributes: %i[iso prefix number] }]
       )
     end
   end
