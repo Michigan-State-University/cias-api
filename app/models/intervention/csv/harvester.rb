@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class Intervention::Csv::Harvester
-  # Test PR to validate github merge base fix
   include Intervention::Csv::Tlfb
   include DateTimeInterface
 
