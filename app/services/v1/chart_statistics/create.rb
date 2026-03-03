@@ -30,6 +30,7 @@ class V1::ChartStatistics::Create
       valid_vars = missing_vars - invalid_vars
       Rails.logger.info("ChartStatistics::Create chart_id=#{chart.id}: missing variables from unselected options (will be set to 0): #{valid_vars.inspect}")
     end
+    return if formula_error?
     return if zero_division_error?
     return unless inside_date_range?
 
@@ -44,6 +45,13 @@ class V1::ChartStatistics::Create
     )
     chart_statistic.filled_at = user_session.finished_at || DateTime.current
     chart_statistic.save!
+  rescue Dentaku::ParseError, Dentaku::TokenizerError, Dentaku::ArgumentError => e
+    Rails.logger.error(
+      "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
+      "formula evaluation failed for chart '#{chart.name}': #{e.class} - #{e.message}. " \
+      "Formula: #{formula['payload']}"
+    )
+    nil
   end
 
   private
@@ -86,6 +94,19 @@ class V1::ChartStatistics::Create
 
   def zero_division_error?
     calculated_formula == Chart::ZERO_DIVISION_ERROR
+  end
+
+  def formula_error?
+    if calculated_formula == Chart::OTHER_FORMULA_ERROR
+      Rails.logger.error(
+        "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
+        "formula evaluation failed for chart '#{chart.name}'. " \
+        "Formula: #{formula['payload']}"
+      )
+      true
+    else
+      false
+    end
   end
 
   def inside_date_range?

@@ -36,6 +36,13 @@ class V1::GeneratedReports::ShareToParticipant
   def participant_should_not_receive_report?
     return true if participant_report_answer.blank?
 
+    unless participant_report_answer.body_data.first.is_a?(Hash)
+      Rails.logger.warn(
+        "[ShareToParticipant] Unexpected body_data format for user_session_id=#{user_session.id}: #{participant_report_answer.body_data.first.class}"
+      )
+      return true
+    end
+
     participant_report_answer.body_data.first&.dig('value', 'receive_report').blank?
   end
 
