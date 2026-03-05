@@ -111,6 +111,52 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
     end
   end
 
+  context 'when a henry ford health report template exists' do
+    let!(:henry_ford_report_template) { create(:report_template, :henry_ford_health, session: session) }
+
+    it 'always generates the henry ford health report regardless of third party selection' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(henry_ford_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(participant_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
+      subject
+    end
+
+    context 'when no third party templates are selected' do
+      before do
+        answer_third_party.update(body: { data: [{ value: 'test@example.com',
+                                                   report_template_ids: [],
+                                                   index: 0 }] })
+      end
+
+      it 'still generates the henry ford health report' do
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(henry_ford_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(participant_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).not_to receive(:call).
+          with(third_party_report_template, user_session, anything)
+        subject
+      end
+    end
+
+    context 'when there is no third party answer at all' do
+      before do
+        answer_third_party.destroy
+      end
+
+      it 'still generates the henry ford health report' do
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(henry_ford_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(participant_report_template, user_session, anything)
+        subject
+      end
+    end
+  end
+
   context 'user is preview_session' do
     let!(:current_v1_user) { create(:user, :confirmed, :preview_session) }
 
