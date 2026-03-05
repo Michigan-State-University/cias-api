@@ -68,19 +68,18 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
     let!(:third_party_report_template2) { create(:report_template, :third_party, session: session) }
 
     before do
-      # Only third_party_report_template is selected, not third_party_report_template2
       answer_third_party.update(body: { data: [{ value: 'test@example.com',
                                                  report_template_ids: [third_party_report_template.id],
                                                  index: 0 }] })
     end
 
-    it 'only generates reports for selected third party templates' do
+    it 'generates reports for all third party templates regardless of selection' do
       expect(V1::GeneratedReports::Create).to receive(:call).
         with(third_party_report_template, user_session, anything)
       expect(V1::GeneratedReports::Create).to receive(:call).
-        with(participant_report_template, user_session, anything)
-      expect(V1::GeneratedReports::Create).not_to receive(:call).
         with(third_party_report_template2, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(participant_report_template, user_session, anything)
       subject
     end
   end
@@ -92,9 +91,11 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
                                                  index: 0 }] })
     end
 
-    it 'only generates participant reports' do
-      expect(V1::GeneratedReports::Create).to receive(:call).once.
+    it 'generates reports for all templates regardless of selection' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
         with(participant_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
       subject
     end
   end
@@ -104,9 +105,11 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
       answer_third_party.destroy
     end
 
-    it 'only generates participant reports' do
-      expect(V1::GeneratedReports::Create).to receive(:call).once.
+    it 'generates reports for all templates regardless of third party answer' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
         with(participant_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
       subject
     end
   end
@@ -131,12 +134,12 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
                                                    index: 0 }] })
       end
 
-      it 'still generates the henry ford health report' do
+      it 'still generates all report templates including henry ford health' do
         expect(V1::GeneratedReports::Create).to receive(:call).
           with(henry_ford_report_template, user_session, anything)
         expect(V1::GeneratedReports::Create).to receive(:call).
           with(participant_report_template, user_session, anything)
-        expect(V1::GeneratedReports::Create).not_to receive(:call).
+        expect(V1::GeneratedReports::Create).to receive(:call).
           with(third_party_report_template, user_session, anything)
         subject
       end
@@ -147,11 +150,13 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
         answer_third_party.destroy
       end
 
-      it 'still generates the henry ford health report' do
+      it 'still generates all report templates including henry ford health' do
         expect(V1::GeneratedReports::Create).to receive(:call).
           with(henry_ford_report_template, user_session, anything)
         expect(V1::GeneratedReports::Create).to receive(:call).
           with(participant_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(third_party_report_template, user_session, anything)
         subject
       end
     end
