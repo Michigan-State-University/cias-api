@@ -16,8 +16,12 @@ class Import::Basic::SmsPlanVariantService
   end
 
   def call
+    sms_links = sms_plan_variant_hash.delete(:sms_links)
     variant = SmsPlan::Variant.create!(sms_plan_variant_hash.merge(sms_plan_id: sms_plan_id))
     variant.update!(position: position)
+    sms_links&.each do |sms_link_hash|
+      Import::Basic::SmsLinkService.call(sms_plan_id, sms_link_hash, variant_id: variant.id)
+    end
     variant
   end
 end
