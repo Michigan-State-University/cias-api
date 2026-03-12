@@ -71,12 +71,22 @@ class Intervention::Csv::Harvester
     column_names = []
     session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
       sms_plan.sms_links.find_each do |sms_link|
-        column_names << [column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.timestamps", index + 1),
-                         column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.totalclicks", index + 1)]
+        prefix = sms_link_column_prefix(sms_plan_index, sms_link)
+        column_names << [column_name(multiple_fill, session, "#{prefix}.timestamps", index + 1),
+                         column_name(multiple_fill, session, "#{prefix}.totalclicks", index + 1)]
       end
     end
 
     column_names
+  end
+
+  def sms_link_column_prefix(sms_plan_index, sms_link)
+    if sms_link.variant_id.present?
+      variant_pos = (sms_link.variant&.position || 0) + 1
+      "sms_messaging#{sms_plan_index}.variant_#{variant_pos}.link_#{sms_link.variable}"
+    else
+      "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}"
+    end
   end
 
   def information_only_screen_videos_header(session, index, multiple_fill)
@@ -209,11 +219,12 @@ class Intervention::Csv::Harvester
   def sms_links(session, user_session, row_index, approach_number, multiple_fill)
     session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
       sms_plan.sms_links.find_each do |sms_link|
+        prefix = sms_link_column_prefix(sms_plan_index, sms_link)
         session_header_index = header.index(
-          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.timestamps", approach_number)
+          column_name(multiple_fill, session, "#{prefix}.timestamps", approach_number)
         )
         total_clicks_index = header.index(
-          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.totalclicks", approach_number)
+          column_name(multiple_fill, session, "#{prefix}.totalclicks", approach_number)
         )
         user_id = user_session.user_id
 

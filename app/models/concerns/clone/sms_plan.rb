@@ -16,9 +16,11 @@ class Clone::SmsPlan < Clone::Base
   private
 
   def create_sms_variants
+    @variant_id_mapping = {}
     source.variants.find_each do |variant|
-      newly_created_variant = SmsPlan::Variant.create(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY).merge(sms_plan_id: outcome.id))
-      newly_created_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
+      new_variant = SmsPlan::Variant.create(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY).merge(sms_plan_id: outcome.id))
+      new_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
+      @variant_id_mapping[variant.id] = new_variant.id
     end
   end
 
@@ -38,7 +40,14 @@ class Clone::SmsPlan < Clone::Base
 
   def create_sms_links
     source.sms_links.find_each do |sms_link|
-      outcome.sms_links << SmsLink.new(sms_plan: outcome, url: sms_link.url, link_type: sms_link.link_type, variable: sms_link.variable)
+      new_variant_id = sms_link.variant_id.present? ? @variant_id_mapping[sms_link.variant_id] : nil
+      outcome.sms_links << SmsLink.new(
+        sms_plan: outcome,
+        url: sms_link.url,
+        link_type: sms_link.link_type,
+        variable: sms_link.variable,
+        variant_id: new_variant_id
+      )
     end
   end
 end
