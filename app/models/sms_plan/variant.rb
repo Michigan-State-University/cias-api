@@ -16,7 +16,7 @@ class SmsPlan::Variant < ApplicationRecord
 
   default_scope { order(:position) }
 
-  ATTR_NAMES_TO_COPY = %w[formula_match content].freeze
+  ATTR_NAMES_TO_COPY = %w[formula_match content position].freeze
 
   def translate(translator, src_language_name_short, dest_language_name_short)
     translate_attribute('content', content, translator, src_language_name_short, dest_language_name_short)
