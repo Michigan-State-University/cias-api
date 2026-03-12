@@ -81,11 +81,12 @@ class Intervention::Csv::Harvester
   end
 
   def sms_link_column_prefix(sms_plan_index, sms_link)
+    plan_index = sms_plan_index.to_i + 1
     if sms_link.variant_id.present?
       variant_pos = (sms_link.variant&.position || 0) + 1
-      "sms_messaging#{sms_plan_index}.variant_#{variant_pos}.link_#{sms_link.variable}"
+      "sms_messaging_#{plan_index}.variant_#{variant_pos}.link_#{sms_link.variable}"
     else
-      "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}"
+      "sms_messaging_#{plan_index}.link_#{sms_link.variable}"
     end
   end
 
