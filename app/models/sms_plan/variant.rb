@@ -25,6 +25,6 @@ class SmsPlan::Variant < ApplicationRecord
   private
 
   def assign_position
-    self.position = sms_plan.variants.count
+    self.position ||= sms_plan.variants.count
   end
 end
