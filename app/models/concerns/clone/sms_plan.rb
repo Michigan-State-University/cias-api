@@ -17,7 +17,7 @@ class Clone::SmsPlan < Clone::Base
 
   def create_sms_variants
     @variant_id_mapping = {}
-    source.variants.find_each do |variant|
+    source.variants.each do |variant|
       new_variant = SmsPlan::Variant.create(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY).merge(sms_plan_id: outcome.id))
       new_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
       @variant_id_mapping[variant.id] = new_variant.id
