@@ -665,7 +665,7 @@ GEM
     xml-simple (1.1.9)
       rexml
     zeitwerk (2.7.4)
-    zlib (3.2.1)
+    zlib (3.2.3)
 
 PLATFORMS
   ruby

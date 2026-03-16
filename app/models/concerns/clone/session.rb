@@ -166,14 +166,24 @@ class Clone::Session < Clone::Base
       new_sms_plan.no_formula_attachment.attach(plan.no_formula_attachment.blob) if plan.no_formula_attachment.attached?
       outcome.sms_plans << new_sms_plan
 
-      plan.variants.each { |variant| create_and_assign_variant(variant, new_sms_plan) }
+      variant_id_mapping = {}
+      plan.variants.each do |variant|
+        new_variant = create_and_assign_variant(variant, new_sms_plan)
+        variant_id_mapping[variant.id] = new_variant.id
+      end
 
       plan.alert_phones.each do |alert_phone|
         new_sms_plan.alert_phones << AlertPhone.new(sms_plan: new_sms_plan, phone: alert_phone.phone)
       end
 
       plan.sms_links.each do |sms_link|
-        new_sms_plan.sms_links << SmsLink.new(url: sms_link.url, link_type: sms_link.link_type, session: source, variable: sms_link.variable)
+        new_variant_id = sms_link.variant_id.present? ? variant_id_mapping[sms_link.variant_id] : nil
+        new_sms_plan.sms_links << SmsLink.new(
+          url: sms_link.url,
+          link_type: sms_link.link_type,
+          variable: sms_link.variable,
+          variant_id: new_variant_id
+        )
       end
     end
   end
@@ -217,5 +227,6 @@ class Clone::Session < Clone::Base
     new_variant = SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
     new_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
     new_sms_plan.variants << new_variant
+    new_variant
   end
 end
