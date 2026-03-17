@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::SmsLinks::VerifyService
+  include ::PredefinedParticipantUrlHelper
+
   attr_reader :sms_links_user
 
   def self.call(sms_links_user)
@@ -14,6 +16,9 @@ class V1::SmsLinks::VerifyService
   def call
     sms_links_user&.add_timestamp
 
-    sms_links_user&.sms_link&.url
+    url = sms_links_user&.sms_link&.url
+    return url if url.blank?
+
+    append_pid_to_intervention_url(url, sms_links_user.user)
   end
 end
