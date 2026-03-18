@@ -41,4 +41,28 @@ RSpec.describe Import::V1::SmsPlanService do
     # because it differs by like 100 milliseconds so we have to compare strings
     expect(sms_plan_hash[:end_at].in_time_zone('UTC').strftime(fmt)).to eq SmsPlan.first.end_at.in_time_zone('UTC').strftime(fmt)
   end
+
+  context 'when sms_links are present in the hash (no-formula links)' do
+    before do
+      sms_plan_hash[:sms_links] = [
+        { url: 'https://promo.example.com', link_type: 'website', variable: 'promo' }
+      ]
+    end
+
+    it 'creates the sms_links' do
+      expect { subject }.to change(SmsLink, :count).by(1)
+    end
+
+    it 'creates sms_links with correct attributes and no variant_id' do
+      subject
+      link = SmsLink.last
+      expect(link).to have_attributes(
+        url: 'https://promo.example.com',
+        link_type: 'website',
+        variable: 'promo',
+        variant_id: nil
+      )
+      expect(link.sms_plan_id).to eq(SmsPlan.last.id)
+    end
+  end
 end

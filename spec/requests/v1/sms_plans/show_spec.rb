@@ -45,7 +45,8 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
         'attributes' => include(
           'formula_match' => variant.formula_match,
           'content' => variant.content
-        )
+        ),
+        'relationships' => include('sms_links' => hash_including('data' => []))
       )
       expect(json_response['included']).to include(
         'id' => variant2.id,
@@ -53,7 +54,8 @@ RSpec.describe 'GET /v1/sms_plans/:id', type: :request do
         'attributes' => include(
           'formula_match' => variant2.formula_match,
           'content' => variant2.content
-        )
+        ),
+        'relationships' => include('sms_links' => hash_including('data' => []))
       )
     end
 

@@ -158,4 +158,53 @@ RSpec.describe SmsHelper do
       end
     end
   end
+
+  describe '#insert_links_into_variant' do
+    let(:plan) { create(:sms_plan, session: session) }
+    let(:no_formula_link) { create(:sms_link, sms_plan: plan, session: session, variable: 'promo') }
+
+    context 'when variant is nil (no-formula mode)' do
+      before { no_formula_link }
+
+      it 'creates SmsLinksUser entries for no-formula links only' do
+        expect { helper.insert_links_into_variant('Click ::promo::'.dup, plan) }
+          .to change(SmsLinksUser, :count).by(1)
+      end
+
+      it 'replaces the token with the short link' do
+        result = helper.insert_links_into_variant('Click ::promo::'.dup, plan)
+        expect(result).to match(%r{/link/})
+        expect(result).not_to include('::promo::')
+      end
+
+      it 'does not process variant-scoped links' do
+        variant = create(:sms_plan_variant, sms_plan: plan)
+        create(:sms_link, variant: variant, sms_plan: plan, session: session, variable: 'offer')
+        result = helper.insert_links_into_variant('::promo:: ::offer::'.dup, plan)
+        expect(result).to include('::offer::')  # variant link not substituted
+      end
+    end
+
+    context 'when variant is provided (formula mode)' do
+      let(:variant) { create(:sms_plan_variant, sms_plan: plan) }
+      let!(:variant_link) { create(:sms_link, variant: variant, sms_plan: plan, session: session, variable: 'offer') }
+
+      it 'creates SmsLinksUser entries for variant links only' do
+        expect { helper.insert_links_into_variant('Buy ::offer::'.dup, plan, variant) }
+          .to change(SmsLinksUser, :count).by(1)
+      end
+
+      it 'replaces the token with the short link' do
+        result = helper.insert_links_into_variant('Buy ::offer::'.dup, plan, variant)
+        expect(result).to match(%r{/link/})
+        expect(result).not_to include('::offer::')
+      end
+
+      it 'does not process no-formula links' do
+        no_formula_link
+        result = helper.insert_links_into_variant('::promo:: ::offer::'.dup, plan, variant)
+        expect(result).to include('::promo::')  # no-formula link not substituted
+      end
+    end
+  end
 end

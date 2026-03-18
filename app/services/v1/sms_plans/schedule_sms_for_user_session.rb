@@ -3,18 +3,7 @@
 class V1::SmsPlans::ScheduleSmsForUserSession
   include Rails.application.routes.url_helpers
   include ::SmsHelper
-
-  INTERVENTION_URL_REGEX = %r{
-  #{Regexp.escape(ENV.fetch('WEB_URL'))}
-  /interventions/
-  [^/\s]+
-  (?:
-    /invite
-    |
-    /sessions/[^/\s]+/fill
-  )
-  (?:\?[^\s]*)?
-}x
+  include ::PredefinedParticipantUrlHelper
 
   def self.call(user_session)
     new(user_session).call
@@ -83,14 +72,15 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
     frequency = plan.frequency
-    content = sms_content(plan)
+    variant = plan.is_used_formula ? matched_variant(plan) : nil
+    content = variant&.content || plan.no_formula_text
 
     return if content.blank?
 
     attachment_url = attachment_url(plan)
     content = insert_variables_into_variant(content)
-    content = insert_links_into_variant(content, plan)
-    content = add_predefined_participant_indicator_to_invitation_link(content)
+    content = insert_links_into_variant(content, plan, variant)
+    content = append_pid_to_intervention_urls(content, user)
     finish_date = plan.end_at
 
     if plan.alert?
@@ -144,22 +134,5 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
   def now_in_timezone
     @now_in_timezone ||= Time.use_zone(timezone) { Time.current }
-  end
-
-  def add_predefined_participant_indicator_to_invitation_link(content)
-    return content unless user.role?('predefined_participant')
-
-    pid = user.predefined_user_parameter.slug
-    content.gsub(INTERVENTION_URL_REGEX) do |url|
-      uri = URI.parse(url)
-
-      params = URI.decode_www_form(uri.query || '')
-      params << ['pid', pid] unless params.any? { |k, _| k == 'pid' }
-
-      uri.query = URI.encode_www_form(params)
-      uri.to_s
-    rescue URI::InvalidURIError
-      url
-    end
   end
 end

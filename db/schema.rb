@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_02_24_000000) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_11_130114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -856,9 +856,12 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_24_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "variable", null: false
+    t.uuid "variant_id"
     t.index ["session_id"], name: "index_sms_links_on_session_id"
-    t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true
+    t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true, where: "(variant_id IS NULL)"
     t.index ["sms_plan_id"], name: "index_sms_links_on_sms_plan_id"
+    t.index ["variant_id", "variable"], name: "index_sms_links_on_variant_id_and_variable", unique: true, where: "(variant_id IS NOT NULL)"
+    t.index ["variant_id"], name: "index_sms_links_on_variant_id"
   end
 
   create_table "sms_links_users", force: :cascade do |t|
@@ -1188,6 +1191,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_02_24_000000) do
   add_foreign_key "sms_codes", "health_clinics"
   add_foreign_key "sms_codes", "sessions"
   add_foreign_key "sms_links", "sessions"
+  add_foreign_key "sms_links", "sms_plan_variants", column: "variant_id"
   add_foreign_key "sms_links", "sms_plans"
   add_foreign_key "sms_links_users", "sms_links"
   add_foreign_key "sms_links_users", "users"

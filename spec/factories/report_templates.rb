@@ -15,6 +15,10 @@ FactoryBot.define do
       report_for { 'participant' }
     end
 
+    trait :henry_ford_health do
+      report_for { 'henry_ford_health' }
+    end
+
     trait :with_logo do
       after(:create) do |report_template|
         report_template.update(
