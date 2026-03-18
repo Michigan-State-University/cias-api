@@ -21,7 +21,7 @@ gem 'connection_pool'
 gem 'dentaku'
 gem 'devise-argon2'
 gem 'devise_invitable'
-gem 'devise_token_auth'
+gem 'devise_token_auth', git: 'https://github.com/lynndylanhurley/devise_token_auth.git', ref: 'bcdc3a5964086b6a08f3f98eb878a107af1334da' # pinned for devise 5 support, revert to rubygems once >= 1.2.7 is released
 gem 'faker', require: false
 gem 'jsonapi-serializer'
 gem 'jmespath', '>= 1.6.1'
