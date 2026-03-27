@@ -73,6 +73,20 @@ en:
           attributes:
             user_id:
               already_exists: already exists
+        session:
+          attributes:
+            base:
+              only_one_ra_session_allowed: 'Only one Research Assistant session is allowed per intervention'
+            position:
+              must_be_zero: 'must be 0 for Research Assistant sessions'
+              reserved_for_ra_session: 'Position 0 is reserved for Research Assistant sessions'
+            formulas:
+              ra_session_cannot_branch_to_other_sessions: 'Research Assistant sessions cannot branch to other sessions'
+              cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
+            type:
+              cannot_change_type: 'Session type cannot be changed after creation'
+            sms_plans:
+              present: 'Research Assistant sessions do not support SMS plans'
         question_group:
           question: '%{question_type} can appear only once per session'
           question_variable: 'Variable name is in invalid format'
@@ -133,6 +147,11 @@ en:
     default_response: 'You have entered an incorrect code. Please try again.'
     welcome_message: 'You are now enrolled. You will start receiving messages soon.'
     completion_message: 'Thank you for completing this session!'
+    default_ra_name: 'New Research Assistant Session'
+    ra_cannot_reposition: 'Research Assistant sessions cannot be repositioned'
+    position_zero_reserved: 'Position 0 is reserved for Research Assistant sessions'
+    ra_cannot_clone_same_intervention: 'Research Assistant sessions cannot be duplicated within the same intervention'
+    ra_already_exists_in_target: 'Target intervention already has a Research Assistant session'
   users:
     deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
@@ -147,6 +166,7 @@ en:
       already_finished: 'You cannot provide an answer for the finished session'
       previous_question: 'Previous question is unavailable for this type of session'
       scheduled_session: 'You cannot fill scheduled session before the set time'
+      not_ra_fulfiller: 'You are not authorized to fulfill this Research Assistant session'
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."

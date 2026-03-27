@@ -18,6 +18,7 @@ class V1::UserSessionsController < V1Controller
 
   def create
     validate_session_status
+    guard_ra_session_creation
     user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
@@ -28,6 +29,7 @@ class V1::UserSessionsController < V1Controller
 
   def show_or_create
     validate_session_status
+    guard_ra_session_creation
     user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
@@ -121,5 +123,11 @@ class V1::UserSessionsController < V1Controller
     return unless session_load.autoclose_enabled
 
     raise ComplexException.new(I18n.t('sessions.closed'), { reason: 'SESSION_CLOSED' }, :bad_request) if Time.zone.now > session_load.autoclose_at
+  end
+
+  def guard_ra_session_creation
+    return unless session_load.type == 'Session::ResearchAssistant'
+
+    authorize! :fulfill_ra_session, session_load.intervention
   end
 end
