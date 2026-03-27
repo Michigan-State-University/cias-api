@@ -6,6 +6,7 @@ class Question < ApplicationRecord
   include BodyInterface
   include Clone
   include FormulaInterface
+  include FormulaRaBranchingValidation
   include BlockHelper
   include Translate
   include ::TranslationAuxiliaryMethods

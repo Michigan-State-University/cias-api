@@ -87,7 +87,16 @@ en:
               cannot_change_type: 'Session type cannot be changed after creation'
             sms_plans:
               present: 'Research Assistant sessions do not support SMS plans'
+        question:
+          attributes:
+            formulas:
+              ra_cannot_branch_to_other_sessions: 'Questions in Research Assistant sessions cannot branch to other sessions'
+              cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
         question_group:
+          attributes:
+            formulas:
+              ra_cannot_branch_to_other_sessions: 'Question groups in Research Assistant sessions cannot branch to other sessions'
+              cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
           question: '%{question_type} can appear only once per session'
           question_variable: 'Variable name is in invalid format'
         organization_invitation:

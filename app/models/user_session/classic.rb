@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserSession::Classic < UserSession
-  include UserSession::ClassicBehavior
+  include ::UserSession::ClassicBehavior
 
   def finish(send_email: true)
     return if finished_at

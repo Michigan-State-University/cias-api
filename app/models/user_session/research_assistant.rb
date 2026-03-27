@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class UserSession::ResearchAssistant < UserSession
-  include UserSession::ClassicBehavior
+  include ::UserSession::ClassicBehavior
 
   belongs_to :fulfilled_by, class_name: 'User', optional: true
 

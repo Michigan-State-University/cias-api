@@ -27,9 +27,20 @@ class V1::SessionService
   def create(session_params)
     session = sessions.new(session_params)
     session_type_sms = session.sms_session_type?
+    ra_session = session.type == 'Session::ResearchAssistant'
+
     session.assign_google_tts_voice(first_session) unless session_type_sms
     session.current_narrator = intervention.current_narrator unless session_type_sms
-    session.position = session_type_sms ? 999_999 : sessions.where.not(type: 'Session::Sms').last&.position.to_i + 1
+
+    if ra_session
+      session.position = 0
+      session.name = session.name.presence || I18n.t('sessions.default_ra_name', default: 'New Research Assistant Session')
+    elsif session_type_sms
+      session.position = 999_999
+    else
+      session.position = sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).last&.position.to_i + 1
+    end
+
     session.save!
     session
   end
