@@ -22,11 +22,11 @@ RSpec.describe 'GET /v1/tags', type: :request do
 
   context 'when user is authenticated' do
     context 'with tags in DB' do
-      let!(:tag1) { create(:tag, name: 'Health') }
-      let!(:tag2) { create(:tag, name: 'Mental Health') }
-      let!(:tag3) { create(:tag, name: 'Wellness') }
-      let!(:tag4) { create(:tag, name: 'Nutrition') }
-      let!(:tag5) { create(:tag, name: 'Exercise') }
+      let!(:tag1) { create(:tag, name: 'Health', user: user) }
+      let!(:tag2) { create(:tag, name: 'Mental Health', user: user) }
+      let!(:tag3) { create(:tag, name: 'Wellness', user: user) }
+      let!(:tag4) { create(:tag, name: 'Nutrition', user: user) }
+      let!(:tag5) { create(:tag, name: 'Exercise', user: user) }
 
       before { request }
 
@@ -173,6 +173,28 @@ RSpec.describe 'GET /v1/tags', type: :request do
 
       it 'returns zero tags_size' do
         expect(json_response['tags_size']).to eq(0)
+      end
+    end
+
+    context 'when another user has tags' do
+      let!(:other_user) { create(:user, :confirmed, :researcher) }
+      let!(:other_tag) { create(:tag, name: 'Other User Tag', user: other_user) }
+      let!(:my_tag) { create(:tag, name: 'My Tag', user: user) }
+
+      before { request }
+
+      it 'returns only current user tags' do
+        tag_names = json_response['data'].map { |t| t['attributes']['name'] }
+        expect(tag_names).to contain_exactly('My Tag')
+      end
+
+      it 'does not include other user tags' do
+        tag_ids = json_response['data'].map { |t| t['id'] }
+        expect(tag_ids).not_to include(other_tag.id)
+      end
+
+      it 'returns correct tags_size' do
+        expect(json_response['tags_size']).to eq(1)
       end
     end
   end

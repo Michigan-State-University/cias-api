@@ -12,9 +12,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/tags/assign', type: :req
 
   let(:intervention_owner) { admin }
   let!(:intervention) { create(:intervention, user: intervention_owner, status: 'draft') }
-  let!(:existing_tag1) { create(:tag, name: 'Existing Tag 1') }
-  let!(:existing_tag2) { create(:tag, name: 'Existing Tag 2') }
-  let!(:already_assigned_tag) { create(:tag, name: 'Already Assigned') }
+  let!(:existing_tag1) { create(:tag, name: 'Existing Tag 1', user: user) }
+  let!(:existing_tag2) { create(:tag, name: 'Existing Tag 2', user: user) }
+  let!(:already_assigned_tag) { create(:tag, name: 'Already Assigned', user: user) }
   let!(:tag_intervention) { create(:tag_intervention, tag: already_assigned_tag, intervention: intervention) }
 
   let(:params) do
@@ -156,6 +156,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/tags/assign', type: :req
   context 'when user is researcher and intervention owner' do
     let(:intervention_owner) { researcher }
     let(:user) { researcher }
+    let!(:existing_tag1) { create(:tag, name: 'Existing Tag 1', user: researcher) }
+    let!(:existing_tag2) { create(:tag, name: 'Existing Tag 2', user: researcher) }
+    let!(:already_assigned_tag) { create(:tag, name: 'Already Assigned', user: researcher) }
 
     before { request }
 
@@ -183,6 +186,9 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/tags/assign', type: :req
     let(:intervention_owner) { admin }
     let(:user) { researcher }
     let!(:collaborator) { create(:collaborator, intervention: intervention, user: researcher, view: true, edit: true) }
+    let!(:existing_tag1) { create(:tag, name: 'Existing Tag 1', user: researcher) }
+    let!(:existing_tag2) { create(:tag, name: 'Existing Tag 2', user: researcher) }
+    let!(:already_assigned_tag) { create(:tag, name: 'Already Assigned', user: researcher) }
 
     before do
       intervention.update(current_editor_id: researcher.id)

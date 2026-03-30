@@ -35,7 +35,7 @@ class Import::Basic::InterventionService
     end
 
     tags_hash&.each do |tag_hash|
-      get_import_service_class(tag_hash, Tag).call(intervention.id, tag_hash)
+      get_import_service_class(tag_hash, Tag).call(intervention.id, tag_hash, user)
     end
 
     set_branching_and_reflections!

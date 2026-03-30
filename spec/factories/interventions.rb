@@ -26,8 +26,8 @@ FactoryBot.define do
     end
 
     trait :with_tags do
-      after(:build) do |intervention|
-        intervention.tags << create_list(:tag, 3)
+      after(:create) do |intervention|
+        intervention.tags << create_list(:tag, 3, user: intervention.user)
       end
     end
 
