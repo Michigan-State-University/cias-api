@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class V1::Intervention::AssignTags
-  def self.call(intervention, tag_ids, tag_names)
-    new(intervention, tag_ids, tag_names).call
+  def self.call(intervention, tag_ids, tag_names, user)
+    new(intervention, tag_ids, tag_names, user).call
   end
 
-  def initialize(intervention, tag_ids, tag_names)
+  def initialize(intervention, tag_ids, tag_names, user)
     @intervention = intervention
     @tag_ids = tag_ids
     @tag_names = tag_names
+    @user = user
   end
 
   def call
@@ -24,7 +25,7 @@ class V1::Intervention::AssignTags
 
   private
 
-  attr_reader :intervention, :tag_ids, :tag_names
+  attr_reader :intervention, :tag_ids, :tag_names, :user
   attr_accessor :tags_to_add
 
   def create_missing_tags!
@@ -36,7 +37,7 @@ class V1::Intervention::AssignTags
       name = name&.strip
       next if name.blank?
 
-      new_tag = Tag.find_or_create_by(name: name)
+      new_tag = Tag.find_or_create_by(name: name, user: user)
       next if new_tag.id.in?(already_assigned_tag_ids)
 
       tags_to_add << new_tag
@@ -56,6 +57,6 @@ class V1::Intervention::AssignTags
   def find_tags_to_add!
     return if tag_ids.blank?
 
-    @tags_to_add = Tag.where(id: tag_ids)
+    @tags_to_add = Tag.where(id: tag_ids, user: user)
   end
 end

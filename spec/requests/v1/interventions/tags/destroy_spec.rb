@@ -12,7 +12,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/tags/:id', type: :requ
 
   let(:intervention_owner) { admin }
   let!(:intervention) { create(:intervention, user: intervention_owner, status: 'draft') }
-  let!(:tag) { create(:tag, name: 'Tag to Remove') }
+  let!(:tag) { create(:tag, name: 'Tag to Remove', user: admin) }
   let!(:tag_intervention) { create(:tag_intervention, tag: tag, intervention: intervention) }
 
   let(:request) { delete v1_intervention_tag_path(intervention.id, tag.id), headers: headers }
@@ -50,7 +50,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/tags/:id', type: :requ
   end
 
   context 'when tag is not assigned to intervention' do
-    let!(:unassigned_tag) { create(:tag, name: 'Unassigned Tag') }
+    let!(:unassigned_tag) { create(:tag, name: 'Unassigned Tag', user: admin) }
     let(:request) { delete v1_intervention_tag_path(intervention.id, unassigned_tag.id), headers: headers }
 
     before { request }
@@ -165,8 +165,8 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/tags/:id', type: :requ
   end
 
   context 'when multiple tags are assigned' do
-    let!(:tag2) { create(:tag, name: 'Tag 2') }
-    let!(:tag3) { create(:tag, name: 'Tag 3') }
+    let!(:tag2) { create(:tag, name: 'Tag 2', user: admin) }
+    let!(:tag3) { create(:tag, name: 'Tag 3', user: admin) }
     let!(:tag_intervention2) { create(:tag_intervention, tag: tag2, intervention: intervention) }
     let!(:tag_intervention3) { create(:tag_intervention, tag: tag3, intervention: intervention) }
 
