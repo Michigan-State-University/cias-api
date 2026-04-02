@@ -50,6 +50,8 @@ class V1::GeneratedReports::ShareToThirdParty
     third_party_faxes_report_template_ids.each do |receiver_label, hash|
       hash[:reports].uniq.each do |report_template_id|
         generated_report = third_party_reports.find_by(report_template_id: report_template_id)
+        next if generated_report.nil?
+
         report_template = generated_report.report_template
         fields = report_template.slice(:cover_letter_description, :cover_letter_sender,
                                        :name).merge({ receiver: ActionView::Base.full_sanitizer.sanitize(receiver_label) })
@@ -123,10 +125,11 @@ class V1::GeneratedReports::ShareToThirdParty
 
   def extracted_data_from_answers
     @extracted_data_from_answers ||= Answer::ThirdParty.where(user_session_id: user_session.id).map do |answer|
+      index = answer.body_data&.first&.dig('index')
       [
         answer.body_data&.first&.dig('value')&.delete(' ')&.split(','),
         answer.body_data&.first&.dig('report_template_ids'),
-        answer.question.body['data'][answer.body_data.first['index']]['payload'].to_s
+        index ? answer.question.body.dig('data', index, 'payload').to_s : nil
       ] # [[email1, fax1, ...], [rep_id], receiver_label]
     end
   end
