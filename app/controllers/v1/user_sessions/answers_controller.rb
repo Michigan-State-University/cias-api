@@ -16,6 +16,7 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def create
+    validate_ra_fulfillment_access if user_session_load.type == 'UserSession::ResearchAssistant'
     raise ActiveRecord::RecordNotSaved, I18n.t('user_sessions.errors.already_finished') if user_session_load.finished_at?
 
     answer = V1::AnswerService.call(current_v1_user, user_session_id, question_id, answer_params)
@@ -53,5 +54,17 @@ class V1::UserSessions::AnswersController < V1Controller
 
   def question_id
     params.require(:question_id)
+  end
+
+  def validate_ra_fulfillment_access
+    return if current_v1_user&.role?('preview_session')
+
+    unless user_session_load.fulfilled_by_id == current_v1_user.id
+      raise ComplexException.new(
+        I18n.t('user_sessions.errors.not_ra_fulfiller'),
+        { reason: 'NOT_RA_FULFILLER' },
+        :forbidden
+      )
+    end
   end
 end

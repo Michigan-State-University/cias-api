@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
-  before_action :verify_access, except: [:verify]
+  before_action :verify_access, except: %i[verify ra_session]
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def index
@@ -53,6 +53,59 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     predefined_participant.update!(active: false)
 
     render status: :no_content
+  end
+
+  def ra_session
+    @predefined_user_parameter = PredefinedUserParameter.find_by!(slug: params[:slug])
+    intervention = predefined_user_parameter.intervention
+    participant = predefined_user_parameter.user
+
+    authorize! :fulfill_ra_session, intervention
+    check_intervention_status
+
+    ra_session = intervention.sessions.find_by!(type: 'Session::ResearchAssistant')
+
+    user_intervention = UserIntervention.find_or_create_by(
+      user_id: participant.id,
+      intervention_id: intervention.id,
+      health_clinic_id: predefined_user_parameter.health_clinic_id
+    )
+
+    user_session = UserSession::ResearchAssistant.find_or_create_by(
+      session_id: ra_session.id,
+      user_id: participant.id,
+      type: 'UserSession::ResearchAssistant',
+      user_intervention_id: user_intervention.id,
+      health_clinic_id: predefined_user_parameter.health_clinic_id
+    )
+
+    if user_session.finished_at.present?
+      render json: {
+        data: {
+          user_session_id: user_session.id,
+          session_id: ra_session.id,
+          intervention_id: intervention.id,
+          health_clinic_id: predefined_user_parameter.health_clinic_id,
+          lang: intervention.language_code,
+          already_completed: true
+        }
+      }, status: :ok
+      return
+    end
+
+    user_session.update!(fulfilled_by_id: current_v1_user.id, started: true)
+    user_intervention.in_progress! if user_intervention.ready_to_start?
+
+    render json: {
+      data: {
+        user_session_id: user_session.id,
+        session_id: ra_session.id,
+        intervention_id: intervention.id,
+        health_clinic_id: predefined_user_parameter.health_clinic_id,
+        lang: intervention.language_code,
+        already_completed: false
+      }
+    }, status: :ok
   end
 
   def send_sms_invitation

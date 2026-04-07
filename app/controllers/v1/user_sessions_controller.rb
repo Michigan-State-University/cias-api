@@ -2,7 +2,7 @@
 
 class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[create show_or_create]
-  before_action :validate_intervention_status
+  before_action :validate_intervention_status, except: [:ra_show]
 
   def show
     validate_session_status
@@ -34,6 +34,22 @@ class V1::UserSessionsController < V1Controller
     authorize! :create, user_session
     user_session.save!
     @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
+
+    render json: serialized_response(user_session), status: :ok
+  end
+
+  def ra_show
+    user_session = UserSession.find(params[:id])
+    ra_intervention = user_session.session.intervention
+
+    raise ComplexException.new(I18n.t('interventions.paused'), { reason: 'INTERVENTION_PAUSED' }, :bad_request) if ra_intervention.paused?
+
+    authorize! :fulfill_ra_session, ra_intervention
+
+    unless user_session.type == 'UserSession::ResearchAssistant' &&
+           user_session.fulfilled_by_id == current_v1_user.id
+      raise CanCan::AccessDenied
+    end
 
     render json: serialized_response(user_session), status: :ok
   end
