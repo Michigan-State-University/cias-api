@@ -6,7 +6,6 @@ class Session::ResearchAssistant < Session
   validate :single_ra_session_per_intervention, on: :create
   validate :position_must_be_zero
   validate :no_cross_session_branching
-  validates :sms_plans, absence: true
   before_validation :force_single_fill
 
   def user_session_type
