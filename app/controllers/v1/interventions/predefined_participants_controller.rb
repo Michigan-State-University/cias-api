@@ -5,11 +5,13 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def index
-    render json: serialized_response(predefined_participants)
+    render json: serialized_response(predefined_participants, 'PredefinedParticipant',
+                                     params: { ra_user_sessions: ra_user_sessions_for_index })
   end
 
   def show
-    render json: serialized_response(predefined_participant)
+    render json: serialized_response(predefined_participant, 'PredefinedParticipant',
+                                     params: { ra_user_sessions: ra_user_sessions_for_show })
   end
 
   def create
@@ -120,6 +122,26 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def slug
     params[:slug]
+  end
+
+  def ra_user_sessions_for_index
+    ra_session = intervention_load.sessions.find_by(type: 'Session::ResearchAssistant')
+    return {} if ra_session.nil?
+
+    UserSession.where(session_id: ra_session.id, user_id: predefined_participants.map(&:id))
+               .includes(:fulfilled_by)
+               .index_by(&:user_id)
+  end
+
+  def ra_user_sessions_for_show
+    ra_session = intervention_load.sessions.find_by(type: 'Session::ResearchAssistant')
+    return {} if ra_session.nil?
+
+    ra_user_session = UserSession.includes(:fulfilled_by)
+                                 .find_by(session_id: ra_session.id, user_id: predefined_participant.id)
+    return {} if ra_user_session.nil?
+
+    { predefined_participant.id => ra_user_session }
   end
 
   def verify_access

@@ -9,8 +9,13 @@ class V1::UserInterventionSerializer < V1Serializer
     object.sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).size
   end
 
-  attribute :sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object|
-    V1::SessionSerializer.new(object.intervention.sessions)
+  attribute :sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object, params|
+    sessions = if params[:participant_view]
+                 object.intervention.sessions.participant_visible
+               else
+                 object.intervention.sessions
+               end
+    V1::SessionSerializer.new(sessions)
   end
 
   attribute :user_sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object|
