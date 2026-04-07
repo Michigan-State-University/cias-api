@@ -5,13 +5,24 @@ module StaticLinkHelper
     return nil if intervention.sessions.blank?
     return nil if user_intervention&.completed?
 
-    user_sessions = UserSession.where(user_intervention: user_intervention).order(:last_answer_at)
+    # RA session blocks participant until completed by researcher
+    if ra_session(intervention).present?
+      ra_user_session = UserSession.find_by(
+        session_id: ra_session(intervention).id,
+        user_id: user_intervention&.user_id
+      )
+      return nil if ra_user_session&.finished_at.blank?
+    end
+
+    user_sessions = UserSession.where(user_intervention: user_intervention)
+                               .where.not(type: 'UserSession::ResearchAssistant')
+                               .order(:last_answer_at)
     user_sessions_in_progress = user_sessions.where(finished_at: nil).where('scheduled_at IS NULL OR scheduled_at < ?', DateTime.now)
 
     return user_sessions_in_progress.last.session if user_sessions_in_progress.any?
     return nil if intervention.type.eql?('Intervention::FlexibleOrder')
 
-    return intervention.sessions.order(:position).first if user_sessions.blank?
+    return intervention.sessions.participant_visible.order(:position).first if user_sessions.blank?
 
     next_session = user_sessions.where.not(finished_at: nil).last.session.next_session
     next_user_session = UserSession.find_by(session_id: next_session&.id, user_intervention: user_intervention)
@@ -36,6 +47,11 @@ module StaticLinkHelper
   end
 
   private
+
+  def ra_session(intervention)
+    @ra_session ||= {}
+    @ra_session[intervention.id] ||= intervention.sessions.find_by(type: 'Session::ResearchAssistant')
+  end
 
   def participant_date_with_payload(user_intervention, next_session)
     return nil unless next_session&.schedule == 'days_after_date'

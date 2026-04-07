@@ -53,6 +53,7 @@ class Session < ApplicationRecord
   delegate :language_code, to: :google_language
 
   scope :multiple_fill, -> { where(multiple_fill: true) }
+  scope :participant_visible, -> { where.not(type: 'Session::ResearchAssistant') }
 
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
@@ -92,7 +93,7 @@ class Session < ApplicationRecord
   end
 
   def next_session
-    intervention.sessions.where.not(type: 'Session::Sms').order(position: :asc).find_by('position > ?', position)
+    intervention.sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).order(position: :asc).find_by('position > ?', position)
   end
 
   def last_session?

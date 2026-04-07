@@ -18,7 +18,8 @@ class V1::Intervention::PredefinedParticipants::VerifyService
       health_clinic_id: health_clinic_id,
       multiple_fill_session_available: multiple_fill_session_available?(user_intervention),
       user_intervention_id: user_intervention.id,
-      lang: intervention.language_code
+      lang: intervention.language_code,
+      ra_session_pending: ra_session_pending?
     }
   end
 
@@ -37,5 +38,16 @@ class V1::Intervention::PredefinedParticipants::VerifyService
 
   def health_clinic_id
     @health_clinic_id ||= predefined_user_parameters.health_clinic_id
+  end
+
+  def ra_session_pending?
+    ra = ra_session(intervention)
+    return false if ra.nil?
+
+    ra_user_session = UserSession.find_by(
+      session_id: ra.id,
+      user_id: predefined_user_parameters.user_id
+    )
+    ra_user_session.nil? || ra_user_session.finished_at.nil?
   end
 end
