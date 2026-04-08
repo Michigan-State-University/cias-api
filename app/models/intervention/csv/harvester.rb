@@ -44,6 +44,7 @@ class Intervention::Csv::Harvester
         header.concat(information_only_screen_videos_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(sms_links_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(session_metadata(session, index, multiple_fill_indicator_for(session)))
+        header.concat(ra_fulfillment_headers(session, index, multiple_fill_indicator_for(session)))
         header.concat(quick_exit_header(session, index, multiple_fill_indicator_for(session)))
       end
     end
@@ -59,6 +60,15 @@ class Intervention::Csv::Harvester
   def session_metadata(session, index, multiple_fill)
     [column_name(multiple_fill, session, 'metadata.session_start', index + 1), column_name(multiple_fill, session, 'metadata.session_end', index + 1),
      column_name(multiple_fill, session, 'metadata.session_duration', index + 1)]
+  end
+
+  def ra_fulfillment_headers(session, index, multiple_fill)
+    return [] unless session.type == 'Session::ResearchAssistant'
+
+    [
+      column_name(multiple_fill, session, 'metadata.fulfilled_by_email', index + 1),
+      column_name(multiple_fill, session, 'metadata.fulfilled_at', index + 1)
+    ]
   end
 
   def quick_exit_header(session, index, multiple_fill)
@@ -151,6 +161,7 @@ class Intervention::Csv::Harvester
         information_only_screen_videos(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
         sms_links(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
         metadata(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
+        ra_fulfillment_data(user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
         quick_exit(user_session.session, row_index, user_session, number_of_attempts, multiple_fill_indicator_for_session)
       end
 
@@ -209,6 +220,17 @@ class Intervention::Csv::Harvester
       rows[row_index][session_headers_index + 1] = session_end
     end
     rows[row_index][session_headers_index] = session_start
+  end
+
+  def ra_fulfillment_data(user_session, row_index, approach_number, multiple_fill)
+    return unless user_session.is_a?(UserSession::ResearchAssistant)
+
+    session = user_session.session
+    email_index = header.index(column_name(multiple_fill, session, 'metadata.fulfilled_by_email', approach_number))
+    rows[row_index][email_index] = user_session.fulfilled_by&.email if email_index
+
+    at_index = header.index(column_name(multiple_fill, session, 'metadata.fulfilled_at', approach_number))
+    rows[row_index][at_index] = user_session.finished_at if at_index
   end
 
   def quick_exit(session, row_index, user_session, approach_number, multiple_fill)

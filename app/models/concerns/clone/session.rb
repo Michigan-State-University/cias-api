@@ -2,7 +2,11 @@
 
 class Clone::Session < Clone::Base
   def execute
-    outcome.position = position || outcome.intervention.sessions.size
+    if source.type == 'Session::ResearchAssistant'
+      outcome.position = 0
+    else
+      outcome.position = position || outcome.intervention.sessions.size
+    end
     outcome.clear_formulas if clean_formulas
     outcome.days_after_date_variable_name = nil if clean_formulas
     ActiveRecord::Base.transaction do
@@ -216,7 +220,7 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_tests
-    return if source.instance_of?(Session::Classic) || source.instance_of?(Session::Sms)
+    return if source.instance_of?(Session::Classic) || source.instance_of?(Session::Sms) || source.instance_of?(Session::ResearchAssistant)
 
     source.cat_mh_test_types.each do |test_type|
       outcome.cat_mh_test_types << test_type
