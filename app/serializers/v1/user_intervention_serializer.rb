@@ -31,6 +31,14 @@ class V1::UserInterventionSerializer < V1Serializer
       object.user.roles.exclude?('predefined_participant')
   end
 
+  attribute :ra_session_pending do |object|
+    ra_session = object.intervention.sessions.find_by(type: 'Session::ResearchAssistant')
+    next false if ra_session.nil?
+
+    ra_user_session = UserSession.find_by(session_id: ra_session.id, user_id: object.user_id)
+    ra_user_session.nil? || ra_user_session.finished_at.nil?
+  end
+
   attribute :intervention do |object|
     {
       name: object.intervention.name,

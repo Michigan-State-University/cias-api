@@ -19,7 +19,8 @@ class V1::Intervention::PredefinedParticipants::VerifyService
       multiple_fill_session_available: multiple_fill_session_available?(user_intervention),
       user_intervention_id: user_intervention.id,
       lang: intervention.language_code,
-      ra_session_pending: ra_session_pending?
+      ra_session_pending: ra_session_pending?,
+      intervention_type: intervention.type
     }
   end
 
