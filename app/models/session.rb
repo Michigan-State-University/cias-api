@@ -214,7 +214,9 @@ class Session < ApplicationRecord
   private
 
   def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US') if google_tts_voice.nil? && type.in?(%w[Session::Classic Session::ResearchAssistant])
+    if google_tts_voice.nil? && type.in?(%w[Session::Classic Session::ResearchAssistant])
+      self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US')
+    end
     save!
   end
 
@@ -235,9 +237,7 @@ class Session < ApplicationRecord
           next unless target['type']&.include?('Session') && target['id'].present?
 
           target_session = ::Session.find_by(id: target['id'])
-          if target_session&.type == 'Session::ResearchAssistant'
-            errors.add(:formulas, :cannot_branch_to_ra_session)
-          end
+          errors.add(:formulas, :cannot_branch_to_ra_session) if target_session&.type == 'Session::ResearchAssistant'
         end
       end
     end

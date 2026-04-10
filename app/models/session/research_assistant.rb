@@ -44,9 +44,7 @@ class Session::ResearchAssistant < Session
     formulas.each do |formula|
       formula['patterns']&.each do |pattern|
         pattern['target']&.each do |target|
-          if target['type']&.include?('Session') && target['id'].present?
-            errors.add(:formulas, :ra_session_cannot_branch_to_other_sessions)
-          end
+          errors.add(:formulas, :ra_session_cannot_branch_to_other_sessions) if target['type']&.include?('Session') && target['id'].present?
         end
       end
     end

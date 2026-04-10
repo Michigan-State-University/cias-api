@@ -17,9 +17,7 @@ module FormulaRaBranchingValidation
     formulas.each do |formula|
       formula['patterns']&.each do |pattern|
         pattern['target']&.each do |target|
-          if target['type']&.include?('Session') && target['id'].present?
-            errors.add(:formulas, :ra_cannot_branch_to_other_sessions)
-          end
+          errors.add(:formulas, :ra_cannot_branch_to_other_sessions) if target['type']&.include?('Session') && target['id'].present?
         end
       end
     end
@@ -34,9 +32,7 @@ module FormulaRaBranchingValidation
           next unless target['type']&.include?('Session') && target['id'].present?
 
           target_session = Session.find_by(id: target['id'])
-          if target_session&.type == 'Session::ResearchAssistant'
-            errors.add(:formulas, :cannot_branch_to_ra_session)
-          end
+          errors.add(:formulas, :cannot_branch_to_ra_session) if target_session&.type == 'Session::ResearchAssistant'
         end
       end
     end

@@ -59,12 +59,12 @@ class V1::UserSessions::AnswersController < V1Controller
   def validate_ra_fulfillment_access
     return if current_v1_user&.role?('preview_session')
 
-    unless user_session_load.fulfilled_by_id == current_v1_user.id
-      raise ComplexException.new(
-        I18n.t('user_sessions.errors.not_ra_fulfiller'),
-        { reason: 'NOT_RA_FULFILLER' },
-        :forbidden
-      )
-    end
+    return if user_session_load.fulfilled_by_id == current_v1_user.id
+
+    raise ComplexException.new(
+      I18n.t('user_sessions.errors.not_ra_fulfiller'),
+      { reason: 'NOT_RA_FULFILLER' },
+      :forbidden
+    )
   end
 end
