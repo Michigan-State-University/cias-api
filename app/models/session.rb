@@ -234,7 +234,7 @@ class Session < ApplicationRecord
         pattern['target']&.each do |target|
           next unless target['type']&.include?('Session') && target['id'].present?
 
-          target_session = Session.find_by(id: target['id'])
+          target_session = ::Session.find_by(id: target['id'])
           if target_session&.type == 'Session::ResearchAssistant'
             errors.add(:formulas, :cannot_branch_to_ra_session)
           end

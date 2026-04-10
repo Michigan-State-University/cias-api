@@ -7,7 +7,7 @@ class Session::ResearchAssistant < Session
   validate :position_must_be_zero
   validate :no_cross_session_branching
   before_validation :force_single_fill
-  before_destroy :log_ra_deletion_impact, if: -> { user_sessions.where.not(finished_at: nil).exists? }
+  before_destroy :log_ra_deletion_impact, prepend: true, if: -> { user_sessions.where.not(finished_at: nil).exists? }
 
   def user_session_type
     UserSession::ResearchAssistant.name
