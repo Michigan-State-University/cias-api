@@ -21,10 +21,12 @@ module SmsHelper
 
   def attachment_url(plan)
     attachment = if plan.is_used_formula
-                   matched_variant(plan).attachment
+                   matched_variant(plan)&.attachment
                  else
                    plan.no_formula_attachment
                  end
+    return if attachment.nil?
+
     url_for(attachment) if attachment.attached?
   end
 
