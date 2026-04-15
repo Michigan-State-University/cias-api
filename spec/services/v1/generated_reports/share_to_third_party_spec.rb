@@ -123,7 +123,7 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
                                                .merge({ receiver: '' })
 
       expect(Api::Documo::SendMultipleFaxes).to receive(:call).with(['+1202-222-2243'], [kind_of(ActiveStorage::Attached::One)], false, fields,
-                                                                      kind_of(ActiveStorage::Attached::One))
+                                                                    kind_of(ActiveStorage::Attached::One))
       subject
     end
   end
