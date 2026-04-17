@@ -6,7 +6,7 @@ class V1::Interventions::TagsController < V1Controller
     authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    added_tags = V1::Intervention::AssignTags.call(intervention_load, tag_ids, tag_names)
+    added_tags = V1::Intervention::AssignTags.call(intervention_load, tag_ids, tag_names, current_v1_user)
 
     render json: serialized_hash(added_tags).to_json, status: :created
   end

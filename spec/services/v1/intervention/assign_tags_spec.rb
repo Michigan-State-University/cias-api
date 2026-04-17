@@ -4,15 +4,16 @@ require 'rails_helper'
 
 RSpec.describe V1::Intervention::AssignTags do
   describe '.call' do
-    subject(:call_service) { described_class.call(intervention, tag_ids, tag_names) }
+    subject(:call_service) { described_class.call(intervention, tag_ids, tag_names, user) }
 
-    let(:intervention) { create(:intervention) }
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let(:intervention) { create(:intervention, user: user) }
     let(:tag_ids) { [] }
     let(:tag_names) { [] }
 
     context 'when assigning tags by IDs' do
-      let!(:tag1) { create(:tag, name: 'Existing Tag 1') }
-      let!(:tag2) { create(:tag, name: 'Existing Tag 2') }
+      let!(:tag1) { create(:tag, name: 'Existing Tag 1', user: user) }
+      let!(:tag2) { create(:tag, name: 'Existing Tag 2', user: user) }
       let(:tag_ids) { [tag1.id, tag2.id] }
 
       it 'assigns the tags to the intervention' do
@@ -68,6 +69,21 @@ RSpec.describe V1::Intervention::AssignTags do
           expect(result).to be_nil
         end
       end
+
+      context 'when tag IDs belong to another user' do
+        let(:other_user) { create(:user, :confirmed, :researcher) }
+        let!(:other_tag) { create(:tag, name: 'Other User Tag', user: other_user) }
+        let(:tag_ids) { [other_tag.id] }
+
+        it 'does not assign tags from another user' do
+          expect { call_service }.not_to change { intervention.tags.count }
+        end
+
+        it 'returns nil' do
+          result = call_service
+          expect(result).to be_nil
+        end
+      end
     end
 
     context 'when creating and assigning tags by names' do
@@ -75,7 +91,7 @@ RSpec.describe V1::Intervention::AssignTags do
 
       it 'creates new tags with the given names' do
         expect { call_service }.to change(Tag, :count).by(2)
-        expect(Tag.pluck(:name)).to include('New Tag 1', 'New Tag 2')
+        expect(Tag.where(user: user).pluck(:name)).to include('New Tag 1', 'New Tag 2')
       end
 
       it 'assigns the created tags to the intervention' do
@@ -88,8 +104,8 @@ RSpec.describe V1::Intervention::AssignTags do
         expect(result.pluck(:name)).to contain_exactly('New Tag 1', 'New Tag 2')
       end
 
-      context 'when tags with the same names already exist' do
-        let!(:existing_tag) { create(:tag, name: 'New Tag 1') }
+      context 'when tags with the same names already exist for this user' do
+        let!(:existing_tag) { create(:tag, name: 'New Tag 1', user: user) }
 
         it 'does not create duplicate tags' do
           expect { call_service }.to change(Tag, :count).by(1)
@@ -108,7 +124,7 @@ RSpec.describe V1::Intervention::AssignTags do
       end
 
       context 'when some tags by name are already assigned to the intervention' do
-        let!(:existing_tag) { create(:tag, name: 'New Tag 1') }
+        let!(:existing_tag) { create(:tag, name: 'New Tag 1', user: user) }
 
         before do
           intervention.tags << existing_tag
@@ -130,7 +146,7 @@ RSpec.describe V1::Intervention::AssignTags do
     end
 
     context 'when assigning tags by both IDs and names' do
-      let!(:existing_tag) { create(:tag, name: 'Existing Tag') }
+      let!(:existing_tag) { create(:tag, name: 'Existing Tag', user: user) }
       let(:tag_ids) { [existing_tag.id] }
       let(:tag_names) { ['New Tag'] }
 
@@ -200,7 +216,7 @@ RSpec.describe V1::Intervention::AssignTags do
     end
 
     context 'when tag names is nil' do
-      let!(:existing_tag) { create(:tag, name: 'Existing Tag') }
+      let!(:existing_tag) { create(:tag, name: 'Existing Tag', user: user) }
       let(:tag_ids) { [existing_tag.id] }
       let(:tag_names) { nil }
 

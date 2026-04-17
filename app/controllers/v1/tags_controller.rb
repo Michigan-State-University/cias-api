@@ -2,7 +2,7 @@
 
 class V1::TagsController < V1Controller
   def index
-    tags = Tag.not_assigned_to_intervention(intervention_id).filter_by_name(search_param)
+    tags = Tag.owned_by(current_v1_user).not_assigned_to_intervention(intervention_id).filter_by_name(search_param)
     paginated_collection = V1::Paginate.call(tags, start_index, end_index)
     render json: serialized_hash(paginated_collection).merge({ tags_size: tags.size }).to_json, status: :ok
   end

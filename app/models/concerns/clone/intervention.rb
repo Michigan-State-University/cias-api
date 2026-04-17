@@ -41,7 +41,10 @@ class Clone::Intervention < Clone::Base
   end
 
   def assign_tags
-    outcome.tags << source.tags
+    source.tags.find_each do |source_tag|
+      tag = Tag.find_or_create_by(name: source_tag.name, user_id: outcome.user_id)
+      outcome.tags << tag unless outcome.tags.include?(tag)
+    end
   end
 
   def create_sessions
