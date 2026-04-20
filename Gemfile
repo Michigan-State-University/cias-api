@@ -87,6 +87,7 @@ group :development, :test do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
   gem 'rubocop-thread_safety', require: false
+  gem 'sidekiq-cron', '~> 2.3'
 end
 
 group :development do
