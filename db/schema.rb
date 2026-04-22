@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_26_120000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_22_142252) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -101,6 +101,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_26_120000) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "bulk_import_payloads", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "researcher_id", null: false
+    t.uuid "intervention_id", null: false
+    t.text "payload_ciphertext", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_bulk_import_payloads_on_created_at"
+    t.index ["intervention_id"], name: "index_bulk_import_payloads_on_intervention_id"
+    t.index ["researcher_id"], name: "index_bulk_import_payloads_on_researcher_id"
   end
 
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
@@ -1145,6 +1156,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_26_120000) do
   add_foreign_key "alert_phones", "sms_plans"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "bulk_import_payloads", "interventions", on_delete: :cascade
+  add_foreign_key "bulk_import_payloads", "users", column: "researcher_id", on_delete: :cascade
   add_foreign_key "cat_mh_google_tts_voices", "cat_mh_languages"
   add_foreign_key "cat_mh_google_tts_voices", "google_tts_voices"
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages"

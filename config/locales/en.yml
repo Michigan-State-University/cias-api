@@ -245,6 +245,22 @@ en:
       header: CIAS Intervention Import - error
       body: 'There was a problem while importing intervention. Try again or contact support.'
       notification: There was an issue with importing intervention
+  bulk_import_mailer:
+    bulk_import_result:
+      subject: CIAS PDP Bulk Import complete
+      header: PDP Bulk Import complete
+      body_summary: 'Intervention %{intervention_name}: %{participants_created} participants created, %{ra_completed} RA sessions auto-completed, %{ra_partial} partially filled, %{failed} failed out of %{total} rows.'
+      button: Open intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
+    bulk_import_error:
+      subject: CIAS PDP Bulk Import failed
+      header: PDP Bulk Import failed
+      body: 'PDP Bulk Import for intervention %{intervention_name} could not be processed. No participants were created. Please try again or contact support.'
+  predefined_participants:
+    bulk_import:
+      participant_validation_error: Participant data validation failed
+      variable_answers_validation_error: RA answer validation failed
+      empty_participants_error: CSV contains no participants
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
