@@ -3,22 +3,27 @@
 class V1::Intervention::PredefinedParticipants::VariableAnswersValidator
   SUPPORTED_QUESTION_TYPES = %w[Question::Single Question::Number Question::Date].freeze
 
-  def self.call(intervention, variable_answers_by_participant)
-    new(intervention, variable_answers_by_participant).call
+  def self.call(intervention, participant_params_list)
+    new(intervention, participant_params_list).call
   end
 
-  def initialize(intervention, variable_answers_by_participant)
+  def initialize(intervention, participant_params_list)
     @intervention = intervention
-    @variable_answers_by_participant = variable_answers_by_participant
+    @participant_params_list = participant_params_list
     @errors = []
   end
 
   def call
+    return if @participant_params_list.none? { |p| p[:variable_answers].present? }
+
     raise_validation_error('ra_session_missing') if ra_session.blank?
     raise_validation_error('ra_session_has_no_answerable_questions') if question_lookup.empty?
 
-    variable_answers_by_participant.each do |index, answers|
-      answers.each { |key, raw_value| validate_entry(index, key, raw_value) }
+    @participant_params_list.each_with_index do |params, idx|
+      answers = params[:variable_answers]&.to_h
+      next if answers.blank?
+
+      answers.each { |key, raw_value| validate_entry(idx, key, raw_value) }
     end
 
     return if @errors.empty?
@@ -32,7 +37,7 @@ class V1::Intervention::PredefinedParticipants::VariableAnswersValidator
 
   private
 
-  attr_reader :intervention, :variable_answers_by_participant
+  attr_reader :intervention
 
   def ra_session
     return @ra_session if defined?(@ra_session)

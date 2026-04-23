@@ -25,9 +25,28 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def bulk_create
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    predefined_users = V1::Intervention::PredefinedParticipants::BulkCreateService.call(intervention_load, predefined_users_parameters)
+    participant_params_list = predefined_users_parameters[:participants] || []
 
-    render json: serialized_response(predefined_users), status: :created
+    if participant_params_list.empty?
+      raise ComplexException.new(
+        I18n.t('predefined_participants.bulk_import.empty_participants_error'),
+        { errors: [{ code: 'empty_participants' }] },
+        :unprocessable_entity
+      )
+    end
+
+    V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator.call(participant_params_list)
+    V1::Intervention::PredefinedParticipants::VariableAnswersValidator.call(intervention_load, participant_params_list)
+
+    payload_record = BulkImportPayload.create!(
+      researcher: current_v1_user,
+      intervention: intervention_load,
+      payload: build_job_payload(participant_params_list)
+    )
+
+    PredefinedParticipants::BulkImportJob.perform_later(payload_record.id)
+
+    head :accepted
   end
 
   def update
@@ -148,9 +167,17 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
         :health_clinic_id,
         :health_clinic_name,
         :health_system_name,
-        { phone_attributes: %i[iso prefix number] }
+        { phone_attributes: %i[iso prefix number], variable_answers: {} }
       ]
     )
+  end
+
+  def build_job_payload(participant_params_list)
+    participant_params_list.map do |params|
+      attributes = params.to_h.deep_stringify_keys.except('variable_answers')
+      variable_answers = (params[:variable_answers] || {}).to_h.deep_stringify_keys
+      { 'attributes' => attributes, 'variable_answers' => variable_answers }
+    end
   end
 
   def intervention_load
