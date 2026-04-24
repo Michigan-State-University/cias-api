@@ -22,13 +22,19 @@ RSpec.describe BulkImportMailer do
       expect(mail.body.encoded).to include(intervention.name)
     end
 
-    it 'renders each counter from the result hash in the body' do
+    it 'renders every counter from the result hash as a table row' do
       body = mail.body.encoded
-      expect(body).to include('9 participants created')
-      expect(body).to include('5 RA sessions auto-completed')
-      expect(body).to include('4 partially filled')
-      expect(body).to include('1 failed')
-      expect(body).to include('10 rows')
+      # Each row is rendered as `<td>Label</td><td>Count</td>` — assert both label and count appear.
+      expect(body).to include('CSV rows')
+      expect(body).to include('>10<')
+      expect(body).to include('Participants created')
+      expect(body).to include('>9<')
+      expect(body).to include('RA sessions auto-completed')
+      expect(body).to include('>5<')
+      expect(body).to include('RA sessions partially filled')
+      expect(body).to include('>4<')
+      expect(body).to include('Failed')
+      expect(body).to include('>1<')
     end
 
     it 'does not include any per-row participant data' do

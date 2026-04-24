@@ -5,7 +5,7 @@ class UserSession::ResearchAssistant < UserSession
 
   belongs_to :fulfilled_by, class_name: 'User', optional: true
 
-  def finish(send_email: true)
+  def finish(send_email: true) # rubocop:disable Lint/UnusedMethodArgument
     return if finished_at
 
     cancel_timeout_job

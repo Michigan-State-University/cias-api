@@ -109,9 +109,10 @@ RSpec.describe Session::ResearchAssistant, type: :model do
                                  user_intervention: user_intervention, finished_at: 1.day.ago)
       end
 
-      it 'calls log_ra_deletion_impact on destroy' do
-        expect(ra_session).to receive(:log_ra_deletion_impact).and_call_original
+      it 'logs a warning on destroy naming the completed-session count' do
+        allow(Rails.logger).to receive(:warn).and_call_original
         ra_session.destroy
+        expect(Rails.logger).to have_received(:warn).with(/RA session .* deleted with 1 completed user sessions/)
       end
     end
 

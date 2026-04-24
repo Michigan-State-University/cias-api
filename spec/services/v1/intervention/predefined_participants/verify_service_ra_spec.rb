@@ -2,14 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService, 'RA session integration' do
+RSpec.describe V1::Intervention::PredefinedParticipants::VerifyService do
   subject(:result) { described_class.call(predefined_user_parameters) }
 
   let!(:predefined_participant) { create(:user, :predefined_participant) }
   let(:predefined_user_parameters) { predefined_participant.predefined_user_parameter }
   let(:intervention) { predefined_user_parameters.intervention }
 
-  describe 'response keys' do
+  describe 'RA session integration — response keys' do
     it 'includes ra_session_pending and intervention_type' do
       expect(result.keys).to include(:ra_session_pending, :intervention_type)
     end

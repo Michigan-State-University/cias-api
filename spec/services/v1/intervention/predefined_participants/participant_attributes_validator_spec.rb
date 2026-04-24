@@ -79,7 +79,7 @@ RSpec.describe V1::Intervention::PredefinedParticipants::ParticipantAttributesVa
     let(:participant_params_list) { [valid_params(email: 'not-an-email')] }
 
     it 'raises ComplexException with at least one error on the email field' do
-      # Note: the concrete code string depends on the email validator gem
+      # NOTE: the concrete code string depends on the email validator gem
       # (Devise uses a message string, not a symbol). We pin only the
       # field, not the code, to stay robust across validator-gem changes.
       expect { call }.to raise_error(ComplexException) do |exc|

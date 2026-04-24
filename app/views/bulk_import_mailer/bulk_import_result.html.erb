@@ -180,15 +180,29 @@
                       <tbody>
                       <tr>
                         <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
-                          <div style="font-family:DM Sans, Helvetica, Arial;font-size:16px;font-weight:700;line-height:26px;text-align:center;color:#2F3850;">
-                            <! -- MAIN-TEXT START --> <%= render inline: t('bulk_import_mailer.bulk_import_result.body_summary',
-                                                                                intervention_name: @intervention.name,
-                                                                                total: @result[:total],
-                                                                                participants_created: @result[:participants_created],
-                                                                                ra_completed: @result[:ra_completed],
-                                                                                ra_partial: @result[:ra_partial],
-                                                                                failed: @result[:failed]) %> <! -- MAIN-TEXT END -->
+                          <! -- MAIN-TEXT START -->
+                          <div style="font-family:DM Sans, Helvetica, Arial;font-size:16px;line-height:26px;text-align:center;color:#2F3850;">
+                            <p style="margin:0 0 16px 0;font-weight:700;">
+                              <%= t('bulk_import_mailer.bulk_import_result.intro_html', intervention_name: @intervention.name) %>
+                            </p>
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;text-align:left;font-size:14px;">
+                              <tbody>
+                                <% [
+                                  [t('bulk_import_mailer.bulk_import_result.total'),                @result[:total]],
+                                  [t('bulk_import_mailer.bulk_import_result.participants_created'), @result[:participants_created]],
+                                  [t('bulk_import_mailer.bulk_import_result.ra_completed'),         @result[:ra_completed]],
+                                  [t('bulk_import_mailer.bulk_import_result.ra_partial'),           @result[:ra_partial]],
+                                  [t('bulk_import_mailer.bulk_import_result.failed'),               @result[:failed]]
+                                ].each do |label, count| %>
+                                  <tr>
+                                    <td style="padding:10px 16px;border-bottom:1px solid #E5E7EB;color:#6D7485;"><%= label %></td>
+                                    <td style="padding:10px 16px;border-bottom:1px solid #E5E7EB;color:#2F3850;font-weight:700;text-align:right;"><%= count %></td>
+                                  </tr>
+                                <% end %>
+                              </tbody>
+                            </table>
                           </div>
+                          <! -- MAIN-TEXT END -->
                         </td>
                       </tr>
                       </tbody>

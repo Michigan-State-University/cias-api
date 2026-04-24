@@ -25,9 +25,9 @@ RSpec.describe PredefinedParticipants::BulkImportJob, type: :job do
 
   describe 'happy path' do
     it 'calls the service with decrypted payload' do
-      expect(V1::Intervention::PredefinedParticipants::BulkImportService)
-        .to receive(:call).with(researcher, intervention, payload_value).and_return(service_result)
       perform
+      expect(V1::Intervention::PredefinedParticipants::BulkImportService)
+        .to have_received(:call).with(researcher, intervention, payload_value)
     end
 
     it 'sends the result email' do
@@ -110,6 +110,58 @@ RSpec.describe PredefinedParticipants::BulkImportJob, type: :job do
       allow(Sentry).to receive(:capture_exception)
       expect(BulkImportMailer).not_to receive(:bulk_import_error)
       perform
+    end
+  end
+
+  describe 'observability (logging)' do
+    it 'logs Starting with researcher + intervention IDs and row count' do
+      allow(Rails.logger).to receive(:info)
+      perform
+      expect(Rails.logger).to have_received(:info)
+        .with(match(/Starting.*researcher_id=#{researcher.id}.*intervention_id=#{intervention.id}.*rows=1/))
+    end
+
+    it 'logs Completed with counters from the service result' do
+      allow(Rails.logger).to receive(:info)
+      perform
+      expect(Rails.logger).to have_received(:info)
+        .with(match(/Completed.*participants_created=1.*ra_completed=0.*ra_partial=0.*failed=0/))
+    end
+
+    it 'logs Service raised (warn) with exception CLASS, not message' do
+      allow(V1::Intervention::PredefinedParticipants::BulkImportService)
+        .to receive(:call).and_raise(StandardError, 'leak_canary: p@example.test')
+      allow(Sentry).to receive(:capture_exception)
+      allow(Rails.logger).to receive(:warn)
+
+      perform
+
+      expect(Rails.logger).to have_received(:warn)
+        .with(match(/Service raised.*error=StandardError/))
+      expect(Rails.logger).not_to have_received(:warn).with(match(/leak_canary/))
+    end
+
+    it 'logs Email skipped when researcher.email_notification is false' do
+      researcher.update!(email_notification: false)
+      allow(Rails.logger).to receive(:info)
+
+      perform
+
+      expect(Rails.logger).to have_received(:info)
+        .with(match(/Email skipped.*email_notification=false.*researcher_id=#{researcher.id}/))
+    end
+
+    it 'HIPAA: no log line contains researcher email or participant CSV PII' do
+      captured = []
+      %i[info warn error].each do |level|
+        allow(Rails.logger).to receive(level) { |msg| captured << msg.to_s }
+      end
+
+      perform
+
+      all_logs = captured.join("\n")
+      expect(all_logs).not_to include(researcher.email)
+      expect(all_logs).not_to include('p@example.test') # participant email from payload_value
     end
   end
 
