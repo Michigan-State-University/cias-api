@@ -19,6 +19,12 @@ class Session::ResearchAssistant < Session
     self.multiple_fill = false
   end
 
+  def set_default_variable
+    return if variable.present?
+
+    self.variable = 'ra'
+  end
+
   def single_ra_session_per_intervention
     return unless intervention&.sessions&.where(type: 'Session::ResearchAssistant')
                                &.where&.not(id: id)&.exists?
