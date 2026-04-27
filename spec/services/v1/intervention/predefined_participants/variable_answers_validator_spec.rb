@@ -29,11 +29,17 @@ RSpec.describe V1::Intervention::PredefinedParticipants::VariableAnswersValidato
   end
 
   def multiple_question(variable:)
-    create(:question_multiple,
-           question_group: question_group,
-           body: {
-             'data' => [{ 'payload' => 'Opt', 'variable' => { 'name' => variable, 'value' => '1' } }]
-           })
+    # Model layer rejects Question::Multiple in RA sessions; stub the rejection on this
+    # single instance to simulate legacy data and exercise the validator's defensive
+    # `unsupported_question_type` path. Per-instance stub avoids affecting other examples.
+    question = build(:question_multiple,
+                     question_group: question_group,
+                     body: {
+                       'data' => [{ 'payload' => 'Opt', 'variable' => { 'name' => variable, 'value' => '1' } }]
+                     })
+    allow(question).to receive(:type_supported_for_ra_session)
+    question.save!
+    question
   end
 
   # Build a participant row hash. Mirrors the shape the controller hands the

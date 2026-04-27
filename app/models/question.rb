@@ -62,6 +62,7 @@ class Question < ApplicationRecord
                                                                } }
   validate :correct_variable_format
   validate :properly_assigned
+  validate :type_supported_for_ra_session
 
   delegate :session, to: :question_group
   delegate :ability_to_update_for?, to: :question_group
@@ -246,6 +247,14 @@ class Question < ApplicationRecord
     elsif ['Question::Sms', 'Question::SmsInformation'].include?(type)
       errors.add(:base, "Can not add #{type} to #{session.type}")
     end
+  end
+
+  def type_supported_for_ra_session
+    return unless question_group&.session.is_a?(::Session::ResearchAssistant)
+    return if type == 'Question::Finish'
+    return if ::Session::ResearchAssistant::SUPPORTED_QUESTION_TYPES.include?(type)
+
+    errors.add(:type, :unsupported_in_ra_session)
   end
 
   def special_variable?(_var)

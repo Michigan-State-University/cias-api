@@ -3,6 +3,8 @@
 class Session::ResearchAssistant < Session
   include ::Session::ClassicBehavior
 
+  SUPPORTED_QUESTION_TYPES = %w[Question::Single Question::Number Question::Date].freeze
+
   validate :single_ra_session_per_intervention, on: :create
   validate :position_must_be_zero
   validate :no_cross_session_branching

@@ -201,12 +201,16 @@ RSpec.describe V1::Intervention::PredefinedParticipants::BulkImportService do
     end
 
     describe 'mixed-type RA session (Single + Multiple) with only Singles in CSV' do
-      # Regression guard for plan entry #62 + spec #25.
+      # Multiple is now rejected at the model
+      # layer for RA sessions; stub on the instance to simulate legacy data so this regression
+      # guard still exercises the auto-finish "partial" path with a non-supported question present.
       before do
         single_question(variable: 'mood', values: %w[1 2 3])
-        create(:question_multiple,
-               question_group: question_group,
-               body: { 'data' => [{ 'payload' => 'Opt', 'variable' => { 'name' => 'picks', 'value' => '1' } }] })
+        multiple_q = build(:question_multiple,
+                           question_group: question_group,
+                           body: { 'data' => [{ 'payload' => 'Opt', 'variable' => { 'name' => 'picks', 'value' => '1' } }] })
+        allow(multiple_q).to receive(:type_supported_for_ra_session)
+        multiple_q.save!
       end
 
       let(:payload) do

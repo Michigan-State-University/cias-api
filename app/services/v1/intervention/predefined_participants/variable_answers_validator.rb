@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class V1::Intervention::PredefinedParticipants::VariableAnswersValidator
-  SUPPORTED_QUESTION_TYPES = %w[Question::Single Question::Number Question::Date].freeze
+  SUPPORTED_QUESTION_TYPES = Session::ResearchAssistant::SUPPORTED_QUESTION_TYPES
 
   def self.call(intervention, participant_params_list)
     new(intervention, participant_params_list).call

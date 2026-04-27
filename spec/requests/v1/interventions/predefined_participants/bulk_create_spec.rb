@@ -165,14 +165,19 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
   end
 
   describe 'scenario 9 — unsupported question type (Multiple) in variable_answers' do
+    # Defensive: model-layer `Question#type_supported_for_ra_session` rejects creating Multiple
+    # in an RA session, so this state is unreachable through normal API use. Per-instance
+    # validation stub lets us simulate legacy data and exercise the validator's fallback path.
     let!(:ra_session) { create(:ra_session, intervention: intervention, variable: 's1') }
     let(:params) { wrap(participant_attrs(email: 'p@example.test', variable_answers: { 's1.picks' => '1' })) }
     let!(:question_group) { create(:question_group, session: ra_session) }
 
     before do
-      create(:question_multiple,
-             question_group: question_group,
-             body: { 'data' => [{ 'payload' => 'Opt', 'variable' => { 'name' => 'picks', 'value' => '1' } }] })
+      question = build(:question_multiple,
+                       question_group: question_group,
+                       body: { 'data' => [{ 'payload' => 'Opt', 'variable' => { 'name' => 'picks', 'value' => '1' } }] })
+      allow(question).to receive(:type_supported_for_ra_session)
+      question.save!
     end
 
     it 'returns 422 with unsupported_question_type, no payload, no enqueue' do
