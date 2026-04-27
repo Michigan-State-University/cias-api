@@ -376,6 +376,35 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         end
       end
 
+      context 'when date with human-readable format' do
+        let!(:question_body) do
+          {
+            'data' => [
+              { 'payload' => '' }
+            ],
+            'variable' => { 'name' => 'date' }
+          }
+        end
+        let!(:answer_body) do
+          {
+            'data' => [
+              {
+                'var' => 'date',
+                'value' => 'Tue Mar 10 2026'
+              }
+            ]
+          }
+        end
+        let!(:question) { create(:question_date, question_group: question_group, body: question_body) }
+        let!(:answer) { create(:answer_date, question: question, body: answer_body, user_session: user_session) }
+
+        it 'normalizes the date to ISO 8601 format' do
+          subject.collect
+          expect(subject.rows).to eq [[answer.user_session.user_id.to_s, answer.user_session.user.email.to_s, '2026-03-10',
+                                       answer.user_session.answers.first.created_at, nil, nil]]
+        end
+      end
+
       context 'when phone' do
         let!(:question_body) do
           {
