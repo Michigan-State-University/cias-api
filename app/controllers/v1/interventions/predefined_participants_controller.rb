@@ -1,15 +1,17 @@
 # frozen_string_literal: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
-  before_action :verify_access, except: [:verify]
+  before_action :verify_access, except: %i[verify ra_session]
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def index
-    render json: serialized_response(predefined_participants)
+    render json: serialized_response(predefined_participants, 'PredefinedParticipant',
+                                     params: { ra_user_sessions: ra_user_sessions_for_index })
   end
 
   def show
-    render json: serialized_response(predefined_participant)
+    render json: serialized_response(predefined_participant, 'PredefinedParticipant',
+                                     params: { ra_user_sessions: ra_user_sessions_for_show })
   end
 
   def create
@@ -23,9 +25,27 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   def bulk_create
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    predefined_users = V1::Intervention::PredefinedParticipants::BulkCreateService.call(intervention_load, predefined_users_parameters)
+    participant_params_list = predefined_users_parameters[:participants] || []
 
-    render json: serialized_response(predefined_users), status: :created
+    if participant_params_list.empty?
+      raise ComplexException.new(
+        I18n.t('predefined_participants.bulk_import.empty_participants_error'),
+        { errors: [{ code: 'empty_participants' }] },
+        :unprocessable_entity
+      )
+    end
+
+    run_bulk_import_validators(participant_params_list)
+
+    payload_record = BulkImportPayload.create!(
+      researcher: current_v1_user,
+      intervention: intervention_load,
+      payload: build_job_payload(participant_params_list)
+    )
+
+    PredefinedParticipants::BulkImportJob.perform_later(payload_record.id)
+
+    head :accepted
   end
 
   def update
@@ -51,6 +71,59 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     predefined_participant.update!(active: false)
 
     render status: :no_content
+  end
+
+  def ra_session
+    @predefined_user_parameter = PredefinedUserParameter.find_by!(slug: params[:slug])
+    intervention = predefined_user_parameter.intervention
+    participant = predefined_user_parameter.user
+
+    authorize! :fulfill_ra_session, intervention
+    check_intervention_status
+
+    ra_session = intervention.sessions.find_by!(type: 'Session::ResearchAssistant')
+
+    user_intervention = UserIntervention.find_or_create_by(
+      user_id: participant.id,
+      intervention_id: intervention.id,
+      health_clinic_id: predefined_user_parameter.health_clinic_id
+    )
+
+    user_session = UserSession::ResearchAssistant.find_or_create_by(
+      session_id: ra_session.id,
+      user_id: participant.id,
+      type: 'UserSession::ResearchAssistant',
+      user_intervention_id: user_intervention.id,
+      health_clinic_id: predefined_user_parameter.health_clinic_id
+    )
+
+    if user_session.finished_at.present?
+      render json: {
+        data: {
+          user_session_id: user_session.id,
+          session_id: ra_session.id,
+          intervention_id: intervention.id,
+          health_clinic_id: predefined_user_parameter.health_clinic_id,
+          lang: intervention.language_code,
+          already_completed: true
+        }
+      }, status: :ok
+      return
+    end
+
+    user_session.update!(fulfilled_by_id: current_v1_user.id, started: true)
+    user_intervention.in_progress! if user_intervention.ready_to_start?
+
+    render json: {
+      data: {
+        user_session_id: user_session.id,
+        session_id: ra_session.id,
+        intervention_id: intervention.id,
+        health_clinic_id: predefined_user_parameter.health_clinic_id,
+        lang: intervention.language_code,
+        already_completed: false
+      }
+    }, status: :ok
   end
 
   def send_sms_invitation
@@ -93,8 +166,42 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
         :health_clinic_id,
         :health_clinic_name,
         :health_system_name,
-        { phone_attributes: %i[iso prefix number] }
+        { phone_attributes: %i[iso prefix number], variable_answers: {} }
       ]
+    )
+  end
+
+  def build_job_payload(participant_params_list)
+    participant_params_list.map do |params|
+      attributes = params.to_h.deep_stringify_keys.except('variable_answers')
+      variable_answers = (params[:variable_answers] || {}).to_h.deep_stringify_keys
+      { 'attributes' => attributes, 'variable_answers' => variable_answers }
+    end
+  end
+
+  # Run both validators and accumulate errors so the researcher sees every issue in one response,
+  # not just the first one. Each validator's `.call` raises ComplexException with `{ errors: [...] }`;
+  # we catch, concat, and raise once at the end. The two error sets share the `{ row:, field:, code: }`
+  # shape and `field` is naturally namespaced (`email`/`phone.*`/`health_clinic_id` vs `<sess>.<var>`),
+  # so the frontend can route each entry to the correct CSV cell unambiguously.
+  def run_bulk_import_validators(participant_params_list)
+    errors = []
+
+    [
+      -> { V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator.call(participant_params_list) },
+      -> { V1::Intervention::PredefinedParticipants::VariableAnswersValidator.call(intervention_load, participant_params_list) }
+    ].each do |validator|
+      validator.call
+    rescue ComplexException => e
+      errors.concat(e.additional_information[:errors])
+    end
+
+    return if errors.empty?
+
+    raise ComplexException.new(
+      I18n.t('predefined_participants.bulk_import.bulk_import_validation_error'),
+      { errors: errors },
+      :unprocessable_entity
     )
   end
 
@@ -120,6 +227,26 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def slug
     params[:slug]
+  end
+
+  def ra_user_sessions_for_index
+    ra_session = intervention_load.sessions.find_by(type: 'Session::ResearchAssistant')
+    return {} if ra_session.nil?
+
+    UserSession.where(session_id: ra_session.id, user_id: predefined_participants.map(&:id))
+               .includes(:fulfilled_by)
+               .index_by(&:user_id)
+  end
+
+  def ra_user_sessions_for_show
+    ra_session = intervention_load.sessions.find_by(type: 'Session::ResearchAssistant')
+    return {} if ra_session.nil?
+
+    ra_user_session = UserSession.includes(:fulfilled_by)
+                                 .find_by(session_id: ra_session.id, user_id: predefined_participant.id)
+    return {} if ra_user_session.nil?
+
+    { predefined_participant.id => ra_user_session }
   end
 
   def verify_access
