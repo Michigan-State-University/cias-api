@@ -35,8 +35,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       )
     end
 
-    V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator.call(participant_params_list)
-    V1::Intervention::PredefinedParticipants::VariableAnswersValidator.call(intervention_load, participant_params_list)
+    run_bulk_import_validators(participant_params_list)
 
     payload_record = BulkImportPayload.create!(
       researcher: current_v1_user,
@@ -178,6 +177,32 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       variable_answers = (params[:variable_answers] || {}).to_h.deep_stringify_keys
       { 'attributes' => attributes, 'variable_answers' => variable_answers }
     end
+  end
+
+  # Run both validators and accumulate errors so the researcher sees every issue in one response,
+  # not just the first one. Each validator's `.call` raises ComplexException with `{ errors: [...] }`;
+  # we catch, concat, and raise once at the end. The two error sets share the `{ row:, field:, code: }`
+  # shape and `field` is naturally namespaced (`email`/`phone.*`/`health_clinic_id` vs `<sess>.<var>`),
+  # so the frontend can route each entry to the correct CSV cell unambiguously.
+  def run_bulk_import_validators(participant_params_list)
+    errors = []
+
+    [
+      -> { V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator.call(participant_params_list) },
+      -> { V1::Intervention::PredefinedParticipants::VariableAnswersValidator.call(intervention_load, participant_params_list) }
+    ].each do |validator|
+      validator.call
+    rescue ComplexException => e
+      errors.concat(e.additional_information[:errors])
+    end
+
+    return if errors.empty?
+
+    raise ComplexException.new(
+      I18n.t('predefined_participants.bulk_import.bulk_import_validation_error'),
+      { errors: errors },
+      :unprocessable_entity
+    )
   end
 
   def intervention_load

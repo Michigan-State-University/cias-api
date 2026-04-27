@@ -38,6 +38,7 @@ es:
     bulk_import:
       participant_validation_error: La validación de los datos del participante ha fallado
       variable_answers_validation_error: La validación de las respuestas RA ha fallado
+      bulk_import_validation_error: La validación de la importación masiva ha fallado
       empty_participants_error: El CSV no contiene participantes
   session_mailer:
     grant_access_to_a_user:

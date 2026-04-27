@@ -264,13 +264,13 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     end
   end
 
-  describe 'scenario 14 — fail-fast: participant-attr errors surface WITHOUT variable-answer errors' do
+  describe 'scenario 14 — accumulate: BOTH participant-attr AND variable-answer errors surface in one response' do
     let!(:ra_session) { create(:ra_session, intervention: intervention, variable: 's1') }
     let(:params) do
       wrap(participant_attrs(
         # Participant-attr failure: invalid email format.
         email: 'not-an-email',
-        # Variable-answer failure that would trip if reached: out-of-options.
+        # Variable-answer failure: out-of-options value.
         variable_answers: { 's1.mood' => '999' }
       ))
     end
@@ -282,15 +282,22 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
              body: { 'data' => [{ 'payload' => 'A', 'value' => '1' }], 'variable' => { 'name' => 'mood' } })
     end
 
-    it 'returns only participant-attr errors; variable-answer validator is not invoked; no payload; no enqueue' do
-      expect(V1::Intervention::PredefinedParticipants::VariableAnswersValidator).not_to receive(:call)
-
+    it 'returns 422 with errors from BOTH validators in one response; no payload; no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
       expect(response).to have_http_status(:unprocessable_entity)
+
       errors = json_response['details']['errors']
-      expect(errors.pluck('field')).to include('email')
-      expect(errors.pluck('field')).not_to include('s1.mood')
+      fields = errors.pluck('field')
+      # Both validators ran; both error categories present.
+      expect(fields).to include('email')
+      expect(fields).to include('s1.mood')
+    end
+
+    it 'invokes BOTH validators (regression guard against fail-fast reverting)' do
+      expect(V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator).to receive(:call).and_call_original
+      expect(V1::Intervention::PredefinedParticipants::VariableAnswersValidator).to receive(:call).and_call_original
+      request
     end
   end
 
