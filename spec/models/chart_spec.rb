@@ -204,5 +204,26 @@ RSpec.describe Chart do
       expect(result).to match_array(%w[var1 var2])
       expect(result).not_to include('other_var')
     end
+
+    it 'caches per-intervention so successive calls with different interventions return their own questions' do
+      # Regression: previously the result was memoized in a single ivar without
+      # keying on intervention, so a Chart instance reused across multiple
+      # interventions (CreateForUserSessions bulk path) would lock in the first
+      # intervention's vars and misclassify formulas for the rest.
+      other_intervention = create(:intervention, :published, organization: organization)
+      other_session = create(:session, intervention: other_intervention, variable: 'session1')
+      other_question_group = create(:question_group, session: other_session)
+      create(:question_single, question_group: other_question_group, body: {
+               data: [{ payload: 'option1', value: '1' }],
+               variable: { name: 'other_intervention_var' }
+             })
+
+      first_result = chart.send(:intervention_question_variables, intervention)
+      second_result = chart.send(:intervention_question_variables, other_intervention)
+
+      expect(first_result).to match_array(%w[var1 var2])
+      expect(second_result).to contain_exactly('other_intervention_var')
+      expect(second_result).not_to include('var1', 'var2')
+    end
   end
 end
