@@ -54,7 +54,6 @@ class Chart < ApplicationRecord
     available_vars = intervention_question_variables(intervention)
 
     missing_vars.reject do |var|
-      # Remove session prefix
       var_name = var.split('.').last
       available_vars.include?(var_name)
     end
@@ -63,11 +62,11 @@ class Chart < ApplicationRecord
   private
 
   def intervention_question_variables(intervention)
-    @intervention_question_variables ||= begin
-      questions = ::Question.joins(question_group: :session)
-                            .where(sessions: { intervention_id: intervention.id })
-
-      questions.flat_map(&:question_variables).compact.uniq
-    end
+    # Keyed by intervention.id: a Chart instance can be called with different interventions.
+    @intervention_question_variables ||= {}
+    @intervention_question_variables[intervention.id] ||= ::Question
+      .joins(question_group: :session)
+      .where(sessions: { intervention_id: intervention.id })
+      .flat_map(&:question_variables).compact.uniq
   end
 end
