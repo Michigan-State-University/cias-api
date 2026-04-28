@@ -27,8 +27,16 @@ class V1::ChartStatistics::Create
         return
       end
 
-      valid_vars = missing_vars - invalid_vars
-      Rails.logger.info("ChartStatistics::Create chart_id=#{chart.id}: missing variables from unselected options (will be set to 0): #{valid_vars.inspect}")
+      if any_owning_question_unanswered?(missing_vars)
+        Rails.logger.info(
+          "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
+          "user_session=#{user_session.id} did not reach all questions referenced by formula " \
+          "(branched-around or partial completion). Formula: #{formula['payload']}"
+        )
+        return
+      end
+
+      Rails.logger.info("ChartStatistics::Create chart_id=#{chart.id}: missing variables from unselected options (will be set to 0): #{missing_vars.inspect}")
     end
     return if formula_error?
     return if zero_division_error?
@@ -115,5 +123,26 @@ class V1::ChartStatistics::Create
     return false if chart.date_range_end.present? && chart.date_range_end + 1.day <= user_session.finished_at
 
     true
+  end
+
+  def any_owning_question_unanswered?(missing_vars)
+    return false if missing_vars.empty?
+
+    required_var_names = missing_vars.map { |v| v.split('.').last }
+
+    owning_question_ids = Question.joins(question_group: :session)
+                                  .where(sessions: { intervention_id: user_session.session.intervention_id })
+                                  .select { |q| q.question_variables.compact.intersect?(required_var_names) }
+                                  .map(&:id)
+    return false if owning_question_ids.empty?
+
+    latest_user_session_ids = user_session.user_intervention.latest_user_sessions.map(&:id)
+
+    answered_question_ids = Answer.confirmed
+                                  .where(user_session_id: latest_user_session_ids,
+                                         question_id: owning_question_ids)
+                                  .pluck(:question_id).uniq
+
+    (owning_question_ids - answered_question_ids).any?
   end
 end
