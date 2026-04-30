@@ -15,6 +15,7 @@ class Import::Basic::ReportTemplateService
     @session_id = session_id
     @logo = report_template_hash.delete(:logo)
     @cover_letter_custom_logo = report_template_hash.delete(:cover_letter_custom_logo)
+    report_template_hash.delete(:id)
   end
 
   attr_reader :report_template_hash, :session_id, :logo, :cover_letter_custom_logo
