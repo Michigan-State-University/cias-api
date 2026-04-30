@@ -2,6 +2,7 @@
 
 RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   include ActiveJob::TestHelper
+  include ActiveSupport::Testing::TimeHelpers
   include Rails.application.routes.url_helpers
 
   subject { described_class.call(user_session) }
@@ -21,7 +22,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
   before do
     ActiveJob::Base.queue_adapter = :test
-    allow(Time).to receive(:current).and_return(current_time)
+    travel_to(current_time)
     clear_enqueued_jobs
   end
 
@@ -86,7 +87,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
                                         {
                                           'var' => 'phone',
                                           'value' => { 'iso' => 'PL', 'number' => '123123123', 'prefix' => '+48', 'confirmed' => true,
-                                                       'time_ranges' => [{ 'from' => '9', 'to' => '13' }], 'time_zone' => 'Asia/Baku' }
+                                                       'time_ranges' => [{ 'from' => '9', 'to' => '13' }], 'timezone' => 'Asia/Baku' }
                                         }
                                       ]
                                     })

@@ -50,13 +50,14 @@ class V1::SmsPlans::ScheduleSmsForUserSession
     if plan.schedule_payload.zero?
       return after_session_end_schedule(plan) if plan.sms_send_time_type_preferred_by_participant?
 
-      expected_time_of_message = now_in_timezone.change(random_time(plan)).utc
+      expected_time_of_message = now_in_timezone.change(random_time(plan))
       return after_session_end_schedule(plan) if expected_time_of_message.past?
 
       set_frequency(expected_time_of_message, plan)
+      return
     end
 
-    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time(plan)).utc
+    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time(plan))
     set_frequency(start_time, plan)
   end
 
@@ -66,7 +67,9 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
     return unless date_answer
 
-    start_time = DateTime.parse(date_answer).next_day(plan.schedule_payload).change(random_time(plan)).utc
+    start_time = ActiveSupport::TimeZone[timezone].parse(date_answer)
+                                                  .next_day(plan.schedule_payload)
+                                                  .change(random_time(plan))
     set_frequency(start_time, plan)
   end
 

@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
   include ActiveJob::TestHelper
+  include ActiveSupport::Testing::TimeHelpers
 
   subject { described_class.call(user_session) }
 
@@ -17,7 +18,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
 
   before do
     ActiveJob::Base.queue_adapter = :test
-    allow(Time).to receive(:current).and_return(current_time)
+    travel_to(current_time)
     clear_enqueued_jobs
   end
 
@@ -99,6 +100,68 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         end.utc
 
         expect(scheduled_datetime).to be_between(start_range, end_range)
+      end
+    end
+  end
+
+  describe 'participant-defined timezone (CIAS-4147 regression)' do
+    # Multi-day plan + preferred_by_participant + non-Eastern timezone.
+    # Pre-fix every iteration's `at` lands at the participant's selected hour
+    # interpreted as UTC (off by their UTC offset). Post-fix every iteration
+    # lands inside the participant's window in their local zone.
+    let(:participant_timezone) { 'America/Bogota' } # UTC-5, no DST — clean validation
+    let!(:phone_answer) do
+      create(:answer_phone, user_session: user_session,
+                            body: { 'data' => [
+                              {
+                                'var' => 'phone',
+                                'value' => {
+                                  'iso' => 'US', 'number' => '202-555-0173', 'prefix' => '+1', 'confirmed' => true,
+                                  'time_ranges' => [{ 'from' => 7, 'to' => 9, 'label' => 'early_morning' }],
+                                  'timezone' => participant_timezone
+                                }
+                              }
+                            ] })
+    end
+    let!(:sms_plan) do
+      create(:sms_plan,
+             session: session,
+             no_formula_text: 'tz test',
+             schedule: SmsPlan.schedules[:days_after_session_end],
+             schedule_payload: 1,
+             frequency: SmsPlan.frequencies[:once_a_day],
+             sms_send_time_type: 'preferred_by_participant',
+             end_at: current_time + 5.days)
+    end
+
+    it 'schedules every iteration inside the participant\'s window in their local zone' do
+      subject
+
+      sms_jobs = ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j[:job] == SmsPlans::SendSmsJob }
+      expect(sms_jobs.size).to be >= 5
+
+      sms_jobs.each do |job|
+        scheduled = Time.zone.at(job[:at]).in_time_zone(participant_timezone)
+        # rand range is [from, to) so hour is 7 or 8 — never 9
+        expect(scheduled.hour).to be_between(7, 8),
+                                  "expected hour in [7, 9) #{participant_timezone}, got #{scheduled} (UTC=#{Time.zone.at(job[:at]).utc})"
+      end
+    end
+
+    context 'with America/New_York participant (Eastern, DST-active)' do
+      let(:participant_timezone) { 'America/New_York' }
+
+      it 'schedules every iteration inside the participant\'s window in EDT/EST' do
+        subject
+
+        sms_jobs = ActiveJob::Base.queue_adapter.enqueued_jobs.select { |j| j[:job] == SmsPlans::SendSmsJob }
+        expect(sms_jobs.size).to be >= 5
+
+        sms_jobs.each do |job|
+          scheduled = Time.zone.at(job[:at]).in_time_zone(participant_timezone)
+          expect(scheduled.hour).to be_between(7, 8),
+                                    "expected hour in [7, 9) #{participant_timezone}, got #{scheduled} (UTC=#{Time.zone.at(job[:at]).utc})"
+        end
       end
     end
   end
