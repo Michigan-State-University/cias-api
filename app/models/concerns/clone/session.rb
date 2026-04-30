@@ -3,6 +3,7 @@
 class Clone::Session < Clone::Base
   def execute
     outcome.position = position || outcome.intervention.sessions.size
+    outcome.generated_report_count = 0
     outcome.clear_formulas if clean_formulas
     outcome.days_after_date_variable_name = nil if clean_formulas
     ActiveRecord::Base.transaction do
