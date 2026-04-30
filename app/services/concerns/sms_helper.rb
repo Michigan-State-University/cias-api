@@ -99,7 +99,12 @@ module SmsHelper
 
   def timezone
     timezone_defined_by_user = value_provided_by_the_user.present? ? value_provided_by_the_user['timezone'].to_s : ''
-    ActiveSupport::TimeZone[timezone_defined_by_user].present? ? timezone_defined_by_user : Phonelib.parse(phone.full_number).timezone
+    return timezone_defined_by_user if ActiveSupport::TimeZone[timezone_defined_by_user].present?
+
+    phonelib_zone = Phonelib.parse(phone&.full_number).timezone
+    return phonelib_zone if phonelib_zone.present? && ActiveSupport::TimeZone[phonelib_zone].present?
+
+    user.time_zone.presence || 'UTC'
   end
 
   def time_ranges_defined_by_user
