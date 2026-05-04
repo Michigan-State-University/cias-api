@@ -93,6 +93,45 @@ RSpec.describe Session::ResearchAssistant, type: :model do
     end
   end
 
+  describe '#set_default_variable' do
+    let(:fresh_intervention) { create(:intervention) }
+
+    it 'defaults to "ra" when no other session uses that variable' do
+      ra = described_class.new(name: 'RA', intervention: fresh_intervention)
+      ra.valid? # triggers before_validation
+      expect(ra.variable).to eq('ra')
+    end
+
+    it 'falls back to "ra_1" when "ra" is taken by another session in the intervention' do
+      create(:session, intervention: fresh_intervention, variable: 'ra')
+      ra = described_class.new(name: 'RA', intervention: fresh_intervention)
+      ra.valid?
+      expect(ra.variable).to eq('ra_1')
+    end
+
+    it 'falls back to "ra_2" when "ra" and "ra_1" are both taken' do
+      create(:session, intervention: fresh_intervention, variable: 'ra')
+      create(:session, intervention: fresh_intervention, variable: 'ra_1')
+      ra = described_class.new(name: 'RA', intervention: fresh_intervention)
+      ra.valid?
+      expect(ra.variable).to eq('ra_2')
+    end
+
+    it 'leaves an explicitly-set variable alone' do
+      ra = described_class.new(name: 'RA', variable: 'custom', intervention: fresh_intervention)
+      ra.valid?
+      expect(ra.variable).to eq('custom')
+    end
+
+    it 'isolates the collision check by intervention (same variable in another intervention does not trigger fallback)' do
+      other_intervention = create(:intervention)
+      create(:session, intervention: other_intervention, variable: 'ra')
+      ra = described_class.new(name: 'RA', intervention: fresh_intervention)
+      ra.valid?
+      expect(ra.variable).to eq('ra')
+    end
+  end
+
   describe '#user_session_type' do
     it 'returns UserSession::ResearchAssistant name' do
       expect(ra_session.user_session_type).to eq('UserSession::ResearchAssistant')

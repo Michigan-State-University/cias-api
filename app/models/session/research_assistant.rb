@@ -24,7 +24,13 @@ class Session::ResearchAssistant < Session
   def set_default_variable
     return if variable.present?
 
-    self.variable = 'ra'
+    candidate = 'ra'
+    index = 1
+    while ::Session.where.not(id: id).where(intervention: intervention).exists?(variable: candidate)
+      candidate = "ra_#{index}"
+      index += 1
+    end
+    self.variable = candidate
   end
 
   def single_ra_session_per_intervention
