@@ -269,6 +269,7 @@ en:
       variable_answers_validation_error: RA answer validation failed
       bulk_import_validation_error: Bulk import validation failed
       empty_participants_error: CSV contains no participants
+      ra_answers_require_published_intervention_error: RA session answers can only be imported when the intervention is published
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!

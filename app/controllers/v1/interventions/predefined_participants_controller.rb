@@ -35,6 +35,14 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       )
     end
 
+    if any_variable_answers_present?(participant_params_list) && !intervention_load.published?
+      raise ComplexException.new(
+        I18n.t('predefined_participants.bulk_import.ra_answers_require_published_intervention_error'),
+        { errors: [{ code: 'ra_answers_require_published_intervention_error' }] },
+        :unprocessable_entity
+      )
+    end
+
     run_bulk_import_validators(participant_params_list)
 
     payload_record = BulkImportPayload.create!(
@@ -179,11 +187,11 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     end
   end
 
-  # Run both validators and accumulate errors so the researcher sees every issue in one response,
-  # not just the first one. Each validator's `.call` raises ComplexException with `{ errors: [...] }`;
-  # we catch, concat, and raise once at the end. The two error sets share the `{ row:, field:, code: }`
-  # shape and `field` is naturally namespaced (`email`/`phone.*`/`health_clinic_id` vs `<sess>.<var>`),
-  # so the frontend can route each entry to the correct CSV cell unambiguously.
+  def any_variable_answers_present?(participant_params_list)
+    participant_params_list.any? { |p| p[:variable_answers].present? }
+  end
+
+  # Run both validators and accumulate errors so the researcher sees every issue in one response
   def run_bulk_import_validators(participant_params_list)
     errors = []
 

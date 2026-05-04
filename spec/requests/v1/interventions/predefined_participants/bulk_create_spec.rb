@@ -9,7 +9,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
   end
 
   let!(:researcher) { create(:user, :confirmed, :researcher) }
-  let!(:intervention) { create(:intervention, user_id: researcher.id) }
+  let!(:intervention) { create(:intervention, :published, user_id: researcher.id) }
   let(:current_user) { researcher }
   let(:headers) { current_user.create_new_auth_token }
 
@@ -366,6 +366,68 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
       %w[alice@example.test Alice Smith].each do |pii|
         expect(serialised).not_to include(pii)
       end
+    end
+  end
+
+  describe 'scenario 16 — draft intervention + variable_answers → 422' do
+    let!(:intervention) { create(:intervention, user_id: researcher.id) }
+    let!(:ra_session) { create(:ra_session, intervention: intervention, variable: 's1') }
+    let!(:question_group) { create(:question_group, session: ra_session) }
+    let(:params) do
+      wrap(participant_attrs(email: 'p@example.test', variable_answers: { 's1.mood' => '1' }))
+    end
+
+    before do
+      create(:question_single,
+             question_group: question_group,
+             body: { 'data' => [{ 'payload' => 'A', 'value' => '1' }], 'variable' => { 'name' => 'mood' } })
+    end
+
+    it 'returns 422 with ra_answers_require_published_intervention_error before validators run' do
+      expect(V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator).not_to receive(:call)
+      expect(V1::Intervention::PredefinedParticipants::VariableAnswersValidator).not_to receive(:call)
+
+      expect { request }.not_to change(BulkImportPayload, :count)
+      expect(bulk_import_jobs).to be_empty
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json_response['details']['errors']).to include(
+        a_hash_including('code' => 'ra_answers_require_published_intervention_error')
+      )
+    end
+  end
+
+  describe 'scenario 17 — draft intervention + no variable_answers → 202' do
+    let!(:intervention) { create(:intervention, user_id: researcher.id) }
+    let(:params) { wrap(participant_attrs(email: 'p1@example.test')) }
+
+    it 'returns 202 and enqueues BulkImportJob (participants-only upload still works in draft)' do
+      expect { request }.to change(BulkImportPayload, :count).by(1)
+                                                             .and change { bulk_import_jobs.size }.by(1) # rubocop:disable RSpec/ExpectChange
+      expect(response).to have_http_status(:accepted)
+    end
+  end
+
+  describe 'scenario 18 — paused intervention + variable_answers → 422' do
+    let!(:intervention) { create(:intervention, :paused, user_id: researcher.id) }
+    let!(:ra_session) { create(:ra_session, intervention: intervention, variable: 's1') }
+    let!(:question_group) { create(:question_group, session: ra_session) }
+    let(:params) do
+      wrap(participant_attrs(email: 'p@example.test', variable_answers: { 's1.mood' => '1' }))
+    end
+
+    before do
+      create(:question_single,
+             question_group: question_group,
+             body: { 'data' => [{ 'payload' => 'A', 'value' => '1' }], 'variable' => { 'name' => 'mood' } })
+    end
+
+    it 'returns 422 with ra_answers_require_published_intervention_error (any non-published state blocks)' do
+      expect { request }.not_to change(BulkImportPayload, :count)
+      expect(bulk_import_jobs).to be_empty
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(json_response['details']['errors']).to include(
+        a_hash_including('code' => 'ra_answers_require_published_intervention_error')
+      )
     end
   end
 
