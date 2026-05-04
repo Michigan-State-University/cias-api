@@ -44,4 +44,10 @@ class V1::UserSessionSerializer < V1Serializer
   attribute :live_chat_enabled do |object|
     object.session.intervention.live_chat_enabled
   end
+
+  attribute :fulfilled_by_id, if: proc { |record| record.type == 'UserSession::ResearchAssistant' }
+
+  attribute :fulfilled_by_email, if: proc { |record| record.type == 'UserSession::ResearchAssistant' } do |object|
+    object.fulfilled_by&.email
+  end
 end

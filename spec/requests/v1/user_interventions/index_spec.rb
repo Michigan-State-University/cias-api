@@ -47,6 +47,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => intervention_with_restriction.id,
               'type' => intervention_with_restriction.type,
@@ -71,6 +72,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -95,6 +97,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -119,6 +122,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -143,6 +147,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => intervention.id,
               'type' => intervention.type,
@@ -167,6 +172,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => paused_intervention.id,
               'type' => paused_intervention.type,
@@ -191,6 +197,7 @@ RSpec.describe 'GET /v1/user_interventions', type: :request do
             'last_answer_date' => nil,
             'contain_multiple_fill_session' => false,
             'health_clinic_id' => nil,
+            'ra_session_pending' => false,
             'intervention' => {
               'id' => paused_intervention.id,
               'type' => paused_intervention.type,
