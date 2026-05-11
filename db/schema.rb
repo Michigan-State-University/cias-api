@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_11_130114) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_22_142252) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -101,6 +101,17 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_11_130114) do
     t.index ["created_at"], name: "index_audits_on_created_at"
     t.index ["request_uuid"], name: "index_audits_on_request_uuid"
     t.index ["user_id", "user_type"], name: "user_index"
+  end
+
+  create_table "bulk_import_payloads", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "researcher_id", null: false
+    t.uuid "intervention_id", null: false
+    t.text "payload_ciphertext", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_bulk_import_payloads_on_created_at"
+    t.index ["intervention_id"], name: "index_bulk_import_payloads_on_intervention_id"
+    t.index ["researcher_id"], name: "index_bulk_import_payloads_on_researcher_id"
   end
 
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
@@ -1040,7 +1051,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_11_130114) do
     t.string "sms_phone_prefix"
     t.text "sms_phone_number_ciphertext"
     t.string "sms_phone_number_bidx"
+    t.uuid "fulfilled_by_id"
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
+    t.index ["fulfilled_by_id"], name: "index_user_sessions_on_fulfilled_by_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
@@ -1143,6 +1156,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_11_130114) do
   add_foreign_key "alert_phones", "sms_plans"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "bulk_import_payloads", "interventions", on_delete: :cascade
+  add_foreign_key "bulk_import_payloads", "users", column: "researcher_id", on_delete: :cascade
   add_foreign_key "cat_mh_google_tts_voices", "cat_mh_languages"
   add_foreign_key "cat_mh_google_tts_voices", "google_tts_voices"
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages"
@@ -1205,5 +1220,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_11_130114) do
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "user_interventions"
   add_foreign_key "user_sessions", "users"
+  add_foreign_key "user_sessions", "users", column: "fulfilled_by_id"
   add_foreign_key "users", "hfhs_patient_details"
 end

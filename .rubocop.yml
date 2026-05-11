@@ -150,6 +150,7 @@ Metrics/ClassLength:
     - 'app/models/question.rb'
     - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
     - 'app/models/intervention.rb'
+    - 'app/controllers/v1/interventions/predefined_participants_controller.rb'
 
 Metrics/ParameterLists:
   Enabled: true
@@ -161,6 +162,7 @@ Metrics/ModuleLength:
   Enabled: true
   Exclude:
     - 'app/services/concerns/sms_helper.rb'
+    - 'app/models/concerns/session/classic_behavior.rb'
 
 Performance/AncestorsInclude:
   Enabled: true

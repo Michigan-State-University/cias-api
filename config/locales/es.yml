@@ -18,6 +18,29 @@ es:
       header: "Los nuevos informes del sistema están listos para usted"
       body: "Tiene %{number_of_generated_reports} nuevo(s) informe(s) disponible(s) para descargar en su panel. Haga clic en el siguiente enlace para visitar su panel de control."
       button_text: Visitar el panel
+  bulk_import_mailer:
+    bulk_import_result:
+      subject: Importación masiva de Participantes Predefinidos CIAS completada
+      header: Importación masiva de Participantes Predefinidos completada
+      intro_html: 'Su importación masiva para <strong>%{intervention_name}</strong> se ha completado.'
+      total: Filas del CSV
+      participants_created: Participantes creados
+      ra_completed: Sesiones RA completadas automáticamente
+      ra_partial: Sesiones RA parcialmente completadas
+      failed: Errores
+      button: Abrir intervención
+      link: '%{web_url}/interventions/%{intervention_id}'
+    bulk_import_error:
+      subject: La importación masiva de Participantes Predefinidos CIAS ha fallado
+      header: La importación masiva de Participantes Predefinidos ha fallado
+      body: 'La importación masiva de Participantes Predefinidos para la intervención %{intervention_name} no pudo procesarse. No se creó ningún participante. Por favor, inténtelo de nuevo o póngase en contacto con el soporte.'
+  predefined_participants:
+    bulk_import:
+      participant_validation_error: La validación de los datos del participante ha fallado
+      variable_answers_validation_error: La validación de las respuestas RA ha fallado
+      bulk_import_validation_error: La validación de la importación masiva ha fallado
+      empty_participants_error: El CSV no contiene participantes
+      ra_answers_require_published_intervention_error: Las respuestas de la sesión RA solo se pueden importar cuando la intervención está publicada
   session_mailer:
     grant_access_to_a_user:
       subject: ¡Tienes acceso y la sesión está disponible para ser completada!
