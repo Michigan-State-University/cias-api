@@ -68,7 +68,7 @@ gem 'paranoia'
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.28'
 gem 'jwt', '~> 3.1'
-gem 'aasm', '~> 5.1', '>= 5.1.1'
+gem 'aasm', '~> 5.5'
 # for faraday multipart
 gem 'faraday-multipart'
 gem 'audited'
