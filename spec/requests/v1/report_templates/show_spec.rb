@@ -52,28 +52,19 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
               'cover_letter_sender' => report_template.cover_letter_sender,
               'session_id' => session.id
             ),
-            'relationships' => {
+            'relationships' => include(
               'sections' => {
-                'data' => [
-                  include(
-                    'id' => section.id,
-                    'type' => 'section'
-                  )
-                ]
+                'data' => contain_exactly(
+                  include('id' => section.id, 'type' => 'section')
+                )
               },
               'variants' => {
-                'data' => [
-                  include(
-                    'id' => variant1.id,
-                    'type' => 'variant'
-                  ),
-                  include(
-                    'id' => variant2.id,
-                    'type' => 'variant'
-                  )
-                ]
+                'data' => contain_exactly(
+                  include('id' => variant1.id, 'type' => 'variant'),
+                  include('id' => variant2.id, 'type' => 'variant')
+                )
               }
-            }
+            )
           )
 
           expect(json_response['included']).to include(
@@ -83,20 +74,14 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
               'formula' => section.formula,
               'report_template_id' => report_template.id
             ),
-            'relationships' => {
+            'relationships' => include(
               'variants' => {
-                'data' => [
-                  include(
-                    'id' => variant1.id,
-                    'type' => 'variant'
-                  ),
-                  include(
-                    'id' => variant2.id,
-                    'type' => 'variant'
-                  )
-                ]
+                'data' => contain_exactly(
+                  include('id' => variant1.id, 'type' => 'variant'),
+                  include('id' => variant2.id, 'type' => 'variant')
+                )
               }
-            }
+            )
           ).and include(
             'id' => variant1.id.to_s,
             'type' => 'variant',

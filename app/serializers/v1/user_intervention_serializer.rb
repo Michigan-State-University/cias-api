@@ -6,11 +6,16 @@ class V1::UserInterventionSerializer < V1Serializer
   attributes :completed_sessions, :status, :last_answer_date, :contain_multiple_fill_session, :health_clinic_id
 
   attribute :sessions_in_intervention do |object|
-    object.sessions.where.not(type: 'Session::Sms').size
+    object.sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).size
   end
 
-  attribute :sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object|
-    V1::SessionSerializer.new(object.intervention.sessions)
+  attribute :sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object, params|
+    sessions = if params[:participant_view]
+                 object.intervention.sessions.participant_visible
+               else
+                 object.intervention.sessions
+               end
+    V1::SessionSerializer.new(sessions)
   end
 
   attribute :user_sessions, if: proc { |_record, params| !(params[:exclude].present? && params[:exclude].include?(:sessions)) } do |object|
@@ -24,6 +29,14 @@ class V1::UserInterventionSerializer < V1Serializer
             .map(&:downcase)
             .exclude?(object.user.email) &&
       object.user.roles.exclude?('predefined_participant')
+  end
+
+  attribute :ra_session_pending do |object|
+    ra_session = object.intervention.sessions.find_by(type: 'Session::ResearchAssistant')
+    next false if ra_session.nil?
+
+    ra_user_session = UserSession.find_by(session_id: ra_session.id, user_id: object.user_id)
+    ra_user_session.nil? || ra_user_session.finished_at.nil?
   end
 
   attribute :intervention do |object|
