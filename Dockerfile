@@ -28,12 +28,16 @@ ENV LANG=C.UTF-8 \
 # libyaml-dev → psych (YAML)
 # libffi-dev → fiddle (extracted from stdlib in Ruby 3.3); transitive via argon2-kdf → blind_index
 # zlib1g-dev → zlib gem (extracted from stdlib in Ruby 3.3); transitive via faraday-gzip → metainspector
-# NOTE: libpq-dev intentionally NOT installed — pg 1.6.2 ships a precompiled x86_64-linux gem
-#       that statically links libpq. Verified by `bundle info pg` showing pg-1.6.2-x86_64-linux.
+# libpq-dev → pg gem. Kept defensively: pg 1.6.2 currently ships a precompiled x86_64-linux
+#             native gem that statically links libpq, so this is technically optional today.
+#             But: if pg is ever downgraded, or BUNDLE_FORCE_RUBY_PLATFORM is set, or a new
+#             arch is added to PLATFORMS, pg falls back to source compile and needs these headers.
+#             Builder-stage only — runtime image is unaffected.
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
         build-essential \
         git \
         libffi-dev \
+        libpq-dev \
         libyaml-dev \
         pkg-config \
         zlib1g-dev \
