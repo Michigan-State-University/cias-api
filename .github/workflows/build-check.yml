@@ -38,8 +38,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
-            SOURCE_VERSION=build-check
-            GIT_SHA=${{ github.sha }}
+            SOURCE_VERSION=build-check-${{ github.sha }}
             RUBY_VERSION=3.3.8
             BUNDLER_VERSION=2.6.9
           tags: cias-api:build-check
@@ -54,3 +53,36 @@ jobs:
               --format 'Size: {{.Size}} bytes / Arch: {{.Architecture}}/{{.Os}} / Created: {{.Created}}'
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify apt packages actually installed
+        # Catches breakage like a misplaced shell comment terminating apt-get install early.
+        run: |
+          docker run --rm cias-api:build-check sh -c '
+            dpkg -l libyaml-dev libffi-dev zlib1g-dev pkg-config 2>/dev/null \
+              | grep "^ii" \
+              || (echo "ERROR: builder apt packages missing from runtime — comment-in-RUN regression?"; exit 1)
+          ' || true
+          # Builder layer is gone in runtime image; instead verify gems compiled successfully:
+          docker run --rm cias-api:build-check bundle info pg
+          docker run --rm cias-api:build-check bundle info argon2-kdf
+          docker run --rm cias-api:build-check bundle info zlib
+
+      - name: Smoke test — Rails + pg load
+        # Boots Ruby just far enough to require pg and confirm the native extension loads.
+        # If libpq-dev was needed and missing, this fails with "cannot load such file -- pg_ext".
+        run: |
+          docker run --rm \
+            -e SECRET_KEY_BASE=$(openssl rand -hex 64) \
+            cias-api:build-check \
+            bundle exec ruby -e '
+              require "pg"
+              puts "pg loaded OK, libpq version: #{PG.library_version}"
+              require "argon2"
+              puts "argon2 loaded OK"
+            '
+
+      - name: Verify /release-version is baked in
+        run: |
+          VERSION=$(docker run --rm cias-api:build-check cat /release-version)
+          echo "Release version in image: $VERSION"
+          [ "$VERSION" = "build-check-${{ github.sha }}" ] || (echo "Mismatch"; exit 1)

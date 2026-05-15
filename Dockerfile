@@ -23,17 +23,17 @@ ENV LANG=C.UTF-8 \
     BUNDLE_JOBS=4 \
     BUNDLE_RETRY=3
 
-# build-essential, pkg-config → compiling C extensions (pg, hiredis, oj, etc.)
+# build-essential, pkg-config → compiling C extensions (hiredis, oj, etc.)
 # git → required for the devise_token_auth git source in Gemfile
-# libpq-dev → pg gem
 # libyaml-dev → psych (YAML)
 # libffi-dev → fiddle (extracted from stdlib in Ruby 3.3); transitive via argon2-kdf → blind_index
 # zlib1g-dev → zlib gem (extracted from stdlib in Ruby 3.3); transitive via faraday-gzip → metainspector
+# NOTE: libpq-dev intentionally NOT installed — pg 1.6.2 ships a precompiled x86_64-linux gem
+#       that statically links libpq. Verified by `bundle info pg` showing pg-1.6.2-x86_64-linux.
 RUN apt-get update -qq && apt-get install -y --no-install-recommends \
         build-essential \
         git \
         libffi-dev \
-        # libpq-dev \
         libyaml-dev \
         pkg-config \
         zlib1g-dev \
