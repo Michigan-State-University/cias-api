@@ -22,13 +22,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build image (no push)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
@@ -54,15 +54,13 @@ jobs:
             echo '```'
           } | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Verify apt packages actually installed
-        # Catches breakage like a misplaced shell comment terminating apt-get install early.
+      - name: Verify native gems installed correctly
+        # If a builder apt package (libffi-dev, zlib1g-dev, etc.) was missing because of a
+        # Dockerfile regression, `bundle install` would have failed and the build wouldn't
+        # have reached this point. So reaching this step at all proves the builder did its job.
+        # Here we just print which pg variant (native vs source-compiled) ended up in the image
+        # for visibility in the workflow log.
         run: |
-          docker run --rm cias-api:build-check sh -c '
-            dpkg -l libyaml-dev libffi-dev zlib1g-dev pkg-config 2>/dev/null \
-              | grep "^ii" \
-              || (echo "ERROR: builder apt packages missing from runtime — comment-in-RUN regression?"; exit 1)
-          ' || true
-          # Builder layer is gone in runtime image; instead verify gems compiled successfully:
           docker run --rm cias-api:build-check bundle info pg
           docker run --rm cias-api:build-check bundle info argon2-kdf
           docker run --rm cias-api:build-check bundle info zlib
