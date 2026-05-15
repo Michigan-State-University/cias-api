@@ -1,22 +1,68 @@
-.byebug_history
-.editorconfig
-.env*
+# VCS / editors
 .git
 .github
+.gitignore
+.gitattributes
+.editorconfig
 .idea
+.vscode
+**/.DS_Store
+
+# Local secrets / env — NEVER bake into the image
+.env*
+*.local.yml
+# Google Cloud service account JSONs (filename pattern varies by project)
+cias-api-*.json
+credentials*.json
+# Any stray private keys at repo root (NB: public/publickey509.pem is intentionally kept — that's a public cert served by Puma)
+/*.pem
+/*.key
+/*.p12
+
+# Build / test artifacts
+coverage/
+spec/
+test/
+tmp/
+log/
+**/*.log
+node_modules/
+storage/
+public/assets
+public/system
+
+# Docker / CI files (not needed inside the image)
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Ruby / Bundler / IDE local state
+.bundle
+.byebug_history
 .rspec
 .rubocop.yml
-.vscode/*
-/public/assets
-/public/system
-app.json
-docker-compose.analytics.yml
-docker-compose.yml
-Dockerfile
-Guardfile
-log/*
-node_modules/
-Procfile
+.ruby-version
+.ruby-lsp/
+.bundler-audit.yml
+.overcommit.yml
+.pgsync.yml
+
+# Tooling / repo metadata
+.claude
+docs
+plans
 README.md
-spec/
-tmp/
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+Guardfile
+Procfile
+app.json
+dump.rdb
+
+# Deployment manifests for other platforms (not ECS)
+container/
+
+# Dev scratch
+db_reset.sh
+t.json
