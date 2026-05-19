@@ -46,6 +46,11 @@ docker-compose*.yml
 .bundler-audit.yml
 .overcommit.yml
 .pgsync.yml
+vendor/
+
+# Rails encrypted credentials — credentials.yml.enc CAN be in the image (it's encrypted),
+# but master.key NEVER (it's the decryption key)
+config/master.key
 
 # Tooling / repo metadata
 .claude
