@@ -71,6 +71,9 @@ gem 'jwt', '~> 3.1'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
+# Security pin (bundler-audit): stay on the 0.5 line, which patches all
+# net-imap advisories without the 0.6 major bump. Transitive via `mail`.
+gem 'net-imap', '~> 0.5.14'
 gem 'audited'
 gem 'uri', '>= 1.1.1'
 
