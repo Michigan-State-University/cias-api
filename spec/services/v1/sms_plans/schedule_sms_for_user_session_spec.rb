@@ -401,6 +401,41 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
       end
     end
 
+    context 'when formula matches no variant but no_formula_text is present (CIAS-4182)' do
+      let!(:question_body) do
+        {
+          'data' => [
+            { 'value' => '1', 'payload' => '' }
+          ],
+          'variable' => { 'name' => 'var1' }
+        }
+      end
+      let!(:answer_body) do
+        {
+          'data' => [
+            {
+              'var' => 'var1',
+              'value' => '1'
+            }
+          ]
+        }
+      end
+      let!(:question_group) { create(:question_group_plain, session: session) }
+      let!(:question) { create(:question_single, question_group: question_group, body: question_body) }
+      let!(:answer) { create(:answer_single, question: question, body: answer_body, user_session: user_session) }
+      let!(:sms_plan) do
+        create(:sms_plan, session: session, is_used_formula: true, formula: 'var1 + 1', no_formula_text: 'rand_8=1')
+      end
+      let!(:variant) do
+        create(:sms_plan_variant, sms_plan: sms_plan, formula_match: '=5', content: 'variant content')
+      end
+
+      it 'does not fall back to no_formula_text and sends nothing' do
+        subject
+        expect(SmsPlans::SendSmsJob).not_to have_been_enqueued
+      end
+    end
+
     context 'when we have formula without any variants' do
       let!(:sms_plan) { create(:sms_plan, session: session, is_used_formula: true, formula: 'var1 + 1') }
 

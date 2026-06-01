@@ -76,7 +76,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
     frequency = plan.frequency
     variant = plan.is_used_formula ? matched_variant(plan) : nil
-    content = variant&.content || plan.no_formula_text
+    content = plan.is_used_formula ? variant&.content : plan.no_formula_text
 
     return if content.blank?
 
