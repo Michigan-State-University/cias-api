@@ -27,13 +27,6 @@ class V1::AudioService
 
   private
 
-  # Synthesize the speech BEFORE opening any DB transaction (so the external TTS call never
-  # holds a connection/lock open), then persist the row and its mp3 atomically.
-  #
-  # create_or_find_by! leans on the DB unique index instead of a check-then-act find: two
-  # requests racing to build the same (text, language, voice) digest converge on a single
-  # row instead of the loser raising ActiveRecord::RecordNotUnique.
-  # See .claude/jira-tasks/backlog/audio-tts-find-or-create-race.
   def create_audio(digest)
     speech = Audio::TextToSpeech.new(Audio.new, text: text, language: language_code, voice_type: voice_type)
     content = speech.fetch_speech_from_text
