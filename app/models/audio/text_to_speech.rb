@@ -19,6 +19,13 @@ class Audio::TextToSpeech < SimpleDelegator
     url
   end
 
+  # Was private; exposed so callers can synthesize as a standalone step and run this
+  # external (Google) HTTP call OUTSIDE any DB transaction — the round-trip then never holds
+  # a connection or an uncommitted unique-key row lock open.
+  def fetch_speech_from_text
+    provider.new(text, language, voice_type).synthesize
+  end
+
   private
 
   def require_provider
@@ -27,9 +34,5 @@ class Audio::TextToSpeech < SimpleDelegator
 
   def provider
     @provider ||= "Audio::TextToSpeech::#{require_provider.classify}".safe_constantize
-  end
-
-  def fetch_speech_from_text
-    provider.new(text, language, voice_type).synthesize
   end
 end
