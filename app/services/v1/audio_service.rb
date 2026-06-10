@@ -28,8 +28,7 @@ class V1::AudioService
   private
 
   def create_audio(digest)
-    speech = Audio::TextToSpeech.new(Audio.new, text: text, language: language_code, voice_type: voice_type)
-    content = speech.fetch_speech_from_text
+    content = Audio::TextToSpeech.new(nil, text: text, language: language_code, voice_type: voice_type).fetch_speech_from_text
 
     audio = Audio.create_or_find_by!(sha256: digest) do |new_audio|
       new_audio.language = language_code
