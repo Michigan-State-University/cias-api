@@ -1,6 +1,10 @@
 name: CI
 on: push
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   setup_environment:
     name: Prepare environment & split tests
@@ -11,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -19,7 +23,7 @@ jobs:
         env:
           RUBYOPT: --jit
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -45,6 +49,19 @@ jobs:
         run: echo "test-chunk-ids=$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')" >> $GITHUB_OUTPUT
         env:
           CHUNKS: ${{ steps.set-test-chunks.outputs.test-chunks }}
+
+  bundler_audit:
+    name: Dependency security audit
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.8
+      - name: Audit dependencies
+        run: |
+          gem install bundler-audit
+          bundle-audit check --update
 
   test:
     name: Test batch no. ${{ matrix.chunk }}
@@ -72,7 +89,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
@@ -81,7 +98,7 @@ jobs:
           RUBYOPT: --jit
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -104,8 +121,4 @@ jobs:
         env:
           CHUNKS: ${{ needs.setup_environment.outputs.test-chunks }}
           #sed is needed because rspec prepends './' to file paths which contain '"' character and this jq command returns them in such format
-        run: bundle exec rspec $(echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | sed 's/\"//g')
-      - name: Analyze with bundler audit
-        run: |
-          gem install bundler-audit
-          bundle-audit check --update
+        run: bundle exec rspec --profile 20 $(echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | sed 's/\"//g')
