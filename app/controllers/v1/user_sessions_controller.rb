@@ -3,6 +3,7 @@
 class V1::UserSessionsController < V1Controller
   skip_before_action :authenticate_user!, only: %i[create show_or_create]
   before_action :validate_intervention_status, except: [:ra_show]
+  before_action :guard_ra_session_creation, only: %i[create show_or_create]
 
   def show
     validate_session_status
@@ -18,7 +19,6 @@ class V1::UserSessionsController < V1Controller
 
   def create
     validate_session_status
-    guard_ra_session_creation
     user_session = V1::UserSessions::CreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
@@ -29,7 +29,6 @@ class V1::UserSessionsController < V1Controller
 
   def show_or_create
     validate_session_status
-    guard_ra_session_creation
     user_session = V1::UserSessions::FetchOrCreateService.call(session_id, user_id, health_clinic_id)
     authorize! :create, user_session
     user_session.save!
