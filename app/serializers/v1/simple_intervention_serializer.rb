@@ -6,7 +6,7 @@ class V1::SimpleInterventionSerializer < V1Serializer
   attributes :id, :user_id, :name, :status, :sensitive_data_state, :clear_sensitive_data_scheduled_at, :created_at, :updated_at, :organization_id,
              :google_language_id, :note
 
-  cache_options(store: Rails.cache, namespace: 'simple-intervention-serializer', expires_in: 24.hours) # temporary length, might be a subject to change
+  cache_options(store: Rails.cache, namespace: 'simple-intervention-serializer-v2', expires_in: 24.hours)
 
   attribute :user do |object|
     object.user.as_json(only: %i[id email first_name last_name])
@@ -18,6 +18,10 @@ class V1::SimpleInterventionSerializer < V1Serializer
 
   attribute :sessions_size do |object|
     object.sessions.size
+  end
+
+  attribute :has_research_assistant_session do |object|
+    object.ra_session.present?
   end
 
   attribute :exported_data do |object|
