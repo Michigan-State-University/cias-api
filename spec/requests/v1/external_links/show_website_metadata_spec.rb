@@ -3,10 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe 'GET /v1/show_website_metadata', type: :request do
-  WebMock.disable!
-  WebMock.allow_net_connect!
-
   let!(:user) { create(:user, :confirmed, roles: %w[participant admin guest]) }
+  let(:headers) { current_user.create_new_auth_token }
+  let!(:params) do
+    {
+      url: url
+    }
+  end
+  let(:request) { get v1_show_website_metadata_path, params: params, headers: headers }
   let!(:researcher) { create(:user, :confirmed, :researcher) }
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:guest) { create(:user, :confirmed, :guest) }
@@ -34,13 +38,38 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
       'How migrations relate to schema.rb. How to maintain referential integrity.'
   end
   let(:title2) { 'Amazon.com' }
-  let(:headers) { current_user.create_new_auth_token }
-  let!(:params) do
-    {
-      url: url
-    }
+
+  # MetaInspector reaches out to the live web, which made this spec flaky (it depended
+  # on external sites' markup/redirects being stable). We stub MetaInspector at the
+  # gem boundary so the spec is deterministic and never touches the network — it
+  # verifies the controller's own behaviour (building the metadata payload and
+  # mapping MetaInspector failures to 422).
+  let(:metainspector_error) { nil }
+  let(:resolved_url) { url }
+  let(:result_title) { title }
+  let(:result_description) { description }
+  let(:result_best_image) { 'https://guides.rubyonrails.org/images/og-image.png' }
+  let(:result_images) { [result_best_image] }
+
+  let(:metainspector_page) do
+    images = double('MetaInspector::Images', best: result_best_image, as_json: result_images)
+    double(
+      'MetaInspector::Document',
+      url: resolved_url,
+      title: result_title,
+      description: result_description,
+      images: images,
+      to_hash: {}
+    )
   end
-  let(:request) { get v1_show_website_metadata_path, params: params, headers: headers }
+
+  before do
+    if metainspector_error
+      allow(MetaInspector).to receive(:new).and_raise(metainspector_error)
+    else
+      allow(MetaInspector).to receive(:new).and_return(metainspector_page)
+    end
+  end
 
   context 'when auth' do
     context 'is invalid' do
@@ -90,6 +119,8 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
               url: url2
             }
           end
+          let(:resolved_url) { "https://www.#{url2}/" }
+          let(:result_title) { 'Amazon.com. Spend less. Smile more.' }
 
           it 'returns correct http status' do
             expect(response).to have_http_status(:ok)
@@ -103,6 +134,7 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
 
         context 'when url is invalid' do
           let(:url) { 'invalid path' }
+          let(:metainspector_error) { MetaInspector::RequestError }
 
           it 'json response' do
             expect(response).to have_http_status(:unprocessable_entity)
@@ -110,6 +142,10 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
 
           context 'when page exist but doesn\'t exist subpage' do
             let(:url) { 'https://edgeguides.rubyonrails.org/wrong_path' }
+            let(:metainspector_error) { nil }
+            let(:result_title) { '404 Not Found' }
+            let(:result_description) { nil }
+            let(:result_best_image) { nil }
 
             it 'returns correct http status' do
               expect(response).to have_http_status(:ok)
