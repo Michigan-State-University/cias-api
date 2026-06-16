@@ -4,6 +4,7 @@ class Clone::Question < Clone::Base
   def execute
     generate_new_answer_ids
     clean_outcome_formulas if clean_formulas
+    outcome.position = next_position if position.nil?
     outcome.save!
     attach_answer_images
     attach_image
@@ -12,6 +13,10 @@ class Clone::Question < Clone::Base
   end
 
   private
+
+  def next_position
+    outcome.question_group.questions.where.not(id: outcome.id).maximum(:position).to_i + 1
+  end
 
   def attach_image
     return unless source.image.attached?
