@@ -9,6 +9,9 @@ class V1::InterventionSerializer < V1Serializer
              :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :created_cat_mh_session_count, :license_type, :is_access_revoked,
              :additional_text, :original_text, :quick_exit, :current_narrator, :live_chat_enabled, :hfhs_access, :note
 
+  # NOTE: RA sessions are included for all views. InterventionSerializer has cache_options
+  # which doesn't account for params — filtering here would cause stale cache hits.
+  # Frontend filters RA sessions from participant view. RA session data is not sensitive.
   has_many :sessions, serializer: V1::SessionSerializer
   has_many :clinic_locations, serializer: V1::ClinicLocationSerializer
   has_many :tags, serializer: V1::TagSerializer

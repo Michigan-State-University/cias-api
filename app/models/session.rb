@@ -53,6 +53,7 @@ class Session < ApplicationRecord
   delegate :language_code, to: :google_language
 
   scope :multiple_fill, -> { where(multiple_fill: true) }
+  scope :participant_visible, -> { where.not(type: 'Session::ResearchAssistant') }
 
   validates :name, :variable, presence: true
   validates :last_report_template_number, presence: true
@@ -68,6 +69,9 @@ class Session < ApplicationRecord
                                                    } }
   validates :position, numericality: { greater_than_or_equal_to: 0 }
   validate :unique_variable, on: %i[create update]
+  validate :position_zero_reserved_for_ra
+  validate :type_immutable, on: :update
+  validate :no_branching_to_ra_session
   validates :autofinish_delay, presence: true, if: :autofinish_enabled
   validates :autofinish_delay, numericality: { greater_than_or_equal_to: 0 }
   validates :autoclose_at, presence: true, if: :autoclose_enabled
@@ -89,7 +93,7 @@ class Session < ApplicationRecord
   end
 
   def next_session
-    intervention.sessions.where.not(type: 'Session::Sms').order(position: :asc).find_by('position > ?', position)
+    intervention.sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).order(position: :asc).find_by('position > ?', position)
   end
 
   def last_session?
@@ -210,8 +214,33 @@ class Session < ApplicationRecord
   private
 
   def assign_default_tts_voice
-    self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US') if google_tts_voice.nil? && type == 'Session::Classic'
+    if google_tts_voice.nil? && type.in?(%w[Session::Classic Session::ResearchAssistant])
+      self.google_tts_voice = GoogleTtsVoice.standard_voices.find_by(language_code: 'en-US')
+    end
     save!
+  end
+
+  def position_zero_reserved_for_ra
+    errors.add(:position, :reserved_for_ra_session) if position&.zero? && type != 'Session::ResearchAssistant'
+  end
+
+  def type_immutable
+    errors.add(:type, :cannot_change_type) if type_changed?
+  end
+
+  def no_branching_to_ra_session
+    return if formulas.blank?
+
+    formulas.each do |formula|
+      formula['patterns']&.each do |pattern|
+        pattern['target']&.each do |target|
+          next unless target['type']&.include?('Session') && target['id'].present?
+
+          target_session = ::Session.find_by(id: target['id'])
+          errors.add(:formulas, :cannot_branch_to_ra_session) if target_session&.type == 'Session::ResearchAssistant'
+        end
+      end
+    end
   end
 
   def assign_default_google_language

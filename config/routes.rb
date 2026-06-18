@@ -314,6 +314,8 @@ Rails.application.routes.draw do
     get '/s/:slug', to: 'links#show', as: :short
     post '/sms/replay', to: 'twillo_message#create', as: :sms_replay
     post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
+    post 'predefined_participants/:slug/ra_session', to: 'interventions/predefined_participants#ra_session', as: :ra_session_predefined_participant
+    get 'user_sessions/:id/ra_show', to: 'user_sessions#ra_show', as: :ra_show_user_session
     post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
   end
 

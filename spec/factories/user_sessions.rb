@@ -24,6 +24,14 @@ FactoryBot.define do
     end
   end
 
+  factory :ra_user_session, class: UserSession::ResearchAssistant do
+    type { UserSession::ResearchAssistant }
+    association :user
+    association :session, factory: :ra_session
+    association :user_intervention
+    multiple_fill { false }
+  end
+
   factory :user_session_cat_mh, class: UserSession::CatMh do
     type { UserSession::CatMh }
     association :user
