@@ -70,7 +70,7 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
             }
           },
           'formulas' => [{ 'payload' => '', 'patterns' => [] }],
-          'position' => 1,
+          'position' => 3,
           'question_group_id' => question_group.id,
           'narrator' => question.narrator
         )
@@ -121,10 +121,36 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
             }
           },
           'formulas' => [{ 'payload' => '', 'patterns' => [] }],
-          'position' => 1,
+          'position' => 4,
           'question_group_id' => question_group.id,
           'narrator' => question.narrator
         )
+      end
+    end
+
+    context 'when assigning the cloned question position (CIAS-4161)' do
+      it 'appends the clone at the end of the group instead of copying the source position' do
+        request
+
+        expect(json_response['data']['attributes']['position']).to eq(3)
+        expect(question_group.questions.reload.pluck(:position)).to contain_exactly(1, 2, 3)
+      end
+
+      it 'does not produce duplicate positions within the group' do
+        request
+
+        positions = question_group.questions.reload.pluck(:position)
+        expect(positions.uniq).to match_array(positions)
+      end
+
+      context 'when cloning repeatedly' do
+        it 'assigns distinct, increasing positions and never collides' do
+          3.times { post v1_clone_question_path(id: question.id), headers: headers }
+
+          positions = question_group.questions.reload.order(:position).pluck(:position)
+          expect(positions).to eq([1, 2, 3, 4, 5])
+          expect(positions.uniq).to eq(positions)
+        end
       end
     end
 
@@ -146,6 +172,15 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
           request
           expect(response).to have_http_status(:forbidden)
         end
+      end
+    end
+
+    context 'when user wants to clone a finish question (CIAS-4161)' do
+      let!(:question) { create(:question_finish, question_group: question_group) }
+
+      it 'is forbidden so it cannot duplicate the reserved 999999 position' do
+        request
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
