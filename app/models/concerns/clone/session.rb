@@ -58,8 +58,14 @@ class Clone::Session < Clone::Base
   def outcome_questions_reassignment
     outcome_questions.find_each do |question|
       question = reassign_branching_question(question)
-      question = reassign_question_reflections(question)
-      question = remove_invalid_reflections(question) if clone_single_session?
+      # During a full-intervention clone, reflection re-pointing is deferred to
+      # Clone::Intervention#reassign_reflections — which runs after ALL sessions
+      # exist, so forward cross-session references can be resolved. Skipping it
+      # here keeps the source ids on the block for that later pass.
+      unless defer_reflection_reassignment
+        question = reassign_question_reflections(question)
+        question = remove_invalid_reflections(question) if clone_single_session?
+      end
       question.save!
     end
   end
@@ -115,14 +121,14 @@ class Clone::Session < Clone::Base
     target_session.questions
                       .joins(:question_group)
                       .where(question_groups: { position: target.question_group.position })
-                      .find_by!(position: target.position)
+                      .find_by(position: target.position)
   end
 
   def matching_session(target_id)
     target = check_if_session_exists(target_id)
     return unless target
 
-    outcome.intervention.sessions.find_by!(position: target.position)
+    outcome.intervention.sessions.find_by(position: target.position)
   end
 
   def check_if_session_exists(target_id)
