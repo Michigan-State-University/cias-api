@@ -7,7 +7,7 @@ gem 'bundler', '~> 2.6.9'
 
 gem 'rails', '~> 7.2.0'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 6.0'
+gem 'puma', '~> 7.2', '>= 7.2.1'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
@@ -71,6 +71,9 @@ gem 'jwt', '~> 3.1'
 gem 'aasm', '~> 5.1', '>= 5.1.1'
 # for faraday multipart
 gem 'faraday-multipart'
+# Security pin (bundler-audit): stay on the 0.5 line, which patches all
+# net-imap advisories without the 0.6 major bump. Transitive via `mail`.
+gem 'net-imap', '~> 0.5.14'
 gem 'audited'
 gem 'uri', '>= 1.1.1'
 

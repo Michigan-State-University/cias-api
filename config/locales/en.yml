@@ -80,6 +80,7 @@ en:
               cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
             type:
               unsupported_in_ra_session: 'Question type is not supported in Research Assistant sessions; only Single, Number, and Date are allowed'
+          ra_variable_required: 'Variable name is required for Research Assistant session questions'
         question_group:
           attributes:
             formulas:
