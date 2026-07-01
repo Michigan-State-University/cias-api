@@ -70,8 +70,13 @@ ENV LANG=C.UTF-8 \
     BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_WITHOUT="development:test" \
     BUNDLE_DEPLOYMENT=1 \
-    PORT=3000 \
-    EPIC_ON_FHIR_AUTHENTICATION_ALGORITHM=RS384
+    PORT=3000
+
+# NOTE: EPIC_ON_FHIR_AUTHENTICATION_ALGORITHM is deliberately NOT baked here.
+# It varies per environment (test Dokku runs RS512) and the code reads it via
+# ENV.fetch with no default (app/services/api/epic_on_fhir/authentication.rb:5).
+# Provide it per-env via SSM Parameter Store / the ECS task def, not as an image
+# constant — baking RS384 would silently change the Epic/HFHS JWT signing alg.
 
 # ALB owns health checks; disable any inherited HEALTHCHECK from the base image
 HEALTHCHECK NONE

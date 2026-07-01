@@ -27,3 +27,5 @@ certificates/
 .claude/
 
 .vscode/
+docs/diagrams
+docs/knowledge-pills

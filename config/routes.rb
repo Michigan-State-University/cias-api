@@ -9,6 +9,8 @@ end
 Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
+  get 'api/health', to: 'health#show'
+
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
       confirmations: 'v1/auth/confirmations',
@@ -62,7 +64,7 @@ Rails.application.routes.draw do
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
     get 'interventions/:intervention_id/csv_attachment', to: 'interventions/answers#csv_attachment', as: :fetch_protected_csv
     resources :interventions, only: %i[index show create update] do
-      concerns :narrator_changeable, { _model: 'Intervention' }
+      concerns :narrator_changeable, _model: 'Intervention'
       post 'clone', on: :member
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
@@ -94,7 +96,7 @@ Rails.application.routes.draw do
       patch 'sessions/update_all_schedules', to: 'sessions#update_all_schedules'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy] do
-        concerns :narrator_changeable, { _model: 'Session' }
+        concerns :narrator_changeable, _model: 'Session'
       end
       resources :navigator_invitations, only: %i[index destroy create], controller: '/v1/live_chat/navigators/invitations'
     end
