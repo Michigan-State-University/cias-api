@@ -20,10 +20,10 @@ describe Api::EpicOnFhir::SslOptions do
   end
 
   context 'when EPIC_ON_FHIR_CA_CERT is not set' do
-    before { allow(ENV).to receive(:[]).and_call_original }
+    before { allow(ENV).to receive(:fetch).and_call_original }
 
     it 'verifies against the system trust store only' do
-      allow(ENV).to receive(:[]).with('EPIC_ON_FHIR_CA_CERT').and_return(nil)
+      allow(ENV).to receive(:fetch).with('EPIC_ON_FHIR_CA_CERT', nil).and_return(nil)
 
       expect(subject).to eq(verify: true)
     end
@@ -31,8 +31,8 @@ describe Api::EpicOnFhir::SslOptions do
 
   context 'when EPIC_ON_FHIR_CA_CERT is set' do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with('EPIC_ON_FHIR_CA_CERT').and_return(ca_cert)
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('EPIC_ON_FHIR_CA_CERT', nil).and_return(ca_cert)
     end
 
     it 'keeps verification on' do
@@ -46,8 +46,8 @@ describe Api::EpicOnFhir::SslOptions do
 
   context 'when EPIC_ON_FHIR_CA_CERT is a single line with escaped newlines' do
     before do
-      allow(ENV).to receive(:[]).and_call_original
-      allow(ENV).to receive(:[]).with('EPIC_ON_FHIR_CA_CERT').and_return(ca_cert.gsub("\n", '\n'))
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('EPIC_ON_FHIR_CA_CERT', nil).and_return(ca_cert.gsub("\n", '\n'))
     end
 
     it 'still builds a trust store' do
