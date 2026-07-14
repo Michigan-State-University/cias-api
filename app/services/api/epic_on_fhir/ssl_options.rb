@@ -11,7 +11,7 @@ module Api::EpicOnFhir::SslOptions
   def self.call
     options = { verify: true }
 
-    ca_cert = ENV['EPIC_ON_FHIR_CA_CERT']
+    ca_cert = ENV.fetch('EPIC_ON_FHIR_CA_CERT', nil)
     options[:cert_store] = build_cert_store(ca_cert) if ca_cert.present?
 
     options
