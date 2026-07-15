@@ -33,5 +33,4 @@ module Api::EpicOnFhir::SslOptions
   end
 
   private_class_method :build_cert_store
-
 end
