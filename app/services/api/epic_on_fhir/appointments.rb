@@ -17,7 +17,7 @@ class Api::EpicOnFhir::Appointments < Api::EpicOnFhir::BaseService
   private
 
   def request
-    connection = Faraday.new ENDPOINT, ssl: Api::EpicOnFhir::SslOptions.call
+    connection = Faraday.new ENDPOINT, ssl: { verify: false }
 
     connection.get do |request|
       request.headers['Authorization'] = "#{authentication[:token_type]} #{authentication[:access_token]}"
