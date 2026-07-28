@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Clone::Intervention < Clone::Base
+  include Clone::ReflectionReassignment
+
   def execute
     outcome.status = :draft
     outcome.sensitive_data_state = 'collected'
@@ -14,6 +16,7 @@ class Clone::Intervention < Clone::Base
     assign_tags
     create_sessions
     reassign_branching
+    reassign_reflections
     outcome.update!(is_hidden: hidden)
     reset_cache_counters
     attach_logo
@@ -49,6 +52,7 @@ class Clone::Intervention < Clone::Base
       outcome.sessions << Clone::Session.new(session,
                                              intervention_id: outcome.id,
                                              clean_formulas: false,
+                                             defer_reflection_reassignment: true,
                                              position: session.position).execute
     end
   end
