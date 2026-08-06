@@ -13,6 +13,125 @@ RSpec.describe Chart do
 
   let(:chart) { create(:chart, dashboard_section: dashboard_section) }
 
+  describe 'formula validity settings' do
+    let(:base_formula) do
+      {
+        'payload' => 'session1.var1 + session1.var2',
+        'patterns' => [{ 'match' => '>=1', 'label' => 'Matched', 'color' => '#C766EA' }],
+        'default_pattern' => { 'label' => 'NotMatched', 'color' => '#E2B1F4' }
+      }
+    end
+
+    def build_chart(formula_overrides)
+      build(:chart, dashboard_section: dashboard_section, formula: base_formula.merge(formula_overrides))
+    end
+
+    describe 'JSON schema' do
+      it 'accepts both new keys' do
+        expect(build_chart('min_answered_variables' => 9, 'positive_despite_missing_threshold' => 15)).to be_valid
+      end
+
+      it 'accepts a zero minimum and a null threshold' do
+        expect(build_chart('min_answered_variables' => 0, 'positive_despite_missing_threshold' => nil)).to be_valid
+      end
+
+      it 'rejects a non-integer minimum' do
+        expect(build_chart('min_answered_variables' => 1.5)).not_to be_valid
+      end
+
+      it 'rejects an undeclared extra key' do
+        expect(build_chart('some_unknown_key' => 1)).not_to be_valid
+      end
+
+      it 'still accepts a legacy formula carrying neither key' do
+        expect(build(:chart, dashboard_section: dashboard_section, formula: base_formula)).to be_valid
+      end
+
+      it 'lets a pre-existing chart re-save without gaining the new keys' do
+        legacy_chart = create(:chart, dashboard_section: dashboard_section, formula: base_formula)
+
+        legacy_chart.update!(description: 'Touched')
+
+        expect(legacy_chart.reload.formula).to eq(base_formula)
+      end
+    end
+
+    describe 'model validation' do
+      it 'rejects a negative minimum' do
+        chart = build_chart('min_answered_variables' => -1)
+
+        expect(chart).not_to be_valid
+      end
+
+      it 'rejects a non-numeric threshold' do
+        chart = build_chart('positive_despite_missing_threshold' => 'high')
+
+        expect(chart).not_to be_valid
+        expect(chart.errors[:formula]).to include('positive_despite_missing_threshold must be a number or null')
+      end
+
+      it 'accepts a chart with neither key' do
+        expect(build(:chart, dashboard_section: dashboard_section, formula: base_formula)).to be_valid
+      end
+
+      it 'does not enforce a min <= formula_variable_count ceiling' do
+        # Deliberate: the FE autosaves the payload on blur carrying the previous min,
+        # so a ceiling would 422 routine payload edits into a silent revert.
+        chart = build_chart('payload' => 'session1.var1', 'min_answered_variables' => 9)
+
+        expect(chart).to be_valid
+      end
+    end
+
+    describe '#formula_variable_count' do
+      def count_for(payload)
+        build(:chart, dashboard_section: dashboard_section,
+                      formula: base_formula.merge('payload' => payload)).formula_variable_count
+      end
+
+      it 'ignores decimal coefficients' do
+        expect(count_for('HT2.phq1 * 1.5 + HT2.phq2')).to eq(2)
+      end
+
+      it 'counts repeated variables once' do
+        expect(count_for('A.b+A.c+A.b')).to eq(2)
+      end
+
+      it 'handles dot-containing variable names' do
+        expect(count_for('HT2.phq.1 + HT2.phq.2')).to eq(2)
+      end
+
+      it 'returns 0 for an empty payload' do
+        expect(count_for('')).to eq(0)
+      end
+
+      it 'returns nil for a malformed payload and still saves the chart' do
+        chart = build(:chart, dashboard_section: dashboard_section,
+                              formula: base_formula.merge('payload' => 'HT2.phq1 +'))
+
+        expect(chart.formula_variable_count).to be_nil
+        expect { chart.save! }.not_to raise_error
+      end
+
+      it 'is invariant to participant answer state' do
+        # Guards the fresh-calculator constraint: Dentaku#dependencies only returns
+        # identifiers absent from calculator memory, so a loaded calculator under-counts.
+        chart = create(:chart, dashboard_section: dashboard_section,
+                               formula: base_formula.merge('payload' => 'session1.var1 + session1.var2'))
+        before_answers = chart.formula_variable_count
+
+        question = create(:question_number, question_group: question_group1, body: {
+                            data: [{ payload: '' }], variable: { name: 'var1' }
+                          })
+        user_session = create(:user_session, session: session1, user: create(:user, :confirmed, :participant))
+        create(:answer_number, question: question, user_session: user_session,
+                               body: { data: [{ var: 'var1', value: '3' }] })
+
+        expect(chart.reload.formula_variable_count).to eq(before_answers).and eq(2)
+      end
+    end
+  end
+
   describe '#validate_formula_variables' do
     context 'when missing_vars is blank' do
       it 'returns empty array for nil' do

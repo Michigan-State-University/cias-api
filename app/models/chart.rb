@@ -17,6 +17,9 @@ class Chart < ApplicationRecord
                                                                     err
                                                                   } }
 
+  validate :validate_min_answered_variables
+  validate :validate_positive_despite_missing_threshold
+
   enum :status, { draft: 'draft', data_collection: 'data_collection', published: 'published' }
   enum :chart_type, { bar_chart: 'bar_chart', pie_chart: 'pie_chart', percentage_bar_chart: 'percentage_bar_chart' }
   enum :interval_type, { monthly: 'monthly', quarterly: 'quarterly' } # only for bar charts
@@ -48,6 +51,21 @@ class Chart < ApplicationRecord
     formula['payload'].scan(/\w+[.]\w+/)
   end
 
+  # Distinct variables the formula payload depends on.
+  # The calculator MUST be fresh and empty: Dentaku#dependencies only returns identifiers
+  # absent from calculator memory, so a memoised/loaded calculator under-counts.
+  # Returns nil for a payload Dentaku cannot parse (e.g. mid-typed `"HT2.phq1 +"`).
+  def formula_variables
+    Dentaku::Calculator.new(case_sensitive: true).dependencies(formula.to_h['payload']).uniq
+  rescue Dentaku::Error
+    nil
+  end
+
+  # Number of distinct variables the formula payload depends on (the `M` in "N out of M").
+  def formula_variable_count
+    formula_variables&.count
+  end
+
   def validate_formula_variables(missing_vars, intervention)
     return [] if missing_vars.blank?
 
@@ -60,6 +78,29 @@ class Chart < ApplicationRecord
   end
 
   private
+
+  # Deliberately loose: no `min <= formula_variable_count` ceiling and no Dentaku parse here.
+  # The FE autosaves the payload on blur carrying the previous min, so a ceiling would turn
+  # routine payload edits into a 422 (a silent revert for the user).
+  def validate_min_answered_variables
+    value = formula_setting('min_answered_variables')
+    return if value.nil? || (value.is_a?(Integer) && value >= 0)
+
+    errors.add(:formula, 'min_answered_variables must be an integer greater than or equal to 0')
+  end
+
+  def validate_positive_despite_missing_threshold
+    value = formula_setting('positive_despite_missing_threshold')
+    return if value.nil? || value.is_a?(Numeric)
+
+    errors.add(:formula, 'positive_despite_missing_threshold must be a number or null')
+  end
+
+  def formula_setting(key)
+    return nil unless formula.is_a?(Hash)
+
+    formula[key]
+  end
 
   def intervention_question_variables(intervention)
     # Keyed by intervention.id: a Chart instance can be called with different interventions.

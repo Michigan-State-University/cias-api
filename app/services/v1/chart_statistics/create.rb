@@ -27,7 +27,9 @@ class V1::ChartStatistics::Create
         return
       end
 
-      if any_owning_question_unanswered?(missing_vars)
+      # An explicit `min_answered_variables` supersedes this guard: the chart owner has
+      # declared how many answers are enough, and the remaining variables 0-fill.
+      if !validity_gate_enabled? && any_owning_question_unanswered?(missing_vars)
         Rails.logger.info(
           "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
           "user_session=#{user_session.id} did not reach all questions referenced by formula " \
@@ -41,18 +43,9 @@ class V1::ChartStatistics::Create
     return if formula_error?
     return if zero_division_error?
     return unless inside_date_range?
+    return unless valid_participant?
 
-    chart_statistic = ChartStatistic.find_or_initialize_by(
-      label: label,
-      organization: organization,
-      health_system: health_system,
-      health_clinic: health_clinic,
-      chart: chart,
-      user: user_session.user,
-      user_session: user_session
-    )
-    chart_statistic.filled_at = user_session.finished_at || DateTime.current
-    chart_statistic.save!
+    upsert_chart_statistic
   rescue Dentaku::ParseError, Dentaku::TokenizerError, Dentaku::ArgumentError => e
     Rails.logger.error(
       "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
@@ -87,9 +80,68 @@ class V1::ChartStatistics::Create
   end
 
   def all_var_values
-    V1::UserInterventionService.new(
+    @all_var_values ||= V1::UserInterventionService.new(
       user_session.user_intervention_id, nil
     ).var_values
+  end
+
+  def validity_gate_enabled?
+    validity_evaluator.enabled?(chart)
+  end
+
+  def validity_evaluator
+    V1::ChartStatistics::ValidityEvaluator
+  end
+
+  # The 0-filled value the payload evaluated to, before pattern matching.
+  # Touching `calculated_formula` (memoised) guarantees the evaluation has run.
+  def score
+    calculated_formula
+    dentaku_service.raw_result
+  end
+
+  def validity
+    @validity ||= validity_evaluator.call(chart, all_var_values, score)
+  end
+
+  def valid_participant?
+    return true unless validity_gate_enabled?
+    return true if validity.passed
+
+    Rails.logger.info(
+      "ChartStatistics::Create EXCLUDED chart_id=#{chart.id}: " \
+      "user_session=#{user_session.id} did not meet the chart validity gate: " \
+      "answered=#{validity.answered_count} required=#{validity_evaluator.min_answered_variables(chart)} " \
+      "of=#{validity.variable_count.inspect} score=#{score.inspect} " \
+      "threshold=#{validity_evaluator.threshold(chart).inspect}"
+    )
+    false
+  end
+
+  def upsert_chart_statistic
+    chart_statistic = ChartStatistic.find_or_initialize_by(**chart_statistic_key)
+    filled_at = user_session.finished_at || DateTime.current
+    # Ordering guard, only ever triggered on the de-duplicated key: the back-fill iterates
+    # finished sessions with no ORDER BY, so an older finish must not overwrite a newer one.
+    # On the legacy key `filled_at` is derived from the `user_session` that is part of the
+    # key, so a re-run always recomputes the same value and this returns false.
+    return if chart_statistic.filled_at.present? && filled_at < chart_statistic.filled_at
+
+    chart_statistic.label = label
+    chart_statistic.user_session = user_session
+    chart_statistic.filled_at = filled_at
+    chart_statistic.save!
+  end
+
+  # `min == 0` keeps today's key: one row per (label, dimensions, user_session). With the
+  # gate on, `label` and `user_session` drop out of the key and become plain assignments,
+  # leaving exactly one row per participant per chart.
+  def chart_statistic_key
+    key = { organization: organization, health_system: health_system, health_clinic: health_clinic,
+            chart: chart, user: user_session.user }
+    return key if validity_gate_enabled?
+
+    key.merge(label: label, user_session: user_session)
   end
 
   def health_system

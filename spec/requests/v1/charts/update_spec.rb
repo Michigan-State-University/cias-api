@@ -75,8 +75,11 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
                 'default_pattern' => {
                   'color' => '#E2B1F4',
                   'label' => 'NotMatched'
-                }
+                },
+                'min_answered_variables' => 0,
+                'positive_despite_missing_threshold' => nil
               },
+              'formula_variable_count' => 0,
               'dashboard_section_id' => dashboard_section.id,
               'published_at' => nil
             }
@@ -123,6 +126,72 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       let(:user) { e_intervention_admin }
 
       it_behaves_like 'permitted user'
+    end
+  end
+
+  context 'when the chart validity settings are updated' do
+    # Sent `as: :json` because the FE posts JSON — form encoding would stringify the
+    # numbers and the formula JSON schema types them strictly (integer / number).
+    let(:request) { patch v1_chart_path(chart.id), params: params, headers: headers, as: :json }
+    let(:params) do
+      {
+        chart: {
+          formula: {
+            payload: 'session1.var1 + session1.var2 + session1.var3',
+            patterns: [{ match: '>=2', label: 'Positive', color: '#C766EA' }],
+            default_pattern: { label: 'Negative', color: '#E2B1F4' },
+            min_answered_variables: 2,
+            positive_despite_missing_threshold: 15
+          }
+        }
+      }
+    end
+
+    before { request }
+
+    it 'returns correct status' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'persists both keys' do
+      expect(chart.reload.formula).to include(
+        'min_answered_variables' => 2,
+        'positive_despite_missing_threshold' => 15
+      )
+    end
+
+    it 'round-trips both keys in the response' do
+      expect(json_response['data']['attributes']['formula']).to include(
+        'min_answered_variables' => 2,
+        'positive_despite_missing_threshold' => 15
+      )
+    end
+
+    it 'returns formula_variable_count matching the payload' do
+      expect(json_response['data']['attributes']['formula_variable_count']).to eq(3)
+    end
+
+    context 'when the minimum is negative' do
+      let(:params) do
+        {
+          chart: {
+            formula: {
+              payload: 'session1.var1',
+              patterns: [{ match: '>=2', label: 'Positive', color: '#C766EA' }],
+              default_pattern: { label: 'Negative', color: '#E2B1F4' },
+              min_answered_variables: -1
+            }
+          }
+        }
+      end
+
+      it 'returns unprocessable entity' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'does not persist the change' do
+        expect(chart.reload.formula['min_answered_variables']).to eq(0)
+      end
     end
   end
 

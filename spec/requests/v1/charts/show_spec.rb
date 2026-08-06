@@ -54,8 +54,11 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
                 'default_pattern' => {
                   'color' => '#E2B1F4',
                   'label' => 'NotMatched'
-                }
+                },
+                'min_answered_variables' => 0,
+                'positive_despite_missing_threshold' => nil
               },
+              'formula_variable_count' => 0,
               'dashboard_section_id' => dashboard_section.id,
               'date_range_start' => nil,
               'date_range_end' => nil,
