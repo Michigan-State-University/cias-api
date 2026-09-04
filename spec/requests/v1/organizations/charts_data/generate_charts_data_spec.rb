@@ -89,7 +89,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'label' => 1.month.ago.strftime('%B %Y'),
                 'value' => 37.5,
                 'color' => '#C766EA',
-                'population' => 8
+                'population' => 8,
+                'invalidValue' => 0
               }
             ],
             'population' => 8,
@@ -102,7 +103,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'label' => 3.months.ago.strftime('%B %Y'),
                 'value' => 3,
                 'color' => '#C766EA',
-                'notMatchedValue' => 5
+                'notMatchedValue' => 5,
+                'invalidValue' => 0
               }
             ],
             'population' => 8,
@@ -206,6 +208,63 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
       end
     end
 
+    # Phase 1 work item 9 - the authorization-scope probe at the REQUEST layer. The service specs
+    # inject a relation directly, so they cannot exercise `accessible_by`, the `left_joins(:chart)`
+    # or the role composition that `charts_data_controller.rb:74-83` adds.
+    #
+    # It is also the only place in the suite where the endpoint serialises a NON-ZERO
+    # `invalidValue`: every other datum pin carries `'invalidValue' => 0`, so an aggregation that
+    # never counted an Invalid row would look green everywhere else in these specs.
+    context 'when Invalid / Insufficient Data rows exist across clinics and organizations' do
+      let(:user) { health_clinic_admin }
+
+      let!(:health_clinic2) do
+        create(:health_clinic, :with_health_clinic_admin, name: 'Sibling Clinic', health_system: health_system)
+      end
+      let!(:other_organization) { create(:organization, name: 'Somebody Else') }
+      let!(:other_health_system) { create(:health_system, organization: other_organization) }
+      let!(:other_health_clinic) { create(:health_clinic, name: 'Foreign Clinic', health_system: other_health_system) }
+
+      # Domestic: same clinic, same chart, same period as the Matched/NotMatched rows above.
+      let!(:domestic_invalid) do
+        create_list(:chart_statistic, 4, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: organization,
+                                         health_system: health_system, chart: bar_chart,
+                                         health_clinic: health_clinic, filled_at: 3.months.ago)
+      end
+      # A sibling clinic in the SAME organization - out of reach of both the `clinic_ids` param and
+      # a `health_clinic_admin`'s own clinic scoping.
+      let!(:sibling_clinic_invalid) do
+        create_list(:chart_statistic, 6, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: organization,
+                                         health_system: health_system, chart: bar_chart,
+                                         health_clinic: health_clinic2, filled_at: 3.months.ago)
+      end
+      # A different organization entirely - out of reach of the organization in the URL.
+      let!(:foreign_org_invalid) do
+        create_list(:chart_statistic, 7, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: other_organization,
+                                         health_system: other_health_system, chart: bar_chart,
+                                         health_clinic: other_health_clinic, filled_at: 3.months.ago)
+      end
+
+      before { request }
+
+      it "serialises the requesting clinic's Invalid count and nobody else's" do
+        chart = json_response['data_for_charts'].find { |entry| entry['chart_id'] == bar_chart.id }
+        datum = chart['data'].find { |entry| entry['label'] == 3.months.ago.strftime('%B %Y') }
+
+        # 4 domestic rows - NOT 10 (with the sibling clinic) and NOT 17 (with the other org).
+        expect(datum['invalidValue']).to eq(4)
+        expect(datum['value']).to eq(3)
+        expect(datum['notMatchedValue']).to eq(5)
+      end
+
+      it 'counts only the reachable Invalid rows in the top-level population' do
+        chart = json_response['data_for_charts'].find { |entry| entry['chart_id'] == bar_chart.id }
+
+        # 3 Matched + 5 NotMatched + 4 Invalid. The other 13 Invalid rows are out of scope.
+        expect(chart['population']).to eq(12)
+      end
+    end
+
     context 'when user is' do
       %w[admin organization_admin e_intervention_admin health_clinic_admin].each do |role|
         context role.to_s do
@@ -291,7 +350,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'label' => 1.month.ago.strftime('%B %Y'),
                 'value' => 37.5,
                 'color' => '#C766EA',
-                'population' => 8
+                'population' => 8,
+                'invalidValue' => 0
               }
             ],
             'population' => 8,
@@ -304,7 +364,8 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
                 'label' => 3.months.ago.strftime('%B %Y'),
                 'value' => 3,
                 'color' => '#C766EA',
-                'notMatchedValue' => 5
+                'notMatchedValue' => 5,
+                'invalidValue' => 0
               }
             ],
             'population' => 8,

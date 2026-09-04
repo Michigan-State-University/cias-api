@@ -26,7 +26,7 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
   # colors each slice straight from `dataItem.color` (PieChart.js:35, passed through
   # untouched), so the fixed grey rides this datum and needs no frontend change.
   def color_for(label, patterns, default_pattern)
-    return ChartStatistic::INSUFFICIENT_DATA_COLOR if label == ChartStatistic::INSUFFICIENT_DATA_LABEL
+    return INSUFFICIENT_DATA_COLOR if label == ChartStatistic::INSUFFICIENT_DATA_LABEL
 
     current_pattern = patterns.find { |pattern| pattern['label'] == label }
 

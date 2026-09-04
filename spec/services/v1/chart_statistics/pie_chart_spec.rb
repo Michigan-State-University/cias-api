@@ -82,7 +82,7 @@ RSpec.describe V1::ChartStatistics::PieChart do
         expect(invalid_slice).to eq(
           'label' => ChartStatistic::INSUFFICIENT_DATA_LABEL,
           'value' => 2,
-          'color' => ChartStatistic::INSUFFICIENT_DATA_COLOR
+          'color' => V1::ChartStatistics::Base::INSUFFICIENT_DATA_COLOR
         )
         # Without the special case the reserved label matches no pattern and would inherit
         # the default category's color, making the two visually indistinguishable.

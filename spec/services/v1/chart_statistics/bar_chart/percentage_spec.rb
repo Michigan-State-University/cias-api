@@ -45,13 +45,15 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
               'label' => chart_matched_statistic1.first.filled_at.strftime('%B %Y'),
               'value' => 66.67,
               'color' => '#C766EA',
-              'population' => 15
+              'population' => 15,
+              'invalidValue' => 0
             },
             {
               'label' => chart_matched_statistic2.first.filled_at.strftime('%B %Y'),
               'value' => 37.5,
               'color' => '#C766EA',
-              'population' => 8
+              'population' => 8,
+              'invalidValue' => 0
             }
           ),
           'population' => 23,
@@ -80,13 +82,15 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
                 'label' => 1.month.ago.strftime('%B %Y'),
                 'value' => 37.5,
                 'color' => '#C766EA',
-                'population' => 8
+                'population' => 8,
+                'invalidValue' => 0
               },
               {
                 'label' => Time.current.strftime('%B %Y'),
                 'value' => 0,
                 'color' => '#C766EA',
-                'population' => 0
+                'population' => 0,
+                'invalidValue' => 0
               }
             ],
             'population' => 23,
@@ -99,13 +103,15 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
                 'label' => 1.month.ago.strftime('%B %Y'),
                 'value' => 0,
                 'color' => '#C766EA',
-                'population' => 0
+                'population' => 0,
+                'invalidValue' => 0
               },
               {
                 'label' => Time.current.strftime('%B %Y'),
                 'value' => 0,
                 'color' => '#C766EA',
-                'population' => 0
+                'population' => 0,
+                'invalidValue' => 0
               }
             ],
             'population' => 0,
@@ -129,13 +135,15 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
                                        'label' => 2.months.ago.strftime('%B %Y'),
                                        'value' => 66.67,
                                        'color' => '#C766EA',
-                                       'population' => 15
+                                       'population' => 15,
+                                       'invalidValue' => 0
                                      },
                                      {
                                        'label' => 1.month.ago.strftime('%B %Y'),
                                        'value' => 37.5,
                                        'color' => '#C766EA',
-                                       'population' => 8
+                                       'population' => 8,
+                                       'invalidValue' => 0
                                      }
                                    ],
                                    'population' => 23,
@@ -154,37 +162,69 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
   end
 
   context 'when the chart has Invalid / Insufficient Data rows' do
-    # Deliberately OUTSIDE the range of every real row: `periodical_statistics` walks from
-    # the first to the last `filled_at` of the chart's rows, so without the
-    # constructor-scoped exclusion these would stretch the axis back three extra months.
+    # Deliberately OUTSIDE the range of every real row: `periodical_statistics` walks from the
+    # first to the last `filled_at` of the chart's rows, so these now stretch the axis back three
+    # extra months - intended, since the period had participants.
     let!(:invalid_statistics) do
       create_list(:chart_statistic, 4, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: organization,
                                        health_system: health_system, chart: bar_chart1,
                                        health_clinic: health_clinic, filled_at: 5.months.ago)
     end
 
-    it 'does not stretch the month axis' do
+    it 'stretches the month axis to cover the Invalid-only period' do
       data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
 
       expect(data['data'].pluck('label')).to eq(
-        [2.months.ago.strftime('%B %Y'), 1.month.ago.strftime('%B %Y')]
+        [5, 4, 3, 2, 1].map { |n| n.months.ago.strftime('%B %Y') }
       )
     end
 
-    it 'excludes Invalid rows from the axis and the chart population' do
+    it 'counts Invalid rows in the denominator and carries them for the tooltip' do
       data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
 
-      # What the exclusion actually protects here: the axis span and the top-level
-      # `population` (`entry_count_hash`). The series and the per-month denominator are
-      # invalid-free by construction, because `data_for_chart` sums only the two configured
-      # labels (`percentage.rb:9-12`) - a reserved-label count could never enter them.
+      # The Invalid-only period reads 0% matched against a population of 4 - it had four
+      # participants, none of whom answered enough. No second series: this chart type renders a
+      # single bar, so `invalidValue` exists for the hover text only.
       expect(data['data']).to eq(
         [
-          { 'label' => 2.months.ago.strftime('%B %Y'), 'value' => 66.67, 'color' => '#C766EA', 'population' => 15 },
-          { 'label' => 1.month.ago.strftime('%B %Y'), 'value' => 37.5, 'color' => '#C766EA', 'population' => 8 }
+          { 'label' => 5.months.ago.strftime('%B %Y'), 'value' => 0, 'color' => '#C766EA', 'population' => 4, 'invalidValue' => 4 },
+          { 'label' => 4.months.ago.strftime('%B %Y'), 'value' => 0, 'color' => '#C766EA', 'population' => 0, 'invalidValue' => 0 },
+          { 'label' => 3.months.ago.strftime('%B %Y'), 'value' => 0, 'color' => '#C766EA', 'population' => 0, 'invalidValue' => 0 },
+          { 'label' => 2.months.ago.strftime('%B %Y'), 'value' => 66.67, 'color' => '#C766EA', 'population' => 15, 'invalidValue' => 0 },
+          { 'label' => 1.month.ago.strftime('%B %Y'), 'value' => 37.5, 'color' => '#C766EA', 'population' => 8, 'invalidValue' => 0 }
         ]
       )
-      expect(data['population']).to eq(23)
+      expect(data['population']).to eq(27)
+    end
+  end
+
+  context 'when Invalid rows share a period with counted participants' do
+    # The headline behaviour change: the same data now reports a LOWER percentage, because the
+    # participants who answered too little are part of the denominator instead of vanishing.
+    let!(:invalid_statistics) do
+      create_list(:chart_statistic, 5, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: organization,
+                                       health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: 2.months.ago)
+    end
+
+    it 'lowers the matched percentage for that period' do
+      data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
+      period = data['data'].find { |datum| datum['label'] == 2.months.ago.strftime('%B %Y') }
+
+      # 10 matched of (10 + 5 + 5) = 50.0 %. Before Invalid entered the denominator the same
+      # rows reported 10 of 15 = 66.67 %.
+      expect(period).to eq(
+        'label' => 2.months.ago.strftime('%B %Y'), 'value' => 50.0, 'color' => '#C766EA',
+        'population' => 20, 'invalidValue' => 5
+      )
+    end
+
+    it 'leaves a period with no Invalid rows untouched' do
+      data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
+      period = data['data'].find { |datum| datum['label'] == 1.month.ago.strftime('%B %Y') }
+
+      expect(period['value']).to eq(37.5)
+      expect(period['invalidValue']).to eq(0)
     end
   end
 
@@ -219,13 +259,15 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
               'label' => "Q#{(chart_matched_statistic1.first.filled_at.month / 3.0).ceil} #{chart_matched_statistic1.first.filled_at.year}",
               'value' => 66.67,
               'color' => '#C766EA',
-              'population' => 15
+              'population' => 15,
+              'invalidValue' => 0
             },
             {
               'label' => "Q#{(chart_matched_statistic2.first.filled_at.month / 3.0).ceil} #{chart_matched_statistic2.first.filled_at.year}",
               'value' => 37.5,
               'color' => '#C766EA',
-              'population' => 8
+              'population' => 8,
+              'invalidValue' => 0
             }
           ),
           'population' => 23,

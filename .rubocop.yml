@@ -386,6 +386,7 @@ RSpec/ContextWording:
 RSpec/DescribeClass:
   Exclude:
     - 'db/migrate/*'
+    - 'spec/lib/tasks/*'
 
 RSpec/ExampleLength:
   Enabled: false
