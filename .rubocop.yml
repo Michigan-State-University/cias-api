@@ -151,6 +151,7 @@ Metrics/ClassLength:
     - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
     - 'app/models/intervention.rb'
     - 'app/controllers/v1/interventions/predefined_participants_controller.rb'
+    - 'app/services/v1/chart_statistics/create.rb'
 
 Metrics/ParameterLists:
   Enabled: true

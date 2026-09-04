@@ -3,8 +3,25 @@
 class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   attr_reader :data_offset
 
+  # Both bar generators - `BarChart::Numeric` and `BarChart::Percentage`, the only
+  # concrete subclasses - run this constructor, and it is the one place that covers every
+  # reader of the collection at once:
+  #
+  #   * `generate_hash`          - the `value` / `notMatchedValue` series and, through them, the
+  #                                per-month `population` the percentage tooltip reads
+  #                                (`data_for_chart` itself reads no rows - it only sums the two
+  #                                configured labels out of `generate_hash`'s counts)
+  #   * `periodical_statistics`  - the MONTH-AXIS SPAN, which walks from the first to the
+  #                                last `filled_at` of ALL the chart's rows, so an Invalid
+  #                                row outside the real rows' range would otherwise append
+  #                                empty months to both bar types
+  #   * `entry_count_hash`       - the top-level `population` (dropped by the frontend)
+  #
+  # "Invalid / Insufficient Data" is a pie-only category: the bar series are two-valued by
+  # design (matched pattern vs default label), so an Invalid row has no series to land in
+  # and must not distort the axis or the denominators either.
   def initialize(charts_data_collection, charts, data_offset = nil)
-    super(charts_data_collection, charts)
+    super(charts_data_collection.excluding_insufficient_data, charts)
     @data_offset = data_offset
   end
 

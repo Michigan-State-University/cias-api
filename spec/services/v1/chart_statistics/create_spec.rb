@@ -371,13 +371,75 @@ RSpec.describe V1::ChartStatistics::Create do
         expect { subject }.not_to change(ChartStatistic, :count)
       end
     end
+
+    # Copying a session renames only the SESSION variable (`clone_jobs/session.rb:15`), never the
+    # question variables inside it, so one intervention legitimately holds two questions named
+    # `epds1`. The guard must attribute a missing `session_var.epds1` to the question in
+    # `session_var` - matching on the bare name instead treats the untouched twin in the copied
+    # session as "never reached" and drops the participant from every ungated chart.
+    context 'when another session in the intervention reuses the same question variable' do
+      let!(:question_reached) do
+        create(:question_single, question_group: question_group, body: {
+                 data: [{ payload: 'Yes', value: '1' }],
+                 variable: { name: 'epds1' }
+               })
+      end
+
+      let!(:question_skipped) do
+        create(:question_single, question_group: question_group, body: {
+                 data: [{ payload: 'Yes', value: '1' }],
+                 variable: { name: 'epds2' }
+               })
+      end
+
+      let(:copied_session) { create(:session, intervention: intervention, variable: 'cloned_session_var_2') }
+      let(:copied_question_group) { create(:question_group, session: copied_session) }
+
+      # The twin the participant never opened - same question variable, different session.
+      let!(:copied_question) do
+        create(:question_single, question_group: copied_question_group, body: {
+                 data: [{ payload: 'Yes', value: '1' }],
+                 variable: { name: 'epds2' }
+               })
+      end
+
+      let!(:answer_reached) do
+        create(:answer_single, user_session: user_session, question: question_reached,
+                               body: { data: [{ var: 'epds1', value: '1' }] })
+      end
+
+      # A skip stores a confirmed answer whose `var` is blank, so the variable never reaches
+      # `var_values` and lands in `missing_vars` - but the question WAS reached.
+      let!(:answer_skipped) do
+        create(:answer_single, user_session: user_session, question: question_skipped, skipped: true,
+                               body: { data: [{ var: '', value: '' }] })
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.epds1 + session_var.epds2',
+          'patterns' => [{ 'match' => '>=1', 'label' => 'Positive', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'creates the chart statistic, attributing the missing variable to the session that was filled' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+      end
+
+      it 'does not log the did-not-reach skip' do
+        allow(Rails.logger).to receive(:info)
+        subject
+        expect(Rails.logger).not_to have_received(:info).with(/did not reach all questions referenced by formula/)
+      end
+    end
   end
 
   describe 'chart validity gate (min_answered_variables > 0)' do
     let(:user_session_finished_at) { DateTime.now }
     let(:question_group) { create(:question_group, session: session) }
     let(:min_answered_variables) { 7 }
-    let(:threshold) { nil }
+    let(:rescue_enabled) { false }
     let(:answered_variables) { 3 }
     let(:answer_value) { '1' }
 
@@ -387,7 +449,7 @@ RSpec.describe V1::ChartStatistics::Create do
         'patterns' => [{ 'match' => '>=2', 'label' => 'Positive', 'color' => '#C766EA' }],
         'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
         'min_answered_variables' => min_answered_variables,
-        'positive_despite_missing_threshold' => threshold
+        'positive_despite_missing_data' => rescue_enabled
       }
     end
 
@@ -410,16 +472,37 @@ RSpec.describe V1::ChartStatistics::Create do
     end
 
     context 'when fewer variables are answered than the minimum' do
+      it 'creates one row under the reserved Invalid / Insufficient Data label' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+        expect(ChartStatistic.last.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+      end
+
+      it 'logs the classification with the counts, score, rescue flag and match state' do
+        allow(Rails.logger).to receive(:info)
+        subject
+        # score 3 matches the '>=2' case, but the rescue is off — matched=true, rescue_enabled=false.
+        expect(Rails.logger).to have_received(:info).with(
+          /INSUFFICIENT_DATA chart_id=#{chart.id}.*answered=3 required=7 of=9 score=3 rescue_enabled=false matched=true/
+        )
+      end
+    end
+
+    context 'when the participant answered none of the chart variables' do
+      # `CreateForUserSession` evaluates EVERY non-draft chart in the organization on every
+      # session finish, so this is the participant who finished some other session and never
+      # reached this chart's instrument at all. They keep today's silent skip rather than
+      # surfacing as a visible Invalid slice (client-confirmed `answered_count >= 1` rule).
+      let(:answered_variables) { 0 }
+
       it 'does not create a chart statistic' do
         expect { subject }.not_to change(ChartStatistic, :count)
       end
 
-      it 'logs the exclusion with the counts, score and threshold' do
+      it 'logs a premature exclusion, not an Invalid classification' do
         allow(Rails.logger).to receive(:info)
         subject
-        expect(Rails.logger).to have_received(:info).with(
-          /EXCLUDED chart_id=#{chart.id}.*answered=3 required=7 of=9 score=3 threshold=nil/
-        )
+        expect(Rails.logger).to have_received(:info).with(/EXCLUDED chart_id=#{chart.id}.*answered=0 required=7/)
+        expect(Rails.logger).not_to have_received(:info).with(/INSUFFICIENT_DATA chart_id=#{chart.id}/)
       end
     end
 
@@ -447,34 +530,69 @@ RSpec.describe V1::ChartStatistics::Create do
       end
 
       it 'does not count the skipped question towards the minimum' do
-        expect { subject }.not_to change(ChartStatistic, :count)
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+        # Had the skipped answer counted, answered would have reached the minimum of 7 and
+        # the participant would carry a score label instead of the reserved one.
+        expect(ChartStatistic.last.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
       end
     end
 
-    context 'when the participant is below the minimum but the score clears the threshold' do
-      let(:threshold) { 15 }
+    context 'when the participant is below the minimum but the 0-filled score matches an explicit case' do
+      let(:rescue_enabled) { true }
       let(:answer_value) { '10' }
 
-      it 'rescues the participant and labels them by the ordinary patterns' do
+      it 'rescues the participant with that case\'s label — never the default or reserved label' do
         expect { subject }.to change(ChartStatistic, :count).by(1)
         expect(ChartStatistic.last.label).to eq('Positive')
+        expect(ChartStatistic.last.label).not_to eq('Negative')
+        expect(ChartStatistic.last.label).not_to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
       end
     end
 
-    context 'when the score exactly equals the threshold' do
-      let(:threshold) { 15 }
-      let(:answer_value) { '5' }
+    context 'when the participant is below the minimum and the score falls to the default category' do
+      # The structural guarantee survives phase 6: with the rescue ON, a participant whose
+      # 0-filled score matches no explicit case is still never labelled by the DEFAULT
+      # pattern — they become visible under the reserved label instead.
+      let(:rescue_enabled) { true }
+      let(:answer_value) { '0' }
 
-      it 'rescues the participant' do
+      it 'creates a reserved-label row, never a default-labelled one' do
         expect { subject }.to change(ChartStatistic, :count).by(1)
+        expect(ChartStatistic.last.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+        expect(ChartStatistic.last.label).not_to eq('Negative')
       end
     end
 
-    context 'when the participant is below the minimum and the score misses the threshold' do
-      let(:threshold) { 15 }
+    context 'when the matched case carries the default category label' do
+      # The end-to-end half of the guarantee: `Create#label` would otherwise stamp
+      # 'Negative' and the pie would render this participant inside the default bucket.
+      let(:rescue_enabled) { true }
+      let(:answer_value) { '10' }
+      let(:formula) do
+        {
+          'payload' => (1..9).map { |i| "session_var.epds#{i}" }.join(' + '),
+          'patterns' => [{ 'match' => '>=2', 'label' => 'Negative', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
+          'min_answered_variables' => min_answered_variables,
+          'positive_despite_missing_data' => rescue_enabled
+        }
+      end
 
-      it 'does not create a chart statistic' do
-        expect { subject }.not_to change(ChartStatistic, :count)
+      it 'creates a reserved-label row instead of a Negative one' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+        expect(ChartStatistic.last.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+        expect(ChartStatistic.last.label).not_to eq('Negative')
+      end
+    end
+
+    context 'when the rescue is off and the score matches an explicit case' do
+      let(:rescue_enabled) { false }
+      let(:answer_value) { '10' }
+
+      it 'creates a reserved-label row rather than the matched case label' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+        expect(ChartStatistic.last.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+        expect(ChartStatistic.last.label).not_to eq('Positive')
       end
     end
 
@@ -500,7 +618,7 @@ RSpec.describe V1::ChartStatistics::Create do
           'patterns' => [{ 'match' => '>=10', 'label' => 'High', 'color' => '#C766EA' }],
           'default_pattern' => { 'label' => 'Low', 'color' => '#E2B1F4' },
           'min_answered_variables' => min_answered_variables,
-          'positive_despite_missing_threshold' => threshold
+          'positive_despite_missing_data' => rescue_enabled
         }
       end
 
@@ -551,13 +669,120 @@ RSpec.describe V1::ChartStatistics::Create do
         expect(statistic.label).to eq('Low')
 
         # The researcher raises the minimum above M; the back-fill re-runs over the
-        # participant's other finished session. Exclusion skips the upsert - it never destroys.
+        # participant's other finished session. The no-downgrade half of the precedence
+        # lattice keeps the real label - exclusion never destroys, and never relabels.
         chart.update!(formula: chart.formula.merge('min_answered_variables' => 5))
         answer_b
 
         expect { described_class.call(chart, user_session_b, organization) }.not_to change(ChartStatistic, :count)
         expect(statistic.reload.label).to eq('Low')
+        expect(statistic.label).not_to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
         expect(statistic.user_session).to eq(user_session_a)
+      end
+    end
+
+    describe 'outcome precedence over back-fill replay order' do
+      # `CreateForUserSessions` selects finished sessions by session VARIABLE across the
+      # whole organization with NO ORDER BY (create_for_user_sessions.rb:26-32), and
+      # `V1::Charts::Regenerate` destroys and replays, so two interventions that both use
+      # the session variable this chart references feed the SAME de-dup key (organization,
+      # health_system, health_clinic, chart, user) in an arbitrary order - while each call's
+      # `answered_count` comes from its own `user_intervention`'s answers, so the outcomes
+      # genuinely differ. A real-label outcome must therefore beat a persisted Invalid row
+      # regardless of `filled_at`, and an Invalid outcome must never overwrite a real one.
+      # One finished session on its own intervention and user_intervention, in the SAME
+      # clinic as every other fill so they all collapse onto one de-dup key.
+      def fill!(answers, finished_at:)
+        other_intervention = create(:intervention, :published, organization: organization)
+        other_session = create(:session, intervention: other_intervention, variable: 'sa')
+        group = create(:question_group, session: other_session)
+        questions = %w[a b].index_with do |name|
+          create(:question_number, question_group: group, body: { data: [{ payload: '' }], variable: { name: name } })
+        end
+        user_intervention = create(:user_intervention, user: user, intervention: other_intervention,
+                                                       health_clinic_id: health_clinic.id)
+        fill = create(:user_session, user: user, session: other_session, user_intervention: user_intervention,
+                                     health_clinic: health_clinic, finished_at: finished_at)
+        answers.each do |name, value|
+          create(:answer_number, user_session: fill, question: questions[name], body: { data: [{ var: name, value: value }] })
+        end
+        fill
+      end
+
+      let(:min_answered_variables) { 2 }
+      let(:formula) do
+        {
+          'payload' => 'sa.a + sa.b',
+          'patterns' => [{ 'match' => '>=10', 'label' => 'High', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Low', 'color' => '#E2B1F4' },
+          'min_answered_variables' => min_answered_variables,
+          'positive_despite_missing_data' => rescue_enabled
+        }
+      end
+      # Both variables answered -> 2 of 2 -> passes, score 20 -> 'High'. Deliberately the
+      # OLDER of the two finishes.
+      let(:passing_fill) { fill!({ 'a' => '20', 'b' => '0' }, finished_at: DateTime.now - 2.hours) }
+      # Only one variable answered -> 1 of 2, rescue off -> Invalid. The NEWER finish.
+      let(:invalid_fill) { fill!({ 'a' => '1' }, finished_at: DateTime.now - 1.hour) }
+
+      it 'upgrades a persisted Invalid row when a passing finish arrives later' do
+        described_class.call(chart, invalid_fill, organization)
+        expect(ChartStatistic.count).to eq(1)
+        expect(ChartStatistic.last.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+
+        newer_passing = fill!({ 'a' => '20', 'b' => '0' }, finished_at: DateTime.now)
+        expect { described_class.call(chart, newer_passing, organization) }.not_to change(ChartStatistic, :count)
+        expect(ChartStatistic.last.label).to eq('High')
+      end
+
+      it 'upgrades a persisted Invalid row even when the passing finish is OLDER' do
+        # The falsifiable core of the lattice: the passing finish is an hour OLDER than the
+        # Invalid one, so a filled_at-only guard would freeze this row at Invalid forever.
+        described_class.call(chart, invalid_fill, organization)
+        described_class.call(chart, passing_fill, organization)
+
+        expect(ChartStatistic.count).to eq(1)
+        statistic = ChartStatistic.last
+        expect(statistic.label).to eq('High')
+        expect(statistic.user_session).to eq(passing_fill)
+        expect(statistic.filled_at).to be_within(1.second).of(passing_fill.finished_at)
+      end
+
+      it 'never downgrades a real-label row when the Invalid finish is replayed second' do
+        # Together with the example above this is REPLAY-ORDER INVARIANCE: the same two
+        # finishes end in the same label, user_session AND filled_at in either order.
+        described_class.call(chart, passing_fill, organization)
+        expect { described_class.call(chart, invalid_fill, organization) }.not_to change(ChartStatistic, :count)
+
+        statistic = ChartStatistic.last
+        expect(statistic.label).to eq('High')
+        expect(statistic.user_session).to eq(passing_fill)
+        expect(statistic.filled_at).to be_within(1.second).of(passing_fill.finished_at)
+      end
+
+      it 'logs the retained row rather than relabelling it' do
+        described_class.call(chart, passing_fill, organization)
+        allow(Rails.logger).to receive(:info)
+
+        described_class.call(chart, invalid_fill, organization)
+
+        # Deliberately not asserting the persisted label: the line no longer carries it (a
+        # participant's clinical category does not belong in a log). Still falsifiable — delete
+        # the retain branch and no RETAINED line is emitted at all.
+        expect(Rails.logger).to have_received(:info).with(/RETAINED chart_id=#{chart.id}/)
+      end
+
+      it 'keeps the newer finish when both outcomes are Invalid' do
+        # Within one outcome class the filled_at ordering guard still rules.
+        older_invalid = fill!({ 'a' => '1' }, finished_at: DateTime.now - 3.hours)
+
+        described_class.call(chart, invalid_fill, organization)
+        described_class.call(chart, older_invalid, organization)
+
+        expect(ChartStatistic.count).to eq(1)
+        statistic = ChartStatistic.last
+        expect(statistic.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+        expect(statistic.user_session).to eq(invalid_fill)
       end
     end
 
@@ -583,8 +808,7 @@ RSpec.describe V1::ChartStatistics::Create do
           'payload' => 'rt.r1 + rt.r2',
           'patterns' => [{ 'match' => '>=2', 'label' => 'Positive', 'color' => '#C766EA' }],
           'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
-          'min_answered_variables' => min_answered_variables,
-          'positive_despite_missing_threshold' => nil
+          'min_answered_variables' => min_answered_variables
         }
       end
 
@@ -617,11 +841,28 @@ RSpec.describe V1::ChartStatistics::Create do
         expect(statistic.label).to eq('Positive')
 
         retake_answer
-        expect { described_class.call(chart, retake_fill, organization) }.not_to change(ChartStatistic, :count)
+        described_class.call(chart, retake_fill, organization)
 
         statistic.reload
         expect(statistic.label).to eq('Positive')
         expect(statistic.user_session).to eq(first_fill)
+        expect(statistic.health_clinic).to eq(health_clinic)
+      end
+
+      it 'records the sibling-clinic retake as its own Invalid row' do
+        # `health_clinic` stays in the de-dup key, so a multiple-fill retake (which can only
+        # land in a DIFFERENT clinic - the user/session/clinic index is unconditionally
+        # unique) is a separate participant-clinic cell. Before phase 6 that cell produced
+        # nothing; now the below-minimum retake is visible there, while clinic A keeps its
+        # real label. Clinic filtering is how the dashboard reads these apart.
+        described_class.call(chart, first_fill, organization)
+        retake_answer
+
+        expect { described_class.call(chart, retake_fill, organization) }.to change(ChartStatistic, :count).by(1)
+
+        retake_row = ChartStatistic.find_by(health_clinic: retake_clinic, chart: chart, user: user)
+        expect(retake_row.label).to eq(ChartStatistic::INSUFFICIENT_DATA_LABEL)
+        expect(retake_row.user_session).to eq(retake_fill)
       end
     end
   end

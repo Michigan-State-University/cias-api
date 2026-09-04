@@ -28,15 +28,25 @@ RSpec.describe Chart do
 
     describe 'JSON schema' do
       it 'accepts both new keys' do
-        expect(build_chart('min_answered_variables' => 9, 'positive_despite_missing_threshold' => 15)).to be_valid
+        expect(build_chart('min_answered_variables' => 9, 'positive_despite_missing_data' => true)).to be_valid
       end
 
-      it 'accepts a zero minimum and a null threshold' do
-        expect(build_chart('min_answered_variables' => 0, 'positive_despite_missing_threshold' => nil)).to be_valid
+      it 'accepts a zero minimum and a false rescue' do
+        expect(build_chart('min_answered_variables' => 0, 'positive_despite_missing_data' => false)).to be_valid
       end
 
       it 'rejects a non-integer minimum' do
         expect(build_chart('min_answered_variables' => 1.5)).not_to be_valid
+      end
+
+      it 'rejects a number for the rescue key' do
+        expect(build_chart('positive_despite_missing_data' => 15)).not_to be_valid
+      end
+
+      it 'rejects an explicit null for the rescue key' do
+        # The only value that isolates the schema layer: the model validator is nil-tolerant
+        # for the absent-key legacy path, so `"type": "boolean"` is what rejects this.
+        expect(build_chart('positive_despite_missing_data' => nil)).not_to be_valid
       end
 
       it 'rejects an undeclared extra key' do
@@ -45,6 +55,15 @@ RSpec.describe Chart do
 
       it 'still accepts a legacy formula carrying neither key' do
         expect(build(:chart, dashboard_section: dashboard_section, formula: base_formula)).to be_valid
+      end
+
+      it 'rejects the legacy numeric threshold key' do
+        # The numeric rescue was replaced by the boolean before the feature ever deployed, so the
+        # key is no longer declared in the schema and `additionalProperties: false` rejects it.
+        legacy_chart = build(:chart, dashboard_section: dashboard_section,
+                                     formula: base_formula.merge('positive_despite_missing_threshold' => 15))
+
+        expect(legacy_chart).not_to be_valid
       end
 
       it 'lets a pre-existing chart re-save without gaining the new keys' do
@@ -63,11 +82,11 @@ RSpec.describe Chart do
         expect(chart).not_to be_valid
       end
 
-      it 'rejects a non-numeric threshold' do
-        chart = build_chart('positive_despite_missing_threshold' => 'high')
+      it 'rejects a non-boolean rescue value' do
+        chart = build_chart('positive_despite_missing_data' => 'yes')
 
         expect(chart).not_to be_valid
-        expect(chart.errors[:formula]).to include('positive_despite_missing_threshold must be a number or null')
+        expect(chart.errors[:formula]).to include('positive_despite_missing_data must be a boolean')
       end
 
       it 'accepts a chart with neither key' do
@@ -80,6 +99,78 @@ RSpec.describe Chart do
         chart = build_chart('payload' => 'session1.var1', 'min_answered_variables' => 9)
 
         expect(chart).to be_valid
+      end
+    end
+
+    describe 'reserved label collision guard' do
+      let(:reserved) { ChartStatistic::INSUFFICIENT_DATA_LABEL }
+      let(:error_message) do
+        "label '#{reserved}' is reserved for participants excluded by the validity gate " \
+          'and cannot be used by a case or by the default category'
+      end
+
+      it 'rejects a case whose label is the reserved label' do
+        chart = build_chart('patterns' => [{ 'match' => '>=1', 'label' => reserved, 'color' => '#C766EA' }])
+
+        expect(chart).not_to be_valid
+        expect(chart.errors[:formula]).to include(error_message)
+      end
+
+      it 'rejects the reserved label regardless of case' do
+        chart = build_chart('patterns' => [{ 'match' => '>=1', 'label' => 'invalid / INSUFFICIENT data', 'color' => '#C766EA' }])
+
+        expect(chart).not_to be_valid
+      end
+
+      it 'rejects the reserved label on the default category' do
+        chart = build_chart('default_pattern' => { 'label' => reserved, 'color' => '#E2B1F4' })
+
+        expect(chart).not_to be_valid
+        expect(chart.errors[:formula]).to include(error_message)
+      end
+
+      it 'rejects the reserved label on a case beyond the first' do
+        # `formula.json`'s `items` is a draft-04 TUPLE, so `patterns[1..]` reaches no schema
+        # constraint at all - this guard is the only thing checking those elements.
+        chart = build_chart('patterns' => [
+                              { 'match' => '>=10', 'label' => 'Severe', 'color' => '#C766EA' },
+                              { 'match' => '>=1', 'label' => reserved, 'color' => '#E2B1F4' }
+                            ])
+
+        expect(chart).not_to be_valid
+      end
+
+      it 'accepts a merely similar label' do
+        chart = build_chart('patterns' => [{ 'match' => '>=1', 'label' => 'Insufficient data', 'color' => '#C766EA' }])
+
+        expect(chart).to be_valid
+      end
+
+      it 'tolerates malformed patterns and a malformed default_pattern without raising' do
+        # `formula.json` constrains no pattern item and leaves `default_pattern`
+        # unconstrained, so the guard must survive whatever survives the schema.
+        %w[patterns default_pattern].each do |key|
+          chart = build(:chart, dashboard_section: dashboard_section,
+                                formula: base_formula.merge(key => 'not a collection'))
+
+          expect { chart.valid? }.not_to raise_error
+        end
+      end
+
+      it 'tolerates a non-Hash case element and a non-String label' do
+        chart = build_chart('patterns' => ['just a string', { 'match' => '>=1', 'label' => 5 }, { 'match' => '>=0' }])
+
+        expect { chart.valid? }.not_to raise_error
+        expect(chart.errors[:formula]).not_to include(error_message)
+      end
+
+      it 'tolerates the case elements that would actually raise without the type guards' do
+        # Deliberately the two fixtures that make the guards falsifiable: `'a string'['label']`
+        # merely returns nil, so the examples above stay green even with the guards deleted.
+        # Delete `pattern.is_a?(Hash)` and `nil['label']` raises NoMethodError; delete
+        # `default_pattern.is_a?(Hash)` and `5['label']` raises TypeError.
+        expect { build_chart('patterns' => [{ 'match' => '>=1', 'label' => 'Ok' }, nil, 5]).valid? }.not_to raise_error
+        expect { build_chart('default_pattern' => 5).valid? }.not_to raise_error
       end
     end
 

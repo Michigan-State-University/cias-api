@@ -106,6 +106,37 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
     end
   end
 
+  context 'when the chart has Invalid / Insufficient Data rows' do
+    # Deliberately OUTSIDE the range of every real row: `periodical_statistics` walks from
+    # the first to the last `filled_at` of the chart's rows, so without the
+    # constructor-scoped exclusion these would stretch the axis back three extra months.
+    let!(:invalid_statistics) do
+      create_list(:chart_statistic, 4, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: organization,
+                                       health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: 5.months.ago)
+    end
+
+    it 'does not stretch the month axis' do
+      data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
+
+      expect(data['data'].pluck('label')).to eq(
+        [2.months.ago.strftime('%B %Y'), 1.month.ago.strftime('%B %Y')]
+      )
+    end
+
+    it 'keeps the series and the population invalid-free' do
+      data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
+
+      expect(data['data']).to eq(
+        [
+          { 'label' => 2.months.ago.strftime('%B %Y'), 'value' => 10, 'color' => '#C766EA', 'notMatchedValue' => 5 },
+          { 'label' => 1.month.ago.strftime('%B %Y'), 'value' => 3, 'color' => '#C766EA', 'notMatchedValue' => 5 }
+        ]
+      )
+      expect(data['population']).to eq(23)
+    end
+  end
+
   context 'when chart has quarterly interval' do
     subject { described_class.new(data_collection, charts).generate }
 

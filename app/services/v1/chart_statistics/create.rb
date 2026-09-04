@@ -43,7 +43,7 @@ class V1::ChartStatistics::Create
     return if formula_error?
     return if zero_division_error?
     return unless inside_date_range?
-    return unless valid_participant?
+    return unless chartable?
 
     upsert_chart_statistic
   rescue Dentaku::ParseError, Dentaku::TokenizerError, Dentaku::ArgumentError => e
@@ -60,6 +60,8 @@ class V1::ChartStatistics::Create
   attr_reader :chart, :user_session, :organization
 
   def label
+    return ChartStatistic::INSUFFICIENT_DATA_LABEL if insufficient_data?
+
     result = calculated_formula
 
     result ? result['label'] : chart.formula['default_pattern']['label']
@@ -71,8 +73,13 @@ class V1::ChartStatistics::Create
     )
   end
 
+  # `defined?` rather than `||=`: `chart.calculate` returns nil for every participant whose
+  # score matched no pattern, and `||=` would re-run the whole Dentaku evaluation on each of
+  # the six call sites in the excluded path.
   def calculated_formula
-    @calculated_formula ||= chart.calculate(dentaku_service)
+    return @calculated_formula if defined?(@calculated_formula)
+
+    @calculated_formula = chart.calculate(dentaku_service)
   end
 
   def formula
@@ -100,32 +107,52 @@ class V1::ChartStatistics::Create
     dentaku_service.raw_result
   end
 
+  # `score` forces the memoised evaluation, so `calculated_formula` is the matched
+  # pattern Hash or nil here (the error sentinels short-circuited in `call`).
   def validity
-    @validity ||= validity_evaluator.call(chart, all_var_values, score)
+    @validity ||= validity_evaluator.call(chart, all_var_values, score, matched_pattern: calculated_formula)
   end
 
-  def valid_participant?
+  # A below-minimum, non-rescued participant is no longer dropped at the gate: they are
+  # persisted under the reserved label so they stay VISIBLE as their own pie category
+  # (CIAS-4191 phase 6). One exception - a participant who answered NONE of the chart's
+  # variables keeps today's silent skip: `CreateForUserSession` evaluates every non-draft
+  # chart in the organization on every session finish, so a participant finishing session A
+  # of an intervention whose gated chart covers session B would otherwise surface as a
+  # visible Invalid slice before ever reaching the instrument.
+  #
+  # Deliberately positioned BEHIND the sentinel checks in `call`: invalid formula variables,
+  # evaluation errors (`formula_error?` / `zero_division_error?`) and out-of-date-range
+  # sessions all `return` earlier and keep today's silent skip. An evaluation-error
+  # participant must never surface as Invalid, and the rescue needs the evaluation those
+  # checks force - so this gate must not be moved ahead of them.
+  def chartable?
     return true unless validity_gate_enabled?
     return true if validity.passed
 
-    Rails.logger.info(
-      "ChartStatistics::Create EXCLUDED chart_id=#{chart.id}: " \
-      "user_session=#{user_session.id} did not meet the chart validity gate: " \
-      "answered=#{validity.answered_count} required=#{validity_evaluator.min_answered_variables(chart)} " \
-      "of=#{validity.variable_count.inspect} score=#{score.inspect} " \
-      "threshold=#{validity_evaluator.threshold(chart).inspect}"
-    )
-    false
+    if validity.answered_count.zero?
+      log_gate_outcome('EXCLUDED', "answered none of the chart's variables, so it never reached the " \
+                                   "instrument - no '#{ChartStatistic::INSUFFICIENT_DATA_LABEL}' row")
+      return false
+    end
+
+    log_gate_outcome('INSUFFICIENT_DATA', 'did not meet the chart validity gate and is classified as ' \
+                                          "'#{ChartStatistic::INSUFFICIENT_DATA_LABEL}'")
+    true
+  end
+
+  # The outcome class of this (chart, participant) evaluation: true when the gate rejected
+  # them, which is exactly when `label` becomes the reserved label. Both the label selector
+  # and the precedence lattice key off it. `validity` is never constructed with the gate
+  # off, which is what keeps `min == 0` byte-identical.
+  def insufficient_data?
+    validity_gate_enabled? && !validity.passed
   end
 
   def upsert_chart_statistic
     chart_statistic = ChartStatistic.find_or_initialize_by(**chart_statistic_key)
     filled_at = user_session.finished_at || DateTime.current
-    # Ordering guard, only ever triggered on the de-duplicated key: the back-fill iterates
-    # finished sessions with no ORDER BY, so an older finish must not overwrite a newer one.
-    # On the legacy key `filled_at` is derived from the `user_session` that is part of the
-    # key, so a re-run always recomputes the same value and this returns false.
-    return if chart_statistic.filled_at.present? && filled_at < chart_statistic.filled_at
+    return unless assignable?(chart_statistic, filled_at)
 
     chart_statistic.label = label
     chart_statistic.user_session = user_session
@@ -133,9 +160,79 @@ class V1::ChartStatistics::Create
     chart_statistic.save!
   end
 
+  # Outcome precedence FIRST, `filled_at` ordering second - and only ever consequential on
+  # the de-duplicated key.
+  #
+  # A real-label outcome (passed or rescued) beats a persisted Invalid row REGARDLESS of
+  # `filled_at`; an Invalid outcome never overwrites a real-label row (the 2026-08-04
+  # "retain" decision - exclusion must not become retraction-by-relabel). The `filled_at`
+  # ordering guard therefore applies only WITHIN one outcome class: real vs real, or
+  # Invalid vs Invalid.
+  #
+  # Why ordering alone is not enough: `CreateForUserSessions` iterates finished sessions
+  # with no ORDER BY (create_for_user_sessions.rb:26-32) and `V1::Charts::Regenerate`
+  # destroys and replays, so a back-fill can hand this service a NEWER Invalid finish
+  # before an OLDER passing one. A filled_at-only guard would freeze that row at Invalid
+  # while the live finish order would have kept the real label - the same data producing a
+  # different chart depending on replay order. With the lattice, replay order cannot change
+  # any row's final label.
+  #
+  # On the legacy (`min == 0`) key the gate is off and `label` is part of the key, so both
+  # precedence branches fall through and this reduces to exactly today's comparison
+  # (`filled_at` is derived from the keyed `user_session`, so a re-run recomputes the same
+  # value and the row is re-saved unchanged).
+  def assignable?(chart_statistic, filled_at)
+    return true if chart_statistic.new_record?
+    return true if persisted_insufficient_data?(chart_statistic) && !insufficient_data?
+
+    if insufficient_data? && !persisted_insufficient_data?(chart_statistic)
+      log_gate_outcome('RETAINED', 'fell below the chart validity gate but the participant is already charted ' \
+                                   'under a real label - row kept, never downgraded')
+      return false
+    end
+
+    chart_statistic.filled_at.blank? || filled_at >= chart_statistic.filled_at
+  end
+
+  def persisted_insufficient_data?(chart_statistic)
+    chart_statistic.label == ChartStatistic::INSUFFICIENT_DATA_LABEL
+  end
+
+  # One structured line per gate DECISION, every one carrying the same diagnostics tail so a log
+  # capture can be filtered by keyword and still read the counts:
+  #
+  #   INSUFFICIENT_DATA - the gate classified this participant as insufficient-data. A row under
+  #                       the reserved label follows, UNLESS a `RETAINED` line for the same
+  #                       evaluation reports that an existing real label was kept instead.
+  #   EXCLUDED          - no row at all (the participant answered none of the chart's variables).
+  #   RETAINED          - nothing was written: a below-minimum finish reached an already-charted
+  #                       participant and the no-downgrade half of the precedence lattice held.
+  #
+  # So TWO lines can fire for one evaluation (`INSUFFICIENT_DATA` then `RETAINED`) - the
+  # classification and the persistence decision are separate facts, and the second is only knowable
+  # after the row is loaded. Anyone counting Invalid participants from logs must subtract
+  # `RETAINED`, or better, count rows.
+  #
+  # These are `info` lines, i.e. dev/QA instrumentation: production runs at `config.log_level =
+  # :warn`, so none of them is emitted there.
+  def log_gate_outcome(outcome, detail)
+    Rails.logger.info(
+      "ChartStatistics::Create #{outcome} chart_id=#{chart.id}: " \
+      "user_session=#{user_session.id} #{detail}: #{gate_diagnostics}"
+    )
+  end
+
+  def gate_diagnostics
+    "answered=#{validity.answered_count} required=#{validity_evaluator.min_answered_variables(chart)} " \
+      "of=#{validity.variable_count.inspect} score=#{score.inspect} " \
+      "rescue_enabled=#{validity_evaluator.rescue_enabled?(chart)} matched=#{calculated_formula.is_a?(Hash)}"
+  end
+
   # `min == 0` keeps today's key: one row per (label, dimensions, user_session). With the
   # gate on, `label` and `user_session` drop out of the key and become plain assignments,
-  # leaving exactly one row per participant per chart.
+  # leaving exactly one row per participant per chart per clinic. `label` being OUT of the
+  # key is what lets a participant's row move between the reserved label and a real one
+  # in place, rather than accumulating one row per outcome.
   def chart_statistic_key
     key = { organization: organization, health_system: health_system, health_clinic: health_clinic,
             chart: chart, user: user_session.user }
@@ -178,23 +275,6 @@ class V1::ChartStatistics::Create
   end
 
   def any_owning_question_unanswered?(missing_vars)
-    return false if missing_vars.empty?
-
-    required_var_names = missing_vars.map { |v| v.split('.').last }
-
-    owning_question_ids = Question.joins(question_group: :session)
-                                  .where(sessions: { intervention_id: user_session.session.intervention_id })
-                                  .select { |q| q.question_variables.compact.intersect?(required_var_names) }
-                                  .map(&:id)
-    return false if owning_question_ids.empty?
-
-    latest_user_session_ids = user_session.user_intervention.latest_user_sessions.map(&:id)
-
-    answered_question_ids = Answer.confirmed
-                                  .where(user_session_id: latest_user_session_ids,
-                                         question_id: owning_question_ids)
-                                  .pluck(:question_id).uniq
-
-    (owning_question_ids - answered_question_ids).any?
+    V1::ChartStatistics::UnansweredOwningQuestions.call(user_session, missing_vars)
   end
 end

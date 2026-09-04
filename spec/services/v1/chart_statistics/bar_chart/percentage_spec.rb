@@ -153,6 +153,41 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
     end
   end
 
+  context 'when the chart has Invalid / Insufficient Data rows' do
+    # Deliberately OUTSIDE the range of every real row: `periodical_statistics` walks from
+    # the first to the last `filled_at` of the chart's rows, so without the
+    # constructor-scoped exclusion these would stretch the axis back three extra months.
+    let!(:invalid_statistics) do
+      create_list(:chart_statistic, 4, label: ChartStatistic::INSUFFICIENT_DATA_LABEL, organization: organization,
+                                       health_system: health_system, chart: bar_chart1,
+                                       health_clinic: health_clinic, filled_at: 5.months.ago)
+    end
+
+    it 'does not stretch the month axis' do
+      data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
+
+      expect(data['data'].pluck('label')).to eq(
+        [2.months.ago.strftime('%B %Y'), 1.month.ago.strftime('%B %Y')]
+      )
+    end
+
+    it 'excludes Invalid rows from the axis and the chart population' do
+      data = subject.find { |entry| entry['chart_id'] == bar_chart1.id }
+
+      # What the exclusion actually protects here: the axis span and the top-level
+      # `population` (`entry_count_hash`). The series and the per-month denominator are
+      # invalid-free by construction, because `data_for_chart` sums only the two configured
+      # labels (`percentage.rb:9-12`) - a reserved-label count could never enter them.
+      expect(data['data']).to eq(
+        [
+          { 'label' => 2.months.ago.strftime('%B %Y'), 'value' => 66.67, 'color' => '#C766EA', 'population' => 15 },
+          { 'label' => 1.month.ago.strftime('%B %Y'), 'value' => 37.5, 'color' => '#C766EA', 'population' => 8 }
+        ]
+      )
+      expect(data['population']).to eq(23)
+    end
+  end
+
   context 'for quarterly charts' do
     let!(:bar_chart1) do
       create(:chart, name: 'percentage_bar_chart1', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart', status: 'published',

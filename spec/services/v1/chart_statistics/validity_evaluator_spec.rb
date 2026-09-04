@@ -1,20 +1,22 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::ChartStatistics::ValidityEvaluator do
-  subject(:result) { described_class.call(chart, var_values, score) }
+  subject(:result) { described_class.call(chart, var_values, score, matched_pattern: matched_pattern) }
 
   let(:payload) { 'HT2.q1 + HT2.q2 + HT2.q3 + HT2.q4' }
   let(:min_answered_variables) { 3 }
-  let(:threshold) { nil }
+  let(:rescue_enabled) { false }
   let(:score) { nil }
+  let(:matched_pattern) { nil }
   let(:var_values) { {} }
+  let(:positive_pattern) { { 'match' => '>=10', 'label' => 'Positive', 'color' => '#C766EA' } }
   let(:formula) do
     {
       'payload' => payload,
-      'patterns' => [{ 'match' => '>=10', 'label' => 'Positive', 'color' => '#C766EA' }],
+      'patterns' => [positive_pattern],
       'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
       'min_answered_variables' => min_answered_variables,
-      'positive_despite_missing_threshold' => threshold
+      'positive_despite_missing_data' => rescue_enabled
     }
   end
   let(:chart) { build(:chart, formula: formula) }
@@ -23,14 +25,22 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     it 'reports the gate as enabled and exposes both settings' do
       expect(described_class.enabled?(chart)).to be true
       expect(described_class.min_answered_variables(chart)).to eq(3)
-      expect(described_class.threshold(chart)).to be_nil
+      expect(described_class.rescue_enabled?(chart)).to be false
+    end
+
+    context 'with the rescue turned on' do
+      let(:rescue_enabled) { true }
+
+      it 'reports the rescue as enabled' do
+        expect(described_class.rescue_enabled?(chart)).to be true
+      end
     end
 
     context 'with a legacy formula that carries neither key' do
       let(:formula) do
         {
           'payload' => payload,
-          'patterns' => [{ 'match' => '>=10', 'label' => 'Positive', 'color' => '#C766EA' }],
+          'patterns' => [positive_pattern],
           'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' }
         }
       end
@@ -38,7 +48,24 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       it 'reports the gate as disabled without raising' do
         expect(described_class.enabled?(chart)).to be false
         expect(described_class.min_answered_variables(chart)).to eq(0)
-        expect(described_class.threshold(chart)).to be_nil
+        expect(described_class.rescue_enabled?(chart)).to be false
+      end
+    end
+
+    context 'with a leftover numeric threshold key and no boolean key' do
+      # The numeric key predates this feature's deploy and is never read.
+      let(:formula) do
+        {
+          'payload' => payload,
+          'patterns' => [positive_pattern],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
+          'min_answered_variables' => min_answered_variables,
+          'positive_despite_missing_threshold' => 15
+        }
+      end
+
+      it 'reads the rescue as off' do
+        expect(described_class.rescue_enabled?(chart)).to be false
       end
     end
   end
@@ -140,7 +167,7 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       let(:formula) do
         {
           'payload' => payload,
-          'patterns' => [{ 'match' => '>=10', 'label' => 'Positive', 'color' => '#C766EA' }],
+          'patterns' => [positive_pattern],
           'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' }
         }
       end
@@ -159,9 +186,10 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
         expect(result.passed).to be false
       end
 
-      context 'and a numeric score clears the threshold' do
-        let(:threshold) { 15 }
+      context 'and the rescue is on with a matched case' do
+        let(:rescue_enabled) { true }
         let(:score) { 20 }
+        let(:matched_pattern) { positive_pattern }
 
         it 'is still rescued' do
           expect(result.passed).to be true
@@ -171,12 +199,13 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     end
   end
 
-  describe 'the threshold rescue' do
+  describe 'the case-match rescue' do
     let(:var_values) { { 'HT2.q1' => '1' } }
-    let(:threshold) { 15 }
+    let(:rescue_enabled) { true }
 
-    context 'when the score is above the threshold' do
+    context 'when the 0-filled score matched an explicit case' do
       let(:score) { 20 }
+      let(:matched_pattern) { positive_pattern }
 
       it 'rescues the participant' do
         expect(result.passed).to be true
@@ -184,35 +213,71 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       end
     end
 
-    context 'when the score equals the threshold' do
-      let(:score) { 15 }
+    context 'when the score fell to the default category (no explicit case matched)' do
+      let(:score) { 9 }
+      let(:matched_pattern) { nil }
 
-      it 'rescues the participant' do
-        expect(result.passed).to be true
-        expect(result.rescued).to be true
-      end
-    end
-
-    context 'when the score is below the threshold' do
-      let(:score) { 14 }
-
-      it 'does not rescue the participant' do
+      it 'never rescues — a rescued participant cannot land in the default category' do
         expect(result.passed).to be false
         expect(result.rescued).to be false
       end
     end
 
-    context 'when the score is a float just under the threshold' do
-      let(:score) { 14.99 }
+    context 'when the matched case carries the default category label' do
+      # Aggregation buckets purely by label string (pie_chart.rb:29-33), so a case whose
+      # label duplicates the default's would rescue the participant INTO the default
+      # category as rendered. Structural identity is not enough.
+      let(:score) { 20 }
+      let(:matched_pattern) { { 'match' => '>=10', 'label' => 'Negative', 'color' => '#C766EA' } }
 
-      it 'does not rescue the participant' do
+      it 'never rescues — the rendered category would be the default one' do
         expect(result.passed).to be false
+        expect(result.rescued).to be false
       end
     end
 
-    context 'when no threshold is configured' do
-      let(:threshold) { nil }
-      let(:score) { 1000 }
+    context 'when the rescue is off' do
+      let(:rescue_enabled) { false }
+      let(:score) { 20 }
+      let(:matched_pattern) { positive_pattern }
+
+      it 'never rescues even though the score matched a case' do
+        expect(result.passed).to be false
+        expect(result.rescued).to be false
+      end
+    end
+
+    context 'when the boolean key is absent (legacy chart)' do
+      let(:formula) do
+        {
+          'payload' => payload,
+          'patterns' => [positive_pattern],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
+          'min_answered_variables' => min_answered_variables
+        }
+      end
+      let(:score) { 20 }
+      let(:matched_pattern) { positive_pattern }
+
+      it 'reads the rescue as off' do
+        expect(result.passed).to be false
+        expect(result.rescued).to be false
+      end
+    end
+
+    context 'when only the leftover numeric threshold key is present' do
+      # Never deployed; a leftover numeric key must read as rescue-off.
+      let(:formula) do
+        {
+          'payload' => payload,
+          'patterns' => [positive_pattern],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
+          'min_answered_variables' => min_answered_variables,
+          'positive_despite_missing_threshold' => 1
+        }
+      end
+      let(:score) { 20 }
+      let(:matched_pattern) { positive_pattern }
 
       it 'never rescues' do
         expect(result.passed).to be false
@@ -223,52 +288,70 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     context 'when the count gate already passed' do
       let(:var_values) { { 'HT2.q1' => '1', 'HT2.q2' => '1', 'HT2.q3' => '1' } }
       let(:score) { 0 }
+      # A Hash here is what makes the assertion falsifiable: without the count-gate
+      # short-circuit, rescue-on + a matched case would report rescued.
+      let(:matched_pattern) { positive_pattern }
 
-      it 'does not consult the threshold' do
+      it 'does not consult the rescue' do
         expect(result.passed).to be true
         expect(result.rescued).to be false
       end
     end
 
-    context 'when the payload is boolean (an OR formula)' do
-      # The ticket's own example. `true >= 15` raises NoMethodError, which would
-      # escape into CreateForUserSession's blanket rescue and drop the participant
-      # from every chart — so the score must be type-checked, never rescued around.
+    context 'when the payload is boolean (an OR formula) and matched an explicit case' do
+      # Deliberate behaviour change from the numeric threshold: the pattern match
+      # replaced the score arithmetic, so a boolean chart matching `=true` is
+      # rescuable and nothing ever compares the score numerically.
       let(:payload) { '(S1.a>10) OR (S1.b>3)' }
       let(:var_values) { { 'S1.a' => '20' } }
       let(:min_answered_variables) { 2 }
+      let(:score) { true }
+      let(:matched_pattern) { { 'match' => '=true', 'label' => 'Flagged', 'color' => '#C766EA' } }
 
-      context 'and it evaluated to true' do
-        let(:score) { true }
-
-        it 'never rescues and never raises' do
-          expect { result }.not_to raise_error
-          expect(result.passed).to be false
-          expect(result.rescued).to be false
-        end
-      end
-
-      context 'and it evaluated to false' do
-        let(:score) { false }
-
-        it 'never rescues and never raises' do
-          expect { result }.not_to raise_error
-          expect(result.passed).to be false
-        end
+      it 'rescues without raising' do
+        expect { result }.not_to raise_error
+        expect(result.passed).to be true
+        expect(result.rescued).to be true
       end
     end
 
-    context 'when the score is a formula error sentinel' do
-      let(:score) { Chart::OTHER_FORMULA_ERROR }
+    context 'when the payload is boolean and fell to the default' do
+      let(:payload) { '(S1.a>10) OR (S1.b>3)' }
+      let(:var_values) { { 'S1.a' => '2' } }
+      let(:min_answered_variables) { 2 }
+      let(:score) { false }
+      let(:matched_pattern) { nil }
 
-      it 'never rescues' do
+      it 'never rescues and never raises' do
+        expect { result }.not_to raise_error
         expect(result.passed).to be false
         expect(result.rescued).to be false
       end
     end
 
+    # Phase 2 pinned the error sentinels on the score; that protection must
+    # survive the signature change, now against `matched_pattern`: only a real
+    # pattern Hash rescues. `FormulaInterface#calculate` returns the truthy
+    # sentinel STRINGS below on evaluation errors, and an unfiltered caller must
+    # never be able to turn "formula errored" into "rescued".
+    context 'when matched_pattern is not a pattern hash' do
+      let(:score) { 20 }
+
+      [Chart::ZERO_DIVISION_ERROR, Chart::OTHER_FORMULA_ERROR, true, 'Positive'].each do |non_hash|
+        context "with #{non_hash.inspect}" do
+          let(:matched_pattern) { non_hash }
+
+          it 'never rescues' do
+            expect(result.passed).to be false
+            expect(result.rescued).to be false
+          end
+        end
+      end
+    end
+
     context 'when the formula was never evaluated' do
       let(:score) { nil }
+      let(:matched_pattern) { nil }
 
       it 'never rescues' do
         expect(result.passed).to be false

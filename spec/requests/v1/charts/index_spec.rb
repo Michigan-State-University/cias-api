@@ -56,7 +56,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
                 'label' => 'NotMatched'
               },
               'min_answered_variables' => 0,
-              'positive_despite_missing_threshold' => nil
+              'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
             'dashboard_section_id' => dashboard_section.id,
@@ -86,7 +86,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
                 'label' => 'NotMatched'
               },
               'min_answered_variables' => 0,
-              'positive_despite_missing_threshold' => nil
+              'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
             'dashboard_section_id' => dashboard_section.id,
@@ -116,7 +116,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
                 'label' => 'NotMatched'
               },
               'min_answered_variables' => 0,
-              'positive_despite_missing_threshold' => nil
+              'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
             'dashboard_section_id' => other_dashboard_section.id,
@@ -164,7 +164,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
                 'label' => 'NotMatched'
               },
               'min_answered_variables' => 0,
-              'positive_despite_missing_threshold' => nil
+              'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
             'dashboard_section_id' => dashboard_section.id,
@@ -194,7 +194,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
                 'label' => 'NotMatched'
               },
               'min_answered_variables' => 0,
-              'positive_despite_missing_threshold' => nil
+              'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
             'dashboard_section_id' => dashboard_section.id,

@@ -36,8 +36,8 @@
       "type": "integer",
       "minimum": 0
     },
-    "positive_despite_missing_threshold": {
-      "type": ["number", "null"]
+    "positive_despite_missing_data": {
+      "type": "boolean"
     },
     "required": [
       "match"
