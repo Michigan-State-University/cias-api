@@ -547,6 +547,48 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
 
+    # Regression: the rescue must have something to rescue.
+    #
+    # `chartable?` short-circuits on `return true if validity.passed` BEFORE the
+    # `answered_count.zero?` exclusion, and `passed?` is `answered_count >= min || rescued?`.
+    # Nothing in `rescued?` required an answer to exist, so a participant branched around every
+    # variable scored 0, matched a band covering 0, and was published under that band's real
+    # label - the exclusion below it never ran. Reachable on any chart whose lowest case covers
+    # zero, which is the NORMAL clinical shape (PHQ-9 "0-4 Minimal", EPDS "0-9 low risk").
+    # Reproduced in the browser 2026-09-08 before the fix.
+    context 'when the participant answered none of the chart variables and the rescue is on' do
+      let(:answered_variables) { 0 }
+      let(:rescue_enabled) { true }
+
+      # The band that makes this reachable: it matches a 0 score, and its label differs from the
+      # default category, so `rescued?`'s final check passes.
+      let(:formula) do
+        {
+          'payload' => (1..9).map { |i| "session_var.epds#{i}" }.join(' + '),
+          'patterns' => [{ 'match' => '<=4', 'label' => 'Minimal', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' },
+          'min_answered_variables' => min_answered_variables,
+          'positive_despite_missing_data' => rescue_enabled
+        }
+      end
+
+      it 'does not create a chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'never publishes a zero-answer participant under a real category label' do
+        subject
+        expect(ChartStatistic.where(chart: chart).pluck(:label)).to be_empty
+      end
+
+      it 'excludes them rather than rescuing them' do
+        allow(Rails.logger).to receive(:info)
+        subject
+        expect(Rails.logger).to have_received(:info).with(/EXCLUDED chart_id=#{chart.id}.*answered=0 required=7/)
+        expect(Rails.logger).not_to have_received(:info).with(/RESCUED chart_id=#{chart.id}/)
+      end
+    end
+
     # The sharp edge between the two definitions of "answered", pinned from the gated side.
     # With the gate ON, `answered` is var-values presence (validity_evaluator.rb:121-122), so
     # a participant who reached every variable and skipped every one counts as 0 answered and

@@ -99,6 +99,13 @@ class V1::ChartStatistics::ValidityEvaluator
   def rescued?
     return false unless enabled?
     return false if answered_count >= min_answered_variables
+    # A rescue needs something to rescue. Without this, a participant branched around EVERY
+    # variable scores 0, matches any band covering 0 - the normal clinical shape, PHQ-9 "0-4
+    # Minimal" - and is published under that band's real label: `passed?` returns true, so
+    # `Create#chartable?` short-circuits before its `answered_count.zero?` exclusion can run.
+    # The guard belongs here rather than in `chartable?` because it is a property of the
+    # rescue itself, and here it also keeps `passed?` honest for every other caller.
+    return false if answered_count.zero?
     return false unless rescue_enabled?
     return false unless matched_pattern.is_a?(Hash)
 
