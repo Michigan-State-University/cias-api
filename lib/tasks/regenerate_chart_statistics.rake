@@ -49,11 +49,13 @@ namespace :chart_statistics do
            'will be DESTROYED and replayed.'
       puts 'Rows whose originating session no longer matches the formula will NOT be recreated.'
     else
-      # The "safe" path is not read-only: the replay still upserts, and on a legacy `min == 0`
-      # chart the de-dup key includes `label`, so a participant can gain a second row
-      # (`create.rb:236-242`). Both paths therefore need the confirmation.
-      puts "REPLAY mode: no rows are destroyed, but #{found.size} chart(s) will be replayed and " \
-           'rows may be added.'
+      # The "safe" path is not read-only: the replay still upserts. It can no longer ADD rows
+      # (the de-dup key is now the same for gated and ungated charts), but on a cell that still
+      # holds legacy duplicate rows it updates an arbitrary one and leaves the siblings stale,
+      # and it CANNOT refresh a row whose `filled_at` is already later than every session the
+      # formula references - such a write is declined silently. Use REPLACE=true to rebuild.
+      puts "REPLAY mode: no rows are destroyed and no rows are added, but #{found.size} chart(s) " \
+           'will be replayed and existing rows may be relabelled.'
     end
 
     abort 'Refusing to run without CONFIRM=yes' unless ENV['CONFIRM'] == 'yes'

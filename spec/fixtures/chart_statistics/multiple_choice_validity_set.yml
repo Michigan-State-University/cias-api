@@ -1,0 +1,224 @@
+# CIAS-4191 - the "Set 2" truth table, as data.
+#
+# Extracted verbatim (values, not prose) from the workspace document
+#   .claude/jira-tasks/cias-4191-dashboard-formula-skip-handling/flow-analysis.html
+#   section "Set 2 - Multiple-choice questions in the formula"
+# so the document and the spec can be diffed against each other instead of drifting.
+# `create_flow_analysis_set_2_spec.rb` is the only reader.
+#
+# WHY THIS TABLE EXISTS - the one rule it encodes:
+#   Every checkbox option of a Multiple-choice question is its OWN formula variable, and
+#   only a CHECKED box counts as answered. So this formula depends on 13 variables
+#   (3 Singles + 2 Multiples x 5 options), "Minimum answered items" reads "out of 13",
+#   and Ivy - who answered all five questions - still counts only 5 of 13 because she
+#   checked exactly one box in each Multiple.
+#
+#   Skipped, branched-around, timed-out and unchecked all score 0 and NONE of them counts
+#   toward the minimum. They differ only in what they leave behind: a skip leaves a
+#   confirmed Answer row whose body entry has a blank `var`; a branch-around and a timeout
+#   leave no row at all; an unchecked option leaves a row with no entry for that option.
+#   All four are absent from var values, which is the only thing the gate measures.
+#
+# DELIBERATELY NOT COVERED: the document's fourth column, "Pie Chart E / today / minimum 0".
+#   Three of the six participants (Kate, Leo, Mia) currently produce NO chart row at all at
+#   `min_answered_variables == 0`, and whether that is right is an OPEN, UNDECIDED question
+#   (raised 2026-09-03: a participant who skips a formula item is charted and scores 0,
+#   while one branched around the same item disappears; timeout has had no client ruling on
+#   either axis). Pinning those cells now would certify behaviour that is expected to
+#   change, so this fixture carries three chart configurations, not four. The alignment
+#   work brings its own rows.
+---
+source:
+  document: .claude/jira-tasks/cias-4191-dashboard-formula-skip-handling/flow-analysis.html
+  section: Set 2 - Multiple-choice questions in the formula
+  extracted_on: '2026-09-04'
+
+session_variable: session_var_2
+
+# 3 Singles + 2 Multiples x 5 options. Asserted against `Chart#formula_variable_count`
+# AND against the variables the real Question records declare.
+variable_count: 13
+
+# The document draws the formula as one line ending "... >= 20". In a CIAS chart the
+# threshold lives in a pattern `match`, never in the payload: `Chart#calculate` evaluates
+# the payload to a SCORE and then matches the cases against it. The document says the same
+# thing in its own "Classification & scoring" block ("Matched - score 20 or more") and its
+# Score column (37 / 17 / 19 / 24 / 28 / 31) is the bare sum, so the payload below is the
+# sum and `>=20` is the single explicit case.
+formula:
+  payload: >-
+    session_var_2.s1 + session_var_2.s2 + session_var_2.s3 + session_var_2.HT1 +
+    session_var_2.HT2 + session_var_2.HT3 + session_var_2.HT4 + session_var_2.HT5 +
+    session_var_2.PH1 + session_var_2.PH2 + session_var_2.PH3 + session_var_2.PH4 +
+    session_var_2.PH5
+  patterns:
+    - match: '>=20'
+      label: Matched
+      color: '#C766EA'
+  default_pattern:
+    label: Not matched
+    color: '#E2B1F4'
+
+# The five questions of the session, in order. Q4/Q5 option values are the document's
+# per-option points (1..5), shown in its table header.
+questions:
+  - id: Q1
+    type: single
+    variable: s1
+  - id: Q2
+    type: single
+    variable: s2
+  - id: Q3
+    type: single
+    variable: s3
+  - id: Q4
+    type: multiple
+    options:
+      - { variable: HT1, value: 1 }
+      - { variable: HT2, value: 2 }
+      - { variable: HT3, value: 3 }
+      - { variable: HT4, value: 4 }
+      - { variable: HT5, value: 5 }
+  - id: Q5
+    type: multiple
+    options:
+      - { variable: PH1, value: 1 }
+      - { variable: PH2, value: 2 }
+      - { variable: PH3, value: 3 }
+      - { variable: PH4, value: 4 }
+      - { variable: PH5, value: 5 }
+
+# Three of the document's four columns. `min_0` (Pie Chart E) is absent on purpose - see
+# the header comment.
+chart_configs:
+  min_5:
+    document_name: Pie Chart F
+    description: at least 5 of 13 answered - minimum 5, rescue unchecked
+    min_answered_variables: 5
+    positive_despite_missing_data: false
+  min_8:
+    document_name: Pie Chart G
+    description: at least 8 of 13 answered - minimum 8, rescue unchecked
+    min_answered_variables: 8
+    positive_despite_missing_data: false
+  min_5_rescue:
+    document_name: Pie Chart H
+    description: minimum 5 plus "Positive Despite Missing Data" - rescue checked
+    min_answered_variables: 5
+    positive_despite_missing_data: true
+
+# One entry per row of the document's table.
+#
+#   answers[].state   answered | skipped | branched | timed_out
+#   answers[].value   Single only - the answered option's value (Singles score 0..10)
+#   answers[].checked Multiple only - the boxes ticked; every other option is unchecked
+#                     and therefore neither scored nor counted
+#   outcomes[].label  the persisted `ChartStatistic#label`
+#                     ("Invalid / Insufficient Data" is ChartStatistic::INSUFFICIENT_DATA_LABEL)
+#   outcomes[].rescued  true only where the participant is BELOW the minimum and the
+#                       "Positive Despite Missing Data" rescue put them in a real category
+#                       anyway - the document's "Rescued -> Matched"
+participants:
+  - name: Hank
+    note: >-
+      all answered. 3 unchecked boxes (HT5, PH4, PH5) each score 0 and read as
+      not answered; every question has an answer record.
+    answers:
+      - { question: Q1, state: answered, value: 8 }
+      - { question: Q2, state: answered, value: 7 }
+      - { question: Q3, state: answered, value: 6 }
+      - { question: Q4, state: answered, checked: [HT1, HT2, HT3, HT4] }
+      - { question: Q5, state: answered, checked: [PH1, PH2, PH3] }
+    answered_variables: 10
+    score: 37
+    outcomes:
+      min_5: { label: Matched, rescued: false }
+      min_8: { label: Matched, rescued: false }
+      min_5_rescue: { label: Matched, rescued: false }
+
+  - name: Ivy
+    note: >-
+      sparse. 8 unchecked boxes each score 0 and read as not answered; she answered
+      every question, yet a minimum of 8 puts her in the Invalid category.
+    answers:
+      - { question: Q1, state: answered, value: 5 }
+      - { question: Q2, state: answered, value: 6 }
+      - { question: Q3, state: answered, value: 4 }
+      - { question: Q4, state: answered, checked: [HT1] }
+      - { question: Q5, state: answered, checked: [PH1] }
+    answered_variables: 5
+    score: 17
+    outcomes:
+      min_5: { label: Not matched, rescued: false }
+      min_8: { label: Invalid / Insufficient Data, rescued: false }
+      min_5_rescue: { label: Not matched, rescued: false }
+
+  - name: Jack
+    note: >-
+      skipped. Q2 and Q5 skipped (each variable scores 0, skip records exist) plus 3
+      unchecked boxes on Q4; 4 of 13 is below every minimum here, and his score of 19
+      matches no case, so no rescue reaches him.
+    answers:
+      - { question: Q1, state: answered, value: 7 }
+      - { question: Q2, state: skipped }
+      - { question: Q3, state: answered, value: 9 }
+      - { question: Q4, state: answered, checked: [HT1, HT2] }
+      - { question: Q5, state: skipped }
+    answered_variables: 4
+    score: 19
+    outcomes:
+      min_5: { label: Invalid / Insufficient Data, rescued: false }
+      min_8: { label: Invalid / Insufficient Data, rescued: false }
+      min_5_rescue: { label: Invalid / Insufficient Data, rescued: false }
+
+  - name: Kate
+    note: >-
+      branched. Branched around Q4 and Q5, so all 10 of their variables score 0 and
+      leave no answer record; 3 of 13 is below every minimum, so only the rescue brings
+      her back - her score of 24 already matches the Matched case.
+    answers:
+      - { question: Q1, state: answered, value: 9 }
+      - { question: Q2, state: answered, value: 8 }
+      - { question: Q3, state: answered, value: 7 }
+      - { question: Q4, state: branched }
+      - { question: Q5, state: branched }
+    answered_variables: 3
+    score: 24
+    outcomes:
+      min_5: { label: Invalid / Insufficient Data, rescued: false }
+      min_8: { label: Invalid / Insufficient Data, rescued: false }
+      min_5_rescue: { label: Matched, rescued: true }
+
+  - name: Leo
+    note: >-
+      timed out. Q5 timed out, so its 5 variables score 0 and leave no answer record;
+      6 of 13 passes minimum 5 but not minimum 8, where he turns Invalid.
+    answers:
+      - { question: Q1, state: answered, value: 8 }
+      - { question: Q2, state: answered, value: 7 }
+      - { question: Q3, state: answered, value: 6 }
+      - { question: Q4, state: answered, checked: [HT1, HT2, HT4] }
+      - { question: Q5, state: timed_out }
+    answered_variables: 6
+    score: 28
+    outcomes:
+      min_5: { label: Matched, rescued: false }
+      min_8: { label: Invalid / Insufficient Data, rescued: false }
+      min_5_rescue: { label: Matched, rescued: false }
+
+  - name: Mia
+    note: >-
+      branched. Q3 branched, so s3 scores 0 and leaves no answer record, even though she
+      answered both Multiples fully; 9 of 13 passes every minimum.
+    answers:
+      - { question: Q1, state: answered, value: 8 }
+      - { question: Q2, state: answered, value: 7 }
+      - { question: Q3, state: branched }
+      - { question: Q4, state: answered, checked: [HT1, HT2, HT3, HT4] }
+      - { question: Q5, state: answered, checked: [PH1, PH2, PH3] }
+    answered_variables: 9
+    score: 31
+    outcomes:
+      min_5: { label: Matched, rescued: false }
+      min_8: { label: Matched, rescued: false }
+      min_5_rescue: { label: Matched, rescued: false }
