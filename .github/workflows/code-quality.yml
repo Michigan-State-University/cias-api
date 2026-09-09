@@ -1,0 +1,257 @@
+name: Code Quality
+
+# Report-only. The scan report is published to S3 and nowhere else: no PR
+# comment, no job summary, no build artifact, and scanner output is kept out of
+# the run log. This repository is public, so its Actions logs and artifacts are
+# world-readable -- findings must not land in either.
+#
+# Coverage is generated here rather than reused from ci.yml: that workflow
+# splits rspec across a TEST_BATCH_COUNT-sized matrix, so its partial reports
+# would have to be uploaded, collated and handed across a workflow boundary.
+# This job runs the suite once instead. The cost is a duplicate suite run on
+# the branches the scan already covers; shard collation is the upgrade path if
+# that outgrows the timeout below.
+
+on:
+  push:
+    branches: [dev, test, master]
+  # No pull_request trigger. This repository is public: runs from forks and
+  # from Dependabot are secret-restricted, so the htd-cq download token, the
+  # config-repo deploy key and the AWS credentials would all be missing and
+  # every such run would fail red for reasons the contributor cannot fix.
+  workflow_dispatch:
+
+concurrency:
+  group: code-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    # Matches ci.yml: the coverage run below needs libffi7, which is not
+    # packaged for ubuntu-latest.
+    runs-on: ubuntu-22.04
+    # htd-cq's --timeout flag is a no-op, so the job-level bound is the only
+    # real limit. This covers the full rspec suite as well as the scan.
+    timeout-minutes: 60
+    env:
+      TECH: rails
+      TIER: high
+      # Report-only. Set to "true" to make a failing gate block the branch.
+      ENFORCE_GATE: "false"
+      # Test environment for the coverage run, mirroring ci.yml.
+      RAILS_ENV: test
+      BUNDLER_VERSION: 2.4.22
+      POSTGRES_PASSWORD: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/cias_test
+      REDIS_URL: redis://localhost:6379/
+      GIT_AUTHOR_EMAIL: ci@ci.ci
+
+    services:
+      database:
+        image: postgres:13.0-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      cache:
+        image: redis
+        options: --entrypoint redis-server
+        ports: ["6379:6379"]
+
+    steps:
+      # Actions are pinned to commit SHAs. Tags are mutable and can be
+      # repointed by the action owner; the trivy-action and kics-github-action
+      # compromises both worked that way. Semgrep flags tag refs as findings.
+      # Resolve a new SHA with:
+      #   gh api repos/<owner>/<repo>/commits/<tag> --jq .sha
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Full history is required by SonarQube's SCM/new-code analysis.
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version-file: .ruby-version
+
+      # Both files are untracked local config the suite needs to boot. They are
+      # removed again before the scan so the scanners see the repository as it
+      # is committed -- .env.template carries a private key placeholder that
+      # would otherwise be reported twice, once from a file that is not in git.
+      #
+      # Every step on the coverage path is best-effort: a broken bundle or a
+      # dead database must not cost the security scan, which does not depend on
+      # any of it. Each one failing just leaves no report, and the scan below
+      # falls back to --skip-coverage.
+      - name: Prepare test environment
+        continue-on-error: true
+        run: |
+          cp .env.template .env
+          cp config/database.docker.yml config/database.yml
+
+      # Gems are installed OUTSIDE the repository, unlike ci.yml which uses
+      # vendor/bundle. The scanners walk the working tree, and ~260 unpacked
+      # gems inside it would be scanned as project code: Sonar, Semgrep, Trivy
+      # and TruffleHog all have vendor/ exclusions, but Checkov has none and
+      # would report gem-shipped Dockerfiles and K8s fixtures as this repo's
+      # IaC findings. The cost is a cache separate from ci.yml's.
+      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ~/bundle-gems
+          key: ${{ runner.os }}-cq-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cq-gems-
+
+      - name: Install dependencies and prepare database
+        continue-on-error: true
+        run: |
+          sudo apt install libffi7
+          gem install bundler -v "${BUNDLER_VERSION}"
+          bundle config set path "${HOME}/bundle-gems"
+          bundle install
+          bundle exec rails db:create db:schema:load --trace
+
+      # Writes coverage/coverage.json through SonarJSONFormatter in
+      # spec/rails_helper.rb. A failing suite must not stop the scan from
+      # collecting everything else, so this step is allowed to fail and the
+      # scan falls back to --skip-coverage when no report is produced.
+      #
+      # A suite that dies partway still leaves a valid report covering only the
+      # files it reached, and SonarQube imports that as a real measurement --
+      # the exit code is the only thing that distinguishes it, so it is
+      # surfaced rather than left buried in a suppressed log.
+      - name: Generate test coverage
+        id: coverage
+        continue-on-error: true
+        run: |
+          set +e
+          bundle exec rspec --format progress >rspec.log 2>&1
+          RSPEC_EXIT=$?
+          set -e
+          if [ "$RSPEC_EXIT" -ne 0 ]; then
+            echo "::warning::rspec exited ${RSPEC_EXIT} -- coverage reflects a partial suite run"
+            tail -n 20 rspec.log
+          fi
+
+      # The scanners must see the repository as it is committed, so everything
+      # the coverage run added is removed first. always(): .env must be gone
+      # even if the steps above bailed out partway.
+      - name: Restore committed tree
+        if: always()
+        run: |
+          rm -rf .env rspec.log .bundle
+          git checkout -- config/database.yml
+
+      - name: Setup SSH for code-quality-configs
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.HTD_CQ_CONFIGS_DEPLOY_KEY }}
+
+      - name: Install htd-cq
+        env:
+          GH_TOKEN: ${{ secrets.HTD_CQ_TOKEN }}
+        run: |
+          gh release download \
+            --repo HTD-Health/code-quality \
+            --pattern "*linux_amd64*" \
+            --dir /tmp
+          tar xzf /tmp/htd-cq_*_linux_amd64.tar.gz -C /usr/local/bin
+          htd-cq --version
+
+      - name: Run htd-cq scan
+        id: scan
+        env:
+          # CI runners share CPU and RAM with the four parallel scanner
+          # containers. The default 3-minute SonarQube startup window is too
+          # tight under that load and the scan dies with exit 2 before the
+          # scanner runs at all. Do not remove this.
+          SONAR_STARTUP_TIMEOUT: 6m
+        run: |
+          # No report means the coverage step failed. Skipping keeps the
+          # coverage conditions at SKIP; without the flag SonarQube reports a
+          # measured 0%, which reads as "no tests" rather than "not measured".
+          COVERAGE_FLAG=""
+          if [ ! -s coverage/coverage.json ]; then
+            COVERAGE_FLAG="--skip-coverage"
+            echo "::warning::no coverage report -- scanning with --skip-coverage"
+          fi
+          set +e
+          htd-cq scan --tech "${TECH}" --tier "${TIER}" ${COVERAGE_FLAG} >scan.log 2>&1
+          CODE=$?
+          set -e
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          # scan.log holds the finding tables and is never printed on a normal
+          # run. Exit 2 means the scan never happened, so the tail carries
+          # infrastructure errors rather than findings -- print it, or the
+          # failure is undiagnosable.
+          if [ "$CODE" = "2" ]; then
+            tail -n 40 scan.log
+          fi
+
+      - name: Verify a report was produced
+        if: always() && steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
+        run: |
+          # With all output suppressed, "exited 0 but wrote nothing" would
+          # otherwise pass silently. Checks existence only, prints no contents.
+          REPORT=$(ls -1 htd-cq-output/json/*.json 2>/dev/null | sort | tail -n1)
+          if [ -z "$REPORT" ] || ! jq empty "$REPORT" 2>/dev/null; then
+            echo "::error::Scan produced no valid JSON report."
+            exit 1
+          fi
+
+      - name: Publish report to S3
+        if: always() && steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.HTD_CQ_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HTD_CQ_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.HTD_CQ_AWS_REGION }}
+          HTD_CQ_S3_BUCKET: ${{ vars.HTD_CQ_S3_BUCKET }}
+        run: |
+          # htd-cq publish exits 0 silently when no bucket is set. S3 is the
+          # only destination for this report, so an unset bucket must fail
+          # loudly rather than discard the scan.
+          if [ -z "$HTD_CQ_S3_BUCKET" ]; then
+            echo "::error::HTD_CQ_S3_BUCKET is not set; the scan report has nowhere to go."
+            exit 1
+          fi
+          # Output suppressed so bucket paths stay out of the public log.
+          htd-cq publish >publish.log 2>&1 || { tail -n 20 publish.log; exit 1; }
+
+      - name: Discard local scan output
+        if: always()
+        run: rm -rf htd-cq-output coverage scan.log publish.log
+
+      - name: Enforce quality gate
+        if: always() && steps.scan.outputs.exit_code != ''
+        run: |
+          EXIT="${{ steps.scan.outputs.exit_code }}"
+          case "$EXIT" in
+            0)
+              ;;
+            1)
+              if [ "$ENFORCE_GATE" = "true" ]; then
+                echo "::error::Quality gate FAILED -- see the report in S3"
+                exit 1
+              fi
+              echo "::warning::Quality gate FAILED (report-only) -- see the report in S3"
+              ;;
+            2)
+              # An infrastructure error means the scan did not happen. This
+              # fails the job even in report-only mode -- it is not a gate
+              # result and must not be silently swallowed.
+              echo "::error::Scan infrastructure error"
+              exit 1
+              ;;
+            *)
+              echo "::error::Unknown htd-cq exit code: $EXIT"
+              exit 1
+              ;;
+          esac

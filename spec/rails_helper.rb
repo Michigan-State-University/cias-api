@@ -3,8 +3,31 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 require 'simplecov'
-require_relative '../lib/rack/health_check'
+require 'simplecov_json_formatter'
+
+# SonarQube reads coverage through its SimpleCov importer, which needs two
+# things SimpleCov does not produce by default:
+#
+#   1. The JSON formatter's coverage.json. The importer cannot parse the
+#      .resultset.json written by SimpleCov 0.18+ and imports nothing.
+#   2. Repo-relative paths. It resolves them against sonar.projectBaseDir,
+#      which is /usr/src/project inside htd-cq's scanner container, so
+#      SimpleCov's absolute host paths are all "cannot be found in filesystem".
+class SonarJSONFormatter < SimpleCov::Formatter::JSONFormatter
+  private
+
+  def format_result(result)
+    super.tap do |hash|
+      hash[:coverage] = hash[:coverage].transform_keys { |path| path.delete_prefix("#{SimpleCov.root}/") }
+    end
+  end
+end
+
+SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, SonarJSONFormatter]
 SimpleCov.start
+
+# Required after SimpleCov.start so this file appears in the report.
+require_relative '../lib/rack/health_check'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
