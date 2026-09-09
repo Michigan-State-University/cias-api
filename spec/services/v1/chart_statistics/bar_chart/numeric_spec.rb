@@ -173,6 +173,60 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   # scope's `Relation#or` was the hazard, and this phase deleted it. Removing an AND-ed predicate
   # is monotonic within the caller's relation. They are a tripwire against a future rewrite that
   # reintroduces filtering here on the bare class rather than on the passed relation.
+  # Bands 2..n have no series on either bar type. `data_for_chart` reads `patterns.first` and
+  # `default_pattern` and nothing else, so on a multi-case chart the participants who matched
+  # the middle cases are drawn nowhere - while the top-level `population` still counts them.
+  # Nothing pinned this before; the behaviour is load-bearing for any researcher who configures
+  # severity bands, which is the ordinary way to use a chart formula.
+  context 'when the chart formula defines more than one case' do
+    let(:chart) { multi_band_chart }
+
+    let!(:multi_band_chart) do
+      create(:chart, name: 'severity', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published',
+                     formula: {
+                       'payload' => 'phq.total',
+                       'patterns' => [
+                         { 'match' => '>=30', 'label' => 'Severe', 'color' => '#C766EA' },
+                         { 'match' => '>=20', 'label' => 'Moderate', 'color' => '#FFC062' },
+                         { 'match' => '>=10', 'label' => 'Mild', 'color' => '#7ED0C1' }
+                       ],
+                       'default_pattern' => { 'label' => 'Minimal', 'color' => '#E2B1F4' },
+                       'min_answered_variables' => 0,
+                       'positive_despite_missing_data' => false
+                     })
+    end
+
+    let!(:band_rows) do
+      { 'Severe' => 3, 'Moderate' => 4, 'Mild' => 5, 'Minimal' => 2,
+        ChartStatistic::INSUFFICIENT_DATA_LABEL => 1 }.map do |label, count|
+        create_list(:chart_statistic, count, label: label, organization: organization, health_system: health_system,
+                                             chart: multi_band_chart, health_clinic: health_clinic, filled_at: 1.month.ago)
+      end
+    end
+
+    let(:datum) { subject.find { |entry| entry['chart_id'] == multi_band_chart.id }['data'].first }
+
+    it 'draws only the first case, the default and Invalid' do
+      expect(datum).to eq(
+        'label' => 1.month.ago.strftime('%B %Y'),
+        'value' => 3,
+        'color' => '#C766EA',
+        'notMatchedValue' => 2,
+        'invalidValue' => 1
+      )
+    end
+
+    it 'leaves the middle bands in no series at all, though population counts them' do
+      chart_entry = subject.find { |entry| entry['chart_id'] == multi_band_chart.id }
+      drawn = datum['value'] + datum['notMatchedValue'] + datum['invalidValue']
+
+      expect(chart_entry['population']).to eq(15)
+      expect(drawn).to eq(6)
+      # 9 participants - every Moderate and every Mild - are counted but never drawn.
+      expect(chart_entry['population'] - drawn).to eq(9)
+    end
+  end
+
   context "when the caller's relation is authorization-scoped" do
     let!(:other_organization) { create(:organization, name: 'Somebody Else') }
     let!(:other_health_system) { create(:health_system, organization: other_organization) }

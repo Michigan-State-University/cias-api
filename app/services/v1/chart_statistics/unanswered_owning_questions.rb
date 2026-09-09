@@ -47,10 +47,6 @@
 # has the accurate framing - this job is "closed only halfway". Leaving the bail-out open
 # here is a recorded trade-off, not an oversight.
 class V1::ChartStatistics::UnansweredOwningQuestions
-  def self.call(user_session, missing_vars)
-    new(user_session, missing_vars).call
-  end
-
   def self.none_answered?(user_session, missing_vars)
     new(user_session, missing_vars).none_answered?
   end
@@ -58,13 +54,6 @@ class V1::ChartStatistics::UnansweredOwningQuestions
   def initialize(user_session, missing_vars)
     @user_session = user_session
     @missing_vars = missing_vars
-  end
-
-  def call
-    return false if missing_vars.empty?
-    return false if owning_question_ids.empty?
-
-    (owning_question_ids - answered_question_ids).any?
   end
 
   def none_answered?

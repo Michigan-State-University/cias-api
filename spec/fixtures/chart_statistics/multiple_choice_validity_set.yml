@@ -106,6 +106,22 @@ chart_configs:
     description: minimum 5 plus "Positive Despite Missing Data" - rescue checked
     min_answered_variables: 5
     positive_despite_missing_data: true
+  # NOT one of the document's columns. The document's only case is `>=20`, which a score of 0
+  # never matches, so on the three configs above a zero-answer participant is never offered to
+  # the rescue at all - `matched_pattern` is nil and `rescued?` is false regardless. This config
+  # replaces the case with a band that COVERS zero, the normal clinical shape (PHQ-9 "0-4
+  # Minimal", EPDS "0-9 low risk"), which is the only shape under which the rescue can reach a
+  # participant who answered nothing. Without the `answered_count.zero?` guard in
+  # `ValidityEvaluator#rescued?` the two zero-answer rows below publish under "Minimal".
+  min_5_rescue_zero_band:
+    document_name: 'Zero-covering band (not in the document)'
+    description: minimum 5, rescue checked, and a case that matches a score of 0
+    min_answered_variables: 5
+    positive_despite_missing_data: true
+    patterns:
+      - match: '<=4'
+        label: Minimal
+        color: '#C766EA'
 
 # One entry per row of the document's table.
 #
@@ -115,6 +131,8 @@ chart_configs:
 #                     and therefore neither scored nor counted
 #   outcomes[].label  the persisted `ChartStatistic#label`
 #                     ("Invalid / Insufficient Data" is ChartStatistic::INSUFFICIENT_DATA_LABEL)
+#   outcomes[].charted  false where the participant produces NO chart row at all; the only
+#                       key such an outcome carries (no label, no rescue)
 #   outcomes[].rescued  true only where the participant is BELOW the minimum and the
 #                       "Positive Despite Missing Data" rescue put them in a real category
 #                       anyway - the document's "Rescued -> Matched"
@@ -183,6 +201,7 @@ participants:
       - { question: Q4, state: branched }
       - { question: Q5, state: branched }
     answered_variables: 3
+    answer_rows: 3
     score: 24
     outcomes:
       min_5: { label: Invalid / Insufficient Data, rescued: false }
@@ -222,3 +241,95 @@ participants:
       min_5: { label: Matched, rescued: false }
       min_8: { label: Matched, rescued: false }
       min_5_rescue: { label: Matched, rescued: false }
+
+  # Beyond the document's six rows: the two ways a participant reaches the gate having
+  # answered NOTHING. Under the gate they are indistinguishable - `answered_count` measures
+  # var-value presence and neither route leaves one - so both are excluded on every config.
+  # They diverge only at `min_answered_variables == 0`, which this fixture does not cover.
+  - name: Olive
+    note: >-
+      branched around every question. No Answer row exists for any of the five, so no
+      variable reaches var values - 0 of 13, score 0.
+    answers:
+      - { question: Q1, state: branched }
+      - { question: Q2, state: branched }
+      - { question: Q3, state: branched }
+      - { question: Q4, state: branched }
+      - { question: Q5, state: branched }
+    answered_variables: 0
+    score: 0
+    outcomes:
+      min_5: { charted: false }
+      min_8: { charted: false }
+      min_5_rescue: { charted: false }
+      min_5_rescue_zero_band: { charted: false }
+
+  - name: Pearl
+    note: >-
+      skipped every question. A confirmed Answer row EXISTS for all five, each carrying a
+      blank `var`, so they are still absent from var values - 0 of 13, score 0. That row
+      count is the only thing separating her from Olive, and the gate cannot see it.
+    answers:
+      - { question: Q1, state: skipped }
+      - { question: Q2, state: skipped }
+      - { question: Q3, state: skipped }
+      - { question: Q4, state: skipped }
+      - { question: Q5, state: skipped }
+    answered_variables: 0
+    score: 0
+    outcomes:
+      min_5: { charted: false }
+      min_8: { charted: false }
+      min_5_rescue: { charted: false }
+      min_5_rescue_zero_band: { charted: false }
+
+  # A THIRD route to a low answered-count, distinct from skipping and from being branched
+  # around: she opened both Multiples and ticked NO box in either. An answer row exists for
+  # all five questions and none of them is a skip, yet only the three Singles contribute a
+  # variable. Deliberately given Kate's counts and score - 3 of 13, 24 - so the pair pins the
+  # claim that "ticked nothing" and "branched around" are treated identically once the values
+  # are read. If Multiple answer parsing ever changes, these two diverge and both go red.
+  - name: Quinn
+    note: >-
+      answered every question but ticked no box on either Multiple. 3 of 13 - the Singles
+      only - and an answer record for all five.
+    answers:
+      - { question: Q1, state: answered, value: 9 }
+      - { question: Q2, state: answered, value: 8 }
+      - { question: Q3, state: answered, value: 7 }
+      - { question: Q4, state: answered, checked: [] }
+      - { question: Q5, state: answered, checked: [] }
+    answered_variables: 3
+    # The fact that separates her from Kate, who has the same count, score and outcomes but
+    # reached nothing: Quinn left an answer row for all FIVE questions. Without this pin the
+    # two rows are indistinguishable, and Quinn's would pass even if her Multiples were
+    # never built at all.
+    answer_rows: 5
+    score: 24
+    outcomes:
+      min_5: { label: Invalid / Insufficient Data, rescued: false }
+      min_8: { label: Invalid / Insufficient Data, rescued: false }
+      min_5_rescue: { label: Matched, rescued: true }
+      # 24 does not match the `<=4` band, so there is nothing to rescue her into - the
+      # zero-covering band rescues a zero score, not every score.
+      min_5_rescue_zero_band: { label: Invalid / Insufficient Data, rescued: false }
+
+  # Timeout, all five. Mechanically identical to Olive - a timeout leaves no answer row - and
+  # pinned separately because the client has ruled on branching but never on timeout, so this
+  # row records what the system does today rather than what anyone decided.
+  - name: Tess
+    note: >-
+      timed out on every question. No answer row exists for any of the five - 0 of 13, score 0.
+    answers:
+      - { question: Q1, state: timed_out }
+      - { question: Q2, state: timed_out }
+      - { question: Q3, state: timed_out }
+      - { question: Q4, state: timed_out }
+      - { question: Q5, state: timed_out }
+    answered_variables: 0
+    score: 0
+    outcomes:
+      min_5: { charted: false }
+      min_8: { charted: false }
+      min_5_rescue: { charted: false }
+      min_5_rescue_zero_band: { charted: false }

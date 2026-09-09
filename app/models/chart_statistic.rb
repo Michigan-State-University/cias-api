@@ -1,15 +1,6 @@
 # frozen_string_literal: true
 
 class ChartStatistic < ApplicationRecord
-  # Reserved label for a participant who reached a gated chart's validity gate but neither
-  # passed the "N out of M answered variables" minimum nor matched an explicit case: they
-  # stay VISIBLE as their own category instead of being silently dropped (CIAS-4191).
-  #
-  # Stored verbatim, in English, on purpose. Chart labels are researcher-authored strings
-  # persisted on the row and rendered verbatim on both the editor tile and the published
-  # dashboard - there is no i18n layer for chart labels anywhere - so the reserved label
-  # follows the same convention. Renaming it later is a data migration, and `Chart`
-  # rejects any pattern/default label that collides with it (case-insensitively).
   INSUFFICIENT_DATA_LABEL = 'Invalid / Insufficient Data'
 
   has_paper_trail

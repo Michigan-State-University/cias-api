@@ -52,17 +52,12 @@ class Chart < ApplicationRecord
     formula['payload'].scan(/\w+[.]\w+/)
   end
 
-  # Distinct variables the formula payload depends on.
-  # The calculator MUST be fresh and empty: Dentaku#dependencies only returns identifiers
-  # absent from calculator memory, so a memoised/loaded calculator under-counts.
-  # Returns nil for a payload Dentaku cannot parse (e.g. mid-typed `"HT2.phq1 +"`).
   def formula_variables
     Dentaku::Calculator.new(case_sensitive: true).dependencies(formula.to_h['payload']).uniq
   rescue Dentaku::Error
     nil
   end
 
-  # Number of distinct variables the formula payload depends on (the `M` in "N out of M").
   def formula_variable_count
     formula_variables&.count
   end
@@ -80,9 +75,6 @@ class Chart < ApplicationRecord
 
   private
 
-  # Deliberately loose: no `min <= formula_variable_count` ceiling and no Dentaku parse here.
-  # The FE autosaves the payload on blur carrying the previous min, so a ceiling would turn
-  # routine payload edits into a 422 (a silent revert for the user).
   def validate_min_answered_variables
     value = formula_setting('min_answered_variables')
     return if value.nil? || (value.is_a?(Integer) && value >= 0)
@@ -90,9 +82,6 @@ class Chart < ApplicationRecord
     errors.add(:formula, 'min_answered_variables must be an integer greater than or equal to 0')
   end
 
-  # Replaced the numeric `positive_despite_missing_threshold` rescue before the feature ever
-  # deployed. That key is no longer declared in `db/schema/chart/formula.json`, so a formula
-  # still carrying it now fails the json-schema validation rather than being tolerated.
   def validate_positive_despite_missing_data
     value = formula_setting('positive_despite_missing_data')
     return if value.nil? || value == true || value == false
@@ -100,22 +89,6 @@ class Chart < ApplicationRecord
     errors.add(:formula, 'positive_despite_missing_data must be a boolean')
   end
 
-  # The reserved "Invalid / Insufficient Data" label is stamped on rows by the validity
-  # gate, and every aggregation buckets purely by label STRING - the pie groups by `label`
-  # (pie_chart.rb:29-34) and both bar generators read only `patterns.first['label']` /
-  # `default_pattern['label']`. A researcher case carrying that label would therefore merge
-  # genuine screens with gate-excluded participants in one slice. Case-insensitive: a
-  # near-duplicate would render as a second, confusingly similar category.
-  #
-  # Nil- AND type-tolerant by necessity: `db/schema/chart/formula.json` constrains no
-  # pattern item (its `required` / `additionalProperties` sit inside the wrong object and
-  # `items` is a draft-04 tuple, leaving `patterns[1..]` unvalidated) and `default_pattern`
-  # is unconstrained. So `patterns` may not be an Array, an element may not be a Hash,
-  # `default_pattern` may be absent or not a Hash, and `label` may be missing or non-String.
-  #
-  # Scope note: this covers collisions with the RESERVED label only. A pattern label
-  # colliding with `default_pattern`'s own label is a different guarantee, already enforced
-  # inside `V1::ChartStatistics::ValidityEvaluator#rescued?` - do not re-implement it here.
   def validate_reserved_label_unused
     return if formula_labels.none? { |label| reserved_label?(label) }
 

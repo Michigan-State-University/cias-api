@@ -282,4 +282,53 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
       )
     end
   end
+
+  # The multi-band consequence is sharper here than on the numeric bar: bands 2..n are absent
+  # from the DENOMINATOR too, so the published percentage is a share of a population smaller
+  # than the chart's own `population` field. A researcher reading "50% matched" against a
+  # population of 15 is reading 3 of 6, not 3 of 15.
+  context 'when the chart formula defines more than one case' do
+    let!(:multi_band_chart) do
+      create(:chart, name: 'severity', dashboard_section: dashboard_sections, chart_type: 'percentage_bar_chart',
+                     status: 'published',
+                     formula: {
+                       'payload' => 'phq.total',
+                       'patterns' => [
+                         { 'match' => '>=30', 'label' => 'Severe', 'color' => '#C766EA' },
+                         { 'match' => '>=20', 'label' => 'Moderate', 'color' => '#FFC062' },
+                         { 'match' => '>=10', 'label' => 'Mild', 'color' => '#7ED0C1' }
+                       ],
+                       'default_pattern' => { 'label' => 'Minimal', 'color' => '#E2B1F4' },
+                       'min_answered_variables' => 0,
+                       'positive_despite_missing_data' => false
+                     })
+    end
+
+    let!(:band_rows) do
+      { 'Severe' => 3, 'Moderate' => 4, 'Mild' => 5, 'Minimal' => 2,
+        ChartStatistic::INSUFFICIENT_DATA_LABEL => 1 }.map do |label, count|
+        create_list(:chart_statistic, count, label: label, organization: organization, health_system: health_system,
+                                             chart: multi_band_chart, health_clinic: health_clinic, filled_at: 1.month.ago)
+      end
+    end
+
+    let(:chart_entry) { subject.find { |entry| entry['chart_id'] == multi_band_chart.id } }
+
+    it 'divides by the first case, the default and Invalid only' do
+      expect(chart_entry['data'].first).to eq(
+        'label' => 1.month.ago.strftime('%B %Y'),
+        'color' => '#C766EA',
+        'population' => 6,
+        'value' => 50.0,
+        'invalidValue' => 1
+      )
+    end
+
+    it "publishes a datum population smaller than the chart's own population" do
+      # 3 Severe + 2 Minimal + 1 Invalid = 6, against 15 rows in the period. Every Moderate
+      # and every Mild is outside the percentage entirely.
+      expect(chart_entry['population']).to eq(15)
+      expect(chart_entry['data'].first['population']).to eq(6)
+    end
+  end
 end

@@ -124,7 +124,8 @@ RSpec.describe V1::ChartStatistics::Create do
     fixture.fetch('chart_configs').to_h do |key, config|
       formula = fixture.fetch('formula').merge(
         'min_answered_variables' => config.fetch('min_answered_variables'),
-        'positive_despite_missing_data' => config.fetch('positive_despite_missing_data')
+        'positive_despite_missing_data' => config.fetch('positive_despite_missing_data'),
+        'patterns' => config.fetch('patterns') { fixture.fetch('formula').fetch('patterns') }
       )
       [key, create(:chart, dashboard_section: dashboard_section, chart_type: :pie_chart,
                            name: config.fetch('document_name'), formula: formula)]
@@ -168,19 +169,43 @@ RSpec.describe V1::ChartStatistics::Create do
         expect(score_of(charts.fetch('min_5'), var_values)).to eq(participant.fetch('score'))
       end
 
+      # Only where the row count is the point: "answered the question" and "answered its
+      # variables" are different facts, and a participant can have five of the first and
+      # three of the second.
+      if participant['answer_rows']
+        it "leaves #{participant.fetch('answer_rows')} answer rows for 5 questions" do
+          expect(Answer.where(user_session: user_session).count).to eq(participant.fetch('answer_rows'))
+        end
+      end
+
       participant.fetch('outcomes').each do |config_key, outcome|
         config = fixture.fetch('chart_configs').fetch(config_key)
-        label = outcome.fetch('label')
-        expectation = outcome.fetch('rescued') ? "is rescued by the case match into '#{label}'" : "is charted as '#{label}'"
+        charted = outcome.fetch('charted', true)
+        label = outcome['label']
+        expectation = if !charted
+                        'produces no chart row at all'
+                      elsif outcome.fetch('rescued')
+                        "is rescued by the case match into '#{label}'"
+                      else
+                        "is charted as '#{label}'"
+                      end
 
         context "on #{config.fetch('document_name')} - #{config.fetch('description')}" do
           let(:chart) { charts.fetch(config_key) }
 
+          # The no-row branch asserts the label set as well as the count: what it guards
+          # against is not "no row" but "a row under a REAL category label", so a bare count
+          # assertion would report the right failure for the wrong reason.
           it expectation do
-            expect { create_chart_statistic }.to change(ChartStatistic, :count).by(1)
-
-            expect(ChartStatistic.find_by(chart: chart, user: user_session.user).label).to eq(outcome.fetch('label'))
-            expect(validity_of(chart, var_values).rescued).to be(outcome.fetch('rescued'))
+            if charted
+              expect { create_chart_statistic }.to change(ChartStatistic, :count).by(1)
+              expect(ChartStatistic.find_by(chart: chart, user: user_session.user).label).to eq(label)
+              expect(validity_of(chart, var_values).rescued).to be(outcome.fetch('rescued'))
+            else
+              expect { described_class.call(chart, user_session, organization) }.not_to change(ChartStatistic, :count)
+              expect(ChartStatistic.where(chart: chart, user: user_session.user)).to be_empty
+              expect(validity_of(chart, var_values).rescued).to be(false)
+            end
           end
         end
       end
