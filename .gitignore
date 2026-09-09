@@ -27,3 +27,7 @@ certificates/
 .claude/
 
 .vscode/
+
+# htd-cq scan artifacts
+htd-cq-output/
+.htd-cq-coverage/
