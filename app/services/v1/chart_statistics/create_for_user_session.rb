@@ -41,8 +41,22 @@ class V1::ChartStatistics::CreateForUserSession
   end
 
   def charts
+    organization_charts.select { |chart| chart_session_variables(chart).include?(finishing_session_variable) }
+  end
+
+  def organization_charts
     Chart.joins(dashboard_section: [reporting_dashboard: :organization]).where(
       dashboard_sections: { reporting_dashboards: { organization: organization } }
     )
+  end
+
+  def finishing_session_variable
+    @finishing_session_variable ||= user_session.session.variable
+  end
+
+  def chart_session_variables(chart)
+    return [] unless chart.formula.is_a?(Hash) && chart.formula['payload'].is_a?(String)
+
+    chart.chart_variables.map { |variable| variable.split('.').first }
   end
 end

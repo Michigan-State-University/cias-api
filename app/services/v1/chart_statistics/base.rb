@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::Base
+  INSUFFICIENT_DATA_COLOR = '#BDC7D6'
+
   attr_reader :charts_data_collection, :charts
 
   def initialize(charts_data_collection, charts)

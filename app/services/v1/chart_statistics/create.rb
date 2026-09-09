@@ -27,11 +27,13 @@ class V1::ChartStatistics::Create
         return
       end
 
-      if any_owning_question_unanswered?(missing_vars)
+      # An explicit `min_answered_variables` supersedes this guard: the chart owner has
+      # declared how many answers are enough, and the remaining variables 0-fill.
+      if !validity_gate_enabled? && answered_none_of_chart_variables?(missing_vars)
         Rails.logger.info(
           "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
-          "user_session=#{user_session.id} did not reach all questions referenced by formula " \
-          "(branched-around or partial completion). Formula: #{formula['payload']}"
+          "user_session=#{user_session.id} answered NONE of the questions referenced by formula " \
+          "(never reached this instrument). Formula: #{formula['payload']}"
         )
         return
       end
@@ -41,18 +43,9 @@ class V1::ChartStatistics::Create
     return if formula_error?
     return if zero_division_error?
     return unless inside_date_range?
+    return unless chartable?
 
-    chart_statistic = ChartStatistic.find_or_initialize_by(
-      label: label,
-      organization: organization,
-      health_system: health_system,
-      health_clinic: health_clinic,
-      chart: chart,
-      user: user_session.user,
-      user_session: user_session
-    )
-    chart_statistic.filled_at = user_session.finished_at || DateTime.current
-    chart_statistic.save!
+    upsert_chart_statistic
   rescue Dentaku::ParseError, Dentaku::TokenizerError, Dentaku::ArgumentError => e
     Rails.logger.error(
       "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
@@ -67,6 +60,8 @@ class V1::ChartStatistics::Create
   attr_reader :chart, :user_session, :organization
 
   def label
+    return ChartStatistic::INSUFFICIENT_DATA_LABEL if insufficient_data?
+
     result = calculated_formula
 
     result ? result['label'] : chart.formula['default_pattern']['label']
@@ -78,8 +73,12 @@ class V1::ChartStatistics::Create
     )
   end
 
+  # `defined?` rather than `||=`: `chart.calculate` returns nil whenever no pattern matched, and
+  # `||=` would then re-run the whole evaluation on every call site in the excluded path.
   def calculated_formula
-    @calculated_formula ||= chart.calculate(dentaku_service)
+    return @calculated_formula if defined?(@calculated_formula)
+
+    @calculated_formula = chart.calculate(dentaku_service)
   end
 
   def formula
@@ -87,9 +86,103 @@ class V1::ChartStatistics::Create
   end
 
   def all_var_values
-    V1::UserInterventionService.new(
+    @all_var_values ||= V1::UserInterventionService.new(
       user_session.user_intervention_id, nil
     ).var_values
+  end
+
+  def validity_gate_enabled?
+    validity_evaluator.enabled?(chart)
+  end
+
+  def validity_evaluator
+    V1::ChartStatistics::ValidityEvaluator
+  end
+
+  # The bare `calculated_formula` call is not dead code: `raw_result` is nil until evaluation runs.
+  def score
+    calculated_formula
+    dentaku_service.raw_result
+  end
+
+  def validity
+    @validity ||= validity_evaluator.call(chart, all_var_values, score, matched_pattern: calculated_formula)
+  end
+
+  # Deliberately positioned BEHIND the sentinel checks in `call`: invalid formula variables,
+  # evaluation errors and out-of-date-range sessions all `return` earlier and keep their silent
+  # skip - an evaluation-error participant must never surface as a visible Invalid slice.
+  def chartable?
+    return true unless validity_gate_enabled?
+    return true if validity.passed
+
+    if validity.answered_count.zero?
+      log_gate_outcome('EXCLUDED', "answered none of the chart's variables, so it never reached the " \
+                                   "instrument - no '#{ChartStatistic::INSUFFICIENT_DATA_LABEL}' row")
+      return false
+    end
+
+    log_gate_outcome('INSUFFICIENT_DATA', 'did not meet the chart validity gate and is classified as ' \
+                                          "'#{ChartStatistic::INSUFFICIENT_DATA_LABEL}'")
+    true
+  end
+
+  def insufficient_data?
+    validity_gate_enabled? && !validity.passed
+  end
+
+  def upsert_chart_statistic
+    chart_statistic = ChartStatistic.find_or_initialize_by(**chart_statistic_key)
+    filled_at = user_session.finished_at || DateTime.current
+    return unless assignable?(chart_statistic, filled_at)
+
+    chart_statistic.label = label
+    chart_statistic.user_session = user_session
+    chart_statistic.filled_at = filled_at
+    chart_statistic.save!
+  end
+
+  # Outcome precedence FIRST, `filled_at` second. A real label beats a persisted Invalid row
+  # regardless of `filled_at`, and an Invalid outcome never overwrites a real one. Replay has no
+  # order - `CreateForUserSessions` iterates with no ORDER BY and `Charts::Regenerate` destroys and
+  # replays - so a filled_at-only guard would make a row's final label depend on replay order.
+  def assignable?(chart_statistic, filled_at)
+    return true if chart_statistic.new_record?
+    return true if persisted_insufficient_data?(chart_statistic) && !insufficient_data?
+
+    if insufficient_data? && !persisted_insufficient_data?(chart_statistic)
+      log_gate_outcome('RETAINED', 'fell below the chart validity gate but the participant is already charted ' \
+                                   'under a real label - row kept, never downgraded')
+      return false
+    end
+
+    chart_statistic.filled_at.blank? || filled_at >= chart_statistic.filled_at
+  end
+
+  def persisted_insufficient_data?(chart_statistic)
+    chart_statistic.label == ChartStatistic::INSUFFICIENT_DATA_LABEL
+  end
+
+  def log_gate_outcome(outcome, detail)
+    Rails.logger.info(
+      "ChartStatistics::Create #{outcome} chart_id=#{chart.id}: " \
+      "user_session=#{user_session.id} #{detail}: #{gate_diagnostics}"
+    )
+  end
+
+  def gate_diagnostics
+    "answered=#{validity.answered_count} required=#{validity_evaluator.min_answered_variables(chart)} " \
+      "of=#{validity.variable_count.inspect} " \
+      "rescue_enabled=#{validity_evaluator.rescue_enabled?(chart)} matched=#{calculated_formula.is_a?(Hash)}"
+  end
+
+  # ONE row per (organization, health_system, health_clinic, chart, user). `label` and
+  # `user_session` are plain assignments, so a participant's row MOVES between categories in
+  # place. With them IN the key (the legacy shape) a participant gained an extra row at every
+  # later session finish, and aggregation counts rows, never people - one person, population 2.
+  def chart_statistic_key
+    { organization: organization, health_system: health_system, health_clinic: health_clinic,
+      chart: chart, user: user_session.user }
   end
 
   def health_system
@@ -125,24 +218,18 @@ class V1::ChartStatistics::Create
     true
   end
 
-  def any_owning_question_unanswered?(missing_vars)
-    return false if missing_vars.empty?
+  # Drops a participant ONLY when they answered none of the formula's variables; some missing
+  # variables 0-fill and they land in an ordinary Matched / Not-matched category. Answeredness is
+  # measured on the OWNING QUESTION having a confirmed `Answer`, never on var-values presence -
+  # the latter would newly drop a participant who reached every question and SKIPPED every one.
+  #
+  # EVALUATION-ORDER SENSITIVITY - the call site must not move. `missing_vars` is only the MISSING
+  # set because `exist_missing_variables?` has stored the values and `add_missing_variables` has
+  # not yet run. Touching `calculated_formula` earlier 0-fills calculator memory, makes
+  # `dependencies` return `[]`, and silently turns this predicate into "everything is present".
+  def answered_none_of_chart_variables?(missing_vars)
+    return false if (chart.formula_variables.to_a - missing_vars).any?
 
-    required_var_names = missing_vars.map { |v| v.split('.').last }
-
-    owning_question_ids = Question.joins(question_group: :session)
-                                  .where(sessions: { intervention_id: user_session.session.intervention_id })
-                                  .select { |q| q.question_variables.compact.intersect?(required_var_names) }
-                                  .map(&:id)
-    return false if owning_question_ids.empty?
-
-    latest_user_session_ids = user_session.user_intervention.latest_user_sessions.map(&:id)
-
-    answered_question_ids = Answer.confirmed
-                                  .where(user_session_id: latest_user_session_ids,
-                                         question_id: owning_question_ids)
-                                  .pluck(:question_id).uniq
-
-    (owning_question_ids - answered_question_ids).any?
+    V1::ChartStatistics::UnansweredOwningQuestions.none_answered?(user_session, missing_vars)
   end
 end
