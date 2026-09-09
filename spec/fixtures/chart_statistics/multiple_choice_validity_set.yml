@@ -314,6 +314,33 @@ participants:
       # zero-covering band rescues a zero score, not every score.
       min_5_rescue_zero_band: { label: Invalid / Insufficient Data, rescued: false }
 
+  # The MIXED route, and the only participant here whose confirmed rows are a PARTIAL set. Given
+  # Olive's and Pearl's counts, score and outcomes deliberately, so the trio pins where the
+  # ungated boundary actually falls: `UnansweredOwningQuestions#none_answered?` is false for Rosa
+  # exactly as it is for Pearl's full five rows, and true only for Olive's zero. The rule is
+  # "none reached" vs "SOME reached" - it has never been skip vs branch, and two rows out of five
+  # are enough. Nothing else in this fixture would notice if that check started counting rows.
+  - name: Rosa
+    note: >-
+      skipped Q1 and Q2, then was branched around Q3, Q4 and Q5. A confirmed Answer row exists
+      for the first two, each carrying a blank `var`; the last three left no row at all. Every
+      variable is still absent from var values - 0 of 13, score 0.
+    answers:
+      - { question: Q1, state: skipped }
+      - { question: Q2, state: skipped }
+      - { question: Q3, state: branched }
+      - { question: Q4, state: branched }
+      - { question: Q5, state: branched }
+    answered_variables: 0
+    # THE assertion for this row: two rows, not Pearl's five and not Olive's none.
+    answer_rows: 2
+    score: 0
+    outcomes:
+      min_5: { charted: false }
+      min_8: { charted: false }
+      min_5_rescue: { charted: false }
+      min_5_rescue_zero_band: { charted: false }
+
   # Timeout, all five. Mechanically identical to Olive - a timeout leaves no answer row - and
   # pinned separately because the client has ruled on branching but never on timeout, so this
   # row records what the system does today rather than what anyone decided.
