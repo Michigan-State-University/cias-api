@@ -5,12 +5,12 @@ name: Code Quality
 # the run log. This repository is public, so its Actions logs and artifacts are
 # world-readable -- findings must not land in either.
 #
-# Coverage is generated here rather than reused from ci.yml: that workflow
-# splits rspec across a TEST_BATCH_COUNT-sized matrix, so its partial reports
-# would have to be uploaded, collated and handed across a workflow boundary.
-# This job runs the suite once instead. The cost is a duplicate suite run on
-# the branches the scan already covers; shard collation is the upgrade path if
-# that outgrows the timeout below.
+# Coverage is NOT generated here. ci.yml already runs the suite across its
+# TEST_BATCH_COUNT shards and collates them into the "coverage-report"
+# artifact; this workflow downloads that artifact for the same commit rather
+# than re-running the suite. Running it here serially would take ~90 minutes --
+# the eight shards total that much rspec time and only finish in ~21 by fanning
+# out.
 
 on:
   push:
@@ -20,49 +20,46 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: code-quality-${{ github.ref }}
+  # head_ref on pull_request, ref on push -- grouping on both puts a branch's
+  # push run and its PR run in one group, so a push to dev with an open
+  # dev -> master PR scans and publishes once rather than twice.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
+  # Required to list ci.yml's runs for this commit and download its
+  # coverage-report artifact. Read-only.
+  actions: read
 
 jobs:
   scan:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository || github.actor != 'dependabot[bot]'
-    # Matches ci.yml: the coverage run below needs libffi7, which is not
-    # packaged for ubuntu-latest.
-    runs-on: ubuntu-22.04
-    # htd-cq's --timeout flag is a no-op, so the job-level bound is the only
-    # real limit. This covers the full rspec suite as well as the scan.
+    # Dependabot and fork PRs get no secrets, so the unguarded ssh-agent step
+    # below would fail red for a reason the contributor cannot fix. ORing these
+    # terms made the condition always true -- a push satisfies the first, a fork
+    # PR the last -- so they are ANDed.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    # Outer bound. Sized for the worst case: COVERAGE_WAIT_MINUTES (30) waiting
+    # on ci.yml, plus the scan's own --timeout (20), plus overhead. A typical
+    # run is ~25 minutes, most of it waiting.
     timeout-minutes: 60
     env:
       TECH: rails
       TIER: high
       # Report-only. Set to "true" to make a failing gate block the branch.
       ENFORCE_GATE: "false"
-      # Test environment for the coverage run, mirroring ci.yml.
-      RAILS_ENV: test
-      BUNDLER_VERSION: 2.4.22
-      POSTGRES_PASSWORD: postgres
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/cias_test
-      REDIS_URL: redis://localhost:6379/
-      GIT_AUTHOR_EMAIL: ci@ci.ci
+      # How long to wait for ci.yml's coverage-report artifact for this commit.
+      # Its slowest shard runs ~20 minutes and the collate job follows, so the
+      # artifact does not exist for roughly the first 25 minutes of a run. On
+      # timeout the scan proceeds without coverage rather than failing.
+      COVERAGE_WAIT_MINUTES: "30"
 
-    services:
-      database:
-        image: postgres:13.0-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      cache:
-        image: redis
-        options: --entrypoint redis-server
-        ports: ["6379:6379"]
+    # No services block: this job never runs the spec suite, so it needs
+    # neither Postgres nor Redis. Coverage arrives as an artifact from ci.yml.
 
     steps:
       # Actions are pinned to commit SHAs. Tags are mutable and can be
@@ -76,78 +73,21 @@ jobs:
           # Full history is required by SonarQube's SCM/new-code analysis.
           fetch-depth: 0
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
-        with:
-          ruby-version-file: .ruby-version
+      # No toolchain setup: every scanner runs in a container and the spec suite
+      # is not run here, so this job needs no local Ruby.
 
-      # Both files are untracked local config the suite needs to boot. They are
-      # removed again before the scan so the scanners see the repository as it
-      # is committed -- .env.template carries a private key placeholder that
-      # would otherwise be reported twice, once from a file that is not in git.
-      #
-      # Every step on the coverage path is best-effort: a broken bundle or a
-      # dead database must not cost the security scan, which does not depend on
-      # any of it. Each one failing just leaves no report, and the scan below
-      # falls back to --skip-coverage.
-      - name: Prepare test environment
-        continue-on-error: true
-        run: |
-          cp .env.template .env
-          cp config/database.docker.yml config/database.yml
-
-      # Gems are installed OUTSIDE the repository, unlike ci.yml which uses
-      # vendor/bundle. The scanners walk the working tree, and ~260 unpacked
-      # gems inside it would be scanned as project code: Sonar, Semgrep, Trivy
-      # and TruffleHog all have vendor/ exclusions, but Checkov has none and
-      # would report gem-shipped Dockerfiles and K8s fixtures as this repo's
-      # IaC findings. The cost is a cache separate from ci.yml's.
-      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
-        with:
-          path: ~/bundle-gems
-          key: ${{ runner.os }}-cq-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cq-gems-
-
-      - name: Install dependencies and prepare database
-        continue-on-error: true
-        run: |
-          sudo apt install libffi7
-          gem install bundler -v "${BUNDLER_VERSION}"
-          bundle config set path "${HOME}/bundle-gems"
-          bundle install
-          bundle exec rails db:create db:schema:load --trace
-
-      # Writes coverage/coverage.json through SonarJSONFormatter in
-      # spec/rails_helper.rb. A failing suite must not stop the scan from
-      # collecting everything else, so this step is allowed to fail and the
-      # scan falls back to --skip-coverage when no report is produced.
-      #
-      # A suite that dies partway still leaves a valid report covering only the
-      # files it reached, and SonarQube imports that as a real measurement --
-      # the exit code is the only thing that distinguishes it, so it is
-      # surfaced rather than left buried in a suppressed log.
-      - name: Generate test coverage
+      # ci.yml collates its spec shards into the "coverage-report" artifact
+      # (script/collate_coverage.rb). The poll logic lives in a script so it can
+      # be shellcheck'd and run outside Actions, following test_setup.sh.
+      - name: Fetch coverage report from CI workflow
         id: coverage
-        continue-on-error: true
-        run: |
-          set +e
-          bundle exec rspec --format progress >rspec.log 2>&1
-          RSPEC_EXIT=$?
-          set -e
-          if [ "$RSPEC_EXIT" -ne 0 ]; then
-            echo "::warning::rspec exited ${RSPEC_EXIT} -- coverage reflects a partial suite run"
-            tail -n 20 rspec.log
-          fi
-
-      # The scanners must see the repository as it is committed, so everything
-      # the coverage run added is removed first. always(): .env must be gone
-      # even if the steps above bailed out partway.
-      - name: Restore committed tree
-        if: always()
-        run: |
-          rm -rf .env rspec.log .bundle
-          git checkout -- config/database.yml
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # On pull_request, github.sha is the merge commit. ci.yml is on: push,
+          # so its runs are keyed on the PR head -- matching on github.sha finds
+          # nothing and every PR waits out the full deadline.
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: ./.github/workflows/fetch_coverage.sh
 
       - name: Setup SSH for code-quality-configs
         uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
@@ -174,16 +114,23 @@ jobs:
           # scanner runs at all. Do not remove this.
           SONAR_STARTUP_TIMEOUT: 6m
         run: |
-          # No report means the coverage step failed. Skipping keeps the
-          # coverage conditions at SKIP; without the flag SonarQube reports a
-          # measured 0%, which reads as "no tests" rather than "not measured".
+          # --skip-coverage is passed ONLY when no report was downloaded. It
+          # disables htd-cq's own coverage *generation*, but it also forces the
+          # two coverage gate conditions to SKIP even when a report is present.
+          # .htd-cq.json deliberately carries no coverageCommand, so omitting
+          # the flag re-runs nothing -- it just lets the gate evaluate the
+          # downloaded report instead of reporting SKIP.
+          #
+          # With no report and no flag, SonarQube would report a measured 0%,
+          # which reads as "no tests" rather than "not measured" -- hence the
+          # flag in that case.
           COVERAGE_FLAG=""
           if [ ! -s coverage/coverage.json ]; then
             COVERAGE_FLAG="--skip-coverage"
             echo "::warning::no coverage report -- scanning with --skip-coverage"
           fi
           set +e
-          htd-cq scan --tech "${TECH}" --tier "${TIER}" ${COVERAGE_FLAG} >scan.log 2>&1
+          htd-cq scan --tech "${TECH}" --tier "${TIER}" ${COVERAGE_FLAG} --timeout 20m >scan.log 2>&1
           CODE=$?
           set -e
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
@@ -195,8 +142,10 @@ jobs:
             tail -n 40 scan.log
           fi
 
+      # No always(): the exit_code test already covers every path where an
+      # earlier step bailed, and Publish below must not run when this fails.
       - name: Verify a report was produced
-        if: always() && steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
+        if: steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
         run: |
           # With all output suppressed, "exited 0 but wrote nothing" would
           # otherwise pass silently. Checks existence only, prints no contents.
@@ -207,7 +156,7 @@ jobs:
           fi
 
       - name: Publish report to S3
-        if: always() && steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
+        if: steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.HTD_CQ_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.HTD_CQ_AWS_SECRET_ACCESS_KEY }}
