@@ -397,9 +397,9 @@ RSpec.describe V1::ChartStatistics::CreateForUserSession do
     # The pre-filter is gate-INDEPENDENT by design: `charts` runs before any chart is
     # evaluated and before `validity_gate_enabled?` is ever consulted, so a GATED chart also
     # stops being evaluated - and stops dragging `filled_at` - at a finish its formula does
-    # not reference. That IS a gated-path behaviour change (phase-1 Deviation 8), accepted
-    # because a gate-conditional pre-filter would reinstate the live-vs-replay
-    # chart-selection divergence WI-17 exists to remove, for gated charts only. Zero
+    # not reference. That IS a gated-path behaviour change, accepted because a gate-conditional
+    # pre-filter would reinstate the live-vs-replay chart-selection divergence the pre-filter
+    # exists to remove, for gated charts only. Zero
     # production impact: `min_answered_variables` does not exist on `origin/dev`, so there
     # are no gated charts anywhere.
     context 'when a GATED chart references only the screening session' do

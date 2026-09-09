@@ -1,14 +1,6 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::Base
-  # The slice/segment colour every generator stamps on `ChartStatistic::INSUFFICIENT_DATA_LABEL`
-  # (cias-web `colors.heather`) - a neutral grey absent from the colour picker's 14 preset
-  # swatches. Uniqueness cannot be guaranteed (the picker also takes a free hex value), so the
-  # grey is a convention; the reserved-label collision guard on `Chart` is the real separator.
-  #
-  # It lives here rather than on `ChartStatistic` because it is generator-level rendering state
-  # with no column behind it. `PieChart` is its only production reader; the bar generators ship no
-  # colour per datum, and `cias-web` holds the same grey client-side as `colors.heather`.
   INSUFFICIENT_DATA_COLOR = '#BDC7D6'
 
   attr_reader :charts_data_collection, :charts

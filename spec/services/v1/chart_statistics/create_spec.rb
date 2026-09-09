@@ -299,10 +299,9 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
 
-    # Retitled, not inverted. This fixture answers `terms` - which the formula does NOT
-    # reference - and none of `epds1..3`, so it always was the ZERO-ANSWERED shape ("Noah"),
-    # and the zero-answered rule keeps dropping it. The partial-completion context below is
-    # the one that inverts.
+    # This fixture answers `terms` - which the formula does NOT reference - and none of
+    # `epds1..3`, so it is the ZERO-ANSWERED shape and is still dropped. The partial-completion
+    # context below is the one that changed.
     context 'when the user answered none of the questions referenced by formula (never reached the instrument)' do
       # Simulates: user declined a gating question (e.g. terms) and branched
       # straight to Finish, never reaching the EPDS-style screening questions.
@@ -346,8 +345,7 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
 
-    # INVERTED 2026-09-04. Partial completion used to be dropped by the strict guard; on an
-    # ungated chart the participant is now charted and `epds3` contributes 0.
+    # On an ungated chart a partially completed participant is charted and `epds3` contributes 0.
     context 'when user reached only some of the referenced questions (partial completion)' do
       let!(:epds_questions) do
         (1..3).map do |i|
@@ -386,22 +384,16 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
 
-    # RE-ANCHORED 2026-09-04. This context used to prove the qualified-pair ownership lookup
-    # by answering `epds1` and skipping `epds2`; under the zero-answered rule one PRESENT
-    # variable short-circuits the whole predicate, so the ownership lookup was never reached
-    # and the example became vacuous. Both questions are now SKIPPED, which puts every
-    # formula variable in `missing_vars` and forces the ownership lookup to run - so the
-    # context proves two things that matter:
+    # Both questions are SKIPPED, which puts every formula variable in `missing_vars` and forces
+    # the ownership lookup to run. Two things are proved here:
     #
-    #   1. A participant who REACHED every chart question and SKIPPED every one is still
-    #      charted. This is the no-regression guarantee: a skip leaves a confirmed `Answer`
-    #      with a blank `var`, so this participant has ZERO var-values present and would be
-    #      newly DROPPED had "answered" been measured on var-values like the gated path does.
-    #   2. The twin question in the copied session does not disturb that. Copying a session
-    #      renames only the SESSION variable (`clone_jobs/session.rb:15`), never the question
-    #      variables inside it, so one intervention legitimately holds two questions named
-    #      `epds2`. Pair-vs-bare matching itself is unit-tested in
-    #      `spec/services/v1/chart_statistics/unanswered_owning_questions_spec.rb`.
+    #   1. A participant who REACHED every chart question and SKIPPED every one is still charted.
+    #      A skip leaves a confirmed `Answer` with a blank `var`, so this participant has ZERO
+    #      var-values present and would be DROPPED had "answered" been measured on var-values.
+    #   2. The twin question in the copied session does not disturb that: copying a session
+    #      renames only the SESSION variable (`clone_jobs/session.rb:15`), so one intervention
+    #      legitimately holds two questions named `epds2`. Pair-vs-bare matching itself is
+    #      unit-tested in `spec/services/v1/chart_statistics/unanswered_owning_questions_spec.rb`.
     context 'when the participant skipped every referenced question and another session reuses the same variable' do
       let!(:question_reached) do
         create(:question_single, question_group: question_group, body: {
@@ -507,23 +499,17 @@ RSpec.describe V1::ChartStatistics::Create do
       it 'logs the classification with the counts, score, rescue flag and match state' do
         allow(Rails.logger).to receive(:info)
         subject
-        # score 3 matches the '>=2' case, but the rescue is off — matched=true, rescue_enabled=false.
+        # The 0-filled score matches the '>=2' case, but the rescue is off - matched=true, rescue_enabled=false.
         expect(Rails.logger).to have_received(:info).with(
-          /INSUFFICIENT_DATA chart_id=#{chart.id}.*answered=3 required=7 of=9 score=3 rescue_enabled=false matched=true/
+          /INSUFFICIENT_DATA chart_id=#{chart.id}.*answered=3 required=7 of=9 rescue_enabled=false matched=true/
         )
       end
     end
 
     context 'when the participant answered none of the chart variables' do
-      # The participant who reached none of the chart's questions. This branch is
-      # LIVE-reachable, not replay-only: here the participant is finishing the very session
-      # the formula references and was branched around all nine of its variables. On the
-      # replay path the same holds for any referenced session. Until 2026-09-04
-      # `CreateForUserSession` ALSO evaluated every non-draft chart in the organization on
-      # every session finish with no session filter, which fed this branch a much larger
-      # population; its session pre-filter now drops those charts before `Create` runs.
-      # Either way they keep today's silent skip rather than surfacing as a visible Invalid
-      # slice (client-confirmed `answered_count >= 1` rule).
+      # The participant who reached none of the chart's questions - here, finishing the very
+      # session the formula references, branched around all nine of its variables. They keep the
+      # silent skip rather than surfacing as a visible Invalid slice.
       let(:answered_variables) { 0 }
 
       it 'does not create a chart statistic' do
@@ -555,7 +541,6 @@ RSpec.describe V1::ChartStatistics::Create do
     # variable scored 0, matched a band covering 0, and was published under that band's real
     # label - the exclusion below it never ran. Reachable on any chart whose lowest case covers
     # zero, which is the NORMAL clinical shape (PHQ-9 "0-4 Minimal", EPDS "0-9 low risk").
-    # Reproduced in the browser 2026-09-08 before the fix.
     context 'when the participant answered none of the chart variables and the rescue is on' do
       let(:answered_variables) { 0 }
       let(:rescue_enabled) { true }
@@ -590,12 +575,10 @@ RSpec.describe V1::ChartStatistics::Create do
     end
 
     # The sharp edge between the two definitions of "answered", pinned from the gated side.
-    # With the gate ON, `answered` is var-values presence (validity_evaluator.rb:121-122), so
-    # a participant who reached every variable and skipped every one counts as 0 answered and
-    # is EXCLUDED. With the gate OFF the same participant is CHARTED, because the ungated rule
-    # measures the owning question instead - see the "reached every chart question and skipped
-    # every one" example in the ungated worked-example block. The asymmetry is deliberate:
-    # gated behaviour is shipped and client-confirmed and does not change here.
+    # With the gate ON, `answered` is var-values presence, so a participant who reached every
+    # variable and skipped every one counts as 0 answered and is EXCLUDED. With the gate OFF the
+    # same participant is CHARTED, because the ungated rule measures the owning question instead.
+    # The asymmetry is deliberate: gated behaviour is shipped and does not change here.
     context 'when the gate is on and the participant skipped every chart variable' do
       let(:answered_variables) { 0 }
 
@@ -627,9 +610,8 @@ RSpec.describe V1::ChartStatistics::Create do
       end
 
       it 'passes the gate silently - no gate-outcome line at all' do
-        # Replaced the old "bypasses the never-reached-question guard" assertion, which went
-        # vacuous when that guard's log line was retired. A clean pass must emit none of the
-        # three gate-outcome lines; a misclassification here would emit one.
+        # A clean pass must emit none of the three gate-outcome lines; a misclassification
+        # here would emit one.
         allow(Rails.logger).to receive(:info)
         subject
         expect(Rails.logger).not_to have_received(:info).with(/EXCLUDED chart_id=#{chart.id}/)
@@ -667,7 +649,7 @@ RSpec.describe V1::ChartStatistics::Create do
     end
 
     context 'when the participant is below the minimum and the score falls to the default category' do
-      # The structural guarantee survives phase 6: with the rescue ON, a participant whose
+      # The structural guarantee holds: with the rescue ON, a participant whose
       # 0-filled score matches no explicit case is still never labelled by the DEFAULT
       # pattern — they become visible under the reserved label instead.
       let(:rescue_enabled) { true }
@@ -799,16 +781,14 @@ RSpec.describe V1::ChartStatistics::Create do
     end
 
     describe 'outcome precedence over back-fill replay order' do
-      # `CreateForUserSessions` selects finished sessions by session VARIABLE across the
-      # whole organization with NO ORDER BY (create_for_user_sessions.rb:26-32), and
-      # `V1::Charts::Regenerate` destroys and replays, so two interventions that both use
-      # the session variable this chart references feed the SAME de-dup key (organization,
-      # health_system, health_clinic, chart, user) in an arbitrary order - while each call's
-      # `answered_count` comes from its own `user_intervention`'s answers, so the outcomes
-      # genuinely differ. A real-label outcome must therefore beat a persisted Invalid row
-      # regardless of `filled_at`, and an Invalid outcome must never overwrite a real one.
-      # One finished session on its own intervention and user_intervention, in the SAME
-      # clinic as every other fill so they all collapse onto one de-dup key.
+      # `CreateForUserSessions` selects finished sessions by session VARIABLE across the whole
+      # organization with NO ORDER BY, and `V1::Charts::Regenerate` destroys and replays, so two
+      # interventions sharing this chart's session variable feed the SAME de-dup key in an
+      # arbitrary order - while each call's `answered_count` comes from its own
+      # `user_intervention`, so the outcomes genuinely differ. A real-label outcome must therefore
+      # beat a persisted Invalid row regardless of `filled_at`, and never the reverse.
+      # One finished session on its own intervention and user_intervention, in the SAME clinic as
+      # every other fill so they all collapse onto one de-dup key.
       def fill!(answers, finished_at:)
         other_intervention = create(:intervention, :published, organization: organization)
         other_session = create(:session, intervention: other_intervention, variable: 'sa')
@@ -967,11 +947,9 @@ RSpec.describe V1::ChartStatistics::Create do
       end
 
       it 'records the sibling-clinic retake as its own Invalid row' do
-        # `health_clinic` stays in the de-dup key, so a multiple-fill retake (which can only
-        # land in a DIFFERENT clinic - the user/session/clinic index is unconditionally
-        # unique) is a separate participant-clinic cell. Before phase 6 that cell produced
-        # nothing; now the below-minimum retake is visible there, while clinic A keeps its
-        # real label. Clinic filtering is how the dashboard reads these apart.
+        # `health_clinic` stays in the de-dup key, so a multiple-fill retake (which can only land
+        # in a DIFFERENT clinic - the user/session/clinic index is unconditionally unique) is a
+        # separate participant-clinic cell. Clinic filtering is how the dashboard reads them apart.
         described_class.call(chart, first_fill, organization)
         retake_answer
 
@@ -984,10 +962,8 @@ RSpec.describe V1::ChartStatistics::Create do
     end
   end
 
-  # The canonical worked example from
-  # .claude/jira-tasks/feature-ungated-chart-branched-participant-inclusion/feature.md -
-  # "Pie Chart A": q1..q4, Matched cutoff 20, NO minimum set (`min_answered_variables` absent,
-  # which is every chart in production). One example per row of that table.
+  # The canonical worked example: q1..q4, Matched cutoff 20, NO minimum set
+  # (`min_answered_variables` absent, which is every chart in production). One example per row.
   #
   #   | Participant | Answers                 | Score | Chart A before | Chart A after   |
   #   |-------------|-------------------------|-------|----------------|-----------------|
@@ -1002,7 +978,7 @@ RSpec.describe V1::ChartStatistics::Create do
   #
   # Carol and Eve are the no-regression guarantee; Dan, Filip and Grace are the change; Noah
   # is what still keeps the guard's second job alive.
-  describe 'ungated chart alignment - feature.md "Pie Chart A" worked example' do
+  describe 'ungated chart alignment - the "Pie Chart A" worked example' do
     let(:user_session_finished_at) { DateTime.now }
     let(:question_group) { create(:question_group, session: session) }
 
@@ -1095,10 +1071,9 @@ RSpec.describe V1::ChartStatistics::Create do
     context 'Filip - branched around q3 and q4, score 14' do
       before { fill!(answered: { 1 => '8', 2 => '6' }) }
 
-      # ACCEPTED CONSEQUENCE, client-confirmed (feature.md decision 1): ordinary labels only
-      # on ungated charts, so Filip is published as a confident 'Not matched' from 2-of-4
-      # data. There is no Invalid / Insufficient Data category when the gate is off. Pinned
-      # deliberately so nobody "fixes" it into an Invalid row.
+      # ACCEPTED CONSEQUENCE, client-confirmed: ordinary labels only on ungated charts, so Filip
+      # is published as a confident 'Not matched' from 2-of-4 data. There is no Invalid /
+      # Insufficient Data category when the gate is off. Pinned so nobody "fixes" it.
       it 'is charted as Not matched, not as an Invalid row' do
         expect { subject }.to change(ChartStatistic, :count).by(1)
         expect(chart_row.label).to eq('Not matched')
@@ -1131,12 +1106,11 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
 
-    # THE no-regression example. A participant who reached every chart question and skipped
-    # every one has ZERO of the formula's variables present in var values, so measuring
-    # "answered" on var-values presence - the way the gated path does
-    # (validity_evaluator.rb:121-122) - would newly DROP them. They are charted today, and the
-    # client required that population not change. The rule therefore measures the OWNING
-    # QUESTION having a confirmed `Answer`, which a skip provides and a branch-around does not.
+    # THE no-regression example. A participant who reached every chart question and skipped every
+    # one has ZERO of the formula's variables present in var values, so measuring "answered" on
+    # var-values presence - the way the gated path does - would newly DROP them. They are charted
+    # today and that population must not change, so the rule measures the OWNING QUESTION having a
+    # confirmed `Answer`, which a skip provides and a branch-around does not.
     context 'when the participant reached every chart question and skipped every one' do
       before { fill!(skipped: [1, 2, 3, 4]) }
 
@@ -1152,12 +1126,11 @@ RSpec.describe V1::ChartStatistics::Create do
       end
     end
 
-    # THE example that separates `none_answered?` from the retired strict `call`. Every other
-    # newly-admitted participant here (Dan, Filip, Grace) has at least one variable PRESENT in
-    # var values and is admitted by that cheap check alone - the strict rule would have
-    # admitted them too, had it ever been reached. This participant has NO variable present
-    # (the skip contributes none) and yet reached one question, so the two predicates disagree:
-    # strict drops them, zero-answered charts them. Score 0, ordinary Not matched.
+    # THE example that separates `none_answered?` from the strict "any unanswered" rule it
+    # replaced. Dan, Filip and Grace each have at least one variable PRESENT and are admitted by
+    # the cheap check alone. This participant has NO variable present (the skip contributes none)
+    # yet reached one question, so the two rules disagree: strict drops them, zero-answered charts
+    # them. Score 0, ordinary Not matched.
     context 'when the participant skipped one question and was branched around the rest' do
       before { fill!(skipped: [1]) }
 
@@ -1178,7 +1151,7 @@ RSpec.describe V1::ChartStatistics::Create do
   # used to select every non-draft chart in the ORGANIZATION with no session filter, and
   # `Chart#validate_formula_variables` matches bare variable names intervention-wide, so this
   # service is reachable with a chart whose formula belongs to a session the participant never
-  # opened. WI-17's pre-filter now drops most of those earlier, but the replay path and
+  # opened. The session pre-filter now drops most of those earlier, but the replay path and
   # `Create`'s direct callers still depend on this backstop.
   describe 'a cross-session participant on a single-session-formula chart' do
     subject { described_class.call(chart, followup_user_session, organization) }
@@ -1234,10 +1207,10 @@ RSpec.describe V1::ChartStatistics::Create do
     end
   end
 
-  # WI-14. The ungated key used to carry `label` and `user_session` while the score has always
-  # been computed from the WHOLE `user_intervention`, so a participant gained an extra row at
-  # every later session finish and was counted once per finish in the population. The key is
-  # now the same de-duplicated one the gated path already used.
+  # The ungated key used to carry `label` and `user_session` while the score has always been
+  # computed from the WHOLE `user_intervention`, so a participant gained an extra row at every
+  # later session finish and was counted once per finish in the population. The key is now the
+  # same de-duplicated one the gated path already used.
   describe 'per-participant de-duplication on an ungated chart' do
     let(:user_session_finished_at) { DateTime.now }
     let(:user_intervention) { create(:user_intervention, user: user, intervention: intervention, health_clinic_id: health_clinic.id) }
@@ -1306,12 +1279,11 @@ RSpec.describe V1::ChartStatistics::Create do
       expect(statistic.filled_at).to be_within(1.second).of(user_session_b.finished_at)
     end
 
-    # The HT1/HT2/HT3 shape the developer reproduced by hand, and the one the client message
-    # describes: a chart scored on ONE session's questions, and a participant who then goes on
-    # to finish two unrelated sessions. `Create` has no session pre-filter (that lives in
+    # A chart scored on ONE session's questions, and a participant who then goes on to finish two
+    # unrelated sessions. `Create` has no session pre-filter (that lives in
     # `CreateForUserSession#charts`, pinned in its own spec), so all three finishes are evaluated
-    # here - which makes this a direct test of the de-dup KEY: on the legacy key this is 3 rows
-    # and the chart reports a population of 3 for one person.
+    # here - a direct test of the de-dup KEY: on the legacy key this is 3 rows and the chart
+    # reports a population of 3 for one person.
     context 'when the chart is scored on one session and the participant finishes two more' do
       let(:formula) do
         {
@@ -1353,11 +1325,9 @@ RSpec.describe V1::ChartStatistics::Create do
 
     context 'when the participant refills a session in a sibling clinic' do
       # `health_clinic` stays in the de-dup key, so a per-clinic second row is documented
-      # dimension behaviour, not duplication - clinic filtering is how the dashboard reads
-      # them apart. A same-clinic retake is impossible anyway
-      # (`index_user_session_on_u_id_and_s_id_and_hc_id` is unconditionally unique), so a
-      # multiple-fill retake always lands in a different clinic. Pinned so the de-dup fix
-      # does not over-reach and collapse clinics too.
+      # dimension behaviour, not duplication. A same-clinic retake is impossible anyway
+      # (`index_user_session_on_u_id_and_s_id_and_hc_id` is unconditionally unique). Pinned so the
+      # de-dup fix does not over-reach and collapse clinics too.
       let(:sibling_clinic) { create(:health_clinic, health_system: health_system) }
       let(:session_a) { create(:session, intervention: intervention, variable: 'sa', multiple_fill: true) }
 

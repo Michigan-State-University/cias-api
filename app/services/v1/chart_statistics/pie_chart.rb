@@ -20,11 +20,6 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
     }
   end
 
-  # The pie keeps every row - the "Invalid / Insufficient Data" slice IS its data - but the
-  # reserved label matches no pattern, so without this special case it would fall through
-  # to `default_pattern['color']` and wear the default category's color. The frontend
-  # colors each slice straight from `dataItem.color` (PieChart.js:35, passed through
-  # untouched), so the fixed grey rides this datum and needs no frontend change.
   def color_for(label, patterns, default_pattern)
     return INSUFFICIENT_DATA_COLOR if label == ChartStatistic::INSUFFICIENT_DATA_LABEL
 

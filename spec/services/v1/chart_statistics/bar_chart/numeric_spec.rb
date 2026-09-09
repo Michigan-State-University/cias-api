@@ -170,7 +170,7 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   # `health_clinic_admin`, with Invalid rows planted on a sibling clinic and another organization.
   #
   # Nor can they fail for the reason the old `excluding_insufficient_data` spec guarded: that
-  # scope's `Relation#or` was the hazard, and this phase deleted it. Removing an AND-ed predicate
+  # scope's `Relation#or` was the hazard, and it has since been deleted. Removing an AND-ed predicate
   # is monotonic within the caller's relation. They are a tripwire against a future rewrite that
   # reintroduces filtering here on the bare class rather than on the passed relation.
   # Bands 2..n have no series on either bar type. `data_for_chart` reads `patterns.first` and

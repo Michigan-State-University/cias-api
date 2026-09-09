@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Calculations::DentakuService
-  # `raw_result` is the value the payload evaluated to, before pattern matching.
-  # It is nil until #evaluate runs (and stays nil when evaluation raises).
   attr_reader :dentaku_calculator, :all_var_values, :formula, :formula_cases, :is_formula_interface, :raw_result
 
   def initialize(all_var_values, formula = nil, formula_cases = nil, is_formula_interface = false)

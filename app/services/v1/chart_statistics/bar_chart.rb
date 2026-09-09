@@ -3,28 +3,6 @@
 class V1::ChartStatistics::BarChart < V1::ChartStatistics::Base
   attr_reader :data_offset
 
-  # `Invalid / Insufficient Data` rows reach both bar generators - `BarChart::Numeric` and
-  # `BarChart::Percentage`, the only concrete subclasses. The collection is NOT filtered here
-  # (it was, until the category was extended beyond pie charts), so all three readers of the
-  # collection see Invalid rows and each deals with them explicitly:
-  #
-  #   * `generate_hash`          - counts every label per period, so the Invalid count is
-  #                                available to `data_for_chart` alongside the two configured
-  #                                labels. `Numeric` publishes it as `invalidValue`;
-  #                                `Percentage` publishes it *and* folds it into the
-  #                                denominator, but gives it no series (see its own note).
-  #   * `periodical_statistics`  - the MONTH-AXIS SPAN walks the first to the last `filled_at`
-  #                                of ALL the chart's rows, so a period containing ONLY
-  #                                Invalid participants now appears on the axis. That is
-  #                                intended: such a period had participants, and hiding it
-  #                                understated the sample.
-  #   * `entry_count_hash`       - the top-level `population` now counts Invalid rows too
-  #                                (dropped by the frontend, which keeps only `data`).
-  #
-  # What did NOT change: both generators still read only `patterns.first` plus `default_pattern`,
-  # so bands 2..n have no series on either bar type. `Numeric` renders two series (`value`,
-  # `notMatchedValue`) plus the new `invalidValue`; `Percentage` renders a SINGLE series (`value`) -
-  # it is that chart's DENOMINATOR, not its series count, that became three-valued.
   def initialize(charts_data_collection, charts, data_offset = nil)
     super(charts_data_collection, charts)
     @data_offset = data_offset

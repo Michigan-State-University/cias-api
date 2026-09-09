@@ -329,9 +329,9 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       end
     end
 
-    # Phase 2 pinned the error sentinels on the score; that protection must
-    # survive the signature change, now against `matched_pattern`: only a real
-    # pattern Hash rescues. `FormulaInterface#calculate` returns the truthy
+    # The error sentinels were pinned on the score before the signature change;
+    # that protection now applies to `matched_pattern`: only a real pattern Hash
+    # rescues. `FormulaInterface#calculate` returns the truthy
     # sentinel STRINGS below on evaluation errors, and an unfiltered caller must
     # never be able to turn "formula errored" into "rescued".
     context 'when matched_pattern is not a pattern hash' do

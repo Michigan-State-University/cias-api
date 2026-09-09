@@ -208,7 +208,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/generate', ty
       end
     end
 
-    # Phase 1 work item 9 - the authorization-scope probe at the REQUEST layer. The service specs
+    # The authorization-scope probe at the REQUEST layer. The service specs
     # inject a relation directly, so they cannot exercise `accessible_by`, the `left_joins(:chart)`
     # or the role composition that `charts_data_controller.rb:74-83` adds.
     #
