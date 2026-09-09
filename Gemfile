@@ -18,6 +18,7 @@ gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
 gem 'connection_pool'
+gem 'csv'
 gem 'dentaku'
 gem 'devise', '~> 5.0'
 gem 'devise-argon2'
@@ -97,7 +98,9 @@ group :development do
   gem 'guard-rake', require: false
   gem 'guard-rspec', require: false
   gem 'letter_opener_web'
-  gem 'license_finder'
+  # license_finder removed: it caps `rubyzip` at < 3, which blocks the fix for
+  # CVE-2026-85396 (path traversal, High). It was never configured or invoked
+  # here. Re-add once upstream supports rubyzip 3.x.
   gem 'pgsync'
   gem 'wkhtmltopdf-binary'
 end
