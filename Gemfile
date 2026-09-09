@@ -18,8 +18,6 @@ gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
 gem 'connection_pool'
-# Required directly by intervention CSV export and live-chat transcripts.
-# Declared explicitly: it is no longer a Ruby default gem from 3.4 on.
 gem 'csv'
 gem 'dentaku'
 gem 'devise', '~> 5.0'
