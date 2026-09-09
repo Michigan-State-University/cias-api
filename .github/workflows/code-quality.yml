@@ -15,10 +15,8 @@ name: Code Quality
 on:
   push:
     branches: [dev, test, master]
-  # No pull_request trigger. This repository is public: runs from forks and
-  # from Dependabot are secret-restricted, so the htd-cq download token, the
-  # config-repo deploy key and the AWS credentials would all be missing and
-  # every such run would fail red for reasons the contributor cannot fix.
+  pull_request:
+    branches: [dev, master]
   workflow_dispatch:
 
 concurrency:
@@ -30,6 +28,7 @@ permissions:
 
 jobs:
   scan:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository || github.actor != 'dependabot[bot]'
     # Matches ci.yml: the coverage run below needs libffi7, which is not
     # packaged for ubuntu-latest.
     runs-on: ubuntu-22.04
