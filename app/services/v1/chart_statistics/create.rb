@@ -176,10 +176,6 @@ class V1::ChartStatistics::Create
       "rescue_enabled=#{validity_evaluator.rescue_enabled?(chart)} matched=#{calculated_formula.is_a?(Hash)}"
   end
 
-  # ONE row per (organization, health_system, health_clinic, chart, user). `label` and
-  # `user_session` are plain assignments, so a participant's row MOVES between categories in
-  # place. With them IN the key (the legacy shape) a participant gained an extra row at every
-  # later session finish, and aggregation counts rows, never people - one person, population 2.
   def chart_statistic_key
     { organization: organization, health_system: health_system, health_clinic: health_clinic,
       chart: chart, user: user_session.user }
