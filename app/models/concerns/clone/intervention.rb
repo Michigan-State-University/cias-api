@@ -17,6 +17,8 @@ class Clone::Intervention < Clone::Base
     create_sessions
     reassign_branching
     reassign_reflections
+    # Must follow reassign_reflections — raw SQL vs whole-column save!, they overwrite each other.
+    apply_session_variable_renames
     outcome.update!(is_hidden: hidden)
     reset_cache_counters
     attach_logo
@@ -49,12 +51,47 @@ class Clone::Intervention < Clone::Base
 
   def create_sessions
     source.sessions.order(:position).each do |session|
-      outcome.sessions << Clone::Session.new(session,
-                                             intervention_id: outcome.id,
-                                             clean_formulas: false,
-                                             defer_reflection_reassignment: true,
-                                             position: session.position).execute
+      cloned_session = Clone::Session.new(session, clone_session_options(session)).execute
+      outcome.sessions << cloned_session
+      next unless rename_session_variables
+
+      variable_renames << [cloned_session.id, session.variable, cloned_session.variable]
     end
+  end
+
+  def clone_session_options(session)
+    options = { intervention_id: outcome.id,
+                clean_formulas: false,
+                defer_reflection_reassignment: true,
+                position: session.position }
+    # Plain key, not params: — Clone#clone's multi-user branch drops params entirely.
+    options[:variable] = cloned_session_variable(session) if rename_session_variables
+    options
+  end
+
+  def cloned_session_variable(session)
+    "cloned_#{session.variable}_#{session.position}"
+  end
+
+  def variable_renames
+    @variable_renames ||= []
+  end
+
+  def apply_session_variable_renames
+    assert_rename_namespace_disjoint!
+
+    variable_renames.each do |session_id, old_variable, new_variable|
+      V1::VariableReferences::SessionService.new(session_id, old_variable, new_variable,
+                                                 include_source_session: true,
+                                                 skip_chart_formulas: true).call
+    end
+  end
+
+  def assert_rename_namespace_disjoint!
+    overlap = variable_renames.map { |_, old, _| old } & variable_renames.map { |_, _, new| new }
+    return if overlap.empty?
+
+    raise ArgumentError, "cloned session variables collide with source variables: #{overlap.join(', ')}"
   end
 
   def reassign_branching
