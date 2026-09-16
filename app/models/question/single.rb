@@ -23,4 +23,42 @@ class Question::Single < Question
   def question_variables
     [body['variable']['name']]
   end
+
+  def extract_variables_from_params(params)
+    variable_name = params.dig(:body, :variable, :name)
+    return [] if variable_name.blank?
+
+    [{ 'name' => variable_name }]
+  end
+
+  def question_answers
+    data = body['data']
+    return [] if data.blank?
+
+    question_var = body.dig('variable', 'name').presence
+
+    data.map do |row|
+      payload_text = row['payload']
+      value = row['value']
+
+      { 'name' => question_var, 'payload' => payload_text, 'value' => value }
+    end
+  end
+
+  def extract_answers_from_params(params)
+    source_body = params[:body]
+    return [] if source_body.blank?
+
+    data = source_body[:data]
+    return [] if data.blank?
+
+    question_var = source_body.dig(:variable, :name).presence
+
+    data.map do |row|
+      payload_text = row[:payload]
+      value = row[:value]
+
+      { 'name' => question_var, 'payload' => payload_text, 'value' => value }
+    end
+  end
 end

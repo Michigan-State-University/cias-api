@@ -148,7 +148,8 @@ class User < ApplicationRecord
   after_create_commit :set_terms_confirmed_date
 
   # ENCRYPTION
-  audited except: %i[email email_ciphertext first_name first_name_ciphertext last_name last_name_ciphertext uid uid_ciphertext tokens]
+  audited except: %i[email email_ciphertext first_name first_name_ciphertext last_name last_name_ciphertext uid uid_ciphertext
+                     migrated_first_name migrated_last_name migrated_email migrated_uid tokens]
   has_encrypted :email, :first_name, :last_name, :uid
   blind_index :email, :uid
 
@@ -282,6 +283,12 @@ class User < ApplicationRecord
     super
   end
 
+  # Exclude migrated_first_name, migrated_last_name, migrated_email, migrated_uid from audited changes
+  def audited_changes(changes = nil)
+    changes ||= super
+    changes.except('migrated_first_name', 'migrated_last_name', 'migrated_email', 'migrated_uid')
+  end
+
   private
 
   def send_welcome_email
@@ -304,8 +311,8 @@ class User < ApplicationRecord
     self.tokens = {}
   end
 
-  def send_devise_notification(notification, *args)
-    devise_mailer.send(notification, self, *args).deliver_later
+  def send_devise_notification(notification, *)
+    devise_mailer.send(notification, self, *).deliver_later
   end
 
   class << self

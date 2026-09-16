@@ -2,10 +2,18 @@
 
 class CloneJobs::Session < CloneJob
   def perform(user, session)
+    if session.type == 'Session::ResearchAssistant'
+      raise ComplexException.new(
+        I18n.t('sessions.ra_cannot_clone_same_intervention'),
+        {},
+        :unprocessable_entity
+      )
+    end
+
     intervention = session.intervention
     position = intervention.sessions.order(:position).last.position + 1
     params = { variable: "cloned_#{session.variable}_#{position}" }
-    cloned_session = session.clone(params: params, clean_formulas: false)
+    cloned_session = session.clone(params: params, clean_formulas: false, position: position)
 
     return unless user.email_notification
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Clone::Intervention < Clone::Base
+  include Clone::ReflectionReassignment
+
   def execute
     outcome.status = :draft
     outcome.sensitive_data_state = 'collected'
@@ -11,11 +13,14 @@ class Clone::Intervention < Clone::Base
     clear_cat_mh_settings!
     clear_hfhs_settings!
     outcome.save!
+    assign_tags
     create_sessions
     reassign_branching
+    reassign_reflections
     outcome.update!(is_hidden: hidden)
     reset_cache_counters
     attach_logo
+    attach_files
     outcome
   end
 
@@ -24,8 +29,22 @@ class Clone::Intervention < Clone::Base
   def attach_logo
     return unless source.logo.attachment
 
-    outcome.logo.attach(source.logo.blob)
+    outcome.logo.attach(io: StringIO.new(source.logo.download),
+                        filename: source.logo.filename,
+                        content_type: source.logo.content_type)
     outcome.logo_blob.update!(description: source.logo_blob.description)
+  end
+
+  def attach_files
+    return unless source.files.attached?
+
+    source.files.find_each do |file|
+      outcome.files.attach(file.blob)
+    end
+  end
+
+  def assign_tags
+    outcome.tags << source.tags
   end
 
   def create_sessions
@@ -33,6 +52,7 @@ class Clone::Intervention < Clone::Base
       outcome.sessions << Clone::Session.new(session,
                                              intervention_id: outcome.id,
                                              clean_formulas: false,
+                                             defer_reflection_reassignment: true,
                                              position: session.position).execute
     end
   end

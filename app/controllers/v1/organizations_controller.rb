@@ -39,6 +39,7 @@ class V1::OrganizationsController < V1Controller
 
   def organization_scope
     Organization.accessible_by(current_ability).includes(
+      :e_intervention_admins, :organization_admins, :organization_invitations,
       health_systems: %i[health_system_admins health_clinics],
       health_clinics: %i[health_clinic_admins health_clinic_invitations]
     )

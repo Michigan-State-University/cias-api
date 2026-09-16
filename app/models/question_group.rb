@@ -4,6 +4,7 @@ class QuestionGroup < ApplicationRecord
   has_paper_trail
   extend DefaultValues
   include FormulaInterface
+  include FormulaRaBranchingValidation
   include ::Clone
 
   CURRENT_VERSION = '1'

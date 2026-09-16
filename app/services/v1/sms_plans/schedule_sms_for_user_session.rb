@@ -3,6 +3,7 @@
 class V1::SmsPlans::ScheduleSmsForUserSession
   include Rails.application.routes.url_helpers
   include ::SmsHelper
+  include ::PredefinedParticipantUrlHelper
 
   def self.call(user_session)
     new(user_session).call
@@ -46,9 +47,17 @@ class V1::SmsPlans::ScheduleSmsForUserSession
   end
 
   def days_after_session_end_schedule(plan)
-    return after_session_end_schedule(plan) if plan.schedule_payload.zero?
+    if plan.schedule_payload.zero?
+      return after_session_end_schedule(plan) if plan.sms_send_time_type_preferred_by_participant?
 
-    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time).utc
+      expected_time_of_message = now_in_timezone.change(random_time(plan))
+      return after_session_end_schedule(plan) if expected_time_of_message.past?
+
+      set_frequency(expected_time_of_message, plan)
+      return
+    end
+
+    start_time = now_in_timezone.next_day(plan.schedule_payload).change(random_time(plan))
     set_frequency(start_time, plan)
   end
 
@@ -58,19 +67,23 @@ class V1::SmsPlans::ScheduleSmsForUserSession
 
     return unless date_answer
 
-    start_time = DateTime.parse(date_answer).next_day(plan.schedule_payload).change(random_time).utc
+    start_time = ActiveSupport::TimeZone[timezone].parse(date_answer)
+                                                  .next_day(plan.schedule_payload)
+                                                  .change(random_time(plan))
     set_frequency(start_time, plan)
   end
 
   def set_frequency(start_time, plan, send_first_right_after_finish = false)
     frequency = plan.frequency
-    content = sms_content(plan)
+    variant = plan.is_used_formula ? matched_variant(plan) : nil
+    content = plan.is_used_formula ? variant&.content : plan.no_formula_text
 
     return if content.blank?
 
     attachment_url = attachment_url(plan)
     content = insert_variables_into_variant(content)
-    content = insert_links_into_variant(content, plan)
+    content = insert_links_into_variant(content, plan, variant)
+    content = append_pid_to_intervention_urls(content, user)
     finish_date = plan.end_at
 
     if plan.alert?
@@ -91,7 +104,7 @@ class V1::SmsPlans::ScheduleSmsForUserSession
       end
 
       while date.to_date <= finish_date.to_date
-        send_sms(date.change(random_time).utc, content, attachment_url)
+        send_sms(date.change(random_time(plan)).utc, content, attachment_url)
         date = date.next_day(number_days[frequency])
       end
     end

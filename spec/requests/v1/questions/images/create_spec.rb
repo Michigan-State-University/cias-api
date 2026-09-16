@@ -5,10 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
   let(:user) { create(:user, :confirmed, :admin) }
   let(:question) { create(:question_information) }
-  let(:headers) do
-    user.create_new_auth_token.
-      merge({ 'Content-Type' => 'multipart/form-data; boundary=something' })
-  end
+  let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
       image: {

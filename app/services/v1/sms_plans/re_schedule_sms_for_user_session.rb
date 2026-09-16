@@ -35,12 +35,12 @@ class V1::SmsPlans::ReScheduleSmsForUserSession
   def days_after_session_end_schedule(plan)
     return after_session_end_schedule(plan) if plan.schedule_payload.zero?
 
-    start_time = then_in_timezone.next_day(plan.schedule_payload).change(random_time).utc
+    start_time = then_in_timezone.next_day(plan.schedule_payload).change(random_time(plan))
     set_frequency(start_time, plan)
   end
 
   def then_in_timezone
-    @then_in_timezone ||= Time.use_zone(timezone) { user_session.finished_at }
+    @then_in_timezone ||= user_session.finished_at&.in_time_zone(timezone)
   end
 
   def paused_at
@@ -68,7 +68,7 @@ class V1::SmsPlans::ReScheduleSmsForUserSession
       end
 
       while date.to_date <= finish_date.to_date
-        send_sms(date.change(random_time).utc, content, attachment_url) if should_be_send?(date)
+        send_sms(date.change(random_time(plan)).utc, content, attachment_url) if should_be_send?(date)
         date = date.next_day(number_days[frequency])
       end
     end

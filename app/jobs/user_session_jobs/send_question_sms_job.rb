@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
+  include SmsCampaign::SmsEventsHelper
   include SmsCampaign::FinishUserSessionHelper
 
   queue_as :question_sms
@@ -18,15 +19,34 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
                       !user.sms_notification
                     end
 
-    return if should_return
-
-    question = Question.find(question_id)
     user_session = UserSession::Sms.find(user_session_id)
 
-    # Handle case when current sending job is reminder - needs to be executed before handling pending answer flag
-    send_sms(user.full_number, question) if reminder
+    log_send_question_sms_job(
+      user_session,
+      {
+        user_id: user_id,
+        question_id: question_id,
+        reminder: reminder,
+        postponed: postponed
+      }
+    )
 
-    return if reminder
+    if should_return
+      log_daily_messages_job_earlier_termination(
+        user_session,
+        { sms_notification: !should_return }
+      )
+      return
+    end
+
+    question = Question.find(question_id)
+
+    # Handle case when current sending job is reminder - needs to be executed before handling pending answer flag
+    if reminder
+      send_sms(user.full_number, question)
+      log_reminder_sent(user_session, question)
+      return
+    end
 
     # Handle case when user has pending answers - reschedule sms question in 5 minutes till the end of the day
     outdated_message = false
@@ -37,22 +57,41 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
       # Skip question if next day
       if datetime_of_next_job < DateTime.current.in_time_zone(ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)).end_of_day
         UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime_of_next_job).perform_later(user_id, question_id, user_session_id, false, true)
+        log_postpone_message_send(user_session, { question_id: question_id, rescheduled_to: datetime_of_next_job })
       else
         outdated_message = true
+        log_outdated_message_detected(user_session, { question_id: question_id })
       end
     end
 
     user.update(pending_sms_answer: false) if outdated_message && postponed
     user_session.update(current_question_id: false) if outdated_message && postponed
 
-    return if (user.pending_sms_answer && question.type == 'Question::Sms') || outdated_message
+    if (user.pending_sms_answer && question.type == 'Question::Sms') || outdated_message
+      log_daily_messages_job_earlier_termination(
+        user_session,
+        {
+          pending_sms_answer: user.pending_sms_answer,
+          outdated_message: outdated_message,
+          question: { id: question_id, type: question.type }
+        }
+      )
+      return
+    end
 
     # Handle case with no pending answers, send current question
 
     send_sms(user.full_number, question)
+    log_sms_message_sent(user_session, question)
     finish_user_session_if_that_was_last_question(user_session, question)
     user_session.assign_attributes(current_question_id: question.id) if question.type == 'Question::Sms'
-    user_session.assign_attributes(number_of_repetitions: (user_session.number_of_repetitions || 0) + 1) if should_increment_number_or_repetition?(question)
+    if should_increment_number_or_repetition?(question)
+      user_session.assign_attributes(number_of_repetitions: (user_session.number_of_repetitions || 0) + 1)
+      log_incrementation_of_repetitions(
+        user_session,
+        { number_of_repetition_after_update: user_session.number_of_repetitions }
+      )
+    end
 
     user_session.save!
 
@@ -62,6 +101,7 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     else
       # Set pending answer flag
       user.update(pending_sms_answer: true)
+      log_set_pending_answer_flag(user_session, { question_id: question.id })
       schedule_question_followups(user, question, user_session)
     end
   end
@@ -85,6 +125,15 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
     for_number_of_days = question.sms_reminders['number_of_days'].to_i
     from = ActiveSupport::TimeZone[ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)].parse(question.sms_reminders['from'] || '')
     to = ActiveSupport::TimeZone[ENV.fetch('CSV_TIMESTAMP_TIME_ZONE', nil)].parse(question.sms_reminders['to'] || '')
+    log_schedule_question_followups_config(
+      user_session,
+      {
+        every_number_of_hours: every_number_of_hours,
+        for_number_of_days: for_number_of_days,
+        from: from,
+        to: to
+      }
+    )
 
     return unless every_number_of_hours && for_number_of_days && from && to
 
@@ -109,6 +158,13 @@ class UserSessionJobs::SendQuestionSmsJob < ApplicationJob
       UserSessionJobs::SendQuestionSmsJob.set(wait_until: datetime)
                                          .perform_later(user.id, question.id, user_session.id, true)
     end
+    log_reminders_jobs(
+      user_session,
+      {
+        reminders_datetimes: reminders_datetimes.shift(1),
+        question_id: question.id
+      }
+    )
   end
 
   def send_sms(number, question)

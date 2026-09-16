@@ -5,11 +5,21 @@ module ImportOperations
     "Import::V#{object_hash[:version]}::#{model_source.name}Service".safe_constantize
   end
 
+  def import_file_directly(resource, key, img)
+    file_data = import_file(img)
+    blob = ActiveStorage::Blob.create_and_upload!(io: file_data[:io], filename: file_data[:filename], content_type: file_data[:content_type])
+    resource.public_send(key).attach(blob)
+    blob
+  end
+
   def import_file(img)
     return if img.blank? || img[:file].nil?
 
+    decoded_data = Base64.decode64(img[:file])
+    decoded_data = Zlib::Inflate.inflate(decoded_data) if img[:compressed]
+
     {
-      io: StringIO.new(Base64.decode64(img[:file])),
+      io: StringIO.new(decoded_data),
       content_type: img[:content_type],
       filename: "#{SecureRandom.hex}.#{img[:extension]}"
     }

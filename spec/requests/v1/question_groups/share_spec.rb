@@ -47,13 +47,13 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         it 'returned questions have no branching,variables and cleared speech blocks' do
           expect(json_response['included'][2]['attributes']['narrator']['blocks']).to eq question_ids.third.narrator['blocks']
           expect(json_response['included'][2]['attributes']['formulas']).not_to eq question_ids.third.formulas
-          expect(json_response['included'][2]['attributes']['body']['data']).to eq question_ids.third.body['data']
+          expect(json_response['included'][2]['attributes']['body']['data'].map { |r| r.except('id') }).to eq question_ids.third.body['data']
         end
 
         it 'shared_question_group questions have no branching,variables and cleared speech blocks' do
           expect(third_question.narrator['blocks']).to eq question_ids.third.narrator['blocks']
           expect(third_question.formulas).not_to eq question_ids.third.formulas
-          expect(third_question.body['data']).to eq question_ids.third.body['data']
+          expect(third_question.body['data'].map { |r| r.except('id') }).to eq question_ids.third.body['data']
         end
       end
 

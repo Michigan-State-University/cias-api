@@ -57,6 +57,16 @@ class V1::UsersController < V1Controller
   def confirm_logging_code
     result = V1::Users::Verifications::Confirm.call(verification_code_params, email_params)
     if result.present?
+      if params[:remember_browser]
+        cookies[:verification_code] = {
+          value: result,
+          httponly: true,
+          secure: true,
+          same_site: :none,
+          expires: 30.days.from_now
+        }
+      end
+
       render json: { verification_code: result }, status: :ok
     else
       head :request_timeout

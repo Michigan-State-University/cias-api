@@ -15,6 +15,13 @@ class Question::ThirdParty < Question
     [body['variable']['name']]
   end
 
+  def extract_variables_from_params(params)
+    variable_name = params.dig(:body, :variable, :name)
+    return [] if variable_name.blank?
+
+    [{ 'name' => variable_name }]
+  end
+
   def translate_body(translator, source_language_name_short, destination_language_name_short)
     body['data'].each do |row|
       row['original_text'] = row['payload']

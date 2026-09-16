@@ -26,7 +26,8 @@ RSpec.describe V1::Translations::Intervention do
 
       it 'translates session name' do
         session = subject.sessions.first
-        expect(session.name).to eq("from=>#{intervention.google_language.language_code} to=>#{language.language_code} text=>#{session.original_text['name']}")
+        expect(session.name).to eq("from=&amp;gt;#{intervention.google_language.language_code} to=&amp;gt;#{language.language_code} " \
+                                   "text=&amp;gt;#{session.original_text['name']}")
       end
     end
 

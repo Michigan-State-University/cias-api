@@ -11,6 +11,16 @@ class Question::Finish < Question
 
   attr_readonly :position
 
+  def self.assign_default_values(attr)
+    super.merge(
+      { 'show_dashboard_button' => false }
+    )
+  end
+
+  def ability_to_clone?
+    false
+  end
+
   def csv_header_names
     []
   end

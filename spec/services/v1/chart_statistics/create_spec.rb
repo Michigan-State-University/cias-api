@@ -77,4 +77,373 @@ RSpec.describe V1::ChartStatistics::Create do
       expect { subject }.not_to change(ChartStatistic, :count)
     end
   end
+
+  describe 'missing variables validation' do
+    let(:user_session_finished_at) { DateTime.now }
+    let(:question_group) { create(:question_group, session: session) }
+
+    context 'when formula references variables that exist in intervention questions' do
+      let!(:question) do
+        create(:question_single, question_group: question_group, body: {
+                 data: [
+                   { payload: 'Apple', value: '1' },
+                   { payload: 'Banana', value: '2' }
+                 ],
+                 variable: { name: 'fruit' }
+               })
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.fruit',
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'creates chart statistic successfully' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+      end
+    end
+
+    context 'when formula references variables from unselected multiple choice options' do
+      let!(:multiple_question) do
+        create(:question_multiple, question_group: question_group, body: {
+                 data: [
+                   { payload: 'Option 1', variable: { name: 'option_1', value: '' } },
+                   { payload: 'Option 2', variable: { name: 'option_2', value: '' } },
+                   { payload: 'Option 3', variable: { name: 'option_3', value: '' } }
+                 ]
+               })
+      end
+
+      # User only selected option_1, but formula references all options
+      let!(:answer_multi) do
+        create(:answer_multiple, user_session: user_session, question: multiple_question,
+                                 body: { data: [{ var: 'option_1', value: '1' }] })
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.option_1 + session_var.option_2 + session_var.option_3',
+          'patterns' => [{ 'match' => '>2', 'label' => 'High', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Low', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'logs missing variables from unselected options' do
+        allow(Rails.logger).to receive(:info)
+        subject
+        expect(Rails.logger).to have_received(:info).with(/missing variables from unselected options/)
+      end
+
+      it 'creates chart statistic successfully with missing vars set to 0' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+      end
+    end
+
+    context 'when formula references variables that do not exist in any intervention question' do
+      let(:formula) do
+        {
+          'payload' => 'session_var.nonexistent_var + session_var.another_invalid',
+          'patterns' => [{ 'match' => '>5', 'label' => 'High', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Low', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs error with invalid variable names' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /ChartStatistics::Create SKIPPED chart_id=#{chart.id}.*invalid_variables=/
+        )
+      end
+
+      it 'returns early without processing' do
+        expect(ChartStatistic).not_to receive(:find_or_initialize_by)
+        subject
+      end
+    end
+
+    context 'when formula references a mix of valid and invalid variables' do
+      let!(:question) do
+        create(:question_number, question_group: question_group, body: {
+                 data: [{ payload: '' }],
+                 variable: { name: 'age' }
+               })
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.age + session_var.invalid_var',
+          'patterns' => [{ 'match' => '>18', 'label' => 'Adult', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Minor', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic due to invalid variables' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs only the invalid variables' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /invalid_variables=\["session_var.invalid_var"\]/
+        )
+      end
+    end
+
+    context 'when formula uses multiple question variables from different question types' do
+      let!(:single_question) do
+        create(:question_single, question_group: question_group, body: {
+                 data: [
+                   { payload: 'Yes', value: '1' },
+                   { payload: 'No', value: '0' }
+                 ],
+                 variable: { name: 'consent' }
+               })
+      end
+
+      let!(:number_question) do
+        create(:question_number, question_group: question_group, body: {
+                 data: [{ payload: '' }],
+                 variable: { name: 'score' }
+               })
+      end
+
+      let!(:answer_consent) { create(:answer_single, user_session: user_session, body: { data: [{ var: 'consent', value: '1' }] }) }
+      let!(:answer_score) { create(:answer_number, user_session: user_session, body: { data: [{ var: 'score', value: '85' }] }) }
+
+      let(:formula) do
+        {
+          'payload' => 'IF(session_var.consent = 1, session_var.score, 0)',
+          'patterns' => [
+            { 'match' => '>80', 'label' => 'High Score', 'color' => '#C766EA' },
+            { 'match' => '>50', 'label' => 'Medium Score', 'color' => '#F4D03F' }
+          ],
+          'default_pattern' => { 'label' => 'Low Score', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'creates chart statistic with valid variables from multiple questions' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+      end
+    end
+
+    context 'when formula references grid question variables' do
+      let!(:grid_question) do
+        create(:question_grid, question_group: question_group, body: {
+                 data: [
+                   {
+                     payload: {
+                       rows: [
+                         { payload: 'Row 1', variable: { name: 'row1' } },
+                         { payload: 'Row 2', variable: { name: 'row2' } }
+                       ],
+                       columns: [
+                         { payload: 'Column 1', variable: { value: '1' } },
+                         { payload: 'Column 2', variable: { value: '2' } }
+                       ]
+                     }
+                   }
+                 ]
+               })
+      end
+
+      # User reached the grid question and answered both rows; the answer must
+      # be tied to grid_question so the new owning-question guard sees it as answered.
+      let!(:answer_grid) do
+        create(:answer_grid, user_session: user_session, question: grid_question,
+                             body: { data: [{ var: 'row1', value: '3' }, { var: 'row2', value: '4' }] })
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.row1 + session_var.row2',
+          'patterns' => [{ 'match' => '>5', 'label' => 'High', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Low', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'validates grid variables correctly' do
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+      end
+    end
+
+    context 'when no missing variables exist' do
+      let!(:question) do
+        create(:question_number, question_group: question_group, body: {
+                 data: [{ payload: '' }],
+                 variable: { name: 'fruit' }
+               })
+      end
+
+      let!(:answer) { create(:answer_number, user_session: user_session, body: { data: [{ var: 'fruit', value: '5' }] }) }
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.fruit',
+          'patterns' => [{ 'match' => '=5', 'label' => 'Five', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'creates chart statistic without validation logic' do
+        expect(chart).not_to receive(:validate_formula_variables)
+        expect { subject }.to change(ChartStatistic, :count).by(1)
+      end
+    end
+
+    context 'when user did not reach all questions referenced by formula (branched-around)' do
+      # Simulates: user declined a gating question (e.g. terms) and branched
+      # straight to Finish, never reaching the EPDS-style screening questions.
+      let!(:terms_question) do
+        create(:question_single, question_group: question_group, body: {
+                 data: [{ payload: 'Yes', value: '1' }],
+                 variable: { name: 'terms' }
+               })
+      end
+
+      let!(:terms_answer) do
+        create(:answer_single, user_session: user_session, question: terms_question,
+                               body: { data: [{ var: 'terms', value: '1' }] })
+      end
+
+      let!(:epds_questions) do
+        (1..3).map do |i|
+          create(:question_single, question_group: question_group, body: {
+                   data: [{ payload: 'Yes', value: '1' }],
+                   variable: { name: "epds#{i}" }
+                 })
+        end
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.epds1 + session_var.epds2 + session_var.epds3',
+          'patterns' => [{ 'match' => '>=2', 'label' => 'Positive', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the skip with the branched-around message' do
+        allow(Rails.logger).to receive(:info)
+        subject
+        expect(Rails.logger).to have_received(:info).with(/did not reach all questions referenced by formula/)
+      end
+    end
+
+    context 'when user reached only some of the referenced questions (partial completion)' do
+      let!(:epds_questions) do
+        (1..3).map do |i|
+          create(:question_single, question_group: question_group, body: {
+                   data: [{ payload: 'Yes', value: '1' }],
+                   variable: { name: "epds#{i}" }
+                 })
+        end
+      end
+
+      let!(:partial_answers) do
+        epds_questions.first(2).map do |q|
+          create(:answer_single, user_session: user_session, question: q,
+                                 body: { data: [{ var: q.body['variable']['name'], value: '1' }] })
+        end
+      end
+
+      let(:formula) do
+        {
+          'payload' => 'session_var.epds1 + session_var.epds2 + session_var.epds3',
+          'patterns' => [{ 'match' => '>=2', 'label' => 'Positive', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Negative', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+    end
+  end
+
+  describe 'formula error handling' do
+    let(:user_session_finished_at) { DateTime.now }
+
+    context 'when formula has syntax errors' do
+      let(:formula) do
+        {
+          'payload' => 'session_var.fruit + * 5', # Invalid syntax
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the error with chart details' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /ChartStatistics::Create SKIPPED chart_id=#{chart.id}.*formula evaluation failed/
+        )
+      end
+
+      it 'returns nil to allow other processing to continue' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'when formula has tokenizer errors' do
+      let(:formula) do
+        {
+          'payload' => 'session_var.fruit +++', # Tokenizer error
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the formula that caused the error' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /Formula: session_var\.fruit \+\+\+/
+        )
+      end
+    end
+
+    context 'when formula references undefined function' do
+      let(:formula) do
+        {
+          'payload' => 'INVALID_FUNC(session_var.fruit)', # Undefined function
+          'patterns' => [{ 'match' => '=1', 'label' => 'Apple', 'color' => '#C766EA' }],
+          'default_pattern' => { 'label' => 'Other', 'color' => '#E2B1F4' }
+        }
+      end
+
+      it 'does not create chart statistic' do
+        expect { subject }.not_to change(ChartStatistic, :count)
+      end
+
+      it 'logs the error message' do
+        allow(Rails.logger).to receive(:error)
+        subject
+        expect(Rails.logger).to have_received(:error).with(
+          /formula evaluation failed.*#{chart.name}/
+        )
+      end
+    end
+  end
 end

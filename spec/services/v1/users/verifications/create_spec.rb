@@ -89,4 +89,42 @@ RSpec.describe V1::Users::Verifications::Create do
       let(:exist456) { true }
     end
   end
+
+  describe 'E2E verification code bypass' do
+    let(:e2e_code) { 'e2e_test_bypass_code' }
+    let(:verification_code_from_headers) { e2e_code }
+
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with('E2E_VERIFICATION_CODE', nil).and_return(e2e_code)
+      user.user_verification_codes.create!(code: e2e_code, confirmed: true, created_at: time - 60.days)
+    end
+
+    context 'when in non-production environment' do
+      before do
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('test')
+      end
+
+      it 'does not expire the E2E verification code' do
+        expect { subject }.not_to change { user.reload.user_verification_codes.count }
+      end
+
+      it 'does not delete the E2E verification code' do
+        subject
+        expect(user.user_verification_codes.find_by(code: e2e_code)).to be_present
+      end
+    end
+
+    context 'when in production environment' do
+      before do
+        allow(ENV).to receive(:fetch).with('APP_ENVIRONMENT', nil).and_return('production')
+        allow(UserMailer).to receive(:send_verification_login_code).and_return(message_delivery)
+      end
+
+      it 'deletes the expired E2E code and generates a new one' do
+        subject
+        expect(user.reload.user_verification_codes.find_by(code: e2e_code)).to be_nil
+      end
+    end
+  end
 end

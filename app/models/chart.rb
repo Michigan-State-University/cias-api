@@ -47,4 +47,26 @@ class Chart < ApplicationRecord
   def chart_variables
     formula['payload'].scan(/\w+[.]\w+/)
   end
+
+  def validate_formula_variables(missing_vars, intervention)
+    return [] if missing_vars.blank?
+
+    available_vars = intervention_question_variables(intervention)
+
+    missing_vars.reject do |var|
+      var_name = var.split('.').last
+      available_vars.include?(var_name)
+    end
+  end
+
+  private
+
+  def intervention_question_variables(intervention)
+    # Keyed by intervention.id: a Chart instance can be called with different interventions.
+    @intervention_question_variables ||= {}
+    @intervention_question_variables[intervention.id] ||= ::Question
+      .joins(question_group: :session)
+      .where(sessions: { intervention_id: intervention.id })
+      .flat_map(&:question_variables).compact.uniq
+  end
 end

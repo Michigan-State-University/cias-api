@@ -3,10 +3,22 @@
 namespace :one_time_use do
   desc 'Assign correct position to existing sms plan variants'
   task assign_position_to_sms_variants: :environment do
-    SmsPlan.find_each do |plan|
+    AuxiliarySmsPlan.find_each do |plan|
       plan.variants.find_each.with_index do |variant, index|
         variant.update!(position: index)
       end
     end
+  end
+
+  class AuxiliarySmsPlan < ActiveRecord::Base
+    self.table_name = 'sms_plans'
+
+    has_many :variants, class_name: 'AuxiliarySmsPlanVariant', foreign_key: 'sms_plan_id'
+  end
+
+  class AuxiliarySmsPlanVariant < ActiveRecord::Base
+    self.table_name = 'sms_plan_variants'
+
+    belongs_to :sms_plan, class_name: 'AuxiliarySmsPlan', foreign_key: 'sms_plan_id'
   end
 end

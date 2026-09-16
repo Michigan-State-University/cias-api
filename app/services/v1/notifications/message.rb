@@ -22,7 +22,7 @@ class V1::Notifications::Message
   private
 
   def connected_to_channel?
-    redis_client = Redis.new
+    redis_client = Redis.new(ssl_params: { verify_mode: ssl_verify_mode })
     redis_client.pubsub('channels', "*user_conversation_channel_#{user.id}").present?
   end
 
@@ -43,5 +43,9 @@ class V1::Notifications::Message
 
   def participant
     @participant ||= conversation.users.where.not(id: user.id).first
+  end
+
+  def ssl_verify_mode
+    ENV.fetch('REDIS_SSL_VERIFY', 'false') == 'true' ? OpenSSL::SSL::VERIFY_PEER : OpenSSL::SSL::VERIFY_NONE
   end
 end

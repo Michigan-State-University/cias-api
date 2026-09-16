@@ -55,6 +55,7 @@ module CiasApi
       i18n.fallbacks = true
     end
 
+    config.action_cable.cable = config_for(:cable)
     config.active_job.queue_adapter = :sidekiq
     config.filter_parameters << :password_confirmation
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)

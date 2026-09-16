@@ -51,6 +51,21 @@ RSpec.describe Intervention, type: :model do
     end
   end
 
+  describe 'filters' do
+    let!(:interventions) { create_list(:intervention, 5) }
+    let!(:intervention_with_name) { create(:intervention, name: 'Special Intervention') }
+    let!(:intervention_with_note) { create(:intervention, note: 'Special Intervention') }
+    let!(:intervention_with_tag) { create(:intervention, :with_tags) }
+
+    it 'filters by name or note' do
+      expect(described_class.filter_by_name_or_note('Special')).to contain_exactly(intervention_with_name, intervention_with_note)
+    end
+
+    it 'filter by tags' do
+      expect(described_class.filter_by_tags([intervention_with_tag.tags.first.id])).to contain_exactly(intervention_with_tag)
+    end
+  end
+
   describe 'instance methods' do
     describe 'translation' do
       let(:intervention) { create(:intervention_with_logo, name: 'New intervention') }
@@ -142,7 +157,7 @@ RSpec.describe Intervention, type: :model do
 
   context 'clone' do
     let(:user) { create(:user, :confirmed, :researcher) }
-    let(:intervention) { create(:intervention, :with_short_link) }
+    let(:intervention) { create(:intervention, :with_short_link, :with_attached_logo) }
     let!(:session) { create(:session, intervention: intervention, position: 1) }
     let!(:other_session) do
       create(:session, intervention: intervention, position: 2,
@@ -200,6 +215,15 @@ RSpec.describe Intervention, type: :model do
                                             'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
+      expect(cloned_intervention.logo.attached?).to be true
+    end
+
+    it 'attachment in the copied intervention is independent from the original intervention' do
+      intervention.logo_blob.update!(description: 'example description')
+      cloned_intervention = intervention.clone
+      expect(cloned_intervention.logo_blob.description).to eq(intervention.logo_blob.description)
+      intervention.logo_blob.update!(description: 'changed description')
+      expect(cloned_intervention.logo_blob.description).not_to eq(intervention.logo_blob.description)
     end
 
     it 'reset cache counters' do
@@ -331,6 +355,35 @@ RSpec.describe Intervention, type: :model do
 
       it 'logo was cloned' do
         expect(cloned_intervention.logo.attached?).to be true
+      end
+    end
+  end
+
+  describe 'name sanitization' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let(:intervention) { build(:intervention, user: user) }
+
+    context 'with clean text' do
+      it 'keeps the name unchanged' do
+        intervention.name = 'Example name'
+        intervention.save!
+        expect(intervention.reload.name).to eq('Example name')
+      end
+    end
+
+    context 'with only allowed <b> tag' do
+      it 'sanitizes but keeps the <b> tag content' do
+        intervention.name = '<b>Example name</b>'
+        intervention.save!
+        expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
+      end
+    end
+
+    context 'with script tag' do
+      it 'removes script tag and sanitizes remaining HTML' do
+        intervention.name = '<script>alert(1)</script><b>Example name</b>'
+        intervention.save!
+        expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
       end
     end
   end

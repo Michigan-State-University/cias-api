@@ -210,7 +210,7 @@
                             <tbody>
                             <tr>
                               <td align="center" bgcolor="#107969" role="presentation" style="border:1px solid #107969;border-radius:100px;cursor:auto;mso-padding-alt:10px 25px;background:#107969;" valign="middle">
-                                <a href="<%= v1_user_confirmation_url(@resource, {confirmation_token: @token, config: message['client-config'].to_s, redirect_url: message['redirect-url']}).html_safe %>" style="display:inline-block;background:#107969;color:#FFFFFF;font-family:DM Sans, Helvetica, Arial;font-size:16px;font-weight:700;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:100px;" target="_blank">
+                                <a href="<%= v1_user_confirmation_url(@resource, {confirmation_token: @token, config: message['client-config'].to_s, redirect_url: message['redirect-url'].to_s}).html_safe %>" style="display:inline-block;background:#107969;color:#FFFFFF;font-family:DM Sans, Helvetica, Arial;font-size:16px;font-weight:700;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:100px;" target="_blank">
                                   <! -- BUTTON START --> <%= t('.confirm_account_link') %> <! -- BUTTON END -->
                                 </a>
                               </td>

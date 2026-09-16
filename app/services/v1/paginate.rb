@@ -16,6 +16,11 @@ class V1::Paginate
   def call
     return collection if (start_index.blank? && end_index.blank?) || collection.blank?
 
-    collection[start_index..end_index]
+    if collection.is_a?(Array)
+      collection[start_index..end_index]
+    else
+      limit = end_index - start_index + 1
+      collection.limit(limit).offset(start_index)
+    end
   end
 end

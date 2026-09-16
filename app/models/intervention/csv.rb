@@ -3,15 +3,16 @@
 require 'csv'
 
 class Intervention::Csv
-  attr_reader :sessions_scope
+  attr_reader :sessions_scope, :period
   attr_accessor :data
 
-  def self.call(intervention)
-    new(intervention).call
+  def self.call(intervention, period)
+    new(intervention, period).call
   end
 
-  def initialize(intervention)
+  def initialize(intervention, period)
     @sessions_scope = data_scope(intervention)
+    @period = period
   end
 
   def call
@@ -22,11 +23,11 @@ class Intervention::Csv
   private
 
   def data_scope(intervention)
-    intervention.sessions.order(:position)
+    intervention.sessions.includes(:intervention, :questions, sms_plans: :sms_links).order(:position)
   end
 
   def collect_data
-    self.data = Harvester.new(sessions_scope).collect
+    self.data = Harvester.new(sessions_scope, period).collect
   end
 
   def generate

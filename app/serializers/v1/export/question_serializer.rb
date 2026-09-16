@@ -18,6 +18,10 @@ class V1::Export::QuestionSerializer < ActiveModel::Serializer
     export_file(object.image)
   end
 
+  attribute :answer_images do
+    export_files(object.answer_images)
+  end
+
   attribute :version do
     Question::CURRENT_VERSION
   end

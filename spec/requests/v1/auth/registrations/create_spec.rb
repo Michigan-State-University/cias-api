@@ -6,8 +6,8 @@ RSpec.describe 'POST /v1/auth', type: :request do
   let(:params) do
     {
       email: 'test@test.com',
-      password: 'password',
-      password_confirmation: 'password',
+      password: 'password123!',
+      password_confirmation: 'password123!',
       first_name: 'first name',
       last_name: 'last name',
       terms: true,
@@ -38,8 +38,8 @@ RSpec.describe 'POST /v1/auth', type: :request do
     let(:params) do
       {
         email: 'test@test.com',
-        password: 'password',
-        password_confirmation: 'password',
+        password: 'password123!',
+        password_confirmation: 'password123!',
         first_name: 'first name',
         last_name: 'last name',
         terms: false,
@@ -67,7 +67,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
     let(:params) do
       {
         email: 'test@test.com',
-        password: 'password',
+        password: 'password123!',
         password_confirmation: 'password',
         first_name: '',
         last_name: '',
@@ -97,7 +97,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
       let(:params) do
         {
           email: 'test@test.com',
-          password: 'password',
+          password: 'password123!',
           password_confirmation: 'password',
           first_name: 'first name',
           last_name: '',

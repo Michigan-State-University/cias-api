@@ -6,11 +6,12 @@ class Intervention::Csv::Harvester
 
   DEFAULT_VALUE = 888
   VIDEO_STATS_KEYS = %i[video_url video_start video_end progress played_seconds].freeze
-  attr_reader :sessions
+  attr_reader :sessions, :period
   attr_accessor :header, :rows, :users, :user_column
 
-  def initialize(sessions)
+  def initialize(sessions, period)
     @sessions = sessions
+    @period = period
     @header = []
     @rows = []
     @users = {}
@@ -43,11 +44,13 @@ class Intervention::Csv::Harvester
         header.concat(information_only_screen_videos_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(sms_links_header(session, index, multiple_fill_indicator_for(session)))
         header.concat(session_metadata(session, index, multiple_fill_indicator_for(session)))
+        header.concat(ra_fulfillment_headers(session, index, multiple_fill_indicator_for(session)))
         header.concat(quick_exit_header(session, index, multiple_fill_indicator_for(session)))
       end
     end
 
     header.unshift(hf_headers(sessions))
+    header.unshift(sms_phone_headers(sessions))
     header.unshift(predefined_user_headers(sessions))
     header.flatten!
     header.unshift(:email)
@@ -57,6 +60,15 @@ class Intervention::Csv::Harvester
   def session_metadata(session, index, multiple_fill)
     [column_name(multiple_fill, session, 'metadata.session_start', index + 1), column_name(multiple_fill, session, 'metadata.session_end', index + 1),
      column_name(multiple_fill, session, 'metadata.session_duration', index + 1)]
+  end
+
+  def ra_fulfillment_headers(session, index, multiple_fill)
+    return [] unless session.type == 'Session::ResearchAssistant'
+
+    [
+      column_name(multiple_fill, session, 'metadata.fulfilled_by_email', index + 1),
+      column_name(multiple_fill, session, 'metadata.fulfilled_at', index + 1)
+    ]
   end
 
   def quick_exit_header(session, index, multiple_fill)
@@ -69,12 +81,23 @@ class Intervention::Csv::Harvester
     column_names = []
     session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
       sms_plan.sms_links.find_each do |sms_link|
-        column_names << [column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.timestamps", index + 1),
-                         column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.totalclicks", index + 1)]
+        prefix = sms_link_column_prefix(sms_plan_index, sms_link)
+        column_names << [column_name(multiple_fill, session, "#{prefix}.timestamps", index + 1),
+                         column_name(multiple_fill, session, "#{prefix}.totalclicks", index + 1)]
       end
     end
 
     column_names
+  end
+
+  def sms_link_column_prefix(sms_plan_index, sms_link)
+    plan_index = sms_plan_index.to_i + 1
+    if sms_link.variant_id.present?
+      variant_pos = (sms_link.variant&.position || 0) + 1
+      "sms_messaging_#{plan_index}.variant_#{variant_pos}.link_#{sms_link.variable}"
+    else
+      "sms_messaging_#{plan_index}.link_#{sms_link.variable}"
+    end
   end
 
   def information_only_screen_videos_header(session, index, multiple_fill)
@@ -104,6 +127,7 @@ class Intervention::Csv::Harvester
       initialize_row
       set_user_data(row_index, grouped_user_sessions.second.first)
       predefined_user_data(row_index, grouped_user_sessions.second.first.user)
+      sms_phone_data(row_index, grouped_user_sessions.second)
 
       grouped_user_sessions.second.each do |user_session|
         number_of_attempts = calculate_number_of_attempts_for(user_session)
@@ -137,6 +161,7 @@ class Intervention::Csv::Harvester
         information_only_screen_videos(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
         sms_links(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
         metadata(user_session.session, user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
+        ra_fulfillment_data(user_session, row_index, number_of_attempts, multiple_fill_indicator_for_session)
         quick_exit(user_session.session, row_index, user_session, number_of_attempts, multiple_fill_indicator_for_session)
       end
 
@@ -197,6 +222,17 @@ class Intervention::Csv::Harvester
     rows[row_index][session_headers_index] = session_start
   end
 
+  def ra_fulfillment_data(user_session, row_index, approach_number, multiple_fill)
+    return unless user_session.is_a?(UserSession::ResearchAssistant)
+
+    session = user_session.session
+    email_index = header.index(column_name(multiple_fill, session, 'metadata.fulfilled_by_email', approach_number))
+    rows[row_index][email_index] = user_session.fulfilled_by&.email if email_index
+
+    at_index = header.index(column_name(multiple_fill, session, 'metadata.fulfilled_at', approach_number))
+    rows[row_index][at_index] = user_session.finished_at if at_index
+  end
+
   def quick_exit(session, row_index, user_session, approach_number, multiple_fill)
     session_header_index = header.index(column_name(multiple_fill, session, 'metadata.quick_exit', approach_number))
 
@@ -206,11 +242,12 @@ class Intervention::Csv::Harvester
   def sms_links(session, user_session, row_index, approach_number, multiple_fill)
     session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
       sms_plan.sms_links.find_each do |sms_link|
+        prefix = sms_link_column_prefix(sms_plan_index, sms_link)
         session_header_index = header.index(
-          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.timestamps", approach_number)
+          column_name(multiple_fill, session, "#{prefix}.timestamps", approach_number)
         )
         total_clicks_index = header.index(
-          column_name(multiple_fill, session, "sms_messaging#{sms_plan_index}.link_#{sms_link.variable}.totalclicks", approach_number)
+          column_name(multiple_fill, session, "#{prefix}.totalclicks", approach_number)
         )
         user_id = user_session.user_id
 
@@ -245,7 +282,11 @@ class Intervention::Csv::Harvester
   end
 
   def user_sessions
-    @user_sessions ||= UserSession.where(session_id: session_ids).includes(:user)
+    @user_sessions ||= if period.present?
+                         UserSession.where(session_id: session_ids).where(created_at: period).includes(:user)
+                       else
+                         UserSession.where(session_id: session_ids).includes(:user)
+                       end
   end
 
   def initialize_row
@@ -291,6 +332,24 @@ class Intervention::Csv::Harvester
 
       rows[row_index][var_index] = user.send(column)
     end
+  end
+
+  def sms_phone_headers(sessions)
+    return [] unless sessions.any? { |session| session.type == 'Session::Sms' }
+
+    ['sms_participant.phone_number']
+  end
+
+  def sms_phone_data(row_index, grouped_user_sessions)
+    var_index = header.index('sms_participant.phone_number')
+    return if var_index.nil?
+
+    # Find the first SMS user session with phone data
+    sms_user_session = grouped_user_sessions.find do |user_session|
+      user_session.is_a?(UserSession::Sms) && user_session.sms_full_number.present?
+    end
+
+    rows[row_index][var_index] = sms_user_session&.sms_full_number
   end
 
   def fill_hf_initial_screen(row_index, user_session)

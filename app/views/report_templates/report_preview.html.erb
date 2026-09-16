@@ -94,7 +94,7 @@
   <body>
     <div class="container">
       <!-- REPORT HEADER -->
-      <div dir='auto'><%= sanitize(report_template.summary, attributes: ['style', 'class']) %></div>
+      <div dir='auto'><%= sanitize(report_template.summary, attributes: ['style', 'class', 'href', 'rel', 'target']) %></div>
 
       <!-- SINGLE SECTION -->
       <%- variants.each do |variant| %>
@@ -117,7 +117,7 @@
             <tr>
               <!-- TEXT -->
               <td class="d-table-cell">
-                <p class="section-text"><%= sanitize(variant.content, attributes: ['style', 'class']) %></p>
+                <p class="section-text"><%= sanitize(variant.content, attributes: ['style', 'class', 'href', 'rel', 'target']) %></p>
               </td>
 
             <!-- IMAGE SPACER -->

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_22_142252) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -103,6 +103,17 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "bulk_import_payloads", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "researcher_id", null: false
+    t.uuid "intervention_id", null: false
+    t.text "payload_ciphertext", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_bulk_import_payloads_on_created_at"
+    t.index ["intervention_id"], name: "index_bulk_import_payloads_on_intervention_id"
+    t.index ["researcher_id"], name: "index_bulk_import_payloads_on_researcher_id"
+  end
+
   create_table "cat_mh_google_tts_voices", force: :cascade do |t|
     t.integer "google_tts_voice_id"
     t.integer "cat_mh_language_id"
@@ -182,7 +193,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.datetime "updated_at", null: false
     t.datetime "filled_at", precision: nil
     t.uuid "user_session_id"
-    t.boolean "v2_record", default: false
     t.index ["chart_id"], name: "index_chart_statistics_on_chart_id"
     t.index ["health_clinic_id"], name: "index_chart_statistics_on_health_clinic_id"
     t.index ["health_system_id"], name: "index_chart_statistics_on_health_system_id"
@@ -510,6 +520,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.datetime "clear_sensitive_data_scheduled_at", precision: nil
     t.integer "navigators_count", default: 0
     t.datetime "paused_at", precision: nil
+    t.string "note"
     t.index ["current_editor_id"], name: "index_interventions_on_current_editor_id"
     t.index ["google_language_id"], name: "index_interventions_on_google_language_id"
     t.index ["name", "user_id"], name: "index_interventions_on_name_and_user_id", using: :gin
@@ -805,6 +816,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.text "default_response"
     t.bigint "google_language_id"
     t.text "completion_message"
+    t.boolean "formula_update_in_progress", default: false, null: false
+    t.integer "generated_report_count", default: 0, null: false
     t.index ["cat_mh_language_id"], name: "index_sessions_on_cat_mh_language_id"
     t.index ["cat_mh_population_id"], name: "index_sessions_on_cat_mh_population_id"
     t.index ["cat_mh_time_frame_id"], name: "index_sessions_on_cat_mh_time_frame_id"
@@ -827,6 +840,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.index ["name"], name: "index_short_links_on_name", unique: true
   end
 
+  create_table "sms_campaign_events", force: :cascade do |t|
+    t.jsonb "event_data", default: {}, null: false
+    t.string "event_type", null: false
+    t.uuid "user_session_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_session_id"], name: "index_sms_campaign_events_on_user_session_id"
+  end
+
   create_table "sms_codes", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "session_id", null: false
     t.uuid "health_clinic_id"
@@ -847,9 +869,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "variable", null: false
+    t.uuid "variant_id"
     t.index ["session_id"], name: "index_sms_links_on_session_id"
-    t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true
+    t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true, where: "(variant_id IS NULL)"
     t.index ["sms_plan_id"], name: "index_sms_links_on_sms_plan_id"
+    t.index ["variant_id", "variable"], name: "index_sms_links_on_variant_id_and_variable", unique: true, where: "(variant_id IS NOT NULL)"
+    t.index ["variant_id"], name: "index_sms_links_on_variant_id"
   end
 
   create_table "sms_links_users", force: :cascade do |t|
@@ -894,6 +919,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.boolean "include_phone_number"
     t.boolean "include_email"
     t.string "schedule_variable"
+    t.string "sms_send_time_type", default: "preferred_by_participant", null: false
+    t.jsonb "sms_send_time_details", default: {}
     t.index ["session_id"], name: "index_sms_plans_on_session_id"
   end
 
@@ -903,6 +930,23 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.index ["intervention_id"], name: "index_stars_on_intervention_id"
     t.index ["user_id", "intervention_id"], name: "index_stars_on_user_id_and_intervention_id", unique: true
     t.index ["user_id"], name: "index_stars_on_user_id"
+  end
+
+  create_table "tag_interventions", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "tag_id", null: false
+    t.uuid "intervention_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["intervention_id"], name: "index_tag_interventions_on_intervention_id"
+    t.index ["tag_id", "intervention_id"], name: "index_tag_interventions_on_tag_id_and_intervention_id", unique: true
+    t.index ["tag_id"], name: "index_tag_interventions_on_tag_id"
+  end
+
+  create_table "tags", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1006,10 +1050,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
     t.uuid "current_question_id"
     t.integer "number_of_repetitions", default: 0, null: false
     t.datetime "max_repetitions_reached_at"
+    t.string "sms_phone_prefix"
+    t.text "sms_phone_number_ciphertext"
+    t.string "sms_phone_number_bidx"
+    t.uuid "fulfilled_by_id"
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
+    t.index ["fulfilled_by_id"], name: "index_user_sessions_on_fulfilled_by_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"
     t.index ["name_audio_id"], name: "index_user_sessions_on_name_audio_id"
     t.index ["session_id"], name: "index_user_sessions_on_session_id"
+    t.index ["sms_phone_number_bidx"], name: "index_user_sessions_on_sms_phone_number_bidx"
     t.index ["user_id", "session_id", "health_clinic_id"], name: "index_user_session_on_u_id_and_s_id_and_hc_id", unique: true
     t.index ["user_id", "session_id"], name: "index_user_sessions_on_user_id_and_session_id", unique: true, where: "((created_at > '2023-10-25 05:30:04'::timestamp without time zone) AND (multiple_fill IS FALSE))"
     t.index ["user_id"], name: "index_user_sessions_on_user_id"
@@ -1108,6 +1158,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
   add_foreign_key "alert_phones", "sms_plans"
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "user_sessions"
+  add_foreign_key "bulk_import_payloads", "interventions", on_delete: :cascade
+  add_foreign_key "bulk_import_payloads", "users", column: "researcher_id", on_delete: :cascade
   add_foreign_key "cat_mh_google_tts_voices", "cat_mh_languages"
   add_foreign_key "cat_mh_google_tts_voices", "google_tts_voices"
   add_foreign_key "cat_mh_test_type_languages", "cat_mh_languages"
@@ -1152,19 +1204,24 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_16_073622) do
   add_foreign_key "sessions", "google_languages"
   add_foreign_key "sessions", "google_tts_voices"
   add_foreign_key "sessions", "interventions"
+  add_foreign_key "sms_campaign_events", "user_sessions"
   add_foreign_key "sms_codes", "health_clinics"
   add_foreign_key "sms_codes", "sessions"
   add_foreign_key "sms_links", "sessions"
+  add_foreign_key "sms_links", "sms_plan_variants", column: "variant_id"
   add_foreign_key "sms_links", "sms_plans"
   add_foreign_key "sms_links_users", "sms_links"
   add_foreign_key "sms_links_users", "users"
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
+  add_foreign_key "tag_interventions", "interventions"
+  add_foreign_key "tag_interventions", "tags"
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
   add_foreign_key "user_sessions", "sessions"
   add_foreign_key "user_sessions", "user_interventions"
   add_foreign_key "user_sessions", "users"
+  add_foreign_key "user_sessions", "users", column: "fulfilled_by_id"
   add_foreign_key "users", "hfhs_patient_details"
 end

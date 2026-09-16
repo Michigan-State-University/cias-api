@@ -4,7 +4,7 @@ class Calculations::DentakuService
   attr_reader :dentaku_calculator, :all_var_values, :formula, :formula_cases, :is_formula_interface
 
   def initialize(all_var_values, formula = nil, formula_cases = nil, is_formula_interface = false)
-    @dentaku_calculator = Dentaku::Calculator.new
+    @dentaku_calculator = Dentaku::Calculator.new(case_sensitive: true)
     @all_var_values = all_var_values
     @formula = formula
     @formula_cases = formula_cases

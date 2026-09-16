@@ -49,4 +49,34 @@ RSpec.describe V1::FlowService::NextQuestion do
       end
     end
   end
+
+  context 'predefined participant with participant report before finish screen' do
+    let!(:question) { create(:question_single, question_group: question_group, position: 1) }
+    let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
+    let!(:participant_report) { create(:question_participant_report, question_group: question_group, position: 2) }
+    let!(:finish_question) { create(:question_finish, question_group: question_group, position: 3) }
+
+    context 'when predefined participant encounters participant report before finish screen' do
+      it 'skips participant report, goes to finish screen, and marks session as finished' do
+        expect(user_session.finished_at).to be_nil
+
+        result = subject
+        expect(result.type).to eql('Question::Finish')
+        expect(user_session.reload.finished_at).to be_present
+      end
+    end
+
+    context 'when finish question is in next question group' do
+      let!(:finish_question_group) { create(:question_group, session: session, position: 2) }
+      let!(:finish_question) { create(:question_finish, question_group: finish_question_group, position: 1) }
+
+      it 'skips participant report, goes to finish screen in next group, and marks session as finished' do
+        expect(user_session.finished_at).to be_nil
+
+        result = subject
+        expect(result.type).to eql('Question::Finish')
+        expect(user_session.reload.finished_at).to be_present
+      end
+    end
+  end
 end

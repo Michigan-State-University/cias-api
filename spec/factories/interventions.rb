@@ -25,6 +25,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_tags do
+      after(:build) do |intervention|
+        intervention.tags << create_list(:tag, 3)
+      end
+    end
+
     trait :with_navigators do
       after(:build) do |intervention|
         intervention.navigators << create(:user, :confirmed, :navigator)
@@ -87,6 +93,10 @@ FactoryBot.define do
           user.predefined_user_parameter.update!(intervention_id: intervention.id)
         end
       end
+    end
+
+    trait :with_attached_logo do
+      logo { FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg') }
     end
   end
 

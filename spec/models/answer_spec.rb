@@ -201,6 +201,30 @@ RSpec.describe Answer, type: :model do
 
       it { expect(with_empty.save).to be true }
     end
+
+    describe '#csv_row_value' do
+      subject(:answer) { build(:answer_date) }
+
+      it 'returns ISO 8601 format for already valid dates' do
+        expect(answer.csv_row_value({ 'value' => '2012-12-12' })).to eq('2012-12-12')
+      end
+
+      it 'normalizes human-readable date to ISO 8601' do
+        expect(answer.csv_row_value({ 'value' => 'Tue Mar 10 2026' })).to eq('2026-03-10')
+      end
+
+      it 'returns blank value as-is' do
+        expect(answer.csv_row_value({ 'value' => '' })).to eq('')
+      end
+
+      it 'returns nil when value is nil' do
+        expect(answer.csv_row_value({ 'value' => nil })).to be_nil
+      end
+
+      it 'returns original value for unparseable string' do
+        expect(answer.csv_row_value({ 'value' => 'not-a-date' })).to eq('not-a-date')
+      end
+    end
   end
 
   describe 'Answer::ExternalLink' do

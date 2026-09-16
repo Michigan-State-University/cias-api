@@ -4,7 +4,7 @@ RSpec.describe V1::Users::Invitations::Update do
   subject { described_class.call(invitation_params) }
 
   let!(:invitation_token) { 'EYKPJ9P5y2Kc3Jp7juvq' }
-  let!(:password) { 'kytdhdn#@!' }
+  let!(:password) { 'kytdhdn#@!124' }
   let!(:user) do
     create(:user, :researcher, email: 'test@example.com',
                                invitation_token: Devise.token_generator.digest(self, :invitation_token, invitation_token),

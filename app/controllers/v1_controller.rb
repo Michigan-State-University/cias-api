@@ -5,6 +5,7 @@ class V1Controller < ApplicationController
   include ExceptionHandler
   include Pagination
   include Resource
+  include ActionController::Cookies
 
   before_action :authenticate_user!
   before_action :set_paper_trail_whodunnit

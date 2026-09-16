@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::Hfhs::UserSession
+  include Api::Hfhs::TlsErrorReporter
+
   ENDPOINT = ENV.fetch('HFHS_URL')
 
   def self.call(user_session_id)
@@ -14,23 +16,34 @@ class Api::Hfhs::UserSession
   def call
     return if no_data_to_hfhs?
 
-    token  = Api::Hfhs::Authentication.call
-    return if token.nil?
-
-    baerer_token = "#{token[:token_type]} #{token[:access_token]}"
-
-    connection = Faraday.new ENDPOINT, ssl: { verify: false }
-
-    connection.post do |request|
-      request.headers['Content-Type'] = 'application/json'
-      request.headers['Authorization'] = baerer_token
-      request.body = body
+    token = Api::Hfhs::Authentication.call
+    if token.nil?
+      report_skipped_delivery("no token issued - skipping answers send for user_session #{user_session_id}")
+      return
     end
+
+    post_answers("#{token[:token_type]} #{token[:access_token]}")
   end
 
   attr_reader :user_session_id
 
   private
+
+  def post_answers(bearer_token)
+    connection = Faraday.new ENDPOINT, ssl: Api::Hfhs::SslOptions.call
+
+    response = connection.post do |request|
+      request.headers['Content-Type'] = 'application/json'
+      request.headers['Authorization'] = bearer_token
+      request.body = body
+    end
+
+    report_delivery_status(ENDPOINT, response.status, label: "answers user_session #{user_session_id}")
+    response
+  rescue Faraday::SSLError => e
+    report_tls_error(e, ENDPOINT)
+    raise
+  end
 
   def body
     {

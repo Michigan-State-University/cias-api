@@ -57,6 +57,7 @@ Rails.application.routes.draw do
     end
 
     resources :preview_session_users, only: :create
+    resources :tags, only: :index
 
     post 'interventions/import', to: 'interventions/transfers#import', as: :import_intervention
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
@@ -72,6 +73,7 @@ Rails.application.routes.draw do
         resources :predefined_participants do
           post 'send_sms_invitation', on: :member
           post 'send_email_invitation', on: :member
+          post 'bulk_create', on: :collection
         end
         resources :answers, only: %i[index]
         resources :invitations, only: %i[index create destroy] do
@@ -84,6 +86,9 @@ Rails.application.routes.draw do
         get 'permission', to: 'collaborators#show'
         post 'star', to: 'stars#create', as: :create_star
         delete 'star', to: 'stars#destroy', as: :destroy_star
+        resources :tags, only: %i[destroy] do
+          post 'assign', on: :collection
+        end
       end
       post 'sessions/:id/duplicate', to: 'sessions#duplicate', as: :duplicate_session
       patch 'sessions/position', to: 'sessions#position'
@@ -167,6 +172,9 @@ Rails.application.routes.draw do
     scope 'questions/:question_id', as: 'question' do
       scope module: 'questions' do
         resource :images, only: %i[create destroy update]
+        resource :answer_images, only: %i[create]
+        delete 'answer_images/:answer_id', to: 'answer_images#destroy', as: :destroy_answer_image
+        patch 'answer_images/:answer_id', to: 'answer_images#update', as: :update_answer_image
       end
     end
 
@@ -307,6 +315,8 @@ Rails.application.routes.draw do
     get '/s/:slug', to: 'links#show', as: :short
     post '/sms/replay', to: 'twillo_message#create', as: :sms_replay
     post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
+    post 'predefined_participants/:slug/ra_session', to: 'interventions/predefined_participants#ra_session', as: :ra_session_predefined_participant
+    get 'user_sessions/:id/ra_show', to: 'user_sessions#ra_show', as: :ra_show_user_session
     post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
   end
 

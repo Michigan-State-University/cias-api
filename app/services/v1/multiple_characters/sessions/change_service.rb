@@ -22,7 +22,7 @@ class V1::MultipleCharacters::Sessions::ChangeService
   def call
     return unless new_character.in?(AVAILABLE_NARRATORS)
 
-    update_character_in_session_questions if session.is_a?(Session::Classic)
+    update_character_in_session_questions if session.is_a?(Session::Classic) || session.is_a?(Session::ResearchAssistant)
 
     session.update!(current_narrator: new_character)
   end

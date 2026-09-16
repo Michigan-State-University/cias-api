@@ -39,10 +39,7 @@ class V1::FlowService::NextQuestion
   def next_or_current_question(question)
     return question if question.is_a?(Hash)
 
-    if question.type == 'Question::Finish'
-      assign_next_session_id(user_session.session.intervention)
-      user_session.finish
-    end
+    handle_finish_screen if question.type == 'Question::Finish'
 
     return question unless user_session.user.role?('predefined_participant')
     return question unless question.is_a?(Question::ParticipantReport)
@@ -50,7 +47,13 @@ class V1::FlowService::NextQuestion
     question_group = question.question_group
     question = question_group.questions.find_by(position: (question.position + 1))
     question ||= user_session.session.question_groups.where('position > ?', question_group.position).order(:position).first.questions.order(:position).first
+    handle_finish_screen if question.type == 'Question::Finish'
     question
+  end
+
+  def handle_finish_screen
+    assign_next_session_id(user_session.session.intervention)
+    user_session.finish
   end
 
   def assign_next_session_id(intervention)
@@ -84,7 +87,7 @@ class V1::FlowService::NextQuestion
   def reassign_next_session_for_flexible_intervention(session, intervention)
     return session unless session.nil? || UserSession.exists?(user_id: user_session.user.id, session_id: session.id)
 
-    intervention.sessions.where.not(type: 'Session::Sms').find_each do |intervention_session|
+    intervention.sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).find_each do |intervention_session|
       return intervention_session unless UserSession.exists?(user_id: user_session.user.id, session_id: intervention_session.id)
     end
 

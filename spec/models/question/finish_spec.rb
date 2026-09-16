@@ -49,6 +49,30 @@ RSpec.describe Question::Finish, type: :model do
           expect(question_finish.question_variables).to be_empty
         end
       end
+
+      describe 'show_dashboard_button setting' do
+        context 'when creating a new finish question' do
+          it 'has show_dashboard_button set to false by default' do
+            expect(question_finish.settings['show_dashboard_button']).to be(false)
+          end
+        end
+
+        context 'when using with_dashboard_button trait' do
+          let(:question_finish_with_button) { create(:question_finish, :with_dashboard_button) }
+
+          it 'has show_dashboard_button set to true' do
+            expect(question_finish_with_button.settings['show_dashboard_button']).to be(true)
+          end
+        end
+
+        context 'when using without_dashboard_button trait' do
+          let(:question_finish_without_button) { create(:question_finish, :without_dashboard_button) }
+
+          it 'has show_dashboard_button set to false' do
+            expect(question_finish_without_button.settings['show_dashboard_button']).to be(false)
+          end
+        end
+      end
     end
   end
 end

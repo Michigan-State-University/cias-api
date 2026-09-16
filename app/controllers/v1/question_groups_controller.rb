@@ -101,7 +101,7 @@ class V1::QuestionGroupsController < V1Controller
     session = Session.find(session_id)
     authorize! :update, session
 
-    return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
+    raise ConcurrentEditException unless session_load.ability_to_update_for?(current_v1_user)
 
     V1::QuestionGroup::ShareInternallyService.call([session], duplicate_internally_params[:question_groups])
     head :created

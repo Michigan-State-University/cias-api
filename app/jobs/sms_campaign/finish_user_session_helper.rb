@@ -8,6 +8,7 @@ module SmsCampaign::FinishUserSessionHelper
     initial_question_group = user_session.session.question_group_initial
     is_last_question = number_of_messages_sent_in_last_cycle(user_session) >= expected_number_of_message_in_last_cycle(initial_question_group)
     user_session.finish if is_last_question
+    log_user_session_finished(user_session)
   end
 
   def number_of_repetitions_reached?(user_session)

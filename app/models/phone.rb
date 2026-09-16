@@ -14,7 +14,7 @@ class Phone < ApplicationRecord
 
   enum :communication_way, { call: 'call', message: 'message' }
 
-  audited except: %i[number number_ciphertext]
+  audited except: %i[number number_ciphertext migrated_number]
   has_encrypted :number
   blind_index :number
 
@@ -36,6 +36,12 @@ class Phone < ApplicationRecord
 
   def full_number
     prefix + number
+  end
+
+  # Exclude migrated_number from audited changes
+  def audited_changes(changes = nil)
+    changes ||= super
+    changes.except('migrated_number')
   end
 
   private

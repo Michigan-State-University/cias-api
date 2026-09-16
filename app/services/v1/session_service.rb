@@ -12,13 +12,10 @@ class V1::SessionService
 
   def sessions(include_multiple_sessions = true)
     include_multiple_sessions = ActiveModel::Type::Boolean.new.cast(include_multiple_sessions)
+    include_multiple_sessions = true if include_multiple_sessions.nil?
 
-    basic_scope =
-      if include_multiple_sessions || include_multiple_sessions.nil?
-        intervention.sessions
-      else
-        intervention.sessions.where(multiple_fill: false)
-      end
+    basic_scope = intervention.sessions.includes(:google_language, sms_codes: :health_clinic, intervention: %i[user logo_attachment])
+    basic_scope = basic_scope.where(multiple_fill: false) unless include_multiple_sessions
 
     basic_scope.order(:position)
   end
@@ -30,9 +27,20 @@ class V1::SessionService
   def create(session_params)
     session = sessions.new(session_params)
     session_type_sms = session.sms_session_type?
+    ra_session = session.type == 'Session::ResearchAssistant'
+
     session.assign_google_tts_voice(first_session) unless session_type_sms
     session.current_narrator = intervention.current_narrator unless session_type_sms
-    session.position = session_type_sms ? 999_999 : sessions.where.not(type: 'Session::Sms').last&.position.to_i + 1
+
+    if ra_session
+      session.position = 0
+      session.name = session.name.presence || I18n.t('sessions.default_ra_name', default: 'New Research Assistant Session')
+    elsif session_type_sms
+      session.position = 999_999
+    else
+      session.position = sessions.where.not(type: ['Session::Sms', 'Session::ResearchAssistant']).last&.position.to_i + 1
+    end
+
     session.save!
     session
   end
@@ -40,11 +48,47 @@ class V1::SessionService
   def update(session_id, session_params)
     sanitize_estimated_time_param(session_params)
     session = session_load(session_id)
-    session.assign_attributes(session_params.except(:cat_tests))
-    session_type_sms = session.sms_session_type?
-    assign_cat_tests_to_session(session, session_params) unless session_type_sms
-    session.integral_update
-    session
+
+    previous_variable = session.variable
+    new_variable = session_params[:variable] || session.variable
+    variable_changing = variable_changed?(previous_variable, new_variable)
+
+    lock_acquired = false
+    jobs_enqueued = false
+
+    begin
+      if variable_changing
+        # rubocop:disable Rails/SkipsModelValidations
+        lock_acquired = Session.where(id: session.id, formula_update_in_progress: false)
+                               .update_all(formula_update_in_progress: true, updated_at: Time.current)
+                               .positive?
+        # rubocop:enable Rails/SkipsModelValidations
+
+        raise ActiveRecord::RecordNotSaved, I18n.t('session.error.formula_update_in_progress') unless lock_acquired
+
+        session.formula_update_in_progress = true
+      end
+
+      session.assign_attributes(session_params.except(:cat_tests))
+      session_type_sms = session.sms_session_type?
+      assign_cat_tests_to_session(session, session_params) unless session_type_sms
+      session.integral_update
+
+      if variable_changing
+        adjust_variable_references(session, previous_variable, session.variable)
+        jobs_enqueued = true
+      end
+
+      session
+    rescue StandardError => e
+      if lock_acquired && !jobs_enqueued
+        Rails.logger.warn "[V1::SessionService] Releasing formula_update_in_progress lock for session #{session.id} due to failure"
+        # rubocop:disable Rails/SkipsModelValidations
+        Session.where(id: session.id).update_all(formula_update_in_progress: false, updated_at: Time.current)
+        # rubocop:enable Rails/SkipsModelValidations
+      end
+      raise e
+    end
   end
 
   def destroy(session_id)
@@ -64,6 +108,16 @@ class V1::SessionService
   def duplicate(session_id, new_intervention_id)
     new_intervention = Intervention.accessible_by(user.ability).find(new_intervention_id)
     old_session = session_load(session_id)
+
+    if old_session.type == 'Session::ResearchAssistant' &&
+       new_intervention.sessions.exists?(type: 'Session::ResearchAssistant')
+      raise ComplexException.new(
+        I18n.t('sessions.ra_already_exists_in_target'),
+        {},
+        :unprocessable_entity
+      )
+    end
+
     new_position = new_intervention.sessions.order(:position).last&.position.to_i + 1
     new_variable = "duplicated_#{old_session.variable}_#{new_position}"
     Clone::Session.new(old_session,
@@ -115,5 +169,18 @@ class V1::SessionService
 
   def sanitize_estimated_time_param(params)
     params[:estimated_time] = params[:estimated_time].to_i if params[:estimated_time].present?
+  end
+
+  def variable_changed?(old_variable, new_variable)
+    old_variable.present? && new_variable.present? && old_variable != new_variable
+  end
+
+  def adjust_variable_references(session, old_variable, new_variable)
+    Rails.logger.info "[DEBUG_SESSION_VAR] Enqueuing AdjustSessionVariableReferences for session #{session.id}. Old: '#{old_variable}', New: '#{new_variable}'"
+    UpdateJobs::AdjustSessionVariableReferences.perform_later(
+      session.id,
+      old_variable,
+      new_variable
+    )
   end
 end
