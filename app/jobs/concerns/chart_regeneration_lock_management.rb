@@ -12,7 +12,6 @@ module ChartRegenerationLockManagement
       job_name = msg['wrapped'] || msg['class']
 
       begin
-        # msg['class'] is Sidekiq's JobWrapper, not the job; the ActiveJob payload is msg['args'].first.
         job = ActiveJob::Base.deserialize(msg['args'].first)
         job.send(:deserialize_arguments_if_needed)
         chart_ids = Array(job.chart_ids_for_lock_cleanup).compact
