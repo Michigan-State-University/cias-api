@@ -48,6 +48,13 @@ class Chart < ApplicationRecord
     true
   end
 
+  # Must stay the exact complement of `CreateForUserSessions#lock_acquired?`: a timestamp older
+  # than the TTL is not a lock, because that service will take it.
+  def regenerating?
+    regenerating_since.present? &&
+      regenerating_since >= V1::ChartStatistics::CreateForUserSessions::LOCK_TTL.ago
+  end
+
   def chart_variables
     formula['payload'].scan(/\w+[.]\w+/)
   end

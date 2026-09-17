@@ -214,10 +214,8 @@ class V1::ChartStatistics::Create
     true
   end
 
-  # Drops a participant ONLY when they answered none of the formula's variables; some missing
-  # variables 0-fill and they land in an ordinary Matched / Not-matched category. Answeredness is
-  # measured on the OWNING QUESTION having a confirmed `Answer`, never on var-values presence -
-  # the latter would newly drop a participant who reached every question and SKIPPED every one.
+  # Drops a participant ONLY when they reached none of the formula's variables; see
+  # `UnansweredOwningQuestions` for what "reached" means here.
   #
   # EVALUATION-ORDER SENSITIVITY - the call site must not move. `missing_vars` is only the MISSING
   # set because `exist_missing_variables?` has stored the values and `add_missing_variables` has

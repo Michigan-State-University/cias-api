@@ -1,14 +1,11 @@
 # frozen_string_literal: true
 
-# The only supported entry point to `V1::Charts::Regenerate`.
+# The only entry point that can run a DESTRUCTIVE regeneration: the regenerate endpoint and the
+# chart status-flip enqueue both pass `replace: false`.
 #
-# The service itself has no production caller: `RegenerateChartsJob` is enqueued only by
-# `V1::ChartStatistics::RegenerateForOrganizations`, which nothing in `app/`, `lib/` or `config/`
-# calls, so regeneration has until now been reachable only from a Rails console. This wraps it
-# with the guards a console session does not give you.
-#
-# DESTRUCTIVE: with `replace: true` (the default) `V1::Charts::Regenerate` runs
-# `ChartStatistic.where(chart_id: chart_ids).destroy_all` BEFORE replaying. The replay rebuilds
+# DESTRUCTIVE: with `replace: true` (the default) each chart's existing rows are destroyed inside
+# that chart's regeneration lock, immediately before it is replayed — so a chart that cannot be
+# replayed (already locked by another run) keeps its rows rather than losing them. The replay rebuilds
 # rows from `CreateForUserSessions`, which re-finds participants by matching `session.variable`
 # against the chart formula's variable prefixes — so any row whose originating session no longer
 # qualifies (renamed session variable, edited formula, deleted session) is destroyed and NOT
@@ -49,13 +46,13 @@ namespace :chart_statistics do
            'will be DESTROYED and replayed.'
       puts 'Rows whose originating session no longer matches the formula will NOT be recreated.'
     else
-      # The "safe" path is not read-only: the replay still upserts. It can no longer ADD rows
-      # (the de-dup key is now the same for gated and ungated charts), but on a cell that still
-      # holds legacy duplicate rows it updates an arbitrary one and leaves the siblings stale,
-      # and it CANNOT refresh a row whose `filled_at` is already later than every session the
-      # formula references - such a write is declined silently. Use REPLACE=true to rebuild.
-      puts "REPLAY mode: no rows are destroyed and no rows are added, but #{found.size} chart(s) " \
-           'will be replayed and existing rows may be relabelled.'
+      # The "safe" path is not read-only: the replay still upserts. It cannot DUPLICATE an already
+      # charted participant (the de-dup key is now the same for gated and ungated charts), but on a
+      # cell that still holds legacy duplicate rows it updates an arbitrary one and leaves the
+      # siblings stale, and it CANNOT refresh a row whose `filled_at` is already later than every
+      # session the formula references - such a write is declined silently. Use REPLACE=true.
+      puts "REPLAY mode: no rows are destroyed, but #{found.size} chart(s) will be replayed - " \
+           'existing rows may be relabelled, and participants not yet charted may gain a row.'
     end
 
     abort 'Refusing to run without CONFIRM=yes' unless ENV['CONFIRM'] == 'yes'

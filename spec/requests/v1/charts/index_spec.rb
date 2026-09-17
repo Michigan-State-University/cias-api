@@ -59,6 +59,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
               'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
+            'regenerating' => false,
             'dashboard_section_id' => dashboard_section.id,
             'date_range_end' => nil,
             'date_range_start' => nil,
@@ -89,6 +90,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
               'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
+            'regenerating' => false,
             'dashboard_section_id' => dashboard_section.id,
             'date_range_end' => nil,
             'date_range_start' => nil,
@@ -119,6 +121,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
               'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
+            'regenerating' => false,
             'dashboard_section_id' => other_dashboard_section.id,
             'date_range_end' => nil,
             'date_range_start' => nil,
@@ -167,6 +170,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
               'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
+            'regenerating' => false,
             'dashboard_section_id' => dashboard_section.id,
             'date_range_start' => nil,
             'date_range_end' => nil,
@@ -197,6 +201,7 @@ RSpec.describe 'GET /v1/charts', type: :request do
               'positive_despite_missing_data' => false
             },
             'formula_variable_count' => 0,
+            'regenerating' => false,
             'dashboard_section_id' => dashboard_section.id,
             'date_range_end' => nil,
             'date_range_start' => nil,

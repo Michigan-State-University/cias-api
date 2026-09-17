@@ -5,4 +5,6 @@ class V1::ChartSerializer < V1Serializer
              :published_at, :position, :interval_type, :date_range_start, :date_range_end
 
   attribute :formula_variable_count
+
+  attribute :regenerating, &:regenerating?
 end

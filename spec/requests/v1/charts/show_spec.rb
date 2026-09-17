@@ -59,6 +59,7 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
                 'positive_despite_missing_data' => false
               },
               'formula_variable_count' => 0,
+              'regenerating' => false,
               'dashboard_section_id' => dashboard_section.id,
               'date_range_start' => nil,
               'date_range_end' => nil,
@@ -103,6 +104,30 @@ RSpec.describe 'GET /v1/charts/:id', type: :request do
 
         it_behaves_like 'unpermitted user'
       end
+    end
+  end
+
+  # The frontend polls this endpoint to decide when to re-enable the regenerate button, so the
+  # attribute has to flip both ways — `false` is asserted in the permitted-user block above.
+  context 'when the chart is being regenerated' do
+    before do
+      chart.update!(regenerating_since: 1.minute.ago)
+      request
+    end
+
+    it 'reports the in-progress state' do
+      expect(json_response['data']['attributes']['regenerating']).to be(true)
+    end
+  end
+
+  context 'when the regeneration lock has outlived the TTL' do
+    before do
+      chart.update!(regenerating_since: (V1::ChartStatistics::CreateForUserSessions::LOCK_TTL + 1.minute).ago)
+      request
+    end
+
+    it 'reports it as idle again, matching what the service would do with that lock' do
+      expect(json_response['data']['attributes']['regenerating']).to be(false)
     end
   end
 

@@ -80,6 +80,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
                 'positive_despite_missing_data' => false
               },
               'formula_variable_count' => 0,
+              'regenerating' => false,
               'dashboard_section_id' => dashboard_section.id,
               'published_at' => nil
             }

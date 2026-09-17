@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_22_142252) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_16_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -216,6 +216,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_22_142252) do
     t.string "interval_type", default: "monthly"
     t.datetime "date_range_start", precision: nil
     t.datetime "date_range_end", precision: nil
+    t.datetime "regenerating_since"
     t.index ["dashboard_section_id"], name: "index_charts_on_dashboard_section_id"
   end
 
