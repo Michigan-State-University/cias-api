@@ -2,6 +2,7 @@
 
 class Clone::Intervention < Clone::Base
   include Clone::ReflectionReassignment
+  include Clone::SessionVariableNaming
 
   def execute
     outcome.status = :draft
@@ -69,29 +70,16 @@ class Clone::Intervention < Clone::Base
     options
   end
 
-  def cloned_session_variable(session)
-    "cloned_#{session.variable}_#{session.position}"
-  end
-
   def variable_renames
     @variable_renames ||= []
   end
 
   def apply_session_variable_renames
-    assert_rename_namespace_disjoint!
-
     variable_renames.each do |session_id, old_variable, new_variable|
       V1::VariableReferences::SessionService.new(session_id, old_variable, new_variable,
                                                  include_source_session: true,
                                                  skip_chart_formulas: true).call
     end
-  end
-
-  def assert_rename_namespace_disjoint!
-    overlap = variable_renames.map { |_, old, _| old } & variable_renames.map { |_, _, new| new }
-    return if overlap.empty?
-
-    raise ArgumentError, "cloned session variables collide with source variables: #{overlap.join(', ')}"
   end
 
   def reassign_branching

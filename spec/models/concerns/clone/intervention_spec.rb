@@ -275,13 +275,56 @@ RSpec.describe Clone::Intervention, type: :model do
     end
   end
 
-  describe 'refusing a rename that would alias another session' do
-    # One session's new name being another's old name silently repoints references; reachable
-    # because Session#variable has no format validation.
-    it 'refuses to clone when a new session variable is another session old variable' do
+  describe 'a generated name that is already taken' do
+    # Reached by duplicating a SESSION and then the intervention: the session-level copy is already
+    # called `cloned_s1_1`, which is what the intervention clone would generate for s1 at position 1.
+    # Before the suffix this raised inside CloneJobs::Intervention, whose rescue turns it into a
+    # generic error email and an orphaned hidden intervention - no copy, no useful diagnosis.
+    it 'suffixes instead of colliding' do
       create(:session, intervention: intervention, variable: 'cloned_s1_1', position: 4)
 
-      expect { intervention.clone }.to raise_error(ArgumentError, /collide/)
+      copy = intervention.clone
+
+      expect(copy_sessions(copy).pluck(:variable)).to include('cloned_s1_1_2')
+    end
+
+    # Two sessions whose stems converge on one base, so the second candidate is only rejected if the
+    # uniqueness check can see the FIRST clone - which lives under the outcome, and the outcome has
+    # no organization by now (`clear_organization!`). Drop `outcome.id` from the scope and both names
+    # come out as `cloned_s1_1`, which `Session#unique_variable` rejects and the whole clone aborts.
+    # Tied positions, so which session takes which name is not pinned - only that both exist.
+    it 'sees names generated earlier in the same batch' do
+      create(:session, intervention: intervention, variable: 'cloned_s1_2', position: 1)
+
+      copy = intervention.clone
+
+      expect(copy_sessions(copy).pluck(:variable)).to include('cloned_s1_1', 'cloned_s1_1_2')
+    end
+
+    # `cloned_cloned_s2077_3_3` is real production shape. A single strip would leave
+    # `cloned_cloned_s2077_3_4` here, so this is what makes the `while` loop load-bearing.
+    it 'unwinds every layer when cloning a clone of a clone' do
+      create(:session, intervention: intervention, variable: 'cloned_cloned_s2077_3_3', position: 4)
+
+      copy = intervention.clone
+
+      expect(copy_sessions(copy).pluck(:variable)).to include('cloned_s2077_4')
+      expect(copy_sessions(copy).pluck(:variable)).to all(satisfy { |v| !v.start_with?('cloned_cloned_') })
+    end
+
+    # The organization branch of `session_variable_taken?` - raw SQL with named binds, and the only
+    # reason this is more than a two-line change. Nothing else in the suite clones an org-owned
+    # intervention, so without this a typo in `:org`/`:ids` reaches production green.
+    it 'avoids a name already used by a sibling intervention in the same organization' do
+      organization = create(:organization)
+      intervention.update!(organization: organization)
+      sibling = create(:intervention, organization: organization)
+      create(:session, intervention: sibling, variable: 'cloned_s1_1', position: 1)
+
+      copy = intervention.clone
+
+      expect(copy_sessions(copy).pluck(:variable)).to include('cloned_s1_1_2')
+      expect(copy_sessions(copy).pluck(:variable)).not_to include('cloned_s1_1')
     end
   end
 
