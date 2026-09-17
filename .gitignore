@@ -31,3 +31,7 @@ certificates/
 # Redis snapshots
 dump.rdb
 *.rdb
+    
+# htd-cq scan artifacts
+htd-cq-output/
+.htd-cq-coverage/
