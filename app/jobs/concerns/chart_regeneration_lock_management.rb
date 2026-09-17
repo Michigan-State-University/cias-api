@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Rails/SkipsModelValidations
 module ChartRegenerationLockManagement
   extend ActiveSupport::Concern
 
@@ -19,7 +18,7 @@ module ChartRegenerationLockManagement
         chart_ids = Array(job.chart_ids_for_lock_cleanup).compact
 
         if chart_ids.any?
-          Chart.unscoped.where(id: chart_ids).update_all(regenerating_since: nil, updated_at: Time.current)
+          Chart.unscoped.where(id: chart_ids).update_all(regenerating_since: nil, updated_at: Time.current) # rubocop:disable Rails/SkipsModelValidations
           Rails.logger.warn "[#{job_name}] Released regeneration lock for #{chart_ids.size} chart(s) after retries exhausted"
         else
           Rails.logger.error "[#{job_name}] Could not determine chart ids to release lock. Args: #{msg['args']}"
@@ -31,4 +30,3 @@ module ChartRegenerationLockManagement
     end
   end
 end
-# rubocop:enable Rails/SkipsModelValidations

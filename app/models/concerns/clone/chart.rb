@@ -3,7 +3,7 @@
 class Clone::Chart < Clone::Base
   def execute
     outcome.status = :draft
-    outcome.regenerating_since = nil # a clone must never inherit the source's in-progress lock
+    outcome.regenerating_since = nil
     outcome.position = Chart.where(dashboard_section_id: outcome.dashboard_section_id).maximum(:position)&.next || 1
     outcome.save!
     outcome

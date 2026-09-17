@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::ChartStatistics::ValidityEvaluator do
-  subject(:result) { described_class.call(chart, var_values, score, matched_pattern: matched_pattern) }
+  subject(:result) { described_class.call(chart, var_values, matched_pattern: matched_pattern) }
 
   let(:payload) { 'HT2.q1 + HT2.q2 + HT2.q3 + HT2.q4' }
   let(:min_answered_variables) { 3 }
   let(:rescue_enabled) { false }
-  let(:score) { nil }
   let(:matched_pattern) { nil }
   let(:var_values) { {} }
   let(:positive_pattern) { { 'match' => '>=10', 'label' => 'Positive', 'color' => '#C766EA' } }
@@ -188,7 +187,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
 
       context 'and the rescue is on with a matched case' do
         let(:rescue_enabled) { true }
-        let(:score) { 20 }
         let(:matched_pattern) { positive_pattern }
 
         it 'is still rescued' do
@@ -204,7 +202,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     let(:rescue_enabled) { true }
 
     context 'when the 0-filled score matched an explicit case' do
-      let(:score) { 20 }
       let(:matched_pattern) { positive_pattern }
 
       it 'rescues the participant' do
@@ -214,7 +211,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     end
 
     context 'when the score fell to the default category (no explicit case matched)' do
-      let(:score) { 9 }
       let(:matched_pattern) { nil }
 
       it 'never rescues — a rescued participant cannot land in the default category' do
@@ -227,7 +223,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       # Aggregation buckets purely by label string (pie_chart.rb:29-33), so a case whose
       # label duplicates the default's would rescue the participant INTO the default
       # category as rendered. Structural identity is not enough.
-      let(:score) { 20 }
       let(:matched_pattern) { { 'match' => '>=10', 'label' => 'Negative', 'color' => '#C766EA' } }
 
       it 'never rescues — the rendered category would be the default one' do
@@ -238,7 +233,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
 
     context 'when the rescue is off' do
       let(:rescue_enabled) { false }
-      let(:score) { 20 }
       let(:matched_pattern) { positive_pattern }
 
       it 'never rescues even though the score matched a case' do
@@ -256,7 +250,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
           'min_answered_variables' => min_answered_variables
         }
       end
-      let(:score) { 20 }
       let(:matched_pattern) { positive_pattern }
 
       it 'reads the rescue as off' do
@@ -276,7 +269,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
           'positive_despite_missing_threshold' => 1
         }
       end
-      let(:score) { 20 }
       let(:matched_pattern) { positive_pattern }
 
       it 'never rescues' do
@@ -287,7 +279,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
 
     context 'when the count gate already passed' do
       let(:var_values) { { 'HT2.q1' => '1', 'HT2.q2' => '1', 'HT2.q3' => '1' } }
-      let(:score) { 0 }
       # A Hash here is what makes the assertion falsifiable: without the count-gate
       # short-circuit, rescue-on + a matched case would report rescued.
       let(:matched_pattern) { positive_pattern }
@@ -305,7 +296,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       let(:payload) { '(S1.a>10) OR (S1.b>3)' }
       let(:var_values) { { 'S1.a' => '20' } }
       let(:min_answered_variables) { 2 }
-      let(:score) { true }
       let(:matched_pattern) { { 'match' => '=true', 'label' => 'Flagged', 'color' => '#C766EA' } }
 
       it 'rescues without raising' do
@@ -319,7 +309,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
       let(:payload) { '(S1.a>10) OR (S1.b>3)' }
       let(:var_values) { { 'S1.a' => '2' } }
       let(:min_answered_variables) { 2 }
-      let(:score) { false }
       let(:matched_pattern) { nil }
 
       it 'never rescues and never raises' do
@@ -335,8 +324,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     # sentinel STRINGS below on evaluation errors, and an unfiltered caller must
     # never be able to turn "formula errored" into "rescued".
     context 'when matched_pattern is not a pattern hash' do
-      let(:score) { 20 }
-
       [Chart::ZERO_DIVISION_ERROR, Chart::OTHER_FORMULA_ERROR, true, 'Positive'].each do |non_hash|
         context "with #{non_hash.inspect}" do
           let(:matched_pattern) { non_hash }
@@ -350,7 +337,6 @@ RSpec.describe V1::ChartStatistics::ValidityEvaluator do
     end
 
     context 'when the formula was never evaluated' do
-      let(:score) { nil }
       let(:matched_pattern) { nil }
 
       it 'never rescues' do

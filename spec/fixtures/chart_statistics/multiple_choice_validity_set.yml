@@ -1,10 +1,9 @@
 # CIAS-4191 - the "Set 2" truth table, as data.
 #
-# Extracted verbatim (values, not prose) from the workspace document
-#   .claude/jira-tasks/cias-4191-dashboard-formula-skip-handling/flow-analysis.html
-#   section "Set 2 - Multiple-choice questions in the formula"
+# Extracted verbatim (values, not prose) from the reviewed CIAS-4191 chart validity
+# scenarios document, section "Set 2 - Multiple-choice questions in the formula"
 # so the document and the spec can be diffed against each other instead of drifting.
-# `create_flow_analysis_set_2_spec.rb` is the only reader.
+# `create_multiple_choice_validity_spec.rb` is the only reader.
 #
 # WHY THIS TABLE EXISTS - the one rule it encodes:
 #   Every checkbox option of a Multiple-choice question is its OWN formula variable, and
@@ -29,7 +28,7 @@
 #   work brings its own rows.
 ---
 source:
-  document: .claude/jira-tasks/cias-4191-dashboard-formula-skip-handling/flow-analysis.html
+  document: CIAS-4191 chart validity scenarios
   section: Set 2 - Multiple-choice questions in the formula
   extracted_on: '2026-09-04'
 

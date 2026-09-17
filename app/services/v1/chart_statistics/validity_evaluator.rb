@@ -9,8 +9,8 @@
 class V1::ChartStatistics::ValidityEvaluator
   Result = Struct.new(:variable_count, :answered_count, :passed, :rescued, keyword_init: true)
 
-  def self.call(chart, all_var_values, score = nil, matched_pattern: nil)
-    new(chart, all_var_values, score, matched_pattern: matched_pattern).call
+  def self.call(chart, all_var_values, matched_pattern: nil)
+    new(chart, all_var_values, matched_pattern: matched_pattern).call
   end
 
   def self.enabled?(chart)
@@ -26,11 +26,9 @@ class V1::ChartStatistics::ValidityEvaluator
     chart.formula.to_h['positive_despite_missing_data'] == true
   end
 
-  def initialize(chart, all_var_values, score = nil, matched_pattern: nil)
+  def initialize(chart, all_var_values, matched_pattern: nil)
     @chart = chart
     @all_var_values = all_var_values || {}
-    # Unused in the decision - retained so the signature can carry it for diagnostics.
-    @score = score
     @matched_pattern = matched_pattern
   end
 
@@ -45,7 +43,7 @@ class V1::ChartStatistics::ValidityEvaluator
 
   private
 
-  attr_reader :chart, :all_var_values, :score, :matched_pattern
+  attr_reader :chart, :all_var_values, :matched_pattern
 
   def enabled?
     min_answered_variables.positive?

@@ -42,7 +42,7 @@ RSpec.describe RegenerateChartsJob, type: :job do
   end
 
   describe 'destructiveness' do
-    # summary.md decision 2: assert the argument AND prove row survival at job level.
+    # Assert the argument AND prove row survival at job level.
     it 'leaves existing ChartStatistic rows intact with their ids when replace is false' do
       existing = create(:chart_statistic, chart: chart, organization: organization)
 

@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
-# CIAS-4191 - the "Set 2" truth table of the workspace document
-# `.claude/jira-tasks/cias-4191-dashboard-formula-skip-handling/flow-analysis.html`, run as
-# specs. Six participants x three chart configurations = 18 outcome cells, driven from
+# CIAS-4191 - the "Set 2" truth table of the reviewed chart validity scenarios document,
+# run as specs. Six participants x three chart configurations = 18 outcome cells, driven from
 # `spec/fixtures/chart_statistics/multiple_choice_validity_set.yml` so the document and
 # this spec can be diffed against each other instead of drifting.
 #
@@ -12,9 +11,9 @@
 #   (3 Singles + 2 Multiples x 5 options) and why Ivy - who answers all five questions -
 #   still counts 5 of 13. Nothing else in the suite exercises a Multiple-choice question
 #   against the validity gate: `validity_evaluator_spec` hands the evaluator a var-values
-#   Hash directly, and the QA harness in `.claude/cias-api/testing/` uses a 9-variable
-#   all-Single formula. Here the var values are produced by REAL `Answer` records through
-#   `UserSession#all_var_values`, so the option-to-variable mapping is proven, not assumed.
+#   Hash directly, and the QA harness uses a 9-variable all-Single formula. Here the var
+#   values are produced by REAL `Answer` records through `UserSession#all_var_values`, so
+#   the option-to-variable mapping is proven, not assumed.
 #
 # WHY THIS LAYER
 #   Answers are built once per file with `let_it_be` and each cell is one
@@ -228,8 +227,8 @@ RSpec.describe V1::ChartStatistics::Create do
   end
 
   def validity_of(chart, var_values)
-    score, matched_pattern = evaluate(chart, var_values)
+    _score, matched_pattern = evaluate(chart, var_values)
 
-    V1::ChartStatistics::ValidityEvaluator.call(chart, var_values, score, matched_pattern: matched_pattern)
+    V1::ChartStatistics::ValidityEvaluator.call(chart, var_values, matched_pattern: matched_pattern)
   end
 end

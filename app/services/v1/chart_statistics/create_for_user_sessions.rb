@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class V1::ChartStatistics::CreateForUserSessions
-  # A job execution is capped at 30 minutes (ApplicationJob's Timeout) and retry_on waits 1 hour, so a
-  # TTL in (30.minutes, 1.hour) is the only window that never steals a live run's lock yet still lets
-  # the queued retry actually retry.
+  # Must sit between ApplicationJob's 30-minute Timeout and retry_on's 1-hour wait: lower steals a
+  # live run's lock, higher leaves the queued retry finding it still held.
   LOCK_TTL = 45.minutes
 
   def self.call(chart_id, replace: false)
@@ -29,11 +28,15 @@ class V1::ChartStatistics::CreateForUserSessions
     Rails.logger.warn "[#{self.class.name}] Started for chart #{chart_id}"
 
     begin
-      if replace
-        destroyed = ChartStatistic.where(chart_id: chart_id).destroy_all.size
-        Rails.logger.warn "[#{self.class.name}] Destroyed #{destroyed} row(s) for chart #{chart_id} before replay"
+      # Atomic destroy+replay: a raise must leave the chart stale, never empty, and retry_on waits
+      # an hour before the next attempt. Costs a wider window for the finish-path race below.
+      ActiveRecord::Base.transaction do
+        if replace
+          destroyed = ChartStatistic.where(chart_id: chart_id).destroy_all.size
+          Rails.logger.warn "[#{self.class.name}] Destroyed #{destroyed} row(s) for chart #{chart_id} before replay"
+        end
+        create_statistics
       end
-      create_statistics
     rescue StandardError => e
       # Deliberately NOT released: retry_on keeps a retry queued, and an idle-looking lock would let
       # a second run start alongside it. LOCK_TTL bounds the hold.
@@ -51,7 +54,6 @@ class V1::ChartStatistics::CreateForUserSessions
   attr_reader :chart_id, :replace
 
   def create_statistics
-    # service should be run when the chart is published/data_collection
     user_sessions.each do |user_session|
       next if user_session.session.intervention.draft?
 
@@ -60,9 +62,9 @@ class V1::ChartStatistics::CreateForUserSessions
   end
 
   # rubocop:disable Rails/SkipsModelValidations
-  # `unscoped` is load-bearing: Chart carries `default_scope { order(:position) }`, and an ordered
-  # relation makes Arel push `regenerating_since IS NULL` into a sub-SELECT instead of the UPDATE's
-  # own qualifier, losing mutual exclusion. Verified: without it two concurrent runs both acquire.
+  # `unscoped` is load-bearing: Chart has `default_scope { order(:position) }`, and an ordered
+  # relation makes Arel push the `IS NULL` test into a sub-SELECT instead of the UPDATE's own
+  # qualifier. Verified: without it two concurrent runs both acquire.
   def lock_acquired?
     @lock_token = Time.current.round(6) # match the column's microsecond precision
     Chart.unscoped
@@ -84,7 +86,11 @@ class V1::ChartStatistics::CreateForUserSessions
   end
   # rubocop:enable Rails/SkipsModelValidations
 
-  # Detection only. The regenerate-vs-participant-finish race is accepted; this stops it being silent.
+  # Detection only, and it sees DUPLICATES only. The other half of the regenerate-vs-finish race is
+  # invisible here: a participant finishing inside the transaction above reads the not-yet-committed
+  # row, takes the UPDATE branch, and its write matches nothing once the destroy commits - a lost
+  # row, not a duplicate one. `save!` does not raise on zero affected rows without optimistic
+  # locking. Fixing that needs a unique key on the cell and an upsert, not a wider detector.
   def log_duplicate_cells
     duplicates = ChartStatistic.where(chart_id: chart_id)
                                .group(:organization_id, :health_system_id, :health_clinic_id, :chart_id, :user_id)
@@ -101,7 +107,7 @@ class V1::ChartStatistics::CreateForUserSessions
   end
 
   def user_sessions
-    UserSession.joins(session: [intervention: :organization]).where(
+    UserSession.joins(session: [intervention: :organization]).preload(session: :intervention).where(
       sessions: {
         interventions: { organization: organization },
         variable: chart_session_variables

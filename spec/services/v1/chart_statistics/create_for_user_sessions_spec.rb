@@ -177,6 +177,18 @@ RSpec.describe V1::ChartStatistics::CreateForUserSessions do
 
       expect(ChartStatistic.where(chart_id: lock_chart.id).pluck(:id)).to eq([existing.id])
     end
+
+    # The destroy and the replay share a transaction. Without it the rows are already gone when the
+    # replay raises, retry_on waits an hour, and each of the 10 attempts re-destroys and re-fails -
+    # so a published chart sits empty until someone intervenes.
+    it 'rolls the destroy back when the replay raises' do
+      existing = create(:chart_statistic, chart: lock_chart, organization: organization)
+      allow_any_instance_of(described_class).to receive(:create_statistics).and_raise(StandardError, 'boom')
+
+      expect { V1::Charts::Regenerate.call([lock_chart.id], replace: true) }.to raise_error('boom')
+
+      expect(ChartStatistic.where(chart_id: lock_chart.id).pluck(:id)).to eq([existing.id])
+    end
   end
 
   describe 'duplicate detection' do

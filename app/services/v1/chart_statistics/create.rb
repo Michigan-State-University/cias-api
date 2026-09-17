@@ -99,14 +99,8 @@ class V1::ChartStatistics::Create
     V1::ChartStatistics::ValidityEvaluator
   end
 
-  # The bare `calculated_formula` call is not dead code: `raw_result` is nil until evaluation runs.
-  def score
-    calculated_formula
-    dentaku_service.raw_result
-  end
-
   def validity
-    @validity ||= validity_evaluator.call(chart, all_var_values, score, matched_pattern: calculated_formula)
+    @validity ||= validity_evaluator.call(chart, all_var_values, matched_pattern: calculated_formula)
   end
 
   # Deliberately positioned BEHIND the sentinel checks in `call`: invalid formula variables,

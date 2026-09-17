@@ -1,12 +1,7 @@
 # frozen_string_literal: true
 
 # The class had no unit spec until 2026-09-04, which meant every change to it flew blind at
-# unit level. Both predicates are covered here:
-#
-#   `none_answered?` - the live ungated rule (drop only the participant who answered NONE of
-#                      the questions owning the formula's missing variables).
-#   `call`           - the retired strict rule (drop when ANY owning question is unanswered),
-#                      retained on the class so the gated path can adopt it.
+# unit level.
 RSpec.describe V1::ChartStatistics::UnansweredOwningQuestions do
   let(:organization) { create(:organization) }
   let(:health_system) { create(:health_system, organization: organization) }

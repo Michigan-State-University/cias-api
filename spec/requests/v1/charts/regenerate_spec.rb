@@ -36,11 +36,12 @@ RSpec.describe 'POST /v1/charts/:id/regenerate', type: :request do
         expect(response).to have_http_status(:accepted)
       end
 
-      # `replace` decides between a replay and a `destroy_all`. Asserting only "a job was enqueued"
-      # cannot tell the two apart, so assert the arguments themselves.
-      it 'enqueues the job non-destructively, with the triggering user' do
+      # `replace` decides between a replay and a full rebuild. Asserting only "a job was enqueued"
+      # cannot tell the two apart, so assert the arguments themselves. `replace: false` cannot
+      # relabel an existing row (see Create#assignable?), so the button would not regenerate at all.
+      it 'enqueues a full rebuild, with the triggering user' do
         expect { request }.to have_enqueued_job(RegenerateChartsJob)
-          .with([chart.id], replace: false, user_id: user.id)
+          .with([chart.id], replace: true, user_id: user.id)
       end
 
       # The acquire lives in V1::ChartStatistics::CreateForUserSessions, which SKIPS when the lock
