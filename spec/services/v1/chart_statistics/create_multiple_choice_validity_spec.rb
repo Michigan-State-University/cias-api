@@ -114,7 +114,12 @@ RSpec.describe V1::ChartStatistics::Create do
     create(:dashboard_section, reporting_dashboard: create(:reporting_dashboard, organization: organization))
   end
   let_it_be(:intervention) { create(:intervention, :published, organization: organization) }
-  let_it_be(:session) { create(:session, intervention: intervention, variable: fixture.fetch('session_variable')) }
+  let_it_be(:session) do
+    RSpec::Mocks.with_temporary_scope do
+      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      create(:session, intervention: intervention, variable: fixture.fetch('session_variable'))
+    end
+  end
   let_it_be(:question_group) { create(:question_group, session: session) }
   let_it_be(:questions) { MultipleChoiceValiditySet.questions(question_group, fixture.fetch('questions')) }
 
