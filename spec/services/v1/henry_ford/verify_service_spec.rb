@@ -129,6 +129,37 @@ RSpec.describe V1::HenryFord::VerifyService do
     end
   end
 
+  context 'when id points at a record this user never drafted' do
+    let!(:someone_elses_detail) { create(:hfhs_patient_detail, patient_id: '89010892', pending: false) }
+    let(:params) { { id: someone_elses_detail.id } }
+
+    it 'refuses to confirm it' do
+      expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it 'does not match the user to it' do
+      expect { subject }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(user.reload.hfhs_patient_detail).to be_nil
+    end
+  end
+
+  context 'when id points at the record this user is already matched to' do
+    let!(:own_detail) { create(:hfhs_patient_detail, patient_id: '89010892', epic_id: 'test-epic-id-123', pending: false) }
+    let(:params) { { id: own_detail.id } }
+
+    before do
+      user.update!(hfhs_patient_detail: own_detail)
+      allow_any_instance_of(Date).to receive(:future?).and_return(true)
+      allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
+        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+      )
+    end
+
+    it 'confirms it' do
+      expect(subject).to eq(own_detail.reload)
+    end
+  end
+
   context 'when id is provided but record not found' do
     let(:params) do
       {

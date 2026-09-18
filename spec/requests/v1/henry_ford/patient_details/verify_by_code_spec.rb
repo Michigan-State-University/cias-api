@@ -215,12 +215,12 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'updates existing record to pending true' do
+      it 'does not demote the already confirmed record back to pending' do
         json_response = response.parsed_body
         patient_detail = HfhsPatientDetail.find(json_response['data']['id'])
 
         expect(patient_detail.id).to eq(existing_patient.id)
-        expect(patient_detail.pending).to be true
+        expect(patient_detail.pending).to be false
       end
 
       it 'does not create new record' do

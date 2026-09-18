@@ -86,11 +86,11 @@ ar:
   henry_ford:
     error:
       barcode:
-        pattern_not_found: "غير قادر على العثور على نمط معرف المريض في الباركود"
         patient_id_empty: "معرف المريض فارغ في الباركود"
-        paring_error: "غير قادر على تحليل معرف المريض من الباركود"
+        parsing_error: "غير قادر على تحليل معرف المريض من الباركود"
       patient:
         multiple_found: "تم العثور على مرضى متعددين - تعريف غامض للمريض"
+        identifier_missing: "سجل المريض الذي أعادته الأداة الخارجية يفتقد المعرف المطلوب. يرجى الاتصال بفريق الدعم لدينا."
   phone_verification: "رمز التحقق CIAS الخاص بك هو: %{verification_code}"
   sms:
     wrong_message: 'رسالة خاطئة'

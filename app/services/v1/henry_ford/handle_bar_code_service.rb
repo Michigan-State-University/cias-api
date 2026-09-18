@@ -38,17 +38,22 @@ class V1::HenryFord::HandleBarCodeService
       zip_code: epic_zip_code(epic_response),
       phone_type: epic_phone_type(epic_response),
       phone_number: epic_phone_number(epic_response),
-      epic_id: epic_patient_id(epic_response),
-      pending: true
+      epic_id: epic_patient_id(epic_response)
     )
+
+    resource.pending = true if resource.new_record?
 
     resource.save!
     resource
   end
 
   def hfhs_patient_id(epic_response)
-    epic_response.dig(:entry, 0, :resource, :identifier).
-      find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }&.
-      dig(:value)
+    identifier = epic_response.dig(:entry, 0, :resource, :identifier).to_a.
+                 find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }&.
+                 dig(:value)
+
+    raise HenryFord::PatientIdentifierMissingError if identifier.blank?
+
+    identifier
   end
 end

@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 
+# Serves the confirmation screen shown right after an Aztec code scan, before
+# the patient has confirmed anything. Every attribute here is therefore
+# deliberately partial: enough for a patient to recognise themselves, not
+# enough to be useful to anybody else. Do NOT add plain attributes to this
+# serializer - add a masked one.
 class V1::HfhsPatientDetailAnonymizedSerializer < V1Serializer
-  attributes :id, :patient_id, :sex, :zip_code
+  attributes :id
 
   attribute :first_name do |object|
     anonymize_name(object.first_name)
@@ -17,6 +22,10 @@ class V1::HfhsPatientDetailAnonymizedSerializer < V1Serializer
 
   attribute :phone_number do |object|
     anonymize_phone(object.phone_number)
+  end
+
+  attribute :mrn do |object|
+    mask_except_last_four(object.patient_id)
   end
 
   class << self
@@ -41,10 +50,16 @@ class V1::HfhsPatientDetailAnonymizedSerializer < V1Serializer
     def anonymize_phone(phone)
       return nil if phone.blank?
 
-      digits = phone.to_s.gsub(/\D/, '')
-      return '****' if digits.length <= 4
+      mask_except_last_four(phone.to_s.gsub(/\D/, ''))
+    end
 
-      "#{'*' * (digits.length - 4)}#{digits[-4..]}"
+    def mask_except_last_four(value)
+      return nil if value.blank?
+
+      value = value.to_s
+      return '****' if value.length <= 4
+
+      "#{'*' * (value.length - 4)}#{value[-4..]}"
     end
   end
 end

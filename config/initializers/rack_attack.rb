@@ -39,6 +39,16 @@ class Rack::Attack
   # Another common method of attack is to use a swarm of computers with
   # different IPs to try brute-forcing a password for a specific account.
 
+  ### Prevent Patient Enumeration Through The Aztec Code Endpoint ###
+
+  # verify_by_code turns an arbitrary caller-supplied barcode into a patient
+  # lookup against Epic. Scanning is a once-per-visit action, so a legitimate
+  # user never comes close to this limit, while a scripted caller walking an
+  # identifier space is stopped early.
+  throttle('henry_ford/verify_by_code/ip', limit: 10, period: 1.minute) do |req|
+    req.ip if req.path == '/v1/henry_ford/verify_by_code' && req.post?
+  end
+
   # Throttle POST requests to /login by IP address
   #
   # Key: "rack::attack:#{Time.now.to_i/:period}:logins/ip:#{req.ip}"

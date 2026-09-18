@@ -104,6 +104,10 @@ module ExceptionHandler
       render json: msg(exc), status: :unprocessable_entity
     end
 
+    rescue_from HenryFord::PatientIdentifierMissingError do |exc|
+      render json: msg(exc), status: :unprocessable_entity
+    end
+
     rescue_from ConcurrentEditException do |exc|
       render json: msg(exc), status: :unprocessable_entity
     end

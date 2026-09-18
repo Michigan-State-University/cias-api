@@ -102,15 +102,34 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
         expect { subject }.not_to change(HfhsPatientDetail, :count)
       end
 
-      it 'updates existing record to pending: true' do
+      it 'does not demote the already confirmed record back to pending' do
         result = subject
         expect(result.id).to eq(existing_patient.id)
-        expect(result.pending).to be true
+        expect(result.pending).to be false
+      end
+
+      it 'refreshes the record with the data returned by EPIC' do
+        result = subject
+        expect(result.epic_id).to eq('test-patient-id')
       end
 
       it 'returns the existing record' do
         result = subject
         expect(result).to eq(existing_patient.reload)
+      end
+    end
+
+    context 'when a pending record for the same patient already exists' do
+      let!(:existing_patient) do
+        create(:hfhs_patient_detail, patient_id: '89010892', pending: true)
+      end
+
+      it 'does not create a new record' do
+        expect { subject }.not_to change(HfhsPatientDetail, :count)
+      end
+
+      it 'keeps the record pending' do
+        expect(subject.pending).to be true
       end
     end
 
@@ -174,8 +193,16 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
         allow_any_instance_of(Api::EpicOnFhir::PatientSearch).to receive(:call).and_return(epic_response_no_system_id)
       end
 
-      it 'creates record with nil patient_id' do
-        expect { subject }.to raise_error(ActiveRecord::RecordInvalid, /Patient can't be blank/)
+      it 'raises PatientIdentifierMissingError' do
+        expect { subject }.to raise_error(HenryFord::PatientIdentifierMissingError)
+      end
+
+      it 'does not create any records' do
+        expect do
+          subject
+        rescue StandardError
+          nil
+        end.not_to change(HfhsPatientDetail, :count)
       end
     end
 
@@ -326,9 +353,9 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
           }
         end
 
-        it 'returns nil' do
-          result = service.send(:hfhs_patient_id, epic_response_no_match)
-          expect(result).to be_nil
+        it 'raises PatientIdentifierMissingError' do
+          expect { service.send(:hfhs_patient_id, epic_response_no_match) }.
+            to raise_error(HenryFord::PatientIdentifierMissingError)
         end
       end
 
@@ -345,9 +372,9 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
           }
         end
 
-        it 'returns nil' do
-          result = service.send(:hfhs_patient_id, epic_response_empty_identifiers)
-          expect(result).to be_nil
+        it 'raises PatientIdentifierMissingError' do
+          expect { service.send(:hfhs_patient_id, epic_response_empty_identifiers) }.
+            to raise_error(HenryFord::PatientIdentifierMissingError)
         end
       end
     end

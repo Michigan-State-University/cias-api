@@ -103,6 +103,8 @@ class V1::HenryFord::VerifyService
   end
 
   def confirm_resource!
+    raise ActiveRecord::RecordNotFound unless @resource.pending? || user.hfhs_patient_detail_id == @resource.id
+
     @resource.update!(pending: false)
   end
 
