@@ -102,13 +102,15 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
                                                  'label' => 3.months.ago.strftime('%B %Y'),
                                                  'value' => 4,
                                                  'color' => '#C766EA',
-                                                 'notMatchedValue' => 5
+                                                 'notMatchedValue' => 5,
+                                                 'invalidValue' => 0
                                                },
                                                {
                                                  'label' => 2.months.ago.strftime('%B %Y'),
                                                  'value' => 10,
                                                  'color' => '#C766EA',
-                                                 'notMatchedValue' => 3
+                                                 'notMatchedValue' => 3,
+                                                 'invalidValue' => 0
                                                }
                                              ),
                                              'population' => 22,
@@ -132,13 +134,15 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
                                                  'label' => 3.months.ago.strftime('%B %Y'),
                                                  'value' => 44.44,
                                                  'color' => '#C766EA',
-                                                 'population' => 9
+                                                 'population' => 9,
+                                                 'invalidValue' => 0
                                                },
                                                {
                                                  'label' => 2.months.ago.strftime('%B %Y'),
                                                  'value' => 76.92,
                                                  'color' => '#C766EA',
-                                                 'population' => 13
+                                                 'population' => 13,
+                                                 'invalidValue' => 0
                                                }
                                              ),
                                              'population' => 22,
