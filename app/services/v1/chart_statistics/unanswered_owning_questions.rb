@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-# Answers "did the participant actually REACH the questions that own `missing_vars`?" for
-# `V1::ChartStatistics::Create`, on ungated charts only. "Reached" means the owning question has
-# a confirmed `Answer` row, not that its variable is present in var values: a SKIP leaves a
-# confirmed row with a blank `var`, a BRANCH-AROUND leaves no row at all. Both read as missing
-# to Dentaku, but only the skip proves the participant stood in front of the question.
 class V1::ChartStatistics::UnansweredOwningQuestions
   def self.none_answered?(user_session, missing_vars)
     new(user_session, missing_vars).none_answered?
@@ -26,10 +21,6 @@ class V1::ChartStatistics::UnansweredOwningQuestions
 
   attr_reader :user_session, :missing_vars
 
-  # Copying a session renames the session variable (`clone_jobs/session.rb:15`) but not the
-  # question variables inside it, so one intervention can hold two questions called `q4`. Matching
-  # the (session variable, question variable) PAIR keeps the untouched twin - which the
-  # participant never opened - out of `owning_question_ids`.
   def qualified_pairs
     @qualified_pairs ||= missing_vars.filter_map { |variable| variable.split('.', 2) if variable.include?('.') }.to_set
   end

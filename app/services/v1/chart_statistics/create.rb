@@ -27,8 +27,6 @@ class V1::ChartStatistics::Create
         return
       end
 
-      # An explicit `min_answered_variables` supersedes this guard: the chart owner has
-      # declared how many answers are enough, and the remaining variables 0-fill.
       if !validity_gate_enabled? && answered_none_of_chart_variables?(missing_vars)
         Rails.logger.info(
           "ChartStatistics::Create SKIPPED chart_id=#{chart.id}: " \
@@ -73,8 +71,6 @@ class V1::ChartStatistics::Create
     )
   end
 
-  # `defined?` rather than `||=`: `chart.calculate` returns nil whenever no pattern matched, and
-  # `||=` would then re-run the whole evaluation on every call site in the excluded path.
   def calculated_formula
     return @calculated_formula if defined?(@calculated_formula)
 
@@ -103,9 +99,6 @@ class V1::ChartStatistics::Create
     @validity ||= validity_evaluator.call(chart, all_var_values, matched_pattern: calculated_formula)
   end
 
-  # Deliberately positioned BEHIND the sentinel checks in `call`: invalid formula variables,
-  # evaluation errors and out-of-date-range sessions all `return` earlier and keep their silent
-  # skip - an evaluation-error participant must never surface as a visible Invalid slice.
   def chartable?
     return true unless validity_gate_enabled?
     return true if validity.passed
@@ -202,7 +195,6 @@ class V1::ChartStatistics::Create
 
   def inside_date_range?
     return false if chart.date_range_start.present? && chart.date_range_start > user_session.finished_at
-    # +1.day because FE sends and BE stores the BEGINNING of the last day, and we need to include this day as a whole as well
     return false if chart.date_range_end.present? && chart.date_range_end + 1.day <= user_session.finished_at
 
     true

@@ -28,8 +28,6 @@ class V1::ChartStatistics::CreateForUserSessions
     Rails.logger.warn "[#{self.class.name}] Started for chart #{chart_id}"
 
     begin
-      # Atomic destroy+replay: a raise must leave the chart stale, never empty, and retry_on waits
-      # an hour before the next attempt. Costs a wider window for the finish-path race below.
       ActiveRecord::Base.transaction do
         if replace
           destroyed = ChartStatistic.where(chart_id: chart_id).destroy_all.size
@@ -38,8 +36,6 @@ class V1::ChartStatistics::CreateForUserSessions
         create_statistics
       end
     rescue StandardError => e
-      # Deliberately NOT released: retry_on keeps a retry queued, and an idle-looking lock would let
-      # a second run start alongside it. LOCK_TTL bounds the hold.
       Rails.logger.error "[#{self.class.name}] Failed for chart #{chart_id}, will retry. Lock remains held. Error: #{e.message}"
       raise
     end
@@ -62,11 +58,8 @@ class V1::ChartStatistics::CreateForUserSessions
   end
 
   # rubocop:disable Rails/SkipsModelValidations
-  # `unscoped` is load-bearing: Chart has `default_scope { order(:position) }`, and an ordered
-  # relation makes Arel push the `IS NULL` test into a sub-SELECT instead of the UPDATE's own
-  # qualifier. Verified: without it two concurrent runs both acquire.
   def lock_acquired?
-    @lock_token = Time.current.round(6) # match the column's microsecond precision
+    @lock_token = Time.current.round(6)
     Chart.unscoped
          .where(id: chart_id)
          .where('regenerating_since IS NULL OR regenerating_since < ?', LOCK_TTL.ago)
@@ -74,8 +67,6 @@ class V1::ChartStatistics::CreateForUserSessions
          .positive?
   end
 
-  # Conditional on the token this run wrote: if the TTL let a later run take over, this run must not
-  # clear the new owner's lock.
   def release_lock
     Chart.unscoped.where(id: chart_id, regenerating_since: @lock_token)
          .update_all(regenerating_since: nil, updated_at: Time.current)
@@ -86,11 +77,6 @@ class V1::ChartStatistics::CreateForUserSessions
   end
   # rubocop:enable Rails/SkipsModelValidations
 
-  # Detection only, and it sees DUPLICATES only. The other half of the regenerate-vs-finish race is
-  # invisible here: a participant finishing inside the transaction above reads the not-yet-committed
-  # row, takes the UPDATE branch, and its write matches nothing once the destroy commits - a lost
-  # row, not a duplicate one. `save!` does not raise on zero affected rows without optimistic
-  # locking. Fixing that needs a unique key on the cell and an upsert, not a wider detector.
   def log_duplicate_cells
     duplicates = ChartStatistic.where(chart_id: chart_id)
                                .group(:organization_id, :health_system_id, :health_clinic_id, :chart_id, :user_id)
@@ -102,7 +88,6 @@ class V1::ChartStatistics::CreateForUserSessions
     Rails.logger.warn "[#{self.class.name}] Chart #{chart_id} left #{duplicates.size} duplicate cell(s) " \
                       "(#{surplus} surplus row(s)) after regeneration"
   rescue StandardError => e
-    # Detection only — a failure in a logging statement must never re-run the regeneration via retry_on.
     Rails.logger.error "[#{self.class.name}] Duplicate detection failed for chart #{chart_id}: #{e.message}"
   end
 

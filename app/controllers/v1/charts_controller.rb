@@ -44,8 +44,6 @@ class V1::ChartsController < V1Controller
 
     raise ActiveRecord::RecordNotSaved, I18n.t('chart.error.regenerate.draft_chart') if chart.draft?
 
-    # CHECK the lock, never acquire it: CreateForUserSessions SKIPS when it is already held, so
-    # acquiring here would make the job skip its own work and leave the chart wedged.
     raise ActiveRecord::RecordNotSaved, I18n.t('chart.error.regenerate.in_progress') if chart.regenerating?
 
     RegenerateChartsJob.perform_later([chart.id], replace: true, user_id: current_v1_user.id)
