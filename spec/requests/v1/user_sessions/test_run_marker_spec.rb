@@ -2,9 +2,6 @@
 
 require 'rails_helper'
 
-# CIAS-4187 — anonymous "Anyone With The Link" fills started from a signed test link are flagged
-# as test runs. Every rejection path has to fail *open*: the participant's fill still succeeds, it
-# is simply not marked.
 RSpec.describe 'test-run marker on the public user_session entry points', type: :request do
   let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
 
@@ -36,8 +33,7 @@ RSpec.describe 'test-run marker on the public user_session entry points', type: 
         expect(created_guest.test_run_marked_by_id).to eq(researcher.id)
       end
 
-      # The client cannot infer this: the backend fails open, so a refused marker looks exactly like
-      # a successful one on the wire unless the response says so.
+      # The client cannot infer this: the backend fails open, so a refused marker looks identical on the wire.
       it 'tells the client the fill is test data' do
         expect(json_response['meta']['test_run']).to be(true)
       end
@@ -105,9 +101,7 @@ RSpec.describe 'test-run marker on the public user_session entry points', type: 
     context 'when the same token is replayed by a second guest' do
       before { perform_request }
 
-      # D8, revised: a replayed link marks every fill it reaches inside its TTL, with no ceiling.
-      # A one-shot nonce, and then a cap of five, each recorded the researcher's next test run as a
-      # real participant with no signal — the pollution this feature exists to prevent.
+      # Deliberate (D8): no ceiling. A one-shot nonce and a cap of five each recorded a later test run as a real participant.
       it 'marks the second guest as well' do
         first_guest = created_guest
         perform_request
@@ -147,8 +141,6 @@ RSpec.describe 'test-run marker on the public user_session entry points', type: 
     it_behaves_like 'a public fill entry point'
   end
 
-  # A request that authorization rejects must not leave a marked guest behind for a fill that never
-  # happened.
   describe 'POST /v1/user_sessions rejected by authorization' do
     let(:intervention) { create(:intervention, user: researcher, status: :draft, shared_to: :anyone) }
 
@@ -169,9 +161,7 @@ RSpec.describe 'test-run marker on the public user_session entry points', type: 
     end
   end
 
-  # The marker used to hang off guest resolution, which every action of this controller reaches
-  # through `current_ability` — so a `test_link_token` anywhere on the request dragged
-  # `params.require(:user_session)` into a GET and turned a working 200 into a 400.
+  # Regression: the marker hung off guest resolution, so a token on any GET dragged `params.require` in and returned 400.
   describe 'GET /v1/user_sessions/:id/ra_show carrying a test_link_token' do
     let(:ra_intervention) { create(:intervention, :published, user: researcher) }
     let!(:ra_session) { create(:ra_session, intervention: ra_intervention) }
@@ -200,8 +190,6 @@ RSpec.describe 'test-run marker on the public user_session entry points', type: 
     end
   end
 
-  # The anonymous flow lands on the invite page first, so the guest can already exist by the time
-  # the session request carries the token.
   describe 'a guest created by an earlier, tokenless request' do
     it 'is still marked when it presents the token' do
       post v1_user_interventions_path, params: { user_intervention: { intervention_id: intervention.id } }
@@ -218,10 +206,8 @@ RSpec.describe 'test-run marker on the public user_session entry points', type: 
     end
   end
 
-  # CIAS-4187 (post-r2 review, SEC-R3-1): `config.filter_parameters` redacts log *output* only.
-  # `Log::UserRequest` persists `params.to_unsafe_h` into `user_log_requests.params`, which `audited`
-  # then copies into `audits.audited_changes` — two permanent stores that never expire. The token is a
-  # credential; it must not land in either.
+  # `filter_parameters` redacts log *output* only. `Log::UserRequest` persists params into `user_log_requests`,
+  # which `audited` copies into `audits` — two permanent stores. The token is a credential and must reach neither.
   describe 'request logging' do
     include ActiveJob::TestHelper
 

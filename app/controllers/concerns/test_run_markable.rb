@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-# Call `mark_test_run` from the fill actions after `authorize!`, never from guest resolution.
 module TestRunMarkable
   private
 
-  # Must never raise: a failed marker degrades the fill, it does not break it.
   def mark_test_run(user)
     token = test_link_token_param
     return false if token.blank?
@@ -16,8 +14,7 @@ module TestRunMarkable
     false
   end
 
-  # `test_run_in_database`: a failed `update!` leaves the object claiming `true`.
-  # The two `test_run_intervention_id`s differ — marker's vs this request's. Do not collapse.
+  # Neither read is redundant: `test_run_in_database` survives a failed `update!`, and the two `test_run_intervention_id`s are the marker's and this request's.
   def test_run_meta(user)
     {
       test_run: user.present? &&

@@ -1,13 +1,11 @@
 # frozen_string_literal: true
 
-# Mints and verifies the signed capability that lets an "Anyone With The Link" fill be marked as a test run.
 class V1::TestRuns::LinkToken
   PURPOSE = 'cias/test_link'
   DEFAULT_TTL_MINUTES = 15
 
   Minted = Struct.new(:token, :expires_at, :nonce, keyword_init: true)
 
-  # `payload` is populated for `:valid` only — an unusable token's contents are not to be believed.
   Inspection = Struct.new(:status, :payload, keyword_init: true) do
     def valid?
       status == :valid
@@ -19,7 +17,6 @@ class V1::TestRuns::LinkToken
   end
 
   class << self
-    # `nonce` gates nothing: the per-token mark ceiling was removed (D8). It is the mint response's `id`.
     def mint(intervention_id, minted_by_id)
       nonce = SecureRandom.uuid
       expires_at = Time.current + ttl
@@ -37,7 +34,6 @@ class V1::TestRuns::LinkToken
       Minted.new(token: token, expires_at: expires_at, nonce: nonce)
     end
 
-    # Never raises — an unusable token must degrade the fill to an ordinary one, not break it.
     def verify(token, intervention_id)
       return nil if token.blank? || intervention_id.blank?
 
@@ -58,7 +54,6 @@ class V1::TestRuns::LinkToken
       return Inspection.new(status: :valid, payload: payload) if usable_payload?(payload)
       return Inspection.new(status: :invalid) unless payload.nil?
 
-      # `:expired` by elimination — our digest, yet `verified` refused it, and expiry is the only check left.
       Inspection.new(status: verifier.valid_message?(token.to_s) ? :expired : :invalid)
     rescue StandardError => e
       Rails.logger.warn("[V1::TestRuns::LinkToken] rejected test-link token: #{e.class}")

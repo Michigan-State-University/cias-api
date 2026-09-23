@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-# Permanently deletes one marked guest's contribution to ONE intervention. Both the scoping and the destruction order are load-bearing.
-# Derived from `.claude/cias-api/testing/test_participant_purge_cascade_spike.rb`, which catalogues every unguarded inbound foreign key.
+# Scoping and destruction order are both load-bearing — derived from `.claude/cias-api/testing/test_participant_purge_cascade_spike.rb`.
 class V1::Intervention::TestParticipants::PurgeService
   prepend Database::Transactional
 
-  # Enabled per table, not per hierarchy; STI subclasses ride on their parent. A model missing here still purges, it just leaves audit rows.
-  # `Audio` is listed because destroying a session with a `name_audio` *updates* one through a `before_destroy` counter.
   AUDIT_SUPPRESSED_MODELS = [
     User, UserIntervention, UserSession, Answer, GeneratedReport, GeneratedReportsThirdPartyUser,
     DownloadedReport, ChartStatistic, SmsCampaignEvent, SmsLinksUser,
@@ -74,7 +71,6 @@ class V1::Intervention::TestParticipants::PurgeService
     )
   end
 
-  # Order is the point of this method — see the class comment.
   def destroy_scoped_data(user, intervention_id)
     user_interventions = UserIntervention.where(user_id: user.id, intervention_id: intervention_id)
     user_sessions = UserSession.where(user_intervention_id: user_interventions.select(:id))
@@ -103,7 +99,6 @@ class V1::Intervention::TestParticipants::PurgeService
       .where(id: LiveChat::Interlocutor.where(user_id: user.id).select(:conversation_id))
   end
 
-  # No association on `User`, so nothing else cleans these up; reachable from the intervention only via `sms_links → sessions`.
   def sms_links_users_for(user, intervention_id)
     SmsLinksUser
       .where(user_id: user.id)
@@ -128,7 +123,6 @@ class V1::Intervention::TestParticipants::PurgeService
       !SmsLinksUser.exists?(user_id: user.id)
   end
 
-  # Leaving the marker set would re-queue this user for every later sweep. `update_columns` is deliberate: bookkeeping, not a domain update.
   def release_marker(user)
     user.update_columns(test_run: false, test_run_intervention_id: nil, purge_scheduled_at: nil) # rubocop:disable Rails/SkipsModelValidations
 
@@ -148,7 +142,6 @@ class V1::Intervention::TestParticipants::PurgeService
     head.without_auditing { suppress_auditing(tail, &block) }
   end
 
-  # A refusal is otherwise silent. `:unscoped_marker` should be impossible, and means that user can never be purged by any route.
   def skipped(reason)
     Rails.logger.warn("[TestParticipants::PurgeService] skipped user_id=#{user_id} reason=#{reason}")
 

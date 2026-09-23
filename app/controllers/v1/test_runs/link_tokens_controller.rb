@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# Unauthenticated so an anonymous guest can check a test link before any fill exists; inspecting is read-only and spends nothing.
 class V1::TestRuns::LinkTokensController < V1Controller
   skip_before_action :authenticate_user!, only: %i[verify]
 
@@ -19,7 +18,6 @@ class V1::TestRuns::LinkTokensController < V1Controller
 
   private
 
-  # Do not rename: `filter_parameters` and `erase_from_params` redact `test_link_token` by key, a rename leaks the credential.
   def verify_params
     params.permit(:test_link_token)
   end

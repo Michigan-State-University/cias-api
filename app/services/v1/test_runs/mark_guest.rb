@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# Flags an anonymous guest as a test run when the request carries a valid token; a successful mark also arms the purge.
 class V1::TestRuns::MarkGuest
   def self.call(user, intervention_id, token)
     new(user, intervention_id, token).call
@@ -21,7 +20,6 @@ class V1::TestRuns::MarkGuest
     persist!(payload)
     true
   rescue StandardError => e
-    # Covers the write and the enqueue: if `perform_later` raised, the row is committed and only the fuse is missing.
     Rails.logger.warn("[V1::TestRuns::MarkGuest] test-run marking did not complete: #{e.class}")
     Sentry.capture_exception(e)
     false

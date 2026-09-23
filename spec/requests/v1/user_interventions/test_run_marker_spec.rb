@@ -2,8 +2,6 @@
 
 require 'rails_helper'
 
-# CIAS-4187 — the anonymous invite landing page hits this entry point first, so it has to honour
-# the signed test link too, and fail open on everything else.
 RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request do
   let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
 
@@ -21,9 +19,7 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
     User.limit_to_roles(%w[guest]).order(:created_at, :id).last
   end
 
-  # CIAS-4187 (review round 2): the concern's rescue is belt-and-braces that nothing else falsifies —
-  # reverting it alone leaves every other example green. Stubbing the public seam pins the fail-open
-  # contract itself: the marker may blow up, the participant's fill must not.
+  # The concern's rescue is belt-and-braces nothing else falsifies — reverting it leaves every other example green.
   context 'when the marker raises' do
     before { allow(V1::TestRuns::MarkGuest).to receive(:call).and_raise(StandardError, 'boom') }
 
@@ -116,9 +112,7 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
   context 'when the same token is replayed by a second guest' do
     before { perform_request }
 
-    # D8, revised: a replayed link marks every fill it reaches inside its TTL, with no ceiling.
-    # A one-shot nonce, and then a cap of five, each recorded the researcher's next test run as a
-    # real participant with no signal — the pollution this feature exists to prevent.
+    # Deliberate (D8): no ceiling. A one-shot nonce and a cap of five each recorded a later test run as a real participant.
     it 'marks the second guest as well' do
       first_guest = created_guest
       perform_request
@@ -141,9 +135,7 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
     end
   end
 
-  # The marker used to hang off guest resolution, which every action reaches through
-  # `current_ability` — so a `test_link_token` on any request of this controller dragged
-  # `params.require(:user_intervention)` into a GET and turned a working 200 into a 400.
+  # Regression: the marker hung off guest resolution, so a token on any GET dragged `params.require` in and returned 400.
   describe 'GET /v1/user_interventions carrying a test_link_token' do
     let(:headers) { researcher.create_new_auth_token }
 
@@ -167,8 +159,6 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
     end
   end
 
-  # A request that authorization rejects must not leave a marked guest behind for a fill that never
-  # happened.
   context 'when authorization rejects the fill' do
     let(:intervention) { create(:intervention, user: researcher, status: :draft, shared_to: :anyone) }
 
@@ -204,11 +194,7 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
     end
   end
 
-  # CIAS-4187 (post-r2 review, F2/F3): `meta.test_run` answers "is *this* fill test data?", not "is
-  # this guest marked for something?". One anonymous guest identity legitimately spans several
-  # "anyone with the link" interventions, and `PurgeService` only deletes the fills of the marked
-  # one — so reporting `true` for a different intervention would promise a deletion that never comes,
-  # in the one direction the banner must never get wrong.
+  # `meta.test_run` answers "is *this* fill test data?" — reporting true for another intervention promises a deletion that never comes.
   describe 'meta.test_run scoping' do
     let(:other_intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
     # Reuse the guest the marking request created, the way a browser would.
@@ -241,11 +227,11 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
       other_token = V1::TestRuns::LinkToken.mint(other_intervention.id, researcher.id).token
       perform_other_request(other_token)
 
-      # `markable?` refuses an already-marked guest, so the fill is genuinely NOT test data.
+      # `markable?` refuses an already-marked guest, so this fill is genuinely not test data.
       expect(json_response['meta']['test_run']).to be(false)
     end
 
-    # The guard that stops anyone "simplifying" the fix back to a bare `test_run?`.
+    # Stops anyone simplifying this back to a bare `test_run?`.
     it 'still reports true for a later tokenless fill of the marked intervention' do
       post v1_user_interventions_path,
            params: { user_intervention: { intervention_id: intervention.id } },
@@ -255,8 +241,6 @@ RSpec.describe 'test-run marker on POST /v1/user_interventions', type: :request 
     end
   end
 
-  # F3: `update!` assigns and *then* saves. A save that raises leaves the in-memory object claiming
-  # `true` while the row says `false` — and the meta is built from that very object moments later.
   describe 'when the marker write fails after assigning' do
     before do
       # Only the marker write — the controller also calls `update!` for `quick_exit_enabled`.

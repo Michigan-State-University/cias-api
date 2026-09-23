@@ -30,8 +30,6 @@ RSpec.describe TestParticipants::StrandedPurgesQuery do
     expect(candidates).to contain_exactly(stranded)
   end
 
-  # The purge either destroys the shell or releases the marker; either way the record stops being a
-  # candidate, which is what makes re-running the reconciler safe.
   it 'ignores a participant whose marker was released' do
     build_guest(test_run: false, test_run_intervention_id: nil, purge_scheduled_at: 2.hours.ago)
 
@@ -44,10 +42,6 @@ RSpec.describe TestParticipants::StrandedPurgesQuery do
     expect(candidates).to contain_exactly(stranded)
   end
 
-  # The hard precondition from the phase-1 review, enforced at the point candidates are chosen.
-  # `test_run` is user-level while the link that sets it is minted per intervention, so a marker
-  # with no intervention cannot be scoped to one and must never reach a destructive job — a bare
-  # `User.where(test_run: true)` sweep is what this clause exists to prevent.
   it 'ignores a marker that carries no intervention, because it cannot be scoped' do
     build_guest(test_run: true, test_run_intervention_id: nil, purge_scheduled_at: 2.hours.ago)
 

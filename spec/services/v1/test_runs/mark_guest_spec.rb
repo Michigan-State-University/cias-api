@@ -61,11 +61,7 @@ RSpec.describe V1::TestRuns::MarkGuest do
     end
   end
 
-  # D8, revised: the link is a time-boxed capability with no ceiling on it. A one-shot nonce, and
-  # then a cap of five, both did the same thing — they moved the silent-failure cliff. The first
-  # fill past the cliff is recorded as a permanent, un-purgeable real participant, which is the
-  # exact pollution this feature exists to prevent. The TTL, the single intervention and the
-  # authorization check at mint time are what bound the link.
+  # Deliberate (D8): a time-boxed capability with no ceiling. Any cap just moves the silent-failure cliff.
   context 'when the same token is used again' do
     it 'marks a second guest too' do
       first_guest = create(:user, :confirmed, :guest)
@@ -97,9 +93,7 @@ RSpec.describe V1::TestRuns::MarkGuest do
     end
   end
 
-  # A guest older than the token's own lifetime cannot be the guest this fill just created: it is a
-  # kiosk, a shared browser or a forwarded link, and it may already hold real participant data that
-  # the eventual purge must never touch.
+  # An older guest is a kiosk, a shared browser or a forwarded link, and may already hold real participant data.
   context 'when the guest is older than the token lifetime' do
     let(:user) do
       create(:user, :confirmed, :guest).tap do |guest|
@@ -130,7 +124,6 @@ RSpec.describe V1::TestRuns::MarkGuest do
       expect(user.reload.test_run).to be(false)
     end
 
-    # A write that blows up costs the link nothing — there is no counter to put back.
     it 'leaves the link usable for the next guest' do
       mark
       other_guest = create(:user, :confirmed, :guest)
@@ -140,11 +133,7 @@ RSpec.describe V1::TestRuns::MarkGuest do
     end
   end
 
-  # Work item 2.5 — the marker and its fuse are a single act. A marker with no scheduled purge is a
-  # test fill that pollutes the charts forever (decision D6 removed the manual purge), and a purge
-  # scheduled for a fill that was *not* marked would delete a real participant. So every example
-  # below pins both halves together: a successful mark schedules the deletion and records when, and
-  # a refused mark does neither.
+  # The marker and its fuse are one act: every example below pins both halves, or neither.
   describe 'the scheduled purge' do
     include ActiveJob::TestHelper
     include ActiveSupport::Testing::TimeHelpers
@@ -181,17 +170,13 @@ RSpec.describe V1::TestRuns::MarkGuest do
         end
       end
 
-      # Names no duration: `StrandedPurgesQuery` treats the stamp as the firing time, so a stamp
-      # later than the job hides a stranding and an earlier one re-enqueues a live purge. Note this
-      # runs under `freeze_time`, so it pins stamp == enqueued-at but cannot by itself distinguish
-      # `wait_until:` from a `wait:` that re-evaluates the clock.
+      # Runs under `freeze_time`, so it pins stamp == enqueued-at but cannot distinguish `wait_until:` from `wait:`.
       it 'schedules the job for exactly the instant it stamped' do
         freeze_time do
           mark
           stamped = user.reload.purge_scheduled_at
 
-          # `.at(nil)` degrades into "no scheduling constraint", so an unstamped row would make the
-          # comparison below pass while proving nothing.
+          # `.at(nil)` means "no scheduling constraint", so an unstamped row would make the comparison below pass vacuously.
           expect(stamped).to be_present
           expect(purge_job).to have_been_enqueued.with(user.id).at(stamped)
         end
@@ -242,8 +227,6 @@ RSpec.describe V1::TestRuns::MarkGuest do
       end
     end
 
-    # The ordering guard. The enqueue follows the write, so a marker that never landed cannot leave
-    # a deletion scheduled against the row behind it.
     context 'when persisting the marker blows up' do
       before { allow(user).to receive(:update!).and_raise(ActiveRecord::StatementInvalid) }
 

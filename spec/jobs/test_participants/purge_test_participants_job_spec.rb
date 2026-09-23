@@ -10,7 +10,7 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
   let_it_be(:session) { create(:session, intervention: intervention) }
 
-  # Destroyed by the subject, so nothing here may be memoised across examples.
+  # Not `let_it_be`: the subject destroys all of it, so it cannot be memoised across examples.
   let(:guest) do
     create(:user, :confirmed, :guest).tap do |user|
       user.update!(test_run: true, test_run_intervention_id: intervention.id, test_run_marked_by_id: researcher.id)
@@ -38,10 +38,6 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
       end
     end
 
-    # Idempotency is delegated to `PurgeService`, which re-reads the marker under a row lock rather
-    # than trusting whatever the job was scheduled against. These three examples pin the contract
-    # the job depends on: every refusal path is a clean no-op, not an exception, so a redelivered or
-    # replayed job cannot fail the queue or destroy anything twice.
     context 'when the participant was already purged' do
       it 'is a clean no-op' do
         guest_id = guest.id
@@ -69,9 +65,6 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
       end
     end
 
-    # `users.test_run` is a user-level flag; the link that sets it is minted per intervention. A
-    # marker carrying no intervention cannot be scoped to one, and purging it "broadly" would be
-    # exactly the unsafe `User.where(test_run: true)` sweep this feature must never do.
     context 'when the marker carries no intervention' do
       it 'refuses rather than purging anything' do
         guest.update!(test_run_intervention_id: nil)
@@ -81,10 +74,6 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
       end
     end
 
-    # The hard precondition carried from the phase-1 review. One anonymous guest identity
-    # legitimately spans several "anyone with the link" interventions belonging to different
-    # researchers, so a job fired for a token minted on intervention A must not reach that guest's
-    # genuine fills of intervention B.
     context 'when the guest also filled a different intervention' do
       let_it_be(:other_researcher) { create(:user, :confirmed, :researcher) }
       let_it_be(:other_intervention) do
@@ -116,8 +105,7 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
     end
   end
 
-  # Work item 2.10. The name is duplicated between the job and `config/sidekiq.yml`, and a mismatch
-  # fails silently — the job enqueues into a queue no worker polls and the purge simply never runs.
+  # The queue name is duplicated in `config/sidekiq.yml`; a mismatch enqueues into a queue no worker polls.
   describe 'the queue' do
     it 'runs on its own queue, not the shared default' do
       expect(described_class.new.queue_name).to eq('test_participant_purge')
@@ -139,8 +127,7 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
     end
   end
 
-  # The scheduling contract `V1::TestRuns::MarkGuest` uses. Asserted here against the job's own
-  # constant; that the marker path actually applies it is `spec/services/v1/test_runs/mark_guest_spec.rb`.
+  # Against the job's own constant — that the marker path applies it is `spec/services/v1/test_runs/mark_guest_spec.rb`.
   describe 'the delayed-enqueue contract' do
     it 'can be scheduled to fire one retention window after marking' do
       freeze_time do

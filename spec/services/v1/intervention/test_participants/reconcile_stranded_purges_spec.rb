@@ -10,8 +10,7 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
   let_it_be(:session) { create(:session, intervention: intervention) }
 
-  # Stamped directly rather than by marking a guest: a real marker also enqueues the job, which is
-  # exactly the stranding these examples need to *not* have happened.
+  # Stamped directly: marking a guest would also enqueue the job, which is the stranding these examples need absent.
   def strand(user, scheduled_at: 2.hours.ago, intervention_id: intervention.id)
     user.update!(test_run: true, test_run_intervention_id: intervention_id, purge_scheduled_at: scheduled_at)
     user
@@ -57,9 +56,7 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
       expect { reconcile }.not_to have_enqueued_job(TestParticipants::PurgeTestParticipantsJob)
     end
 
-    # The hard precondition from the phase-1 review: `test_run` is user-level while the link that
-    # sets it is minted per intervention, so an unscopable marker must never be handed to a job that
-    # destroys data. Removing `where.not(test_run_intervention_id: nil)` from the query fails here.
+    # Removing `where.not(test_run_intervention_id: nil)` from the query fails here.
     it 'does not re-enqueue a marker that carries no intervention' do
       guest.update!(test_run_intervention_id: nil)
 
@@ -68,8 +65,6 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
   end
 
   describe 'the recovery it exists for' do
-    # The whole point of item 2.11: the 24h job lived in Redis, Redis was lost, nothing fired. The
-    # user is still marked and still stamped, so the reconciler finds it and the purge completes.
     it 'completes a purge that the lost scheduled job would have done' do
       perform_enqueued_jobs { reconcile }
 
@@ -88,8 +83,6 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
       expect(User.where(id: guest_id)).to be_empty
     end
 
-    # Two overlapping runs before either job executes: the duplicate is harmless because
-    # `PurgeService` re-reads the marker under a row lock and refuses the second pass.
     it 'is harmless when the same candidate is enqueued twice before either job runs' do
       described_class.call
       described_class.call
@@ -98,9 +91,7 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
       expect(User.where(id: guest.id)).to be_empty
     end
 
-    # Re-stamping or clearing `purge_scheduled_at` would make the reconciler look tidier and destroy
-    # the only evidence that a purge was owed and missed. It is also a production write of a column
-    # this build must not write.
+    # Re-stamping would look tidier and destroy the only evidence that a purge was owed and missed.
     it 'leaves purge_scheduled_at untouched' do
       expect { reconcile }.not_to change { guest.reload.purge_scheduled_at }
     end
@@ -147,7 +138,6 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
       expect(described_class.call(max_purges: 1).enqueued).to eq(1)
     end
 
-    # A dry run destroys nothing, and a truncated preview would hide the scale the operator needs.
     it 'never refuses a dry run' do
       2.times { strand(create(:user, :confirmed, :guest)) }
 

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # Re-enqueues purges that fell due and never ran — a scheduled job lives in Redis, so flushing it loses every pending purge silently.
-# Run by hand via `rake test_participants:reconcile_stranded_purges`; this repo has no periodic scheduler. Safe to run twice.
 class V1::Intervention::TestParticipants::ReconcileStrandedPurges
   BATCH_SIZE = 500
 
@@ -45,12 +44,10 @@ class V1::Intervention::TestParticipants::ReconcileStrandedPurges
 
   attr_reader :dry_run, :now, :max_purges
 
-  # A dry run is never refused — truncating the preview would hide the scale the operator needs to see.
   def refuse?(found)
     !dry_run && max_purges.present? && found > max_purges
   end
 
-  # `pluck`, so no `User` is instantiated and nothing is decrypted.
   def collect_ids(candidates, dispatch:)
     ids = []
 

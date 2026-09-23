@@ -9,7 +9,7 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
   let_it_be(:session) { create(:session, intervention: intervention) }
 
-  # Everything below is destroyed by the subject, so none of it may be memoised across examples.
+  # Not `let_it_be`: the subject destroys all of it, so it cannot be memoised across examples.
   let(:guest) do
     create(:user, :confirmed, :guest).tap do |user|
       user.update!(test_run: true, test_run_intervention_id: intervention.id, test_run_marked_by_id: researcher.id)
@@ -17,9 +17,7 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
   end
 
   let(:user_intervention) { create(:user_intervention, user: guest, intervention: intervention) }
-  # `name_audio` matters: `UserSession::ClassicBehavior` decrements the audio's usage counter in a
-  # `before_destroy`, which saves an `Audio` — so without one here the audit-volume examples below
-  # would pass whether or not `Audio` is suppressed.
+  # Without a `name_audio` the audit-volume examples below pass whether or not `Audio` is suppressed.
   let(:name_audio) { create(:audio, usage_counter: 1) }
   let(:user_session) do
     create(:user_session, user: guest, session: session, user_intervention: user_intervention,
@@ -30,23 +28,17 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
   let(:tlfb_day) { create(:tlfb_day, user_session: user_session) }
   let(:chart_statistic) { create(:chart_statistic, user_session: user_session, user: guest) }
 
-  # Not reachable from `user_sessions` by any association — it references them with a bare foreign
-  # key, which is exactly why the service has to clear it by hand.
   let(:sms_campaign_event) { SmsCampaignEvent.create!(event_type: 'user_session_created', user_session: user_session) }
 
   let(:conversation) { LiveChat::Conversation.create!(intervention: intervention) }
   let(:interlocutor) { LiveChat::Interlocutor.create!(user: guest, conversation: conversation) }
 
-  # `sms_links_users` references `users` with no ON DELETE action and no association on `User`, so
-  # it both has to be destroyed by hand and has to be counted as a blocker before the shell goes.
-  # The factory's `association(:session)` builds its OWN session and `SmsLink#set_derived_ids` uses
-  # `||=`, so the session must be passed explicitly or this row silently lands on another
-  # intervention and every assertion about it passes vacuously.
+  # The session must be passed explicitly — the factory builds its own and `set_derived_ids` uses `||=`,
+  # so otherwise this row lands on another intervention and every assertion about it passes vacuously.
   let(:sms_plan) { create(:sms_plan, session: session) }
   let(:sms_link) { create(:sms_link, sms_plan: sms_plan, session: session) }
   let(:sms_links_user) { create(:sms_links_user, user: guest, sms_link: sms_link) }
 
-  # A real participant on the same intervention. Nothing the purge does may touch this.
   let(:control_participant) { create(:user, :confirmed, :participant) }
   let(:control_user_intervention) { create(:user_intervention, user: control_participant, intervention: intervention) }
   let(:control_user_session) do
@@ -64,9 +56,7 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
     control_chart_statistic
   end
 
-  # Records the tables hit by DELETE, in the order the database saw them. This is what makes the
-  # destruction order a regression test rather than a comment — a refactor that moves the
-  # ChartStatistic step after the cascade fails here even if nothing raises.
+  # Makes the destruction order a regression test: moving the ChartStatistic step fails here even if nothing raises.
   def deleted_tables
     tables = []
     collector = lambda do |_name, _start, _finish, _id, payload|
@@ -110,18 +100,10 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
       expect(tables.index('live_chat_interlocutors')).to be < tables.index('users')
     end
 
-    # Documents why the orphan-shell pattern exists at all: the obvious implementation is illegal.
     it 'is required because user.destroy raises on the very same fixture' do
       expect { guest.destroy }.to raise_error(ActiveRecord::DeleteRestrictionError)
     end
 
-    # The phase brief said "never call `user.destroy`", mirroring `DataClearJobs::ClearUserData`.
-    # It is worth being precise about what that actually buys, because it is less than it looks:
-    # `Relation#destroy_all` loads each record and calls `#destroy` on it, so it runs the very same
-    # `restrict_with_exception` callbacks and raises identically — the cascade spike confirms
-    # `User.where(id:).destroy_all` raises `DeleteRestrictionError` while dependents survive. What
-    # protects the purge is the destruction *order* plus the orphan guard, not the choice of API, so
-    # that is what this asserts.
     it 'deletes the user row only after every restricting association is gone' do
       tables = deleted_tables { purge }
 
@@ -195,9 +177,7 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
     end
   end
 
-  # The hard precondition from the phase-1 security review. `test_run` is a user-level flag, but the
-  # link that sets it is minted per intervention, and one anonymous guest identity legitimately
-  # spans several "anyone with the link" interventions belonging to different researchers.
+  # `test_run` is user-level, but the link that sets it is per-intervention and one guest identity spans several.
   describe 'a marked guest who also filled a different intervention' do
     let_it_be(:other_intervention) { create(:intervention, status: :published, shared_to: :anyone) }
     let_it_be(:other_session) { create(:session, intervention: other_intervention) }
@@ -266,9 +246,6 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
       expect(ChartStatistic.where(id: chart_statistic.id)).to be_empty
     end
 
-    # `conversations_for` intersects on the intervention. Without that intersection the guest's
-    # live-chat history with a different researcher's navigator would be destroyed — including the
-    # navigator's own side of it, which is not the participant's data to delete.
     it "leaves the other intervention's live-chat conversation and both its sides intact" do
       purge
 
@@ -278,7 +255,6 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
       expect(LiveChat::Message.where(id: other_message.id)).to be_present
     end
 
-    # Same intersection, on the path that reaches `sms_links_users` through `sms_links → sessions`.
     it "leaves the other intervention's sms-link rows intact" do
       purge
 
@@ -286,11 +262,6 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
     end
   end
 
-  # The shell can only go when nothing references it. An `sms_links_users` row on a *different*
-  # intervention is the awkward case: it is not the marked intervention's data, so the purge must
-  # not destroy it — which means the user row has to stay too. Missing it lets `orphaned?` return
-  # true, `destroy_all` raise `InvalidForeignKey`, and the whole transaction unwind, so the purge
-  # fails identically on every retry and the participant's data is never deleted at all.
   describe 'a marked guest holding an out-of-scope reference that blocks the shell' do
     let_it_be(:other_intervention) { create(:intervention, status: :published, shared_to: :anyone) }
     let_it_be(:other_session) { create(:session, intervention: other_intervention) }
@@ -341,8 +312,6 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
       expect(UserSession.where(id: user_session.id)).to be_present
     end
 
-    # Without an intervention there is nothing to intersect on, and an unscoped purge is exactly the
-    # failure the marker column was added to prevent.
     it 'refuses a marked participant whose marker names no intervention' do
       guest.update_columns(test_run_intervention_id: nil)
 
@@ -370,15 +339,9 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
   end
 
   describe 'transactionality' do
-    # The seam is the final shell destroy, deliberately: it is the only point that fails *after*
-    # every other step — chart statistics, sms-campaign events, conversations, sms-link rows and the
-    # whole `user_interventions` cascade including the `user_sessions` and `answers` under it. So the
-    # assertions below observe a genuinely half-finished purge coming back in full. (`UserIntervention`
-    # is the wrong seam: `destroy_scoped_data` calls `UserIntervention.where` on its first line, so
-    # stubbing it fails before anything has been destroyed and proves almost nothing. The initial
-    # `User.lock.find_by` is unaffected — `lock` returns a different relation.)
-    # Narrowed to the shell-destroy's own call so the examples' own `User.where` assertions still
-    # reach the database.
+    # The shell destroy is the only seam that fails *after* every other step, so these examples observe a
+    # genuinely half-finished purge coming back. Stubbing `UserIntervention` instead fails before anything
+    # was destroyed and proves almost nothing.
     before do
       allow(User).to receive(:where).and_call_original
       allow(User).to receive(:where).with(hash_including(test_run: true))
@@ -416,8 +379,6 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
       expect(result.counts).to include(answers: 1, generated_reports: 1, tlfb_days: 1)
     end
 
-    # At `warn`, not `info`: production runs `config.log_level = :warn`, so an `info` line would
-    # never be written there — leaving refusals logged and actual deletions invisible.
     it 'logs the purge at warn with the researcher accountable for the marker' do
       allow(Rails.logger).to receive(:warn)
 
@@ -438,8 +399,6 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
       expect(Rails.logger).to have_received(:warn).with(a_string_including('reason=not_marked'))
     end
 
-    # The audit trail is suppressed and the destroyed rows take their history with them, so this log
-    # line is the only trace of the deletion. It must not become a new PHI leak.
     it 'puts no participant PHI in the log line' do
       messages = []
       allow(Rails.logger).to receive(:warn) { |msg| messages << msg }

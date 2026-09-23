@@ -6,9 +6,7 @@ namespace :test_participants do
   task reconcile_stranded_purges: :environment do
     service = V1::Intervention::TestParticipants::ReconcileStrandedPurges
 
-    # A present-but-empty `DRY_RUN` is what `DRY_RUN=$UNSET_VAR` leaves behind — the operator asked
-    # for a preview and the shell ate the value — so it previews. Only an explicit falsey spelling
-    # (`0`, `false`, `off`, `f`, `FALSE`) or omitting the variable entirely runs for real.
+    # A present-but-empty `DRY_RUN` — a shell-eaten variable — still previews. Only an explicit falsey spelling runs for real.
     dry_run = ENV.key?('DRY_RUN') && ActiveModel::Type::Boolean.new.cast(ENV.fetch('DRY_RUN', nil)) != false
     max_purges = ENV.fetch('MAX_PURGES', nil).presence&.to_i || service::MAX_PURGES_PER_RUN
 

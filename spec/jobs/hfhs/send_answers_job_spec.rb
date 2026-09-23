@@ -23,8 +23,6 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
     end
   end
 
-  # The one effect of a fill that cannot be undone: the purge deletes our copy of what was sent but
-  # cannot recall the message.
   context 'with a test participant' do
     let(:user) do
       create(:user, :confirmed, :guest).tap do |guest|

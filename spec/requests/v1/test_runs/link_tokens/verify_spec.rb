@@ -27,16 +27,12 @@ RSpec.describe 'POST /v1/test_link_tokens/verify', type: :request do
       expect(json_response['intervention_id']).to eq(intervention.id)
     end
 
-    # The landing page is anonymous. Who minted the link is staff attribution that belongs on the
-    # marked guest and in the audit trail, not in a response anybody holding the URL can read.
     it 'does not disclose who minted it' do
       expect(json_response.keys).to contain_exactly('status', 'valid', 'intervention_id')
       expect(response.body).not_to include(researcher.id)
     end
   end
 
-  # The token is a capability, not a ticket. Inspecting one must leave it exactly as usable as it
-  # was — otherwise this endpoint would be a way for anyone holding a link to burn it.
   it 'does not consume the token' do
     3.times { perform_request }
 
@@ -52,8 +48,7 @@ RSpec.describe 'POST /v1/test_link_tokens/verify', type: :request do
       .and avoid_changing(UserIntervention, :count)
   end
 
-  # Must be sent as JSON: `ParamsWrapper` only wraps JSON bodies, and wrapping put a second copy of
-  # the token under `link_token`, out of reach of `Log::UserRequest#erase_from_params`.
+  # Must be sent as JSON: `ParamsWrapper` only wraps JSON bodies, and the wrapped copy is what escaped the scrub.
   it 'keeps the token out of the persisted request log' do
     logged = nil
     allow(LogJobs::UserRequest).to receive(:perform_later) { |scope| logged = scope }
@@ -125,8 +120,6 @@ RSpec.describe 'POST /v1/test_link_tokens/verify', type: :request do
     end
   end
 
-  # It answers about the token, never about the intervention: no name, no status, not even whether
-  # the id resolves to a row. The intervention is deliberately never loaded.
   it 'does not look the intervention up, so it cannot leak whether one exists' do
     unknown_id = SecureRandom.uuid
     orphan = V1::TestRuns::LinkToken.mint(unknown_id, researcher.id)

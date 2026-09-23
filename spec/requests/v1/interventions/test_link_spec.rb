@@ -12,9 +12,7 @@ RSpec.describe 'POST /v1/interventions/:id/test_link', type: :request do
   let(:user) { researcher }
   let(:headers) { user.create_new_auth_token }
 
-  # A plain method rather than a memoised `let`: naming it `request` would shadow
-  # `ActionDispatch::Integration::Session#request`, which the rest of this repo's request
-  # specs rely on.
+  # Not named `request`: that would shadow `ActionDispatch::Integration::Session#request`.
   def perform_request
     post test_link_v1_intervention_path(id: intervention.id), headers: headers
   end

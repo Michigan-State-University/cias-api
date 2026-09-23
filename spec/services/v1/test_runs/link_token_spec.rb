@@ -61,9 +61,7 @@ RSpec.describe V1::TestRuns::LinkToken do
       end
     end
 
-    # `PURPOSE` doubles as the key-derivation salt, so a token from any other verifier in the app
-    # dies on the signature long before the purpose is looked at. That is worth pinning, but it is
-    # *key* separation, not purpose separation — the example below covers the purpose itself.
+    # This is *key* separation, not purpose separation — `PURPOSE` is also the derivation salt. The next example covers purpose.
     it 'rejects a token signed with a different derived key' do
       foreign_key = Rails.application.message_verifier(:something_else).generate(
         { 'intervention_id' => intervention_id, 'nonce' => SecureRandom.uuid }
@@ -89,18 +87,12 @@ RSpec.describe V1::TestRuns::LinkToken do
       expect(described_class.verify(minted.token, nil)).to be_nil
     end
 
-    # D8, revised: the per-token ceiling and the counter behind it are gone, so verification is
-    # stateless and a link marks every fill that presents it inside the TTL. A ceiling only moved
-    # the silent-failure cliff — the fill past it became a permanent, un-purgeable real
-    # participant. This fails the moment anything here starts counting again.
+    # Deliberate (D8): verification is stateless. This fails the moment anything here starts counting again.
     it 'stays valid however many times it is presented' do
       expect(Array.new(10) { described_class.verify(minted.token, intervention_id) }).to all(be_present)
     end
   end
 
-  # `verify` answers one yes/no and collapses every rejection into `nil`. `inspect_token` is the
-  # same three checks with the reason kept, because the landing-time gate has to say "your link
-  # expired, copy a fresh one" rather than a shrug.
   describe '.inspect_token' do
     it 'reports a live token as valid and hands back its payload' do
       inspection = described_class.inspect_token(minted.token)
