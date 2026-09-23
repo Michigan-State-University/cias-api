@@ -45,6 +45,10 @@ module Log::UserRequest
     params.delete(:registration)
     params.delete(:phone_number)
     params.delete(:email)
+    # A short-lived credential (CIAS-4187). `config.filter_parameters` redacts log *output* only;
+    # this hash is persisted verbatim to `user_log_requests.params` and copied into
+    # `audits.audited_changes`, neither of which ever expires.
+    params.delete(:test_link_token)
     params[:user]&.delete(:first_name)
     params[:user]&.delete(:last_name)
     params[:user][:phone_attributes]&.delete(:number) if params[:user].present?
