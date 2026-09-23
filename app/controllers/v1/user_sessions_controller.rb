@@ -13,8 +13,6 @@ class V1::UserSessionsController < V1Controller
 
     user_session = V1::UserSessions::FetchService.call(params[:session_id], current_v1_user.id, params[:health_clinic_id])
 
-    # The resume path reports the marker too, so a reloaded test fill keeps its banner. Without it the
-    # banner's contract — absence means "not marked" — would be ambiguous after any refresh.
     render json: serialized_response(user_session, 'UserSession', meta: test_run_meta(current_v1_user)), status: :ok
 
     user_session.update!(started: true)

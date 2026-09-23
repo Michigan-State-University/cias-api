@@ -52,6 +52,19 @@ RSpec.describe 'POST /v1/test_link_tokens/verify', type: :request do
       .and avoid_changing(UserIntervention, :count)
   end
 
+  # Must be sent as JSON: `ParamsWrapper` only wraps JSON bodies, and wrapping put a second copy of
+  # the token under `link_token`, out of reach of `Log::UserRequest#erase_from_params`.
+  it 'keeps the token out of the persisted request log' do
+    logged = nil
+    allow(LogJobs::UserRequest).to receive(:perform_later) { |scope| logged = scope }
+
+    post v1_verify_test_link_token_path, params: body.to_json, headers: { 'CONTENT_TYPE' => 'application/json' }
+
+    expect(response).to have_http_status(:ok)
+    expect(logged).to be_present
+    expect(logged.to_s).not_to include(token)
+  end
+
   context 'when the token has expired' do
     it 'says so, so the page can offer a fresh link rather than a generic error' do
       token = minted.token

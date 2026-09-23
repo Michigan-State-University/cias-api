@@ -1,62 +1,12 @@
 # frozen_string_literal: true
 
-# Permanently removes one marked test participant's contribution to a single intervention — its
-# sessions, answers, generated reports, live-chat conversations and, critically, its
-# `ChartStatistic` rows, so the dashboard recomputes without it. Destruction is irreversible and
-# there is no grace window; that is the decided model for this feature, not an oversight.
-#
-# **Scoping is the whole game.** `users.test_run` is a *user-level* flag, but the test link that
-# sets it is minted for one intervention, and a single anonymous guest identity legitimately spans
-# several "anyone with the link" interventions belonging to different researchers. Every query below
-# therefore intersects `users.test_run_intervention_id`: a link minted for intervention A must never
-# reach that guest's genuine fills of intervention B. A marked user carrying no
-# `test_run_intervention_id` cannot be scoped at all, so it is refused rather than purged broadly.
-#
-# **Destruction order is load-bearing.** It was derived from the live schema by
-# `.claude/cias-api/testing/test_participant_purge_cascade_spike.rb`, which catalogues every inbound
-# foreign key on `users` / `user_sessions` / `user_interventions` and proves each failure mode:
-#
-#   1. `chart_statistics` and `sms_campaign_events` reference `user_sessions` with neither an
-#      `ON DELETE` action nor a Rails `dependent:` — both raise `ActiveRecord::InvalidForeignKey`
-#      unless they are removed first.
-#   2. Live-chat conversations do **not** hang off `user_sessions`; they hang off the intervention,
-#      and `User#interlocutors` is `dependent: :restrict_with_exception`. The conversation has to go
-#      explicitly, as a whole — destroying only the guest's interlocutor would orphan
-#      `live_chat_messages`, which reference it with no `ON DELETE` action either.
-#   3. `sms_links_users` references `users` with neither an `ON DELETE` action nor an association.
-#   4. Only then can the `user_interventions` cascade run
-#      (`UserSession → Answer / GeneratedReport / Tlfb::Day`), and only then can the user shell go.
-#
-# The spike reports five such unguarded constraints in total. Two are unreachable for an anonymous
-# guest and are deliberately left alone rather than handled: `interventions.current_editor_id` (a
-# guest never edits an intervention) and `user_sessions.fulfilled_by_id` (a guest is never a research
-# assistant filling a session on someone else's behalf). Both are still checked by `orphaned?`,
-# because that is an assumption about product behaviour and not something the schema enforces.
-#
-# `user.destroy` is **never** called: `interventions`, `user_interventions`, `user_sessions`,
-# `sessions` and `interlocutors` are all `dependent: :restrict_with_exception`, so it raises for
-# anyone who has ever filled a session — i.e. for every test participant. The shell is removed with
-# `User.where(...).destroy_all` once it is a genuine orphan, and deliberately left in place when the
-# guest still holds data for another intervention.
+# Permanently deletes one marked guest's contribution to ONE intervention. Both the scoping and the destruction order are load-bearing.
+# Derived from `.claude/cias-api/testing/test_participant_purge_cascade_spike.rb`, which catalogues every unguarded inbound foreign key.
 class V1::Intervention::TestParticipants::PurgeService
   prepend Database::Transactional
 
-  # Suppressing the audit trail for the cascade is deliberate (work item 2.9): a purge would
-  # otherwise write thousands of `audits` / `versions` rows describing data that no longer exists.
-  #
-  # `Model.without_auditing` writes to `Audited.store`, which is an `ActiveSupport::CurrentAttributes`
-  # subclass and therefore isolated per thread — safe inside a threaded Sidekiq process. The
-  # module-level `Audited.auditing_enabled=` is a plain process-global accessor and would silently
-  # disable auditing for every other job running alongside this one, so it is not used.
-  #
-  # The list is explicit because auditing is enabled per table, not per hierarchy — `ApplicationRecord`
-  # cannot switch it off for its descendants. STI subclasses share their parent's `table_name`, so
-  # `UserSession` also covers `UserSession::Classic` and `Answer` covers every answer type. A model
-  # missing from this list still purges correctly; it just leaves audit rows behind.
-  #
-  # `Audio` is in the list even though the purge never destroys one: `UserSession::ClassicBehavior`
-  # decrements the narrator audio's usage counter in a `before_destroy`, so destroying a session
-  # with a `name_audio` *updates* an `Audio` and writes an audit for it.
+  # Enabled per table, not per hierarchy; STI subclasses ride on their parent. A model missing here still purges, it just leaves audit rows.
+  # `Audio` is listed because destroying a session with a `name_audio` *updates* one through a `before_destroy` counter.
   AUDIT_SUPPRESSED_MODELS = [
     User, UserIntervention, UserSession, Answer, GeneratedReport, GeneratedReportsThirdPartyUser,
     DownloadedReport, ChartStatistic, SmsCampaignEvent, SmsLinksUser,
@@ -84,9 +34,7 @@ class V1::Intervention::TestParticipants::PurgeService
   end
 
   def call
-    # Re-read under a row lock rather than trusting whatever the caller scheduled against: a
-    # participant un-marked between scheduling and execution must survive, and a concurrent purge
-    # of the same user must not interleave with this one.
+    # Row lock and re-read: a participant un-marked since scheduling must survive, and two purges of one user must not interleave.
     user = User.lock.find_by(id: user_id)
 
     return skipped(:already_purged) if user.nil?
@@ -117,18 +65,7 @@ class V1::Intervention::TestParticipants::PurgeService
     result
   end
 
-  # The only durable trace a purge leaves. The audit trail is deliberately suppressed for the
-  # cascade and the destroyed rows take their own history with them, so without this line there is
-  # no record anywhere that participant data was deleted, by whose link, or how much of it.
-  #
-  # PHI-free by construction: UUIDs, booleans and integers only — no names, emails, phone numbers,
-  # answer bodies or any `has_encrypted` attribute. Emitted inside `Database::Transactional`'s
-  # transaction, so it can over-report: `ApplicationJob`'s 30-minute `Timeout` can still fire between
-  # here and the commit, which would roll the purge back after this line was written.
-  #
-  # `warn`, not `info`: production runs `config.log_level = :warn`, so an `info` line is never
-  # written there at all — the skip path below already logs at `warn`, which would have left
-  # refusals visible and actual deletions invisible.
+  # The only durable trace a purge leaves, and PHI-free by construction. `warn` because production runs at `log_level = :warn`.
   def log_purge(purged_user_id, intervention_id, marked_by_id, result)
     Rails.logger.warn(
       '[TestParticipants::PurgeService] purged ' \
@@ -137,17 +74,12 @@ class V1::Intervention::TestParticipants::PurgeService
     )
   end
 
-  # Everything here is scoped to `intervention_id`. Each `destroy_all` returns the rows it removed,
-  # so the counts report what actually happened rather than what was queued. The steps are written
-  # out one per line rather than collected in a hash literal because the order between them is the
-  # point of this service.
+  # Order is the point of this method — see the class comment.
   def destroy_scoped_data(user, intervention_id)
     user_interventions = UserIntervention.where(user_id: user.id, intervention_id: intervention_id)
     user_sessions = UserSession.where(user_intervention_id: user_interventions.select(:id))
 
-    # Counted up front, while the rows still exist — these go via the `user_interventions` cascade,
-    # so `destroy_all` never reports them and a caller reading `counts` would otherwise be told a
-    # purge removed nothing but sessions.
+    # Counted up front: these go via the `user_interventions` cascade, so `destroy_all` never reports them.
     counts = {
       user_sessions: user_sessions.count,
       answers: Answer.where(user_session_id: user_sessions.select(:id)).count,
@@ -164,52 +96,28 @@ class V1::Intervention::TestParticipants::PurgeService
     counts
   end
 
-  # The conversation is destroyed whole — both interlocutors and every message with it — because a
-  # live-chat conversation belongs to the intervention, not to the participant, and its messages
-  # reference the interlocutor with no `ON DELETE` action. A test participant's conversation has no
-  # value to the navigator once the participant is gone.
-  #
-  # Worth stating plainly: this reaches past the participant. The cascade also takes the navigator's
-  # interlocutor row and the conversation's `notifications`, which are the **navigator's** records,
-  # not the participant's. That is accepted for a conversation whose only other party was a test
-  # run — but it is why this query must stay intersected with the marked intervention.
+  # Destroys the conversation whole, including the navigator's own interlocutor and notifications — which is why it must stay intervention-scoped.
   def conversations_for(user, intervention_id)
     LiveChat::Conversation
       .where(intervention_id: intervention_id)
       .where(id: LiveChat::Interlocutor.where(user_id: user.id).select(:conversation_id))
   end
 
-  # `sms_links_users` has no association on `User`, so nothing cleans it up — and it is reachable
-  # from the intervention only through `sms_links → sessions`, which is how it gets scoped.
+  # No association on `User`, so nothing else cleans these up; reachable from the intervention only via `sms_links → sessions`.
   def sms_links_users_for(user, intervention_id)
     SmsLinksUser
       .where(user_id: user.id)
       .where(sms_link_id: SmsLink.joins(:session).where(sessions: { intervention_id: intervention_id }).select(:id))
   end
 
-  # The shell goes only when nothing references it any more. A guest who also filled a *different*
-  # researcher's "anyone with the link" intervention keeps their account — the database enforces
-  # this too (`restrict_with_exception`), but relying on the raise would abort the whole purge, so
-  # the condition is checked explicitly.
+  # Checked explicitly rather than rescuing the FK violation, which would abort the whole purge.
   def destroy_shell_or_release_marker(user)
     return release_marker(user) unless orphaned?(user)
 
     User.where(id: user.id, test_run: true).destroy_all.size
   end
 
-  # Every inbound foreign key on `users` that has neither an `ON DELETE` action nor a Rails
-  # `dependent:` — i.e. everything the database will refuse to let go — plus the
-  # `restrict_with_exception` associations. The list comes from PART A of the cascade spike, which
-  # reads it out of `pg_constraint` rather than from `schema.rb`.
-  #
-  # This must stay exhaustive. A missing blocker does not degrade gracefully: `orphaned?` returns
-  # true, `destroy_all` raises a FK violation, `Database::Transactional` unwinds the entire purge,
-  # and — because nothing about the input changed — every retry fails the same way, so the
-  # participant's data is never deleted at all.
-  #
-  # The three out-of-scope-for-a-guest columns are checked anyway: they cost one indexed `EXISTS`
-  # each, and "a guest can never be an intervention's editor" is an assumption about product
-  # behaviour, not something the schema enforces.
+  # Must stay exhaustive: a missing blocker makes `destroy_all` raise, unwinds the purge, and every retry fails identically — the data never goes.
   def orphaned?(user)
     !UserIntervention.exists?(user_id: user.id) &&
       !UserSession.exists?(user_id: user.id) &&
@@ -220,10 +128,7 @@ class V1::Intervention::TestParticipants::PurgeService
       !SmsLinksUser.exists?(user_id: user.id)
   end
 
-  # The marker has done its job for this intervention, and the guest's surviving data is not test
-  # data. Leaving it set would make the user a permanent candidate for every later purge sweep.
-  # `update_columns` deliberately skips validations and callbacks — this is bookkeeping on a record
-  # the purge is finished with, not a domain update.
+  # Leaving the marker set would re-queue this user for every later sweep. `update_columns` is deliberate: bookkeeping, not a domain update.
   def release_marker(user)
     user.update_columns(test_run: false, test_run_intervention_id: nil, purge_scheduled_at: nil) # rubocop:disable Rails/SkipsModelValidations
 
@@ -243,10 +148,7 @@ class V1::Intervention::TestParticipants::PurgeService
     head.without_auditing { suppress_auditing(tail, &block) }
   end
 
-  # A refusal is the quiet path — nothing is destroyed and the caller gets a Result it may not
-  # inspect — so it is logged. `:unscoped_marker` in particular should never happen
-  # (`V1::TestRuns::MarkGuest` writes `test_run` and `test_run_intervention_id` in one `update!`),
-  # and if it ever does it means a marked participant can never be purged by any route.
+  # A refusal is otherwise silent. `:unscoped_marker` should be impossible, and means that user can never be purged by any route.
   def skipped(reason)
     Rails.logger.warn("[TestParticipants::PurgeService] skipped user_id=#{user_id} reason=#{reason}")
 

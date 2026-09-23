@@ -319,9 +319,6 @@ Rails.application.routes.draw do
     post 'predefined_participants/:slug/ra_session', to: 'interventions/predefined_participants#ra_session', as: :ra_session_predefined_participant
     get 'user_sessions/:id/ra_show', to: 'user_sessions#ra_show', as: :ra_show_user_session
     post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
-    # POST rather than GET although it reads nothing: the token is a credential, and a query string
-    # is copied verbatim into proxy and load-balancer access logs that `filter_parameters` cannot
-    # reach. Same reasoning as the `*/verify` routes above, which are also POSTs.
     post 'test_link_tokens/verify', to: 'test_runs/link_tokens#verify', as: :verify_test_link_token
   end
 

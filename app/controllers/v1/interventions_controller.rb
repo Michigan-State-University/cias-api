@@ -67,8 +67,6 @@ class V1::InterventionsController < V1Controller
     ), allow_other_host: true)
   end
 
-  # Mints the short-lived, signed credential that turns an "Anyone With The Link" invite into a
-  # test-run link. Only somebody who can already manage this intervention may mint one.
   def test_link
     authorize! :update, Intervention
     authorize! :update, intervention_load

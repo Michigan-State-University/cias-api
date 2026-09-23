@@ -1,40 +1,11 @@
 # frozen_string_literal: true
 
-# Re-enqueues test-participant purges that were scheduled, fell due, and never ran — work item
-# 2.11, driven by `rake test_participants:reconcile_stranded_purges`.
-#
-# The failure it exists for: a scheduled purge sits in Sidekiq's scheduled ZSET for 24 hours, and
-# that is Redis state. Flush, evict or replace Redis and every pending purge disappears silently —
-# no exception, no dead set, no retry. With `purge_scheduled_at` persisted on the user, the
-# stranded records stay findable; this service makes them recoverable.
-#
-# **Safe to run twice, and safe to run while purges are in flight.** It only enqueues; every
-# decision about what may be destroyed is re-made inside `PurgeService`, under a row lock, against
-# the marker as it stands at execution time. A user purged between two runs is gone from the
-# candidate set; a user whose purge completed but whose shell survived had the marker released by
-# the service, so they are gone from it too; a duplicate job for a live candidate is an
-# `:already_purged` / `:not_marked` no-op.
-#
-# **It does not write `purge_scheduled_at`.** Re-stamping the column would look tidy but it would
-# hide the evidence: the timestamp is the only record that a purge was owed and missed, and the
-# reconciler's own idempotency does not depend on clearing it.
-#
-# This codebase has no periodic scheduler — no `sidekiq-cron`, no `whenever`, no `:schedule` block
-# in `config/sidekiq.yml`, and Sidekiq OSS has no built-in cron — so this runs manually, or from
-# whatever deploy-side scheduling exists. Wiring it to a real scheduler is a separate decision.
+# Re-enqueues purges that fell due and never ran — a scheduled job lives in Redis, so flushing it loses every pending purge silently.
+# Run by hand via `rake test_participants:reconcile_stranded_purges`; this repo has no periodic scheduler. Safe to run twice.
 class V1::Intervention::TestParticipants::ReconcileStrandedPurges
   BATCH_SIZE = 500
 
-  # `in_batches` bounds memory, not the total: without a ceiling this loop enqueues one irreversible
-  # deletion per candidate, however many there are. The realistic way that set becomes large is a
-  # backfill — `User.where(test_run: true).update_all(purge_scheduled_at: Time.current)`, written to
-  # "catch up" markers created before item 2.5 was wired — which makes every marked guest
-  # immediately due, including any genuine participant mis-marked under SEC-R2-1. Refuse an
-  # unexpectedly large run and make the operator raise the ceiling deliberately.
-  #
-  # The ceiling is checked against the count, so it is not race-proof against rows becoming due
-  # between the count and the iteration; it is a guard against an operator running this after a
-  # bulk stamp, which is the failure it exists for, not a hard concurrency bound.
+  # A ceiling, because every candidate is an irreversible deletion. Guards against an operator running this after a bulk `purge_scheduled_at` stamp.
   MAX_PURGES_PER_RUN = 100
 
   Result = Struct.new(:found, :enqueued, :dry_run, :refused, :max_purges, :candidate_ids, keyword_init: true) do
@@ -74,16 +45,12 @@ class V1::Intervention::TestParticipants::ReconcileStrandedPurges
 
   attr_reader :dry_run, :now, :max_purges
 
-  # A dry run is never refused — it destroys nothing, and truncating the preview would hide exactly
-  # the scale the operator needs to see. `max_purges: nil` disables the ceiling for a caller that
-  # means it; the rake task never passes nil.
+  # A dry run is never refused — truncating the preview would hide the scale the operator needs to see.
   def refuse?(found)
     !dry_run && max_purges.present? && found > max_purges
   end
 
-  # `pluck` rather than instantiating: the job only needs an id, and a `User` carries encrypted
-  # attributes there is no reason to decrypt here. Batched so a large backlog — the case this
-  # exists for — does not load every candidate at once.
+  # `pluck`, so no `User` is instantiated and nothing is decrypted.
   def collect_ids(candidates, dispatch:)
     ids = []
 
@@ -96,14 +63,7 @@ class V1::Intervention::TestParticipants::ReconcileStrandedPurges
     ids
   end
 
-  # `warn`, not `info`: production runs at `config.log_level = :warn`
-  # (`config/environments/production.rb:64`), so an INFO line is written nowhere an operator can
-  # read it.
-  #
-  # PHI-free by construction: three integers, two booleans and bare user UUIDs — nothing decrypted,
-  # the same shape `Log::UserRequest` already persists. The ids matter because a run whose enqueued
-  # jobs are themselves lost leaves no other trace of whom it targeted: `PurgeService`'s own line is
-  # written only by purges that actually executed.
+  # `warn` because production runs at `log_level = :warn`. The ids matter: if these jobs are lost too, nothing else records whom the run targeted.
   def log(found, ids, refused)
     Rails.logger.warn(
       "[TestParticipants::ReconcileStrandedPurges] found=#{found} enqueued=#{refused || dry_run ? 0 : ids.size} " \
