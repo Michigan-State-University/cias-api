@@ -228,7 +228,7 @@ GEM
     faraday-gzip (2.0.1)
       faraday (>= 1.0)
       zlib (~> 3.0)
-    faraday-http-cache (2.5.1)
+    faraday-http-cache (2.8.0)
       faraday (>= 0.8)
     faraday-multipart (1.2.0)
       multipart-post (~> 2.0)
