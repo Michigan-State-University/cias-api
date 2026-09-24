@@ -61,6 +61,6 @@ module CiasApi
     config.middleware.insert_before(Rack::Sendfile, Rack::Deflater)
     routes.default_url_options = { host: ENV.fetch('APP_HOSTNAME', nil) }
     config.middleware.use ActionDispatch::Flash
-    config.filter_parameters += %i[password password_confirmation email first_name last_name test_link_token]
+    config.filter_parameters << %i[password password_confirmation email first_name last_name]
   end
 end

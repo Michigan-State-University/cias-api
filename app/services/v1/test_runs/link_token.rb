@@ -60,7 +60,6 @@ class V1::TestRuns::LinkToken
       Inspection.new(status: :invalid)
     end
 
-    # A blank or non-numeric env value would coerce to `0.minutes`, minting tokens that are already expired.
     def ttl
       minutes = ENV.fetch('TEST_LINK_TOKEN_TTL_MINUTES', DEFAULT_TTL_MINUTES).to_i
 
@@ -73,7 +72,6 @@ class V1::TestRuns::LinkToken
       payload.is_a?(Hash) && payload['nonce'].present? && payload['intervention_id'].present?
     end
 
-    # Explicit rather than `Rails.application.message_verifier` only so the token can be `url_safe` in an invite URL.
     def verifier
       ActiveSupport::MessageVerifier.new(
         Rails.application.key_generator.generate_key(PURPOSE, 32),

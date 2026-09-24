@@ -3,7 +3,6 @@
 class V1::TestRuns::LinkTokensController < V1Controller
   skip_before_action :authenticate_user!, only: %i[verify]
 
-  # No wrapping: it would copy the token under `link_token`, where `erase_from_params` cannot reach it.
   wrap_parameters false
 
   def verify

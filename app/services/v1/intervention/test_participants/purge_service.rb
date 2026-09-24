@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# Scoping and destruction order are both load-bearing — derived from `.claude/cias-api/testing/test_participant_purge_cascade_spike.rb`.
 class V1::Intervention::TestParticipants::PurgeService
   prepend Database::Transactional
 
@@ -47,7 +46,6 @@ class V1::Intervention::TestParticipants::PurgeService
 
   def purge(user)
     intervention_id = user.test_run_intervention_id
-    # Read before the destroy block: after it, the row this came from may not exist.
     marked_by_id = user.test_run_marked_by_id
     counts = {}
 
@@ -62,7 +60,6 @@ class V1::Intervention::TestParticipants::PurgeService
     result
   end
 
-  # The only durable trace a purge leaves, and PHI-free by construction. `warn` because production runs at `log_level = :warn`.
   def log_purge(purged_user_id, intervention_id, marked_by_id, result)
     Rails.logger.warn(
       '[TestParticipants::PurgeService] purged ' \
@@ -75,7 +72,6 @@ class V1::Intervention::TestParticipants::PurgeService
     user_interventions = UserIntervention.where(user_id: user.id, intervention_id: intervention_id)
     user_sessions = UserSession.where(user_intervention_id: user_interventions.select(:id))
 
-    # Counted up front: these go via the `user_interventions` cascade, so `destroy_all` never reports them.
     counts = {
       user_sessions: user_sessions.count,
       answers: Answer.where(user_session_id: user_sessions.select(:id)).count,
@@ -92,7 +88,6 @@ class V1::Intervention::TestParticipants::PurgeService
     counts
   end
 
-  # Destroys the conversation whole, including the navigator's own interlocutor and notifications — which is why it must stay intervention-scoped.
   def conversations_for(user, intervention_id)
     LiveChat::Conversation
       .where(intervention_id: intervention_id)
@@ -105,7 +100,6 @@ class V1::Intervention::TestParticipants::PurgeService
       .where(sms_link_id: SmsLink.joins(:session).where(sessions: { intervention_id: intervention_id }).select(:id))
   end
 
-  # Checked explicitly rather than rescuing the FK violation, which would abort the whole purge.
   def destroy_shell_or_release_marker(user)
     return release_marker(user) unless orphaned?(user)
 

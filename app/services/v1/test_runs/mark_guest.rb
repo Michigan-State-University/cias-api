@@ -43,7 +43,6 @@ class V1::TestRuns::MarkGuest
     TestParticipants::PurgeTestParticipantsJob.set(wait_until: purge_at).perform_later(user.id)
   end
 
-  # Guests only, and only one created within the token's own lifetime — never a kiosk guest already holding real data.
   def markable?
     return false if token.blank? || intervention_id.blank?
     return false unless user.present? && user.role?('guest') && !user.test_run?

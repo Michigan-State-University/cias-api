@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-# Re-enqueues purges that fell due and never ran — a scheduled job lives in Redis, so flushing it loses every pending purge silently.
 class V1::Intervention::TestParticipants::ReconcileStrandedPurges
   BATCH_SIZE = 500
 
-  # A ceiling, because every candidate is an irreversible deletion. Guards against an operator running this after a bulk `purge_scheduled_at` stamp.
   MAX_PURGES_PER_RUN = 100
 
   Result = Struct.new(:found, :enqueued, :dry_run, :refused, :max_purges, :candidate_ids, keyword_init: true) do

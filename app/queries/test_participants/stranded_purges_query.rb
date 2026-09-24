@@ -9,7 +9,6 @@ class TestParticipants::StrandedPurgesQuery
     @now = now
   end
 
-  # The beginless range excludes NULLs, so a marked user whose purge was never scheduled is not a candidate.
   def call
     User.where(test_run: true)
         .where.not(test_run_intervention_id: nil)

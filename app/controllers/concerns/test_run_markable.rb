@@ -14,7 +14,6 @@ module TestRunMarkable
     false
   end
 
-  # Neither read is redundant: `test_run_in_database` survives a failed `update!`, and the two `test_run_intervention_id`s are the marker's and this request's.
   def test_run_meta(user)
     {
       test_run: user.present? &&
