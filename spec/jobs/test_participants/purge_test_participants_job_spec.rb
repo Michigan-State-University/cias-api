@@ -8,7 +8,12 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
 
   let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
-  let_it_be(:session) { create(:session, intervention: intervention) }
+  let_it_be(:session) do
+    RSpec::Mocks.with_temporary_scope do
+      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      create(:session, intervention: intervention)
+    end
+  end
 
   # Not `let_it_be`: the subject destroys all of it, so it cannot be memoised across examples.
   let(:guest) do
@@ -79,7 +84,12 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
       let_it_be(:other_intervention) do
         create(:intervention, user: other_researcher, status: :published, shared_to: :anyone)
       end
-      let_it_be(:other_session) { create(:session, intervention: other_intervention) }
+      let_it_be(:other_session) do
+        RSpec::Mocks.with_temporary_scope do
+          allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+          create(:session, intervention: other_intervention)
+        end
+      end
 
       let(:other_user_intervention) { create(:user_intervention, user: guest, intervention: other_intervention) }
       let!(:other_user_session) do

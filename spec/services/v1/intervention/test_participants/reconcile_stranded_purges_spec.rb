@@ -8,7 +8,12 @@ RSpec.describe V1::Intervention::TestParticipants::ReconcileStrandedPurges do
 
   let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
-  let_it_be(:session) { create(:session, intervention: intervention) }
+  let_it_be(:session) do
+    RSpec::Mocks.with_temporary_scope do
+      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      create(:session, intervention: intervention)
+    end
+  end
 
   # Stamped directly: marking a guest would also enqueue the job, which is the stranding these examples need absent.
   def strand(user, scheduled_at: 2.hours.ago, intervention_id: intervention.id)

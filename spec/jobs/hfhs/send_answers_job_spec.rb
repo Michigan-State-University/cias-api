@@ -5,7 +5,12 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
 
   let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
-  let_it_be(:session) { create(:session, intervention: intervention) }
+  let_it_be(:session) do
+    RSpec::Mocks.with_temporary_scope do
+      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      create(:session, intervention: intervention)
+    end
+  end
 
   let(:api) { instance_double(Api::Hfhs, send_answers: true, send_reports: true) }
   let(:user_session) { create(:user_session, user: user, session: session) }

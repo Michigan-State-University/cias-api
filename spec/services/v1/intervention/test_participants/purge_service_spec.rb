@@ -7,7 +7,12 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
 
   let_it_be(:researcher) { create(:user, :confirmed, :researcher) }
   let_it_be(:intervention) { create(:intervention, user: researcher, status: :published, shared_to: :anyone) }
-  let_it_be(:session) { create(:session, intervention: intervention) }
+  let_it_be(:session) do
+    RSpec::Mocks.with_temporary_scope do
+      allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+      create(:session, intervention: intervention)
+    end
+  end
 
   # Not `let_it_be`: the subject destroys all of it, so it cannot be memoised across examples.
   let(:guest) do
@@ -180,7 +185,12 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
   # `test_run` is user-level, but the link that sets it is per-intervention and one guest identity spans several.
   describe 'a marked guest who also filled a different intervention' do
     let_it_be(:other_intervention) { create(:intervention, status: :published, shared_to: :anyone) }
-    let_it_be(:other_session) { create(:session, intervention: other_intervention) }
+    let_it_be(:other_session) do
+      RSpec::Mocks.with_temporary_scope do
+        allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+        create(:session, intervention: other_intervention)
+      end
+    end
 
     let(:other_user_intervention) { create(:user_intervention, user: guest, intervention: other_intervention) }
     let(:other_user_session) do
@@ -264,7 +274,12 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
 
   describe 'a marked guest holding an out-of-scope reference that blocks the shell' do
     let_it_be(:other_intervention) { create(:intervention, status: :published, shared_to: :anyone) }
-    let_it_be(:other_session) { create(:session, intervention: other_intervention) }
+    let_it_be(:other_session) do
+      RSpec::Mocks.with_temporary_scope do
+        allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+        create(:session, intervention: other_intervention)
+      end
+    end
 
     let(:other_sms_plan) { create(:sms_plan, session: other_session) }
     let(:other_sms_link) { create(:sms_link, sms_plan: other_sms_plan, session: other_session) }
