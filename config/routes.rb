@@ -67,6 +67,7 @@ Rails.application.routes.draw do
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
+      post 'test_link', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
         resources :predefined_participants do
@@ -318,6 +319,7 @@ Rails.application.routes.draw do
     post 'predefined_participants/:slug/ra_session', to: 'interventions/predefined_participants#ra_session', as: :ra_session_predefined_participant
     get 'user_sessions/:id/ra_show', to: 'user_sessions#ra_show', as: :ra_show_user_session
     post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
+    post 'test_link_tokens/verify', to: 'test_runs/link_tokens#verify', as: :verify_test_link_token
   end
 
   if Rails.env.development?

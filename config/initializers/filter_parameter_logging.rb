@@ -8,4 +8,5 @@ Rails.application.config.filter_parameters += %i[
   first_name last_name email uid
   number
   body
+  test_link_token
 ]

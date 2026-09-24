@@ -7,6 +7,8 @@
 !/tmp/caching-dev.txt
 .byebug_history
 .env
+.env.*
+!.env.template
 .idea/
 .vscode/*
 /.bundle

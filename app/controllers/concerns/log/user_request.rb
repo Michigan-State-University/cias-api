@@ -45,6 +45,7 @@ module Log::UserRequest
     params.delete(:registration)
     params.delete(:phone_number)
     params.delete(:email)
+    params.delete(:test_link_token)
     params[:user]&.delete(:first_name)
     params[:user]&.delete(:last_name)
     params[:user][:phone_attributes]&.delete(:number) if params[:user].present?

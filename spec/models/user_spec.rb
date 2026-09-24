@@ -236,4 +236,40 @@ describe User, type: :model do
                  }
     end
   end
+
+  describe 'test run marker (CIAS-4187)' do
+    subject(:guest) { create(:user, :confirmed, :guest) }
+
+    it 'defaults to false' do
+      expect(guest.test_run).to be(false)
+    end
+
+    it 'is NOT NULL at the database level' do
+      expect(described_class.columns_hash['test_run'].null).to be(false)
+
+      expect do
+        ActiveRecord::Base.transaction(requires_new: true) { guest.update_column(:test_run, nil) }
+      end.to raise_error(ActiveRecord::NotNullViolation)
+    end
+
+    it 'is backed by a partial index limited to test runs' do
+      index = ActiveRecord::Base.connection.indexes(:users).find { |i| i.name == 'index_users_on_test_run' }
+
+      expect(index).to be_present
+      expect(index.columns).to eq(%w[test_run])
+      expect(index.where).to eq('(test_run = true)')
+    end
+
+    it 'exposes a nullable, unset purge_scheduled_at' do
+      expect(described_class.columns_hash['purge_scheduled_at'].null).to be(true)
+      expect(guest.purge_scheduled_at).to be_nil
+    end
+
+    it 'records what the marker covers and who set it, nullable and unset by default' do
+      expect(described_class.columns_hash['test_run_intervention_id'].null).to be(true)
+      expect(described_class.columns_hash['test_run_marked_by_id'].null).to be(true)
+      expect(guest.test_run_intervention_id).to be_nil
+      expect(guest.test_run_marked_by_id).to be_nil
+    end
+  end
 end
