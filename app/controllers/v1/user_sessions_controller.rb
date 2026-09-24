@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::UserSessionsController < V1Controller
+  include TestRunMarkable
+
   skip_before_action :authenticate_user!, only: %i[create show_or_create]
   before_action :validate_intervention_status, except: [:ra_show]
   before_action :guard_ra_session_creation, only: %i[create show_or_create]
@@ -11,7 +13,7 @@ class V1::UserSessionsController < V1Controller
 
     user_session = V1::UserSessions::FetchService.call(params[:session_id], current_v1_user.id, params[:health_clinic_id])
 
-    render json: serialized_response(user_session), status: :ok
+    render json: serialized_response(user_session, 'UserSession', meta: test_run_meta(current_v1_user)), status: :ok
 
     user_session.update!(started: true)
     user_session.user_intervention.in_progress!
@@ -24,7 +26,9 @@ class V1::UserSessionsController < V1Controller
     user_session.save!
     @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
 
-    render json: serialized_response(user_session), status: :ok
+    mark_test_run(@current_v1_user_or_guest_user)
+
+    render json: serialized_response(user_session, 'UserSession', meta: test_run_meta(@current_v1_user_or_guest_user)), status: :ok
   end
 
   def show_or_create
@@ -34,7 +38,9 @@ class V1::UserSessionsController < V1Controller
     user_session.save!
     @current_v1_user_or_guest_user.update!(quick_exit_enabled: true) if intervention.quick_exit?
 
-    render json: serialized_response(user_session), status: :ok
+    mark_test_run(@current_v1_user_or_guest_user)
+
+    render json: serialized_response(user_session, 'UserSession', meta: test_run_meta(@current_v1_user_or_guest_user)), status: :ok
   end
 
   def ra_show
@@ -112,14 +118,14 @@ class V1::UserSessionsController < V1Controller
   end
 
   def intervention
-    @intervention = case params[:action]
-                    when 'quick_exit'
-                      user_session_load.session.intervention
-                    when 'show'
-                      Session.find(params[:session_id]).intervention
-                    else
-                      Session.find(session_id).intervention
-                    end
+    @intervention ||= case params[:action]
+                      when 'quick_exit'
+                        user_session_load.session.intervention
+                      when 'show'
+                        Session.find(params[:session_id]).intervention
+                      else
+                        Session.find(session_id).intervention
+                      end
   end
 
   def intervention_id
