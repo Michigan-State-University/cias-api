@@ -7,7 +7,7 @@ gem 'bundler', '~> 2.4.22'
 
 gem 'rails', '~> 7.2.0'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 7.2', '>= 7.2.1'
+gem 'puma', '~> 8.0', '>= 8.0.2'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
