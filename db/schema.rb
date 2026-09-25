@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_16_100000) do
+ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pgcrypto"
@@ -1053,6 +1053,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_16_100000) do
     t.text "sms_phone_number_ciphertext"
     t.string "sms_phone_number_bidx"
     t.uuid "fulfilled_by_id"
+    t.string "finish_reason"
     t.index ["current_question_id"], name: "index_user_sessions_on_current_question_id"
     t.index ["fulfilled_by_id"], name: "index_user_sessions_on_fulfilled_by_id"
     t.index ["health_clinic_id"], name: "index_user_sessions_on_health_clinic_id"

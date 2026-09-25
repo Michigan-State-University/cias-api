@@ -82,6 +82,38 @@ RSpec.describe UserSession, type: :model do
             expect { user_session.finish(send_email: false) }.to change(Answer, :count).by(-1)
           end
         end
+
+        context 'when the session is closed by an inactivity timeout' do
+          subject(:timeout_finish) { user_session.finish(reason: 'inactivity_timeout') }
+
+          it 'records why the session was closed' do
+            expect { timeout_finish }.to change { user_session.reload.finish_reason }.from(nil).to('inactivity_timeout')
+          end
+
+          it 'still generates the reports' do
+            expect { timeout_finish }.to have_enqueued_job(AfterFinishUserSessionJob)
+              .with(user_session.id, user_session.session.intervention, 'inactivity_timeout')
+          end
+
+          it 'does not schedule the planned text messages' do
+            expect(V1::SmsPlans::ScheduleSmsForUserSession).not_to receive(:call)
+            timeout_finish
+          end
+
+          it 'does not schedule the next session' do
+            expect(user_session_schedule_service).not_to receive(:schedule)
+            timeout_finish
+          end
+
+          it 'does not feed the organization dashboards' do
+            expect(V1::ChartStatistics::CreateForUserSession).not_to receive(:call)
+            timeout_finish
+          end
+
+          it 'does not count the session as completed' do
+            expect { timeout_finish }.not_to change { user_session.user_intervention.reload.completed_sessions }
+          end
+        end
       end
 
       context 'user session on answer' do
@@ -92,7 +124,7 @@ RSpec.describe UserSession, type: :model do
         context 'timeout_job_id is nil' do
           it 'schedules session timeout correctly' do
             expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
-                                                   .with(user_session.id)
+                                                   .with(user_session.id, 'completed')
                                                    .at(a_value_within(1.second).of(expected_timestamp))
           end
 
@@ -116,6 +148,49 @@ RSpec.describe UserSession, type: :model do
             let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
 
             it 'schedule session timeout' do
+              expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
+            end
+          end
+
+          context 'when autofinish is disabled' do
+            before { user_session.session.update!(autofinish_enabled: false) }
+
+            context 'and the participant has not passed the threshold' do
+              it 'does not schedule any timeout' do
+                expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+              end
+            end
+
+            context 'and the participant has passed the threshold' do
+              let!(:answer) { create(:answer_single, question: question, user_session: user_session) }
+
+              before { stub_const('UserSession::ClassicBehavior::INACTIVITY_TIMEOUT_DELAY', 30.minutes) }
+
+              it 'schedules an inactivity timeout after the inactivity delay' do
+                expect { user_session.on_answer }
+                  .to have_enqueued_job(UserSessionTimeoutJob)
+                  .with(user_session.id, 'inactivity_timeout')
+                  .at(a_value_within(1.second).of(30.minutes.from_now))
+              end
+
+              it 'records when the countdown started' do
+                expect { user_session.on_answer }.to change { user_session.reload.last_answer_at }.from(nil)
+              end
+            end
+          end
+
+          context 'when the participant answers a later question after passing the threshold' do
+            let!(:plain_question) { create(:question_single, question_group: question_group) }
+
+            before do
+              create(:answer_single, question: question, user_session: user_session)
+              user_session.on_answer
+              # Sidekiq stores the job id on the record in production; the test adapter does not
+              user_session.update!(timeout_job_id: 'provider-job-id')
+              create(:answer_single, question: plain_question, user_session: user_session)
+            end
+
+            it 'keeps the timeout armed' do
               expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
             end
           end
@@ -149,7 +224,7 @@ RSpec.describe UserSession, type: :model do
 
           it 'schedules session timeout correctly' do
             expect { user_session.on_answer }.to have_enqueued_job(UserSessionTimeoutJob)
-                                                   .with(user_session.id)
+                                                   .with(user_session.id, 'completed')
                                                    .at(a_value_within(1.second).of(expected_timestamp))
           end
         end
