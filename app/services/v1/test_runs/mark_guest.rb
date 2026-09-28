@@ -31,7 +31,7 @@ class V1::TestRuns::MarkGuest
 
   # One instant for both `wait_until:` and `purge_scheduled_at`, so `StrandedPurgesQuery` cannot disagree with the job.
   def persist!(payload)
-    purge_at = TestParticipants::PurgeTestParticipantsJob::RETENTION_WINDOW.from_now
+    purge_at = TestParticipants::PurgeTestParticipantsJob.retention_window.from_now
 
     user.update!(
       test_run: true,
