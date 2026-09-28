@@ -427,7 +427,10 @@ GEM
       childprocess (>= 0.6.3, < 6)
       iniparse (~> 1.4)
       rexml (>= 3.3.9)
-    pagy (4.11.0)
+    pagy (43.6.3)
+      json
+      uri
+      yaml
     paper_trail (17.0.0)
       activerecord (>= 7.1)
       request_store (~> 1.4)
@@ -460,7 +463,7 @@ GEM
     pry-rails (0.3.11)
       pry (>= 0.13.0)
     public_suffix (7.0.5)
-    puma (7.2.1)
+    puma (8.0.2)
       nio4r (~> 2.0)
     racc (1.8.1)
     rack (3.1.21)
@@ -665,6 +668,7 @@ GEM
       ostruct
     wkhtmltopdf-binary (0.12.6.10)
     wkhtmltopdf-heroku (3.0.0)
+    yaml (0.4.0)
     zeitwerk (2.8.3)
     zlib (3.2.3)
 
@@ -724,7 +728,7 @@ DEPENDENCIES
   nokogiri (>= 1.18.9)
   oj
   overcommit
-  pagy (~> 4.0)
+  pagy (~> 43.6)
   paper_trail (~> 17.0.0)
   paranoia
   pg (~> 1.2)
@@ -733,7 +737,7 @@ DEPENDENCIES
   postgresql_cursor
   pry-byebug
   pry-rails
-  puma (~> 7.2, >= 7.2.1)
+  puma (~> 8.0, >= 8.0.2)
   rack (>= 3.1.18)
   rack-attack
   rack-cors

@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 class V1::UserInterventionsController < V1Controller
+  include TestRunMarkable
+
   before_action :validate_intervention_status, only: %i[create]
   skip_before_action :authenticate_user!, only: %i[create]
+
   def index
     collection = user_intervention_scope
     paginated_collection = V1::Paginate.call(collection, start_index, end_index)
@@ -29,7 +32,9 @@ class V1::UserInterventionsController < V1Controller
 
     @current_v1_user_or_guest_user.update!(quick_exit_enabled: intervention.quick_exit, language_code: user_intervention.intervention.language_code)
 
-    render json: serialized_response(user_intervention)
+    mark_test_run(@current_v1_user_or_guest_user)
+
+    render json: serialized_response(user_intervention, 'UserIntervention', meta: test_run_meta(@current_v1_user_or_guest_user))
   end
 
   private
@@ -57,7 +62,7 @@ class V1::UserInterventionsController < V1Controller
   end
 
   def intervention
-    Intervention.find(intervention_id)
+    @intervention ||= Intervention.find(intervention_id)
   end
 
   def user_intervention_scope
