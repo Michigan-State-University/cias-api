@@ -63,5 +63,19 @@ RSpec.describe UserSessionTimeoutJob, type: :job do
           .to change { user_session.reload.finish_reason }.from(nil).to('inactivity_timeout')
       end
     end
+
+    context 'when the session was already finished' do
+      before { user_session.update!(finished_at: 1.minute.ago, last_answer_at: 5.minutes.ago) }
+
+      it 'does not rearm the timeout' do
+        expect { described_class.new.perform(user_session.id, 'inactivity_timeout') }
+          .not_to have_enqueued_job(described_class)
+      end
+
+      it 'does not overwrite how the session was finished' do
+        expect { described_class.new.perform(user_session.id, 'inactivity_timeout') }
+          .not_to change { user_session.reload.finish_reason }.from(nil)
+      end
+    end
   end
 end

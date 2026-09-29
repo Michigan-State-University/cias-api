@@ -5,7 +5,7 @@ class UserSessionTimeoutJob < ApplicationJob
 
   def perform(user_session_id, reason = 'completed')
     user_session = UserSession.find_by(id: user_session_id)
-    return if user_session.nil?
+    return if user_session.nil? || user_session.finished_at.present?
 
     if reason == 'inactivity_timeout' && !user_session.inactivity_elapsed?
       user_session.rearm_inactivity_timeout

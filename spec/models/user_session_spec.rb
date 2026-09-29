@@ -176,6 +176,30 @@ RSpec.describe UserSession, type: :model do
               it 'records when the countdown started' do
                 expect { user_session.on_answer }.to change { user_session.reload.last_answer_at }.from(nil)
               end
+
+              context 'and then answers a later question' do
+                let!(:plain_question) { create(:question_single, question_group: question_group) }
+
+                before do
+                  user_session.on_answer
+                  create(:answer_single, question: plain_question, user_session: user_session)
+                end
+
+                it 'keeps the inactivity timeout armed' do
+                  expect { user_session.on_answer }
+                    .to have_enqueued_job(UserSessionTimeoutJob)
+                    .with(user_session.id, 'inactivity_timeout')
+                    .at(a_value_within(1.second).of(30.minutes.from_now))
+                end
+              end
+            end
+
+            context 'and the threshold answer was taken back with the Back button' do
+              before { create(:answer_single, question: question, user_session: user_session, draft: true) }
+
+              it 'does not schedule any timeout' do
+                expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+              end
             end
           end
 
@@ -249,6 +273,12 @@ RSpec.describe UserSession, type: :model do
         expect(user_intervention.status).to eq('completed')
         expect(user_intervention.completed_sessions).to eq(1)
         expect(user_intervention.finished_at).not_to be_nil
+      end
+
+      it 'does not schedule a timeout on answer' do
+        session.update!(autofinish_enabled: true)
+
+        expect { user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
       end
     end
 

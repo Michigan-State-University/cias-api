@@ -3,9 +3,6 @@
 module UserSession::ClassicBehavior
   extend ActiveSupport::Concern
 
-  # How long a participant may stay inactive before a session that passed the
-  # "Fire report if get this far" threshold is closed and its reports generated.
-  # Only used when the researcher left autofinish off - otherwise autofinish_delay wins.
   INACTIVITY_TIMEOUT_DELAY = ENV.fetch('INACTIVITY_TIMEOUT_DELAY_MINUTES', 30).to_i.minutes
 
   included do
@@ -30,8 +27,6 @@ module UserSession::ClassicBehavior
     end
   end
 
-  # True once the participant has answered a screen flagged with "Fire report if get this far".
-  # Every later answer keeps the timeout armed, so the countdown slides instead of being dropped.
   def threshold_passed?
     answers.confirmed.joins(:question)
            .where("questions.settings @> '{\"start_autofinish_timer\": true}'")
@@ -42,8 +37,7 @@ module UserSession::ClassicBehavior
     inactivity_deadline <= Time.current
   end
 
-  # Gives the session the rest of its window back when a job fires early - a stale one
-  # whose cancellation did not stick, or one enqueued before a later answer slid the deadline.
+  # A job whose cancellation did not stick can fire early - give the session the rest of its window.
   def rearm_inactivity_timeout
     arm_timeout_job(wait: inactivity_deadline - Time.current, reason: 'inactivity_timeout')
   end
