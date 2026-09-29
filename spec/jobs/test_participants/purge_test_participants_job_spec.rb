@@ -137,17 +137,62 @@ RSpec.describe TestParticipants::PurgeTestParticipantsJob, type: :job do
     end
   end
 
-  # Against the job's own constant — that the marker path applies it is `spec/services/v1/test_runs/mark_guest_spec.rb`.
+  # Against the job's own window — that the marker path applies it is `spec/services/v1/test_runs/mark_guest_spec.rb`.
   describe 'the delayed-enqueue contract' do
     it 'can be scheduled to fire one retention window after marking' do
       freeze_time do
-        expect { described_class.set(wait_until: described_class::RETENTION_WINDOW.from_now).perform_later(guest.id) }
-          .to have_enqueued_job(described_class).with(guest.id).at(described_class::RETENTION_WINDOW.from_now)
+        expect { described_class.set(wait_until: described_class.retention_window.from_now).perform_later(guest.id) }
+          .to have_enqueued_job(described_class).with(guest.id).at(described_class.retention_window.from_now)
       end
     end
+  end
 
-    it 'keeps the retention window fixed at 24 hours (assumption A3 — not configurable)' do
-      expect(described_class::RETENTION_WINDOW).to eq(24.hours)
+  describe '.retention_window' do
+    subject(:retention_window) { described_class.retention_window }
+
+    let(:env_value) { nil }
+
+    around do |example|
+      original = ENV.fetch('TEST_PARTICIPANT_RETENTION_MINUTES', nil)
+      ENV['TEST_PARTICIPANT_RETENTION_MINUTES'] = env_value
+      example.run
+    ensure
+      ENV['TEST_PARTICIPANT_RETENTION_MINUTES'] = original
+    end
+
+    context 'when the env var is unset' do
+      it { expect(retention_window).to eq(24.hours) }
+    end
+
+    context 'when the env var holds a positive number' do
+      let(:env_value) { '30' }
+
+      it { expect(retention_window).to eq(30.minutes) }
+    end
+
+    # A junk value must not coerce to `0.minutes` — that would purge a guest while they are still filling.
+    context 'when the env var is blank' do
+      let(:env_value) { '' }
+
+      it { expect(retention_window).to eq(24.hours) }
+    end
+
+    context 'when the env var is not a number' do
+      let(:env_value) { 'thirty' }
+
+      it { expect(retention_window).to eq(24.hours) }
+    end
+
+    context 'when the env var is zero' do
+      let(:env_value) { '0' }
+
+      it { expect(retention_window).to eq(24.hours) }
+    end
+
+    context 'when the env var is negative' do
+      let(:env_value) { '-5' }
+
+      it { expect(retention_window).to eq(24.hours) }
     end
   end
 end

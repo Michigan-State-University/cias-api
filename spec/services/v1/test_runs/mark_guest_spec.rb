@@ -158,7 +158,7 @@ RSpec.describe V1::TestRuns::MarkGuest do
           expect { mark }
             .to have_enqueued_job(purge_job)
             .with(user.id)
-            .at(purge_job::RETENTION_WINDOW.from_now)
+            .at(purge_job.retention_window.from_now)
         end
       end
 
@@ -166,7 +166,7 @@ RSpec.describe V1::TestRuns::MarkGuest do
         freeze_time do
           mark
 
-          expect(user.reload.purge_scheduled_at).to eq(purge_job::RETENTION_WINDOW.from_now)
+          expect(user.reload.purge_scheduled_at).to eq(purge_job.retention_window.from_now)
         end
       end
 
@@ -184,6 +184,23 @@ RSpec.describe V1::TestRuns::MarkGuest do
 
       it 'enqueues onto the dedicated purge queue, not default' do
         expect { mark }.to have_enqueued_job(purge_job).on_queue('test_participant_purge')
+      end
+
+      context 'with TEST_PARTICIPANT_RETENTION_MINUTES set' do
+        around do |example|
+          original = ENV.fetch('TEST_PARTICIPANT_RETENTION_MINUTES', nil)
+          ENV['TEST_PARTICIPANT_RETENTION_MINUTES'] = '30'
+          example.run
+        ensure
+          ENV['TEST_PARTICIPANT_RETENTION_MINUTES'] = original
+        end
+
+        it 'schedules and stamps the purge that many minutes out' do
+          freeze_time do
+            expect { mark }.to have_enqueued_job(purge_job).with(user.id).at(30.minutes.from_now)
+            expect(user.reload.purge_scheduled_at).to eq(30.minutes.from_now)
+          end
+        end
       end
     end
 
