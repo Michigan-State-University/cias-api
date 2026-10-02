@@ -18,13 +18,34 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
   before { allow(Api::Hfhs).to receive(:new).and_return(api) }
 
   context 'with an ordinary participant' do
-    let(:user) { create(:user, :confirmed, :participant) }
+    let(:user) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
 
     it 'sends the answers and the reports' do
       perform_job
 
       expect(api).to have_received(:send_answers).with(user_session.id)
       expect(api).to have_received(:send_reports).with(user_session.id)
+    end
+  end
+
+  context 'with a participant who never verified their HFHS details' do
+    let(:user) { create(:user, :confirmed, :participant) }
+
+    it 'transmits nothing to HFHS' do
+      perform_job
+
+      expect(api).not_to have_received(:send_answers)
+      expect(api).not_to have_received(:send_reports)
+    end
+
+    it 'records why it withheld the transmission' do
+      allow(Rails.logger).to receive(:warn)
+
+      perform_job
+
+      expect(Rails.logger).to have_received(:warn).with(
+        a_string_including('without verified HFHS details', "user_session_id=#{user_session.id}")
+      )
     end
   end
 
