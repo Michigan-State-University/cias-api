@@ -92,7 +92,22 @@ RSpec.describe UserSession, type: :model do
 
           it 'still generates the reports' do
             expect { timeout_finish }.to have_enqueued_job(AfterFinishUserSessionJob)
-              .with(user_session.id, user_session.session.intervention, 'inactivity_timeout')
+              .with(user_session.id, user_session.session.intervention)
+          end
+
+          context 'when the intervention has Henry Ford access' do
+            include ActiveJob::TestHelper
+
+            before do
+              user_session.session.intervention.update!(hfhs_access: true)
+              allow(V1::GeneratedReports::GenerateUserSessionReports).to receive(:call)
+              timeout_finish
+            end
+
+            it 'pushes the answers and reports to Henry Ford' do
+              expect { perform_enqueued_jobs(only: AfterFinishUserSessionJob) }
+                .to have_enqueued_job(Hfhs::SendAnswersJob).with(user_session.id)
+            end
           end
 
           it 'does not schedule the planned text messages' do

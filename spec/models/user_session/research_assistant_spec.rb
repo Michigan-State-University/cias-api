@@ -65,7 +65,7 @@ RSpec.describe UserSession::ResearchAssistant, type: :model do
       it 'still generates the reports' do
         expect { ra_user_session.finish(reason: 'inactivity_timeout') }
           .to have_enqueued_job(AfterFinishUserSessionJob)
-          .with(ra_user_session.id, ra_user_session.session.intervention, 'inactivity_timeout')
+          .with(ra_user_session.id, ra_user_session.session.intervention)
       end
     end
   end

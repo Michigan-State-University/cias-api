@@ -11,22 +11,22 @@ RSpec.describe AfterFinishUserSessionJob, type: :job do
     allow(V1::GeneratedReports::GenerateUserSessionReports).to receive(:call)
   end
 
-  context 'when the session was completed' do
-    it 'pushes the answers to Henry Ford' do
-      expect { described_class.new.perform(user_session.id, intervention) }
-        .to have_enqueued_job(Hfhs::SendAnswersJob).with(user_session.id)
-    end
+  it 'generates the reports' do
+    expect(V1::GeneratedReports::GenerateUserSessionReports).to receive(:call)
+
+    described_class.new.perform(user_session.id, intervention)
   end
 
-  context 'when the session was closed by an inactivity timeout' do
-    it 'generates the reports' do
-      expect(V1::GeneratedReports::GenerateUserSessionReports).to receive(:call)
+  it 'pushes the answers and reports to Henry Ford' do
+    expect { described_class.new.perform(user_session.id, intervention) }
+      .to have_enqueued_job(Hfhs::SendAnswersJob).with(user_session.id)
+  end
 
-      described_class.new.perform(user_session.id, intervention, 'inactivity_timeout')
-    end
+  context 'when the intervention has no Henry Ford access' do
+    let(:intervention) { create(:intervention, hfhs_access: false) }
 
-    it 'does not push the answers to Henry Ford' do
-      expect { described_class.new.perform(user_session.id, intervention, 'inactivity_timeout') }
+    it 'does not push to Henry Ford' do
+      expect { described_class.new.perform(user_session.id, intervention) }
         .not_to have_enqueued_job(Hfhs::SendAnswersJob)
     end
   end

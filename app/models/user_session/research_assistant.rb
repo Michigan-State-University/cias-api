@@ -17,7 +17,7 @@ class UserSession::ResearchAssistant < UserSession
     # UserSessionScheduleService#schedule is skipped — RA blocking is handled by
     # PDP verify, not by session scheduling.
 
-    AfterFinishUserSessionJob.perform_later(id, session.intervention, reason)
+    AfterFinishUserSessionJob.perform_later(id, session.intervention)
 
     return if reason == 'inactivity_timeout'
 
