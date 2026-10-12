@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class V1::GeneratedReports::Create
+  # Captures the variable name from `.:var:.` and `.:s1.var:.` placeholders.
+  VARIABLE_PLACEHOLDER_PATTERN = /\.:([a-zA-Z0-9_.]+?):\./
+
   def self.call(report_template, user_session, dentaku_calculator)
     new(report_template, user_session, dentaku_calculator).call
   end
@@ -19,9 +22,10 @@ class V1::GeneratedReports::Create
 
     variants_to_generate.compact!
 
-    return if variants_to_generate.blank?
-
     insert_variables_into_variants(variants_to_generate)
+    variants_to_generate.reject! { |variant| unanswered_variable_used?(variant) }
+
+    return if variants_to_generate.blank?
 
     GeneratedReport.transaction do
       generated_report = GeneratedReport.create!(
@@ -75,14 +79,29 @@ class V1::GeneratedReports::Create
   end
 
   def insert_variable_into_variants(variable_name, variable_value, variants_to_generate)
-    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value.present? ? variable_value.to_s : 'Unknown') }
+    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value.to_s) }
   end
 
   def insert_variables_into_variants(variants_to_generate)
     insert_name_into_variants(variants_to_generate)
 
     user_intervention_answer_vars.each do |variable, value|
+      next if value.blank?
+
       insert_variable_into_variants(variable, value, variants_to_generate)
+    end
+  end
+
+  def unanswered_variable_used?(variant)
+    variant.content.scan(VARIABLE_PLACEHOLDER_PATTERN).flatten.any? { |variable| intervention_variables.include?(variable) }
+  end
+
+  def intervention_variables
+    @intervention_variables ||= user_session.session.intervention.sessions.each_with_object(Set.new) do |session, variables|
+      prefix = session.id == user_session.session_id ? '' : "#{session.variable}."
+      session.fetch_variables.each do |group|
+        group[:variables].each { |variable| variables << "#{prefix}#{variable.tr('/', '')}" }
+      end
     end
   end
 
