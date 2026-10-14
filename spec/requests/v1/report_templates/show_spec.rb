@@ -62,7 +62,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
                 ]
               },
               'variants' => {
-                'data' => [
+                'data' => contain_exactly(
                   include(
                     'id' => variant1.id,
                     'type' => 'variant'
@@ -71,7 +71,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
                     'id' => variant2.id,
                     'type' => 'variant'
                   )
-                ]
+                )
               }
             }
           )
@@ -85,7 +85,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
             ),
             'relationships' => {
               'variants' => {
-                'data' => [
+                'data' => contain_exactly(
                   include(
                     'id' => variant1.id,
                     'type' => 'variant'
@@ -94,7 +94,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_template/:id', type: :reques
                     'id' => variant2.id,
                     'type' => 'variant'
                   )
-                ]
+                )
               }
             }
           ).and include(
