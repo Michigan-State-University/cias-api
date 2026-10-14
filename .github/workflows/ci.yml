@@ -35,7 +35,6 @@ jobs:
       - name: Analyze with Rubocop
         run: bundle exec rubocop
 
-      # Runtimes recorded by the last fully green run (see save_runtime_log job)
       - name: Restore test runtime log
         uses: actions/cache/restore@v4
         with:
@@ -44,8 +43,6 @@ jobs:
           restore-keys: |
             rspec-runtime-
 
-      # Without a recorded runtime log (first run, evicted cache) fall back to splitting by file size;
-      # spec files missing from the log get the average runtime
       - id: set-group-by
         name: Set grouping strategy
         run: |
@@ -55,7 +52,7 @@ jobs:
             echo "group-by=filesize" >> $GITHUB_OUTPUT
           fi
 
-      # Every test job has to compute the groups from the very same runtime log, otherwise files could be skipped or run twice
+      # all test jobs must split by the same log, otherwise files could be skipped or run twice
       - name: Share test runtime log
         if: steps.set-group-by.outputs.group-by == 'runtime'
         uses: actions/upload-artifact@v4
@@ -66,8 +63,8 @@ jobs:
 
       - id: set-test-groups
         name: Set test groups
-        #parallel_tests group numbers are 1-based, the amount of groups is specified by GitHub secret TEST_BATCH_COUNT
-        run: echo "test-groups=$(jq -cn --argjson count ${{ secrets.TEST_BATCH_COUNT }} '[range(1; $count + 1)]')" >> $GITHUB_OUTPUT
+        #0-based ids, so the output never contains the secret value (GitHub drops such outputs)
+        run: echo "test-groups=$(jq -cn --argjson count ${{ secrets.TEST_BATCH_COUNT }} '[range(0; $count)]')" >> $GITHUB_OUTPUT
 
   test:
     name: Test batch no. ${{ matrix.group }}
@@ -130,12 +127,10 @@ jobs:
           name: rspec-runtime-baseline
           path: tmp
       - name: Run test batch
-        #parallel_tests splits all spec files into TEST_BATCH_COUNT groups of similar total runtime (or file size) and runs only this job's group;
-        #RuntimeLogger records per-file runtimes of this group for the next runs
         run: >-
           bundle exec parallel_rspec spec
-          -n ${{ secrets.TEST_BATCH_COUNT }}
-          --only-group ${{ matrix.group }}
+          -n ${{ strategy.job-total }}
+          --only-group $(( ${{ strategy.job-index }} + 1 ))
           --group-by ${{ needs.setup_environment.outputs.group-by }}
           --runtime-log tmp/parallel_runtime_rspec.log
           --verbose-command
@@ -154,7 +149,6 @@ jobs:
 
   save_runtime_log:
     name: Save test runtime log
-    #runs only when all test batches passed, so the log always covers the whole suite
     needs: test
     runs-on: ubuntu-22.04
 

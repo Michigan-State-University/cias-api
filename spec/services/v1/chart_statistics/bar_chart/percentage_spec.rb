@@ -6,7 +6,6 @@ RSpec.describe V1::ChartStatistics::BarChart::Percentage do
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
-  # chart statistics only need some user session; building one per statistic creates a whole intervention tree each time
   let(:user_session) { create(:user_session) }
   let!(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
   let!(:dashboard_sections) { create(:dashboard_section, name: 'Dashboard section', reporting_dashboard: reporting_dashboard) }
