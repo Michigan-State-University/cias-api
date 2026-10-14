@@ -127,12 +127,8 @@ class V1::UsersController < V1Controller
   end
 
   def user_params
-    if current_v1_user.roles.intersect?(%w[researcher team_admin]) && current_v1_user.id != user_id
-      params.expect(
-        user: [:active]
-      )
-    else
-      params.expect(
+    @user_params ||= begin
+      permitted = params.expect(
         user: [:first_name,
                :last_name,
                :email,
@@ -146,7 +142,12 @@ class V1::UsersController < V1Controller
                { roles: [],
                  phone_attributes: %i[iso prefix number] }]
       )
+      updating_other_user_as_researcher? ? permitted.slice(:active) : permitted
     end
+  end
+
+  def updating_other_user_as_researcher?
+    current_v1_user.roles.intersect?(%w[researcher team_admin]) && current_v1_user.id != user_id
   end
 
   def check_for_blank_params
