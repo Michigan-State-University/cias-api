@@ -3,6 +3,7 @@
 class V1::GeneratedReports::Create
   # Captures the variable name from `.:var:.` and `.:s1.var:.` placeholders.
   VARIABLE_PLACEHOLDER_PATTERN = /\.:([a-zA-Z0-9_.]+?):\./
+  NOT_ANSWERED = 'Not answered'
 
   def self.call(report_template, user_session, dentaku_calculator)
     new(report_template, user_session, dentaku_calculator).call
@@ -22,8 +23,9 @@ class V1::GeneratedReports::Create
 
     variants_to_generate.compact!
 
+    insert_name_into_variants(variants_to_generate)
+    variants_to_generate.reject! { |variant| only_unanswered_variables_used?(variant) }
     insert_variables_into_variants(variants_to_generate)
-    variants_to_generate.reject! { |variant| unanswered_variable_used?(variant) }
 
     return if variants_to_generate.blank?
 
@@ -83,17 +85,27 @@ class V1::GeneratedReports::Create
   end
 
   def insert_variables_into_variants(variants_to_generate)
-    insert_name_into_variants(variants_to_generate)
-
-    user_intervention_answer_vars.each do |variable, value|
-      next if value.blank?
-
+    answered_variables.each do |variable, value|
       insert_variable_into_variants(variable, value, variants_to_generate)
+    end
+
+    variants_to_generate.each { |variant| mark_unanswered_variables(variant) }
+  end
+
+  def mark_unanswered_variables(variant)
+    variant.content.gsub!(VARIABLE_PLACEHOLDER_PATTERN) do |placeholder|
+      intervention_variables.include?(Regexp.last_match(1)) ? NOT_ANSWERED : placeholder
     end
   end
 
-  def unanswered_variable_used?(variant)
-    variant.content.scan(VARIABLE_PLACEHOLDER_PATTERN).flatten.any? { |variable| intervention_variables.include?(variable) }
+  def only_unanswered_variables_used?(variant)
+    used_variables = variant.content.scan(VARIABLE_PLACEHOLDER_PATTERN).flatten
+    used_variables.any? { |variable| intervention_variables.include?(variable) } &&
+      used_variables.none? { |variable| answered_variables.key?(variable) }
+  end
+
+  def answered_variables
+    @answered_variables ||= user_intervention_answer_vars.compact_blank
   end
 
   def intervention_variables

@@ -258,6 +258,30 @@ RSpec.describe V1::GeneratedReports::Create do
         end
       end
 
+      context 'when only some of the variables used in a section have values' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session,
+                                        body: { data: [{ 'var' => 'free_text', 'value' => 'I feel great' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:., more: .:other_text:., earlier: .:s1.free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'keeps the section and marks the unanswered variables as not answered' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [
+              variant_with_content('Your thoughts: I feel great, more: Not answered, earlier: Not answered'),
+              variant_with_content('Second section')
+            ]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
       context 'when every selected section uses a variable without value' do
         before do
           section1_variant1.update(content: 'Your thoughts: .:free_text:.')
