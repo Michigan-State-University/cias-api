@@ -76,6 +76,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'fasterer', require: false
   gem 'overcommit', require: false
+  gem 'parallel_tests'
   gem 'pry-byebug'
   gem 'rack-test'
   gem 'rubocop', '>= 1.22.3', require: false
