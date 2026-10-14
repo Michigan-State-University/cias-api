@@ -121,6 +121,7 @@ jobs:
           gem install bundler -v "2.4.22"
           bundle config set path 'vendor/bundle'
           bundle install
+          ruby -rsecurerandom -e 'File.write("tmp/local_secret.txt", SecureRandom.hex(64))' #generated up front, parallel Rails boots race on creating it
           bundle exec rake "parallel:create[$TEST_PROCESSES]" "parallel:load_schema[$TEST_PROCESSES]"
       - name: Download test runtime log
         if: needs.setup_environment.outputs.group-by == 'runtime'
