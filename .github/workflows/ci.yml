@@ -70,6 +70,9 @@ jobs:
     name: Test batch no. ${{ matrix.group }}
     needs: setup_environment
     runs-on: ubuntu-22.04
+    env:
+      #rspec processes per job, each with its own database
+      TEST_PROCESSES: 4
     strategy:
       matrix:
         group: ${{ fromJson(needs.setup_environment.outputs.test-groups) }}
@@ -110,7 +113,6 @@ jobs:
       - name: Build
         env:
           BUNDLER_VERSION: 2.4.22
-          DATABASE_URL: postgres://postgres:7AU0lHRd5OglmKO@localhost:5432/cias_test
           GIT_AUTHOR_EMAIL: ci@ci.ci
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/
@@ -119,7 +121,7 @@ jobs:
           gem install bundler -v "2.4.22"
           bundle config set path 'vendor/bundle'
           bundle install
-          bundle exec rails db:create db:schema:load --trace
+          bundle exec rake "parallel:create[$TEST_PROCESSES]" "parallel:load_schema[$TEST_PROCESSES]"
       - name: Download test runtime log
         if: needs.setup_environment.outputs.group-by == 'runtime'
         uses: actions/download-artifact@v4
@@ -129,8 +131,8 @@ jobs:
       - name: Run test batch
         run: >-
           bundle exec parallel_rspec spec
-          -n ${{ strategy.job-total }}
-          --only-group $(( ${{ strategy.job-index }} + 1 ))
+          -n $(( ${{ strategy.job-total }} * TEST_PROCESSES ))
+          --only-group $(seq -s, $(( ${{ strategy.job-index }} * TEST_PROCESSES + 1 )) $(( (${{ strategy.job-index }} + 1) * TEST_PROCESSES )))
           --group-by ${{ needs.setup_environment.outputs.group-by }}
           --runtime-log tmp/parallel_runtime_rspec.log
           --verbose-command
