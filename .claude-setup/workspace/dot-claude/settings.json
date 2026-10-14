@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(bundle exec rspec *)",
+      "Bash(bundle exec rubocop *)",
+      "Bash(npm test *)",
+      "Bash(npm run lint*)",
+      "Bash(npx tsc *)",
+      "Bash(npx jest *)",
+      "Bash(npx eslint *)",
+      "mcp__claude_ai_Interlay__get_interlay_context",
+      "mcp__claude_ai_Interlay__get_interlay_info",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs"
+    ],
+    "ask": [
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr merge *)",
+      "Bash(ssh dokku@*)",
+      "Bash(aws *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "mcp__claude_ai_Interlay__create_knowledge_pills",
+      "mcp__claude_ai_Slack",
+      "mcp__claude_ai_Gmail",
+      "mcp__claude_ai_Atlassian",
+      "mcp__claude_ai_Notion",
+      "mcp__claude_ai_HubSpot",
+      "mcp__claude_ai_Google_Drive",
+      "mcp__claude_ai_Google_Docs",
+      "mcp__claude_ai_Google_Sheets"
+    ],
+    "deny": [
+      "Read(**/.env)",
+      "Read(**/.env.local)",
+      "Read(**/.env.*.local)",
+      "Read(**/config/master.key)",
+      "Read(**/config/credentials/**)",
+      "Read(**/config/credentials.yml.enc)",
+      "Read(**/config/credentials_google.json)",
+      "Read(**/cias-api-*.json)",
+      "Read(**/cypress.env.json)",
+      "Read(**/*private*.pem)",
+      "Read(**/*.rdb)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.docker/config.json)",
+      "Read(~/.gnupg/**)",
+      "Read(~/.netrc)",
+      "Read(~/.gem/credentials)",
+      "Read(~/.pgpass)",
+      "Read(~/.git-credentials)",
+      "Read(~/.kube/**)",
+      "Edit(**/.github/workflows/code-quality.yml)",
+      "Bash(cat ./**/.env*)",
+      "Bash(cat *master.key*)",
+      "Bash(cat *credentials*)",
+      "Bash(*credentials:show*)",
+      "Bash(*credentials:edit*)",
+      "Bash(printenv *)",
+      "Bash(env)",
+      "Bash(*db:drop*)",
+      "Bash(*db:reset*)",
+      "Bash(*db:migrate:reset*)",
+      "Bash(*db:purge*)",
+      "Bash(*db:schema:load*)",
+      "Bash(*db:truncate_all*)",
+      "Bash(*DISABLE_DATABASE_ENVIRONMENT_CHECK*)",
+      "Bash(git push cias-prod-dokku*)",
+      "Bash(git push * master)",
+      "Bash(git push * dev)",
+      "Bash(git push * test)",
+      "Bash(git push *:master)",
+      "Bash(git push *:dev)",
+      "Bash(git push *:test)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(ssh * config:*)",
+      "Bash(ssh * postgres:*)",
+      "Bash(gh repo delete *)",
+      "Bash(gh release delete *)",
+      "Bash(gh api * DELETE*)",
+      "Bash(aws *delete*)",
+      "Bash(aws *terminate*)",
+      "Bash(aws s3 rm *)",
+      "Bash(aws ecs update-service *)",
+      "Bash(aws secretsmanager get-secret-value*)",
+      "Bash(aws ssm get-parameter*)",
+      "Bash(npm publish*)",
+      "Bash(gem push *)"
+    ]
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-title.py\"",
+            "timeout": 30,
+            "statusMessage": "Naming session…"
+          }
+        ]
+      }
+    ]
+  }
+}

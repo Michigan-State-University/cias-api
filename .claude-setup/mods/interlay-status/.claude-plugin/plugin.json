@@ -1,0 +1,6 @@
+{
+  "name": "interlay-status",
+  "version": "0.1.0",
+  "description": "Pins the claude.ai Interlay MCP connection status under the prompt",
+  "author": { "name": "Szymon Klempert" }
+}

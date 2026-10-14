@@ -1,0 +1,14 @@
+{
+  "name": "cias-mods",
+  "description": "Claude Code mods for the CIAS workspace",
+  "owner": {
+    "name": "CIAS team"
+  },
+  "plugins": [
+    {
+      "name": "interlay-status",
+      "source": "./interlay-status",
+      "description": "Pins the claude.ai Interlay MCP connection status under the prompt"
+    }
+  ]
+}

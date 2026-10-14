@@ -1,0 +1,31 @@
+{
+  "folders": [
+    {
+      "name": "cias-api",
+      "path": "cias-api"
+    },
+    {
+      "name": "cias-web",
+      "path": "cias-web"
+    },
+    {
+      "name": "🗂 workspace-root (.claude, docs)",
+      "path": "."
+    }
+  ],
+  "settings": {
+    // Hide the sub-repos inside the "workspace-root" folder so they aren't
+    // listed twice (they already appear as their own top-level roots).
+    "files.exclude": {
+      "cias-api": true,
+      "cias-web": true
+    }
+  },
+  "extensions": {
+    "recommendations": ["Shopify.ruby-lsp"],
+    "unwantedRecommendations": [
+      "castwide.solargraph",
+      "sorbet.sorbet-vscode-extension"
+    ]
+  }
+}
