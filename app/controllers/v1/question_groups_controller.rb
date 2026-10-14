@@ -151,7 +151,7 @@ class V1::QuestionGroupsController < V1Controller
   end
 
   def question_group_params
-    params.expect(question_group: [:title, :session_id, :type, { formulas: [:payload, { patterns: [:match] }], sms_schedule: {} }])
+    params.expect(question_group: [:title, :session_id, :type, { formulas: [[:payload, { patterns: [[:match]] }]], sms_schedule: {} }])
   end
 
   def question_group_id

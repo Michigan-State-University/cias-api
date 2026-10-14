@@ -83,7 +83,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
 
   def predefined_users_parameters
     params.expect(
-      predefined_users: [participants: [
+      predefined_users: [participants: [[
         :first_name,
         :last_name,
         :email,
@@ -91,7 +91,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
         :email_notification,
         :sms_notification,
         { phone_attributes: %i[iso prefix number] }
-      ]]
+      ]]]
     )
   end
 

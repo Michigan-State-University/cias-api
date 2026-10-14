@@ -132,13 +132,13 @@ class V1::QuestionsController < V1Controller
 
   def question_params
     params.expect(question: [:type, :question_group_id, :title, :subtitle, :video_url, { accepted_answers: {},
-                                                                                         sms_reminders: {}, narrator: {}, settings: {}, formulas: [
-                                                                                           :payload, { patterns: [:match,
-                                                                                                                  { target: %i[type probability id] }] }
-                                                                                         ], body: {} }])
+                                                                                         sms_reminders: {}, narrator: {}, settings: {}, formulas: [[
+                                                                                           :payload, { patterns: [[:match,
+                                                                                                                  { target: [%i[type probability id]] }]] }
+                                                                                         ]], body: {} }])
   end
 
   def position_params
-    params.expect(question: [position: %i[id position question_group_id]])
+    params.expect(question: [position: [%i[id position question_group_id]]])
   end
 end

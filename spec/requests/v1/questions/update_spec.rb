@@ -166,6 +166,48 @@ RSpec.describe 'PATCH /v1/question_groups/:question_group_id/questions/:id', typ
     end
   end
 
+  context 'formulas with branching targets' do
+    let(:target_question) { create(:question_single, question_group: question_group) }
+    let(:target) { [{ 'id' => target_question.id, 'probability' => '100', 'type' => 'Question::Single' }] }
+    let(:params) do
+      {
+        question: {
+          type: question.type,
+          title: 'Question Test 1',
+          subtitle: 'test 1',
+          body: {
+            data: [
+              {
+                payload: {
+                  range_start: 0,
+                  range_end: 10,
+                  start_value: 'test 1',
+                  end_value: 'test 1'
+                }
+              }
+            ],
+            variable: {
+              name: 'var_test_1'
+            }
+          },
+          formulas: [{ payload: 'var_test_1', patterns: [{ match: '=1', target: target }] }]
+        }
+      }
+    end
+
+    before { request }
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'returns target in the response' do
+      expect(json_response['data']['attributes']['formulas'].first['patterns'].first['target']).to eq target
+    end
+
+    it 'persists target in the database' do
+      expect(question.reload.formulas.first['patterns'].first['target']).to eq target
+    end
+  end
+
   context 'collaboration mode' do
     it_behaves_like 'collaboration mode - only one editor at the same time'
   end
