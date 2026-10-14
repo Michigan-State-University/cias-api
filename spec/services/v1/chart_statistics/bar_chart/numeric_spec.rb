@@ -6,6 +6,8 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  # chart statistics only need some user session; building one per statistic creates a whole intervention tree each time
+  let(:user_session) { create(:user_session) }
   let!(:reporting_dashboard) { create(:reporting_dashboard, organization: organization) }
   let!(:dashboard_sections) { create(:dashboard_section, name: 'Dashboard section', reporting_dashboard: reporting_dashboard) }
   let!(:bar_chart1) { create(:chart, name: 'bar_chart1', dashboard_section: dashboard_sections, chart_type: 'bar_chart', status: 'published') }
@@ -15,19 +17,19 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
 
   let!(:chart_matched_statistic1) do
     create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                      health_clinic: health_clinic, filled_at: 2.months.ago)
+                                      health_clinic: health_clinic, filled_at: 2.months.ago, user_session: user_session)
   end
   let!(:chart_not_matched_statistic1) do
     create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                     health_clinic: health_clinic, filled_at: 2.months.ago)
+                                     health_clinic: health_clinic, filled_at: 2.months.ago, user_session: user_session)
   end
   let!(:chart_matched_statistic2) do
     create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                     health_clinic: health_clinic, filled_at: 1.month.ago)
+                                     health_clinic: health_clinic, filled_at: 1.month.ago, user_session: user_session)
   end
   let!(:chart_not_matched_statistic2) do
     create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                     health_clinic: health_clinic, filled_at: 1.month.ago)
+                                     health_clinic: health_clinic, filled_at: 1.month.ago, user_session: user_session)
   end
 
   let(:data_collection) { ChartStatistic.all }
@@ -118,19 +120,19 @@ RSpec.describe V1::ChartStatistics::BarChart::Numeric do
 
     let!(:chart_matched_statistic1) do
       create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                        health_clinic: health_clinic, filled_at: DateTime.now)
+                                        health_clinic: health_clinic, filled_at: DateTime.now, user_session: user_session)
     end
     let!(:chart_not_matched_statistic1) do
       create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                       health_clinic: health_clinic, filled_at: DateTime.now)
+                                       health_clinic: health_clinic, filled_at: DateTime.now, user_session: user_session)
     end
     let!(:chart_matched_statistic2) do
       create_list(:chart_statistic, 3, label: 'Matched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter)
+                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter, user_session: user_session)
     end
     let!(:chart_not_matched_statistic2) do
       create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: bar_chart1,
-                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter)
+                                       health_clinic: health_clinic, filled_at: DateTime.now.prev_quarter, user_session: user_session)
     end
 
     it 'return correct aggregated data' do
