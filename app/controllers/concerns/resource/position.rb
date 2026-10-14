@@ -19,7 +19,7 @@ module Resource::Position
   private
 
   def position_params
-    params.expect(controller_name.classify.underscore.to_sym => [position: %i[id position]])
+    params.expect(controller_name.classify.underscore.to_sym => [position: [%i[id position]]])
   end
 
   def response_scope

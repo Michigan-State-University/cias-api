@@ -82,7 +82,7 @@ class V1::ReportTemplates::SectionsController < V1Controller
   end
 
   def position_params
-    params.expect(section: [position: %i[id position]])
+    params.expect(section: [position: [%i[id position]]])
   end
 
   def ability_to_update?
