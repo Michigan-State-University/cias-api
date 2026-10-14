@@ -6,8 +6,8 @@ jobs:
     name: Prepare environment & split tests
     runs-on: ubuntu-22.04
     outputs:
-      test-chunks: ${{ steps.set-test-chunks.outputs.test-chunks }}
-      test-chunk-ids: ${{ steps.set-test-chunk-ids.outputs.test-chunk-ids }}
+      test-groups: ${{ steps.set-test-groups.outputs.test-groups }}
+      group-by: ${{ steps.set-group-by.outputs.group-by }}
 
     steps:
       - name: Checkout code
@@ -35,24 +35,47 @@ jobs:
       - name: Analyze with Rubocop
         run: bundle exec rubocop
 
-      - id: set-test-chunks
-        name: Set Chunks
-        #the test_setup.sh script returns a list of all spec files and passes that to jq, which groups them up in batches (amount of batches specified by GitHub secret TEST_BATCH_COUNT)
-        run: echo "test-chunks=$(./.github/workflows/test_setup.sh ./spec | jq -cM '[to_entries | group_by(.key % ${{ secrets.TEST_BATCH_COUNT }}) | .[] | map(.value)]')" >> $GITHUB_OUTPUT
+      # Runtimes recorded by the last fully green run (see save_runtime_log job)
+      - name: Restore test runtime log
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: rspec-runtime-${{ github.run_id }}
+          restore-keys: |
+            rspec-runtime-
 
-      - id: set-test-chunk-ids
-        name: Set Chunk IDs
-        run: echo "test-chunk-ids=$(echo $CHUNKS | jq -cM 'to_entries | map(.key)')" >> $GITHUB_OUTPUT
-        env:
-          CHUNKS: ${{ steps.set-test-chunks.outputs.test-chunks }}
+      # Without a recorded runtime log (first run, evicted cache) fall back to splitting by file size;
+      # spec files missing from the log get the average runtime
+      - id: set-group-by
+        name: Set grouping strategy
+        run: |
+          if [ -s tmp/parallel_runtime_rspec.log ]; then
+            echo "group-by=runtime" >> $GITHUB_OUTPUT
+          else
+            echo "group-by=filesize" >> $GITHUB_OUTPUT
+          fi
+
+      # Every test job has to compute the groups from the very same runtime log, otherwise files could be skipped or run twice
+      - name: Share test runtime log
+        if: steps.set-group-by.outputs.group-by == 'runtime'
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-runtime-baseline
+          path: tmp/parallel_runtime_rspec.log
+          retention-days: 1
+
+      - id: set-test-groups
+        name: Set test groups
+        #parallel_tests group numbers are 1-based, the amount of groups is specified by GitHub secret TEST_BATCH_COUNT
+        run: echo "test-groups=$(jq -cn --argjson count ${{ secrets.TEST_BATCH_COUNT }} '[range(1; $count + 1)]')" >> $GITHUB_OUTPUT
 
   test:
-    name: Test batch no. ${{ matrix.chunk }}
+    name: Test batch no. ${{ matrix.group }}
     needs: setup_environment
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        chunk: ${{ fromJson(needs.setup_environment.outputs.test-chunk-ids) }}
+        group: ${{ fromJson(needs.setup_environment.outputs.test-groups) }}
     services:
       database:
         image: postgres:13.0-alpine
@@ -100,13 +123,52 @@ jobs:
           bundle config set path 'vendor/bundle'
           bundle install
           bundle exec rails db:create db:schema:load --trace
+      - name: Download test runtime log
+        if: needs.setup_environment.outputs.group-by == 'runtime'
+        uses: actions/download-artifact@v4
+        with:
+          name: rspec-runtime-baseline
+          path: tmp
       - name: Run test batch
-        env:
-          CHUNKS: ${{ needs.setup_environment.outputs.test-chunks }}
-          #sed is needed because rspec prepends './' to file paths which contain '"' character and this jq command returns them in such format
-        run: bundle exec rspec $(echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | sed 's/\"//g')
+        #parallel_tests splits all spec files into TEST_BATCH_COUNT groups of similar total runtime (or file size) and runs only this job's group;
+        #RuntimeLogger records per-file runtimes of this group for the next runs
+        run: >-
+          bundle exec parallel_rspec spec
+          -n ${{ secrets.TEST_BATCH_COUNT }}
+          --only-group ${{ matrix.group }}
+          --group-by ${{ needs.setup_environment.outputs.group-by }}
+          --runtime-log tmp/parallel_runtime_rspec.log
+          --verbose-command
+          -o '--format progress --format ParallelTests::RSpec::RuntimeLogger --out tmp/runtime_logs/group_${{ matrix.group }}.log'
+      - name: Upload test runtimes
+        uses: actions/upload-artifact@v4
+        with:
+          name: rspec-runtime-group-${{ matrix.group }}
+          path: tmp/runtime_logs/
+          retention-days: 1
       - name: Analyze with bundler audit
         continue-on-error: true #untill fix all issues
         run: |
           gem install bundler-audit
           bundle-audit check --update
+
+  save_runtime_log:
+    name: Save test runtime log
+    #runs only when all test batches passed, so the log always covers the whole suite
+    needs: test
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Download test runtimes
+        uses: actions/download-artifact@v4
+        with:
+          pattern: rspec-runtime-group-*
+          path: tmp/runtime_logs
+          merge-multiple: true
+      - name: Merge test runtimes
+        run: cat tmp/runtime_logs/*.log | grep -E '^spec/.+_spec\.rb:[0-9.]+$' > tmp/parallel_runtime_rspec.log
+      - name: Save test runtime log
+        uses: actions/cache/save@v4
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: rspec-runtime-${{ github.run_id }}
