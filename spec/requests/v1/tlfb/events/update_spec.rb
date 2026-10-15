@@ -34,6 +34,45 @@ RSpec.describe 'PATCH /v1/tlfb/events', type: :request do
     end
   end
 
+  context 'when FE sends unwrapped JSON' do
+    let(:request) { patch v1_tlfb_event_path(id: event.id), params: { name: 'anniversary' }, headers: headers, as: :json }
+
+    it 'updates the name' do
+      request
+      expect(response).to have_http_status(:ok)
+      expect(event.reload.name).to eq 'anniversary'
+    end
+  end
+
+  context 'when event contains attributes other than name' do
+    let(:other_day) { create(:tlfb_day, question_group: question_group, user_session: user_session) }
+    let(:params) { { event: { name: 'anniversary', day_id: other_day.id } } }
+
+    it 'updates only the name' do
+      request
+      expect(response).to have_http_status(:ok)
+      expect(event.reload).to have_attributes(name: 'anniversary', day_id: day.id)
+    end
+  end
+
+  context 'when event param is missing' do
+    let(:params) { {} }
+
+    it 'returns bad request' do
+      request
+      expect(response).to have_http_status(:bad_request)
+    end
+  end
+
+  context 'when event has no permitted attributes' do
+    let(:params) { { event: { day_id: day.id } } }
+
+    it 'returns bad request and does not change the event' do
+      expect { request }.not_to change { event.reload.name }
+      expect(response).to have_http_status(:bad_request)
+    end
+  end
+
   context 'when user has no access' do
     %i[e_intervention_admin health_clinic_admin health_system_admin organization_admin researcher team_admin third_party].each do |role|
       context "user is #{role}" do

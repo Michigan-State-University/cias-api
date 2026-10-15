@@ -51,6 +51,6 @@ class V1::Tlfb::EventsController < V1Controller
   end
 
   def update_params
-    params.required(:event).permit(:name)
+    params.expect(event: [:name])
   end
 end
