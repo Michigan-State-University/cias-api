@@ -154,6 +154,7 @@ jobs:
           --only-group $(seq -s, $(( ${{ strategy.job-index }} * TEST_PROCESSES + 1 )) $(( (${{ strategy.job-index }} + 1) * TEST_PROCESSES )))
           --group-by ${{ needs.setup_environment.outputs.group-by }}
           --runtime-log tmp/parallel_runtime_rspec.log
+          --exclude-pattern '^spec/performance/'
           --verbose-command
           -o '--profile 20 --format progress --format ParallelTests::RSpec::RuntimeLogger --out tmp/runtime_logs/group_${{ matrix.group }}.log'
       - name: Upload test runtimes
@@ -189,6 +190,72 @@ jobs:
           # nothing and coverage never reaches the scan.
           include-hidden-files: true
 
+  # Wall-clock assertions (perform_under) need an unloaded runner: next to the
+  # TEST_PROCESSES parallel rspec processes of a batch they run ~2.5x slower and
+  # fail on timing alone. So spec/performance is excluded from the batches above
+  # and runs here in a single rspec process on its own runner.
+  performance_tests:
+    name: Performance tests
+    needs: setup_environment
+    runs-on: ubuntu-22.04
+    services:
+      database:
+        image: postgres:13.0-alpine
+        env:
+          POSTGRES_PASSWORD: 7AU0lHRd5OglmKO
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      cache:
+        image: redis
+        options: --entrypoint redis-server
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.8
+        env:
+          RUBYOPT: --jit
+      - run: cp .env.template .env
+      - run: cp ./config/database.docker.yml ./config/database.yml
+      - uses: actions/cache@v5
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+      - name: Build
+        env:
+          BUNDLER_VERSION: 2.4.22
+          GIT_AUTHOR_EMAIL: ci@ci.ci
+          RAILS_ENV: test
+          REDIS_URL: redis://localhost:6379/
+        run: |
+          sudo apt install libffi7
+          gem install bundler -v "2.4.22"
+          bundle config set path 'vendor/bundle'
+          bundle install
+          bundle exec rake db:create db:schema:load
+      - name: Run performance tests
+        run: bundle exec rspec spec/performance --profile 20 --format progress
+      - name: Upload coverage shard
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-shard-performance
+          path: coverage/.resultset.json
+          retention-days: 1
+          if-no-files-found: warn
+          include-hidden-files: true
+
   save_runtime_log:
     name: Save test runtime log
     needs: test
@@ -211,7 +278,7 @@ jobs:
 
   collate_coverage:
     name: Collate coverage
-    needs: test
+    needs: [test, performance_tests]
     # Run when batches FAILED -- their partial coverage still counts, and
     # without this one red batch would mean no coverage at all. Skip when they
     # were never reached (a red Rubocop skips the matrix) or cancelled, where
