@@ -25,6 +25,16 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/csv_attachment', type: :r
     end
   end
 
+  context 'when intervention has no reports attached' do
+    let(:reports) { [] }
+
+    it 'returns no content' do
+      pending 'BUG: Interventions::AnswersController#csv_attachment is missing `return` after `head :no_content`'
+      request
+      expect(response).to have_http_status(:no_content)
+    end
+  end
+
   context 'collaborator without access data' do
     let(:user) { intervention.collaborators.first.user }
 

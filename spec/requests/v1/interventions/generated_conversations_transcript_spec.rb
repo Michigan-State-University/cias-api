@@ -27,6 +27,16 @@ RSpec.describe 'GET v1/interventions/:id/generated_conversations_transcript', ty
     end
   end
 
+  context 'when intervention has no conversations transcript attached' do
+    let(:transcript) { nil }
+
+    it 'returns no content' do
+      pending 'BUG: InterventionsController#generated_conversations_transcript is missing `return` after `head :no_content`'
+      request
+      expect(response).to have_http_status(:no_content)
+    end
+  end
+
   context 'collaborator without access data' do
     let(:user) { intervention.collaborators.first.user }
 
