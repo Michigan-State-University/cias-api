@@ -7,7 +7,7 @@ if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
 end
 
 Rails.application.routes.draw do
-  root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
+  root to: proc { [200, { 'content-type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {

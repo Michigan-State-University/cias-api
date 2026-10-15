@@ -29,7 +29,7 @@ describe 'GET /v1/auth/confirmation', type: :request do
       let(:redirect_url) { 'https://evil.example.com/login' }
 
       it 'does not allow redirecting to other host' do
-        expect { send_request }.to raise_error(ActionController::Redirecting::OpenRedirectError)
+        expect { send_request }.to raise_error(ActionController::Redirecting::UnsafeRedirectError)
       end
     end
   end
@@ -55,7 +55,7 @@ describe 'GET /v1/auth/confirmation', type: :request do
       let(:redirect_url) { 'https://evil.example.com/login' }
 
       it 'does not allow redirecting to other host' do
-        expect { send_request }.to raise_error(ActionController::Redirecting::OpenRedirectError)
+        expect { send_request }.to raise_error(ActionController::Redirecting::UnsafeRedirectError)
       end
     end
 
