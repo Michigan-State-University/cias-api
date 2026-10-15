@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '3.3.8'
 gem 'bundler', '~> 2.4.22'
 
-gem 'rails', '~> 8.1.1'
+gem 'rails', '~> 8.1.4'
 gem 'pg', '~> 1.2'
 gem 'puma', '~> 8.0', '>= 8.0.2'
 

@@ -744,7 +744,7 @@ DEPENDENCIES
   rack-attack
   rack-cors
   rack-test
-  rails (~> 8.1.1)
+  rails (~> 8.1.4)
   rails-html-sanitizer (>= 1.6.1)
   redis
   rspec-benchmark
