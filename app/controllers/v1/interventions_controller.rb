@@ -10,7 +10,8 @@ class V1::InterventionsController < V1Controller
     ra_interventions_ids = Session::ResearchAssistant.where(intervention_id: paginated_collection.map(&:id)).distinct.pluck(:intervention_id)
 
     render json: serialized_hash(paginated_collection, 'SimpleIntervention', params: {
-                                   starred_interventions_ids: starred_interventions_ids, ra_interventions_ids: ra_interventions_ids,
+                                   starred_interventions_ids: starred_interventions_ids,
+                                   ra_interventions_ids: ra_interventions_ids,
                                    current_user_id: current_v1_user.id
                                  }).merge({ interventions_size: collection.size }).to_json
   end
