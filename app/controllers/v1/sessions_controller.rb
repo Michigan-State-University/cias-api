@@ -90,6 +90,21 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(updated_sessions.reload)
   end
 
+  def position
+    position_values = position_params[:position]
+
+    ra_session_ids = intervention.sessions.where(type: 'Session::ResearchAssistant').pluck(:id)
+    if position_values.any? { |v| ra_session_ids.include?(v[:id]) }
+      raise ComplexException.new(I18n.t('sessions.ra_cannot_reposition'), {}, :unprocessable_entity)
+    end
+
+    if position_values.any? { |v| v[:position].to_i.zero? && ra_session_ids.exclude?(v[:id]) }
+      raise ComplexException.new(I18n.t('sessions.position_zero_reserved'), {}, :unprocessable_entity)
+    end
+
+    super
+  end
+
   private
 
   def variable_filter_options

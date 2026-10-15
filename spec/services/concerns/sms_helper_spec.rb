@@ -158,4 +158,113 @@ RSpec.describe SmsHelper do
       end
     end
   end
+
+  describe '#timezone' do
+    context 'when the participant has explicitly set a valid timezone in their phone answer' do
+      let!(:phone_answer) do
+        create(:answer_phone, user_session: user_session,
+                              body: { 'data' => [{ 'var' => 'phone',
+                                                   'value' => { 'iso' => 'US', 'number' => '202-555-0173', 'prefix' => '+1', 'confirmed' => true,
+                                                                'timezone' => 'America/Bogota' } }] })
+      end
+
+      it 'returns the participant-provided timezone' do
+        expect(helper.timezone).to eq('America/Bogota')
+      end
+    end
+
+    context 'when the participant did not provide a timezone (no phone answer)' do
+      it 'falls back to the timezone derived from the phone number' do
+        # phone is +1 202-555-0173 → US → America/New_York via Phonelib
+        expect(helper.timezone).to eq('America/New_York')
+      end
+    end
+
+    context 'when the participant supplied an invalid timezone string' do
+      let!(:phone_answer) do
+        create(:answer_phone, user_session: user_session,
+                              body: { 'data' => [{ 'var' => 'phone',
+                                                   'value' => { 'iso' => 'US', 'number' => '202-555-0173', 'prefix' => '+1', 'confirmed' => true,
+                                                                'timezone' => 'Not/A/Real/Zone' } }] })
+      end
+
+      it 'falls back to the phone-number-derived timezone' do
+        expect(helper.timezone).to eq('America/New_York')
+      end
+    end
+
+    context 'when both the participant value and Phonelib lookup yield no valid zone' do
+      # User has_one :phone, so we mutate the existing phone in place rather than
+      # creating a second one (which would lead to ambiguous user.phone lookups).
+      before do
+        user.phone.update_columns(number: '999', prefix: '+999')
+      end
+
+      it 'sanity: helper.phone resolves to the unparseable number' do
+        expect(helper.phone.full_number).to eq('+999999')
+        expect(Phonelib.parse(helper.phone.full_number).timezone).to be_blank
+      end
+
+      it 'falls back to the user.time_zone column' do
+        user.update!(time_zone: 'America/Los_Angeles')
+        expect(helper.timezone).to eq('America/Los_Angeles')
+      end
+
+      context 'when user.time_zone is also blank' do
+        it 'falls back to UTC' do
+          user.update_column(:time_zone, nil)
+          expect(helper.timezone).to eq('UTC')
+        end
+      end
+    end
+  end
+
+  describe '#insert_links_into_variant' do
+    let(:plan) { create(:sms_plan, session: session) }
+    let(:no_formula_link) { create(:sms_link, sms_plan: plan, session: session, variable: 'promo') }
+
+    context 'when variant is nil (no-formula mode)' do
+      before { no_formula_link }
+
+      it 'creates SmsLinksUser entries for no-formula links only' do
+        expect { helper.insert_links_into_variant('Click ::promo::'.dup, plan) }
+          .to change(SmsLinksUser, :count).by(1)
+      end
+
+      it 'replaces the token with the short link' do
+        result = helper.insert_links_into_variant('Click ::promo::'.dup, plan)
+        expect(result).to match(%r{/link/})
+        expect(result).not_to include('::promo::')
+      end
+
+      it 'does not process variant-scoped links' do
+        variant = create(:sms_plan_variant, sms_plan: plan)
+        create(:sms_link, variant: variant, sms_plan: plan, session: session, variable: 'offer')
+        result = helper.insert_links_into_variant('::promo:: ::offer::'.dup, plan)
+        expect(result).to include('::offer::')  # variant link not substituted
+      end
+    end
+
+    context 'when variant is provided (formula mode)' do
+      let(:variant) { create(:sms_plan_variant, sms_plan: plan) }
+      let!(:variant_link) { create(:sms_link, variant: variant, sms_plan: plan, session: session, variable: 'offer') }
+
+      it 'creates SmsLinksUser entries for variant links only' do
+        expect { helper.insert_links_into_variant('Buy ::offer::'.dup, plan, variant) }
+          .to change(SmsLinksUser, :count).by(1)
+      end
+
+      it 'replaces the token with the short link' do
+        result = helper.insert_links_into_variant('Buy ::offer::'.dup, plan, variant)
+        expect(result).to match(%r{/link/})
+        expect(result).not_to include('::offer::')
+      end
+
+      it 'does not process no-formula links' do
+        no_formula_link
+        result = helper.insert_links_into_variant('::promo:: ::offer::'.dup, plan, variant)
+        expect(result).to include('::promo::')  # no-formula link not substituted
+      end
+    end
+  end
 end

@@ -17,6 +17,10 @@ class Question::Finish < Question
     )
   end
 
+  def ability_to_clone?
+    false
+  end
+
   def csv_header_names
     []
   end

@@ -57,6 +57,8 @@ class V1::Translations::NarratorBlocks
 
   def clear_and_split_text
     sanitized_subtitle = ActionView::Base.full_sanitizer.sanitize(question.subtitle)
-    sanitized_subtitle&.split(/(?<=[[:punct:]])/)
+    parts = sanitized_subtitle&.split(/(?<=[[:punct:]])/) || []
+    # This prevents standalone inverted Spanish punctuation (¿, ¡) from creating separate elements
+    parts.grep_v(/^\s*[¿¡]+\s*$/)
   end
 end

@@ -1,0 +1,26 @@
+# .trufflehogignore -- exclude patterns for TruffleHog secret detection
+# Each line is a regex matched against file paths.
+# Lines starting with # are comments. Empty lines are ignored.
+#
+# .env.template is deliberately NOT ignored -- it is committed and must stay
+# scanned so a real value pasted into it is caught.
+
+# Scan output
+htd-cq-output/
+coverage/
+
+# Local, untracked runtime state
+^\.env$
+\.byebug_history
+log/
+tmp/
+storage/
+
+# Editor and agent config
+^\.claude/
+^\.idea/
+^\.vscode/
+
+# Vendored dependencies
+vendor/
+node_modules/

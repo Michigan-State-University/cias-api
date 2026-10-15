@@ -3,8 +3,13 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 require 'simplecov'
-require_relative '../lib/rack/health_check'
+require_relative 'sonar_json_formatter'
+
+SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, SonarJSONFormatter]
 SimpleCov.start
+
+# Required after SimpleCov.start so this file appears in the report.
+require_relative '../lib/rack/health_check'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
@@ -54,8 +59,6 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :feature
   config.include ApiHelpers
   config.include MailerHelpers
-
-  include ActionDispatch::TestProcess
 
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = Rails.root.join('spec/fixtures').to_s

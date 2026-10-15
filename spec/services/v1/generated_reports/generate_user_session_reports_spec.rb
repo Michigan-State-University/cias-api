@@ -8,6 +8,12 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
   let!(:third_party_report_template) { create(:report_template, :third_party, session: session) }
   let!(:participant_report_template) { create(:report_template, :participant, session: session) }
   let!(:user_session) { create(:user_session, user: current_v1_user, session: session) }
+  let!(:answer_third_party) do
+    create(:answer_third_party, user_session: user_session,
+                                body: { data: [{ value: 'test@example.com',
+                                                 report_template_ids: [third_party_report_template.id],
+                                                 index: 0 }] })
+  end
   let!(:all_var_values) { user_session.all_var_values }
   let(:dentaku_calculator) { Dentaku::Calculator.new }
 
@@ -55,6 +61,104 @@ RSpec.describe V1::GeneratedReports::GenerateUserSessionReports do
       expect(dentaku_calculator).not_to receive(:store)
       expect(V1::GeneratedReports::Create).not_to receive(:call)
       subject
+    end
+  end
+
+  context 'when only some third party templates are selected' do
+    let!(:third_party_report_template2) { create(:report_template, :third_party, session: session) }
+
+    before do
+      answer_third_party.update(body: { data: [{ value: 'test@example.com',
+                                                 report_template_ids: [third_party_report_template.id],
+                                                 index: 0 }] })
+    end
+
+    it 'generates reports for all third party templates regardless of selection' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template2, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(participant_report_template, user_session, anything)
+      subject
+    end
+  end
+
+  context 'when no third party templates are selected' do
+    before do
+      answer_third_party.update(body: { data: [{ value: 'test@example.com',
+                                                 report_template_ids: [],
+                                                 index: 0 }] })
+    end
+
+    it 'generates reports for all templates regardless of selection' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(participant_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
+      subject
+    end
+  end
+
+  context 'when there is no third party answer at all' do
+    before do
+      answer_third_party.destroy
+    end
+
+    it 'generates reports for all templates regardless of third party answer' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(participant_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
+      subject
+    end
+  end
+
+  context 'when a henry ford health report template exists' do
+    let!(:henry_ford_report_template) { create(:report_template, :henry_ford_health, session: session) }
+
+    it 'always generates the henry ford health report regardless of third party selection' do
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(henry_ford_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(participant_report_template, user_session, anything)
+      expect(V1::GeneratedReports::Create).to receive(:call).
+        with(third_party_report_template, user_session, anything)
+      subject
+    end
+
+    context 'when no third party templates are selected' do
+      before do
+        answer_third_party.update(body: { data: [{ value: 'test@example.com',
+                                                   report_template_ids: [],
+                                                   index: 0 }] })
+      end
+
+      it 'still generates all report templates including henry ford health' do
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(henry_ford_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(participant_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(third_party_report_template, user_session, anything)
+        subject
+      end
+    end
+
+    context 'when there is no third party answer at all' do
+      before do
+        answer_third_party.destroy
+      end
+
+      it 'still generates all report templates including henry ford health' do
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(henry_ford_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(participant_report_template, user_session, anything)
+        expect(V1::GeneratedReports::Create).to receive(:call).
+          with(third_party_report_template, user_session, anything)
+        subject
+      end
     end
   end
 

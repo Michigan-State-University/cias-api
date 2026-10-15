@@ -4,6 +4,7 @@ class Clone::Question < Clone::Base
   def execute
     generate_new_answer_ids
     clean_outcome_formulas if clean_formulas
+    outcome.position = next_position if position.nil?
     outcome.save!
     attach_answer_images
     attach_image
@@ -12,6 +13,10 @@ class Clone::Question < Clone::Base
   end
 
   private
+
+  def next_position
+    outcome.question_group.questions.where.not(id: outcome.id).maximum(:position).to_i + 1
+  end
 
   def attach_image
     return unless source.image.attached?
@@ -26,19 +31,10 @@ class Clone::Question < Clone::Base
   end
 
   def generate_new_answer_ids
-    return unless source.type.in?(%w[Question::Single Question::Multiple Question::ThirdParty Question::Grid])
+    return unless source.type.in?(%w[Question::Single Question::Multiple])
 
-    if source.type == 'Question::Grid'
-      outcome.body.dig('data', 0, 'payload', 'rows').each do |row|
-        row['id'] = SecureRandom.uuid
-      end
-      outcome.body.dig('data', 0, 'payload', 'columns').each do |row|
-        row['id'] = SecureRandom.uuid
-      end
-    else
-      outcome.body['data'].each do |answer|
-        answer['id'] = SecureRandom.uuid
-      end
+    outcome.body['data'].each do |answer|
+      answer['id'] = SecureRandom.uuid
     end
   end
 

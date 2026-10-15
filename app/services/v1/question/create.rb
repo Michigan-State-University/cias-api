@@ -27,24 +27,14 @@ class V1::Question::Create
   attr_accessor :questions_scope
 
   def extend_question_params(question_params)
-    if question_params[:type].in?(questions_with_multiple_simple_answer)
-      question_params.dig(:body, :data).each do |answer_params|
-        answer_params[:id] = SecureRandom.uuid
-      end
-    elsif question_params[:type] == Question::Grid.name
-      question_params.dig(:body, :data).each do |data|
-        data.dig(:payload, :rows).each do |row|
-          row[:id] = SecureRandom.uuid
-        end
+    return unless question_params[:type].in?(questions_with_multiple_simple_answer)
 
-        data.dig(:payload, :columns).each do |col|
-          col[:id] = SecureRandom.uuid
-        end
-      end
+    question_params.dig(:body, :data).each do |answer_params|
+      answer_params[:id] = SecureRandom.uuid
     end
   end
 
   def questions_with_multiple_simple_answer
-    @questions_with_multiple_simple_answer ||= %w[Question::Single Question::Multiple Question::ThirdParty]
+    @questions_with_multiple_simple_answer ||= %w[Question::Single Question::Multiple]
   end
 end

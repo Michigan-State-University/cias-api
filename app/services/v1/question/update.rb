@@ -110,25 +110,15 @@ class V1::Question::Update
   end
 
   def extend_question_params(question_params)
-    if question.type.in?(questions_with_multiple_simple_answer)
-      question_params.dig(:body, :data)&.each do |answer_params|
-        answer_params[:id] = SecureRandom.uuid if answer_params[:id].blank?
-      end
-    elsif question.type == Question::Grid.name
-      question_params.dig(:body, :data)&.each do |data|
-        data.dig(:payload, :rows).each do |row|
-          row[:id] = SecureRandom.uuid if row[:id].blank?
-        end
+    return unless question.type.in?(questions_with_multiple_simple_answer)
 
-        data.dig(:payload, :columns)&.each do |col|
-          col[:id] = SecureRandom.uuid if col[:id].blank?
-        end
-      end
+    question_params.dig(:body, :data)&.each do |answer_params|
+      answer_params[:id] = SecureRandom.uuid if answer_params[:id].blank?
     end
   end
 
   def questions_with_multiple_simple_answer
-    @questions_with_multiple_simple_answer ||= %w[Question::Single Question::Multiple Question::ThirdParty]
+    @questions_with_multiple_simple_answer ||= %w[Question::Single Question::Multiple]
   end
 
   def adjust_variable_references(changed_vars)

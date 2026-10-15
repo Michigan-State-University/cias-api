@@ -22,6 +22,11 @@ en:
   session:
     error:
       formula_update_in_progress: 'Cannot update session variable while references update is in progress. Please try again in a few moments.'
+  chart:
+    error:
+      regenerate:
+        draft_chart: 'A draft chart has not collected any data yet, so there is nothing to regenerate. Publish it or move it to data collection first.'
+        in_progress: 'This chart is already being regenerated. Please wait for the current run to finish before starting another.'
   question_group:
     finish:
       title: Finish Group
@@ -73,7 +78,19 @@ en:
           attributes:
             user_id:
               already_exists: already exists
+        question:
+          attributes:
+            formulas:
+              ra_cannot_branch_to_other_sessions: 'Questions in Research Assistant sessions cannot branch to other sessions'
+              cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
+            type:
+              unsupported_in_ra_session: 'Question type is not supported in Research Assistant sessions; only Single, Number, and Date are allowed'
+          ra_variable_required: 'Variable name is required for Research Assistant session questions'
         question_group:
+          attributes:
+            formulas:
+              ra_cannot_branch_to_other_sessions: 'Question groups in Research Assistant sessions cannot branch to other sessions'
+              cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
           question: '%{question_type} can appear only once per session'
           question_variable: 'Variable name is in invalid format'
         organization_invitation:
@@ -90,8 +107,18 @@ en:
               sms_code:
                 protected_code: 'This code is reserved and cannot be used'
           attributes:
+            base:
+              only_one_ra_session_allowed: 'Only one Research Assistant session is allowed per intervention'
             variable:
               already_exists: already exists
+            position:
+              must_be_zero: 'must be 0 for Research Assistant sessions'
+              reserved_for_ra_session: 'Position 0 is reserved for Research Assistant sessions'
+            formulas:
+              ra_session_cannot_branch_to_other_sessions: 'Research Assistant sessions cannot branch to other sessions'
+              cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
+            type:
+              cannot_change_type: 'Session type cannot be changed after creation'
         live_chat:
           conversation:
             no_navigator_available: "No navigators are currently present."
@@ -133,6 +160,11 @@ en:
     default_response: 'You have entered an incorrect code. Please try again.'
     welcome_message: 'You are now enrolled. You will start receiving messages soon.'
     completion_message: 'Thank you for completing this session!'
+    default_ra_name: 'New Research Assistant Session'
+    ra_cannot_reposition: 'Research Assistant sessions cannot be repositioned'
+    position_zero_reserved: 'Position 0 is reserved for Research Assistant sessions'
+    ra_cannot_clone_same_intervention: 'Research Assistant sessions cannot be duplicated within the same intervention'
+    ra_already_exists_in_target: 'Target intervention already has a Research Assistant session'
   users:
     deactivated: "This account has been deactivated. Please get in touch with the support if you think it is a mistake."
     invite:
@@ -147,6 +179,7 @@ en:
       already_finished: 'You cannot provide an answer for the finished session'
       previous_question: 'Previous question is unavailable for this type of session'
       scheduled_session: 'You cannot fill scheduled session before the set time'
+      not_ra_fulfiller: 'You are not authorized to fulfill this Research Assistant session'
   teams:
     invitations:
       accepted: "You've successfully joined team %{team_name}."
@@ -220,6 +253,29 @@ en:
       header: CIAS Intervention Import - error
       body: 'There was a problem while importing intervention. Try again or contact support.'
       notification: There was an issue with importing intervention
+  bulk_import_mailer:
+    bulk_import_result:
+      subject: CIAS Predefined Participants Bulk Import complete
+      header: Predefined Participants Bulk Import complete
+      intro_html: 'Your bulk import for <strong>%{intervention_name}</strong> is complete.'
+      total: CSV rows
+      participants_created: Participants created
+      ra_completed: RA sessions auto-completed
+      ra_partial: RA sessions partially filled
+      failed: Failed
+      button: Open intervention
+      link: '%{web_url}/interventions/%{intervention_id}'
+    bulk_import_error:
+      subject: CIAS Predefined Participants Bulk Import failed
+      header: Predefined Participants Bulk Import failed
+      body: 'Predefined Participants Bulk Import for intervention %{intervention_name} could not be processed. No participants were created. Please try again or contact support.'
+  predefined_participants:
+    bulk_import:
+      participant_validation_error: Participant data validation failed
+      variable_answers_validation_error: RA answer validation failed
+      bulk_import_validation_error: Bulk import validation failed
+      empty_participants_error: CSV contains no participants
+      ra_answers_require_published_intervention_error: RA session answers can only be imported when the intervention is published
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
@@ -313,6 +369,11 @@ en:
       subject: 'Error during copying'
       header: 'An error has occurred during copying.'
       body: 'Something went wrong while copying your session/intervention. Please try again.'
+  chart_regeneration_mailer:
+    complete:
+      subject: 'Chart %{chart_name} has been regenerated'
+      header: 'Your chart has been regenerated'
+      body: 'The data for chart %{chart_name} has been recalculated and is up to date in your reporting dashboard.'
   duplicate_mailer:
     session:
       subject: 'Duplicate of %{session_name}'

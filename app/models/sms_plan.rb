@@ -14,6 +14,7 @@ class SmsPlan < ApplicationRecord
   belongs_to :session, counter_cache: true
   has_many :variants, class_name: 'SmsPlan::Variant', dependent: :destroy
   has_many :sms_links, dependent: :destroy
+  has_many :no_formula_sms_links, -> { where(variant_id: nil) }, class_name: 'SmsLink', inverse_of: :sms_plan, dependent: :destroy
   has_one_attached :no_formula_attachment, dependent: :purge_later
 
   attribute :original_text, :json, default: -> { assign_default_values('original_text') }

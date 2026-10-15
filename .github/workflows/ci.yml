@@ -1,6 +1,10 @@
 name: CI
 on: push
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   setup_environment:
     name: Prepare environment & split tests
@@ -11,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -19,7 +23,7 @@ jobs:
         env:
           RUBYOPT: --jit
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -36,7 +40,7 @@ jobs:
         run: bundle exec rubocop
 
       - name: Restore test runtime log
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: tmp/parallel_runtime_rspec.log
           key: rspec-runtime-${{ github.run_id }}
@@ -55,7 +59,7 @@ jobs:
       # all test jobs must split by the same log, otherwise files could be skipped or run twice
       - name: Share test runtime log
         if: steps.set-group-by.outputs.group-by == 'runtime'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: rspec-runtime-baseline
           path: tmp/parallel_runtime_rspec.log
@@ -65,6 +69,20 @@ jobs:
         name: Set test groups
         #0-based ids, so the output never contains the secret value (GitHub drops such outputs)
         run: echo "test-groups=$(jq -cn --argjson count ${{ secrets.TEST_BATCH_COUNT }} '[range(0; $count)]')" >> $GITHUB_OUTPUT
+
+  bundler_audit:
+    name: Dependency security audit
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.8
+      - name: Audit dependencies
+        continue-on-error: true #untill fix all issues
+        run: |
+          gem install bundler-audit
+          bundle-audit check --update
 
   test:
     name: Test batch no. ${{ matrix.group }}
@@ -95,7 +113,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
@@ -104,7 +122,7 @@ jobs:
           RUBYOPT: --jit
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -125,7 +143,7 @@ jobs:
           bundle exec rake "parallel:create[$TEST_PROCESSES]" "parallel:load_schema[$TEST_PROCESSES]"
       - name: Download test runtime log
         if: needs.setup_environment.outputs.group-by == 'runtime'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: rspec-runtime-baseline
           path: tmp
@@ -137,18 +155,39 @@ jobs:
           --group-by ${{ needs.setup_environment.outputs.group-by }}
           --runtime-log tmp/parallel_runtime_rspec.log
           --verbose-command
-          -o '--format progress --format ParallelTests::RSpec::RuntimeLogger --out tmp/runtime_logs/group_${{ matrix.group }}.log'
+          -o '--profile 20 --format progress --format ParallelTests::RSpec::RuntimeLogger --out tmp/runtime_logs/group_${{ matrix.group }}.log'
       - name: Upload test runtimes
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: rspec-runtime-group-${{ matrix.group }}
           path: tmp/runtime_logs/
           retention-days: 1
-      - name: Analyze with bundler audit
-        continue-on-error: true #untill fix all issues
-        run: |
-          gem install bundler-audit
-          bundle-audit check --update
+
+      # SimpleCov writes this on every rspec run (see spec/rails_helper.rb).
+      # The collate job below merges the shards for the Code Quality workflow.
+      #
+      # All TEST_PROCESSES rspec processes of this job share one
+      # coverage/.resultset.json: SimpleCov names each run after its
+      # TEST_ENV_NUMBER ("(1/1)", "(2/1)", ...) and stores it under a file lock,
+      # so the file ends up holding every process of the batch.
+      #
+      # always(): a batch that failed still covered the files it reached, and a
+      # partial figure beats none. A missing resultset means the batch died
+      # before SimpleCov could write, which must not fail the job -- but `warn`
+      # rather than `ignore`, so it is visible. `ignore` is what let the
+      # hidden-file exclusion below go unnoticed for a whole green run.
+      - name: Upload coverage shard
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-shard-${{ matrix.group }}
+          path: coverage/.resultset.json
+          retention-days: 1
+          if-no-files-found: warn
+          # SimpleCov's resultset is a dotfile, and upload-artifact excludes
+          # hidden files by default -- without this the upload silently finds
+          # nothing and coverage never reaches the scan.
+          include-hidden-files: true
 
   save_runtime_log:
     name: Save test runtime log
@@ -157,7 +196,7 @@ jobs:
 
     steps:
       - name: Download test runtimes
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           pattern: rspec-runtime-group-*
           path: tmp/runtime_logs
@@ -165,7 +204,58 @@ jobs:
       - name: Merge test runtimes
         run: cat tmp/runtime_logs/*.log | grep -E '^spec/.+_spec\.rb:[0-9.]+$' > tmp/parallel_runtime_rspec.log
       - name: Save test runtime log
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: tmp/parallel_runtime_rspec.log
           key: rspec-runtime-${{ github.run_id }}
+
+  collate_coverage:
+    name: Collate coverage
+    needs: test
+    # Run when batches FAILED -- their partial coverage still counts, and
+    # without this one red batch would mean no coverage at all. Skip when they
+    # were never reached (a red Rubocop skips the matrix) or cancelled, where
+    # there is provably nothing to merge.
+    if: ${{ !cancelled() && needs.test.result != 'skipped' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version: 3.3.8
+
+      - name: Download coverage shards
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: coverage-shards
+          pattern: coverage-shard-*
+
+      # Standalone gems rather than `bundle install`: collation needs SimpleCov
+      # only, and installing 260 gems to merge some JSON would cost more than
+      # the job itself.
+      #
+      # Versions are read from Gemfile.lock, not pinned here. SimpleCov's
+      # resultset format is version-sensitive -- the 0.18 change is the whole
+      # reason spec/sonar_json_formatter.rb exists -- so a bump that left this
+      # behind would have the shards written by one version and merged by
+      # another. SimpleCov.collate would drop everything and the scan would
+      # silently lose coverage with nothing going red.
+      - name: Collate shard coverage
+        run: |
+          lockver() { grep -m1 -E "^    $1 \(" Gemfile.lock | sed -E 's/.*\(([^)]+)\).*/\1/'; }
+          gem install --no-document \
+            "simplecov:$(lockver simplecov)" \
+            "simplecov_json_formatter:$(lockver simplecov_json_formatter)"
+          ruby script/collate_coverage.rb
+
+      - name: Upload collated coverage report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-report
+          path: coverage/coverage.json
+          retention-days: 1
+          # Not a dotfile, so no include-hidden-files needed here. warn, not
+          # ignore: no report is a legitimate outcome, but it should be visible
+          # in the run rather than only in the script's own output.
+          if-no-files-found: warn

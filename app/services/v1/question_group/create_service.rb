@@ -45,7 +45,7 @@ class V1::QuestionGroup::CreateService
   end
 
   def extend_question_params(question_params)
-    return unless question_params['type'].in?(%w[Question::Single Question::Multiple Question::ThirdParty])
+    return unless question_params['type'].in?(%w[Question::Single Question::Multiple])
 
     question_params.dig(:body, :data).each do |answer_params|
       answer_params[:id] = SecureRandom.uuid

@@ -6,6 +6,7 @@ class Question < ApplicationRecord
   include BodyInterface
   include Clone
   include FormulaInterface
+  include FormulaRaBranchingValidation
   include BlockHelper
   include Translate
   include ::TranslationAuxiliaryMethods
@@ -61,6 +62,10 @@ class Question < ApplicationRecord
                                                                } }
   validate :correct_variable_format
   validate :properly_assigned
+  validate :type_supported_for_ra_session
+  validate :ra_session_variable_present
+
+  before_validation :assign_default_ra_variable, on: :create
 
   delegate :session, to: :question_group
   delegate :ability_to_update_for?, to: :question_group
@@ -244,6 +249,44 @@ class Question < ApplicationRecord
       errors.add(:base, "Can not add #{type} to #{session.type}") unless ['Question::Sms', 'Question::SmsInformation'].include?(type)
     elsif ['Question::Sms', 'Question::SmsInformation'].include?(type)
       errors.add(:base, "Can not add #{type} to #{session.type}")
+    end
+  end
+
+  def type_supported_for_ra_session
+    return unless question_group&.session.is_a?(::Session::ResearchAssistant)
+    return if type == 'Question::Finish'
+    return if ::Session::ResearchAssistant::SUPPORTED_QUESTION_TYPES.include?(type)
+
+    errors.add(:type, :unsupported_in_ra_session)
+  end
+
+  def ra_session_answerable?
+    question_group&.session.is_a?(::Session::ResearchAssistant) &&
+      ::Session::ResearchAssistant::SUPPORTED_QUESTION_TYPES.include?(type)
+  end
+
+  def assign_default_ra_variable
+    return unless ra_session_answerable?
+    return if body.dig('variable', 'name').present?
+
+    body['variable'] ||= {}
+    body['variable']['name'] = next_unique_ra_variable
+  end
+
+  def ra_session_variable_present
+    return unless ra_session_answerable?
+    return if body.dig('variable', 'name').present?
+
+    errors.add(:base, I18n.t('activerecord.errors.models.question.ra_variable_required'))
+  end
+
+  def next_unique_ra_variable
+    taken = session.questions
+                   .where.not(id: id)
+                   .filter_map { |question| question.body.dig('variable', 'name').presence }
+    loop do
+      candidate = "var_#{SecureRandom.hex(3)}"
+      return candidate unless taken.include?(candidate)
     end
   end
 

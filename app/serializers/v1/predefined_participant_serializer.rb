@@ -12,4 +12,16 @@ class V1::PredefinedParticipantSerializer < V1Serializer
       object.predefined_user_parameter.send(attr)
     end
   end
+
+  attribute :ra_session_completed do |object, params|
+    params[:ra_user_sessions]&.dig(object.id)&.finished_at.present? || false
+  end
+
+  attribute :ra_session_finished_at do |object, params|
+    params[:ra_user_sessions]&.dig(object.id)&.finished_at
+  end
+
+  attribute :ra_session_fulfilled_by_email do |object, params|
+    params[:ra_user_sessions]&.dig(object.id)&.fulfilled_by&.email
+  end
 end

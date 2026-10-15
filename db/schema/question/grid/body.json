@@ -20,9 +20,6 @@
                     {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string"
-                        },
                         "payload": {
                           "type": "string"
                         },
@@ -57,9 +54,6 @@
                     {
                       "type": "object",
                       "properties": {
-                        "id": {
-                          "type": "string"
-                        },
                         "payload": {
                           "type": "string"
                         },
@@ -92,9 +86,6 @@
                           "type": "string"
                         },
                         "original_text" : {
-                          "type": "string"
-                        },
-                        "id": {
                           "type": "string"
                         },
                         "variable": {

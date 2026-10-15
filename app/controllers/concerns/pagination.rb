@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Pagination
-  include Pagy::Backend
+  include Pagy::Method
 
   def paginate(collection, params)
     _, paginated_collection = pagy(collection,
-                                   items: params[:per_page] || default_items(collection),
+                                   limit: params[:per_page] || default_items(collection),
                                    page: params[:page] || 1)
     paginated_collection
   end

@@ -21,10 +21,12 @@ module SmsHelper
 
   def attachment_url(plan)
     attachment = if plan.is_used_formula
-                   matched_variant(plan).attachment
+                   matched_variant(plan)&.attachment
                  else
                    plan.no_formula_attachment
                  end
+    return if attachment.nil?
+
     url_for(attachment) if attachment.attached?
   end
 
@@ -41,8 +43,9 @@ module SmsHelper
     content
   end
 
-  def insert_links_into_variant(content, plan)
-    plan.sms_links.each do |sms_link|
+  def insert_links_into_variant(content, plan, variant = nil)
+    links = variant.present? ? variant.sms_links : plan.no_formula_sms_links
+    links.each do |sms_link|
       sms_links_user = sms_link.sms_links_users.create!(user: user)
       content.gsub!("::#{sms_link.variable}::", "#{ENV.fetch('WEB_URL')}/link/#{sms_links_user.slug}")
     end
@@ -96,7 +99,12 @@ module SmsHelper
 
   def timezone
     timezone_defined_by_user = value_provided_by_the_user.present? ? value_provided_by_the_user['timezone'].to_s : ''
-    ActiveSupport::TimeZone[timezone_defined_by_user].present? ? timezone_defined_by_user : Phonelib.parse(phone.full_number).timezone
+    return timezone_defined_by_user if ActiveSupport::TimeZone[timezone_defined_by_user].present?
+
+    phonelib_zone = Phonelib.parse(phone&.full_number).timezone
+    return phonelib_zone if phonelib_zone.present? && ActiveSupport::TimeZone[phonelib_zone].present?
+
+    user.time_zone.presence || 'UTC'
   end
 
   def time_ranges_defined_by_user

@@ -16,12 +16,26 @@ class V1::GeneratedReports::ShareToThirdParty
   end
 
   def call
-    return if third_party_reports.blank?
-    return if no_one_to_send?
+    Rails.logger.info("[ShareToThirdParty] Starting for user_session_id=#{user_session.id} " \
+                      "reports=#{third_party_reports.count} " \
+                      "email_recipients=#{third_party_emails_report_template_ids.size} " \
+                      "fax_recipients=#{third_party_faxes_report_template_ids.size}")
+
+    if third_party_reports.blank?
+      Rails.logger.info("[ShareToThirdParty] Skipping user_session_id=#{user_session.id}: no third_party reports generated")
+      return
+    end
+
+    if no_one_to_send?
+      Rails.logger.info("[ShareToThirdParty] Skipping user_session_id=#{user_session.id}: no one to send to")
+      return
+    end
 
     number_of_generated_reports = create_generated_reports_third_party_users
     send_reports_emails(number_of_generated_reports)
     send_faxes
+
+    Rails.logger.info("[ShareToThirdParty] Completed for user_session_id=#{user_session.id}")
   end
 
   private
@@ -31,15 +45,24 @@ class V1::GeneratedReports::ShareToThirdParty
 
   def send_reports_emails(number_of_generated_reports)
     third_party_users.each do |user|
-      next if user.deactivated? || !user.email_notification
+      if user.deactivated? || !user.email_notification
+        Rails.logger.info("[ShareToThirdParty] Skipping email for user_session_id=#{user_session.id} " \
+                          "third_party_user_id=#{user.id} deactivated=#{user.deactivated?} " \
+                          "email_notification=#{user.email_notification}")
+        next
+      end
 
       num_of_generated_reports = number_of_generated_reports[user.email]
       if user.confirmed?
         if num_of_generated_reports.positive?
+          Rails.logger.info("[ShareToThirdParty] Delivering email for user_session_id=#{user_session.id} " \
+                            "third_party_user_id=#{user.id} report_count=#{num_of_generated_reports}")
           GeneratedReportMailer.with(locale: user_session.session.language_code)
                                .new_report_available(user.email, num_of_generated_reports).deliver_now
         end
       else
+        Rails.logger.info("[ShareToThirdParty] Enqueueing invitation email for user_session_id=#{user_session.id} " \
+                          "third_party_user_id=#{user.id} report_count=#{num_of_generated_reports}")
         SendNewReportNotificationJob.set(wait: 30.seconds).perform_later(user.email, user_session.session.language_code, num_of_generated_reports)
       end
     end
@@ -50,6 +73,12 @@ class V1::GeneratedReports::ShareToThirdParty
     third_party_faxes_report_template_ids.each do |receiver_label, hash|
       hash[:reports].uniq.each do |report_template_id|
         generated_report = third_party_reports.find_by(report_template_id: report_template_id)
+        if generated_report.nil?
+          Rails.logger.warn("[ShareToThirdParty] Missing generated_report for user_session_id=#{user_session.id} " \
+                            "report_template_id=#{report_template_id} — skipping fax")
+          next
+        end
+
         report_template = generated_report.report_template
         fields = report_template.slice(:cover_letter_description, :cover_letter_sender,
                                        :name).merge({ receiver: ActionView::Base.full_sanitizer.sanitize(receiver_label) })
@@ -58,6 +87,9 @@ class V1::GeneratedReports::ShareToThirdParty
                elsif report_template.custom?
                  report_template.cover_letter_custom_logo
                end
+        Rails.logger.info("[ShareToThirdParty] Sending fax for user_session_id=#{user_session.id} " \
+                          "report_template_id=#{report_template_id} generated_report_id=#{generated_report.id} " \
+                          "fax_count=#{hash[:numbers].uniq.size} cover_letter=#{report_template.has_cover_letter}")
         documo.send_faxes(hash[:numbers].uniq, [generated_report.pdf_report], report_template.has_cover_letter, fields, logo)
       end
     end
@@ -123,10 +155,15 @@ class V1::GeneratedReports::ShareToThirdParty
 
   def extracted_data_from_answers
     @extracted_data_from_answers ||= Answer::ThirdParty.where(user_session_id: user_session.id).map do |answer|
+      index = answer.body_data&.first&.dig('index')
+      if index.nil?
+        Rails.logger.warn("[ShareToThirdParty] Missing index in body_data for user_session_id=#{user_session.id} " \
+                          "answer_id=#{answer.id} — receiver label will be blank")
+      end
       [
         answer.body_data&.first&.dig('value')&.delete(' ')&.split(','),
         answer.body_data&.first&.dig('report_template_ids'),
-        answer.question.body['data'][answer.body_data.first['index']]['payload'].to_s
+        index ? answer.question.body.dig('data', index, 'payload').to_s : ''
       ] # [[email1, fax1, ...], [rep_id], receiver_label]
     end
   end

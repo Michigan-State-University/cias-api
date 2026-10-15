@@ -15,6 +15,7 @@ class CloneJobs::Intervention < CloneJob
     logger.error e
     logger.error e.message
     logger.error 'ERROR-LOG-END'
+    Sentry.capture_exception(e, extra: { user_id: user&.id, intervention_id: intervention_id, clone_params: clone_params })
     CloneMailer.error(user).deliver_now
 
     cloned_interventions = Array(cloned_interventions) unless cloned_interventions.is_a?(Array)

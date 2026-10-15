@@ -6,6 +6,7 @@ class V1::Export::SmsPlanSerializer < ActiveModel::Serializer
               :schedule_variable, :sms_send_time_type, :sms_send_time_details
 
   has_many :variants, serializer: V1::Export::SmsPlanVariantSerializer
+  has_many :no_formula_sms_links, key: :sms_links, serializer: V1::Export::SmsLinkSerializer
 
   attribute :version do
     SmsPlan::CURRENT_VERSION

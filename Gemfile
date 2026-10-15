@@ -7,7 +7,7 @@ gem 'bundler', '~> 2.4.22'
 
 gem 'rails', '~> 8.1.1'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 6.0'
+gem 'puma', '~> 8.0', '>= 8.0.2'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
@@ -18,10 +18,15 @@ gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
 gem 'connection_pool'
+gem 'csv'
 gem 'dentaku'
+gem 'devise', '~> 5.0'
 gem 'devise-argon2'
 gem 'devise_invitable'
-gem 'devise_token_auth'
+# pinned to git for devise 5 support, revert to rubygems once >= 1.2.7 is released
+gem 'devise_token_auth',
+    git: 'https://github.com/lynndylanhurley/devise_token_auth.git',
+    ref: 'bcdc3a5964086b6a08f3f98eb878a107af1334da'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
 gem 'jmespath', '>= 1.6.1'
@@ -34,7 +39,7 @@ gem 'loofah-activerecord', '~> 2.0'
 gem 'metainspector', '~> 5.5'
 gem 'nokogiri', '>= 1.18.9'
 gem 'oj'
-gem 'pagy', '~> 4.0'
+gem 'pagy', '~> 43.6'
 gem 'phonelib'
 gem 'postgresql_cursor'
 gem 'pry-rails'
@@ -43,7 +48,7 @@ gem 'redis'
 gem 'kredis', '~> 1.5'
 gem 'sidekiq', '>= 7.2.4'
 gem 'sql_query'
-gem 'twilio-ruby', '~> 7.9.0'
+gem 'twilio-ruby', '~> 7.9.1'
 gem 'wicked_pdf'
 gem 'rack', '>= 3.1.18'
 gem 'rack-attack'
@@ -64,9 +69,12 @@ gem 'paranoia'
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.28'
 gem 'jwt', '~> 3.1'
-gem 'aasm', '~> 5.1', '>= 5.1.1'
+gem 'aasm', '~> 5.5'
 # for faraday multipart
 gem 'faraday-multipart'
+# Security pin (bundler-audit): stay on the 0.5 line, which patches all
+# net-imap advisories without the 0.6 major bump. Transitive via `mail`.
+gem 'net-imap', '~> 0.5.14'
 gem 'audited'
 gem 'uri', '>= 1.1.1'
 
@@ -91,7 +99,9 @@ group :development do
   gem 'guard-rake', require: false
   gem 'guard-rspec', require: false
   gem 'letter_opener_web'
-  gem 'license_finder'
+  # license_finder removed: it caps `rubyzip` at < 3, which blocks the fix for
+  # CVE-2026-85396 (path traversal, High). It was never configured or invoked
+  # here. Re-add once upstream supports rubyzip 3.x.
   gem 'pgsync'
   gem 'wkhtmltopdf-binary'
 end

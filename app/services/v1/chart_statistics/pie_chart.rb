@@ -13,13 +13,19 @@ class V1::ChartStatistics::PieChart < V1::ChartStatistics::Base
   end
 
   def data_for_chart(label, value, patterns, default_pattern)
-    current_pattern = patterns.find { |pattern| pattern['label'] == label }
-
     {
       'label' => label,
       'value' => value,
-      'color' => current_pattern.present? ? current_pattern['color'] : default_pattern['color']
+      'color' => color_for(label, patterns, default_pattern)
     }
+  end
+
+  def color_for(label, patterns, default_pattern)
+    return INSUFFICIENT_DATA_COLOR if label == ChartStatistic::INSUFFICIENT_DATA_LABEL
+
+    current_pattern = patterns.find { |pattern| pattern['label'] == label }
+
+    current_pattern.present? ? current_pattern['color'] : default_pattern['color']
   end
 
   def current_chart_type_collection

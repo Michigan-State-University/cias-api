@@ -67,6 +67,7 @@ Rails.application.routes.draw do
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
+      post 'test_link', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
         resources :predefined_participants do
@@ -270,6 +271,7 @@ Rails.application.routes.draw do
 
     resources :charts, controller: :charts
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
+    post 'charts/:id/regenerate', to: 'charts#regenerate', as: :regenerate_chart
 
     get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
 
@@ -314,7 +316,10 @@ Rails.application.routes.draw do
     get '/s/:slug', to: 'links#show', as: :short
     post '/sms/replay', to: 'twillo_message#create', as: :sms_replay
     post 'predefined_participants/verify', to: 'interventions/predefined_participants#verify', as: :verify_predefined_participant
+    post 'predefined_participants/:slug/ra_session', to: 'interventions/predefined_participants#ra_session', as: :ra_session_predefined_participant
+    get 'user_sessions/:id/ra_show', to: 'user_sessions#ra_show', as: :ra_show_user_session
     post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
+    post 'test_link_tokens/verify', to: 'test_runs/link_tokens#verify', as: :verify_test_link_token
   end
 
   if Rails.env.development?

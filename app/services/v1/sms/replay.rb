@@ -183,7 +183,13 @@ class V1::Sms::Replay
 
   def create_new_user_session!(session:, user:)
     health_clinic_id = session.intervention.organization_id ? session.sms_code.health_clinic_id : nil
-    user_session = V1::UserSessions::CreateService.call(session.id, user.id, health_clinic_id)
+    user_session = V1::UserSessions::CreateService.call(
+      session.id,
+      user.id,
+      health_clinic_id,
+      sms_phone_prefix: "+#{@number_prefix}",
+      sms_phone_number: @national_number
+    )
     user_session.save!
     log_start_session(user_session)
     schedule_user_session_job!(user_session)

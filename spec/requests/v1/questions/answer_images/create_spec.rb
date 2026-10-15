@@ -13,10 +13,7 @@ RSpec.describe 'POST /v1/questions/:question_id/answer_images', type: :request d
              ]
            })
   end
-  let(:headers) do
-    user.create_new_auth_token.
-      merge({ 'Content-Type' => 'multipart/form-data; boundary=something' })
-  end
+  let(:headers) { user.create_new_auth_token }
   let(:params) do
     {
       image: {

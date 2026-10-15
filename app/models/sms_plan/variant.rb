@@ -6,12 +6,13 @@ class SmsPlan::Variant < ApplicationRecord
   has_paper_trail
   belongs_to :sms_plan
   has_one_attached :attachment, dependent: :purge_later
+  has_many :sms_links, inverse_of: :variant, dependent: :destroy
 
   CURRENT_VERSION = '1'
 
   attribute :original_text, :json, default: -> { { 'content' => '' } }
 
-  before_create :assign_position
+  after_create :assign_position
 
   default_scope { order(:position) }
 
@@ -24,6 +25,6 @@ class SmsPlan::Variant < ApplicationRecord
   private
 
   def assign_position
-    self.position = sms_plan.variants.count
+    update!(position: sms_plan.variants.count - 1)
   end
 end

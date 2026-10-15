@@ -106,6 +106,60 @@ RSpec.describe V1::GeneratedReports::ShareToThirdParty do
     it_behaves_like "won't share report with third party"
   end
 
+  context 'when answer has no index field and recipient is a fax number' do
+    let!(:answer_third_party) do
+      create(:answer_third_party, user_session: user_session,
+                                  body: { data: [{ value: '+1202-222-2243',
+                                                   report_template_ids: [generated_report.report_template.id] }] })
+    end
+
+    before do
+      allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call)
+                                                                 .and_return(true)
+    end
+
+    it 'still sends the fax with an empty receiver label' do
+      fields = generated_report.report_template.slice(:cover_letter_description, :cover_letter_sender, :name)
+                                               .merge({ receiver: '' })
+
+      expect(Api::Documo::SendMultipleFaxes).to receive(:call).with(['+1202-222-2243'], [kind_of(ActiveStorage::Attached::One)], false, fields,
+                                                                    kind_of(ActiveStorage::Attached::One))
+      subject
+    end
+  end
+
+  context 'when answer has no index field and recipient is an email' do
+    let!(:answer_third_party) do
+      create(:answer_third_party, user_session: user_session,
+                                  body: { data: [{ value: 'johnny@example.com',
+                                                   report_template_ids: [generated_report.report_template.id] }] })
+    end
+
+    it 'still sends the email' do
+      expect { subject }.to change(User, :count).by(1)
+      expect(SendNewReportNotificationJob).to have_been_enqueued
+    end
+  end
+
+  context 'when generated report for a given report_template_id does not exist' do
+    let!(:answer_third_party) do
+      create(:answer_third_party, user_session: user_session,
+                                  body: { data: [{ value: '+1202-222-2243',
+                                                   report_template_ids: [SecureRandom.uuid],
+                                                   index: 0 }] })
+    end
+
+    before do
+      allow_any_instance_of(Api::Documo::SendMultipleFaxes).to receive(:call)
+                                                                 .and_return(true)
+    end
+
+    it 'does not crash and skips the missing report' do
+      expect(Api::Documo::SendMultipleFaxes).not_to receive(:call)
+      expect { subject }.not_to raise_error
+    end
+  end
+
   context 'when users with provided emails are researchers' do
     let!(:user) { create(:user, :confirmed, :researcher, email: 'johnny@example.com') }
     let!(:user2) { create(:user, :confirmed, :researcher, email: 'johnny2@example.com') }
