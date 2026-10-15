@@ -157,7 +157,7 @@ GEM
       bundler (>= 1.2.0, < 3)
       thor (~> 1.0)
     byebug (12.0.0)
-    cancancan (3.6.1)
+    cancancan (3.7.0)
     case_transform (0.2)
       activesupport
     cgi (0.5.2)
@@ -758,7 +758,7 @@ DEPENDENCIES
   sentry-rails (~> 5.28)
   sentry-ruby (~> 5.5)
   shoulda-matchers
-  sidekiq (>= 7.2.4)
+  sidekiq (>= 7.3.3)
   simplecov
   sql_query
   test-prof
