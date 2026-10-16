@@ -3,8 +3,13 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 require 'simplecov'
-require_relative '../lib/rack/health_check'
+require_relative 'sonar_json_formatter'
+
+SimpleCov.formatters = [SimpleCov::Formatter::HTMLFormatter, SonarJSONFormatter]
 SimpleCov.start
+
+# Required after SimpleCov.start so this file appears in the report.
+require_relative '../lib/rack/health_check'
 
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)

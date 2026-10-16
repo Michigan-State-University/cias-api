@@ -122,3 +122,75 @@ jobs:
           CHUNKS: ${{ needs.setup_environment.outputs.test-chunks }}
           #sed is needed because rspec prepends './' to file paths which contain '"' character and this jq command returns them in such format
         run: bundle exec rspec --profile 20 $(echo $CHUNKS | jq '.[${{ matrix.chunk }}] | .[] | @text' | sed 's/\"//g')
+
+      # SimpleCov writes this on every rspec run (see spec/rails_helper.rb).
+      # The collate job below merges the shards for the Code Quality workflow.
+      #
+      # always(): a batch that failed still covered the files it reached, and a
+      # partial figure beats none. A missing resultset means the batch died
+      # before SimpleCov could write, which must not fail the job -- but `warn`
+      # rather than `ignore`, so it is visible. `ignore` is what let the
+      # hidden-file exclusion below go unnoticed for a whole green run.
+      - name: Upload coverage shard
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-shard-${{ matrix.chunk }}
+          path: coverage/.resultset.json
+          retention-days: 1
+          if-no-files-found: warn
+          # SimpleCov's resultset is a dotfile, and upload-artifact excludes
+          # hidden files by default -- without this the upload silently finds
+          # nothing and coverage never reaches the scan.
+          include-hidden-files: true
+
+  collate_coverage:
+    name: Collate coverage
+    needs: test
+    # Run when batches FAILED -- their partial coverage still counts, and
+    # without this one red batch would mean no coverage at all. Skip when they
+    # were never reached (a red Rubocop skips the matrix) or cancelled, where
+    # there is provably nothing to merge.
+    if: ${{ !cancelled() && needs.test.result != 'skipped' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version: 3.3.8
+
+      - name: Download coverage shards
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: coverage-shards
+          pattern: coverage-shard-*
+
+      # Standalone gems rather than `bundle install`: collation needs SimpleCov
+      # only, and installing 260 gems to merge some JSON would cost more than
+      # the job itself.
+      #
+      # Versions are read from Gemfile.lock, not pinned here. SimpleCov's
+      # resultset format is version-sensitive -- the 0.18 change is the whole
+      # reason spec/sonar_json_formatter.rb exists -- so a bump that left this
+      # behind would have the shards written by one version and merged by
+      # another. SimpleCov.collate would drop everything and the scan would
+      # silently lose coverage with nothing going red.
+      - name: Collate shard coverage
+        run: |
+          lockver() { grep -m1 -E "^    $1 \(" Gemfile.lock | sed -E 's/.*\(([^)]+)\).*/\1/'; }
+          gem install --no-document \
+            "simplecov:$(lockver simplecov)" \
+            "simplecov_json_formatter:$(lockver simplecov_json_formatter)"
+          ruby script/collate_coverage.rb
+
+      - name: Upload collated coverage report
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: coverage-report
+          path: coverage/coverage.json
+          retention-days: 1
+          # Not a dotfile, so no include-hidden-files needed here. warn, not
+          # ignore: no report is a legitimate outcome, but it should be visible
+          # in the run rather than only in the script's own output.
+          if-no-files-found: warn

@@ -82,6 +82,14 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
       end
     end
 
+    context 'when autofinish is off and the question has "Fire report if get this far" on' do
+      let(:question) { create(:question_single, :start_autofinish_timer_on, question_group: question_group) }
+
+      it 'schedules the inactivity timeout' do
+        expect { request }.to have_enqueued_job(UserSessionTimeoutJob).with(user_session.id, 'inactivity_timeout')
+      end
+    end
+
     it_behaves_like 'deactivated account'
 
     it_behaves_like 'paused intervention'

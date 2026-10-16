@@ -96,4 +96,44 @@ RSpec.describe Calculations::DentakuService do
       end
     end
   end
+
+  describe '#raw_result' do
+    let!(:variant1) { create(:report_template_section_variant, formula_match: '=10') }
+    let(:variants) { ReportTemplate::Section::Variant.all }
+
+    it 'is nil before the formula is evaluated' do
+      expect(subject.raw_result).to be_nil
+    end
+
+    context 'with a numeric payload' do
+      let(:all_var_values) { { 's1.var1' => 6, 's1.var2' => 4 } }
+      let(:formula) { 's1.var1 + s1.var2' }
+
+      it 'exposes the value the payload evaluated to, and still returns the matched variant' do
+        subject.store_and_transform_values
+        expect(subject.evaluate(formula, variants)).to eq(variant1)
+        expect(subject.raw_result).to eq(10)
+      end
+    end
+
+    context 'with a boolean payload' do
+      let(:all_var_values) { { 's1.var1' => 20, 's1.var2' => 1 } }
+      let(:formula) { '(s1.var1>10) OR (s1.var2>3)' }
+
+      it 'exposes the boolean the payload evaluated to' do
+        subject.store_and_transform_values
+        subject.evaluate(formula, ReportTemplate::Section::Variant.none)
+        expect(subject.raw_result).to be true
+      end
+    end
+
+    context 'when the payload cannot be evaluated' do
+      let(:formula) { 'var1 +' }
+
+      it 'stays nil' do
+        expect { subject.evaluate(formula, variants) }.to raise_error(Dentaku::ParseError)
+        expect(subject.raw_result).to be_nil
+      end
+    end
+  end
 end

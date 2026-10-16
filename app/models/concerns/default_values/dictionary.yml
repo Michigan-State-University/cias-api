@@ -70,6 +70,8 @@ chart:
       label: 'NotMatched',
       color: '#E2B1F4'
     }
+    min_answered_variables: 0
+    positive_despite_missing_data: false
 user:
   roles:
     - participant

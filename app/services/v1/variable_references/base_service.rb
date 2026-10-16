@@ -42,6 +42,12 @@ class V1::VariableReferences::BaseService
     ActiveRecord::Base.connection.execute(update_sql)
   end
 
+  def update_question_feedback_spectrum_scoped(session, old_var, new_var, exclude_source_session: false)
+    base_query = build_question_base_query(session, exclude_source_session).where(type: 'Question::Feedback')
+    update_sql = build_feedback_spectrum_update_sql('questions', old_var, new_var, base_query)
+    ActiveRecord::Base.connection.execute(update_sql)
+  end
+
   def update_question_group_formulas_scoped(session, old_var, new_var, exclude_source_session: false)
     base_query = build_question_group_base_query(session, exclude_source_session)
     update_sql = build_jsonb_formula_update_sql('question_groups', old_var, new_var, base_query)
@@ -76,12 +82,28 @@ class V1::VariableReferences::BaseService
   end
 
   def update_days_after_date_session_variable_references(old_var, new_var)
+    anchored = ActiveRecord::Base.connection.quote("\\A#{Regexp.escape(old_var)}")
+    replacement = ActiveRecord::Base.connection.quote(escape_regexp_replacement(new_var))
+
+    id_subquery = days_after_date_scope
+                  .where('sessions.days_after_date_variable_name = :old ' \
+                         'OR sessions.days_after_date_variable_name LIKE :prefix',
+                         old: old_var, prefix: "#{sanitize_like_pattern(old_var)}.%")
+                  .select('sessions.id')
+                  .reorder('')
+                  .to_sql
+
     update_sql = <<-SQL.squish
       UPDATE sessions
-      SET days_after_date_variable_name = REPLACE(days_after_date_variable_name, #{ActiveRecord::Base.connection.quote(old_var)}, #{ActiveRecord::Base.connection.quote(new_var)})
-      WHERE days_after_date_variable_name ILIKE #{ActiveRecord::Base.connection.quote("#{old_var}%")}
+      SET days_after_date_variable_name = regexp_replace(days_after_date_variable_name, #{anchored}, #{replacement}),
+          updated_at = NOW()
+      WHERE sessions.id IN (#{id_subquery})
     SQL
     ActiveRecord::Base.connection.execute(update_sql)
+  end
+
+  def days_after_date_scope
+    raise NotImplementedError, "#{self.class} must scope days_after_date rewrites to an intervention"
   end
 
   def update_sms_plan_formulas_scoped(session, old_var, new_var, exclude_source_session: false)

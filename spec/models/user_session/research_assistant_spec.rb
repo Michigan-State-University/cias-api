@@ -55,5 +55,36 @@ RSpec.describe UserSession::ResearchAssistant, type: :model do
         expect(ra_user_session.finished_at).to eq(original_finished_at)
       end
     end
+
+    context 'when closed by an inactivity timeout' do
+      it 'records why the session was closed' do
+        expect { ra_user_session.finish(reason: 'inactivity_timeout') }
+          .to change { ra_user_session.reload.finish_reason }.from(nil).to('inactivity_timeout')
+      end
+
+      it 'still generates the reports' do
+        expect { ra_user_session.finish(reason: 'inactivity_timeout') }
+          .to have_enqueued_job(AfterFinishUserSessionJob)
+          .with(ra_user_session.id, ra_user_session.session.intervention)
+      end
+    end
+  end
+
+  describe '#on_answer' do
+    let(:question_group) { create(:question_group, session: ra_user_session.session) }
+    let(:question) { create(:question_single, :start_autofinish_timer_on, question_group: question_group) }
+
+    before do
+      ActiveJob::Base.queue_adapter = :test
+      create(:answer_single, question: question, user_session: ra_user_session)
+    end
+
+    context 'when autofinish is off and the threshold was passed' do
+      it 'schedules the inactivity timeout' do
+        expect { ra_user_session.on_answer }
+          .to have_enqueued_job(UserSessionTimeoutJob)
+          .with(ra_user_session.id, 'inactivity_timeout')
+      end
+    end
   end
 end

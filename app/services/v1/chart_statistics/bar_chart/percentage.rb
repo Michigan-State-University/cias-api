@@ -9,14 +9,16 @@ class V1::ChartStatistics::BarChart::Percentage < V1::ChartStatistics::BarChart
     monthly_data_value = value[pattern['label']]
 
     other_label = default_pattern['label']
-    population = value[other_label] + monthly_data_value
+    invalid_value = value[ChartStatistic::INSUFFICIENT_DATA_LABEL]
+    population = value[other_label] + monthly_data_value + invalid_value
     monthly_data_value = population.zero? ? 0 : (monthly_data_value.to_f / population * 100).round(2)
 
     {
       'label' => month,
       'color' => pattern['color'],
       'population' => population,
-      'value' => monthly_data_value
+      'value' => monthly_data_value,
+      'invalidValue' => invalid_value
     }
   end
 

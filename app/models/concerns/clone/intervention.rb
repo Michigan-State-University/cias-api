@@ -2,6 +2,7 @@
 
 class Clone::Intervention < Clone::Base
   include Clone::ReflectionReassignment
+  include Clone::SessionVariableNaming
 
   def execute
     outcome.status = :draft
@@ -17,6 +18,8 @@ class Clone::Intervention < Clone::Base
     create_sessions
     reassign_branching
     reassign_reflections
+    # Must follow reassign_reflections — raw SQL vs whole-column save!, they overwrite each other.
+    apply_session_variable_renames
     outcome.update!(is_hidden: hidden)
     reset_cache_counters
     attach_logo
@@ -49,11 +52,33 @@ class Clone::Intervention < Clone::Base
 
   def create_sessions
     source.sessions.order(:position).each do |session|
-      outcome.sessions << Clone::Session.new(session,
-                                             intervention_id: outcome.id,
-                                             clean_formulas: false,
-                                             defer_reflection_reassignment: true,
-                                             position: session.position).execute
+      cloned_session = Clone::Session.new(session, clone_session_options(session)).execute
+      outcome.sessions << cloned_session
+      next unless rename_session_variables
+
+      variable_renames << [cloned_session.id, session.variable, cloned_session.variable]
+    end
+  end
+
+  def clone_session_options(session)
+    options = { intervention_id: outcome.id,
+                clean_formulas: false,
+                defer_reflection_reassignment: true,
+                position: session.position }
+    # Plain key, not params: — Clone#clone's multi-user branch drops params entirely.
+    options[:variable] = cloned_session_variable(session) if rename_session_variables
+    options
+  end
+
+  def variable_renames
+    @variable_renames ||= []
+  end
+
+  def apply_session_variable_renames
+    variable_renames.each do |session_id, old_variable, new_variable|
+      V1::VariableReferences::SessionService.new(session_id, old_variable, new_variable,
+                                                 include_source_session: true,
+                                                 skip_chart_formulas: true).call
     end
   end
 

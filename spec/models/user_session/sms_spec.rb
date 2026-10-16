@@ -230,6 +230,12 @@ RSpec.describe UserSession::Sms, type: :model do
     it 'does not raise error when called' do
       expect { sms_user_session.on_answer }.not_to raise_error
     end
+
+    it 'does not schedule a timeout' do
+      sms_user_session.session.update!(autofinish_enabled: true)
+
+      expect { sms_user_session.on_answer }.not_to have_enqueued_job(UserSessionTimeoutJob)
+    end
   end
 
   describe '#finish' do

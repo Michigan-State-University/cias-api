@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Calculations::DentakuService
-  attr_reader :dentaku_calculator, :all_var_values, :formula, :formula_cases, :is_formula_interface
+  attr_reader :dentaku_calculator, :all_var_values, :formula, :formula_cases, :is_formula_interface, :raw_result
 
   def initialize(all_var_values, formula = nil, formula_cases = nil, is_formula_interface = false)
     @dentaku_calculator = Dentaku::Calculator.new(case_sensitive: true)
@@ -24,6 +24,7 @@ class Calculations::DentakuService
   def evaluate(formula, formula_cases, is_formula_interface = false)
     add_missing_variables(formula)
     result = dentaku_calculator.evaluate!(formula)
+    @raw_result = result
 
     is_formula_interface ? json_formula(result, formula_cases) : variant_formula(result, formula_cases)
   end

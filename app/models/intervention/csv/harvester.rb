@@ -59,7 +59,8 @@ class Intervention::Csv::Harvester
 
   def session_metadata(session, index, multiple_fill)
     [column_name(multiple_fill, session, 'metadata.session_start', index + 1), column_name(multiple_fill, session, 'metadata.session_end', index + 1),
-     column_name(multiple_fill, session, 'metadata.session_duration', index + 1)]
+     column_name(multiple_fill, session, 'metadata.session_duration', index + 1),
+     column_name(multiple_fill, session, 'metadata.finish_reason', index + 1)]
   end
 
   def ra_fulfillment_headers(session, index, multiple_fill)
@@ -220,6 +221,7 @@ class Intervention::Csv::Harvester
       rows[row_index][session_headers_index + 1] = session_end
     end
     rows[row_index][session_headers_index] = session_start
+    rows[row_index][session_headers_index + 3] = user_session.finish_reason
   end
 
   def ra_fulfillment_data(user_session, row_index, approach_number, multiple_fill)
