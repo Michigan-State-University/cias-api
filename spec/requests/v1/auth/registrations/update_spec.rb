@@ -38,7 +38,7 @@ describe 'PATCH /v1/auth', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'does not change attributes' do
         expect(current_user.reload.attributes).to include(
@@ -59,7 +59,7 @@ describe 'PATCH /v1/auth', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'does not change attributes' do
         expect(current_user.reload.attributes).to include(

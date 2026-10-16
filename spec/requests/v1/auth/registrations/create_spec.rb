@@ -50,7 +50,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
 
     it 'return correct status' do
       request
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'have correct message' do
@@ -132,7 +132,7 @@ RSpec.describe 'POST /v1/auth', type: :request do
       before { request }
 
       it 'returns correct status code' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns correct error message' do

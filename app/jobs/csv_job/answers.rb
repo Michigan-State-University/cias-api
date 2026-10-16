@@ -30,7 +30,7 @@ class CsvJob::Answers < CsvJob
     if start_datetime.present? && end_datetime.present?
       start_datetime..end_datetime
     elsif start_datetime.present?
-      start_datetime...
+      (start_datetime...)
     elsif end_datetime.present?
       Time.zone.at(0)..end_datetime
 

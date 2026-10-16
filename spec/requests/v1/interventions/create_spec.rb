@@ -84,7 +84,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'response contains proper error message' do
         expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -138,7 +138,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'response contains proper error message' do
         expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -184,7 +184,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq "Validation failed: Name can't be blank"

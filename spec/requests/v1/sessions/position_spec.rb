@@ -65,4 +65,41 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', typ
       end
     end
   end
+
+  context 'when position params are malicious' do
+    context 'when position contains an SQL expression' do
+      let(:params) { { session: { position: [{ id: session1.id, position: '7+(SELECT 770)' }] } } }
+
+      before { request }
+
+      it 'does not evaluate it' do
+        pending 'BUG: position is interpolated into position_bulk_update.sql.erb, so the subquery is executed (SQL injection)'
+        expect(session1.reload.position).not_to eq(777)
+      end
+    end
+
+    context 'when id contains a quote' do
+      let(:params) { { session: { position: [{ id: "x'", position: 1 }] } } }
+
+      before { request }
+
+      it 'does not break the SQL statement' do
+        pending 'BUG: id is interpolated into a string literal in position_bulk_update.sql.erb, a quote ends it (SQL syntax error)'
+        expect(response.body).not_to include('PG::SyntaxError')
+      end
+    end
+
+    context 'when session belongs to another researcher' do
+      let(:other_intervention) { create(:intervention, user: create(:user, :confirmed, :researcher)) }
+      let!(:other_session) { create(:session, position: 1, intervention: other_intervention) }
+      let(:params) { { session: { position: [{ id: other_session.id, position: 99 }] } } }
+
+      before { request }
+
+      it 'does not change its position' do
+        pending 'BUG: Resource::Position updates any session by id, ignoring intervention_id and per-record access (IDOR)'
+        expect(other_session.reload.position).to eq(1)
+      end
+    end
+  end
 end
