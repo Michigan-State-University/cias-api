@@ -79,7 +79,6 @@ jobs:
         with:
           ruby-version: 3.3.8
       - name: Audit dependencies
-        continue-on-error: true #untill fix all issues
         run: |
           gem install bundler-audit
           bundle-audit check --update
