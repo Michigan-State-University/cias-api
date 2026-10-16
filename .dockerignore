@@ -13,7 +13,6 @@ app.json
 docker-compose.analytics.yml
 docker-compose.yml
 Dockerfile
-Guardfile
 log/*
 node_modules/
 Procfile

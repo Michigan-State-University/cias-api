@@ -17,7 +17,6 @@ gem 'active_model_serializers', '~> 0.10.16'
 gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
-gem 'connection_pool'
 gem 'csv'
 gem 'dentaku'
 gem 'devise', '~> 5.0'
@@ -29,23 +28,17 @@ gem 'devise_token_auth',
     ref: 'bcdc3a5964086b6a08f3f98eb878a107af1334da'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
-gem 'jmespath', '>= 1.6.1'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '~> 3.25.5'
-gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
-gem 'loofah-activerecord', '~> 2.0'
 gem 'metainspector', '~> 5.5'
 gem 'nokogiri', '>= 1.18.9'
 gem 'oj'
 gem 'pagy', '~> 43.6'
 gem 'phonelib'
-gem 'postgresql_cursor'
-gem 'pry-rails'
 gem 'rack-cors'
-gem 'redis'
-gem 'kredis', '~> 1.5'
+gem 'redis', '~> 5.4'
 gem 'sidekiq', '>= 7.3.3'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 7.9.1'
@@ -86,6 +79,7 @@ group :development, :test do
   gem 'overcommit', require: false
   gem 'parallel_tests'
   gem 'pry-byebug'
+  gem 'pry-rails'
   gem 'rack-test'
   gem 'rubocop', '>= 1.22.3', require: false
   gem 'rubocop-performance', require: false
@@ -96,8 +90,6 @@ end
 
 group :development do
   gem 'bump'
-  gem 'guard-rake', require: false
-  gem 'guard-rspec', require: false
   gem 'letter_opener_web'
   # license_finder removed: it caps `rubyzip` at < 3, which blocks the fix for
   # CVE-2026-85396 (path traversal, High). It was never configured or invoked
@@ -119,7 +111,6 @@ group :test do
   gem 'test-prof'
   gem 'timecop'
   gem 'database_cleaner-active_record'
-  gem 'action-cable-testing', '~> 0.6.1'
   gem 'rspec-benchmark'
   gem 'benchmark-ips'
   gem 'webmock'
