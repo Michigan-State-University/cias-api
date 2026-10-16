@@ -12,7 +12,7 @@ class V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsControll
   # rubocop:enable Rails/LexicallyScopedActionFilter
 
   rescue_from ActiveRecord::ActiveRecordError do |exc|
-    render json: { message: exc.message }, status: :unprocessable_entity
+    render json: { message: exc.message }, status: :unprocessable_content
   end
 
   private

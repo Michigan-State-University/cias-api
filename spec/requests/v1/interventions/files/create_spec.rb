@@ -92,7 +92,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/files', type: :request d
 
     it 'returns correct HTTP status code (Payload Too Large)' do
       request
-      expect(response).to have_http_status(:payload_too_large)
+      expect(response).to have_http_status(:content_too_large)
     end
   end
 end

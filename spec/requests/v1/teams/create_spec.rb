@@ -93,7 +93,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
     context 'when name is missing' do
       let(:params) { { team: { name: '' } } }
 
-      it 'does not create new team, returns :unprocessable_entity status' do
+      it 'does not create new team, returns :unprocessable_content status' do
         expect { request }.not_to change(Team, :count)
         expect(response).to have_http_status(:not_found)
       end

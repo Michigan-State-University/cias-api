@@ -31,7 +31,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       raise ComplexException.new(
         I18n.t('predefined_participants.bulk_import.empty_participants_error'),
         { errors: [{ code: 'empty_participants' }] },
-        :unprocessable_entity
+        :unprocessable_content
       )
     end
 
@@ -39,7 +39,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       raise ComplexException.new(
         I18n.t('predefined_participants.bulk_import.ra_answers_require_published_intervention_error'),
         { errors: [{ code: 'ra_answers_require_published_intervention_error' }] },
-        :unprocessable_entity
+        :unprocessable_content
       )
     end
 
@@ -172,7 +172,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     raise ComplexException.new(
       I18n.t('predefined_participants.bulk_import.bulk_import_validation_error'),
       { errors: errors },
-      :unprocessable_entity
+      :unprocessable_content
     )
   end
 

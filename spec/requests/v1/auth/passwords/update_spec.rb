@@ -35,7 +35,7 @@ describe 'PATCH /v1/auth/password', type: :request do
     context 'current_password is INVALID' do
       let(:current_password) { 'InvalidCurrentPassword' }
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'does not change password' do
         expect(current_user.reload.valid_password?('NewPassword1!')).to be false
@@ -49,7 +49,7 @@ describe 'PATCH /v1/auth/password', type: :request do
     context 'password and password_confirmation are not the same' do
       let(:password_confirmation) { 'OtherPassword1!' }
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'does not change password' do
         expect(current_user.reload.valid_password?('NewPassword1!')).to be false

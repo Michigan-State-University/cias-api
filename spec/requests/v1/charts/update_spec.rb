@@ -190,7 +190,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       end
 
       it 'returns unprocessable entity' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -209,7 +209,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       end
 
       it 'returns unprocessable entity' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -228,7 +228,7 @@ RSpec.describe 'PATCH /v1/charts/:id', type: :request do
       end
 
       it 'returns unprocessable entity' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'does not persist the change' do

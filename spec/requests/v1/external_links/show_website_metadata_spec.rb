@@ -137,7 +137,7 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
           let(:metainspector_error) { MetaInspector::RequestError }
 
           it 'json response' do
-            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to have_http_status(:unprocessable_content)
           end
 
           context 'when page exist but doesn\'t exist subpage' do
@@ -163,7 +163,7 @@ RSpec.describe 'GET /v1/show_website_metadata', type: :request do
             let(:url) { 'https://pl.test.org/test1234' }
 
             it 'returns correct http status' do
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             end
           end
         end

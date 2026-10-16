@@ -83,7 +83,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
 
@@ -99,7 +99,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
 
@@ -114,7 +114,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
         end
@@ -162,7 +162,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
         end

@@ -35,7 +35,7 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
     let(:user_session) { create(:user_session, user: user, session: session, finished_at: DateTime.now) }
 
     it 'returns correct http status' do
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'return correct error msg' do

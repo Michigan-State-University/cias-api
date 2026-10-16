@@ -127,7 +127,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'Returns correct status code (Unprocessable entity)' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -141,7 +141,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'returns correct status code (Unprocessable entity)' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

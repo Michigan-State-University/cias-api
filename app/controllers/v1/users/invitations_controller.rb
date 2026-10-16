@@ -24,12 +24,12 @@ class V1::Users::InvitationsController < V1Controller
 
     user = V1::Users::Invitations::Create.call(invited_email)
 
-    return render json: { error: I18n.t('devise.failure.email_already_exists') }, status: :unprocessable_entity unless user
+    return render json: { error: I18n.t('devise.failure.email_already_exists') }, status: :unprocessable_content unless user
 
     if user.valid?
       render json: serialized_response(user, 'User', { only_email: true }), status: :created
     else
-      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
+      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_content
     end
   end
 
@@ -42,7 +42,7 @@ class V1::Users::InvitationsController < V1Controller
     if user.valid?
       render json: serialized_response(user, controller_name.classify, { params: { only_email: true } })
     else
-      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
+      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_content
     end
   end
 
@@ -55,7 +55,7 @@ class V1::Users::InvitationsController < V1Controller
       prepare_registration_data(user)
       render json: serialized_hash(user, 'User', { only_email: true }).merge({ verification_code: user_verification_code(user) })
     else
-      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_entity
+      render json: { error: user.errors.full_messages.to_sentence }, status: :unprocessable_content
     end
   end
 

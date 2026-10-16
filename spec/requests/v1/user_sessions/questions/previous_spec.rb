@@ -167,7 +167,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
 
     it 'returns correct status code (Unprocessable entity)' do
       request
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'sends validation error message' do

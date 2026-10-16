@@ -121,7 +121,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'response contains proper error message' do
         expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -144,7 +144,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     before { request }
 
     it 'return correct status' do
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'return correct error message' do
@@ -271,7 +271,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
             }
           end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(response).to have_http_status(:unprocessable_content) }
 
           it 'response contains proper error message' do
             expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -348,7 +348,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       before { request }
 
       it 'returns correct status code (Unprocessable entity)' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'sends validation error message' do
