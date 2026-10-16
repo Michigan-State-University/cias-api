@@ -63,7 +63,7 @@ class V1::InterventionsController < V1Controller
     authorize! :read, Intervention
     authorize! :get_protected_attachment, intervention_load
 
-    head :no_content unless intervention_load.conversations_transcript.attached?
+    return head :no_content unless intervention_load.conversations_transcript.attached?
 
     redirect_to(ENV.fetch('APP_HOSTNAME', nil) + Rails.application.routes.url_helpers.rails_blob_path(
       intervention_load.conversations_transcript, only_path: true

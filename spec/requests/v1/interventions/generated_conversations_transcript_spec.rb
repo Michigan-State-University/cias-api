@@ -27,11 +27,25 @@ RSpec.describe 'GET v1/interventions/:id/generated_conversations_transcript', ty
     end
   end
 
+  context 'when path relative redirects raise' do
+    around do |example|
+      original = ActionController::API.action_on_path_relative_redirect
+      ActionController::API.action_on_path_relative_redirect = :raise
+      example.run
+    ensure
+      ActionController::API.action_on_path_relative_redirect = original
+    end
+
+    it 'redirects to the absolute resource url' do
+      request
+      expect(response).to redirect_to(action_path)
+    end
+  end
+
   context 'when intervention has no conversations transcript attached' do
     let(:transcript) { nil }
 
     it 'returns no content' do
-      pending 'BUG: InterventionsController#generated_conversations_transcript is missing `return` after `head :no_content`'
       request
       expect(response).to have_http_status(:no_content)
     end

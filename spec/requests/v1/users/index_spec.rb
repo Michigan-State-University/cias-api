@@ -85,7 +85,6 @@ RSpec.describe 'GET /v1/users', type: :request do
         let(:params) { { name: '(' } }
 
         it 'does not raise an error' do
-          pending 'BUG: User.name_contains interpolates the name param into a Regexp, "(" raises unhandled RegexpError (500)'
           expect { request }.not_to raise_error
           expect(response).to have_http_status(:ok)
         end
@@ -95,7 +94,6 @@ RSpec.describe 'GET /v1/users', type: :request do
         let(:params) { { name: '.*' } }
 
         it 'matches it literally' do
-          pending 'BUG: User.name_contains interpolates the name param into a Regexp, ".*" matches every user'
           request
           expect(json_response['data']).to be_empty
         end
