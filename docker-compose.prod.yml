@@ -1,0 +1,84 @@
+# Production-like local stack for verifying the Dockerfile against the ECS deploy model:
+#   migrate runs once → completes → web + worker start.
+#
+# Usage:
+#   docker compose -f docker-compose.prod.yml build
+#   docker compose -f docker-compose.prod.yml up
+#
+# This is NOT the dev compose file (see docker-compose.yml) — no source bind-mount,
+# the image is treated as immutable, mirroring how ECS will run it.
+
+x-app-defaults: &app_defaults
+  build:
+    context: .
+    dockerfile: Dockerfile
+    args:
+      SOURCE_VERSION: ${SOURCE_VERSION:-local}
+  image: cias-api:${SOURCE_VERSION:-local}
+  env_file:
+    - .env.production.local
+  environment:
+    CIAS_DATABASE_HOST: db
+    CIAS_DATABASE_USER: cias
+    CIAS_DATABASE_PASSWORD: cias
+    REDIS_URL: redis://cache:6379/0
+    CABLE_REDIS_URL: redis://cache:6379/1
+
+services:
+  migrate:
+    <<: *app_defaults
+    command: ["bundle", "exec", "rails", "db:migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    <<: *app_defaults
+    command: ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+    ports:
+      - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      cache:
+        condition: service_healthy
+
+  worker:
+    <<: *app_defaults
+    command: ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      cache:
+        condition: service_healthy
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: cias
+      POSTGRES_PASSWORD: cias
+      POSTGRES_DB: cias_production
+    volumes:
+      - cias-prod-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cias"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  cache:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - cias-prod-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  cias-prod-db:
+    name: cias-prod-db
+  cias-prod-redis:
+    name: cias-prod-redis
