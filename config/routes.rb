@@ -9,6 +9,8 @@ end
 Rails.application.routes.draw do
   root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
+  get 'api/health', to: 'health#show'
+
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
       confirmations: 'v1/auth/confirmations',

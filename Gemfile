@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 ruby '3.3.8'
-gem 'bundler', '~> 2.4.22'
+gem 'bundler', '~> 2.6.9'
 
 gem 'rails', '~> 7.2.0'
 gem 'pg', '~> 1.2'
