@@ -29,6 +29,22 @@ describe 'PATCH /v1/auth', type: :request do
     end
   end
 
+  context 'when changing password' do
+    let(:params) do
+      {
+        current_password: 'SomePassword1!',
+        password: 'ComplPass12!',
+        password_confirmation: 'ComplPass12!'
+      }
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'changes password' do
+      expect(current_user.reload.valid_password?('ComplPass12!')).to be true
+    end
+  end
+
   context 'when params are INVALID' do
     context 'current_password is INVALID' do
       let(:params) do
@@ -48,6 +64,26 @@ describe 'PATCH /v1/auth', type: :request do
 
       it 'contains the proper error message' do
         expect(json_response['message']).to eq 'Current password is invalid'
+      end
+    end
+
+    context 'password and password_confirmation are not the same' do
+      let(:params) do
+        {
+          current_password: 'SomePassword1!',
+          password: 'ComplPass12!',
+          password_confirmation: 'OtherPassword1!'
+        }
+      end
+
+      it { expect(response).to have_http_status(:unprocessable_content) }
+
+      it 'does not change password' do
+        expect(current_user.reload.valid_password?('ComplPass12!')).to be false
+      end
+
+      it 'contains the proper error message' do
+        expect(json_response['message']).to eq "Password confirmation doesn't match Password"
       end
     end
 
