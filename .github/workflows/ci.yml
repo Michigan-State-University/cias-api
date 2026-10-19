@@ -20,8 +20,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.8
-        env:
-          RUBYOPT: --jit
 
       - uses: actions/cache@v5
         with:
@@ -67,8 +65,10 @@ jobs:
 
       - id: set-test-groups
         name: Set test groups
-        #0-based ids, so the output never contains the secret value (GitHub drops such outputs)
-        run: echo "test-groups=$(jq -cn --argjson count ${{ secrets.TEST_BATCH_COUNT }} '[range(0; $count)]')" >> $GITHUB_OUTPUT
+        env:
+          #not a secret: Dependabot pushes get no Actions secrets, which left the matrix empty
+          TEST_BATCH_COUNT: 8
+        run: echo "test-groups=$(jq -cn --argjson count "$TEST_BATCH_COUNT" '[range(0; $count)]')" >> $GITHUB_OUTPUT
 
   bundler_audit:
     name: Dependency security audit
@@ -91,6 +91,7 @@ jobs:
       #rspec processes per job, each with its own database
       TEST_PROCESSES: 4
     strategy:
+      fail-fast: false
       matrix:
         group: ${{ fromJson(needs.setup_environment.outputs.test-groups) }}
     services:
@@ -117,8 +118,6 @@ jobs:
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
           ruby-version: 3.3.8
-        env:
-          RUBYOPT: --jit
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
       - uses: actions/cache@v5
@@ -221,8 +220,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.8
-        env:
-          RUBYOPT: --jit
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
       - uses: actions/cache@v5
