@@ -12,11 +12,10 @@
 
 WickedPdf.config ||= {}
 WickedPdf.config.merge!({
-                          # Path to the wkhtmltopdf executable: This usually isn't needed if using
-                          # one of the wkhtmltopdf-binary family of gems.
-                          # exe_path: ENV['WKHTMLTOPDF_PATH'] || '/usr/local/bin/wkhtmltopdf'
-                          #   or
-                          # exe_path: Gem.bin_path('wkhtmltopdf-binary', 'wkhtmltopdf')
+                          # Path to the wkhtmltopdf executable. Set only in the Docker image,
+                          # where the wkhtmltopdf-heroku binary can't run; elsewhere the key is
+                          # dropped by .compact and the gem's binary stays in effect.
+                          exe_path: ENV.fetch('WKHTMLTOPDF_PATH', nil)
 
                           # Layout file to be used for all PDFs
                           # (but can be overridden in `render :pdf` calls)
@@ -27,4 +26,4 @@ WickedPdf.config.merge!({
                           # 'xvfb-run' command, in order to simulate an X server.
                           #
                           # use_xvfb: true,
-                        })
+                        }.compact)

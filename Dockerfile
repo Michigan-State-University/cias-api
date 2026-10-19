@@ -81,10 +81,17 @@ ENV LANG=C.UTF-8 \
 # ALB owns health checks; disable any inherited HEALTHCHECK from the base image
 HEALTHCHECK NONE
 
+# wkhtmltopdf for wicked_pdf (report PDFs). The binary bundled in the wkhtmltopdf-heroku
+# gem is built for Ubuntu and needs libjpeg.so.8, which bookworm doesn't ship, so install
+# the official bookworm build instead; config/initializers/wicked_pdf.rb picks it up via
+# WKHTMLTOPDF_PATH. The release publishes no checksum; this one is from the downloaded asset.
+ADD --checksum=sha256:98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81a3941d \
+    https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
+    /tmp/wkhtmltox.deb
+
 # Runtime packages:
-#   wkhtmltopdf (via wicked_pdf + wkhtmltopdf-heroku) needs:
-#     fontconfig, libjpeg62-turbo, libpng16-16, libxext6, libxrender1, xfonts-*
-#   libvips42 → ActiveStorage image processing
+#   /tmp/wkhtmltox.deb → /usr/local/bin/wkhtmltopdf; needs fontconfig, libjpeg62-turbo,
+#     libpng16-16, libxext6, libxrender1, xfonts-* (apt resolves the rest)
 #   libpq5 → pg gem runtime
 #   libjemalloc2 → memory allocator
 #   tini → PID 1 signal handling
@@ -102,7 +109,10 @@ RUN apt-get update -qq && apt-get install -y --no-install-recommends \
         tzdata \
         xfonts-75dpi \
         xfonts-base \
-    && rm -rf /var/lib/apt/lists/*
+        /tmp/wkhtmltox.deb \
+    && rm -rf /tmp/wkhtmltox.deb /var/lib/apt/lists/*
+
+ENV WKHTMLTOPDF_PATH=/usr/local/bin/wkhtmltopdf
 
 # Pin bundler in runtime too, since CMD invokes `bundle exec ...`
 RUN gem install bundler -v ${BUNDLER_VERSION} \
