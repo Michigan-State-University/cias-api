@@ -52,7 +52,7 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
   end
 
   def dashboard_section_params
-    params.require(:dashboard_section).permit(:name, :description)
+    params.expect(dashboard_section: %i[name description])
   end
 
   def filter_status

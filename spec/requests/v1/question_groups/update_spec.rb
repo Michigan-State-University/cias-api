@@ -78,10 +78,78 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
     end
   end
 
+  context 'when nested attributes are provided' do
+    let(:request) do
+      patch v1_session_question_group_path(session_id: session.id, id: question_group.id),
+            params: params, headers: headers, as: :json
+    end
+    let(:headers) { create(:user, :confirmed, :admin).create_new_auth_token }
+    let(:formulas) do
+      [
+        { 'payload' => 'var1 + var2', 'patterns' => [{ 'match' => '=1' }, { 'match' => '>1' }] },
+        { 'payload' => 'var3', 'patterns' => [{ 'match' => '<5' }] }
+      ]
+    end
+    let(:sms_schedule) do
+      {
+        'period' => 'weekly',
+        'questions_per_day' => 2,
+        'day_of_period' => %w[1 3],
+        'time' => { 'range' => { 'from' => '8', 'to' => '12' } }
+      }
+    end
+    let(:params) { { question_group: { formulas: formulas, sms_schedule: sms_schedule } } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'persists formulas with patterns' do
+      expect(question_group.reload.formulas).to eq formulas
+    end
+
+    it 'persists sms schedule' do
+      expect(question_group.reload.sms_schedule).to eq sms_schedule
+    end
+
+    context 'when formulas are empty' do
+      let(:params) { { question_group: { formulas: [] } } }
+
+      it 'clears formulas' do
+        expect(question_group.reload.formulas).to eq []
+      end
+    end
+  end
+
+  context 'when question_group contains only unpermitted attributes' do
+    let(:headers) { create(:user, :confirmed, :admin).create_new_auth_token }
+    let(:params) { { question_group: { unknown: 'value' } } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:bad_request) }
+  end
+
   context 'collaboration mode' do
     let(:user) { create(:user, :researcher) }
     let(:headers) { user.create_new_auth_token }
 
     it_behaves_like 'collaboration mode - only one editor at the same time'
+  end
+
+  context "when a researcher points session_id at another user's session" do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+    let(:headers) { researcher.create_new_auth_token }
+    let(:intervention) { create(:intervention, user: researcher) }
+    let(:foreign_session) { create(:session, intervention: create(:intervention, user: create(:user, :confirmed, :admin))) }
+    let(:params) { { question_group: { title: 'Renamed group', session_id: foreign_session.id } } }
+
+    it 'renames the group and keeps it in its own session' do
+      pending "BUG: question_group_params permits session_id, so a researcher can move a group into another user's session (T-35)"
+      request
+
+      expect(response).to have_http_status(:ok)
+      expect(question_group.reload).to have_attributes(title: 'Renamed group', session_id: session.id)
+    end
   end
 end

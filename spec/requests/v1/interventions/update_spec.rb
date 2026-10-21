@@ -121,7 +121,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'response contains proper error message' do
         expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -144,7 +144,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     before { request }
 
     it 'return correct status' do
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'return correct error message' do
@@ -222,6 +222,10 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     shared_examples 'permitted user' do
       context 'intervention does not belong to him' do
         it { expect(response).to have_http_status(:not_found) }
+
+        it 'does not change the intervention' do
+          expect(intervention.reload).to have_attributes(name: 'Old Intervention', status: 'draft')
+        end
       end
 
       context 'intervention belongs to him' do
@@ -271,7 +275,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
             }
           end
 
-          it { expect(response).to have_http_status(:unprocessable_entity) }
+          it { expect(response).to have_http_status(:unprocessable_content) }
 
           it 'response contains proper error message' do
             expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -348,7 +352,7 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       before { request }
 
       it 'returns correct status code (Unprocessable entity)' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'sends validation error message' do
@@ -439,6 +443,61 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
       it 'keeps the schedule_payload and schedule_at fields' do
         expect { request }.not_to change { session.reload.schedule_payload && session.reload.schedule_at }
       end
+    end
+  end
+
+  context 'when the name and the note change' do
+    let(:params) { { intervention: { name: 'Renamed intervention', note: 'A note' } } }
+
+    it 'persists both, returns them and bumps updated_at' do
+      expect { request }.to change { intervention.reload.updated_at }
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['attributes']).to include('name' => 'Renamed intervention', 'note' => 'A note')
+      expect(intervention.reload).to have_attributes(name: 'Renamed intervention', note: 'A note')
+    end
+  end
+
+  context 'when the body has a malformed shape' do
+    context 'when intervention is a scalar' do
+      let(:params) { { intervention: 'not-a-hash' } }
+
+      it_behaves_like 'rejects malformed params', -> { intervention.reload.attributes }
+    end
+
+    context 'when a permitted scalar is sent as an array' do
+      let(:params) { { intervention: { name: ['array'] } } }
+
+      it_behaves_like 'rejects malformed params', -> { intervention.reload.attributes }
+    end
+
+    context 'when the intervention key is missing' do
+      let(:params) { {} }
+
+      it_behaves_like 'rejects malformed params', -> { intervention.reload.attributes }
+    end
+  end
+
+  context 'when the status is not a known status' do
+    let(:params) { { intervention: { status: 'bogus' } } }
+
+    it 'is rejected with 400 and leaves the intervention unchanged' do
+      pending 'BUG: an unknown status is passed to the state machine as an event name and raises NoMethodError, ' \
+              'so the API answers 500 instead of 400 like an invalid transition (T-20)'
+      request
+      expect(response).to have_http_status(:bad_request)
+      expect(intervention.reload.status).to eq('draft')
+    end
+  end
+
+  context 'when a draft is published' do
+    let!(:session) { create(:session, intervention: intervention) }
+    let(:params) { { intervention: { status: 'published' } } }
+
+    it 'stamps published_at in Interventions::PublishJob' do
+      perform_enqueued_jobs(only: Interventions::PublishJob) { request }
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['attributes']['status']).to eq('published')
+      expect(intervention.reload.published_at).to be_present
     end
   end
 end

@@ -264,4 +264,10 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/tags/assign', type: :req
       expect(json_response['data']).to be_nil
     end
   end
+
+  context 'when tag is not a hash' do
+    let(:params) { { tag: 'x' } }
+
+    it_behaves_like 'rejects malformed params', -> { intervention.reload.tags.count }
+  end
 end

@@ -128,4 +128,86 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
       it_behaves_like 'permitted user'
     end
   end
+
+  context 'when the editor creates a single answer question group' do
+    let!(:new_session) { create(:session, intervention: create(:intervention, user: researcher)) }
+    let(:single_question) do
+      {
+        type: 'Question::Single',
+        title: '<p>Q</p>',
+        subtitle: '<p>S</p>',
+        settings: { image: false, title: true, video: false, required: true, subtitle: true },
+        body: { data: [{ payload: '<p>Yes</p>', value: '1' }], variable: { name: 'created_var' } },
+        narrator: { blocks: [], settings: { voice: true, animation: true, character: 'peedy' } }
+      }
+    end
+    let(:group_params) { { title: 'Created group', type: 'QuestionGroup::Plain', questions: [single_question] } }
+    let(:request) do
+      post v1_session_question_groups_path(session_id: new_session.id),
+           params: { question_group: group_params }, headers: researcher.create_new_auth_token, as: :json
+    end
+    let(:plain_groups) { new_session.reload.question_groups.where(type: 'QuestionGroup::Plain') }
+
+    it 'returns the group with its question and gives every answer an id' do
+      request
+
+      expect(response).to have_http_status(:created)
+      group = json_response['data']
+      question = json_response['included'].first
+      expect(group['attributes']).to include('title' => 'Created group', 'type' => 'QuestionGroup::Plain')
+      expect(question['attributes']['type']).to eq('Question::Single')
+      expect(question['attributes']['body']['data'])
+        .to match([include('id' => match(/\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/))])
+    end
+
+    context 'when question_group is not a hash' do
+      let(:group_params) { 'not a hash' }
+
+      it 'is rejected with 400 and creates nothing' do
+        expect { request }.not_to change(QuestionGroup, :count)
+        expect(response).to have_http_status(:bad_request)
+        expect(json_response.keys).to eq(['message'])
+      end
+    end
+
+    context 'when a question has narrator settings without the required character' do
+      let(:single_question) { super().merge(narrator: { blocks: [], settings: { voice: true } }) }
+
+      it 'is rejected with 422 and leaves no group behind' do
+        pending 'BUG: CreateService saves the group before its questions outside a transaction, so a failing question leaves an orphaned group (T-37)'
+        request
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(json_response['message']).to include('character')
+        expect(plain_groups).to be_empty
+      end
+    end
+
+    context 'when the group has no questions' do
+      let(:group_params) { { title: 'Empty', type: 'QuestionGroup::Plain', questions: [] } }
+
+      it 'creates and returns the empty group' do
+        pending 'BUG: question_group_pure_empty deletes the new empty group before it is reloaded, so create answers 404 (T-37)'
+        request
+
+        expect(response).to have_http_status(:created)
+        expect(plain_groups.pluck(:id)).to eq([json_response['data']['id']])
+      end
+    end
+
+    context "when another user's session has an empty group" do
+      let(:other_session) do
+        create(:session, intervention: create(:intervention, user: create(:user, :confirmed, :researcher)))
+      end
+      let!(:others_empty_group) { create(:question_group_plain, session: other_session, position: 1) }
+
+      it 'does not delete it' do
+        pending "BUG: question_group_pure_empty deletes every empty question group in the database, including other users', on each create (T-37)"
+        request
+
+        expect(response).to have_http_status(:created)
+        expect(QuestionGroup.exists?(others_empty_group.id)).to be true
+      end
+    end
+  end
 end

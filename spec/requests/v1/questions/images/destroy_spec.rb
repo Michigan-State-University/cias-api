@@ -33,4 +33,20 @@ RSpec.describe 'DELETE /v1/questions/:question_id/images', type: :request do
       it { expect(response).to have_http_status(:ok) }
     end
   end
+
+  context 'when the question has an image' do
+    before do
+      question.image.attach(FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true))
+    end
+
+    it 'removes the attachment and its blob' do
+      blob_id = question.image.blob.id
+      request
+
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['attributes']).to include('image_url' => nil, 'image_alt' => nil)
+      expect(question.reload.image).not_to be_attached
+      expect(ActiveStorage::Blob.exists?(blob_id)).to be false
+    end
+  end
 end

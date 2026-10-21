@@ -20,8 +20,8 @@ class V1::SimpleInterventionSerializer < V1Serializer
     object.sessions.size
   end
 
-  attribute :has_research_assistant_session do |object|
-    object.ra_session.present?
+  attribute :has_research_assistant_session do |object, params|
+    object.id.in? params[:ra_interventions_ids]
   end
 
   attribute :exported_data do |object|

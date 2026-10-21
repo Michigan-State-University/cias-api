@@ -93,7 +93,7 @@ RSpec.describe 'POST /v1/teams', type: :request do
     context 'when name is missing' do
       let(:params) { { team: { name: '' } } }
 
-      it 'does not create new team, returns :unprocessable_entity status' do
+      it 'does not create new team, returns :unprocessable_content status' do
         expect { request }.not_to change(Team, :count)
         expect(response).to have_http_status(:not_found)
       end
@@ -122,5 +122,23 @@ RSpec.describe 'POST /v1/teams', type: :request do
     let(:user) { team.team_admin }
 
     it_behaves_like 'new team is forbidden to create'
+  end
+
+  context 'when the team params are a scalar' do
+    let(:params) { { team: 'Best Team' } }
+
+    it_behaves_like 'rejects malformed params', -> { Team.count }
+  end
+
+  context 'when a researcher is assigned as the admin of the new team' do
+    let(:new_team_admin) { create(:user, :confirmed, :researcher) }
+
+    before { request }
+
+    it 'returns the team admin with the team_admin role' do
+      pending 'BUG: the included team admin is serialized with the roles from before the promotion (["researcher"]), without team_admin (T-39)'
+      included = json_response['included'].find { |item| item['id'] == new_team_admin.id }
+      expect(included['attributes']['roles']).to include('team_admin')
+    end
   end
 end

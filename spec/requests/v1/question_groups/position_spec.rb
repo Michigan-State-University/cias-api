@@ -46,5 +46,74 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/position', type: :reque
         expect(question_group3.reload.position).to eq 8
       end
     end
+
+    context 'when position is sent as a single object instead of an array' do
+      let(:params) { { question_group: { position: { id: question_group1.id, position: 6 } } } }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:bad_request) }
+
+      it 'does not change position' do
+        expect(question_group1.reload.position).to eq 3
+      end
+    end
+
+    context 'when question_group key is missing' do
+      let(:params) { { position: [{ id: question_group1.id, position: 6 }] } }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:bad_request) }
+    end
+
+    context 'when position params are malicious' do
+      context 'when position contains an SQL expression' do
+        let(:params) { { question_group: { position: [{ id: question_group1.id, position: '7+(SELECT 770)' }] } } }
+
+        before { request }
+
+        it 'does not evaluate it' do
+          pending 'BUG: position is interpolated into position_bulk_update.sql.erb, so the subquery is executed (SQL injection)'
+          expect(question_group1.reload.position).not_to eq(777)
+        end
+      end
+
+      context 'when id contains a quote' do
+        let(:params) { { question_group: { position: [{ id: "x'", position: 1 }] } } }
+
+        before { request }
+
+        it 'does not break the SQL statement' do
+          pending 'BUG: id is interpolated into a string literal in position_bulk_update.sql.erb, a quote ends it (SQL syntax error)'
+          expect(response.body).not_to include('PG::SyntaxError')
+        end
+      end
+
+      context 'when question group belongs to another researcher' do
+        let(:other_session) { create(:session, intervention: create(:intervention, user: create(:user, :researcher))) }
+        let!(:other_question_group) { create(:question_group, session: other_session, position: 1) }
+        let(:params) { { question_group: { position: [{ id: other_question_group.id, position: 99 }] } } }
+
+        before { request }
+
+        it 'does not change its position' do
+          pending 'BUG: Resource::Position updates any question group by id, ignoring session_id and per-record access (IDOR)'
+          expect(other_question_group.reload.position).to eq(1)
+        end
+      end
+
+      context 'when id is not a uuid' do
+        let(:params) { { question_group: { position: [{ id: 'not-a-uuid', position: 1 }] } } }
+
+        before { request }
+
+        it 'is rejected with 422 without leaking a database error' do
+          pending 'BUG: id is passed to position_bulk_update.sql.erb without format validation, so PostgreSQL rejects the uuid cast (T-02)'
+          expect(response.body).not_to match(/PG::|ActiveRecord::StatementInvalid/)
+          expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
+    end
   end
 end

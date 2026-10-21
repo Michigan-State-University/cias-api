@@ -177,4 +177,20 @@ RSpec.describe 'DELETE /v1/sessions/:session_id/delete_questions', type: :reques
       expect(Question.find_by(id: new_question.id)).not_to be_nil
     end
   end
+
+  context "when a researcher sends another user's question ids to the delete endpoint of own session" do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+    let(:own_session) { create(:session, intervention: create(:intervention, user: researcher)) }
+    let(:request) do
+      delete v1_session_delete_questions_path(session_id: own_session.id), params: { ids: [questions.first.id] },
+                                                                           headers: researcher.create_new_auth_token
+    end
+
+    it 'answers 404 and leaves them untouched' do
+      request
+
+      expect(response).to have_http_status(:not_found)
+      expect(Question.exists?(questions.first.id)).to be true
+    end
+  end
 end

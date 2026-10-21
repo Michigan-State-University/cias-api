@@ -64,5 +64,25 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/move_variants', type: :request 
     it 'returns Bad Request HTTP status code' do
       expect(response).to have_http_status(:bad_request)
     end
+
+    context 'when position is not a list' do
+      let(:params) { { variant: { position: 'x' } } }
+
+      it 'returns Bad Request HTTP status code' do
+        expect(response).to have_http_status(:bad_request)
+        expect(json_response).to include('message')
+      end
+    end
+  end
+
+  context 'when every variant gets a new position' do
+    let(:order) { [sms_variants[1], sms_variants[2], sms_variants[0]] }
+    let(:params) { { variant: { position: order.each_with_index.map { |variant, index| { id: variant.id, position: index } } } } }
+
+    it 'returns and persists the new order' do
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['relationships']['variants']['data'].pluck('id')).to eq(order.map(&:id))
+      expect(sms_plan.variants.pluck(:content)).to eq(order.map(&:content))
+    end
   end
 end

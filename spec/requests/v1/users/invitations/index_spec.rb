@@ -56,5 +56,10 @@ describe 'GET /v1/users/invitations', type: :request do
     it 'returns correct email' do
       expect(json_response['data'][0]['attributes']['email']).to eq 'test@example.com'
     end
+
+    it 'exposes only the e-mail of a pending invitation' do
+      pending 'BUG: the invitations list passes only_email to UserSerializer, which ignores it and serializes every user attribute (T-09)'
+      expect(json_response['data'][0]['attributes'].keys).to eq ['email']
+    end
   end
 end

@@ -103,4 +103,13 @@ RSpec.describe 'DELETE /v1/users/:user_id/avatars', type: :request do
       end
     end
   end
+
+  context 'when an admin removes the avatar of another user' do
+    let(:user_id) { other_user.id }
+    let(:removed_blob) { other_user.avatar.blob }
+
+    it 'purges the blob' do
+      expect(ActiveStorage::Blob.exists?(removed_blob.id)).to be(false)
+    end
+  end
 end

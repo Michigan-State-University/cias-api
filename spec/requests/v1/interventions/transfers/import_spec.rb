@@ -44,4 +44,13 @@ RSpec.describe 'POST /v1/interventions/import', type: :request do
       expect(response).to have_http_status(:bad_request)
     end
   end
+
+  context 'when the imported file is missing' do
+    let(:params) { {} }
+
+    it 'returns bad request and enqueues nothing' do
+      expect { request }.not_to have_enqueued_job(Interventions::ImportJob)
+      expect(response).to have_http_status(:bad_request)
+    end
+  end
 end

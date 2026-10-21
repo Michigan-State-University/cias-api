@@ -224,6 +224,20 @@ describe User, type: :model do
     it do
       expect { user.confirm }.to have_enqueued_job(ActionMailer::MailDeliveryJob).once
     end
+
+    context 'when the confirmation is rolled back' do
+      before { user }
+
+      it 'does not enqueue the welcome email' do
+        pending 'BUG: welcome email is enqueued in after_save (inside the transaction) instead of after commit'
+        expect do
+          ActiveRecord::Base.transaction do
+            user.confirm
+            raise ActiveRecord::Rollback
+          end
+        end.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+      end
+    end
   end
 
   context 'predefined participant' do

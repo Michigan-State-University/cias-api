@@ -6,6 +6,7 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
   let!(:organization) { create(:organization, :with_organization_admin, :with_e_intervention_admin, name: 'Michigan Public Health') }
   let!(:health_system) { create(:health_system, :with_health_system_admin, organization: organization) }
   let!(:health_clinic) { create(:health_clinic, :with_health_clinic_admin, name: 'Health Clinic', health_system: health_system) }
+  let(:user_session) { create(:user_session) }
   let!(:reporting_dashboard) { organization.reporting_dashboard }
   let!(:dashboard_sections) { create(:dashboard_section, name: 'Dashboard section', reporting_dashboard: reporting_dashboard) }
 
@@ -36,19 +37,19 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
 
   let!(:chart_matched_statistic) do
     create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic,
-                                      filled_at: 2.months.ago)
+                                      filled_at: 2.months.ago, user_session: user_session)
   end
   let!(:chart_matched_statistic2) do
     create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic,
-                                     filled_at: 3.months.ago)
+                                     filled_at: 3.months.ago, user_session: user_session)
   end
   let!(:chart_not_matched_statistic) do
     create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic,
-                                     filled_at: 3.months.ago)
+                                     filled_at: 3.months.ago, user_session: user_session)
   end
   let!(:chart_not_matched_statistic2) do
     create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart, health_clinic: health_clinic,
-                                     filled_at: 2.months.ago)
+                                     filled_at: 2.months.ago, user_session: user_session)
   end
 
   let(:headers) { user.create_new_auth_token }
@@ -158,11 +159,11 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
       context 'return data from a specific period of time' do
         let!(:chart_matched_statistic) do
           create_list(:chart_statistic, 4, label: 'Matched', organization: organization, health_system: health_system, chart: chart,
-                                           health_clinic: health_clinic, filled_at: Time.current)
+                                           health_clinic: health_clinic, filled_at: Time.current, user_session: user_session)
         end
         let!(:chart_not_matched_statistic) do
           create_list(:chart_statistic, 3, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart,
-                                           health_clinic: health_clinic, filled_at: Time.current)
+                                           health_clinic: health_clinic, filled_at: Time.current, user_session: user_session)
         end
 
         let(:params) do
@@ -281,11 +282,11 @@ RSpec.describe 'GET /v1/organizations/:organization_id/charts_data/:chart_id/gen
       let!(:chart_hc2) { create(:chart, name: 'chart_hc2', dashboard_section: dashboard_sections, chart_type: 'pie_chart', status: 'published') }
       let!(:chart_matched_statistic_hc2) do
         create_list(:chart_statistic, 10, label: 'Matched', organization: organization, health_system: health_system, chart: chart_hc2,
-                                          health_clinic: health_clinic2, filled_at: 2.months.ago)
+                                          health_clinic: health_clinic2, filled_at: 2.months.ago, user_session: user_session)
       end
       let!(:chart_not_matched_statistic_hc2) do
         create_list(:chart_statistic, 5, label: 'NotMatched', organization: organization, health_system: health_system, chart: chart_hc2,
-                                         health_clinic: health_clinic2, filled_at: 3.months.ago)
+                                         health_clinic: health_clinic2, filled_at: 3.months.ago, user_session: user_session)
       end
 
       before do

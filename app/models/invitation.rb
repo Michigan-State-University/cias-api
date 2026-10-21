@@ -12,7 +12,7 @@ class Invitation < ApplicationRecord
   def resend
     invited_user = User.find_by(email: email)
     return :ok unless invited_user.nil? || invited_user.email_notification
-    return :unprocessable_entity unless invitable.published?
+    return :unprocessable_content unless invitable.published?
 
     if invitable.is_a?(Session)
       scheduled_at = UserSession.find_by(user_id: invited_user&.id, session_id: invitable.id, health_clinic: health_clinic, finished_at: nil)&.scheduled_at
