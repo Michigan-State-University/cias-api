@@ -49,6 +49,16 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/csv_attachment', type: :r
     end
   end
 
+  context 'when current user is a researcher without access to the intervention' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    before { request }
+
+    it 'returns not found' do
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   context 'collaborator without access data' do
     let(:user) { intervention.collaborators.first.user }
 

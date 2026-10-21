@@ -82,6 +82,17 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/files', type: :request d
     end
   end
 
+  context 'when current user is a researcher without access to the intervention' do
+    let(:intervention) { create(:flexible_order_intervention) }
+    let(:headers) { create(:user, :confirmed, :researcher).create_new_auth_token }
+
+    before { request }
+
+    it 'returns not found' do
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   context 'file is too big' do
     let(:user) { create(:user, :confirmed, :admin) }
     let(:headers) { user.create_new_auth_token }

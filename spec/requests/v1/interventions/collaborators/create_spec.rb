@@ -35,6 +35,11 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/collaborators', type: :r
     it 'have correct keys' do
       expect(json_response['data'].first['attributes'].keys).to match_array(%w[id view edit data_access user])
     end
+
+    it 'grants view access only by default' do
+      expect(json_response['data'].map { |collaborator| collaborator['attributes'].slice('view', 'edit', 'data_access') })
+        .to all(eq('view' => true, 'edit' => false, 'data_access' => false))
+    end
   end
 
   context 'when the collaborator is already in this intervention' do
