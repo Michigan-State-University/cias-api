@@ -100,6 +100,37 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', typ
         pending 'BUG: Resource::Position updates any session by id, ignoring intervention_id and per-record access (IDOR)'
         expect(other_session.reload.position).to eq(1)
       end
+
+      context 'when the request targets the other researcher intervention' do
+        let(:request) do
+          patch v1_intervention_sessions_position_path(intervention_id: other_intervention.id),
+                params: params, headers: user.create_new_auth_token
+        end
+
+        it 'returns not found and does not change its position' do
+          pending 'BUG: Resource::Position authorizes only the Session class and updates the sent ids without scoping them, ' \
+                  'so a researcher reorders sessions of an intervention they cannot access; the 404 comes only after the update (T-53)'
+          expect(response).to have_http_status(:not_found)
+          expect(other_session.reload.position).to eq(1)
+        end
+      end
+    end
+  end
+
+  context 'when position is not a list' do
+    let(:params) { { session: { position: 'x' } } }
+
+    before do
+      [session1, session2, session3]
+      request
+    end
+
+    it 'returns bad request' do
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'does not change positions' do
+      expect([session1, session2, session3].map { |session| session.reload.position }).to eq [4, 5, 6]
     end
   end
 end

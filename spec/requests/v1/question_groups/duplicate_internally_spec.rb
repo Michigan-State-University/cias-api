@@ -130,4 +130,24 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
       end
     end
   end
+
+  context "when a researcher copies another user's group" do
+    let(:researcher) { create(:user, :researcher, :confirmed) }
+    let(:admin) { create(:user, :admin, :confirmed) }
+    let(:foreign_group) { create(:question_group, session: create(:session, intervention: create(:intervention, user: admin))) }
+    let!(:foreign_question) { create(:question_single, question_group: foreign_group) }
+    let!(:target_session) { create(:session, intervention: create(:intervention, user: researcher)) }
+    let(:params) do
+      { question_groups: [{ id: foreign_group.id, question_ids: [foreign_question.id] }], session_id: target_session.id }
+    end
+    let(:request) do
+      post v1_question_groups_duplicate_internally_path, params: params, headers: researcher.create_new_auth_token
+    end
+
+    it 'is refused and copies nothing' do
+      pending "BUG: DuplicateWithStructureService loads source groups with an unscoped QuestionGroup.find, so a researcher can copy another user's group (T-35)"
+      expect { request }.not_to change(Question, :count)
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

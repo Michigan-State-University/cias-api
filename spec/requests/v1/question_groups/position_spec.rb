@@ -102,6 +102,18 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/position', type: :reque
           expect(other_question_group.reload.position).to eq(1)
         end
       end
+
+      context 'when id is not a uuid' do
+        let(:params) { { question_group: { position: [{ id: 'not-a-uuid', position: 1 }] } } }
+
+        before { request }
+
+        it 'is rejected with 422 without leaking a database error' do
+          pending 'BUG: id is passed to position_bulk_update.sql.erb without format validation, so PostgreSQL rejects the uuid cast (T-02)'
+          expect(response.body).not_to match(/PG::|ActiveRecord::StatementInvalid/)
+          expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
     end
   end
 end

@@ -118,4 +118,33 @@ RSpec.describe 'POST /v1/sessions/:session_id/question_group/duplicate_here', ty
       expect(json_response['message']).to include("Couldn't find Question with 'id'")
     end
   end
+
+  context 'when the selected questions differ in content' do
+    let!(:question_in_first_group) do
+      Array.new(4) { |i| create(:question_single, question_group: question_groups[0], title: "Single question #{i + 1}", position: i + 1) }
+    end
+
+    it 'carries the content of exactly the selected questions over to the new group' do
+      request
+
+      copied = QuestionGroup.find(json_response['data'].first['id']).questions.order(:position)
+      originals = [question_in_first_group[0], question_in_first_group[3]]
+      content = ->(q) { [q.type, q.title, q.subtitle, q.body['data'].pluck('payload')] }
+      expect(copied.map(&content)).to eq(originals.map(&content))
+    end
+  end
+
+  context "when a researcher duplicates another user's group into own session" do
+    let(:foreign_group) do
+      create(:question_group, session: create(:session, intervention: create(:intervention, user: create(:user, :researcher, :confirmed))))
+    end
+    let!(:foreign_question) { create(:question_single, question_group: foreign_group) }
+    let(:params) { { question_groups: [{ id: foreign_group.id, question_ids: [foreign_question.id] }] } }
+
+    it 'is refused and copies nothing' do
+      pending "BUG: DuplicateWithStructureService loads source groups with an unscoped QuestionGroup.find, so a researcher can copy another user's group (T-35)"
+      expect { request }.not_to change(Question, :count)
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
