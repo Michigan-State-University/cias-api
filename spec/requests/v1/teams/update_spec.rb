@@ -214,4 +214,21 @@ RSpec.describe 'PATCH /v1/teams/:id', type: :request do
       end
     end
   end
+
+  context 'when a member of the team was serialized before the rename' do
+    let(:memory_store) { ActiveSupport::Cache::MemoryStore.new }
+    let(:member) { create(:user, :confirmed, :researcher, team_id: team.id) }
+
+    before do
+      allow(V1::UserSerializer).to receive(:cache_store_instance).and_return(memory_store)
+      get v1_user_path(member.id), headers: headers
+    end
+
+    it "shows the member's new team name after the rename" do
+      pending 'BUG: the cached UserSerializer entry is keyed by the user only, so team_name stays stale after the team is renamed (T-39)'
+      request
+      get v1_user_path(member.id), headers: headers
+      expect(json_response['data']['attributes']['team_name']).to eq 'Best Team'
+    end
+  end
 end

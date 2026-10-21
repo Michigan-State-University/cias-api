@@ -240,6 +240,27 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when roles are missing' do
+      let(:params) { { email: 'newresearcher@gmail.com' } }
+
+      it 'does not invite anybody, returns :bad_request status' do
+        expect { request }.to avoid_changing(User, :count)
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+  end
+
+  context 'when a team admin invites a new user with the admin role' do
+    let(:user) { team.team_admin }
+    let(:params) { { email: 'escalation@example.com', roles: ['admin'] } }
+
+    before { request }
+
+    it 'does not create an admin account' do
+      pending 'BUG: the team invitation passes the roles sent by the client to the invited user, so a team admin can create an admin (T-04)'
+      expect(User.find_by(email: 'escalation@example.com')&.roles.to_a).not_to include('admin')
+    end
   end
 
   context 'authorization' do

@@ -114,4 +114,10 @@ RSpec.describe 'POST /v1/health_clinics', type: :request do
       end
     end
   end
+
+  context 'when the health clinic params are a scalar' do
+    let(:params) { { health_clinic: 'New Health Clinic' } }
+
+    it_behaves_like 'rejects malformed params', -> { HealthClinic.count }
+  end
 end

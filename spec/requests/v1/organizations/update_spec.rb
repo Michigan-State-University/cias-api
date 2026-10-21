@@ -211,4 +211,14 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
       end
     end
   end
+
+  context 'when the organization params are a scalar' do
+    let(:params) { { organization: 'Oregano Public Health' } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:bad_request) }
+
+    it { expect(organization.reload.name).to eq 'Michigan Public Health' }
+  end
 end

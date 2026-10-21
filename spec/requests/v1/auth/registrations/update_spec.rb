@@ -29,6 +29,27 @@ describe 'PATCH /v1/auth', type: :request do
     end
   end
 
+  context 'when roles are sent along with a valid password' do
+    let(:current_user) { create(:user, :researcher, password: 'SomePassword1!', email: 'old-email@test.com') }
+    let(:params) do
+      {
+        email: 'old-email@test.com',
+        current_password: 'SomePassword1!',
+        roles: ['admin']
+      }
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'does not change the roles' do
+      expect(current_user.reload.roles).to eq ['researcher']
+    end
+
+    it 'does not return the roles as changed' do
+      expect(json_response['data']['attributes']['roles']).to eq ['researcher']
+    end
+  end
+
   context 'when changing password' do
     let(:params) do
       {
