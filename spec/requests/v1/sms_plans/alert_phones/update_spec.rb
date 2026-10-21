@@ -60,4 +60,19 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :reque
       end
     end
   end
+
+  context 'when the phone is not on the plan' do
+    let!(:other_phone) { create(:phone, :confirmed) }
+    let(:request) do
+      patch v1_sms_plan_phone_path(sms_plan_id: sms_alert.id, id: other_phone.id), headers: headers, params: params
+    end
+
+    it 'returns :not_found and changes nothing' do
+      pending 'BUG: update/destroy of an alert phone looks the phone up with find_by on the plan alert phones and calls .phone ' \
+              'on the nil result, so a phone that is not on the plan answers 500 instead of 404 (T-17)'
+
+      expect { request }.not_to change { other_phone.reload.attributes }
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
