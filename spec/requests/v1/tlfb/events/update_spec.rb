@@ -92,10 +92,11 @@ RSpec.describe 'PATCH /v1/tlfb/events', type: :request do
     let(:user) { create(:user, :confirmed, :participant) }
     let(:headers) { user.create_new_auth_token }
 
-    it 'return correct status and error msg' do
+    it 'return correct status and error msg and keeps the name' do
       request
       expect(response).to have_http_status(:not_found)
       expect(json_response['message']).to include('Couldn\'t find Tlfb::Event with')
+      expect(event.reload.name).not_to eq('anniversary')
     end
   end
 
