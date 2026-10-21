@@ -33,4 +33,36 @@ RSpec.describe 'POST /v1/report_templates/:report_template_id/generate_pdf_previ
       end
     end
   end
+
+  context 'when the owner researcher requests a preview of their template' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let!(:report_template) { create(:report_template, session: create(:session, intervention: create(:intervention, user: user))) }
+
+    it 'enqueues the job and answers :created with an empty body' do
+      expect { request }.to have_enqueued_job(ReportTemplates::GeneratePdfPreviewJob).with(report_template.id, user.id)
+      expect(response).to have_http_status(:created)
+      expect(response.body).to be_blank
+    end
+  end
+
+  context 'when the template does not exist' do
+    let(:request) do
+      post v1_report_template_generate_pdf_preview_path(report_template_id: '00000000-0000-0000-0000-000000000000'),
+           params: {}, headers: headers
+    end
+
+    %i[researcher admin].each do |role|
+      context "when the user is #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+
+        it 'answers :not_found and enqueues nothing' do
+          pending 'BUG: the template is loaded with find_by, so an unknown id is not reported as :not_found ' \
+                  '(researchers get :forbidden, admins hit NoMethodError on nil) (T-45)'
+
+          expect { request }.not_to have_enqueued_job(ReportTemplates::GeneratePdfPreviewJob)
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
 end

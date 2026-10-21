@@ -110,4 +110,12 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
       it_behaves_like 'permitted user'
     end
   end
+
+  context 'when a researcher reads the templates of a session that is not theirs' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    it 'returns :forbidden' do
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end
