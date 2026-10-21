@@ -10,7 +10,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/star', type: :request 
   let(:other_intervention) { create(:intervention, user: researcher) }
 
   let(:headers) { admin.create_new_auth_token }
-  let(:request) { delete v1_intervention_create_star_path(intervention.id), headers: headers }
+  let(:request) { delete v1_intervention_destroy_star_path(intervention.id), headers: headers }
 
   before do
     Star.create(user_id: admin.id, intervention_id: intervention.id)
@@ -32,7 +32,7 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/star', type: :request 
   end
 
   context 'when the id in the request is of an intervention that does not exist' do
-    let(:request) { delete v1_intervention_create_star_path(SecureRandom.uuid), headers: headers }
+    let(:request) { delete v1_intervention_destroy_star_path(SecureRandom.uuid), headers: headers }
 
     it 'returns the status not found' do
       request
@@ -63,5 +63,23 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/star', type: :request 
 
   it 'deletes only one star' do
     expect { request }.to change(Star, :count).by(-1)
+  end
+
+  it 'answers 204' do
+    request
+    expect(response).to have_http_status(:no_content)
+  end
+
+  context 'when intervention serializers are cached in Redis' do
+    include_context 'with intervention serializers cached in Redis', [V1::SimpleInterventionSerializer]
+
+    it 'shows starred: false on an already loaded dashboard list' do
+      pending 'BUG: unstarring does not expire the cached SimpleInterventionSerializer entry of the user, so the list keeps starred: true (T-12)'
+      expect(starred_on_list(admin)).to be(true)
+
+      request
+
+      expect(starred_on_list(admin)).to be(false)
+    end
   end
 end

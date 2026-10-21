@@ -232,4 +232,27 @@ RSpec.describe 'POST /v1/interventions', type: :request do
       expect(json_response['message']).to eq 'You are not authorized to access this page.'
     end
   end
+
+  context 'when the body contains attributes outside the permit list' do
+    let(:user) { researcher }
+    let(:other_researcher) { create(:user, :confirmed, :researcher) }
+    let(:params) do
+      {
+        intervention: {
+          name: 'Unpermitted attributes', user_id: other_researcher.id, sensitive_data_state: 'removed',
+          created_cat_mh_session_count: 9, hfhs_access: true, published_at: '2020-01-01T00:00:00Z'
+        }
+      }
+    end
+
+    before { request }
+
+    it 'creates the intervention and ignores them' do
+      expect(response).to have_http_status(:created)
+      expect(Intervention.find(json_response['data']['id'])).to have_attributes(
+        name: 'Unpermitted attributes', user_id: researcher.id, sensitive_data_state: 'collected',
+        created_cat_mh_session_count: 0, hfhs_access: false, published_at: nil
+      )
+    end
+  end
 end
