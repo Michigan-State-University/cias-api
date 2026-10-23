@@ -52,7 +52,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
       end
     end
 
-    # Remove all questions, that should be send today, but before job execution
+    # Remove all questions, that should be sent today, but before job execution
     questions_to_be_send_today.reject! { |elem| elem[:time_to_send] < DateTime.current }
 
     # Adjust Smses sending times for preventing race condition
