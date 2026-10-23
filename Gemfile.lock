@@ -632,6 +632,8 @@ GEM
     slop (4.10.1)
     sql_query (0.7.4)
       activerecord (>= 3.2)
+    strong_migrations (2.8.0)
+      activerecord (>= 7.2)
     test-prof (1.4.4)
     thor (1.5.0)
     timecop (0.9.10)
@@ -759,6 +761,7 @@ DEPENDENCIES
   sidekiq (>= 7.2.4)
   simplecov
   sql_query
+  strong_migrations (~> 2.8)
   test-prof
   timecop
   twilio-ruby (~> 7.9.1)
@@ -1000,6 +1003,7 @@ CHECKSUMS
   simpleidn (0.2.3) sha256=08ce96f03fa1605286be22651ba0fc9c0b2d6272c9b27a260bc88be05b0d2c29
   slop (4.10.1) sha256=844322b5ffcf17ed4815fdb173b04a20dd82b4fd93e3744c88c8fafea696d9c7
   sql_query (0.7.4) sha256=4bbfd094f9a8fc9a265f2c438021cf3f36938d7cb3f5591594d024b9364bda2f
+  strong_migrations (2.8.0) sha256=cb9c0f8160e60f3e9c0e76098d57a6f61825b9618e8eb41cebbd1c1079874439
   test-prof (1.4.4) sha256=1a59513ed9d33a1f5ca17c0b89da4e70f60a91c83ec62e9a873dbb99141353ef
   thor (1.5.0)
   timecop (0.9.10) sha256=12ba45ce57cdcf6b1043cb6cdffa6381fd89ce10d369c28a7f6f04dc1b0cd8eb
