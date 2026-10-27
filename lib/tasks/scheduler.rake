@@ -14,3 +14,7 @@ task interventions_schedule: :environment do
     end
   end
 end
+
+task hfhs_clear_abandoned_patient_details: :environment do
+  Hfhs::ClearAbandonedPatientDetailsJob.perform_later
+end

@@ -18,6 +18,14 @@ es:
       header: "Los nuevos informes del sistema están listos para usted"
       body: "Tiene %{number_of_generated_reports} nuevo(s) informe(s) disponible(s) para descargar en su panel. Haga clic en el siguiente enlace para visitar su panel de control."
       button_text: Visitar el panel
+  henry_ford:
+    error:
+      patient:
+        multiple_found: "Se encontraron múltiples pacientes - identificación ambigua del paciente"
+        identifier_missing: "El registro del paciente devuelto por la herramienta externa no incluye el identificador requerido. Póngase en contacto con nuestro equipo de soporte."
+      barcode:
+        patient_id_empty: "El ID del paciente está vacío en el código de barras"
+        parsing_error: "No se puede analizar la identificación del paciente a partir del código de barras"
   bulk_import_mailer:
     bulk_import_result:
       subject: Importación masiva de Participantes Predefinidos CIAS completada
