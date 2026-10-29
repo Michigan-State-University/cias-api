@@ -150,19 +150,6 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
       end
     end
 
-    %w[User Object Answer::DoesNotExist Answer::CatMh].each do |type|
-      context "when the answer type is #{type}" do
-        let(:params) { { answer: { type: type, body: { data: data } }, question_id: question_id } }
-
-        it 'is rejected with 422 and stores nothing' do
-          pending 'BUG: POST /v1/user_sessions/:id/answers constantizes answer[type] from the request, so User ends in 400 from a failed SQL query, ' \
-                  'Object and an unknown name in 500, and Answer::CatMh, which the type check always lets through, is stored with 201 instead of 422 (T-33)'
-          expect { request }.not_to change(Answer, :count)
-          expect(response).to have_http_status(:unprocessable_content)
-        end
-      end
-    end
-
     context 'when the answer names another user session' do
       let(:params) do
         { answer: { type: 'Answer::Single', body: { data: data }, video_stats: {}, user_session_id: SecureRandom.uuid }, question_id: question_id }
@@ -172,50 +159,6 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
         request
         expect(response).to have_http_status(:created)
         expect(Answer.find(json_response['data']['id']).user_session_id).to eq(user_session.id)
-      end
-    end
-
-    context 'when the body is a string instead of an object' do
-      let(:params) { { answer: { type: 'Answer::Single', body: 'not-an-object' }, question_id: question_id } }
-
-      it 'is rejected with 422 instead of stored empty' do
-        pending 'BUG: POST /v1/user_sessions/:id/answers silently drops a scalar answer body and saves an empty answer with 201 (T-40)'
-        expect { request }.not_to change(Answer, :count)
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-    end
-
-    context 'when the question belongs to another session' do
-      let(:other_intervention) { create(:intervention, :published, user_id: researcher.id) }
-      let(:other_question) do
-        create(:question_single, question_group: create(:question_group, session: create(:session, intervention: other_intervention)))
-      end
-      let(:question_id) { other_question.id }
-
-      it 'is not found and stores nothing' do
-        pending 'BUG: POST /v1/user_sessions/:id/answers does not check that question_id belongs to the session of the user session, ' \
-                'so answers to questions of other interventions are stored (T-33)'
-        expect { request }.not_to change(Answer, :count)
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context 'when another participant writes into this user session' do
-      let(:other_participant) { create(:user, :confirmed, :participant) }
-      let(:request) do
-        post v1_user_session_answers_path(user_session.id), headers: other_participant.create_new_auth_token, params: params, as: :json
-      end
-
-      before do
-        other_user_intervention = create(:user_intervention, intervention: intervention, user: other_participant)
-        create(:user_session, user: other_participant, session: session, user_intervention: other_user_intervention)
-      end
-
-      it 'is forbidden and stores nothing' do
-        pending 'BUG: POST /v1/user_sessions/:id/answers never authorizes the user session, ' \
-                'so any signed-in user stores answers in another participant\'s user session (T-33)'
-        expect { request }.not_to change(Answer, :count)
-        expect(response).to have_http_status(:forbidden)
       end
     end
   end

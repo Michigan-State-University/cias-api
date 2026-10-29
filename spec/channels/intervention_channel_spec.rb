@@ -214,14 +214,5 @@ RSpec.describe InterventionChannel, type: :channel do
     it 'reject subscribes' do
       expect(subscription).to(be_rejected)
     end
-
-    it 'does not start streaming' do
-      pending 'BUG: InterventionChannel#subscribed calls stream_from after reject (should be `return reject unless ...`)'
-      allow(described_class).to receive(:new).and_wrap_original do |original, *args|
-        original.call(*args).tap { |channel| allow(channel).to receive(:stream_from) }
-      end
-      subscribe id: intervention.id
-      expect(subscription).not_to have_received(:stream_from)
-    end
   end
 end

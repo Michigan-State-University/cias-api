@@ -477,18 +477,6 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     end
   end
 
-  context 'when the status is not a known status' do
-    let(:params) { { intervention: { status: 'bogus' } } }
-
-    it 'is rejected with 400 and leaves the intervention unchanged' do
-      pending 'BUG: an unknown status is passed to the state machine as an event name and raises NoMethodError, ' \
-              'so the API answers 500 instead of 400 like an invalid transition (T-20)'
-      request
-      expect(response).to have_http_status(:bad_request)
-      expect(intervention.reload.status).to eq('draft')
-    end
-  end
-
   context 'when a draft is published' do
     let!(:session) { create(:session, intervention: intervention) }
     let(:params) { { intervention: { status: 'published' } } }

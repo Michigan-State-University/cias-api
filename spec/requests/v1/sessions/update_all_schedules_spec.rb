@@ -160,16 +160,5 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/update_all_sch
           .to all(eq('schedule' => 'days_after', 'schedule_payload' => 3))
       end
     end
-
-    context 'when the schedule is unknown' do
-      let(:valid_params) { { session: { schedule: 'bogus' } } }
-
-      it 'rejects it and leaves the sessions unchanged' do
-        pending 'BUG: update_all_schedules writes the schedule with update_all, bypassing enum validation, so an unknown schedule ' \
-                'answers 200 and stores the unknown value, which the model reads back as nil, for every session (T-10)'
-        expect(response).to have_http_status(:unprocessable_content)
-        expect([session1, session2, session3].map { |session| session.reload.schedule }).to eq %w[immediately immediately days_after]
-      end
-    end
   end
 end

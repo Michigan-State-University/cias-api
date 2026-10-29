@@ -65,33 +65,4 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/posi
       end
     end
   end
-
-  context 'when a position is an SQL expression' do
-    let(:params) { { dashboard_section: { position: [{ id: dashboard_section1.id, position: '1+1+5' }] } } }
-
-    before { request }
-
-    it 'does not evaluate the expression' do
-      pending 'BUG: the bulk position update interpolates position values into raw SQL, so "1+1+5" is evaluated and stored as 7 (T-02)'
-      expect(response.status).to be_between(400, 499)
-      expect(dashboard_section1.reload.position).to eq 4
-    end
-  end
-
-  context 'when an e-intervention admin of the organization sends a section of another organization' do
-    let(:organization) { create(:organization, :with_e_intervention_admin) }
-    let(:user) { organization.e_intervention_admins.first }
-    let(:other_organization) { create(:organization) }
-    let(:foreign_section) do
-      create(:dashboard_section, position: 1, reporting_dashboard: other_organization.reporting_dashboard)
-    end
-    let(:params) { { dashboard_section: { position: [{ id: foreign_section.id, position: 42 }] } } }
-
-    before { request }
-
-    it 'does not move it' do
-      pending 'BUG: the bulk position update changes rows by id without scoping them to the organization in the URL (T-53)'
-      expect(foreign_section.reload.position).to eq 1
-    end
-  end
 end

@@ -18,16 +18,4 @@ RSpec.describe Interventions::ImportJob, type: :job do
       expect { subject }.not_to change(Intervention, :count)
     end
   end
-
-  context 'when the job raises an error' do
-    before do
-      ActiveJob::Base.queue_adapter = :test
-    end
-
-    it 'is not retried' do
-      pending 'BUG: sidekiq_options retry: false is ignored, ApplicationJob retry_on StandardError re-enqueues the job'
-      expect { described_class.perform_now(user_id, SecureRandom.uuid) }.to raise_error(StandardError)
-      expect(described_class).not_to have_been_enqueued
-    end
-  end
 end

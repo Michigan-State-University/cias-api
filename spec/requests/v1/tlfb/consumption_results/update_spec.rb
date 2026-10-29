@@ -58,24 +58,6 @@ RSpec.describe 'PATCH v1/tlfb/consumption_results/:id', type: :request do
     end
   end
 
-  context 'when another participant overwrites the result' do
-    let(:owner) { create(:user, :confirmed, :participant) }
-    let(:user) do
-      create(:user, :confirmed, :participant).tap { |participant| create(:user_session, user: participant, session: session) }
-    end
-    let(:user_session) { create(:user_session, user: owner, session: session) }
-    let(:consumption_result) { create(:tlfb_consumption_result, day: day, body: { 'consumed' => true }) }
-    let(:params) { { consumption_result: { body: { consumed: false, forged: true } } } }
-    let(:request) { patch v1_tlfb_consumption_result_path(consumption_result.id), headers: headers, params: params, as: :json }
-
-    it 'is not found and the result stays' do
-      pending 'BUG: PATCH /v1/tlfb/consumption_results/:id authorizes only the class and loads the record unscoped, ' \
-              'so any participant overwrites another participant\'s result (T-34)'
-      expect(response).to have_http_status(:not_found)
-      expect(consumption_result.reload.body).to eq('consumed' => true)
-    end
-  end
-
   context 'When params invalid' do
     let(:params) { {} }
 

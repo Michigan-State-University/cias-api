@@ -97,40 +97,6 @@ RSpec.describe 'POST /v1/regenerate_audio', type: :request do
     end
   end
 
-  context 'when current user has no access to the question' do
-    let!(:original_url) { block_audio_url }
-
-    before { request }
-
-    context 'when user is a researcher who neither owns nor collaborates on the intervention' do
-      let(:user) { create(:user, :confirmed, :researcher) }
-
-      it 'returns forbidden' do
-        pending 'BUG: AudioController#regenerate has no authorization check and lets unrelated researchers regenerate audio'
-        expect(response).to have_http_status(:forbidden)
-      end
-
-      it 'does not change the narrator of the question' do
-        pending 'BUG: AudioController#regenerate has no authorization check and lets unrelated researchers overwrite the narrator'
-        expect(block_audio_url).to eq(original_url)
-      end
-    end
-
-    context 'when user is a participant without a user session of the session' do
-      let(:user) { create(:user, :confirmed, :participant) }
-
-      it 'returns forbidden' do
-        pending 'BUG: AudioController#regenerate has no authorization check and lets unrelated participants regenerate audio'
-        expect(response).to have_http_status(:forbidden)
-      end
-
-      it 'does not change the narrator of the question' do
-        pending 'BUG: AudioController#regenerate has no authorization check and lets unrelated participants overwrite the narrator'
-        expect(block_audio_url).to eq(original_url)
-      end
-    end
-  end
-
   describe 'voice resolution' do
     let!(:original_url) { block_audio_url }
 

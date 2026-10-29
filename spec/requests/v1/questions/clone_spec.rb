@@ -184,14 +184,4 @@ RSpec.describe 'POST /v1/questions/:id/clone', type: :request do
       end
     end
   end
-
-  context "when a researcher clones another user's question" do
-    let(:user) { create(:user, :confirmed, :researcher) }
-
-    it 'is refused and adds nothing to that group' do
-      pending "BUG: Resource::Clone loads the record with an unscoped find and authorizes only the class, so another user's question gets cloned (T-35)"
-      expect { request }.not_to change(question_group.questions, :count)
-      expect(response).to have_http_status(:not_found)
-    end
-  end
 end

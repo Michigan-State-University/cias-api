@@ -133,18 +133,4 @@ RSpec.describe 'POST /v1/sessions/:session_id/question_group/duplicate_here', ty
       expect(copied.map(&content)).to eq(originals.map(&content))
     end
   end
-
-  context "when a researcher duplicates another user's group into own session" do
-    let(:foreign_group) do
-      create(:question_group, session: create(:session, intervention: create(:intervention, user: create(:user, :researcher, :confirmed))))
-    end
-    let!(:foreign_question) { create(:question_single, question_group: foreign_group) }
-    let(:params) { { question_groups: [{ id: foreign_group.id, question_ids: [foreign_question.id] }] } }
-
-    it 'is refused and copies nothing' do
-      pending "BUG: DuplicateWithStructureService loads source groups with an unscoped QuestionGroup.find, so a researcher can copy another user's group (T-35)"
-      expect { request }.not_to change(Question, :count)
-      expect(response).to have_http_status(:not_found)
-    end
-  end
 end

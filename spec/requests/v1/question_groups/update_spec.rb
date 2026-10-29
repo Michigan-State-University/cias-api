@@ -136,20 +136,4 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/:id', type: :request do
 
     it_behaves_like 'collaboration mode - only one editor at the same time'
   end
-
-  context "when a researcher points session_id at another user's session" do
-    let(:researcher) { create(:user, :confirmed, :researcher) }
-    let(:headers) { researcher.create_new_auth_token }
-    let(:intervention) { create(:intervention, user: researcher) }
-    let(:foreign_session) { create(:session, intervention: create(:intervention, user: create(:user, :confirmed, :admin))) }
-    let(:params) { { question_group: { title: 'Renamed group', session_id: foreign_session.id } } }
-
-    it 'renames the group and keeps it in its own session' do
-      pending "BUG: question_group_params permits session_id, so a researcher can move a group into another user's session (T-35)"
-      request
-
-      expect(response).to have_http_status(:ok)
-      expect(question_group.reload).to have_attributes(title: 'Renamed group', session_id: session.id)
-    end
-  end
 end

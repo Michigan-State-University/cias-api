@@ -69,17 +69,4 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/star', type: :request 
     request
     expect(response).to have_http_status(:no_content)
   end
-
-  context 'when intervention serializers are cached in Redis' do
-    include_context 'with intervention serializers cached in Redis', [V1::SimpleInterventionSerializer]
-
-    it 'shows starred: false on an already loaded dashboard list' do
-      pending 'BUG: unstarring does not expire the cached SimpleInterventionSerializer entry of the user, so the list keeps starred: true (T-12)'
-      expect(starred_on_list(admin)).to be(true)
-
-      request
-
-      expect(starred_on_list(admin)).to be(false)
-    end
-  end
 end

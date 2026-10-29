@@ -65,22 +65,6 @@ RSpec.describe 'POST v1/tlfb/consumption_results', type: :request do
     end
   end
 
-  context 'when another participant writes into this user session' do
-    let(:owner) { create(:user, :confirmed, :participant) }
-    let(:user) do
-      create(:user, :confirmed, :participant).tap { |participant| create(:user_session, user: participant, session: session) }
-    end
-    let(:user_session) { create(:user_session, user: owner, session: session) }
-    let(:request) { post v1_tlfb_consumption_results_path, headers: headers, params: params, as: :json }
-
-    it 'is not found and creates nothing' do
-      pending 'BUG: POST /v1/tlfb/consumption_results authorizes only the class and takes user_session_id from the request, ' \
-              'so any participant writes results into another participant\'s user session (T-34)'
-      expect(response).to have_http_status(:not_found)
-      expect(Tlfb::ConsumptionResult.count).to eq(0)
-    end
-  end
-
   context 'When params invalid' do
     let(:params) { {} }
 

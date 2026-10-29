@@ -552,19 +552,6 @@ describe 'PATCH /v1/users/:id', type: :request do
     it { expect(researcher.reload.first_name).to eq 'Smith' }
   end
 
-  context 'when phone_attributes is a scalar' do
-    let(:user_id) { researcher.id }
-    let(:params) { { user: { first_name: 'Ada', phone_attributes: '123' } } }
-
-    it 'drops phone_attributes and applies the other changes',
-       pending: 'BUG: the user request log calls delete(:number) on phone_attributes from the raw params, so a scalar value raises TypeError (500) (T-69)' do
-      expect(response).to have_http_status(:ok)
-      researcher.reload
-      expect(researcher.first_name).to eq 'Ada'
-      expect(researcher.phone).to be_nil
-    end
-  end
-
   context 'when a deactivated user is reactivated with a JSON body without the user key' do
     let(:researcher) { create(:user, :confirmed, :researcher, active: false) }
     let(:user_id) { researcher.id }

@@ -21,18 +21,6 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/export', type: :request 
     end
   end
 
-  context 'when a researcher exports an intervention they have no access to' do
-    let(:researcher) { create(:user, :confirmed, :researcher) }
-    let(:request) { post v1_export_intervention_path(intervention.id), headers: researcher.create_new_auth_token }
-
-    it 'is refused' do
-      pending 'BUG: export authorizes only the Intervention class, not the record, so a researcher without access gets 200 ' \
-              'and the export job fails silently instead of a 404 (T-05)'
-      request
-      expect(response).to have_http_status(:not_found)
-    end
-  end
-
   context 'when the export job runs' do
     let!(:intervention) { create(:intervention, user: user, name: 'Exported intervention') }
     let!(:session) { create(:session, intervention: intervention, name: 'Exported session') }

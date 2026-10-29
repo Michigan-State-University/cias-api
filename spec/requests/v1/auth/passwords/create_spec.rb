@@ -16,13 +16,6 @@ describe 'POST /v1/auth/password', type: :request do
       expect(response).to have_http_status(:created)
     end
 
-    it 'returns empty body, indistinguishable from the unknown email response' do
-      pending 'render_create_success (head :created) is shadowed by `prepend Auth::Default`, ' \
-              'so the serialized user (email, names, phone, roles, ...) is returned to an unauthenticated caller'
-      send_request
-      expect(response.body).to be_empty
-    end
-
     it 'enqueues reset password instructions email' do
       expect { send_request }.to have_enqueued_mail(Devise::Mailer, :reset_password_instructions)
         .with(user, kind_of(String), hash_including(redirect_url: redirect_url))

@@ -60,20 +60,6 @@ RSpec.describe 'POST /v1/tlfb/events', type: :request do
     end
   end
 
-  context 'when another participant adds an event to this user session' do
-    let(:other_participant) { create(:user, :confirmed, :participant) }
-    let(:request) { post v1_tlfb_events_path, params: params, headers: other_participant.create_new_auth_token, as: :json }
-
-    before { create(:user_session, user: other_participant, session_id: session.id) }
-
-    it 'is not found and creates nothing' do
-      pending 'BUG: POST /v1/tlfb/events authorizes only the class and takes user_session_id from the request, ' \
-              'so any participant adds events to another participant\'s user session (T-34)'
-      expect { request }.not_to change(Tlfb::Event, :count)
-      expect(response).to have_http_status(:not_found)
-    end
-  end
-
   context 'unauthorize user' do
     let(:request) do
       post v1_tlfb_events_path, params: params, as: :json

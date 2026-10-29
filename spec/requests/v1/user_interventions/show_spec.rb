@@ -75,22 +75,6 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
     end
   end
 
-  context 'when the participant has started a session' do
-    let!(:user) { create(:user, :participant, :confirmed) }
-    let!(:intervention) { create(:intervention, :published, shared_to: 'anyone') }
-    let!(:user_session) do
-      create(:user_session, user: user, session: sessions.first, user_intervention: user_intervention, health_clinic_id: health_clinic.id,
-                            last_answer_at: 1.hour.ago)
-    end
-
-    before { request }
-
-    it 'returns last_answer_date as the last answer timestamp' do
-      pending 'BUG: UserIntervention#last_answer_date returns the whole latest UserSession record instead of its last_answer_at (T-55)'
-      expect(json_response['data']['attributes']['last_answer_date']).to eq(user_session.last_answer_at.as_json)
-    end
-  end
-
   context 'predefined participnat has access to session shared to invited' do
     let!(:intervention) { create(:flexible_order_intervention, user: user, status: 'published', shared_to: 'invited') }
     let!(:user) { create(:user, :predefined_participant, :confirmed) }

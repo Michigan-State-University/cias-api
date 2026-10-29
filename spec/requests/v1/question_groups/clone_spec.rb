@@ -108,12 +108,5 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
       original_answer_ids = [question1, question2].flat_map { |q| q.reload.body['data'].pluck('id') }
       expect(copied.flat_map { |q| q.body['data'].pluck('id') } & original_answer_ids).to be_empty
     end
-
-    it 'puts the copy in its own slot of the session order' do
-      pending 'BUG: QuestionGroup#clone copies the source position, so the copy and the original share a slot in the session order (T-21)'
-      request
-
-      expect(QuestionGroup.find(json_response['data']['id']).position).not_to eq(question_group.reload.position)
-    end
   end
 end

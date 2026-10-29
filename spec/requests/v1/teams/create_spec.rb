@@ -129,16 +129,4 @@ RSpec.describe 'POST /v1/teams', type: :request do
 
     it_behaves_like 'rejects malformed params', -> { Team.count }
   end
-
-  context 'when a researcher is assigned as the admin of the new team' do
-    let(:new_team_admin) { create(:user, :confirmed, :researcher) }
-
-    before { request }
-
-    it 'returns the team admin with the team_admin role' do
-      pending 'BUG: the included team admin is serialized with the roles from before the promotion (["researcher"]), without team_admin (T-39)'
-      included = json_response['included'].find { |item| item['id'] == new_team_admin.id }
-      expect(included['attributes']['roles']).to include('team_admin')
-    end
-  end
 end

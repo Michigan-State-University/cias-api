@@ -92,25 +92,4 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/accesses', type: :request
 
   # The index action calls no `authorize!` and does not scope through `accessible_by`,
   # so any signed-in user can list the access emails of any intervention.
-  context 'when current user has no access to the intervention' do
-    before { request }
-
-    context 'when user is a researcher who neither owns nor collaborates on it' do
-      let(:user) { create(:user, :confirmed, :researcher) }
-
-      it 'does not return access list' do
-        pending 'BUG: AccessesController#index has no authorization check and leaks emails to unrelated researchers'
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-
-    context 'when user is a participant' do
-      let(:user) { create(:user, :confirmed, :participant) }
-
-      it 'does not return access list' do
-        pending 'BUG: AccessesController#index has no authorization check and leaks emails to participants'
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-  end
 end

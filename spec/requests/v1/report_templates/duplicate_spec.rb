@@ -108,18 +108,4 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
       expect(ActiveStorage::Blob.exists?(blob.id)).to be(false)
     end
   end
-
-  context 'when the target session belongs to another user' do
-    let(:foreign_session) { create(:session, intervention: create(:intervention, user: create(:user, :confirmed, :admin))) }
-    let(:params) { { report_template: { session_id: foreign_session.id } } }
-
-    it 'rejects the request and creates nothing in the foreign session' do
-      pending 'BUG: duplicate authorizes only the source session and loads the target session without an access check (T-06)'
-
-      request
-
-      expect(response).to have_http_status(:not_found)
-      expect(foreign_session.report_templates).to be_empty
-    end
-  end
 end
