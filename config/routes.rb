@@ -22,13 +22,13 @@ Rails.application.routes.draw do
       get 'ping', to: '/v1#ping'
     end
 
-    concern :narrator_changeable do |options = {}|
+    concern :narrator_changeable do |options|
       member do
         resources :change_narrator,
                   only: %i[create],
                   param: :object_id,
                   defaults: options,
-                  as: "#{options[:_as] || options[:_model]&.tableize}_narrator",
+                  as: "#{options[:_as] || options[:_model].tableize}_narrator",
                   controller: 'narrator'
       end
     end
