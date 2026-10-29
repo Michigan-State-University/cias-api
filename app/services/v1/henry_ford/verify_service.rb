@@ -98,7 +98,7 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
     "_#{location_id}_#{visit_id}"
   end
 
-  def verify_by_name(appointment, location_identifer)
+  def verify_by_name(appointment, location_identifier)
     appointment_name = appointment
                          .dig(:resource, :participant)
                          .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
@@ -110,8 +110,8 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
                    .first
 
     appointment_location_id = location.epic_identifier
-    location.update!(auxiliary_epic_identifier: location_identifer)
-    Rails.logger.send(:info, "HFHS_IDENTIFIER_LOG test: #{appointment_location_id}, auxiliary: #{location_identifer}")
+    location.update!(auxiliary_epic_identifier: location_identifier)
+    Rails.logger.send(:info, "HFHS_IDENTIFIER_LOG test: #{appointment_location_id}, auxiliary: #{location_identifier}")
 
     location
   end
