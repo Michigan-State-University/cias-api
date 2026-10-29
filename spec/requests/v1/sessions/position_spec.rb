@@ -65,4 +65,21 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position', typ
       end
     end
   end
+
+  context 'when position is not a list' do
+    let(:params) { { session: { position: 'x' } } }
+
+    before do
+      [session1, session2, session3]
+      request
+    end
+
+    it 'returns bad request' do
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'does not change positions' do
+      expect([session1, session2, session3].map { |session| session.reload.position }).to eq [4, 5, 6]
+    end
+  end
 end

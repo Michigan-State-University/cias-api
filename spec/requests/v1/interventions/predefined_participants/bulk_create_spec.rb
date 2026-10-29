@@ -3,9 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/bulk_create', type: :request do
+  # Sent as JSON (like the frontend): form-encoding turns `participants: []` into `[""]`,
+  # which `params.expect` rejects with 400 instead of reaching the empty_participants check.
   subject(:request) do
     post bulk_create_v1_intervention_predefined_participants_path(intervention_id: intervention.id),
-         params: params, headers: headers
+         params: params, headers: headers, as: :json
   end
 
   let!(:researcher) { create(:user, :confirmed, :researcher) }
@@ -95,7 +97,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422, no payload created, no BulkImportJob enqueued' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -106,7 +108,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422, no payload created, no BulkImportJob enqueued' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -124,7 +126,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422, no payload created, no BulkImportJob enqueued' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -134,7 +136,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with not_found on health_clinic_id' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(
         a_hash_including('field' => 'health_clinic_id', 'code' => 'not_found')
       )
@@ -157,7 +159,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with unknown_question_variable, no payload, no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(
         a_hash_including('field' => 's1.nonexistent', 'code' => 'unknown_question_variable')
       )
@@ -183,7 +185,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with unsupported_question_type, no payload, no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(
         a_hash_including('field' => 's1.picks', 'code' => 'unsupported_question_type')
       )
@@ -215,7 +217,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with per-field codes, no payload, no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       errors = json_response['details']['errors']
       expect(errors).to include(a_hash_including('field' => 's1.mood', 'code' => 'value_not_in_options'))
       expect(errors).to include(a_hash_including('field' => 's1.score', 'code' => 'value_not_a_number'))
@@ -231,7 +233,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with ra_session_missing, no payload, no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(a_hash_including('code' => 'ra_session_missing'))
     end
   end
@@ -250,7 +252,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with value_blank, no payload, no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(a_hash_including('code' => 'value_blank'))
     end
   end
@@ -264,7 +266,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
 
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(a_hash_including('code' => 'empty_participants'))
     end
   end
@@ -290,7 +292,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with errors from BOTH validators in one response; no payload; no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
 
       errors = json_response['details']['errors']
       fields = errors.pluck('field')
@@ -334,7 +336,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'error hashes carry only structural keys and stable codes — no PII leaks; no payload; no enqueue' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       errors = json_response['details']['errors']
       expect(errors).not_to be_empty
 
@@ -389,7 +391,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
 
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(
         a_hash_including('code' => 'ra_answers_require_published_intervention_error')
       )
@@ -424,32 +426,47 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     it 'returns 422 with ra_answers_require_published_intervention_error (any non-published state blocks)' do
       expect { request }.not_to change(BulkImportPayload, :count)
       expect(bulk_import_jobs).to be_empty
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(json_response['details']['errors']).to include(
         a_hash_including('code' => 'ra_answers_require_published_intervention_error')
       )
     end
   end
 
+  describe 'params shape (params.expect)' do
+    context 'when predefined_users key is missing' do
+      let(:params) { { participants: [participant_attrs(email: 'p@example.test')] } }
+
+      it 'returns 400, no payload created, no BulkImportJob enqueued' do
+        expect { request }.not_to change(BulkImportPayload, :count)
+        expect(bulk_import_jobs).to be_empty
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+
+    context 'when participants are sent as a single object instead of an array' do
+      let(:params) { { predefined_users: { participants: participant_attrs(email: 'p@example.test') } } }
+
+      it 'returns 400' do
+        request
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
+
+    context 'when participant contains unpermitted attributes' do
+      let(:params) { wrap(participant_attrs(email: 'p@example.test', roles: %w[admin])) }
+
+      it 'strips them from the stored payload' do
+        request
+        expect(response).to have_http_status(:accepted)
+        expect(BulkImportPayload.last.payload.first['attributes']).not_to have_key('roles')
+      end
+    end
+  end
+
   describe 'authorization' do
     let(:params) { wrap(participant_attrs(email: 'p@example.test')) }
 
-    context 'another researcher (no access to this intervention)' do
-      let(:current_user) { create(:user, :researcher, :confirmed) }
-
-      it 'returns 404 (intervention not accessible_by)' do
-        request
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-
-    context 'a participant (wrong role)' do
-      let(:current_user) { create(:user, :participant, :confirmed) }
-
-      it 'returns 403' do
-        request
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
+    it_behaves_like 'users without access'
   end
 end

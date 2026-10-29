@@ -147,6 +147,10 @@ RSpec.describe UserSession, type: :model do
             expect(UserSessionTimeoutJob).not_to receive(:cancel)
             user_session.on_answer
           end
+
+          it 'enqueues the timeout job before commit so its job id can be stored for cancellation' do
+            expect(UserSessionTimeoutJob.enqueue_after_transaction_commit).to be(false)
+          end
         end
 
         context 'when session contains question which run timeout' do

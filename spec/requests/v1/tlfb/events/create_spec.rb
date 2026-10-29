@@ -47,6 +47,19 @@ RSpec.describe 'POST /v1/tlfb/events', type: :request do
     end
   end
 
+  context 'when the fields are sent unwrapped' do
+    let(:request) do
+      post v1_tlfb_events_path, params: { exact_date: '2026-10-01T00:00:00.000Z', user_session_id: user_session.id,
+                                          question_group_id: question_group.id }, headers: headers, as: :json
+    end
+
+    it 'creates the event in the participant\'s user session' do
+      expect { request }.to change(Tlfb::Event, :count).by(1)
+      expect(response).to have_http_status(:created)
+      expect(Tlfb::Event.find(json_response['data']['id']).day.user_session_id).to eq(user_session.id)
+    end
+  end
+
   context 'unauthorize user' do
     let(:request) do
       post v1_tlfb_events_path, params: params, as: :json

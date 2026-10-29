@@ -108,10 +108,10 @@ class V1::Sessions::ReportTemplatesController < V1Controller
   end
 
   def report_template_params
-    params.require(:report_template).
-      permit(:name, :report_for, :logo, :cover_letter_custom_logo, :summary,
-             :has_cover_letter, :cover_letter_logo_type, :cover_letter_description, :cover_letter_sender,
-             :duplicated_from_other_session_warning_dismissed)
+    params.
+      expect(report_template: %i[name report_for logo cover_letter_custom_logo summary
+                                 has_cover_letter cover_letter_logo_type cover_letter_description cover_letter_sender
+                                 duplicated_from_other_session_warning_dismissed])
   end
 
   def correct_ability?

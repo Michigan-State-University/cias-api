@@ -29,6 +29,43 @@ describe 'PATCH /v1/auth', type: :request do
     end
   end
 
+  context 'when roles are sent along with a valid password' do
+    let(:current_user) { create(:user, :researcher, password: 'SomePassword1!', email: 'old-email@test.com') }
+    let(:params) do
+      {
+        email: 'old-email@test.com',
+        current_password: 'SomePassword1!',
+        roles: ['admin']
+      }
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'does not change the roles' do
+      expect(current_user.reload.roles).to eq ['researcher']
+    end
+
+    it 'does not return the roles as changed' do
+      expect(json_response['data']['attributes']['roles']).to eq ['researcher']
+    end
+  end
+
+  context 'when changing password' do
+    let(:params) do
+      {
+        current_password: 'SomePassword1!',
+        password: 'ComplPass12!',
+        password_confirmation: 'ComplPass12!'
+      }
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'changes password' do
+      expect(current_user.reload.valid_password?('ComplPass12!')).to be true
+    end
+  end
+
   context 'when params are INVALID' do
     context 'current_password is INVALID' do
       let(:params) do
@@ -38,7 +75,7 @@ describe 'PATCH /v1/auth', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'does not change attributes' do
         expect(current_user.reload.attributes).to include(
@@ -51,6 +88,26 @@ describe 'PATCH /v1/auth', type: :request do
       end
     end
 
+    context 'password and password_confirmation are not the same' do
+      let(:params) do
+        {
+          current_password: 'SomePassword1!',
+          password: 'ComplPass12!',
+          password_confirmation: 'OtherPassword1!'
+        }
+      end
+
+      it { expect(response).to have_http_status(:unprocessable_content) }
+
+      it 'does not change password' do
+        expect(current_user.reload.valid_password?('ComplPass12!')).to be false
+      end
+
+      it 'contains the proper error message' do
+        expect(json_response['message']).to eq "Password confirmation doesn't match Password"
+      end
+    end
+
     context 'email is INVALID' do
       let(:params) do
         {
@@ -59,7 +116,7 @@ describe 'PATCH /v1/auth', type: :request do
         }
       end
 
-      it { expect(response).to have_http_status(:unprocessable_entity) }
+      it { expect(response).to have_http_status(:unprocessable_content) }
 
       it 'does not change attributes' do
         expect(current_user.reload.attributes).to include(

@@ -240,6 +240,15 @@ RSpec.describe 'POST /v1/teams/:team_id/invitations', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when roles are missing' do
+      let(:params) { { email: 'newresearcher@gmail.com' } }
+
+      it 'does not invite anybody, returns :bad_request status' do
+        expect { request }.to avoid_changing(User, :count)
+        expect(response).to have_http_status(:bad_request)
+      end
+    end
   end
 
   context 'authorization' do
