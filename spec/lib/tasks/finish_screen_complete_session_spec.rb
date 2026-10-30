@@ -16,7 +16,10 @@ RSpec.describe 'finish_screen:complete_session' do
     allow($stdout).to receive(:write)
   end
 
-  after { original_env.nil? ? ENV.delete('INTERVENTION_IDS') : ENV['INTERVENTION_IDS'] = original_env }
+  after do
+    original_env.nil? ? ENV.delete('INTERVENTION_IDS') : ENV['INTERVENTION_IDS'] = original_env
+    ENV.delete('DRY_RUN')
+  end
 
   def create_finish_screen(intervention)
     session = create(:session, intervention: intervention)
@@ -40,6 +43,31 @@ RSpec.describe 'finish_screen:complete_session' do
       invoke
 
       expect(dashboard_buttons_of([other_finish_screen])).to all(be(true))
+    end
+  end
+
+  context 'with DRY_RUN' do
+    before do
+      ENV['INTERVENTION_IDS'] = intervention.id
+      ENV['DRY_RUN'] = '1'
+    end
+
+    it 'changes nothing' do
+      invoke
+
+      expect(dashboard_buttons_of(finish_screens)).to all(be(true))
+    end
+  end
+
+  context 'when one finish screen cannot be saved' do
+    before do
+      ENV['INTERVENTION_IDS'] = intervention.id
+      finish_screens.max_by(&:id).update_columns(title: '')
+    end
+
+    it 'rolls back every finish screen of the run' do
+      expect { invoke }.to raise_error(ActiveRecord::RecordInvalid)
+      expect(dashboard_buttons_of(finish_screens)).to all(be(true))
     end
   end
 
