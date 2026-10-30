@@ -119,8 +119,8 @@ RSpec.describe 'v1/question_groups/duplicate_internally', type: :request do
 
       before { request }
 
-      it 'returns unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns correct error message' do

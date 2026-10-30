@@ -41,5 +41,28 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers/:id', type: :requ
         expect(json_response['data']['type']).to eq('answer')
       end
     end
+
+    context 'has a free text body with unicode and markup' do
+      let(:data) { AnswerBodySamples::ALL['Answer::FreeResponse'][:data] }
+      let(:answer) { create(:answer_free_response, user_session: user_session, question: question, body: { data: data }) }
+
+      before { request }
+
+      it 'returns the body exactly as stored' do
+        expect(json_response['data']['attributes']['decrypted_body']).to eq('data' => data)
+      end
+    end
+
+    context 'has a numeric body' do
+      let(:question) { create(:question_number) }
+      let(:data) { AnswerBodySamples::ALL['Answer::Number'][:data] }
+      let(:answer) { create(:answer_number, user_session: user_session, question: question, body: { data: data }) }
+
+      before { request }
+
+      it 'returns the value as a JSON number' do
+        expect(json_response['data']['attributes']['decrypted_body']).to eq('data' => data)
+      end
+    end
   end
 end

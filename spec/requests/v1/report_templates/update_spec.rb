@@ -82,6 +82,14 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
             expect(response).to have_http_status(:bad_request)
           end
         end
+
+        ['a string', %w[an array]].each do |body|
+          context "when report_template is #{body.inspect}" do
+            let(:params) { { report_template: body } }
+
+            it_behaves_like 'rejects malformed params', -> { report_template.reload.attributes }
+          end
+        end
       end
     end
 
@@ -151,6 +159,58 @@ RSpec.describe 'PATCH /v1/sessions/:session_id/report_template/:id', type: :requ
     it 'correctly deletes report template id from third party questions' do
       request
       expect(third_party_question.reload.body_data.pluck('report_template_ids')).to all(eq [other_report_template.id])
+    end
+  end
+
+  context 'when the owner uploads a cover letter custom logo of a third-party report' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let(:intervention) { create(:intervention, user: user) }
+    let!(:report_template) { create(:report_template, :third_party, session: session) }
+    let(:params) { { report_template: { cover_letter_custom_logo: logo } } }
+
+    it 'attaches the file and returns its url' do
+      request
+
+      expect(response).to have_http_status(:ok)
+      expect(report_template.reload.cover_letter_custom_logo).to be_attached
+      expect(json_response['data']['attributes']['cover_letter_custom_logo_url']).to be_present
+    end
+  end
+
+  context 'when the front sends back the whole template with read-only and stale attributes' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let(:intervention) { create(:intervention, user: user) }
+    let!(:section) { create(:report_template_section, report_template: report_template) }
+    let!(:variant) { create(:report_template_section_variant, report_template_section: section) }
+    let(:other_session) { create(:session, intervention: create(:intervention, user: user)) }
+    let(:params) do
+      {
+        report_template: {
+          id: '00000000-0000-0000-0000-000000000000',
+          name: 'Renamed through PUT',
+          session_id: other_session.id,
+          is_duplicated_from_other_session: true,
+          logo_url: 'https://example.com/evil.png',
+          sections: [],
+          variants: []
+        }
+      }
+    end
+    let(:request) do
+      put v1_session_report_template_path(session_id: session.id, id: report_template.id),
+          params: params, headers: headers, as: :json
+    end
+
+    it 'updates the permitted name only and keeps sections, variants and the session' do
+      request
+
+      expect(response).to have_http_status(:ok)
+      expect(report_template.reload).to have_attributes(
+        name: 'Renamed through PUT', session_id: session.id, is_duplicated_from_other_session: false
+      )
+      expect(report_template.sections.pluck(:id)).to eq([section.id])
+      expect(report_template.variants.pluck(:id)).to eq([variant.id])
+      expect(other_session.report_templates).to be_empty
     end
   end
 end
