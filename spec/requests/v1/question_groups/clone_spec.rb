@@ -87,4 +87,26 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/clone', type: :reque
       end
     end
   end
+
+  context 'when a researcher clones a group of own draft session' do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+    let(:headers) { researcher.create_new_auth_token }
+    let!(:session) { create(:session, intervention: create(:intervention, user: researcher)) }
+
+    it 'copies the questions with new ids and answer ids' do
+      [question1, question2].each do |question|
+        question.update_columns(body: question.body.merge('data' => question.body['data'].map { |a| a.merge('id' => SecureRandom.uuid) }))
+      end
+      request
+
+      expect(response).to have_http_status(:ok)
+      copy = QuestionGroup.find(json_response['data']['id'])
+      expect(copy).to have_attributes(session_id: session.id, title: 'Question Group Title')
+      copied = copy.questions.order(:position)
+      expect(copied.map(&:subtitle)).to eq(['Question Subtitle', 'Question Subtitle 2'])
+      expect(copied.map { |q| q.body['data'].pluck('payload') }).to eq([question1, question2].map { |q| q.body['data'].pluck('payload') })
+      original_answer_ids = [question1, question2].flat_map { |q| q.reload.body['data'].pluck('id') }
+      expect(copied.flat_map { |q| q.body['data'].pluck('id') } & original_answer_ids).to be_empty
+    end
+  end
 end

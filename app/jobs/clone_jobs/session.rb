@@ -6,7 +6,7 @@ class CloneJobs::Session < CloneJob
       raise ComplexException.new(
         I18n.t('sessions.ra_cannot_clone_same_intervention'),
         {},
-        :unprocessable_entity
+        :unprocessable_content
       )
     end
 

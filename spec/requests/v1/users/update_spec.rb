@@ -35,8 +35,9 @@ describe 'PATCH /v1/users/:id', type: :request do
   let(:question_group) { nil }
   let(:question) { nil }
   let(:answer) { nil }
+  let(:request_format) { nil }
 
-  before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params }
+  before { patch v1_user_path(user_id), headers: current_user.create_new_auth_token, params: params, as: request_format }
 
   context 'when current_user is admin' do
     shared_examples 'admin' do
@@ -502,5 +503,74 @@ describe 'PATCH /v1/users/:id', type: :request do
         it { expect(response).to have_http_status(:not_found) }
       end
     end
+  end
+
+  context 'when the payload carries attributes that are not permitted' do
+    let!(:encrypted_password) { researcher.encrypted_password }
+    let!(:confirmed_at) { researcher.confirmed_at }
+    let(:user_id) { researcher.id }
+    let(:params) do
+      {
+        user: {
+          first_name: 'Ada',
+          time_zone: 'Europe/Warsaw',
+          email_notification: false,
+          encrypted_password: 'not-a-digest',
+          confirmed_at: nil,
+          invitation_token: 'forged',
+          quick_exit_enabled: true
+        }
+      }
+    end
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'applies the permitted attributes' do
+      expect(researcher.reload).to have_attributes(first_name: 'Ada', time_zone: 'Europe/Warsaw', email_notification: false)
+    end
+
+    it 'ignores the attributes that are not permitted' do
+      expect(researcher.reload).to have_attributes(
+        encrypted_password: encrypted_password, confirmed_at: be_within(1.second).of(confirmed_at),
+        invitation_token: nil, quick_exit_enabled: false
+      )
+    end
+
+    it 'does not serialize credentials or tokens' do
+      expect(json_response['data']['attributes'].keys).not_to include(
+        'encrypted_password', 'tokens', 'invitation_token', 'reset_password_token', 'confirmation_token'
+      )
+    end
+  end
+
+  context 'when the user params are a scalar' do
+    let(:user_id) { researcher.id }
+    let(:params) { { user: 'Ada' } }
+
+    it { expect(response).to have_http_status(:bad_request) }
+
+    it { expect(researcher.reload.first_name).to eq 'Smith' }
+  end
+
+  context 'when a deactivated user is reactivated with a JSON body without the user key' do
+    let(:researcher) { create(:user, :confirmed, :researcher, active: false) }
+    let(:user_id) { researcher.id }
+    let(:params) { { active: true } }
+    let(:request_format) { :json }
+
+    it 'reactivates the user' do
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['attributes']['active']).to be(true)
+      expect(researcher.reload.active).to be(true)
+    end
+  end
+
+  context 'when a researcher tries to change their own roles' do
+    let(:current_user) { researcher }
+    let(:params) { { user: { roles: ['admin'] } } }
+
+    it { expect(response).to have_http_status(:forbidden) }
+
+    it { expect(researcher.reload.roles).to eq ['researcher'] }
   end
 end

@@ -74,7 +74,7 @@ RSpec.describe 'POST /v1/question_groups/:question_group_id/questions', type: :r
       end
 
       it 'returns correct status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns correct error message' do

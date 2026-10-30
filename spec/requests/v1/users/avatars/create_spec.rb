@@ -116,6 +116,11 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
     end
   end
 
+  it 'serves the uploaded image under the returned avatar_url' do
+    expect(served_file(json_response['data']['attributes']['avatar_url'])).to eq File.binread('spec/factories/images/test_image_1.jpg')
+    expect(response.media_type).to eq 'image/jpeg'
+  end
+
   context 'when file is incorrect' do
     context 'when file size is too big (more than 10 megabytes)' do
       let(:params) do
@@ -127,7 +132,7 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'Returns correct status code (Unprocessable entity)' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -141,8 +146,14 @@ RSpec.describe 'POST /v1/users/:user_id/avatars', type: :request do
       end
 
       it 'returns correct status code (Unprocessable entity)' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
+  end
+
+  context 'when the avatar part is missing' do
+    let(:params) { { other: 'x' } }
+
+    it { expect(response).to have_http_status(:bad_request) }
   end
 end

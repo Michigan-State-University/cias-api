@@ -26,6 +26,10 @@ RSpec.describe 'DELETE /v1/users/:id', type: :request do
         before { request }
 
         it { expect(response).to have_http_status(:no_content) }
+
+        it 'deactivates the user instead of deleting it' do
+          expect(alter_user.reload.active).to be(false)
+        end
       end
 
       context 'not found' do

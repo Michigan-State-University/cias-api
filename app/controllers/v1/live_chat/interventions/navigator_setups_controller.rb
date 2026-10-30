@@ -36,9 +36,11 @@ class V1::LiveChat::Interventions::NavigatorSetupsController < V1Controller
     V1::LiveChat::Interventions::NavigatorSetupSerializer.new(data, { include: %i[participant_links navigator_links phone message_phone] })
   end
 
+  # rubocop:disable Rails/StrongParametersExpect -- expect returns 400 when no permitted key is present
   def navigator_setup_params
     params.require(:navigator_setup).permit(:contact_email, :no_navigator_available_message,
                                             :filled_script_template, :contact_message, phone_attributes: %i[iso number prefix],
                                                                                        message_phone_attributes: %i[iso number prefix])
   end
+  # rubocop:enable Rails/StrongParametersExpect
 end

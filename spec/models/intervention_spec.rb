@@ -397,5 +397,13 @@ RSpec.describe Intervention, type: :model do
         expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
       end
     end
+
+    context 'when updating an existing intervention with script tag' do
+      it 'removes script tag and sanitizes remaining HTML' do
+        intervention.save!
+        intervention.update!(name: '<script>alert(1)</script><b>Example name</b>')
+        expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
+      end
+    end
   end
 end

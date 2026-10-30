@@ -16,7 +16,7 @@ module ExceptionHandler
 
     rescue_from ActiveRecord::RecordInvalid do |exc|
       Sentry.capture_exception(exc)
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ActiveRecord::RecordNotFound do |exc|
@@ -25,17 +25,17 @@ module ExceptionHandler
 
     rescue_from ActiveRecord::RecordNotUnique do |exc|
       Sentry.capture_exception(exc)
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ActiveRecord::RecordNotSaved do |exc|
       Sentry.capture_exception(exc)
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ActiveRecord::Rollback do |exc|
       Sentry.capture_exception(exc)
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ActiveRecord::SubclassNotFound do |exc|
@@ -49,12 +49,12 @@ module ExceptionHandler
 
     rescue_from Dentaku::Error do |exc|
       Sentry.capture_exception(exc)
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ArgumentError do |exc|
       Sentry.capture_exception(exc)
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from CatMh::ConnectionFailedException do |exc|
@@ -64,18 +64,18 @@ module ExceptionHandler
     end
 
     rescue_from CatMh::ActionNotAvailable do |exc|
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from JSON::ParserError do |exc|
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ComplexException do |exc|
       Sentry.capture_exception(exc)
       message = { message: exc.message, details: exc.additional_information }
 
-      render json: message, status: exc.status_code || :unprocessable_entity
+      render json: message, status: exc.status_code || :unprocessable_content
     end
 
     rescue_from EpicOnFhir::NotFound do |exc|
@@ -97,7 +97,7 @@ module ExceptionHandler
     end
 
     rescue_from ConcurrentEditException do |exc|
-      render json: msg(exc), status: :unprocessable_entity
+      render json: msg(exc), status: :unprocessable_content
     end
   end
 

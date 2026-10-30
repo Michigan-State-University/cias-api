@@ -138,4 +138,27 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/update_all_sch
       expect(response).to have_http_status(:success)
     end
   end
+
+  context 'when the owner researcher updates the schedules' do
+    let(:user) { researcher }
+    let(:intervention) { create(:intervention, user: researcher) }
+
+    before { request }
+
+    context 'when the attributes are sent as JSON without the session key' do
+      let(:request) do
+        patch "/v1/interventions/#{intervention.id}/sessions/update_all_schedules",
+              params: { schedule: 'days_after', schedule_payload: 3, schedule_at: nil },
+              headers: headers, as: :json
+      end
+
+      it 'stores and returns the schedule and its payload of every session' do
+        expect(response).to have_http_status(:ok)
+        expect([session1, session2, session3].map { |session| session.reload.slice(:schedule, :schedule_payload).values })
+          .to all(eq(['days_after', 3]))
+        expect(json_response['data'].map { |session| session['attributes'].slice('schedule', 'schedule_payload') })
+          .to all(eq('schedule' => 'days_after', 'schedule_payload' => 3))
+      end
+    end
+  end
 end

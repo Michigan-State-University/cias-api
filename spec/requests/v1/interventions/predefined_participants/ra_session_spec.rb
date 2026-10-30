@@ -40,6 +40,13 @@ RSpec.describe 'RA session endpoints', type: :request do
         expect { request }.to change(UserSession::ResearchAssistant, :count).by(1)
       end
 
+      it 'hands back the same user session when called again' do
+        request
+        first_id = json_response['data']['user_session_id']
+        expect { request }.not_to change(UserSession::ResearchAssistant, :count)
+        expect(json_response['data']['user_session_id']).to eq(first_id)
+      end
+
       it 'stamps fulfilled_by_id with the researcher' do
         request
         user_session = UserSession::ResearchAssistant.last

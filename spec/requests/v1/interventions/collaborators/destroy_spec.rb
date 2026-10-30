@@ -21,6 +21,14 @@ RSpec.describe 'DELETE /v1/interventions/:intervention_id/collaborators/:id', ty
     it 'intervention shouldn\'t have any collaborators' do
       expect(intervention.reload.collaborators.count).to be 0
     end
+
+    it 'removes the permission entry and read access of the removed collaborator' do
+      collaborator_headers = collaborator.user.create_new_auth_token
+      get v1_intervention_permission_path(intervention_id: intervention.id), headers: collaborator_headers
+      expect(response).to have_http_status(:not_found)
+      get v1_intervention_path(id: intervention.id), headers: collaborator_headers
+      expect(response).to have_http_status(:not_found)
+    end
   end
 
   context 'when user without access' do

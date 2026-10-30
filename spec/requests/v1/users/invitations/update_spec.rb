@@ -57,7 +57,7 @@ describe 'PATCH /v1/users/invitations', type: :request do
       it 'redirects to web app register page' do
         request
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(json_response['error']).to eq 'Invitation token is invalid'
       end
     end

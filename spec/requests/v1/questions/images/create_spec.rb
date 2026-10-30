@@ -41,4 +41,26 @@ RSpec.describe 'POST /v1/questions/:question_id/images', type: :request do
       it { expect(response).to have_http_status(:created) }
     end
   end
+
+  context 'when the file is not inside image[]' do
+    let(:params) { { file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true) } }
+
+    before { request }
+
+    it 'returns :bad_request and attaches nothing' do
+      expect(response).to have_http_status(:bad_request)
+      expect(question.reload.image).not_to be_attached
+    end
+  end
+
+  context "when a researcher uploads to another user's question" do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    before { request }
+
+    it 'returns :not_found and attaches nothing' do
+      expect(response).to have_http_status(:not_found)
+      expect(question.reload.image).not_to be_attached
+    end
+  end
 end

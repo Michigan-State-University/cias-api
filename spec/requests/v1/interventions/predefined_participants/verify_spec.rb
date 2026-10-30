@@ -53,6 +53,13 @@ RSpec.describe 'POST /v1/predefined_participants/verify', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'signs the participant in through the headers and keeps the tokens out of the body' do
+      request
+      expect(response.headers['access-token']).to be_present
+      expect(response.headers['uid']).to eq(user.uid)
+      expect(response.body).not_to include(response.headers['access-token'])
+    end
+
     it 'return correct body' do
       request
       expect(json_response.keys).to match_array(%w[user redirect_data])

@@ -6,7 +6,7 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
     authorize! :update, intervention_load
     return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
 
-    return render status: :payload_too_large if files_too_big?
+    return render status: :content_too_large if files_too_big?
 
     assign_file_to_setup!
     render json: serialized_response(setup_load.reload, 'LiveChat::Interventions::NavigatorSetup')
@@ -37,7 +37,7 @@ class V1::LiveChat::Interventions::FilesController < V1Controller
   end
 
   def file_params
-    params.require(:navigator_setup).permit(:files_for, files: [])
+    params.expect(navigator_setup: [:files_for, { files: [] }])
   end
 
   def intervention_load

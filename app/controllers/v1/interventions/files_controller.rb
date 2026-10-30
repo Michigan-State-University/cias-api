@@ -5,7 +5,7 @@ class V1::Interventions::FilesController < V1Controller
     authorize! :update, Intervention
     authorize! :update, intervention_load
     return render status: :method_not_allowed unless intervention_load.can_have_files?
-    return render status: :payload_too_large if file_sizes_too_big?
+    return render status: :content_too_large if file_sizes_too_big?
 
     V1::Intervention::AttachFiles.call(intervention_load, files)
     render json: serialized_response(intervention_load, 'Intervention'), status: :created
@@ -35,7 +35,7 @@ class V1::Interventions::FilesController < V1Controller
   end
 
   def intervention_params
-    params.require(:intervention).permit(files: [])
+    params.expect(intervention: [files: []])
   end
 
   def files

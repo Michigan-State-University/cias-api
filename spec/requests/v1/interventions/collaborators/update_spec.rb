@@ -58,4 +58,29 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/collaborators/:id', typ
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  context 'when the front sends a single unwrapped flag as JSON' do
+    let(:intervention) { create(:intervention, user: user) }
+    let!(:collaborator) { create(:collaborator, intervention: intervention, view: true, edit: false, data_access: false) }
+    let(:request) do
+      patch v1_intervention_collaborator_path(intervention_id: intervention.id, id: collaborator.id),
+            params: { edit: true }, headers: current_user.create_new_auth_token, as: :json
+    end
+
+    it 'return correct status' do
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'changes only that flag' do
+      expect(collaborator.reload.slice(:view, :edit, :data_access)).to eq('view' => true, 'edit' => true, 'data_access' => false)
+    end
+  end
+
+  context 'when the body is not a hash' do
+    let(:params) { { collaborator: 'x' } }
+
+    it 'returns bad request' do
+      expect(response).to have_http_status(:bad_request)
+    end
+  end
 end

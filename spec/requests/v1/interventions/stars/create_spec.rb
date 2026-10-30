@@ -56,4 +56,30 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/star', type: :request do
   it 'behaves idempotently' do
     expect { 10.times { request } }.to change(Star, :count).by(1)
   end
+
+  it 'answers 204, also when starred again' do
+    2.times do
+      request
+      expect(response).to have_http_status(:no_content)
+    end
+  end
+
+  context 'when intervention serializers are cached in Redis' do
+    include_context 'with intervention serializers cached in Redis', [V1::InterventionSerializer, V1::SimpleInterventionSerializer]
+
+    before { intervention }
+
+    def starred_on_show(user)
+      get v1_intervention_path(intervention.id), headers: user.create_new_auth_token
+      expect(response).to have_http_status(:ok)
+      json_response['data']['attributes']['starred']
+    end
+
+    it 'shows the star on the dashboard list of the starring user only' do
+      request
+
+      expect(starred_on_list(admin)).to be(true)
+      expect(starred_on_list(researcher)).to be(false)
+    end
+  end
 end

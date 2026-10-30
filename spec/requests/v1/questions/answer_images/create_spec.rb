@@ -55,4 +55,14 @@ RSpec.describe 'POST /v1/questions/:question_id/answer_images', type: :request d
       end
     end
   end
+
+  context 'when the answer_id is not an answer of the question' do
+    let(:params) { super().deep_merge(image: { answer_id: '00000000-0000-0000-0000-000000000000' }) }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:unprocessable_content) }
+    it { expect(json_response).to eq('message' => 'Wrong answer_id') }
+    it { expect(question.reload.answer_images).to be_empty }
+  end
 end
