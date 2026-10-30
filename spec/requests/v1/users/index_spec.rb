@@ -75,6 +75,31 @@ RSpec.describe 'GET /v1/users', type: :request do
       it_behaves_like 'correct users response'
     end
 
+    context 'when name filter contains regex metacharacters' do
+      before do
+        participant1
+        researcher
+      end
+
+      context 'when it is an invalid regex' do
+        let(:params) { { name: '(' } }
+
+        it 'does not raise an error' do
+          expect { request }.not_to raise_error
+          expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'when it is a wildcard pattern' do
+        let(:params) { { name: '.*' } }
+
+        it 'matches it literally' do
+          request
+          expect(json_response['data']).to be_empty
+        end
+      end
+    end
+
     context 'with team_id filter params' do
       let!(:team1) { create(:team) }
       let!(:team2) { create(:team) }

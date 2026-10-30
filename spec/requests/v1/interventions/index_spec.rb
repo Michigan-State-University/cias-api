@@ -270,4 +270,30 @@ RSpec.describe 'GET /v1/interventions', type: :request do
       end
     end
   end
+
+  context 'has_research_assistant_session' do
+    let!(:ra_interventions) { admin_interventions.first(2) }
+    let(:ra_session_queries) { [] }
+    let(:request) { get v1_interventions_path, params: params, headers: admin.create_new_auth_token }
+
+    before do
+      ra_interventions.each { |intervention| create(:ra_session, intervention: intervention) }
+      create(:session, intervention: researcher_interventions.first)
+
+      callback = lambda do |*, payload|
+        ra_session_queries << payload[:sql] if payload[:sql].include?('FROM "sessions"') && payload[:sql].include?('"sessions"."type"')
+      end
+      ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') { request }
+    end
+
+    it 'flags only interventions with an RA session' do
+      flags = json_response['data'].to_h { |intervention| [intervention['id'], intervention['attributes']['has_research_assistant_session']] }
+      expect(flags.select { |_id, flag| flag }.keys).to match_array(ra_interventions.map(&:id))
+      expect(flags.size).to eq(11)
+    end
+
+    it 'checks RA sessions with a single query regardless of page size' do
+      expect(ra_session_queries.size).to eq(1)
+    end
+  end
 end

@@ -31,9 +31,10 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
       expect(json_response['data']['attributes']['clear_sensitive_data_scheduled_at'].present?).to be true
     end
 
-    it 'sets the "sensitive_data_state" flag to "prepared_to_remove"' do
+    it 'marks the sensitive data to remove and returns that state' do
       request
       expect(intervention.reload.sensitive_data_marked_to_remove?).to be(true)
+      expect(json_response['data']['attributes']['sensitive_data_state']).to eq('marked_to_remove')
     end
 
     it 'does enqueued job' do
@@ -97,6 +98,23 @@ RSpec.describe 'DELETE /v1/interventions/:id/user_data', type: :request do
     let!(:sensitive_data_state) { 'removed' }
 
     it_behaves_like 'cannot clear user data'
+  end
+
+  context 'when the removal is already scheduled' do
+    let(:sensitive_data_state) { 'marked_to_remove' }
+
+    it_behaves_like 'cannot clear user data'
+  end
+
+  context 'when a delay in days is given' do
+    let(:params) { { delay: 3 } }
+
+    it 'schedules the removal that many days ahead' do
+      requested_at = Time.current
+      request
+      scheduled_at = Time.zone.parse(json_response['data']['attributes']['clear_sensitive_data_scheduled_at'])
+      expect(scheduled_at).to be_within(1.minute).of(requested_at + 3.days)
+    end
   end
 
   context 'when researcher tries to clear data in their own intervention' do

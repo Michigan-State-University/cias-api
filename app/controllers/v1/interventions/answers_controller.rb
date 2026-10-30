@@ -19,7 +19,7 @@ class V1::Interventions::AnswersController < V1Controller
   def csv_attachment
     authorize! :get_protected_attachment, intervention
 
-    head :no_content unless intervention.reports.attached?
+    return head :no_content unless intervention.reports.attached?
 
     redirect_to(ENV.fetch('APP_HOSTNAME', nil) + Rails.application.routes.url_helpers.rails_blob_path(intervention.newest_report, only_path: true),
                 allow_other_host: true)
