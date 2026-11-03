@@ -304,10 +304,6 @@ Style/StructInheritance:
   Exclude:
     - 'app/policies/**/*'
 
-Style/DocumentDynamicEvalDefinition:
-  Exclude:
-    - 'app/controllers/v1/auth_controller.rb'
-
 Rails/ActiveRecordCallbacksOrder:
   Enabled: true
 
