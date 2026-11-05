@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 
 ruby '3.3.8'
-gem 'bundler', '~> 2.4.22'
+gem 'bundler', '~> 2.6.9'
 
 gem 'rails', '~> 8.1.4'
 gem 'pg', '~> 1.2'
@@ -58,6 +58,8 @@ gem 'countries'
 gem 'paper_trail', '~> 17.0.0'
 # for soft delete
 gem 'paranoia'
+# for stopping migrations that would break the running app or lock tables
+gem 'strong_migrations', '~> 2.8'
 # for logging errors
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.28'
