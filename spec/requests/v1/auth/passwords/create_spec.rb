@@ -11,9 +11,10 @@ describe 'POST /v1/auth/password', type: :request do
   let(:send_request) { post '/v1/auth/password', params: params }
 
   context 'when user with given email exists' do
-    it 'returns created status' do
+    it 'returns created status with empty body' do
       send_request
       expect(response).to have_http_status(:created)
+      expect(response.body).to be_empty
     end
 
     it 'enqueues reset password instructions email' do
