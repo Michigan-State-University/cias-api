@@ -49,7 +49,7 @@ module MetaOperations
     end
 
     def tmp_file # rubocop:disable Lint/DuplicateMethods
-      @tmp_file ||= Rails.root.join('tmp', filename).open('wb') do |file|
+      @tmp_file ||= Rails.root.join('tmp', "#{SecureRandom.hex(8)}_#{filename}").open('wb') do |file|
         file.write(stream)
         file.path
       end

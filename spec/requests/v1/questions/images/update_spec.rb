@@ -47,4 +47,17 @@ RSpec.describe 'PATCH /v1/questions/:question_id/images', type: :request do
       end
     end
   end
+
+  context "when a researcher describes the image of another user's question" do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:not_found) }
+
+    it 'leaves the image description unchanged' do
+      expect(question.reload.image).to be_attached
+      expect(question.image_blob.description).not_to eq('Some description')
+    end
+  end
 end

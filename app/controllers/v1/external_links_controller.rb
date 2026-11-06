@@ -17,7 +17,7 @@ class V1::ExternalLinksController < V1Controller
           hash_metadata: page.to_hash
         }
     rescue MetaInspector::ParserError, MetaInspector::RequestError
-      head :unprocessable_entity
+      head :unprocessable_content
     else
       render json: metadata
     end

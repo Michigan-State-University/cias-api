@@ -43,6 +43,22 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/accesses', type: :reques
         it 'returns correct http status' do
           expect(response).to have_http_status(:not_acceptable)
         end
+
+        it 'does not store any access' do
+          expect(intervention.reload.intervention_accesses).to be_empty
+        end
+      end
+    end
+
+    context 'when emails is not a list' do
+      let!(:params) { { user_session: { emails: 'not-a-list' } } }
+
+      it 'returns bad request' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'does not store any access' do
+        expect(intervention.reload.intervention_accesses).to be_empty
       end
     end
 
@@ -61,6 +77,19 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/accesses', type: :reques
         let!(:collaborator) { create(:collaborator, intervention: intervention, user: create(:user, :researcher, :confirmed), view: true, edit: true) }
 
         it { expect(response).to have_http_status(:created) }
+      end
+    end
+
+    context 'when current user is a researcher without access to the intervention' do
+      let(:intervention) { create(:intervention, :published) }
+      let(:user) { create(:user, :confirmed, :researcher) }
+
+      it 'returns forbidden' do
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not store any access' do
+        expect(intervention.reload.intervention_accesses).to be_empty
       end
     end
 

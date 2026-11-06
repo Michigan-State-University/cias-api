@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class V1::GeneratedReports::Create
+  # Captures the variable name from `.:var:.` and `.:s1.var:.` placeholders.
+  VARIABLE_PLACEHOLDER_PATTERN = /\.:([a-zA-Z0-9_.]+?):\./
+  NOT_ANSWERED = 'Not answered'
+
   def self.call(report_template, user_session, dentaku_calculator)
     new(report_template, user_session, dentaku_calculator).call
   end
@@ -19,9 +23,11 @@ class V1::GeneratedReports::Create
 
     variants_to_generate.compact!
 
-    return if variants_to_generate.blank?
-
+    insert_name_into_variants(variants_to_generate)
+    variants_to_generate.reject! { |variant| only_unanswered_variables_used?(variant) }
     insert_variables_into_variants(variants_to_generate)
+
+    return if variants_to_generate.blank?
 
     GeneratedReport.transaction do
       generated_report = GeneratedReport.create!(
@@ -75,14 +81,39 @@ class V1::GeneratedReports::Create
   end
 
   def insert_variable_into_variants(variable_name, variable_value, variants_to_generate)
-    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value.present? ? variable_value.to_s : 'Unknown') }
+    variants_to_generate.each { |variant| variant.content.gsub!(".:#{variable_name}:.", variable_value.to_s) }
   end
 
   def insert_variables_into_variants(variants_to_generate)
-    insert_name_into_variants(variants_to_generate)
-
-    user_intervention_answer_vars.each do |variable, value|
+    answered_variables.each do |variable, value|
       insert_variable_into_variants(variable, value, variants_to_generate)
+    end
+
+    variants_to_generate.each { |variant| mark_unanswered_variables(variant) }
+  end
+
+  def mark_unanswered_variables(variant)
+    variant.content.gsub!(VARIABLE_PLACEHOLDER_PATTERN) do |placeholder|
+      intervention_variables.include?(Regexp.last_match(1)) ? NOT_ANSWERED : placeholder
+    end
+  end
+
+  def only_unanswered_variables_used?(variant)
+    used_variables = variant.content.scan(VARIABLE_PLACEHOLDER_PATTERN).flatten
+    used_variables.any? { |variable| intervention_variables.include?(variable) } &&
+      used_variables.none? { |variable| answered_variables.key?(variable) }
+  end
+
+  def answered_variables
+    @answered_variables ||= user_intervention_answer_vars.compact_blank
+  end
+
+  def intervention_variables
+    @intervention_variables ||= user_session.session.intervention.sessions.each_with_object(Set.new) do |session, variables|
+      prefix = session.id == user_session.session_id ? '' : "#{session.variable}."
+      session.fetch_variables.each do |group|
+        group[:variables].each { |variable| variables << "#{prefix}#{variable.tr('/', '')}" }
+      end
     end
   end
 

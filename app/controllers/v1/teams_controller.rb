@@ -67,6 +67,6 @@ class V1::TeamsController < V1Controller
   end
 
   def team_params
-    params.require(:team).permit(:name, :user_id)
+    params.expect(team: %i[name user_id])
   end
 end

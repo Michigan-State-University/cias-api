@@ -16,7 +16,7 @@ class V1::Translations::Intervention
   def call
     return if destination_language_id.nil?
 
-    cloned_resource = source_intervention.clone(hidden: true)
+    cloned_resource = source_intervention.clone(hidden: true, rename_session_variables: false)
     translator = V1::Google::TranslationService.new
     cloned_resource.translate(translator, source_language_name_short, destination_language_name_short)
     change_language(cloned_resource)

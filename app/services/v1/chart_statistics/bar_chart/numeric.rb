@@ -11,7 +11,8 @@ class V1::ChartStatistics::BarChart::Numeric < V1::ChartStatistics::BarChart
       'label' => month,
       'value' => value[pattern['label']],
       'color' => pattern['color'],
-      'notMatchedValue' => value[other_label]
+      'notMatchedValue' => value[other_label],
+      'invalidValue' => value[ChartStatistic::INSUFFICIENT_DATA_LABEL]
     }
   end
 

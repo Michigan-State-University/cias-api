@@ -252,6 +252,14 @@ RSpec.describe Session, type: :model do
           expect(session.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
         end
       end
+
+      context 'when updating an existing session with script tag' do
+        it 'removes script tag and sanitizes remaining HTML' do
+          session.save!
+          session.update!(name: '<script>alert(1)</script><b>Example name</b>')
+          expect(session.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
+        end
+      end
     end
   end
 end

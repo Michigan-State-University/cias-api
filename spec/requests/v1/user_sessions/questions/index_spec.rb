@@ -29,6 +29,17 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       it_behaves_like 'paused intervention'
     end
 
+    context 'when another participant asks for the next question of this user session' do
+      let(:other_participant) { create(:user, :confirmed, :participant) }
+
+      before { get v1_user_session_questions_url(user_session.id), headers: other_participant.create_new_auth_token }
+
+      it 'is forbidden' do
+        expect(response).to have_http_status(:forbidden)
+        expect(json_response).to include('message')
+      end
+    end
+
     context 'when start immediately is set' do
       let!(:answer) { create(:answer_single, question_id: question.id, user_session_id: user_session.id) }
       let!(:session2) { create(:session, intervention_id: intervention.id, schedule: :immediately) }
@@ -46,6 +57,14 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
 
       it 'set session as finished' do
         expect(user_session.reload.finished_at).not_to be_nil
+      end
+
+      context 'in fixed order intervention' do
+        let!(:intervention) { create(:fixed_order_intervention, user_id: researcher.id, status: status, license_type: 'unlimited') }
+
+        it 'skips the finish screen and returns first question of next session' do
+          expect(json_response['data']['id']).to eq(question2.id)
+        end
       end
     end
 

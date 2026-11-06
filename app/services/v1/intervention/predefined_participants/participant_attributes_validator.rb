@@ -19,7 +19,7 @@ class V1::Intervention::PredefinedParticipants::ParticipantAttributesValidator
     raise ComplexException.new(
       I18n.t('predefined_participants.bulk_import.participant_validation_error'),
       { errors: @errors },
-      :unprocessable_entity
+      :unprocessable_content
     )
   end
 

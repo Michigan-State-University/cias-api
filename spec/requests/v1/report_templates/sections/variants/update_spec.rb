@@ -75,6 +75,12 @@ RSpec.describe 'PUT /v1/report_templates/sections/:section_id/variants/:id', typ
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when variant is a string' do
+      let(:params) { { variant: 'x' } }
+
+      it_behaves_like 'rejects malformed params', -> { report_template_section_variant.reload.attributes }
+    end
   end
 
   context 'when user is not super admin' do

@@ -64,6 +64,17 @@ RSpec.describe 'GET /v1/user_interventions/:id', type: :request do
     }
   end
 
+  context 'when another participant asks for the user intervention' do
+    let(:other_participant) { create(:user, :participant, :confirmed) }
+    let(:request) { get v1_user_intervention_path(user_intervention.id), headers: other_participant.create_new_auth_token }
+
+    before { request }
+
+    it 'is not found' do
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   context 'predefined participnat has access to session shared to invited' do
     let!(:intervention) { create(:flexible_order_intervention, user: user, status: 'published', shared_to: 'invited') }
     let!(:user) { create(:user, :predefined_participant, :confirmed) }

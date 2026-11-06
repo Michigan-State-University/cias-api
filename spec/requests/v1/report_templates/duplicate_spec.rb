@@ -77,4 +77,35 @@ RSpec.describe 'POST /v1/sessions/:session_id/report_templates/:report_template_
       end
     end
   end
+
+  context 'when the source template has a logo' do
+    let(:session) { create(:session, intervention: intervention) }
+    let!(:report_template) { create(:report_template, :with_logo, session: session) }
+    let(:copy) { ReportTemplate.find(json_response['data']['id']) }
+
+    def remove_logo(template)
+      delete v1_session_report_template_remove_logo_path(session_id: session.id, report_template_id: template.id),
+             headers: user.create_new_auth_token
+    end
+
+    it 'shares the blob with the copy and keeps the file until the last attachment is removed' do
+      blob = report_template.logo.blob
+
+      request
+      expect(response).to have_http_status(:created)
+      expect(copy.logo.blob).to eq(blob)
+      expect(json_response['data']['attributes']['logo_url']).to be_present
+
+      remove_logo(report_template)
+      expect(response).to have_http_status(:no_content)
+      expect(report_template.reload.logo).not_to be_attached
+      expect(copy.reload.logo.blob).to eq(blob)
+      expect(ActiveStorage::Blob.exists?(blob.id)).to be(true)
+
+      remove_logo(copy)
+      expect(response).to have_http_status(:no_content)
+      expect(copy.reload.logo).not_to be_attached
+      expect(ActiveStorage::Blob.exists?(blob.id)).to be(false)
+    end
+  end
 end

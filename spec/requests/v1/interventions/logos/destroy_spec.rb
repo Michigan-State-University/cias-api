@@ -64,4 +64,13 @@ RSpec.describe 'DELETE /v1/interventions/:interventions_id/logo', type: :request
       }
     end
   end
+
+  context "when a researcher deletes the logo of another user's intervention" do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+
+    before { delete v1_intervention_logo_path(intervention_id), headers: researcher.create_new_auth_token }
+
+    it { expect(response).to have_http_status(:not_found) }
+    it { expect(intervention.reload.logo).to be_attached }
+  end
 end

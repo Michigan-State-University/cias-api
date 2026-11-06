@@ -7,7 +7,7 @@ if ENV['SIDEKIQ_WEB_INTERFACE'] == '1'
 end
 
 Rails.application.routes.draw do
-  root to: proc { [200, { 'Content-Type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
+  root to: proc { [200, { 'content-type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
@@ -62,11 +62,12 @@ Rails.application.routes.draw do
     post 'interventions/:id/export', to: 'interventions/transfers#export', as: :export_intervention
     get 'interventions/:intervention_id/csv_attachment', to: 'interventions/answers#csv_attachment', as: :fetch_protected_csv
     resources :interventions, only: %i[index show create update] do
-      concerns :narrator_changeable, { _model: 'Intervention' }
+      concerns :narrator_changeable, _model: 'Intervention'
       post 'clone', on: :member
       post 'export', on: :member
       post 'generate_conversations_transcript', on: :member
       get 'generated_conversations_transcript', on: :member
+      post 'test_link', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
         resources :predefined_participants do
@@ -94,7 +95,7 @@ Rails.application.routes.draw do
       patch 'sessions/update_all_schedules', to: 'sessions#update_all_schedules'
       post 'translate', to: 'translations/translations#translate_intervention', on: :member
       resources :sessions, only: %i[index show create update destroy] do
-        concerns :narrator_changeable, { _model: 'Session' }
+        concerns :narrator_changeable, _model: 'Session'
       end
       resources :navigator_invitations, only: %i[index destroy create], controller: '/v1/live_chat/navigators/invitations'
     end
@@ -270,6 +271,7 @@ Rails.application.routes.draw do
 
     resources :charts, controller: :charts
     post 'charts/:id/clone', to: 'charts#clone', as: :clone_chart
+    post 'charts/:id/regenerate', to: 'charts#regenerate', as: :regenerate_chart
 
     get 'show_website_metadata', to: 'external_links#show_website_metadata', as: :show_website_metadata
 
@@ -317,6 +319,7 @@ Rails.application.routes.draw do
     post 'predefined_participants/:slug/ra_session', to: 'interventions/predefined_participants#ra_session', as: :ra_session_predefined_participant
     get 'user_sessions/:id/ra_show', to: 'user_sessions#ra_show', as: :ra_show_user_session
     post 'sms_links/verify', to: '/v1/sms_links#verify', as: :verify_sms_link
+    post 'test_link_tokens/verify', to: 'test_runs/link_tokens#verify', as: :verify_test_link_token
   end
 
   if Rails.env.development?

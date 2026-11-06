@@ -67,6 +67,14 @@ RSpec.describe 'POST /v1/short_links/verify', type: :request do
     }
   end
 
+  context 'when no short link has that name' do
+    let(:params) { { slug: 'no-such-short-link' } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:not_found) }
+  end
+
   context 'when intervention is draft' do
     let(:intervention) { create(:intervention, user: researcher) }
 

@@ -38,6 +38,27 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/answers', type: :request 
     end
   end
 
+  context 'when answers hold bodies of different JSON types' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let(:intervention) { create(:intervention, user: user) }
+    let(:session) { create(:session, intervention: intervention) }
+    let(:user_session) { create(:user_session, session: session) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:headers) { user.create_new_auth_token }
+
+    before do
+      AnswerBodySamples::ALL.each_value do |sample|
+        create(sample[:answer], user_session: user_session, question: create(sample[:question], question_group: question_group), body: { data: sample[:data] })
+      end
+      request
+    end
+
+    it 'returns each body exactly as stored, with the same JSON types' do
+      expect(json_response['data'].map { |item| item['attributes']['decrypted_body'] })
+        .to match_array(AnswerBodySamples::ALL.values.map { |sample| { 'data' => sample[:data] } })
+    end
+  end
+
   context 'unauthorized access' do
     %i[participant guest].each do |role|
       let!(:user) { create(:user, :confirmed, role) }

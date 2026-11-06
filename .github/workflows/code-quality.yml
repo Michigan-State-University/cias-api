@@ -1,0 +1,205 @@
+name: Code Quality
+
+# Report-only. The scan report is published to S3 and nowhere else: no PR
+# comment, no job summary, no build artifact, and scanner output is kept out of
+# the run log. This repository is public, so its Actions logs and artifacts are
+# world-readable -- findings must not land in either.
+#
+# Coverage is NOT generated here. ci.yml already runs the suite across its
+# TEST_BATCH_COUNT shards and collates them into the "coverage-report"
+# artifact; this workflow downloads that artifact for the same commit rather
+# than re-running the suite. Running it here serially would take ~90 minutes --
+# the eight shards total that much rspec time and only finish in ~21 by fanning
+# out.
+
+on:
+  push:
+    branches: [dev, test, master]
+  pull_request:
+    branches: [dev, master]
+  workflow_dispatch:
+
+concurrency:
+  # head_ref on pull_request, ref on push -- grouping on both puts a branch's
+  # push run and its PR run in one group, so a push to dev with an open
+  # dev -> master PR scans and publishes once rather than twice.
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  # Required to list ci.yml's runs for this commit and download its
+  # coverage-report artifact. Read-only.
+  actions: read
+
+jobs:
+  scan:
+    # Dependabot and fork PRs get no secrets, so the unguarded ssh-agent step
+    # below would fail red for a reason the contributor cannot fix. ORing these
+    # terms made the condition always true -- a push satisfies the first, a fork
+    # PR the last -- so they are ANDed.
+    if: >-
+      github.actor != 'dependabot[bot]' &&
+      (github.event_name != 'pull_request' ||
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    # Outer bound. Sized for the worst case: COVERAGE_WAIT_MINUTES (30) waiting
+    # on ci.yml, plus the scan's own --timeout (20), plus overhead. A typical
+    # run is ~25 minutes, most of it waiting.
+    timeout-minutes: 60
+    env:
+      TECH: rails
+      TIER: high
+      # Report-only. Set to "true" to make a failing gate block the branch.
+      ENFORCE_GATE: "false"
+      # How long to wait for ci.yml's coverage-report artifact for this commit.
+      # Its slowest shard runs ~20 minutes and the collate job follows, so the
+      # artifact does not exist for roughly the first 25 minutes of a run. On
+      # timeout the scan proceeds without coverage rather than failing.
+      COVERAGE_WAIT_MINUTES: "30"
+
+    # No services block: this job never runs the spec suite, so it needs
+    # neither Postgres nor Redis. Coverage arrives as an artifact from ci.yml.
+
+    steps:
+      # Actions are pinned to commit SHAs. Tags are mutable and can be
+      # repointed by the action owner; the trivy-action and kics-github-action
+      # compromises both worked that way. Semgrep flags tag refs as findings.
+      # Resolve a new SHA with:
+      #   gh api repos/<owner>/<repo>/commits/<tag> --jq .sha
+      - name: Checkout repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Full history is required by SonarQube's SCM/new-code analysis.
+          fetch-depth: 0
+
+      # No toolchain setup: every scanner runs in a container and the spec suite
+      # is not run here, so this job needs no local Ruby.
+
+      # ci.yml collates its spec shards into the "coverage-report" artifact
+      # (script/collate_coverage.rb). The poll logic lives in a script so it can
+      # be shellcheck'd and run outside Actions, following test_setup.sh.
+      - name: Fetch coverage report from CI workflow
+        id: coverage
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # On pull_request, github.sha is the merge commit. ci.yml is on: push,
+          # so its runs are keyed on the PR head -- matching on github.sha finds
+          # nothing and every PR waits out the full deadline.
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: ./.github/workflows/fetch_coverage.sh
+
+      - name: Setup SSH for code-quality-configs
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.HTD_CQ_CONFIGS_DEPLOY_KEY }}
+
+      - name: Install htd-cq
+        env:
+          GH_TOKEN: ${{ secrets.HTD_CQ_TOKEN }}
+        run: |
+          gh release download \
+            --repo HTD-Health/code-quality \
+            --pattern "*linux_amd64*" \
+            --dir /tmp
+          tar xzf /tmp/htd-cq_*_linux_amd64.tar.gz -C /usr/local/bin
+          htd-cq --version
+
+      - name: Run htd-cq scan
+        id: scan
+        env:
+          # CI runners share CPU and RAM with the four parallel scanner
+          # containers. The default 3-minute SonarQube startup window is too
+          # tight under that load and the scan dies with exit 2 before the
+          # scanner runs at all. Do not remove this.
+          SONAR_STARTUP_TIMEOUT: 6m
+        run: |
+          # --skip-coverage is passed ONLY when no report was downloaded. It
+          # disables htd-cq's own coverage *generation*, but it also forces the
+          # two coverage gate conditions to SKIP even when a report is present.
+          # .htd-cq.json deliberately carries no coverageCommand, so omitting
+          # the flag re-runs nothing -- it just lets the gate evaluate the
+          # downloaded report instead of reporting SKIP.
+          #
+          # With no report and no flag, SonarQube would report a measured 0%,
+          # which reads as "no tests" rather than "not measured" -- hence the
+          # flag in that case.
+          COVERAGE_FLAG=""
+          if [ ! -s coverage/coverage.json ]; then
+            COVERAGE_FLAG="--skip-coverage"
+            echo "::warning::no coverage report -- scanning with --skip-coverage"
+          fi
+          set +e
+          htd-cq scan --tech "${TECH}" --tier "${TIER}" ${COVERAGE_FLAG} --timeout 20m >scan.log 2>&1
+          CODE=$?
+          set -e
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          # scan.log holds the finding tables and is never printed on a normal
+          # run. Exit 2 means the scan never happened, so the tail carries
+          # infrastructure errors rather than findings -- print it, or the
+          # failure is undiagnosable.
+          if [ "$CODE" = "2" ]; then
+            tail -n 40 scan.log
+          fi
+
+      # No always(): the exit_code test already covers every path where an
+      # earlier step bailed, and Publish below must not run when this fails.
+      - name: Verify a report was produced
+        if: steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
+        run: |
+          # With all output suppressed, "exited 0 but wrote nothing" would
+          # otherwise pass silently. Checks existence only, prints no contents.
+          REPORT=$(ls -1 htd-cq-output/json/*.json 2>/dev/null | sort | tail -n1)
+          if [ -z "$REPORT" ] || ! jq empty "$REPORT" 2>/dev/null; then
+            echo "::error::Scan produced no valid JSON report."
+            exit 1
+          fi
+
+      - name: Publish report to S3
+        if: steps.scan.outputs.exit_code != '' && steps.scan.outputs.exit_code != '2'
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.HTD_CQ_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.HTD_CQ_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.HTD_CQ_AWS_REGION }}
+          HTD_CQ_S3_BUCKET: ${{ vars.HTD_CQ_S3_BUCKET }}
+        run: |
+          # htd-cq publish exits 0 silently when no bucket is set. S3 is the
+          # only destination for this report, so an unset bucket must fail
+          # loudly rather than discard the scan.
+          if [ -z "$HTD_CQ_S3_BUCKET" ]; then
+            echo "::error::HTD_CQ_S3_BUCKET is not set; the scan report has nowhere to go."
+            exit 1
+          fi
+          # Output suppressed so bucket paths stay out of the public log.
+          htd-cq publish >publish.log 2>&1 || { tail -n 20 publish.log; exit 1; }
+
+      - name: Discard local scan output
+        if: always()
+        run: rm -rf htd-cq-output coverage scan.log publish.log
+
+      - name: Enforce quality gate
+        if: always() && steps.scan.outputs.exit_code != ''
+        run: |
+          EXIT="${{ steps.scan.outputs.exit_code }}"
+          case "$EXIT" in
+            0)
+              ;;
+            1)
+              if [ "$ENFORCE_GATE" = "true" ]; then
+                echo "::error::Quality gate FAILED -- see the report in S3"
+                exit 1
+              fi
+              echo "::warning::Quality gate FAILED (report-only) -- see the report in S3"
+              ;;
+            2)
+              # An infrastructure error means the scan did not happen. This
+              # fails the job even in report-only mode -- it is not a gate
+              # result and must not be silently swallowed.
+              echo "::error::Scan infrastructure error"
+              exit 1
+              ;;
+            *)
+              echo "::error::Unknown htd-cq exit code: $EXIT"
+              exit 1
+              ;;
+          esac

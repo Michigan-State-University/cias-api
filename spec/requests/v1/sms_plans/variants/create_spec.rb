@@ -52,6 +52,12 @@ RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/variants', type: :request do
           expect { request }.not_to change(SmsPlan::Variant, :count)
           expect(response).to have_http_status(:bad_request)
         end
+
+        context 'when variant is a string' do
+          let(:params) { { variant: 'x' } }
+
+          it_behaves_like 'rejects malformed params', -> { SmsPlan::Variant.count }
+        end
       end
 
       context 'when intervention was published' do

@@ -57,4 +57,26 @@ RSpec.describe 'GET /v1/interventions/:id/answers', type: :request do
       end
     end
   end
+
+  context 'when a participant has answered' do
+    let(:user) { researcher }
+    let(:intervention) { create(:intervention, :published, user: researcher) }
+    let(:session) { create(:session, intervention: intervention) }
+    let(:question) { create(:question_single, question_group: create(:question_group, session: session)) }
+    let(:participant) { create(:user, :confirmed, :participant) }
+    let(:user_session) { create(:user_session, user: participant, session: session, finished_at: Time.current) }
+    let(:answer_column) { "#{session.variable}.single_var" }
+    let(:csv) { CSV.parse(intervention.reload.newest_report.download, headers: true) }
+
+    before do
+      create(:answer_single, user_session: user_session, question: question, body: { data: [{ var: 'single_var', value: '2' }] })
+      perform_enqueued_jobs(only: CsvJob::Answers) { request }
+    end
+
+    it 'attaches a CSV with the participant answer' do
+      expect(csv.headers.first(2)).to eq %w[user_id email]
+      expect(csv.size).to eq 1
+      expect(csv.first.to_h).to include('email' => participant.email, answer_column => '2')
+    end
+  end
 end

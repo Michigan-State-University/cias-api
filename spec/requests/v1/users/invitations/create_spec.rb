@@ -57,8 +57,8 @@ describe 'POST /v1/users/invitations', type: :request do
         request
       end
 
-      it 'returns unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns correct error message' do
@@ -80,8 +80,8 @@ describe 'POST /v1/users/invitations', type: :request do
         request
       end
 
-      it 'returns unprocessable_entity status' do
-        expect(response).to have_http_status(:unprocessable_entity)
+      it 'returns unprocessable_content status' do
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns correct error message' do

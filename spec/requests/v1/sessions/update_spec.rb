@@ -83,7 +83,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
 
@@ -99,7 +99,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
 
@@ -114,7 +114,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
         end
@@ -162,7 +162,7 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
 
             it {
               request
-              expect(response).to have_http_status(:unprocessable_entity)
+              expect(response).to have_http_status(:unprocessable_content)
             }
           end
         end
@@ -225,6 +225,61 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/:id', type: :r
     it 'lets users assign empty array of formulas' do
       request
       expect(json_response['data']['attributes']['formulas']).to eq []
+    end
+  end
+
+  context 'formulas with branching targets' do
+    let(:target_session) { create(:session, intervention: intervention) }
+    let(:formulas) do
+      [
+        {
+          'payload' => 'var1',
+          'patterns' => [
+            { 'match' => '=1', 'target' => [{ 'id' => target_session.id, 'probability' => '100', 'type' => 'Session' }] }
+          ]
+        }
+      ]
+    end
+    let(:params) { { session: { formulas: formulas } } }
+    let(:request) do
+      patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers, as: :json
+    end
+
+    before { request }
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'returns target in the response' do
+      expect(json_response['data']['attributes']['formulas']).to eq formulas
+    end
+
+    it 'persists target in the database' do
+      expect(session.reload.formulas).to eq formulas
+    end
+  end
+
+  context 'sms codes' do
+    let(:session) { Session.create(name: 'SmsSession', intervention: intervention, type: 'Session::Sms') }
+    let(:params) { { session: { sms_codes_attributes: [{ sms_code: 'FIRST_CODE' }, { sms_code: 'SECOND_CODE' }] } } }
+    let(:request) do
+      patch v1_intervention_session_path(intervention_id: intervention.id, id: session.id), params: params, headers: headers, as: :json
+    end
+
+    before { request }
+
+    it { expect(response).to have_http_status(:ok) }
+
+    it 'persists every sms code' do
+      expect(session.reload.sms_codes.pluck(:sms_code)).to include('FIRST_CODE', 'SECOND_CODE')
+    end
+
+    context 'when existing sms code is updated' do
+      let(:sms_code) { SmsCode.create!(session: session, sms_code: 'OLD_CODE') }
+      let(:params) { { session: { sms_codes_attributes: [{ id: sms_code.id, sms_code: 'NEW_CODE' }] } } }
+
+      it 'updates it' do
+        expect(sms_code.reload.sms_code).to eq 'NEW_CODE'
+      end
     end
   end
 

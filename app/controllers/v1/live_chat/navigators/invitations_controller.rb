@@ -51,7 +51,7 @@ class V1::LiveChat::Navigators::InvitationsController < V1Controller
   private
 
   def navigator_invitation_params
-    params.require(:navigator_invitation).permit(:intervention_id, emails: [])
+    params.expect(navigator_invitation: [:intervention_id, { emails: [] }])
   end
 
   def email

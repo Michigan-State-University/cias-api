@@ -56,4 +56,10 @@ RSpec.describe 'POST /v1/user_sessions', type: :request do
   it_behaves_like 'paused intervention'
 
   it_behaves_like 'closed session'
+
+  context 'when user_session is a string instead of a hash' do
+    let(:params) { { user_session: session.id } }
+
+    it_behaves_like 'rejects malformed params', -> { UserSession.count }
+  end
 end

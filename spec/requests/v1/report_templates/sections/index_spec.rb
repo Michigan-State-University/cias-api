@@ -77,4 +77,13 @@ RSpec.describe 'GET /v1/report_templates/:report_template_id/sections', type: :r
       expect(json_response['data']).to be_empty
     end
   end
+
+  context 'when a researcher reads the sections of a template that is not theirs' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    it 'does not return them' do
+      expect(response).to have_http_status(:forbidden)
+      expect(response.body).not_to include(report_template_section1.id)
+    end
+  end
 end

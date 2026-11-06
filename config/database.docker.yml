@@ -12,4 +12,4 @@ development:
 
 test:
   <<: *default
-  database: cias_test
+  database: cias_test<%= ENV['TEST_ENV_NUMBER'] %>

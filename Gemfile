@@ -5,9 +5,9 @@ source 'https://rubygems.org'
 ruby '3.3.8'
 gem 'bundler', '~> 2.4.22'
 
-gem 'rails', '~> 7.2.0'
+gem 'rails', '~> 8.1.4'
 gem 'pg', '~> 1.2'
-gem 'puma', '~> 7.2', '>= 7.2.1'
+gem 'puma', '~> 8.0', '>= 8.0.2'
 
 gem 'activejob-cancel'
 gem 'activerecord_json_validator'
@@ -17,7 +17,7 @@ gem 'active_model_serializers', '~> 0.10.16'
 gem 'bootsnap', '>= 1.9.3', require: false
 gem 'cancancan'
 gem 'config'
-gem 'connection_pool'
+gem 'csv'
 gem 'dentaku'
 gem 'devise', '~> 5.0'
 gem 'devise-argon2'
@@ -28,24 +28,18 @@ gem 'devise_token_auth',
     ref: 'bcdc3a5964086b6a08f3f98eb878a107af1334da'
 gem 'faker', require: false
 gem 'jsonapi-serializer'
-gem 'jmespath', '>= 1.6.1'
 gem 'google-cloud-text_to_speech'
 gem 'google-cloud-translate-v2'
 gem 'google-protobuf', '~> 3.25.5'
-gem 'hiredis'
 gem 'loofah', '>= 2.19.1'
-gem 'loofah-activerecord', '~> 2.0'
 gem 'metainspector', '~> 5.5'
 gem 'nokogiri', '>= 1.18.9'
 gem 'oj'
-gem 'pagy', '~> 4.0'
+gem 'pagy', '~> 43.6'
 gem 'phonelib'
-gem 'postgresql_cursor'
-gem 'pry-rails'
 gem 'rack-cors'
-gem 'redis'
-gem 'kredis', '~> 1.5'
-gem 'sidekiq', '>= 7.2.4'
+gem 'redis', '~> 5.4'
+gem 'sidekiq', '>= 7.3.3'
 gem 'sql_query'
 gem 'twilio-ruby', '~> 7.9.1'
 gem 'wicked_pdf'
@@ -68,7 +62,7 @@ gem 'paranoia'
 gem 'sentry-ruby', '~> 5.5'
 gem 'sentry-rails', '~> 5.28'
 gem 'jwt', '~> 3.1'
-gem 'aasm', '~> 5.1', '>= 5.1.1'
+gem 'aasm', '~> 5.5'
 # for faraday multipart
 gem 'faraday-multipart'
 # Security pin (bundler-audit): stay on the 0.5 line, which patches all
@@ -79,11 +73,13 @@ gem 'uri', '>= 1.1.1'
 
 group :development, :test do
   gem 'bundler-audit'
-  gem 'bullet'
+  gem 'bullet', '~> 8.1'
   gem 'dotenv-rails'
   gem 'fasterer', require: false
   gem 'overcommit', require: false
+  gem 'parallel_tests'
   gem 'pry-byebug'
+  gem 'pry-rails'
   gem 'rack-test'
   gem 'rubocop', '>= 1.22.3', require: false
   gem 'rubocop-performance', require: false
@@ -94,10 +90,10 @@ end
 
 group :development do
   gem 'bump'
-  gem 'guard-rake', require: false
-  gem 'guard-rspec', require: false
   gem 'letter_opener_web'
-  gem 'license_finder'
+  # license_finder removed: it caps `rubyzip` at < 3, which blocks the fix for
+  # CVE-2026-85396 (path traversal, High). It was never configured or invoked
+  # here. Re-add once upstream supports rubyzip 3.x.
   gem 'pgsync'
   gem 'wkhtmltopdf-binary'
 end
@@ -115,7 +111,6 @@ group :test do
   gem 'test-prof'
   gem 'timecop'
   gem 'database_cleaner-active_record'
-  gem 'action-cable-testing', '~> 0.6.1'
   gem 'rspec-benchmark'
   gem 'benchmark-ips'
   gem 'webmock'
