@@ -83,12 +83,31 @@ describe User, type: :model do
 
   describe '#time_zone' do
     %w[America/New_York Europe/Warsaw Europe/Vienna America/Chicago America/Denver
-       America/Detroit].each do |time_zone|
+       America/Detroit Asia/Ho_Chi_Minh Asia/Kolkata Europe/Kyiv Pacific/Auckland UTC].each do |time_zone|
       context "time zone is #{time_zone}" do
         let(:user) { build_stubbed(:user, :confirmed, :researcher, time_zone: time_zone) }
 
         it 'user is valid with time zone' do
           expect(user).to be_valid
+        end
+      end
+    end
+
+    context 'time zone is the alias Asia/Saigon' do
+      let(:user) { build_stubbed(:user, :confirmed, :researcher, time_zone: 'Asia/Saigon') }
+
+      it 'user is valid with time zone' do
+        expect(user).to be_valid
+      end
+    end
+
+    ['Not/AZone', '', 'GMT+7', 'UTC+07:00', '+07:00'].each do |time_zone|
+      context "time zone is #{time_zone.inspect}" do
+        let(:user) { build_stubbed(:user, :confirmed, :researcher, time_zone: time_zone) }
+
+        it 'user is invalid because of the time zone' do
+          user.valid?
+          expect(user.errors[:time_zone]).to include('is not included in the list')
         end
       end
     end
