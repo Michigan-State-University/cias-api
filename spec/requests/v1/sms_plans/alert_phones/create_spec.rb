@@ -9,9 +9,9 @@ RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/alert_phones/', type: :request d
   let(:params) do
     {
       phone: {
-        iso: 'pl',
+        iso: 'PL',
         prefix: '+48',
-        number: '765876987'
+        number: '512345678'
       }
     }
   end
@@ -54,7 +54,7 @@ RSpec.describe 'POST /v1/sms_plans/:sms_plan_id/alert_phones/', type: :request d
 
     context 'when phone contains non-permitted attributes' do
       let(:other_user) { create(:user, :confirmed, :participant) }
-      let(:params) { { phone: { iso: 'pl', prefix: '+48', number: '765876987', user_id: other_user.id, confirmed: false } } }
+      let(:params) { { phone: { iso: 'PL', prefix: '+48', number: '512345678', user_id: other_user.id, confirmed: false } } }
 
       it 'ignores them' do
         request

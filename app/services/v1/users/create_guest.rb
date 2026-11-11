@@ -15,7 +15,7 @@ class V1::Users::CreateGuest
 
     if phone_number
       number_prefix = Phonelib.parse(phone_number).country_code
-      national_number = Phonelib.parse(phone_number).national(false)
+      national_number = Phonelib.parse(phone_number).raw_national
       iso = Phonelib.parse(phone_number).country
 
       Phone.new(prefix: "+#{number_prefix}", number: national_number, iso: iso, user: new_user).save!

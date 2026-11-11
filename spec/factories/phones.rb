@@ -3,9 +3,9 @@
 FactoryBot.define do
   factory :phone do
     user
-    iso { 'PL' }
-    prefix { '+48' }
-    sequence(:number) { |s| "11122233#{s}" }
+    iso { 'US' }
+    prefix { '+1' }
+    sequence(:number) { |s| "20155501#{format('%02d', s % 100)}" }
     confirmation_code { '11111' }
     trait :unconfirmed do
       confirmed { false }
