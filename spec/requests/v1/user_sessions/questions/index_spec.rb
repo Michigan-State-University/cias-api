@@ -58,6 +58,14 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       it 'set session as finished' do
         expect(user_session.reload.finished_at).not_to be_nil
       end
+
+      context 'in fixed order intervention' do
+        let!(:intervention) { create(:fixed_order_intervention, user_id: researcher.id, status: status, license_type: 'unlimited') }
+
+        it 'skips the finish screen and returns first question of next session' do
+          expect(json_response['data']['id']).to eq(question2.id)
+        end
+      end
     end
 
     context 'tlfb logic' do
