@@ -45,7 +45,7 @@ class V1::Sms::Replay
   end
 
   def keyword?(keywords)
-    word = message.gsub(/\A[[:punct:][:space:]]+|[[:punct:][:space:]]+\z/, '')
+    word = message.sub(/\A[[:punct:][:space:]]++/, '').sub(/[[:punct:][:space:]]++\z/, '')
     keywords.any? { |keyword| word.casecmp?(keyword) }
   end
 
