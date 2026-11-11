@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
-  enable_extension "plpgsql"
   enable_extension "uuid-ossp"
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -672,8 +672,48 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
     t.uuid "navigator_setup_id"
     t.string "communication_way"
     t.string "number_bidx"
+    t.boolean "sms_eligible", default: false, null: false
     t.index ["number_bidx"], name: "index_phones_on_number_bidx"
     t.index ["user_id"], name: "index_phones_on_user_id"
+  end
+
+  create_table "predefined_participants_sms_campaigns", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "intervention_id", null: false
+    t.uuid "author_id"
+    t.uuid "parent_campaign_id"
+    t.string "kind", null: false
+    t.string "status", default: "scheduled", null: false
+    t.text "body", null: false
+    t.datetime "scheduled_at", null: false
+    t.integer "days_after"
+    t.datetime "sent_at"
+    t.integer "recipients_count"
+    t.integer "accepted_count", default: 0, null: false
+    t.integer "failed_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_pp_sms_campaigns_on_author_id"
+    t.index ["intervention_id", "created_at"], name: "index_pp_sms_campaigns_on_intervention_id_and_created_at"
+    t.index ["intervention_id", "kind"], name: "index_pp_sms_campaigns_one_in_flight_per_kind", unique: true, where: "(((status)::text = ANY (ARRAY[('scheduled'::character varying)::text, ('sending'::character varying)::text])) AND ((kind)::text <> 'scheduled_reminder'::text))"
+    t.index ["parent_campaign_id"], name: "index_pp_sms_campaigns_on_parent_campaign_id", unique: true, where: "(parent_campaign_id IS NOT NULL)"
+    t.index ["status", "scheduled_at"], name: "index_pp_sms_campaigns_on_status_and_scheduled_at"
+  end
+
+  create_table "predefined_participants_sms_deliveries", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "campaign_id", null: false
+    t.uuid "predefined_user_parameter_id", null: false
+    t.bigint "message_id"
+    t.text "body", null: false
+    t.string "status", default: "pending", null: false
+    t.string "error_code"
+    t.datetime "sent_at"
+    t.integer "resend_count", default: 0, null: false
+    t.datetime "last_resent_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["campaign_id", "predefined_user_parameter_id"], name: "index_pp_sms_deliveries_on_campaign_id_and_participant_id", unique: true
+    t.index ["message_id"], name: "index_pp_sms_deliveries_on_message_id"
+    t.index ["predefined_user_parameter_id"], name: "index_pp_sms_deliveries_on_predefined_user_parameter_id"
   end
 
   create_table "predefined_user_parameters", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -689,8 +729,12 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
     t.boolean "sms_notification", default: false
     t.boolean "email_notification", default: false
     t.datetime "email_invitation_sent_at", precision: nil
+    t.datetime "first_opened_at"
+    t.datetime "last_reminder_sent_at"
+    t.datetime "last_resent_at"
     t.index ["health_clinic_id"], name: "index_predefined_user_parameters_on_health_clinic_id"
     t.index ["intervention_id"], name: "index_predefined_user_parameters_on_intervention_id"
+    t.index ["slug"], name: "index_predefined_user_parameters_on_slug", unique: true
     t.index ["user_id"], name: "index_predefined_user_parameters_on_user_id"
   end
 
@@ -860,20 +904,30 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
     t.index ["sms_code"], name: "unique_active_sms_codes", unique: true, where: "(active IS TRUE)"
   end
 
+  create_table "sms_inbound_receipts", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.string "message_sid", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["created_at"], name: "index_sms_inbound_receipts_on_created_at"
+    t.index ["message_sid"], name: "index_sms_inbound_receipts_on_message_sid", unique: true
+  end
+
   create_table "sms_links", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.string "url", null: false
     t.string "link_type", default: "website", null: false
-    t.uuid "session_id", null: false
-    t.uuid "sms_plan_id", null: false
+    t.uuid "session_id"
+    t.uuid "sms_plan_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "variable", null: false
     t.uuid "variant_id"
+    t.uuid "campaign_id"
+    t.index ["campaign_id", "variable"], name: "index_sms_links_on_campaign_id_and_variable", unique: true, where: "(campaign_id IS NOT NULL)"
     t.index ["session_id"], name: "index_sms_links_on_session_id"
     t.index ["sms_plan_id", "variable"], name: "index_sms_links_on_sms_plan_id_and_variable", unique: true, where: "(variant_id IS NULL)"
     t.index ["sms_plan_id"], name: "index_sms_links_on_sms_plan_id"
     t.index ["variant_id", "variable"], name: "index_sms_links_on_variant_id_and_variable", unique: true, where: "(variant_id IS NOT NULL)"
     t.index ["variant_id"], name: "index_sms_links_on_variant_id"
+    t.check_constraint "num_nonnulls(campaign_id, sms_plan_id) = 1", name: "sms_links_belong_to_plan_or_campaign"
   end
 
   create_table "sms_links_users", force: :cascade do |t|
@@ -883,9 +937,16 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
     t.string "entered_timestamps", default: [], null: false, array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_sms_links_users_on_slug", unique: true
     t.index ["sms_link_id", "user_id"], name: "index_sms_links_users_on_sms_link_id_and_user_id", unique: true
     t.index ["sms_link_id"], name: "index_sms_links_users_on_sms_link_id"
     t.index ["user_id"], name: "index_sms_links_users_on_user_id"
+  end
+
+  create_table "sms_opt_outs", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.datetime "opted_out_at", null: false
+    t.index ["user_id"], name: "index_sms_opt_outs_on_user_id", unique: true
   end
 
   create_table "sms_plan_variants", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
@@ -1198,6 +1259,12 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
   add_foreign_key "live_chat_summoning_users", "users"
   add_foreign_key "messages", "questions"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
+  add_foreign_key "predefined_participants_sms_campaigns", "interventions"
+  add_foreign_key "predefined_participants_sms_campaigns", "predefined_participants_sms_campaigns", column: "parent_campaign_id"
+  add_foreign_key "predefined_participants_sms_campaigns", "users", column: "author_id", on_delete: :nullify
+  add_foreign_key "predefined_participants_sms_deliveries", "messages", on_delete: :nullify
+  add_foreign_key "predefined_participants_sms_deliveries", "predefined_participants_sms_campaigns", column: "campaign_id"
+  add_foreign_key "predefined_participants_sms_deliveries", "predefined_user_parameters"
   add_foreign_key "predefined_user_parameters", "health_clinics"
   add_foreign_key "predefined_user_parameters", "interventions"
   add_foreign_key "predefined_user_parameters", "users"
@@ -1212,11 +1279,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_09_22_090000) do
   add_foreign_key "sms_campaign_events", "user_sessions"
   add_foreign_key "sms_codes", "health_clinics"
   add_foreign_key "sms_codes", "sessions"
+  add_foreign_key "sms_links", "predefined_participants_sms_campaigns", column: "campaign_id"
   add_foreign_key "sms_links", "sessions"
   add_foreign_key "sms_links", "sms_plan_variants", column: "variant_id"
   add_foreign_key "sms_links", "sms_plans"
   add_foreign_key "sms_links_users", "sms_links"
   add_foreign_key "sms_links_users", "users"
+  add_foreign_key "sms_opt_outs", "users", on_delete: :cascade
   add_foreign_key "stars", "interventions"
   add_foreign_key "stars", "users"
   add_foreign_key "tag_interventions", "interventions"
