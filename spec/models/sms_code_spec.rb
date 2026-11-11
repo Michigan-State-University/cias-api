@@ -77,6 +77,14 @@ RSpec.describe SmsCode, type: :model do
         end
       end
 
+      %w[STOPALL UNSUBSCRIBE CANCEL QUIT OPTOUT REVOKE UNSTOP HELP].each do |keyword|
+        it "is invalid with the reserved keyword #{keyword}" do
+          sms_code.sms_code = keyword.downcase
+          expect(sms_code).not_to be_valid
+          expect(sms_code.errors[:sms_code]).to be_present
+        end
+      end
+
       context 'when sms_code is valid' do
         it 'is valid with allowed code' do
           sms_code.sms_code = 'VALID_CODE'
@@ -89,6 +97,31 @@ RSpec.describe SmsCode, type: :model do
           sms_code.sms_code = 'STARTING'
           expect(sms_code).to be_valid
         end
+      end
+    end
+
+    context 'with a record stored before the keyword list was widened' do
+      let(:sms_code) do
+        create(:sms_code, active: true).tap { |code| code.update_column(:sms_code, 'CANCEL') }
+      end
+
+      it 'can still be saved when neither the code nor the active flag changes' do
+        expect(sms_code.update(updated_at: Time.current)).to be(true)
+      end
+
+      it 'can still be deactivated' do
+        expect(sms_code.update(active: false)).to be(true)
+      end
+
+      it 'cannot be reactivated while it holds a reserved keyword' do
+        sms_code.update(active: false)
+        expect(sms_code.reload.update(active: true)).to be(false)
+        expect(sms_code.errors[:sms_code]).to be_present
+      end
+
+      it 'cannot be changed to another reserved keyword' do
+        expect(sms_code.update(sms_code: 'QUIT')).to be(false)
+        expect(sms_code.errors[:sms_code]).to be_present
       end
     end
 

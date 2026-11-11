@@ -9,4 +9,9 @@ Rails.application.config.filter_parameters += %i[
   number
   body
   test_link_token
+  slug token url phone
 ]
+
+twilio_phone_and_location_params = /\A(From|To)(?:[A-Z]|\z)/
+
+Rails.application.config.filter_parameters << twilio_phone_and_location_params

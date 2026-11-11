@@ -16,15 +16,13 @@ class V1::Sms::Replay
     @to_number = to
     @message = body.to_s.strip
     @number_prefix = Phonelib.parse(from).country_code
-    @national_number = Phonelib.parse(from).national(false)
+    @national_number = Phonelib.parse(from).raw_national
   end
 
   def call
-    # Handle case with SMS stop signal
-    if message.downcase.match?('stop')
-      delete_messaged_for(from_number)
-      return response_message
-    end
+    return handle_stop if keyword?(SmsOptOut::OPT_OUT_KEYWORDS)
+    return handle_start if keyword?(SmsOptOut::OPT_IN_KEYWORDS)
+    return handle_help if command?('help')
 
     # Handle incoming message
     if message.length >= SmsCode::SMS_CODE_MIN_LENGTH
@@ -40,6 +38,47 @@ class V1::Sms::Replay
 
   def response_message
     @response_message ||= Twilio::TwiML::MessagingResponse.new
+  end
+
+  def command?(keyword)
+    message.casecmp?(keyword)
+  end
+
+  def keyword?(keywords)
+    word = message.gsub(/\A[[:punct:][:space:]]+|[[:punct:][:space:]]+\z/, '')
+    keywords.any? { |keyword| word.casecmp?(keyword) }
+  end
+
+  def handle_stop
+    record_opt_out
+    delete_messaged_for(from_number)
+    response_message
+  end
+
+  def handle_start
+    ::SmsOptOut.where(user_id: users_for_number.select(:id)).delete_all
+    response_message
+  end
+
+  def handle_help
+    response_message.message(body: I18n.with_locale(help_locale) { I18n.t('sms.help') })
+    response_message
+  end
+
+  def help_locale
+    users_for_number.includes(predefined_user_parameter: { intervention: :google_language }).filter_map do |user|
+      user.predefined_user_parameter&.intervention&.google_language&.language_code
+    end.first || I18n.default_locale
+  end
+
+  def users_for_number
+    User.left_joins(:phone).where(phone: { prefix: "+#{@number_prefix}", number: @national_number })
+  end
+
+  def record_opt_out
+    users_for_number.pluck(:id).each do |user_id|
+      ::SmsOptOut.create_or_find_by!(user_id: user_id) { |opt_out| opt_out.opted_out_at = Time.current }
+    end
   end
 
   def translate_with_intervention_locale(session, key)

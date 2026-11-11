@@ -2,14 +2,15 @@
 
 class SmsCode < ApplicationRecord
   SMS_CODE_MIN_LENGTH = 4
-  TWILIO_SPECIAL_CODES = %w[STOP START].freeze
+  TWILIO_SPECIAL_CODES = [*SmsOptOut::OPT_OUT_KEYWORDS, *SmsOptOut::OPT_IN_KEYWORDS, 'HELP'].freeze
 
   has_paper_trail
   belongs_to :session, inverse_of: :sms_codes
   belongs_to :health_clinic, inverse_of: :sms_codes, optional: true
 
   validates :sms_code, uniqueness: true, presence: true, length: { minimum: SMS_CODE_MIN_LENGTH }, if: -> { active }
-  validate :sms_code_cannot_be_protected_word, if: -> { active }
+  validate :sms_code_cannot_be_protected_word,
+           if: -> { active && (will_save_change_to_sms_code? || will_save_change_to_active?) }
 
   def sms_code_cannot_be_protected_word
     return if sms_code.blank?
