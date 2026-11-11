@@ -74,6 +74,8 @@ module ExceptionHandler
     rescue_from ComplexException do |exc|
       Sentry.capture_exception(exc)
       message = { message: exc.message, details: exc.additional_information }
+      retry_after = exc.additional_information[:retry_after] if exc.additional_information.is_a?(Hash)
+      response.set_header('Retry-After', retry_after.to_s) if retry_after
 
       render json: message, status: exc.status_code || :unprocessable_content
     end
