@@ -63,12 +63,12 @@ RSpec.describe Sentry do
           'To' => '+15555550100', 'Body' => 'yes', 'MessageSid' => 'SM123' }
       end
 
-      it 'masks the sender and the message' do
-        expect(filtered.slice('From', 'FromCity', 'FromState', 'FromZip', 'FromCountry', 'Body').values).to all(eq('[FILTERED]'))
+      it 'masks the sender, the recipient number and the message' do
+        expect(filtered.slice('From', 'FromCity', 'FromState', 'FromZip', 'FromCountry', 'To', 'Body').values).to all(eq('[FILTERED]'))
       end
 
-      it 'keeps the CIAS number and the message id' do
-        expect(filtered.slice('To', 'MessageSid')).to eq('To' => '+15555550100', 'MessageSid' => 'SM123')
+      it 'keeps the message id' do
+        expect(filtered.slice('MessageSid')).to eq('MessageSid' => 'SM123')
       end
     end
 
