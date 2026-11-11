@@ -251,4 +251,90 @@ RSpec.describe V1::Intervention::PredefinedParticipants::BulkImportService do
       expect(call).to include(total: 0, participants_created: 0, failed: 0)
     end
   end
+
+  describe 'phone handling' do
+    let!(:researcher) { create(:user, :confirmed, :researcher) }
+    let!(:intervention) { create(:intervention, user_id: researcher.id) }
+
+    before { allow(Sentry).to receive(:capture_exception) }
+
+    def entry(email, phone)
+      { 'attributes' => { 'first_name' => 'Alice', 'last_name' => 'Smith', 'email' => email, 'phone_attributes' => phone },
+        'variable_answers' => {} }
+    end
+
+    describe 'one syntactically invalid number among valid rows' do
+      subject(:result) { described_class.call(researcher, intervention, payload) }
+
+      let(:payload) do
+        [entry('us@example.test', 'iso' => 'US', 'prefix' => '+1', 'number' => '(201) 555-0123'),
+         entry('bad@example.test', 'iso' => 'PL', 'prefix' => '+48', 'number' => '111222331'),
+         entry('pl@example.test', 'iso' => 'PL', 'prefix' => '+48', 'number' => '512 345 678')]
+      end
+
+      it 'counts exactly the invalid row as failed' do
+        expect(result).to include(total: 3, participants_created: 2, failed: 1)
+      end
+
+      it 'leaves no orphaned User for the failed row' do
+        result
+        expect(User.exists?(email: 'bad@example.test')).to be(false)
+      end
+
+      it 'creates only the valid users and parameters' do
+        expect { result }.to change(User, :count).by(2).and change(PredefinedUserParameter, :count).by(2)
+      end
+
+      it 'imports the other rows with normalized phones' do
+        result
+        expect(User.find_by(email: 'us@example.test').phone.slice(:iso, :prefix, :number)).to eq('iso' => 'US', 'prefix' => '+1', 'number' => '2015550123')
+        expect(User.find_by(email: 'pl@example.test').phone.slice(:iso, :prefix, :number)).to eq('iso' => 'PL', 'prefix' => '+48', 'number' => '512345678')
+      end
+    end
+
+    describe 'GB and landline rows import normally' do
+      let(:payload) do
+        [entry('gb@example.test', 'iso' => 'GB', 'prefix' => '+44', 'number' => '7400123456'),
+         entry('line@example.test', 'iso' => 'PL', 'prefix' => '+48', 'number' => '123456789')]
+      end
+
+      it 'imports both with no failures' do
+        expect(described_class.call(researcher, intervention, payload)).to include(participants_created: 2, failed: 0)
+      end
+    end
+
+    describe 'a participant imported with a formatted number is found by V1::Sms::Replay' do
+      let(:sms_session) { create(:sms_session, intervention: intervention) }
+      let(:from) { '+12015550123' }
+      let(:to) { '+12015550130' }
+
+      before { allow(Sidekiq::ScheduledSet).to receive(:new).and_return([]) }
+
+      def sms_user_session_for(user)
+        user_intervention = create(:user_intervention, user: user, intervention: intervention)
+        create(:sms_user_session, user: user, session: sms_session, user_intervention: user_intervention)
+      end
+
+      def import_with(number)
+        described_class.call(researcher, intervention, [entry('pdp@example.test', 'iso' => 'US', 'prefix' => '+1', 'number' => number)])
+        User.find_by!(email: 'pdp@example.test')
+      end
+
+      it 'a participant stored in the Phonelib split is found' do
+        user = import_with('2015550123')
+        user_session = sms_user_session_for(user)
+        V1::Sms::Replay.call(from, to, 'STOP')
+        expect(user_session.reload.finished_at).to be_present
+      end
+
+      ['(201) 555-0123', '201-555-0123', '201 555 0123'].each do |raw|
+        it "finds a participant imported as #{raw.inspect}" do
+          user = import_with(raw)
+          user_session = sms_user_session_for(user)
+          V1::Sms::Replay.call(from, to, 'STOP')
+          expect(user_session.reload.finished_at).to be_present
+        end
+      end
+    end
+  end
 end
