@@ -30,6 +30,8 @@ class Intervention < ApplicationRecord
   has_many :notifications, as: :notifiable, dependent: :destroy
   has_many :live_chat_summoning_users, class_name: 'LiveChat::SummoningUser', dependent: :destroy
   has_many :predefined_user_parameters, dependent: :destroy
+  has_many :sms_campaigns, class_name: 'PredefinedParticipants::SmsCampaign', inverse_of: :intervention,
+                           dependent: :destroy
   has_many :predefined_users, through: :predefined_user_parameters, source: :user
   has_many :tag_interventions, dependent: :destroy
   has_many :tags, through: :tag_interventions
