@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class V1::Interventions::PredefinedParticipantsController < V1Controller
+  include ::PredefinedParticipants::InterventionGate
+
   before_action :verify_access, except: %i[verify ra_session]
+  before_action :require_current_editor, except: %i[index show verify ra_session]
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def index
@@ -15,16 +18,12 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def create
-    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
-
     predefined_user = V1::Intervention::PredefinedParticipants::CreateService.call(intervention_load, predefined_user_parameters)
 
     render json: serialized_response(predefined_user), status: :created
   end
 
   def bulk_create
-    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
-
     participant_params_list = predefined_users_parameters[:participants] || []
 
     if participant_params_list.empty?
@@ -57,8 +56,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def update
-    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
-
     predefined_user = V1::Intervention::PredefinedParticipants::UpdateService.call(intervention_load, predefined_participant, predefined_user_parameters)
 
     render json: serialized_response(predefined_user)
@@ -74,8 +71,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def destroy
-    return head :forbidden unless intervention_load.ability_to_update_for?(current_v1_user)
-
     predefined_participant.update!(active: false)
 
     render status: :no_content
@@ -98,7 +93,9 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def send_sms_invitation
-    V1::Intervention::PredefinedParticipants::SendSmsInvitation.call(predefined_participant)
+    V1::PredefinedParticipants::ResendService.call(predefined_participant,
+                                                   intervention: intervention_load,
+                                                   min_interval: resend_min_interval)
     render json: predefined_participant.predefined_user_parameter.reload.slice(:sms_invitation_sent_at), status: :ok
   end
 
@@ -108,6 +105,10 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   private
+
+  def resend_min_interval
+    Settings.sms_campaigns.resend_min_interval_minutes.minutes
+  end
 
   def access_token_to_response!
     response.headers.merge!(predefined_user_parameter.user.create_new_auth_token)
@@ -176,24 +177,16 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     )
   end
 
-  def intervention_load
-    @intervention_load ||= Intervention.accessible_by(current_ability).find(intervention_id)
-  end
-
   def predefined_participants
     @predefined_participants ||= intervention_load.predefined_users.includes(:predefined_user_parameter, :phone)
   end
 
   def predefined_participant
-    @predefined_participant ||= predefined_participants.find(params[:id])
+    @predefined_participant ||= intervention_load.predefined_users.find(params[:id])
   end
 
   def predefined_user_parameter
     @predefined_user_parameter ||= PredefinedUserParameter.find_by!(slug: slug)
-  end
-
-  def intervention_id
-    params[:intervention_id]
   end
 
   def slug
@@ -213,11 +206,6 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       lang: intervention.language_code,
       already_completed: result.already_completed
     }
-  end
-
-  def verify_access
-    authorize! :update, Intervention
-    authorize! :update, intervention_load
   end
 
   def check_intervention_status
