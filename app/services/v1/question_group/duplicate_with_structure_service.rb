@@ -69,8 +69,9 @@ class V1::QuestionGroup::DuplicateWithStructureService
     return unless question.type.in?(Question::UNIQUE_IN_SESSION)
 
     raise ArgumentError, I18n.t('duplication_with_structure.uniqueness_violation') if uniq_question_already_in_session?(question, session)
-    raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation') unless validate_hfhs_access_and_uniqueness?(question,
-                                                                                                                                    session.intervention)
+    return if validate_hfhs_access_and_uniqueness?(question, session.intervention)
+
+    raise ArgumentError, I18n.t('duplication_with_structure.hfhs.uniqueness_violation', site_name: Ehr::Settings.site_name)
   end
 
   def uniq_question_already_in_session?(question, session)

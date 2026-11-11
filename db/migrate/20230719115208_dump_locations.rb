@@ -1,5 +1,5 @@
 class DumpLocations < ActiveRecord::Migration[6.1]
-  def change
-    Rake::Task['one_time_use:dump_clinic_locations'].invoke unless ClinicLocation.any?
-  end
+  # Used to load one site's clinic locations; site data no longer ships with the code. Kept empty so the
+  # version stays in the history of databases that already ran it.
+  def change; end
 end

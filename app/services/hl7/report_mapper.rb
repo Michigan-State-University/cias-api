@@ -6,12 +6,10 @@ class Hl7::ReportMapper < Hl7::BaseMapper
 
   SECOND_SEGMENT_TYPE = 'TXA' # Transcription Document Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/TXA
   DOCUMENT_COMPLETION_STATUS = 'AU' #	Authenticated -> https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0271
-  REPORT_TYPE = 'DASST-D' # provided by HFHS
   DOCUMENT_AVAILABILITY_STATUS = 'AV' # Available for patient care ->https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0273
 
   THIRD_SEGMENT_TYPE = 'OBX' # Observation/Result -> https://hl7-definition.caristix.com/v2/HL7v2.6/Segments/OBX
   OBX_VALUE_TYPE = 'ED' # Encapsulated Data -> https://hl7-definition.caristix.com/v2/HL7v2.6/Tables/0125
-  OBSERVATION_VALUE = 'EpicWBS^PDF^Base64' # -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/OBX
 
   def self.call(generated_report_id, user_session_id)
     new(generated_report_id, user_session_id).call
@@ -25,14 +23,24 @@ class Hl7::ReportMapper < Hl7::BaseMapper
   def call
     %W[
       #{FIRST_SEGMENT_TYPE}||#{PATIENT_CLASS}|||||||||||||||||#{visit_id}
-      #{SECOND_SEGMENT_TYPE}||#{REPORT_TYPE}||#{finish_date}||||||||#{hfhs_patient_id}|||||#{DOCUMENT_COMPLETION_STATUS}||#{DOCUMENT_AVAILABILITY_STATUS}
-      #{THIRD_SEGMENT_TYPE}|1|#{OBX_VALUE_TYPE}|||#{OBSERVATION_VALUE}^#{file_base64}
+      #{SECOND_SEGMENT_TYPE}||#{document_type}||#{finish_date}||||||||#{hfhs_patient_id}|||||#{DOCUMENT_COMPLETION_STATUS}||#{DOCUMENT_AVAILABILITY_STATUS}
+      #{THIRD_SEGMENT_TYPE}|1|#{OBX_VALUE_TYPE}|||#{observation_value_prefix}^#{file_base64}
     ]
   end
 
   attr_reader :report
 
   private
+
+  # TXA-2, assigned by the receiving site -> https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/TXA.2
+  def document_type
+    Ehr::Settings.hl7_document_type
+  end
+
+  # OBX-5 prefix before the base64 PDF, assigned by the receiving site -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/OBX
+  def observation_value_prefix
+    Ehr::Settings.hl7_observation_value_prefix
+  end
 
   def visit_id
     user_session.user.hfhs_patient_detail.visit_id

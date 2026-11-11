@@ -5,6 +5,8 @@ require 'rails_helper'
 describe Hl7::UserSessionMapper do
   subject { described_class.call(user_session.id) }
 
+  include_context 'with HL7 settings configured'
+
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:session) { create(:session) }
   let!(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }

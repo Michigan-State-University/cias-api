@@ -363,8 +363,9 @@ class Intervention::Csv::Harvester
     return if patient_details.blank?
 
     attrs = question.rename_attrs(attrs)
+    prefix = Ehr::Settings.csv_prefix
     attrs.each_with_index do |column, index|
-      var_index = header.index("henry_ford_health.#{column}")
+      var_index = header.index("#{prefix}.#{column}")
       next if var_index.nil?
 
       rows[row_index][var_index] = patient_details[index]

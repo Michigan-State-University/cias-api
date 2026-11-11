@@ -7,6 +7,8 @@ class Hfhs::SendAnswersJob < ApplicationJob
     user_session = UserSession.find_by(id: user_session_id)
     return if user_session.nil? || test_run?(user_session) || unverified_patient?(user_session)
 
+    Ehr::Settings.ensure_hl7_values!
+
     api = Api::Hfhs.new
     api.send_answers(user_session_id)
     api.send_reports(user_session_id)

@@ -80,7 +80,7 @@ class V1::QuestionGroup::ShareService
 
     return if intervention.hfhs_access
 
-    raise ActiveRecord::ActiveRecordError, (I18n.t 'duplication_with_structure.hfhs.access_violation')
+    raise ActiveRecord::ActiveRecordError, I18n.t('duplication_with_structure.hfhs.access_violation', site_name: Ehr::Settings.site_name)
   end
 
   def question_type_exist_in_session?(question, question_group)

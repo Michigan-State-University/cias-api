@@ -402,5 +402,35 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         end
       end
     end
+
+    context 'when sharing an initial screen into an intervention without EHR access' do
+      let!(:ehr_intervention) { create(:intervention, user: user, hfhs_access: true) }
+      let!(:ehr_session) { create(:session, intervention: ehr_intervention) }
+      let!(:ehr_question_group) { create(:question_group_plain, session: ehr_session, position: 1) }
+      let!(:initial_screen) { create(:question_henry_ford_initial_screen, question_group: ehr_question_group) }
+      let(:params) { { question_group: { question_ids: [initial_screen.id] } } }
+
+      context 'with a configured site name' do
+        include_context 'with environment variables', { 'EHR_SITE_NAME' => 'Henry Ford' }
+
+        it 'rejects the share and names the site in the message' do
+          request
+          expect(response).to have_http_status(:bad_request)
+          expect(json_response['message'])
+            .to eq("You can't duplicate the Henry Ford Initial Screen to an intervention without access to Henry Ford's system")
+          expect(shared_question_group.reload.questions.size).to be(2)
+        end
+      end
+
+      context 'without a configured site name' do
+        include_context 'with environment variables', { 'EHR_SITE_NAME' => '' }
+
+        it 'rejects the share and uses the generic name' do
+          request
+          expect(response).to have_http_status(:bad_request)
+          expect(json_response['message']).to eq("You can't duplicate the EHR Initial Screen to an intervention without access to EHR's system")
+        end
+      end
+    end
   end
 end
