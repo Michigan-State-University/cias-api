@@ -9,7 +9,8 @@ class Hl7::BaseMapper
 
   protected
 
+  # A blank setting falls back to the participant's time zone (in_time_zone('') would raise).
   def report_timezone
-    ENV.fetch('HFH_REPORT_TIMEZONE', nil) || user_session&.user&.time_zone
+    Ehr::Settings.fetch('HL7_REPORT_TIMEZONE', legacy: 'HFH_REPORT_TIMEZONE') || user_session&.user&.time_zone
   end
 end

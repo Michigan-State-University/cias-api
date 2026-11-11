@@ -14,9 +14,9 @@ describe Api::Hfhs::Reports do
   let(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
   let(:user_session) { create(:user_session, user: patient) }
 
+  include_context 'with environment variables', { 'HL7_RECEIVER_URL' => 'https://hfhs.test/data' }
+
   before do
-    # ENDPOINT is baked from ENV at class load; CI ships HFHS_URL empty, so stub it.
-    stub_const('Api::Hfhs::Reports::ENDPOINT', endpoint)
     allow(Api::Hfhs::SslOptions).to receive(:call).and_return(verify: false)
     allow(Hl7::GeneratedReportMapper).to receive(:call).and_return('MSH|test')
   end
@@ -37,7 +37,7 @@ describe Api::Hfhs::Reports do
       it 'warns about the skipped delivery and does not POST' do
         allow(Rails.logger).to receive(:warn)
         subject
-        expect(Rails.logger).to have_received(:warn).with(/no token issued - skipping reports send/)
+        expect(Rails.logger).to have_received(:warn).with("[HL7 receiver] no token issued - skipping reports send for user_session #{user_session.id}")
       end
     end
 
@@ -46,10 +46,29 @@ describe Api::Hfhs::Reports do
         allow(Api::Hfhs::Authentication).to receive(:call).and_return(token_type: 'Bearer', access_token: 'abc')
       end
 
+      context 'when neither receiver URL name is set' do
+        include_context 'with environment variables', { 'HL7_RECEIVER_URL' => nil, 'HFHS_URL' => '' }
+
+        it 'raises naming both settings without POSTing' do
+          expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_RECEIVER_URL (or HFHS_URL) is not set')
+          expect(a_request(:post, /.*/)).not_to have_been_made
+        end
+      end
+
       it 'POSTs each report to the gateway' do
         stub = stub_request(:post, endpoint).to_return(status: 200, body: '')
         subject
         expect(stub).to have_been_requested
+      end
+
+      context 'when only the old HFHS_URL is set' do
+        include_context 'with environment variables', { 'HL7_RECEIVER_URL' => nil, 'HFHS_URL' => 'https://hfhs.test/data' }
+
+        it 'still POSTs to it' do
+          stub = stub_request(:post, endpoint).to_return(status: 200, body: '')
+          subject
+          expect(stub).to have_been_requested
+        end
       end
 
       it 'reports the TLS error and re-raises on handshake failure' do

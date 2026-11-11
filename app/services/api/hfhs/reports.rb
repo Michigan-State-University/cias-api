@@ -3,8 +3,6 @@
 class Api::Hfhs::Reports
   include Api::Hfhs::TlsErrorReporter
 
-  ENDPOINT = ENV.fetch('HFHS_URL')
-
   def self.call(user_session_id)
     new(user_session_id).call
   end
@@ -34,12 +32,16 @@ class Api::Hfhs::Reports
 
   private
 
+  def endpoint
+    Ehr::Settings.fetch!('HL7_RECEIVER_URL', legacy: 'HFHS_URL')
+  end
+
   def generated_reports
     @generated_reports ||= user_session.generated_reports.where(report_for: 'henry_ford_health')
   end
 
   def send_data!(token)
-    connection = Faraday.new ENDPOINT, ssl: Api::Hfhs::SslOptions.call
+    connection = Faraday.new endpoint, ssl: Api::Hfhs::SslOptions.call
 
     response = connection.post do |request|
       request.headers['Content-Type'] = 'application/json'
@@ -47,10 +49,10 @@ class Api::Hfhs::Reports
       request.body = body
     end
 
-    report_delivery_status(ENDPOINT, response.status, label: "report user_session #{user_session.id}")
+    report_delivery_status(endpoint, response.status, label: "report user_session #{user_session.id}")
     response
   rescue Faraday::SSLError => e
-    report_tls_error(e, ENDPOINT)
+    report_tls_error(e, endpoint)
     raise
   end
 

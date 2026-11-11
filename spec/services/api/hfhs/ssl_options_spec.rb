@@ -35,32 +35,40 @@ describe Api::Hfhs::SslOptions do
     { root: root, intermediate: intermediate, leaf: leaf }
   end
 
-  before { allow(ENV).to receive(:fetch).and_call_original }
+  # Each example sets the new names and clears the old ones; the fallback contexts set them the other way round.
+  def self.ssl_settings(verify:, ca_cert:, legacy_verify: nil, legacy_ca_cert: nil)
+    {
+      'HL7_RECEIVER_SSL_VERIFY' => verify, 'HFHS_SSL_VERIFY' => legacy_verify,
+      'HL7_RECEIVER_CA_CERT' => ca_cert, 'HFHS_CA_CERT' => legacy_ca_cert
+    }
+  end
 
-  context 'when HFHS_SSL_VERIFY is off (default)' do
-    before { allow(ENV).to receive(:fetch).with('HFHS_SSL_VERIFY', false).and_return(false) }
+  # The PEMs come from the per-example PKI (a `let`), so the CA cert settings are written in a `before`;
+  # the environment-variables context still restores them, because its keys include both CA cert names.
 
-    it 'returns verify:false with no cert_store' do
-      expect(subject).to eq(verify: false)
+  [nil, '', 'false'].each do |verify|
+    context "when HL7_RECEIVER_SSL_VERIFY is #{verify.inspect} (default off)" do
+      include_context 'with environment variables', ssl_settings(verify: verify, ca_cert: nil)
+
+      it 'returns verify:false with no cert_store' do
+        expect(subject).to eq(verify: false)
+      end
     end
   end
 
-  context 'when HFHS_SSL_VERIFY is on' do
-    before { allow(ENV).to receive(:fetch).with('HFHS_SSL_VERIFY', false).and_return('true') }
-
-    context 'and HFHS_CA_CERT is blank' do
-      before { allow(ENV).to receive(:fetch).with('HFHS_CA_CERT', nil).and_return(nil) }
+  context 'when HL7_RECEIVER_SSL_VERIFY is on' do
+    context 'and HL7_RECEIVER_CA_CERT is blank' do
+      include_context 'with environment variables', ssl_settings(verify: 'true', ca_cert: '')
 
       it 'verifies against the system trust store only' do
         expect(subject).to eq(verify: true)
       end
     end
 
-    context 'and HFHS_CA_CERT carries the root + intermediate' do
-      before do
-        pem = [pki[:root].to_pem, pki[:intermediate].to_pem].join
-        allow(ENV).to receive(:fetch).with('HFHS_CA_CERT', nil).and_return(pem)
-      end
+    context 'and HL7_RECEIVER_CA_CERT carries the root + intermediate' do
+      include_context 'with environment variables', ssl_settings(verify: 'true', ca_cert: nil)
+
+      before { ENV['HL7_RECEIVER_CA_CERT'] = [pki[:root].to_pem, pki[:intermediate].to_pem].join }
 
       it 'keeps verification on and adds a cert_store' do
         expect(subject[:verify]).to be(true)
@@ -80,16 +88,34 @@ describe Api::Hfhs::SslOptions do
       end
     end
 
-    context 'and HFHS_CA_CERT is a single line with escaped newlines' do
-      before do
-        pem = [pki[:root].to_pem, pki[:intermediate].to_pem].join.gsub("\n", '\n')
-        allow(ENV).to receive(:fetch).with('HFHS_CA_CERT', nil).and_return(pem)
-      end
+    context 'and HL7_RECEIVER_CA_CERT is a single line with escaped newlines' do
+      include_context 'with environment variables', ssl_settings(verify: 'true', ca_cert: nil)
+
+      before { ENV['HL7_RECEIVER_CA_CERT'] = [pki[:root].to_pem, pki[:intermediate].to_pem].join.gsub("\n", '\n') }
 
       it 'still builds a working trust store' do
         store = subject[:cert_store]
         expect(store.verify(pki[:leaf], [pki[:intermediate]])).to be(true)
       end
+    end
+  end
+
+  context 'when only the old HFHS_SSL_VERIFY and HFHS_CA_CERT are set' do
+    include_context 'with environment variables', ssl_settings(verify: nil, ca_cert: nil, legacy_verify: 'true')
+
+    before { ENV['HFHS_CA_CERT'] = [pki[:root].to_pem, pki[:intermediate].to_pem].join }
+
+    it 'falls back to them: verification on, with the added certificates' do
+      expect(subject[:verify]).to be(true)
+      expect(subject[:cert_store].verify(pki[:leaf], [pki[:intermediate]])).to be(true)
+    end
+  end
+
+  context 'when HL7_RECEIVER_SSL_VERIFY is off but the old HFHS_SSL_VERIFY is on' do
+    include_context 'with environment variables', ssl_settings(verify: 'false', ca_cert: nil, legacy_verify: 'true')
+
+    it 'follows the new name (the env-only rollback)' do
+      expect(subject).to eq(verify: false)
     end
   end
 end

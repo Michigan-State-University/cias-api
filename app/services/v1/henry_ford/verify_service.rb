@@ -111,7 +111,7 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
 
     appointment_location_id = location.epic_identifier
     location.update!(auxiliary_epic_identifier: location_identifer)
-    Rails.logger.send(:info, "HFHS_IDENTIFIER_LOG test: #{appointment_location_id}, auxiliary: #{location_identifer}")
+    Rails.logger.debug { "[EHR verify] clinic location matched by name: epic_identifier=#{appointment_location_id}, auxiliary=#{location_identifer}" }
 
     location
   end
@@ -175,7 +175,7 @@ class V1::HenryFord::VerifyService # rubocop:disable Metrics/ClassLength
   end
 
   def valid_appointment?(location, location_identifier, parsed_date)
-    if ENV.fetch('HFHS_APPOINTMENTS_FROM_PAST', 0).to_i == 1
+    if Ehr::Settings.fetch('EHR_APPOINTMENTS_FROM_PAST', legacy: 'HFHS_APPOINTMENTS_FROM_PAST').to_i == 1
       available_location?(location, location_identifier)
     else
       available_location?(location, location_identifier) && (parsed_date&.today? || parsed_date&.future?)

@@ -20,7 +20,7 @@ class Hfhs::SendAnswersJob < ApplicationJob
     return false unless user_session.user&.test_run?
 
     Rails.logger.warn(
-      '[Hfhs::SendAnswersJob] skipped HFHS transmission for a test run ' \
+      '[Hfhs::SendAnswersJob] skipped HL7 transmission for a test run ' \
       "user_session_id=#{user_session.id} user_id=#{user_session.user_id}"
     )
     true
@@ -30,7 +30,7 @@ class Hfhs::SendAnswersJob < ApplicationJob
     return false if user_session.user&.hfhs_patient_detail_id?
 
     Rails.logger.warn(
-      '[Hfhs::SendAnswersJob] skipped HFHS transmission for a patient without verified HFHS details ' \
+      '[Hfhs::SendAnswersJob] skipped HL7 transmission for a patient without verified EHR patient details ' \
       "user_session_id=#{user_session.id} user_id=#{user_session.user_id}"
     )
     true

@@ -236,7 +236,7 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
       %w[
         additional_text cat_mh_application_id cat_mh_organization_id cat_mh_pool clear_sensitive_data_scheduled_at
         conversations_present conversations_transcript created_at created_cat_mh_session_count csv current_editor
-        current_narrator exported_data files first_session_language google_language_id has_cat_sessions has_collaborators
+        current_narrator ehr_access exported_data files first_session_language google_language_id has_cat_sessions has_collaborators
         hfhs_access id is_access_revoked language_code language_name license_type live_chat_enabled logo name note
         organization_id original_text published_at quick_exit sensitive_data_state sessions_size shared_to starred status
         type updated_at user user_id

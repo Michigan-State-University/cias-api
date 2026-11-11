@@ -16,7 +16,11 @@ class V1::InterventionSerializer < V1Serializer
   has_many :clinic_locations, serializer: V1::ClinicLocationSerializer
   has_many :tags, serializer: V1::TagSerializer
 
-  cache_options(store: Rails.cache, namespace: 'intervention-serializer', expires_in: 24.hours) # temporary length, might be a subject to change
+  # Bump the namespace whenever the attribute set changes, or cached entries miss the new attributes for up to a day.
+  cache_options(store: Rails.cache, namespace: 'intervention-serializer-v2', expires_in: 24.hours) # temporary length, might be a subject to change
+
+  # Site-neutral name of hfhs_access; both are sent for one release.
+  attribute :ehr_access, &:hfhs_access
 
   attribute :starred do |object, params|
     object.starred_by?(params[:current_user_id])

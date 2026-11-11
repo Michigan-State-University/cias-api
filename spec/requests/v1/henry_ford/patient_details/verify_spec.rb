@@ -2,103 +2,118 @@
 
 require 'rails_helper'
 
-RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
-  let(:user) { create(:user, :confirmed, :participant) }
-  let!(:hfhs_data) { create(:hfhs_patient_detail) }
-  let!(:session) do
-    create(:session,
-           intervention: create(:intervention,
-                                intervention_locations: [create(:intervention_location,
-                                                                clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD',
-                                                                                                          external_name: 'brukowa'))]))
-  end
-
-  let(:headers) { user.create_new_auth_token }
-  let(:params) do
-    {
-      hfhs_patient_data: {
-        first_name: hfhs_data.first_name,
-        last_name: hfhs_data.last_name,
-        dob: hfhs_data.dob,
-        sex: hfhs_data.sex,
-        zip_code: hfhs_data.zip_code,
-        phone_number: hfhs_data.phone_number,
-        phone_type: hfhs_data.phone_type
-      },
-      session_id: session.id
-    }
-  end
-  let(:request) { post v1_henry_ford_verify_path, params: params, headers: headers }
-
-  before do
-    allow_any_instance_of(Date).to receive(:future?).and_return(true)
-
-    allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
-      JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
-    )
-    allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-      JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
-    )
-
-    request
-  end
-
-  context 'when auth' do
-    context 'is invalid' do
-      let(:request) { post v1_health_systems_path }
-
-      it_behaves_like 'unauthorized user'
-    end
-
-    context 'is valid' do
-      it_behaves_like 'authorized user'
-    end
-  end
-
-  context 'when user is registered participant' do
-    it 'returns correct status' do
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'correctly assigned data to user' do
-      expect(user.reload.hfhs_patient_detail.provided_last_name).to eq(hfhs_data.last_name)
-      expect(user.reload.hfhs_patient_detail.provided_first_name).to eq(hfhs_data.first_name)
-      expect(user.reload.hfhs_patient_detail.provided_zip).to eq(hfhs_data.zip_code)
-      expect(user.reload.hfhs_patient_detail.provided_phone_number).to eq(hfhs_data.phone_number)
-      expect(user.reload.hfhs_patient_detail.provided_sex).to eq(hfhs_data.sex)
-    end
-  end
-
-  # sentry-rails copies these instrumented params into breadcrumbs and span data of every traced request
-  context 'when Rails instruments the request' do
-    let(:instrumented_params) { [] }
-    let(:params) { super().deep_merge(hfhs_patient_data: { mrn: '12345678' }) }
-    let(:request) do
-      ActiveSupport::Notifications.subscribed(->(event) { instrumented_params << event.payload[:params] }, 'process_action.action_controller') do
-        post v1_henry_ford_verify_path, params: params, headers: headers
+# /v1/ehr/verify is the site-neutral path of the same action; /v1/henry_ford/verify stays for one release.
+RSpec.describe 'POST /v1/henry_ford/verify and POST /v1/ehr/verify', type: :request do
+  %w[/v1/henry_ford/verify /v1/ehr/verify].each do |path|
+    context "via #{path}" do
+      let(:user) { create(:user, :confirmed, :participant) }
+      let!(:hfhs_data) { create(:hfhs_patient_detail) }
+      let!(:session) do
+        create(:session,
+               intervention: create(:intervention,
+                                    intervention_locations: [create(:intervention_location,
+                                                                    clinic_location: create(:clinic_location, name: 'brukowa', department: 'HTD',
+                                                                                                              external_name: 'brukowa'))]))
       end
-    end
 
-    it 'masks every patient field' do
-      expect(instrumented_params.last['hfhs_patient_data']).to eq(
-        %w[first_name last_name dob sex zip_code phone_number phone_type mrn].index_with { '[FILTERED]' }
-      )
-    end
-  end
+      let(:headers) { user.create_new_auth_token }
+      let(:params) do
+        {
+          hfhs_patient_data: {
+            first_name: hfhs_data.first_name,
+            last_name: hfhs_data.last_name,
+            dob: hfhs_data.dob,
+            sex: hfhs_data.sex,
+            zip_code: hfhs_data.zip_code,
+            phone_number: hfhs_data.phone_number,
+            phone_type: hfhs_data.phone_type
+          },
+          session_id: session.id
+        }
+      end
+      let(:request) { post path, params: params, headers: headers }
 
-  context 'when user is quest' do
-    let(:user) { create(:user, :confirmed, :guest) }
+      before do
+        allow_any_instance_of(Date).to receive(:future?).and_return(true)
 
-    it 'returns correct status' do
-      expect(response).to have_http_status(:ok)
-    end
+        allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
+          JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+        )
+        allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
+          JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+        )
 
-    it 'patient data doesn\'t assign' do
-      expect(user.reload.hfhs_patient_detail.provided_last_name).to eq(hfhs_data.last_name)
-      expect(user.reload.hfhs_patient_detail.provided_first_name).to eq(hfhs_data.first_name)
-      expect(user.reload.hfhs_patient_detail.provided_zip).to eq(hfhs_data.zip_code)
-      expect(user.reload.hfhs_patient_detail.provided_phone_number).to eq(hfhs_data.phone_number)
-      expect(user.reload.hfhs_patient_detail.provided_sex).to eq(hfhs_data.sex)
+        request
+      end
+
+      context 'when auth' do
+        context 'is invalid' do
+          let(:request) { post path, params: params }
+
+          it_behaves_like 'unauthorized user'
+        end
+
+        context 'is valid' do
+          it_behaves_like 'authorized user'
+        end
+      end
+
+      context 'when user is registered participant' do
+        it 'returns correct status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'correctly assigned data to user' do
+          expect(user.reload.hfhs_patient_detail.provided_last_name).to eq(hfhs_data.last_name)
+          expect(user.reload.hfhs_patient_detail.provided_first_name).to eq(hfhs_data.first_name)
+          expect(user.reload.hfhs_patient_detail.provided_zip).to eq(hfhs_data.zip_code)
+          expect(user.reload.hfhs_patient_detail.provided_phone_number).to eq(hfhs_data.phone_number)
+          expect(user.reload.hfhs_patient_detail.provided_sex).to eq(hfhs_data.sex)
+        end
+      end
+
+      # sentry-rails copies these instrumented params into breadcrumbs and span data of every traced request
+      context 'when Rails instruments the request' do
+        let(:instrumented_params) { [] }
+        let(:params) { super().deep_merge(hfhs_patient_data: { mrn: '12345678' }) }
+        let(:request) do
+          ActiveSupport::Notifications.subscribed(->(event) { instrumented_params << event.payload[:params] }, 'process_action.action_controller') do
+            post path, params: params, headers: headers
+          end
+        end
+
+        it 'masks every patient field' do
+          expect(instrumented_params.last['hfhs_patient_data']).to eq(
+            %w[first_name last_name dob sex zip_code phone_number phone_type mrn].index_with { '[FILTERED]' }
+          )
+        end
+      end
+
+      context 'when the user may not read user sessions' do
+        let(:user) { create(:user, :confirmed, :third_party) }
+
+        it { expect(response).to have_http_status(:forbidden) }
+
+        it 'stores no patient details' do
+          expect(user.reload.hfhs_patient_detail).to be_nil
+        end
+      end
+
+      context 'when user is quest' do
+        let(:user) { create(:user, :confirmed, :guest) }
+
+        it 'returns correct status' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'patient data doesn\'t assign' do
+          expect(user.reload.hfhs_patient_detail.provided_last_name).to eq(hfhs_data.last_name)
+          expect(user.reload.hfhs_patient_detail.provided_first_name).to eq(hfhs_data.first_name)
+          expect(user.reload.hfhs_patient_detail.provided_zip).to eq(hfhs_data.zip_code)
+          expect(user.reload.hfhs_patient_detail.provided_phone_number).to eq(hfhs_data.phone_number)
+          expect(user.reload.hfhs_patient_detail.provided_sex).to eq(hfhs_data.sex)
+        end
+      end
     end
   end
 end

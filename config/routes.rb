@@ -54,6 +54,11 @@ Rails.application.routes.draw do
       post 'verify', to: 'patient_details#verify'
       resources :clinic_locations, only: :index
     end
+    # Site-neutral paths for the same actions; /v1/henry_ford/* stays for one release.
+    scope 'ehr', module: 'henry_ford', as: 'ehr' do
+      post 'verify', to: 'patient_details#verify'
+      resources :clinic_locations, only: :index
+    end
 
     resources :preview_session_users, only: :create
     resources :tags, only: :index

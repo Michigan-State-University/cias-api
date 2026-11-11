@@ -21,7 +21,7 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
 
   def call
     # rubocop:disable Layout/LineLength
-    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{sending_facility}||#{receiving_facility}|#{date_now}||#{msh_message_type}^#{msh_trigger_event}|#{message_count}|#{ENV.fetch('PROCESSING')}|#{MSH_VERSION_ID}|||
+    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{sending_facility}||#{receiving_facility}|#{date_now}||#{msh_message_type}^#{msh_trigger_event}|#{message_count}|#{processing_id}|#{MSH_VERSION_ID}|||
        #{SECOND_SEGMENT_TYPE}|||#{user.hfhs_patient_detail.patient_id}||#{user.hfhs_patient_detail.last_name}^#{user.hfhs_patient_detail.first_name}||#{dob_in_correct_format}|#{sex}]
     # rubocop:enable Layout/LineLength
   end
@@ -38,6 +38,11 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
   # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.6
   def receiving_facility
     Ehr::Settings.hl7_receiving_facility
+  end
+
+  # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.11
+  def processing_id
+    Ehr::Settings.hl7_processing_id
   end
 
   def date_now

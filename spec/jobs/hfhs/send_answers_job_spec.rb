@@ -46,7 +46,7 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
       perform_job
 
       expect(Rails.logger).to have_received(:warn).with(
-        a_string_including('without verified HFHS details', "user_session_id=#{user_session.id}")
+        a_string_including('skipped HL7 transmission for a patient without verified EHR patient details', "user_session_id=#{user_session.id}")
       )
     end
   end
@@ -71,14 +71,23 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
       perform_job
 
       expect(Rails.logger).to have_received(:warn).with(
-        a_string_including('skipped HFHS transmission for a test run', "user_id=#{user.id}")
+        a_string_including('skipped HL7 transmission for a test run', "user_id=#{user.id}")
       )
     end
   end
 
+  it 'checks the 5 HL7 values, MSH-11 included' do
+    expect(Ehr::Settings::HL7_REQUIRED_SETTINGS).to contain_exactly(
+      'HL7_SENDING_FACILITY', 'HL7_RECEIVING_FACILITY', 'HL7_PROCESSING_ID', 'HL7_DOCUMENT_TYPE', 'HL7_OBSERVATION_VALUE_PREFIX'
+    )
+  end
+
   Ehr::Settings::HL7_REQUIRED_SETTINGS.each do |setting|
-    context "when #{setting} is blank" do
-      include_context 'with environment variables', { setting => '' }
+    # HL7_PROCESSING_ID still falls back to PROCESSING, so both are blanked.
+    blank_names = [setting, Ehr::Settings::HL7_LEGACY_NAMES[setting]].compact
+
+    context "when #{blank_names.join(' and ')} #{blank_names.one? ? 'is' : 'are'} blank" do
+      include_context 'with environment variables', blank_names.index_with('')
 
       let(:user) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
 
@@ -104,6 +113,19 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
       it 'fails the attempt so ActiveJob schedules a retry' do
         expect { perform_job }.to have_enqueued_job(described_class).with(user_session.id)
       end
+    end
+  end
+
+  context 'when only the old PROCESSING is set' do
+    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => '', 'PROCESSING' => 'P' }
+
+    let(:user) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
+
+    it 'sends the answers and the reports' do
+      perform_job
+
+      expect(api).to have_received(:send_answers).with(user_session.id)
+      expect(api).to have_received(:send_reports).with(user_session.id)
     end
   end
 

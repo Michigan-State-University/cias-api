@@ -3,14 +3,12 @@
 class Api::Hfhs::Authentication
   include Api::Hfhs::TlsErrorReporter
 
-  ENDPOINT = ENV.fetch('HFHS_TOKEN_URL')
-
   def self.call
     new.call
   end
 
   def call
-    connection = Faraday.new ENDPOINT, ssl: Api::Hfhs::SslOptions.call
+    connection = Faraday.new endpoint, ssl: Api::Hfhs::SslOptions.call
 
     response = connection.post do |request|
       request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -19,19 +17,23 @@ class Api::Hfhs::Authentication
 
     JSON.parse(response.body).symbolize_keys if response.status == 200
   rescue Faraday::SSLError => e
-    report_tls_error(e, ENDPOINT)
+    report_tls_error(e, endpoint)
     raise
   end
 
   private
 
+  def endpoint
+    Ehr::Settings.fetch!('HL7_RECEIVER_TOKEN_URL', legacy: 'HFHS_TOKEN_URL')
+  end
+
   def params
     {
       grant_type: 'password',
-      username: ENV.fetch('HFHS_USERNAME'),
-      client_id: ENV.fetch('HFHS_CLIENT_ID'),
-      client_secret: ENV.fetch('HFHS_CLIENT_SECRET'),
-      password: ENV.fetch('HFHS_PASSWORD')
+      username: Ehr::Settings.fetch('HL7_RECEIVER_USERNAME', legacy: 'HFHS_USERNAME'),
+      client_id: Ehr::Settings.fetch('HL7_RECEIVER_CLIENT_ID', legacy: 'HFHS_CLIENT_ID'),
+      client_secret: Ehr::Settings.fetch('HL7_RECEIVER_CLIENT_SECRET', legacy: 'HFHS_CLIENT_SECRET'),
+      password: Ehr::Settings.fetch('HL7_RECEIVER_PASSWORD', legacy: 'HFHS_PASSWORD')
     }
   end
 end
