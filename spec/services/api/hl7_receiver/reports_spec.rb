@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'webmock/rspec'
 
-describe Api::Hfhs::Reports do
+describe Api::Hl7Receiver::Reports do
   include WebMock::API
 
   WebMock.enable!
@@ -17,13 +17,13 @@ describe Api::Hfhs::Reports do
   include_context 'with environment variables', { 'HL7_RECEIVER_URL' => 'https://hfhs.test/data' }
 
   before do
-    allow(Api::Hfhs::SslOptions).to receive(:call).and_return(verify: false)
+    allow(Api::Hl7Receiver::SslOptions).to receive(:call).and_return(verify: false)
     allow(Hl7::GeneratedReportMapper).to receive(:call).and_return('MSH|test')
   end
 
   context 'when there are no henry_ford_health reports' do
     it 'returns without authenticating or POSTing' do
-      expect(Api::Hfhs::Authentication).not_to receive(:call)
+      expect(Api::Hl7Receiver::Authentication).not_to receive(:call)
       subject
     end
   end
@@ -32,7 +32,7 @@ describe Api::Hfhs::Reports do
     let!(:report) { create(:generated_report, report_for: 'henry_ford_health', user_session: user_session) }
 
     context 'when no token is issued' do
-      before { allow(Api::Hfhs::Authentication).to receive(:call).and_return(nil) }
+      before { allow(Api::Hl7Receiver::Authentication).to receive(:call).and_return(nil) }
 
       it 'warns about the skipped delivery and does not POST' do
         allow(Rails.logger).to receive(:warn)
@@ -43,7 +43,7 @@ describe Api::Hfhs::Reports do
 
     context 'when a token is issued' do
       before do
-        allow(Api::Hfhs::Authentication).to receive(:call).and_return(token_type: 'Bearer', access_token: 'abc')
+        allow(Api::Hl7Receiver::Authentication).to receive(:call).and_return(token_type: 'Bearer', access_token: 'abc')
       end
 
       context 'when neither receiver URL name is set' do

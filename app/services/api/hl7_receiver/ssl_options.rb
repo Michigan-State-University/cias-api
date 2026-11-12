@@ -22,7 +22,7 @@
 #   * on + HL7_RECEIVER_CA_CERT set          -> verify against system roots + the added intermediate.
 #   * on + HL7_RECEIVER_CA_CERT blank        -> system store only; verifies :443 but FAILS :7443
 #                                               (incomplete chain) - so HL7_RECEIVER_CA_CERT must be set.
-module Api::Hfhs::SslOptions
+module Api::Hl7Receiver::SslOptions
   PEM_CERTIFICATE = /-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/m
 
   def self.call

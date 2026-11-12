@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class V1::HenryFord::ClinicLocationsController < V1Controller
+class V1::Ehr::ClinicLocationsController < V1Controller
   def index
     authorize! :read, Intervention
 

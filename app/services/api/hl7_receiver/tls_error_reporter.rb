@@ -16,7 +16,7 @@
 #
 # All lines are PHI-free: endpoint, HTTP status and the user_session UUID only - never
 # answer body or PID content.
-module Api::Hfhs::TlsErrorReporter
+module Api::Hl7Receiver::TlsErrorReporter
   LOG_PREFIX = '[HL7 receiver]'
 
   def report_tls_error(error, endpoint)

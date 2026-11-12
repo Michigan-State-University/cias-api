@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe Api::Hfhs::SslOptions do
+describe Api::Hl7Receiver::SslOptions do
   subject { described_class.call }
 
   # Minimal 3-level PKI mirroring HF's real chain: root -> intermediate -> leaf.

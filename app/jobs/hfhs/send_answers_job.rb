@@ -9,7 +9,7 @@ class Hfhs::SendAnswersJob < ApplicationJob
 
     Ehr::Settings.ensure_hl7_values!
 
-    api = Api::Hfhs.new
+    api = Api::Hl7Receiver.new
     api.send_answers(user_session_id)
     api.send_reports(user_session_id)
   end

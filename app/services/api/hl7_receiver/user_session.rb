@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-class Api::Hfhs::UserSession
-  include Api::Hfhs::TlsErrorReporter
+class Api::Hl7Receiver::UserSession
+  include Api::Hl7Receiver::TlsErrorReporter
 
   def self.call(user_session_id)
     new(user_session_id).call
@@ -14,7 +14,7 @@ class Api::Hfhs::UserSession
   def call
     return if no_data_to_hfhs?
 
-    token = Api::Hfhs::Authentication.call
+    token = Api::Hl7Receiver::Authentication.call
     if token.nil?
       report_skipped_delivery("no token issued - skipping answers send for user_session #{user_session_id}")
       return
@@ -32,7 +32,7 @@ class Api::Hfhs::UserSession
   end
 
   def post_answers(bearer_token)
-    connection = Faraday.new endpoint, ssl: Api::Hfhs::SslOptions.call
+    connection = Faraday.new endpoint, ssl: Api::Hl7Receiver::SslOptions.call
 
     response = connection.post do |request|
       request.headers['Content-Type'] = 'application/json'

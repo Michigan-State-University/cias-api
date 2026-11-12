@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'webmock/rspec'
 
-describe Api::Hfhs::Authentication do
+describe Api::Hl7Receiver::Authentication do
   include WebMock::API
 
   WebMock.enable!
@@ -21,7 +21,7 @@ describe Api::Hfhs::Authentication do
   }
 
   # keep SslOptions from touching the trust store in a unit test
-  before { allow(Api::Hfhs::SslOptions).to receive(:call).and_return(verify: false) }
+  before { allow(Api::Hl7Receiver::SslOptions).to receive(:call).and_return(verify: false) }
 
   context 'when the token endpoint returns 200' do
     let!(:token_request) do

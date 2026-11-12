@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-class Api::Hfhs::Authentication
-  include Api::Hfhs::TlsErrorReporter
+class Api::Hl7Receiver::Authentication
+  include Api::Hl7Receiver::TlsErrorReporter
 
   def self.call
     new.call
   end
 
   def call
-    connection = Faraday.new endpoint, ssl: Api::Hfhs::SslOptions.call
+    connection = Faraday.new endpoint, ssl: Api::Hl7Receiver::SslOptions.call
 
     response = connection.post do |request|
       request.headers['Content-Type'] = 'application/x-www-form-urlencoded'

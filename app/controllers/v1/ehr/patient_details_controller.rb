@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-class V1::HenryFord::PatientDetailsController < V1Controller
+class V1::Ehr::PatientDetailsController < V1Controller
   def verify
     authorize! :read, UserSession
 
-    result = V1::HenryFord::VerifyService.call(current_v1_user, patient_detail_params, session_id)
+    result = V1::Ehr::VerifyService.call(current_v1_user, patient_detail_params, session_id)
     render json: serialized_hash(result, HfhsPatientDetail)
   end
 

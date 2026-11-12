@@ -50,12 +50,12 @@ Rails.application.routes.draw do
         resource :avatars, only: %i[create destroy]
       end
     end
-    namespace :henry_ford do
+    # Old path for the V1::Ehr actions below; /v1/henry_ford/* stays for one release.
+    namespace :henry_ford, module: 'ehr' do
       post 'verify', to: 'patient_details#verify'
       resources :clinic_locations, only: :index
     end
-    # Site-neutral paths for the same actions; /v1/henry_ford/* stays for one release.
-    scope 'ehr', module: 'henry_ford', as: 'ehr' do
+    namespace :ehr do
       post 'verify', to: 'patient_details#verify'
       resources :clinic_locations, only: :index
     end
