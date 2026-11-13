@@ -5,7 +5,7 @@ RSpec.describe V1::Users::SmsTokens::Phone do
 
   let!(:user) { create(:user, :confirmed) }
   let!(:phone_number) { '123456789' }
-  let!(:prefix) { '48' }
+  let!(:prefix) { '+48' }
   let!(:iso) { 'PL' }
   let(:phone) { Phone.last }
 
@@ -33,7 +33,7 @@ RSpec.describe V1::Users::SmsTokens::Phone do
     end
 
     context 'but phone changed' do
-      let!(:old_phone) { create(:phone, number: '987654321', prefix: prefix, iso: iso, user: user) }
+      let!(:old_phone) { create(:phone, number: '512345678', prefix: prefix, iso: iso, user: user) }
 
       it 'new phone for user is added' do
         expect { subject }.to change { user.reload.phone }.from(old_phone)

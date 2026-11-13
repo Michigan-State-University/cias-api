@@ -313,7 +313,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     let(:email) { 'leaktest@example.test' }
     let(:first_name) { 'Eleanor' }
     let(:last_name) { 'Rigby' }
-    let(:phone_number) { '5551234567' }
+    let(:phone_number) { '2015550123' }
     let(:raw_answer) { 'SENSITIVE_VALUE_XYZ' }
     let!(:existing) { create(:user, :confirmed, email: email) } # forces a taken error
     let(:params) do
@@ -468,5 +468,119 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
     let(:params) { wrap(participant_attrs(email: 'p@example.test')) }
 
     it_behaves_like 'users without access'
+  end
+
+  describe 'phone handling' do
+    include ActiveJob::TestHelper
+
+    subject(:request) do
+      post bulk_create_v1_intervention_predefined_participants_path(intervention_id: intervention.id),
+           params: { predefined_users: { participants: participants } }, headers: researcher.create_new_auth_token, as: :json
+    end
+
+    let!(:researcher) { create(:user, :confirmed, :researcher) }
+    let!(:intervention) { create(:intervention, :published, user_id: researcher.id) }
+
+    def row(email, phone)
+      { first_name: 'Alice', last_name: 'Smith', email: email, phone_attributes: phone }
+    end
+
+    describe 'the validator stays atomic' do
+      let(:participants) do
+        [
+          row('bulk-a@example.test', PhoneNumberFixtures::US_MAIN),
+          row('bulk-b@example.test', { iso: 'PL', prefix: '+48', number: 'notanumber' }),
+          row('bulk-c@example.test', PhoneNumberFixtures::PL_MOBILE)
+        ]
+      end
+
+      it 'answers 422 for the whole request' do
+        request
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+
+      it 'points at the offending row and a phone field only' do
+        request
+        errors = json_response['details']['errors']
+        expect(errors).to include(a_hash_including('row' => 1, 'field' => a_string_starting_with('phone')))
+        expect(errors.pluck('row').uniq).to eq([1])
+      end
+
+      it 'stores no payload and enqueues no import' do
+        expect { request }.to avoid_changing(BulkImportPayload, :count)
+        expect(enqueued_jobs.pluck(:job)).not_to include(PredefinedParticipants::BulkImportJob)
+      end
+    end
+
+    describe 'eligibility is decided per number type, not per country' do
+      let(:participants) do
+        [
+          row('bulk-de@example.test', PhoneNumberFixtures::DE_MOBILE),
+          row('bulk-landline@example.test', PhoneNumberFixtures::PL_LANDLINE),
+          row('bulk-premium@example.test', PhoneNumberFixtures::US_PREMIUM),
+          row('bulk-eligible@example.test', PhoneNumberFixtures::US_MAIN)
+        ]
+      end
+
+      it 'is accepted' do
+        request
+        expect(response).to have_http_status(:accepted)
+      end
+
+      it 'imports every row and marks only the landline and premium-rate numbers ineligible' do
+        perform_enqueued_jobs(only: PredefinedParticipants::BulkImportJob) { request }
+        phones = Phone.joins(user: :predefined_user_parameter)
+                      .where(predefined_user_parameters: { intervention_id: intervention.id })
+        expect(phones.count).to eq(4)
+        eligibility = phones.includes(:user).to_h { |phone| [phone.user.email, phone.sms_eligible] }
+        expect(eligibility).to eq('bulk-de@example.test' => true, 'bulk-landline@example.test' => false,
+                                  'bulk-premium@example.test' => false, 'bulk-eligible@example.test' => true)
+      end
+    end
+
+    describe 'a number typed with punctuation is found by the STOP handler after bulk import' do
+      let(:participants) { [row('bulk-fmt@example.test', { iso: 'US', prefix: '+1', number: '(201) 555-0123' })] }
+      let(:sms_session) { create(:sms_session, intervention: create(:intervention)) }
+
+      it 'resolves the participant through V1::Sms::Replay' do
+        perform_enqueued_jobs(only: PredefinedParticipants::BulkImportJob) { request }
+        participant = User.find_by!(email: 'bulk-fmt@example.test')
+        user_intervention = create(:user_intervention, user: participant, intervention: sms_session.intervention)
+        sms_user_session = create(:sms_user_session, user: participant, session: sms_session, user_intervention: user_intervention)
+
+        V1::Sms::Replay.call('+12015550123', '+12015550124', 'STOP')
+
+        expect(sms_user_session.reload.finished_at).to be_present
+      end
+    end
+  end
+
+  describe 'editor gate' do
+    let(:params) { wrap(participant_attrs(email: 'gate@example.test')) }
+
+    context 'when intervention has collaborators and nobody is the current editor' do
+      let!(:intervention) { create(:intervention, :published, :with_collaborators, user_id: researcher.id) }
+
+      it 'returns 403' do
+        request
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'enqueues no BulkImportJob' do
+        request
+        expect(bulk_import_jobs).to be_empty
+      end
+    end
+
+    context 'when the researcher is the current editor' do
+      let!(:intervention) { create(:intervention, :published, :with_collaborators, user_id: researcher.id) }
+
+      before { intervention.update(current_editor: researcher) }
+
+      it 'returns 202' do
+        request
+        expect(response).to have_http_status(:accepted)
+      end
+    end
   end
 end

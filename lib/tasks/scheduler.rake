@@ -14,3 +14,8 @@ task interventions_schedule: :environment do
     end
   end
 end
+
+desc 'Purge SMS inbound receipts older than the retention window (called by the Heroku scheduler add-on)'
+task purge_sms_inbound_receipts: :environment do
+  SmsInboundReceipt.purge_stale
+end

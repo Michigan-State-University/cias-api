@@ -10,9 +10,9 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :reque
   let(:params) do
     {
       phone: {
-        iso: 'pl',
+        iso: 'PL',
         prefix: '+48',
-        number: '765876987'
+        number: '512345678'
       }
     }
   end

@@ -16,4 +16,12 @@ RSpec.describe V1::Users::CreateGuest do
     expect(guest_user.valid?).to be true
     expect(guest_user.confirmed?).to be true
   end
+
+  context 'with a phone number that has a trunk prefix' do
+    subject { described_class.call('+447400123456') }
+
+    it 'stores the phone so that full_number is E.164' do
+      expect(subject.phone.reload).to have_attributes(number: '7400123456', full_number: '+447400123456')
+    end
+  end
 end

@@ -97,7 +97,18 @@ class V1::Intervention::TestParticipants::PurgeService
   def sms_links_users_for(user, intervention_id)
     SmsLinksUser
       .where(user_id: user.id)
-      .where(sms_link_id: SmsLink.joins(:session).where(sessions: { intervention_id: intervention_id }).select(:id))
+      .where(sms_link_id: sms_links_for(intervention_id))
+  end
+
+  def sms_links_for(intervention_id)
+    SmsLink
+      .left_joins(:session, :campaign)
+      .where(
+        'sessions.intervention_id = :intervention_id ' \
+        'OR predefined_participants_sms_campaigns.intervention_id = :intervention_id',
+        intervention_id: intervention_id
+      )
+      .select('sms_links.id')
   end
 
   def destroy_shell_or_release_marker(user)

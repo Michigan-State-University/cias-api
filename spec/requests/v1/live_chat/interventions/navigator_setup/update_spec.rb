@@ -36,7 +36,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         {
           navigator_setup: {
             phone_attributes: {
-              number: 111_111_111,
+              number: 2_015_550_123,
               iso: 'US',
               prefix: '+1'
             }
@@ -48,7 +48,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         request
         phone = intervention.navigator_setup.phone
         expect(phone).not_to be_nil
-        expect(phone.number).to eq 111_111_111.to_s
+        expect(phone.number).to eq 2_015_550_123.to_s
         expect(phone.iso).to eq 'US'
         expect(phone.prefix).to eq '+1'
       end
@@ -59,7 +59,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         {
           navigator_setup: {
             message_phone_attributes: {
-              number: 222_222_222,
+              number: 2_015_550_123,
               iso: 'US',
               prefix: '+1'
             }
@@ -71,7 +71,7 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         request
         phone = intervention.navigator_setup.message_phone
         expect(phone).not_to be_nil
-        expect(phone.number).to eq 222_222_222.to_s
+        expect(phone.number).to eq 2_015_550_123.to_s
         expect(phone.iso).to eq 'US'
         expect(phone.prefix).to eq '+1'
       end
@@ -84,9 +84,9 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         {
           navigator_setup: {
             phone_attributes: {
-              number: 111_222_333,
-              iso: 'PL',
-              prefix: '+43'
+              number: 2_015_550_124,
+              iso: 'US',
+              prefix: '+1'
             }
           }
         }
@@ -95,9 +95,9 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       it do
         request
         phone = intervention.navigator_setup.reload.phone
-        expect(phone.number).to eq 111_222_333.to_s
-        expect(phone.iso).to eq 'PL'
-        expect(phone.prefix).to eq '+43'
+        expect(phone.number).to eq 2_015_550_124.to_s
+        expect(phone.iso).to eq 'US'
+        expect(phone.prefix).to eq '+1'
       end
     end
 
@@ -108,9 +108,9 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
         {
           navigator_setup: {
             message_phone_attributes: {
-              number: 111_222_333,
-              iso: 'PL',
-              prefix: '+43'
+              number: 2_015_550_124,
+              iso: 'US',
+              prefix: '+1'
             }
           }
         }
@@ -119,9 +119,9 @@ RSpec.describe 'PATCH /v1/live_chat/intervention/:id/navigator_setups', type: :r
       it do
         request
         phone = intervention.navigator_setup.reload.message_phone
-        expect(phone.number).to eq 111_222_333.to_s
-        expect(phone.iso).to eq 'PL'
-        expect(phone.prefix).to eq '+43'
+        expect(phone.number).to eq 2_015_550_124.to_s
+        expect(phone.iso).to eq 'US'
+        expect(phone.prefix).to eq '+1'
       end
     end
 

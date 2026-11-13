@@ -15,9 +15,19 @@ class DataClearJobs::ClearUserData < ApplicationJob
       intervention.sensitive_data_removed!
       create_notification!(intervention)
     end
+
+    cancel_scheduled_campaigns(intervention)
   end
 
   private
+
+  def cancel_scheduled_campaigns(intervention)
+    intervention.sms_campaigns.scheduled.find_each do |campaign|
+      V1::PredefinedParticipants::SmsCampaigns::CancelService.call(campaign)
+    rescue ComplexException => e
+      raise unless e.status_code == :conflict
+    end
+  end
 
   def delete_temporary_users_without_intervention!(intervention)
     User.left_joins(:user_interventions, :predefined_user_parameter)

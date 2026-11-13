@@ -51,6 +51,7 @@ class Intervention::Csv::Harvester
 
     header.unshift(hf_headers(sessions))
     header.unshift(sms_phone_headers(sessions))
+    header.unshift(sms_campaign_headers)
     header.unshift(predefined_user_headers(sessions))
     header.flatten!
     header.unshift(:email)
@@ -80,8 +81,8 @@ class Intervention::Csv::Harvester
 
   def sms_links_header(session, index, multiple_fill)
     column_names = []
-    session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
-      sms_plan.sms_links.find_each do |sms_link|
+    sms_plan_links(session).each_with_index do |(_sms_plan, sms_links), sms_plan_index|
+      sms_links.each do |sms_link|
         prefix = sms_link_column_prefix(sms_plan_index, sms_link)
         column_names << [column_name(multiple_fill, session, "#{prefix}.timestamps", index + 1),
                          column_name(multiple_fill, session, "#{prefix}.totalclicks", index + 1)]
@@ -89,6 +90,11 @@ class Intervention::Csv::Harvester
     end
 
     column_names
+  end
+
+  def sms_plan_links(session)
+    @sms_plan_links ||= {}
+    @sms_plan_links[session.id] ||= session.sms_plans.map { |sms_plan| [sms_plan, sms_plan.sms_links.sort_by(&:id)] }
   end
 
   def sms_link_column_prefix(sms_plan_index, sms_link)
@@ -104,7 +110,7 @@ class Intervention::Csv::Harvester
   def information_only_screen_videos_header(session, index, multiple_fill)
     column_names = []
 
-    session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |_question, question_index|
+    information_video_questions(session).each_with_index do |_question, question_index|
       VIDEO_STATS_KEYS.each do |key|
         column_names << [column_name(multiple_fill, session, "video_stats.question_information_only_#{question_index + 1}.#{key}", index + 1)]
       end
@@ -128,6 +134,7 @@ class Intervention::Csv::Harvester
       initialize_row
       set_user_data(row_index, grouped_user_sessions.second.first)
       predefined_user_data(row_index, grouped_user_sessions.second.first.user)
+      sms_campaign_data(row_index, grouped_user_sessions.first)
       sms_phone_data(row_index, grouped_user_sessions.second)
 
       grouped_user_sessions.second.each do |user_session|
@@ -242,8 +249,8 @@ class Intervention::Csv::Harvester
   end
 
   def sms_links(session, user_session, row_index, approach_number, multiple_fill)
-    session.sms_plans.each_with_index do |sms_plan, sms_plan_index|
-      sms_plan.sms_links.find_each do |sms_link|
+    sms_plan_links(session).each_with_index do |(_sms_plan, links), sms_plan_index|
+      links.each do |sms_link|
         prefix = sms_link_column_prefix(sms_plan_index, sms_link)
         session_header_index = header.index(
           column_name(multiple_fill, session, "#{prefix}.timestamps", approach_number)
@@ -251,17 +258,51 @@ class Intervention::Csv::Harvester
         total_clicks_index = header.index(
           column_name(multiple_fill, session, "#{prefix}.totalclicks", approach_number)
         )
-        user_id = user_session.user_id
 
-        timestamps = sms_link.sms_links_users.where(user_id: user_id).pluck(:entered_timestamps).flatten
-        rows[row_index][session_header_index] = timestamps.join(' | ')
-        rows[row_index][total_clicks_index] = timestamps.count
+        write_click_cells(row_index, session_header_index, total_clicks_index, sms_link, user_session.user_id)
       end
     end
   end
 
+  def write_click_cells(row_index, timestamps_index, total_clicks_index, sms_link, user_id)
+    timestamps = entered_timestamps_for(sms_link, user_id)
+    rows[row_index][timestamps_index] = timestamps.join(' | ')
+    rows[row_index][total_clicks_index] = timestamps.count
+  end
+
+  def entered_timestamps_for(sms_link, user_id)
+    clicks_by_link_and_user[[sms_link.id, user_id]] || []
+  end
+
+  def clicks_by_link_and_user
+    @clicks_by_link_and_user ||= load_clicks_by_link_and_user
+  end
+
+  def load_clicks_by_link_and_user
+    link_ids = tracked_sms_link_ids
+    return {} if link_ids.empty?
+
+    SmsLinksUser.where(sms_link_id: link_ids)
+                .pluck(:sms_link_id, :user_id, :entered_timestamps)
+                .to_h { |sms_link_id, user_id, timestamps| [[sms_link_id, user_id], timestamps] }
+  end
+
+  def tracked_sms_link_ids
+    (plan_sms_link_ids + campaign_sms_links.map { |_prefix, sms_link| sms_link.id }).uniq
+  end
+
+  def plan_sms_link_ids
+    sessions.flat_map { |session| sms_plan_links(session).flat_map { |_sms_plan, links| links.map(&:id) } }
+  end
+
+  def information_video_questions(session)
+    @information_video_questions ||= {}
+    @information_video_questions[session.id] ||=
+      session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").to_a
+  end
+
   def information_only_screen_videos(session, user_session, row_index, approach_number, multiple_fill)
-    session.questions.where(type: 'Question::Information').where("(settings -> 'video')::boolean is TRUE").each_with_index do |question, index|
+    information_video_questions(session).each_with_index do |question, index|
       answer = question.answers.where(user_session: user_session).first
 
       VIDEO_STATS_KEYS.each do |key|
@@ -285,9 +326,9 @@ class Intervention::Csv::Harvester
 
   def user_sessions
     @user_sessions ||= if period.present?
-                         UserSession.where(session_id: session_ids).where(created_at: period).includes(:user)
+                         UserSession.where(session_id: session_ids).where(created_at: period).includes(:user, :session, :answers)
                        else
-                         UserSession.where(session_id: session_ids).includes(:user)
+                         UserSession.where(session_id: session_ids).includes(:user, :session, :answers)
                        end
   end
 
@@ -333,6 +374,33 @@ class Intervention::Csv::Harvester
       next if var_index.nil?
 
       rows[row_index][var_index] = user.send(column)
+    end
+  end
+
+  def campaign_sms_links
+    @campaign_sms_links ||= collect_campaign_sms_links
+  end
+
+  def collect_campaign_sms_links
+    intervention = sessions.first&.intervention
+    return [] if intervention.nil?
+
+    intervention.sms_campaigns.order(:created_at, :id).flat_map.with_index(1) do |campaign, index|
+      campaign.sms_links.order(:created_at, :id).map { |sms_link| ["sms_campaign_#{index}.link_#{sms_link.variable}", sms_link] }
+    end
+  end
+
+  def sms_campaign_headers
+    campaign_sms_links.flat_map { |prefix, _sms_link| ["#{prefix}.timestamps", "#{prefix}.totalclicks"] }
+  end
+
+  def sms_campaign_data(row_index, user_id)
+    campaign_sms_links.each do |prefix, sms_link|
+      timestamps_index = header.index("#{prefix}.timestamps")
+      total_clicks_index = header.index("#{prefix}.totalclicks")
+      next if timestamps_index.nil? || total_clicks_index.nil?
+
+      write_click_cells(row_index, timestamps_index, total_clicks_index, sms_link, user_id)
     end
   end
 

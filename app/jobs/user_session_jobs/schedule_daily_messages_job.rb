@@ -4,6 +4,7 @@ class UserSessionJobs::ScheduleDailyMessagesJob < ApplicationJob
   include SmsCampaign::SmsEventsHelper
 
   queue_as :question_sms
+  self.enqueue_after_transaction_commit = true
   DELAY_BETWEEN_QUESTIONS_IN_SECONDS = 10
 
   def perform(user_session_id, should_reset_user_pending_flag = false)

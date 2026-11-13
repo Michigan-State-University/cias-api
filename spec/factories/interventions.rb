@@ -65,7 +65,7 @@ FactoryBot.define do
       end
 
       after(:create) do |intervention|
-        intervention.navigator_setup.update!(phone: Phone.new(number: '111111111', prefix: '+48', iso: 'PL', communication_way: 'call'))
+        intervention.navigator_setup.update!(phone: Phone.new(number: '512345678', prefix: '+48', iso: 'PL', communication_way: 'call'))
       end
     end
 
@@ -75,7 +75,7 @@ FactoryBot.define do
       end
 
       after(:create) do |intervention|
-        intervention.navigator_setup.update!(message_phone: Phone.new(number: '222222222', prefix: '+48', iso: 'PL', communication_way: 'message'))
+        intervention.navigator_setup.update!(message_phone: Phone.new(number: '512345678', prefix: '+48', iso: 'PL', communication_way: 'message'))
       end
     end
 

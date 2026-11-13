@@ -276,6 +276,21 @@ en:
       bulk_import_validation_error: Bulk import validation failed
       empty_participants_error: CSV contains no participants
       ra_answers_require_published_intervention_error: RA session answers can only be imported when the intervention is published
+    sms_campaigns:
+      errors:
+        intervention_not_published: The intervention must be published to send SMS messages
+        invalid_payload: The SMS campaign is invalid
+        no_recipients: There are no participants eligible for this SMS campaign
+        campaign_in_progress: An SMS campaign of this kind is already in progress
+        daily_cap_exceeded: The daily SMS limit for this intervention has been reached
+        not_cancellable: Only a scheduled SMS campaign can be cancelled
+        rate_limited: Too many requests, try again later
+    resend:
+      errors:
+        send_failed: The SMS could not be sent
+        too_soon: This participant was messaged recently, try again later
+        sms_not_eligible: The participant's phone number cannot receive text messages
+        sms_opted_out: The participant has opted out of text messages
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
@@ -465,6 +480,7 @@ en:
   sms:
     wrong_message: 'You have entered an incorrect code. Please try again.'
     already_signed: 'You are already enrolled in this campaign.'
+    help: 'CIAS: Reply STOP to stop receiving text messages and START to receive them again. Message and data rates may apply.'
     cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns.'
     session_not_found: "Oops! That code doesn't match any of our text plans. Check the spelling and make sure the letters are in the correct case (uppercase/lowercase)"
   exceptions:

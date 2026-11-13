@@ -272,4 +272,17 @@ describe User, type: :model do
       expect(guest.test_run_marked_by_id).to be_nil
     end
   end
+
+  describe 'sms_links_users association' do
+    it 'has many sms_links_users with dependent: :delete_all' do
+      expect(described_class.new).to have_many(:sms_links_users).dependent(:delete_all)
+    end
+
+    it 'removes the join rows when the user is destroyed' do
+      user = create(:user)
+      row = SmsLinksUser.create!(user: user, sms_link: create(:sms_link))
+      expect { user.destroy! }.not_to raise_error
+      expect(SmsLinksUser.exists?(row.id)).to be(false)
+    end
+  end
 end

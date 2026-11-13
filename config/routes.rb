@@ -70,6 +70,11 @@ Rails.application.routes.draw do
       post 'test_link', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
+        resources :sms_campaigns, only: %i[index create], path: 'predefined_participants/sms_campaigns',
+                                  module: 'predefined_participants' do
+          get 'meta', on: :collection
+          post 'cancel', on: :member
+        end
         resources :predefined_participants do
           post 'send_sms_invitation', on: :member
           post 'send_email_invitation', on: :member
