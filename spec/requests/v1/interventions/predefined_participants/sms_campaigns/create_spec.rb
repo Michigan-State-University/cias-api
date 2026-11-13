@@ -97,10 +97,10 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
       expect(campaigns.sole.kind).to eq('manual_reminder')
     end
 
-    it 'never exposes the stored body in the response' do
+    it 'returns the stored body so the created campaign reads back like the one on the list' do
       request
       expect(response).to have_http_status(:accepted)
-      expect(response.body).not_to include(canary_body)
+      expect(json_response['data']['attributes']['body']).to eq(canary_body)
     end
 
     def link_param

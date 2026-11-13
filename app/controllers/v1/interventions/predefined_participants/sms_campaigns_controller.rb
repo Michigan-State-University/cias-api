@@ -41,7 +41,7 @@ class V1::Interventions::PredefinedParticipants::SmsCampaignsController < V1Cont
   private
 
   def campaigns
-    intervention_load.sms_campaigns.preload(:parent_campaign).order(created_at: :desc, id: :desc)
+    intervention_load.sms_campaigns.preload(:parent_campaign, :sms_links).order(created_at: :desc, id: :desc)
   end
 
   def pagination_params

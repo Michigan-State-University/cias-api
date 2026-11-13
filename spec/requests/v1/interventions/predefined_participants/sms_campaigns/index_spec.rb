@@ -77,11 +77,42 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/predefined_participants/s
       expect(Time.zone.parse(attributes['sent_at'])).to be_within(1.second).of(sent_at)
     end
 
-    it 'never exposes the stored body' do
+    it 'exposes the stored body so the researcher can review what was sent' do
       create(:pdp_sms_campaign, intervention: intervention, status: 'sent')
       request
       expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include(canary_body)
+      expect(json_response['data'].sole['attributes']['body']).to eq(canary_body)
+    end
+
+    it 'exposes the campaign links in the shape they were created with' do
+      campaign = create(:pdp_sms_campaign, intervention: intervention, status: 'sent')
+      create(:pdp_campaign_sms_link, campaign: campaign, url: canary_url, variable: canary_variable, link_type: 'video')
+      request
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data'].sole['attributes']['links']).to eq(
+        [{ 'url' => canary_url, 'variable' => canary_variable, 'link_type' => 'video' }]
+      )
+    end
+
+    it 'exposes an empty link list for a campaign without links' do
+      create(:pdp_sms_campaign, intervention: intervention, status: 'sent')
+      request
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data'].sole['attributes']['links']).to eq([])
+    end
+
+    it 'exposes the body and links of a scheduled reminder separately from its parent' do
+      parent = create(:pdp_sms_campaign, intervention: intervention, status: 'sent', body: 'PARENT BODY')
+      child = create(:pdp_sms_campaign, intervention: intervention, kind: 'scheduled_reminder', parent_campaign: parent,
+                                        days_after: 3, body: 'REMINDER BODY')
+      create(:pdp_campaign_sms_link, campaign: child, variable: 'reminder_link')
+      request
+      expect(response).to have_http_status(:ok)
+      rows = json_response['data'].index_by { |entry| entry['id'] }
+      expect(rows[parent.id]['attributes']['body']).to eq('PARENT BODY')
+      expect(rows[parent.id]['attributes']['links']).to eq([])
+      expect(rows[child.id]['attributes']['body']).to eq('REMINDER BODY')
+      expect(rows[child.id]['attributes']['links'].pluck('variable')).to eq(['reminder_link'])
     end
 
     it 'is not answered by predefined_participants#show' do

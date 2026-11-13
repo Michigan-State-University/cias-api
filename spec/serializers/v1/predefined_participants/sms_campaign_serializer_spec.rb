@@ -29,14 +29,29 @@ RSpec.describe 'V1::PredefinedParticipants::SmsCampaignSerializer' do
                                 recipients_count: 5, accepted_count: 4, failed_count: 1)
     end
 
-    it 'exposes exactly kind, status, scheduled_at, sent_at, the three counters and the provisional flag' do
+    it 'exposes exactly kind, status, scheduled_at, sent_at, the three counters, the provisional flag, the body and the links' do
       expect(attributes_of(campaign).keys).to match_array(%w[kind status scheduled_at sent_at recipients_count accepted_count
-                                                             failed_count scheduled_at_provisional])
+                                                             failed_count scheduled_at_provisional body links])
     end
 
-    it 'never exposes the body, the author or the intervention' do
+    it 'never exposes the author or the intervention' do
       keys = attributes_of(campaign).keys
-      expect(keys).not_to include('body', 'author_id', 'intervention_id', 'parent_campaign_id', 'days_after')
+      expect(keys).not_to include('author_id', 'intervention_id', 'parent_campaign_id', 'days_after')
+    end
+
+    it 'exposes the body the campaign was created with' do
+      expect(attributes_of(campaign)['body']).to eq(campaign.body)
+    end
+
+    it 'exposes the links in the shape the campaign was created with' do
+      create(:pdp_campaign_sms_link, campaign: campaign, url: 'https://example.test/x', variable: 'x', link_type: 'video')
+      expect(attributes_of(campaign.reload)['links']).to eq(
+        [{ url: 'https://example.test/x', variable: 'x', link_type: 'video' }]
+      )
+    end
+
+    it 'exposes an empty link list for a campaign without links' do
+      expect(attributes_of(campaign)['links']).to eq([])
     end
 
     it 'returns the record id' do
