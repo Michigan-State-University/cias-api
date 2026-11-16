@@ -5,8 +5,9 @@
 # rescans a different code, or switches to manual entry leaves that draft behind
 # with nothing to ever clean it up, so this job expires them.
 #
-# Scheduled by the `hfhs_clear_abandoned_patient_details` rake task (Heroku
-# Scheduler), see lib/tasks/scheduler.rake.
+# Every draft enqueues this job (delayed past RETENTION_PERIOD) when it is
+# created, see V1::HenryFord::HandleBarCodeService. The
+# `hfhs_clear_abandoned_patient_details` rake task stays as a manual trigger.
 class Hfhs::ClearAbandonedPatientDetailsJob < ApplicationJob
   queue_as :hfhs
 

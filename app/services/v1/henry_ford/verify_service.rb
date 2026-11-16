@@ -18,17 +18,20 @@ class V1::HenryFord::VerifyService
   attr_reader :user, :patient_params, :patient, :appointments, :session_id
   attr_accessor :resource
 
+  # Nothing is confirmed until the appointment lookup has succeeded: a failed
+  # Continue leaves the draft pending, so the same user can simply retry.
   def call
     if patient_params[:id].present?
-      @resource = HfhsPatientDetail.find(patient_params[:id])
-      confirm_resource!
+      load_confirmable_resource!
+      epic_id = @resource.epic_id
     else
       @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code, mrn)
-      create_or_find_resource!
+      epic_id = epic_patient_id(@patient)
     end
 
-    @appointments = Api::EpicOnFhir::Appointments.call(@resource.epic_id)
-    @resource.update!(visit_id: hfhs_visit_id)
+    @appointments = Api::EpicOnFhir::Appointments.call(epic_id)
+    create_or_find_resource!(epic_id) if @resource.nil?
+    @resource.update!(visit_id: hfhs_visit_id, **confirmation_attributes)
     assign_patient_details!
     @resource
   end
@@ -102,20 +105,35 @@ class V1::HenryFord::VerifyService
     [available_locations.where(auxiliary_epic_identifier: appointment_location_auxiliary_id).first, appointment_location_auxiliary_id]
   end
 
-  def confirm_resource!
-    raise ActiveRecord::RecordNotFound unless @resource.pending? || user.hfhs_patient_detail_id == @resource.id
+  # A pending draft can only be confirmed by the user who scanned it, and a
+  # confirmed record only by the user already matched to it.
+  def load_confirmable_resource!
+    @resource = HfhsPatientDetail.find_by(id: patient_params[:id])
+    return if @resource&.epic_id.present? && confirmable_by_user?
 
-    @resource.update!(pending: false)
+    raise ActiveRecord::RecordNotFound, I18n.t('henry_ford.error.patient.draft_not_found')
   end
 
-  def create_or_find_resource!
+  def confirmable_by_user?
+    (@resource.pending? && @resource.drafted_by_id == user.id) || user.hfhs_patient_detail_id == @resource.id
+  end
+
+  # A preview user is never matched to the record, so its draft stays pending
+  # and expires instead of becoming an unmatched confirmed row.
+  def confirmation_attributes
+    user.preview_session? ? {} : { pending: false }
+  end
+
+  # epic_id is not part of the lookup: rows stored before it existed must still
+  # be found (and get it filled in) rather than duplicated.
+  def create_or_find_resource!(epic_id)
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,
       first_name: epic_first_name(@patient),
       last_name: epic_last_name(@patient),
       dob: epic_dob(@patient),
       sex: epic_sex(@patient),
-      zip_code: epic_zip_code(@patient),
+      zip_code: epic_zip_code(@patient) || zip_code,
       phone_type: epic_phone_type(@patient),
       phone_number: epic_phone_number(@patient),
       provided_first_name: first_name,
@@ -124,9 +142,9 @@ class V1::HenryFord::VerifyService
       provided_sex: sex,
       provided_zip: zip_code,
       provided_phone_type: phone_type,
-      provided_phone_number: phone_number,
-      epic_id: epic_patient_id(@patient)
-    )
+      provided_phone_number: phone_number
+    ) { |record| record.epic_id = epic_id }
+    @resource.update!(epic_id: epic_id) if @resource.epic_id != epic_id
   end
 
   def assign_patient_details!

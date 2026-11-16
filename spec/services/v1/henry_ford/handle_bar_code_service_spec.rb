@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require 'webmock/rspec'
+
 RSpec.describe V1::HenryFord::HandleBarCodeService do
   describe '.call' do
-    subject { described_class.call(params) }
+    subject { described_class.call(user, params) }
 
+    let(:user) { create(:user, :confirmed, :guest) }
     let(:params) { { barcode: barcode } }
     let(:barcode) { '<PtID>Z394</PtID><PtDAT>54348</PtDAT><UID> ' }
     let(:patient_id) { 'Z394' }
@@ -43,6 +46,7 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
               ],
               telecom: [
                 {
+                  system: 'phone',
                   use: 'mobile',
                   value: '+1234567890'
                 }
@@ -71,65 +75,106 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
         expect(result.pending).to be true
       end
 
+      it 'records the scanning user as the owner of the draft' do
+        expect(subject.drafted_by).to eq(user)
+      end
+
+      it 'stores the Epic patient id encrypted' do
+        result = subject
+        expect(result.epic_id).to eq('test-patient-id')
+        expect(result.epic_id_ciphertext).to be_present
+        expect(result.epic_id_ciphertext).not_to include('test-patient-id')
+      end
+
+      it 'schedules the expiry of the draft' do
+        expect { subject }.to have_enqueued_job(Hfhs::ClearAbandonedPatientDetailsJob).
+          at(a_value_within(1.minute).of(Hfhs::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD.from_now + 1.hour))
+      end
+
       it 'extracts and stores patient data correctly' do
         result = subject
         expect(result.patient_id).to eq('89010892')
         expect(result.first_name).to eq('John')
         expect(result.last_name).to eq('Doe')
         expect(result.dob).to eq(Date.parse('1980-01-01'))
-        expect(result.sex).to eq('male')
+        expect(result.sex).to eq('M')
         expect(result.zip_code).to eq('12345')
         expect(result.phone_type).to eq('mobile')
         expect(result.phone_number).to eq('+1234567890')
       end
     end
 
-    context 'when patient already exists' do
-      let!(:existing_patient) do
-        create(:hfhs_patient_detail,
-               patient_id: '89010892',
-               first_name: 'John',
-               last_name: 'Doe',
-               dob: Date.parse('1980-01-01'),
-               sex: 'male',
-               zip_code: '12345',
-               phone_type: 'mobile',
-               phone_number: '+1234567890',
-               pending: false)
+    describe 'phone selection' do
+      def telecom(entries)
+        epic_response[:entry][0][:resource][:telecom] = entries
       end
 
-      it 'does not create a new record' do
-        expect { subject }.not_to change(HfhsPatientDetail, :count)
+      it 'prefers a mobile number over a better-ranked home one' do
+        telecom([{ system: 'phone', use: 'home', value: '111', rank: 1 },
+                 { system: 'email', use: 'mobile', value: 'a@b.c' },
+                 { system: 'phone', use: 'mobile', value: '222', rank: 2 }])
+        expect(subject).to have_attributes(phone_number: '222', phone_type: 'mobile')
       end
 
-      it 'does not demote the already confirmed record back to pending' do
-        result = subject
-        expect(result.id).to eq(existing_patient.id)
-        expect(result.pending).to be false
+      it 'falls back to the best-ranked phone when there is no mobile' do
+        telecom([{ system: 'email', value: 'a@b.c' },
+                 { system: 'phone', use: 'work', value: '333', rank: 2 },
+                 { system: 'phone', use: 'home', value: '111', rank: 1 }])
+        expect(subject).to have_attributes(phone_number: '111', phone_type: 'home')
       end
 
-      it 'refreshes the record with the data returned by EPIC' do
-        result = subject
-        expect(result.epic_id).to eq('test-patient-id')
+      it 'keeps the number but no type when the use is not one CIAS knows' do
+        telecom([{ system: 'phone', use: 'temp', value: '444' }])
+        expect(subject).to have_attributes(phone_number: '444', phone_type: nil)
       end
 
-      it 'returns the existing record' do
-        result = subject
-        expect(result).to eq(existing_patient.reload)
+      it 'stores no phone when Epic has none' do
+        telecom([{ system: 'email', value: 'a@b.c' }])
+        expect(subject).to have_attributes(phone_number: nil, phone_type: nil)
       end
     end
 
-    context 'when a pending record for the same patient already exists' do
+    context 'when a confirmed record for the same patient already exists' do
+      let(:other_user) { create(:user, :confirmed, :guest) }
       let!(:existing_patient) do
-        create(:hfhs_patient_detail, patient_id: '89010892', pending: true)
+        create(:hfhs_patient_detail,
+               patient_id: '89010892',
+               first_name: 'Robert',
+               last_name: 'Doe',
+               dob: Date.parse('1980-01-01'),
+               sex: 'M',
+               zip_code: '11111',
+               phone_type: 'home',
+               phone_number: '+1111111111',
+               pending: false)
       end
 
-      it 'does not create a new record' do
-        expect { subject }.not_to change(HfhsPatientDetail, :count)
+      before { other_user.update!(hfhs_patient_detail: existing_patient) }
+
+      it 'creates a separate draft' do
+        expect { subject }.to change(HfhsPatientDetail, :count).by(1)
+        expect(subject.id).not_to eq(existing_patient.id)
       end
 
-      it 'keeps the record pending' do
-        expect(subject.pending).to be true
+      it 'leaves the existing record untouched' do
+        expect { subject }.not_to(change { existing_patient.reload.attributes })
+        expect(other_user.reload.hfhs_patient_detail).to eq(existing_patient)
+      end
+    end
+
+    context 'when a pending draft for the same patient already exists' do
+      let!(:existing_draft) do
+        create(:hfhs_patient_detail, patient_id: '89010892', pending: true, drafted_by: create(:user, :confirmed, :guest))
+      end
+
+      it 'creates a new draft owned by the scanning user' do
+        expect { subject }.to change(HfhsPatientDetail, :count).by(1)
+        expect(subject.id).not_to eq(existing_draft.id)
+        expect(subject.drafted_by).to eq(user)
+      end
+
+      it 'does not touch the other draft' do
+        expect { subject }.not_to(change { existing_draft.reload.attributes })
       end
     end
 
@@ -142,8 +187,8 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
         allow_any_instance_of(Api::EpicOnFhir::PatientSearch).to receive(:call).and_return(epic_response_multiple)
       end
 
-      it 'raises MultiplePatientsFoundError' do
-        expect { subject }.to raise_error(HenryFord::MultiplePatientsFoundError)
+      it 'answers like no match at all' do
+        expect { subject }.to raise_error(EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.patient.not_found'))
       end
 
       it 'does not create any records' do
@@ -155,17 +200,20 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
       end
     end
 
+    # Stubbed at the HTTP layer: PatientSearch turns a zero-result bundle into
+    # EpicOnFhir::NotFound before this service sees it.
     context 'when no patients are found' do
-      let(:epic_response_empty) do
-        epic_response.merge(total: 0)
-      end
-
       before do
-        allow_any_instance_of(Api::EpicOnFhir::PatientSearch).to receive(:call).and_return(epic_response_empty)
+        allow_any_instance_of(Api::EpicOnFhir::PatientSearch).to receive(:call).and_call_original
+        allow(ENV).to receive(:fetch).and_call_original
+        allow(ENV).to receive(:fetch).with('EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM', nil).and_return('urn:oid:1.2.3')
+        stub_request(:get, ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT').chomp('/'))
+          .with(query: { '_format' => 'json', 'identifier' => 'urn:oid:1.2.3|Z394' })
+          .to_return(status: 200, body: epic_response.merge(total: 0, entry: []).to_json)
       end
 
-      it 'raises MultiplePatientsFoundError' do
-        expect { subject }.to raise_error(HenryFord::MultiplePatientsFoundError)
+      it 'raises EpicOnFhir::NotFound' do
+        expect { subject }.to raise_error(EpicOnFhir::NotFound)
       end
 
       it 'does not create any records' do
@@ -226,8 +274,9 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
   end
 
   describe '#call' do
-    subject { described_class.new(params).call }
+    subject { described_class.new(user, params).call }
 
+    let(:user) { create(:user, :confirmed, :guest) }
     let(:params) { { barcode: '<PtID>Z394</PtID><PtDAT>54348</PtDAT><UID> ' } }
     let(:patient_id) { 'Z394' }
     let(:epic_response) do
@@ -262,6 +311,7 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
               ],
               telecom: [
                 {
+                  system: 'phone',
                   use: 'work',
                   value: '+9876543210'
                 }
@@ -284,7 +334,7 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
         expect(result.first_name).to eq('Jane')
         expect(result.last_name).to eq('Smith')
         expect(result.dob).to eq(Date.parse('1990-05-15'))
-        expect(result.sex).to eq('female')
+        expect(result.sex).to eq('F')
         expect(result.zip_code).to eq('54321')
         expect(result.phone_type).to eq('work')
         expect(result.phone_number).to eq('+9876543210')
@@ -295,10 +345,15 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
 
   describe 'service initialization' do
     let(:params) { { barcode: '<PtID>Z394</PtID>' } }
-    let(:service) { described_class.new(params) }
+    let(:user) { build(:user) }
+    let(:service) { described_class.new(user, params) }
 
     it 'stores params' do
       expect(service.params).to eq(params)
+    end
+
+    it 'stores the scanning user' do
+      expect(service.user).to eq(user)
     end
 
     it 'has accessible params' do
@@ -307,7 +362,7 @@ RSpec.describe V1::HenryFord::HandleBarCodeService do
   end
 
   describe 'private methods' do
-    let(:service) { described_class.new({}) }
+    let(:service) { described_class.new(build(:user), {}) }
     let(:epic_response) do
       {
         entry: [

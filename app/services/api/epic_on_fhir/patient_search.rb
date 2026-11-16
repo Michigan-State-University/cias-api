@@ -17,6 +17,7 @@ class Api::EpicOnFhir::PatientSearch < Api::EpicOnFhir::BaseService
   private
 
   def request
+    identifier = identifier_param
     connection = Faraday.new ENDPOINT, ssl: Api::EpicOnFhir::SslOptions.call
 
     connection.get do |request|
@@ -24,21 +25,19 @@ class Api::EpicOnFhir::PatientSearch < Api::EpicOnFhir::BaseService
       request.headers['Content-Type'] = 'application/fhir+json'
       request.headers['Accept'] = 'application/fhir+json'
       request.params['_format'] = 'json'
-      request.params['identifier'] = identifier_param
+      request.params['identifier'] = identifier
     end
   end
 
   # Epic resolves a bare `identifier` value against every identifier type it
-  # knows, which can match the wrong patient. Qualifying the search with
-  # `system|value` removes that ambiguity - but we do not yet know which
-  # identifier system the Aztec code's PtID belongs to (it is NOT necessarily
-  # EPIC_ON_FHIR_SYSTEM, the MRN system used by $match). Until HFH confirms it,
-  # EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM stays unset and we search unqualified,
-  # exactly as before. Setting the env var is then the whole change.
+  # knows (a bare 8-digit PtID would also match an MRN), so the search is always
+  # qualified with the PtID's identifier system (EPT .1). Without it the search
+  # fails closed instead of silently running unqualified.
   def identifier_param
     system = ENV.fetch('EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM', nil)
+    raise EpicOnFhir::UnexpectedError, I18n.t('epic_on_fhir.error.unexpected_error') if system.blank?
 
-    system.presence ? "#{system}|#{patient_id}" : patient_id
+    "#{system}|#{patient_id}"
   end
 
   def not_found_condition?(response)

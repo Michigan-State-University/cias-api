@@ -10,7 +10,7 @@ RSpec.describe V1::HfhsPatientDetailAnonymizedSerializer do
            dob: Date.parse('1980-04-17'),
            patient_id: '89010892',
            phone_number: '+1 (234) 567-7890',
-           sex: 'male',
+           sex: 'M',
            zip_code: '12345')
   end
 

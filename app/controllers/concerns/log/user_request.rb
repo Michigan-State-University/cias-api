@@ -57,6 +57,16 @@ module Log::UserRequest
     params.delete(:current_password)
     params[:sms_plan]&.delete(:no_formula_attachment)
     params[:variant]&.delete(:attachment)
+    erase_hfhs_barcode
+  end
+
+  # The raw Aztec payload (Epic patient ID + printing user's Epic ID), in both
+  # the posted copy and the ParamsWrapper copy that JSON requests get.
+  def erase_hfhs_barcode
+    wrapped = params[:patient_detail]
+    [params[:hfhs_patient_data], (wrapped[:hfhs_patient_data] if wrapped.is_a?(ActionController::Parameters))].each do |data|
+      data.delete(:barcode) if data.is_a?(ActionController::Parameters)
+    end
   end
   # rubocop:enable all
 end

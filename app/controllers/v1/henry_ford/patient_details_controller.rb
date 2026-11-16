@@ -10,8 +10,9 @@ class V1::HenryFord::PatientDetailsController < V1Controller
 
   def verify_by_code
     authorize! :read, UserSession
+    authorize_hfhs_scan_session!
 
-    result = V1::HenryFord::HandleBarCodeService.call(verify_code_params)
+    result = V1::HenryFord::HandleBarCodeService.call(current_v1_user, verify_code_params)
 
     render json: serialized_hash(result, 'HfhsPatientDetailAnonymized')
   end
@@ -28,5 +29,15 @@ class V1::HenryFord::PatientDetailsController < V1Controller
 
   def session_id
     params[:session_id]
+  end
+
+  def authorize_hfhs_scan_session!
+    session = Session.find_by(id: params.require(:session_id))
+
+    return if session&.intervention&.hfhs_access? &&
+              session.questions.exists?(type: 'Question::HenryFordInitial') &&
+              session.user_sessions.exists?(user_id: current_v1_user.id)
+
+    raise CanCan::AccessDenied, I18n.t('henry_ford.error.session.not_allowed')
   end
 end

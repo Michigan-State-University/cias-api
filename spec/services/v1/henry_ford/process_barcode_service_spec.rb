@@ -17,8 +17,8 @@ RSpec.describe V1::HenryFord::ProcessBarcodeService do
     context 'when barcode contains patient ID with extra whitespace' do
       let(:barcode) { '<PtID>      Z394</PtID><PtDAT>54348</PtDAT><UID> ' }
 
-      it 'extracts patient ID with whitespace' do
-        expect(subject).to eq('      Z394')
+      it 'strips the label padding' do
+        expect(subject).to eq('Z394')
       end
     end
 
@@ -30,11 +30,33 @@ RSpec.describe V1::HenryFord::ProcessBarcodeService do
       end
     end
 
-    context 'when barcode contains alphanumeric patient ID with special characters' do
-      let(:barcode) { '<PtID>ABC-123_DEF</PtID><PtDAT>54348</PtDAT><UID> ' }
+    context 'when patient ID is 10 alphanumeric characters' do
+      let(:barcode) { '<PtID>Z123456789</PtID><PtDAT>54348</PtDAT><UID> ' }
 
-      it 'extracts complex patient ID correctly' do
-        expect(subject).to eq('ABC-123_DEF')
+      it 'accepts it' do
+        expect(subject).to eq('Z123456789')
+      end
+    end
+
+    # FHIR search syntax in the PtID would let the caller pick the identifier
+    # system (`system|value`), OR several identifiers together (`,`) or escape (`\`).
+    [
+      'urn:oid:1.2.840.114350.1.13.338.3.7.5.737384.48|82000421',
+      'Z394,Z13564,Z2550',
+      'Z394\\,Z1',
+      'ABC-123_DEF',
+      'Z 394',
+      'Z1234567890'
+    ].each do |rejected_id|
+      context "when patient ID is #{rejected_id.inspect}" do
+        let(:barcode) { "<PtID>#{rejected_id}</PtID><PtDAT>54348</PtDAT><UID> " }
+
+        it 'raises BarcodeParsingError with the parsing error message' do
+          expect { subject }.to raise_error(
+            HenryFord::BarcodeParsingError,
+            I18n.t('henry_ford.error.barcode.parsing_error')
+          )
+        end
       end
     end
 
