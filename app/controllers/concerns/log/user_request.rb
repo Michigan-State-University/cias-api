@@ -61,8 +61,7 @@ module Log::UserRequest
     erase_hfhs_barcode
   end
 
-  # The raw Aztec payload (Epic patient ID + printing user's Epic ID), in both
-  # the posted copy and the ParamsWrapper copy that JSON requests get.
+  # JSON requests also carry a ParamsWrapper copy under :patient_detail.
   def erase_hfhs_barcode
     wrapped = params[:patient_detail]
     [params[:hfhs_patient_data], (wrapped[:hfhs_patient_data] if wrapped.is_a?(ActionController::Parameters))].each do |data|

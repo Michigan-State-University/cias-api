@@ -40,17 +40,9 @@ class Rack::Attack
   # different IPs to try brute-forcing a password for a specific account.
 
   ### Prevent Patient Enumeration Through The Aztec Code Endpoint ###
-
-  # verify_by_code turns an arbitrary caller-supplied barcode into a patient
-  # lookup against Epic. Scanning is a once-per-visit action, so a legitimate
-  # user never comes close to this limit, while a scripted caller walking an
-  # identifier space is stopped early.
-  # The per-account limit lives in V1::HenryFord::PatientDetailsController (`rate_limit`),
-  # where the authenticated user is known.
+  # The per-account limit is `rate_limit` in V1::HenryFord::PatientDetailsController.
   throttle('henry_ford/verify_by_code/ip', limit: 10, period: 1.minute) do |req|
-    # Rails' implicit `(.:format)` routes any suffix without a `/` to the action - `.json`,
-    # but also `.j-s`, `.%7E` or `.a+b` - so all of them are counted. rack-attack already
-    # normalises `//` and a trailing `/`.
+    # Any format suffix routes here (.json, but also .j-s or .%7E), so count them all.
     req.ip if req.post? && req.path.match?(%r{\A/v1/henry_ford/verify_by_code(?:\.[^/]+)?\z})
   end
 

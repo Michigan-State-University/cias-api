@@ -18,8 +18,7 @@ class V1::HenryFord::VerifyService
   attr_reader :user, :patient_params, :patient, :appointments, :session_id
   attr_accessor :resource
 
-  # Nothing is confirmed until the appointment lookup has succeeded: a failed
-  # Continue leaves the draft pending, so the same user can simply retry.
+  # Confirm only after the appointment lookup succeeds, so a failed Continue can be retried.
   def call
     if patient_params[:id].present?
       load_confirmable_resource!
@@ -105,8 +104,6 @@ class V1::HenryFord::VerifyService
     [available_locations.where(auxiliary_epic_identifier: appointment_location_auxiliary_id).first, appointment_location_auxiliary_id]
   end
 
-  # A pending draft can only be confirmed by the user who scanned it, and a
-  # confirmed record only by the user already matched to it.
   def load_confirmable_resource!
     @resource = HfhsPatientDetail.find_by(id: patient_params[:id])
     return if @resource&.epic_id.present? && confirmable_by_user?
@@ -118,14 +115,11 @@ class V1::HenryFord::VerifyService
     (@resource.pending? && @resource.drafted_by_id == user.id) || user.hfhs_patient_detail_id == @resource.id
   end
 
-  # A preview user is never matched to the record, so its draft stays pending
-  # and expires instead of becoming an unmatched confirmed row.
   def confirmation_attributes
     user.preview_session? ? {} : { pending: false }
   end
 
-  # epic_id is not part of the lookup: rows stored before it existed must still
-  # be found (and get it filled in) rather than duplicated.
+  # epic_id stays out of the key so older rows without it are found, not duplicated.
   def create_or_find_resource!(epic_id)
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,

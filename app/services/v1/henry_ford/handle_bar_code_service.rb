@@ -19,9 +19,7 @@ class V1::HenryFord::HandleBarCodeService
   def call
     patient_id = V1::HenryFord::ProcessBarcodeService.call(params)
     epic_response = Api::EpicOnFhir::PatientSearch.call(patient_id)
-    # Zero matches already raise EpicOnFhir::NotFound inside PatientSearch; several
-    # matches answer the same way, so a caller cannot tell a miss from a hit on
-    # more than one patient.
+    # Several matches get the same 404 as a miss.
     raise EpicOnFhir::NotFound, I18n.t('epic_on_fhir.error.patient.not_found') if epic_response[:total] != 1
 
     create_draft_patient_record(epic_response)
@@ -29,9 +27,7 @@ class V1::HenryFord::HandleBarCodeService
 
   private
 
-  # Every scan gets its own draft, owned by the user who scanned it. Holding a
-  # label proves nothing yet, so an existing (possibly confirmed and matched)
-  # record is never returned, shared or overwritten here.
+  # Always a new draft: a scanned label must never reach an existing record.
   def create_draft_patient_record(epic_response)
     draft = HfhsPatientDetail.create!(
       patient_id: hfhs_patient_id(epic_response),
@@ -50,8 +46,7 @@ class V1::HenryFord::HandleBarCodeService
     draft
   end
 
-  # Nothing schedules the rake task on Dokku or ECS, so each draft enqueues the
-  # (idempotent) sweep that will expire it if nobody confirms it.
+  # The rake task isn't scheduled anywhere, so each draft enqueues its own expiry.
   def schedule_draft_expiry
     Hfhs::ClearAbandonedPatientDetailsJob.set(wait: Hfhs::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD + 1.hour).perform_later
   end

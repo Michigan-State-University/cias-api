@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 class V1::HenryFord::ProcessBarcodeService
-  # The PtID is the Epic internal patient ID (EPT .1): letters and digits,
-  # space-padded to 10 characters on the label. Anything else - FHIR search
-  # syntax such as `|`, `,` or `\` included - is rejected, so the caller cannot
-  # choose the identifier system or OR several identifiers into one search.
+  # Also rejects FHIR search syntax (`|`, `,`, `\`) so a label can't change the search.
   PATIENT_ID_FORMAT = /\A[A-Za-z0-9]{1,10}\z/
 
   def self.call(verify_code_params)

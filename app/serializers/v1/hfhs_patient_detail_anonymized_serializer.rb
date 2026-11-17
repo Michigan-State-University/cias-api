@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
-# Serves the confirmation screen shown right after an Aztec code scan, before
-# the patient has confirmed anything. Every attribute here is therefore
-# deliberately partial: enough for a patient to recognise themselves, not
-# enough to be useful to anybody else. Do NOT add plain attributes to this
-# serializer - add a masked one.
+# Shown before the patient is confirmed: add masked attributes only.
 class V1::HfhsPatientDetailAnonymizedSerializer < V1Serializer
   attributes :id
 

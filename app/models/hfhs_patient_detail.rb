@@ -20,7 +20,6 @@ class HfhsPatientDetail < ApplicationRecord
               :provided_sex, :provided_zip, :provided_phone_number, :provided_phone_type, :provided_dob
 
   has_many :users, dependent: :nullify
-  # The user who scanned the Aztec code; only they can confirm the pending draft.
   belongs_to :drafted_by, class_name: 'User', optional: true
 
   validates :patient_id, presence: true

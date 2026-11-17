@@ -1,11 +1,7 @@
 # frozen_string_literal: true
 
 class V1::HenryFord::PatientDetailsController < V1Controller
-  # Per account, so one user cannot spread a scripted walk over several IPs. It runs
-  # after V1Controller#authenticate_user!, so it counts the account devise_token_auth
-  # actually authenticated, however the token was sent, and an unauthenticated request
-  # naming someone else's uid is never charged to them. `with:` keeps the bare 429 on
-  # Rails 8.1, whose default raises ActionController::TooManyRequests instead.
+  # `with:` keeps a plain 429; the Rails 8.1 default raises TooManyRequests.
   rate_limit to: 5, within: 10.minutes, by: -> { current_v1_user.id },
              with: -> { head :too_many_requests }, only: :verify_by_code
 

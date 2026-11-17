@@ -29,10 +29,7 @@ class Api::EpicOnFhir::PatientSearch < Api::EpicOnFhir::BaseService
     end
   end
 
-  # Epic resolves a bare `identifier` value against every identifier type it
-  # knows (a bare 8-digit PtID would also match an MRN), so the search is always
-  # qualified with the PtID's identifier system (EPT .1). Without it the search
-  # fails closed instead of silently running unqualified.
+  # A bare identifier also matches other ID types (e.g. the MRN), so never search unqualified.
   def identifier_param
     system = ENV.fetch('EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM', nil)
     raise EpicOnFhir::UnexpectedError, I18n.t('epic_on_fhir.error.unexpected_error') if system.blank?

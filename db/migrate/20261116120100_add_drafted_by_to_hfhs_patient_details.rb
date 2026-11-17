@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# The user who scanned the Aztec code; only they can confirm the pending draft.
 class AddDraftedByToHfhsPatientDetails < ActiveRecord::Migration[7.2]
   def change
     add_reference :hfhs_patient_details, :drafted_by, type: :uuid, null: true, index: true,
