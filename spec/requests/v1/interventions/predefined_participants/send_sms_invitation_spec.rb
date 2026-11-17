@@ -106,27 +106,16 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants/
 
       it_behaves_like 'users without access'
 
-      context 'with a collaborator who has edit: true' do
+      context 'with a collaborator who has edit: true (SMS invitations are not behind the editor lock)' do
         before { create(:collaborator, intervention: intervention, user: collaborator, edit: true, view: true) }
 
-        it 'answers 403 when the collaborator is not the current editor' do
+        it 'is allowed even when another user holds the editor lock' do
           intervention.update!(current_editor: researcher)
           post sms_path, headers: collaborator.create_new_auth_token
-          expect(response).to have_http_status(:forbidden)
+          expect(response).to have_http_status(:ok)
         end
 
-        it 'sends no message for the non-editor' do
-          intervention.update!(current_editor: researcher)
-          expect { post sms_path, headers: collaborator.create_new_auth_token }.not_to change(Message, :count)
-        end
-
-        it 'answers 403 when nobody is the current editor' do
-          post sms_path, headers: collaborator.create_new_auth_token
-          expect(response).to have_http_status(:forbidden)
-        end
-
-        it 'the same collaborator gets 200 once they are the current editor' do
-          intervention.update!(current_editor: collaborator)
+        it 'is allowed when nobody holds the editor lock' do
           post sms_path, headers: collaborator.create_new_auth_token
           expect(response).to have_http_status(:ok)
         end

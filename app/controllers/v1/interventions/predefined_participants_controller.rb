@@ -4,7 +4,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   include ::PredefinedParticipants::InterventionGate
 
   before_action :verify_access, except: %i[verify ra_session]
-  before_action :require_current_editor, except: %i[index show verify ra_session]
+  before_action :require_current_editor, except: %i[index show verify ra_session send_sms_invitation send_email_invitation]
   skip_before_action :authenticate_user!, only: %i[verify]
 
   def index
