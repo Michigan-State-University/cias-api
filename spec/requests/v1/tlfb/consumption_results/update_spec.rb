@@ -44,6 +44,20 @@ RSpec.describe 'PATCH v1/tlfb/consumption_results/:id', type: :request do
     end
   end
 
+  context 'when the participant who owns the user session sends the body unwrapped' do
+    let(:user) { create(:user, :confirmed, :participant) }
+    let(:user_session) { create(:user_session, user: user, session: session) }
+    let(:request) do
+      patch v1_tlfb_consumption_result_path(consumption_result.id), headers: headers,
+                                                                    params: { body: { consumed: false, substances: [] } }, as: :json
+    end
+
+    it 'stores the new body' do
+      expect(response).to have_http_status(:ok)
+      expect(consumption_result.reload.body).to eq('consumed' => false, 'substances' => [])
+    end
+  end
+
   context 'When params invalid' do
     let(:params) { {} }
 

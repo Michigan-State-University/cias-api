@@ -133,7 +133,7 @@ class User < ApplicationRecord
 
   scope :name_contains, lambda { |substring|
     if substring.present?
-      ids = select { |u| "#{u.first_name} #{u.last_name} #{u.email}" =~ /#{substring.downcase}/i }.map(&:id)
+      ids = select { |u| "#{u.first_name} #{u.last_name} #{u.email}".downcase.include?(substring.downcase) }.map(&:id)
       User.where(id: ids)
     end
   }

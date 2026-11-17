@@ -114,7 +114,7 @@ class V1::SessionService
       raise ComplexException.new(
         I18n.t('sessions.ra_already_exists_in_target'),
         {},
-        :unprocessable_entity
+        :unprocessable_content
       )
     end
 

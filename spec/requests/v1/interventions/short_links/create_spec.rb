@@ -55,7 +55,7 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/short_links', type: :req
     before { request }
 
     it {
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     }
 
     it {

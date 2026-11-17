@@ -45,6 +45,12 @@ RSpec.describe 'POST /v1/report_templates/:report_template_id/sections', type: :
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when section is a string' do
+      let(:params) { { section: 'x' } }
+
+      it_behaves_like 'rejects malformed params', -> { ReportTemplate::Section.count }
+    end
   end
 
   context 'when user is not super admin' do

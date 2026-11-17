@@ -56,7 +56,7 @@ class V1::Interventions::CollaboratorsController < V1Controller
   end
 
   def collaborator_params
-    params.require(:collaborator).permit(:view, :edit, :data_access)
+    params.expect(collaborator: %i[view edit data_access])
   end
 
   def emails

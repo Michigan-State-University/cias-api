@@ -17,4 +17,15 @@ RSpec.describe 'GET /v1/sessions/:session_id/sms_plans', type: :request do
     expect(json_response['data'][0]['id']).to eq sms_plan1.id
     expect(json_response['data'][1]['id']).to eq sms_plan2.id
   end
+
+  context 'when a researcher reads the plans of a session that is not theirs' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    it 'returns not found without the plans' do
+      request
+
+      expect(response).to have_http_status(:not_found)
+      expect(response.body).not_to include(sms_plan1.id)
+    end
+  end
 end

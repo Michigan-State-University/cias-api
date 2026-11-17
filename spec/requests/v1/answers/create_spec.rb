@@ -32,14 +32,23 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
 
   context 'when user session is finished' do
     let(:user) { create(:user, :participant, :confirmed) }
-    let(:user_session) { create(:user_session, user: user, session: session, finished_at: DateTime.now) }
+    let(:stored_data) { [{ 'var' => 'a1', 'value' => '2' }] }
+    let(:user_session) do
+      create(:user_session, user: user, session: session, finished_at: DateTime.now).tap do |finished_session|
+        create(:answer_single, user_session: finished_session, question: question, body: { data: stored_data })
+      end
+    end
 
     it 'returns correct http status' do
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'return correct error msg' do
       expect(json_response['message']).to eq 'You cannot provide an answer for the finished session'
+    end
+
+    it 'leaves the stored answer untouched' do
+      expect(user_session.answers.sole.decrypted_body).to eq('data' => stored_data)
     end
   end
 

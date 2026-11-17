@@ -10,10 +10,11 @@ class V1::Charts::Regenerate
     @replace = replace
   end
 
+  # The destroy happens per chart INSIDE CreateForUserSessions' lock. Destroying up front meant a
+  # chart that was then skipped (locked) or that raised had its rows deleted and never rebuilt.
   def call
-    ChartStatistic.where(chart_id: chart_ids).destroy_all if replace
     chart_ids.each do |chart_id|
-      V1::ChartStatistics::CreateForUserSessions.call(chart_id)
+      V1::ChartStatistics::CreateForUserSessions.call(chart_id, replace: replace)
     end
   end
 

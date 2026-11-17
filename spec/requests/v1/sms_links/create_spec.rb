@@ -167,7 +167,7 @@ RSpec.describe 'POST /v1/sms_links', type: :request do
 
     it 'returns :created status' do
       request
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'does NOT create SMS link' do
@@ -190,9 +190,9 @@ RSpec.describe 'POST /v1/sms_links', type: :request do
 
       before { create(:sms_link, variant: variant, sms_plan: sms_plan, session: sms_plan.session, variable: 'dup_var') }
 
-      it 'returns :unprocessable_entity' do
+      it 'returns :unprocessable_content' do
         request
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'does NOT create SMS link' do

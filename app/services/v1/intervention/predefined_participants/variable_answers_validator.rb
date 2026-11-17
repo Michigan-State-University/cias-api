@@ -31,7 +31,7 @@ class V1::Intervention::PredefinedParticipants::VariableAnswersValidator
     raise ComplexException.new(
       I18n.t('predefined_participants.bulk_import.variable_answers_validation_error'),
       { errors: @errors },
-      :unprocessable_entity
+      :unprocessable_content
     )
   end
 
@@ -85,7 +85,7 @@ class V1::Intervention::PredefinedParticipants::VariableAnswersValidator
     raise ComplexException.new(
       I18n.t('predefined_participants.bulk_import.variable_answers_validation_error'),
       { errors: [{ code: code }] },
-      :unprocessable_entity
+      :unprocessable_content
     )
   end
 end

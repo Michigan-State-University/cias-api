@@ -4,7 +4,7 @@ class V1::NarratorController < V1Controller
   def create
     authorize! :update, object_load
 
-    MultipleCharacters::ChangeNarratorJob.perform_later(current_v1_user, model, object_id, new_narrator, replaced_animation)
+    MultipleCharacters::ChangeNarratorJob.perform_later(current_v1_user, model, record_id, new_narrator, replaced_animation)
 
     head :ok
   end
@@ -15,16 +15,16 @@ class V1::NarratorController < V1Controller
     params[:_model]
   end
 
-  def object_id
+  def record_id
     params[:id]
   end
 
   def object_load
-    model.safe_constantize.find(object_id)
+    model.safe_constantize.find(record_id)
   end
 
   def narrator_params
-    params.require(:narrator).permit(:name, replaced_animations: {})
+    params.expect(narrator: [:name, { replaced_animations: {} }])
   end
 
   def new_narrator

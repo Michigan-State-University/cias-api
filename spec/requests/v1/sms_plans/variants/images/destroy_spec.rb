@@ -24,6 +24,10 @@ RSpec.describe 'DELETE /v1/sms_plans/:sms_plan_id/variants/:id/attachment', type
       request
       expect(variant.reload.attachment.attached?).to be(false)
     end
+
+    it 'purges the file in the background' do
+      expect { request }.to have_enqueued_job(ActiveStorage::PurgeJob).with(variant.attachment.blob)
+    end
   end
 
   context 'when intervention is published' do

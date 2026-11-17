@@ -31,7 +31,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       raise ComplexException.new(
         I18n.t('predefined_participants.bulk_import.empty_participants_error'),
         { errors: [{ code: 'empty_participants' }] },
-        :unprocessable_entity
+        :unprocessable_content
       )
     end
 
@@ -39,7 +39,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
       raise ComplexException.new(
         I18n.t('predefined_participants.bulk_import.ra_answers_require_published_intervention_error'),
         { errors: [{ code: 'ra_answers_require_published_intervention_error' }] },
-        :unprocessable_entity
+        :unprocessable_content
       )
     end
 
@@ -121,13 +121,13 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
   end
 
   def predefined_user_parameters
-    params.require(:predefined_user).permit(:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, :external_id, :email,
-                                            :sms_notification, :email_notification, phone_attributes: %i[iso prefix number])
+    params.expect(predefined_user: [:first_name, :last_name, :health_clinic_id, :active, :auto_invitation, :external_id, :email,
+                                    :sms_notification, :email_notification, { phone_attributes: %i[iso prefix number] }])
   end
 
   def predefined_users_parameters
-    params.require(:predefined_users).permit(
-      participants: [
+    params.expect(
+      predefined_users: [participants: [[
         :first_name,
         :last_name,
         :email,
@@ -138,7 +138,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
         :health_clinic_name,
         :health_system_name,
         { phone_attributes: %i[iso prefix number], variable_answers: {} }
-      ]
+      ]]]
     )
   end
 
@@ -172,7 +172,7 @@ class V1::Interventions::PredefinedParticipantsController < V1Controller
     raise ComplexException.new(
       I18n.t('predefined_participants.bulk_import.bulk_import_validation_error'),
       { errors: errors },
-      :unprocessable_entity
+      :unprocessable_content
     )
   end
 

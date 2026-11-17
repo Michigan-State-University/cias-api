@@ -23,10 +23,10 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position (RA g
       }
     end
 
-    it 'returns unprocessable_entity' do
+    it 'returns unprocessable_content' do
       patch v1_intervention_sessions_position_path(intervention_id: intervention.id),
             params: params, headers: headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
@@ -42,10 +42,10 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position (RA g
       }
     end
 
-    it 'returns unprocessable_entity' do
+    it 'returns unprocessable_content' do
       patch v1_intervention_sessions_position_path(intervention_id: intervention.id),
             params: params, headers: headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

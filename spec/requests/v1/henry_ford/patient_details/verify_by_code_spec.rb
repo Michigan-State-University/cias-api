@@ -160,7 +160,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
         end
 
         it 'returns error status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
@@ -175,7 +175,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
         end
 
         it 'returns error status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
@@ -190,7 +190,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
         end
 
         it 'returns error status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
 
@@ -205,7 +205,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
         end
 
         it 'returns error status' do
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
       end
     end
@@ -369,7 +369,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
     end
 
     it 'returns unprocessable entity with the translated message' do
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.patient.identifier_missing'))
       expect(HfhsPatientDetail.count).to eq(0)
     end
@@ -384,7 +384,7 @@ RSpec.describe 'POST /v1/henry_ford/verify_by_code', type: :request do
     end
 
     it 'is rejected before Epic is asked' do
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.barcode.parsing_error'))
       expect(HfhsPatientDetail.count).to eq(0)
     end

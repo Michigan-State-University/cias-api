@@ -11,6 +11,12 @@ RSpec.describe V1::GeneratedReports::Create do
       session = create(:session, intervention: intervention)
       @user_session = create(:user_session, session: session)
       @report_template = create(:report_template, session: session)
+      question_group = create(:question_group, session: session)
+      create(:question_free_response, question_group: question_group, body: { data: [{ payload: '' }], variable: { name: 'free_text' } })
+      create(:question_free_response, question_group: question_group, body: { data: [{ payload: '' }], variable: { name: 'other_text' } })
+      other_session = create(:session, intervention: intervention, variable: 's1')
+      create(:question_free_response, question_group: create(:question_group, session: other_session),
+                                      body: { data: [{ payload: '' }], variable: { name: 'free_text' } })
       section1 = create(:report_template_section, report_template: @report_template,
                                                   formula: 'var1+var2')
       section2 = create(:report_template_section, report_template: @report_template,
@@ -37,6 +43,8 @@ RSpec.describe V1::GeneratedReports::Create do
   let(:dentaku_calculator) { Dentaku::Calculator.new }
 
   before do
+    # Shared before_all records keep in-memory content from previous examples; reset them to the DB state.
+    [section1_variant1, section1_variant2, section2_variant1, section2_variant2].each(&:reload)
     allow(Dentaku::Calculator).to receive(:new).and_return(dentaku_calculator)
     dentaku_service.store_and_transform_values
     Timecop.freeze
@@ -170,6 +178,118 @@ RSpec.describe V1::GeneratedReports::Create do
           ).and_return('PDF TEMPLATE')
 
           subject
+        end
+      end
+
+      context 'when the answer was skipped' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session, skipped: true,
+                                        body: { data: [{ 'var' => '', 'value' => '' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'omits the section that uses the variable' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [variant_with_content('Second section')]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when the answer value is blank' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session,
+                                        body: { data: [{ 'var' => 'free_text', 'value' => '' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'omits the section that uses the variable' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [variant_with_content('Second section')]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when a variable from another session has no value' do
+        before do
+          section1_variant1.update(content: 'Earlier you said: .:s1.free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'omits the section that uses the variable' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [variant_with_content('Second section')]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when the placeholder does not match any intervention variable' do
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_txt:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'keeps the section with the placeholder untouched' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [
+              variant_with_content('Your thoughts: .:free_txt:.'),
+              variant_with_content('Second section')
+            ]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when only some of the variables used in a section have values' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session,
+                                        body: { data: [{ 'var' => 'free_text', 'value' => 'I feel great' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:., more: .:other_text:., earlier: .:s1.free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'keeps the section and marks the unanswered variables as not answered' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [
+              variant_with_content('Your thoughts: I feel great, more: Not answered, earlier: Not answered'),
+              variant_with_content('Second section')
+            ]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when every selected section uses a variable without value' do
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:.')
+          section2_variant1.update(content: 'More thoughts: .:other_text:.')
+        end
+
+        it 'does not create a report' do
+          expect { subject }.to avoid_changing(GeneratedReport, :count)
         end
       end
     end

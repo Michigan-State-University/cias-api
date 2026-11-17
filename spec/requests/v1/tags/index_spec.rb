@@ -160,6 +160,26 @@ RSpec.describe 'GET /v1/tags', type: :request do
       end
     end
 
+    context 'with intervention_id parameter' do
+      let(:intervention) { create(:intervention, user: user) }
+      let!(:assigned_tag) { create(:tag, name: 'Assigned') }
+      let!(:free_tag) { create(:tag, name: 'Free') }
+      let(:params) { { intervention_id: intervention.id } }
+
+      before do
+        create(:tag_intervention, tag: assigned_tag, intervention: intervention)
+        request
+      end
+
+      it 'leaves out the tags already assigned to that intervention' do
+        expect(json_response['data'].pluck('id')).to contain_exactly(free_tag.id.to_s)
+      end
+
+      it 'counts only the unassigned tags' do
+        expect(json_response['tags_size']).to eq(1)
+      end
+    end
+
     context 'when no tags exist' do
       before { request }
 

@@ -22,6 +22,11 @@ en:
   session:
     error:
       formula_update_in_progress: 'Cannot update session variable while references update is in progress. Please try again in a few moments.'
+  chart:
+    error:
+      regenerate:
+        draft_chart: 'A draft chart has not collected any data yet, so there is nothing to regenerate. Publish it or move it to data collection first.'
+        in_progress: 'This chart is already being regenerated. Please wait for the current run to finish before starting another.'
   question_group:
     finish:
       title: Finish Group
@@ -364,6 +369,11 @@ en:
       subject: 'Error during copying'
       header: 'An error has occurred during copying.'
       body: 'Something went wrong while copying your session/intervention. Please try again.'
+  chart_regeneration_mailer:
+    complete:
+      subject: 'Chart %{chart_name} has been regenerated'
+      header: 'Your chart has been regenerated'
+      body: 'The data for chart %{chart_name} has been recalculated and is up to date in your reporting dashboard.'
   duplicate_mailer:
     session:
       subject: 'Duplicate of %{session_name}'

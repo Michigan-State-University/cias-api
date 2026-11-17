@@ -47,6 +47,31 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/predefined_participants
 
   it_behaves_like 'users without access'
 
+  context 'with nested phone attributes' do
+    let(:params) do
+      {
+        predefined_user: {
+          first_name: 'John',
+          phone_attributes: { iso: 'US', prefix: '+1', number: '2025550123' }
+        }
+      }
+    end
+
+    before { request }
+
+    it 'updates phone' do
+      expect(user.reload.phone.slice(:iso, :prefix, :number)).to eq('iso' => 'US', 'prefix' => '+1', 'number' => '2025550123')
+    end
+  end
+
+  context 'when predefined_user key is missing' do
+    let(:params) { { first_name: 'John' } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:bad_request) }
+  end
+
   context 'researcher activates the account' do
     let(:user) { create(:user, :predefined_participant, active: false) }
     let(:params) do

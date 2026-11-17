@@ -37,6 +37,20 @@ class V1::ChartsController < V1Controller
     head :no_content
   end
 
+  def regenerate
+    authorize! :update, Chart
+
+    chart = chart_load
+
+    raise ActiveRecord::RecordNotSaved, I18n.t('chart.error.regenerate.draft_chart') if chart.draft?
+
+    raise ActiveRecord::RecordNotSaved, I18n.t('chart.error.regenerate.in_progress') if chart.regenerating?
+
+    RegenerateChartsJob.perform_later([chart.id], replace: true, user_id: current_v1_user.id)
+
+    head :accepted
+  end
+
   private
 
   def charts_scope
@@ -48,7 +62,7 @@ class V1::ChartsController < V1Controller
   end
 
   def chart_params
-    params.require(:chart).permit(:name, :description, :chart_type, :trend_line, :status, :dashboard_section_id,
-                                  :interval_type, :date_range_start, :date_range_end, formula: {})
+    params.expect(chart: [:name, :description, :chart_type, :trend_line, :status, :dashboard_section_id,
+                          :interval_type, :date_range_start, :date_range_end, { formula: {} }])
   end
 end

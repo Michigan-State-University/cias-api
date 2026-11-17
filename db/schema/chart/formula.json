@@ -32,6 +32,13 @@
         "type": "string"
       }
     },
+    "min_answered_variables": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "positive_despite_missing_data": {
+      "type": "boolean"
+    },
     "required": [
       "match"
     ],

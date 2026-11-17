@@ -32,4 +32,46 @@ RSpec.describe 'POST /v1/interventions/:intervention_id/predefined_participants'
   end
 
   it_behaves_like 'users without access'
+
+  context 'with nested phone attributes' do
+    let(:params) do
+      {
+        predefined_user: {
+          first_name: 'John',
+          last_name: 'Doe',
+          external_id: 'ext-1',
+          sms_notification: true,
+          phone_attributes: { iso: 'US', prefix: '+1', number: '2025550123' }
+        }
+      }
+    end
+    let(:created_user) { intervention.reload.predefined_users.first }
+
+    before { request }
+
+    it 'persists phone' do
+      expect(created_user.phone.slice(:iso, :prefix, :number)).to eq('iso' => 'US', 'prefix' => '+1', 'number' => '2025550123')
+    end
+
+    it 'persists predefined user parameters' do
+      expect(created_user.predefined_user_parameter.slice(:external_id, :sms_notification)).to eq('external_id' => 'ext-1',
+                                                                                                  'sms_notification' => true)
+    end
+  end
+
+  context 'when predefined_user key is missing' do
+    let(:params) { { first_name: 'John' } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:bad_request) }
+  end
+
+  context 'when predefined_user contains only unpermitted attributes' do
+    let(:params) { { predefined_user: { roles: %w[admin] } } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:bad_request) }
+  end
 end

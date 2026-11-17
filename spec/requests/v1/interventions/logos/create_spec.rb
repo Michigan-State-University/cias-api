@@ -100,4 +100,27 @@ RSpec.describe 'POST /v1/interventions/:interventions_id/logo', type: :request d
       }
     end
   end
+
+  context 'when the file is not inside logo[]' do
+    let(:params) { { file: FactoryHelpers.upload_file('spec/factories/images/test_image_1.jpg', 'image/jpeg', true) } }
+
+    before { post v1_intervention_logo_path(intervention_id), params: params, headers: current_user.create_new_auth_token }
+
+    it 'returns :bad_request with a message only and attaches nothing' do
+      expect(response).to have_http_status(:bad_request)
+      expect(json_response.keys).to eq(['message'])
+      expect(intervention.reload.logo).not_to be_attached
+    end
+  end
+
+  context "when a researcher uploads to another user's intervention" do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+
+    before { post v1_intervention_logo_path(intervention_id), params: params, headers: researcher.create_new_auth_token }
+
+    it 'returns :not_found and attaches nothing' do
+      expect(response).to have_http_status(:not_found)
+      expect(intervention.reload.logo).not_to be_attached
+    end
+  end
 end

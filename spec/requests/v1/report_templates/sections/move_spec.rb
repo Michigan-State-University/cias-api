@@ -72,4 +72,35 @@ RSpec.describe 'PATCH /v1/report_templates/:report_template_id/move_sections', t
       expect(json_response['message']).to eql('You are not authorized to access this page.')
     end
   end
+
+  context 'when every section gets a new position' do
+    let!(:params) do
+      {
+        'section' => {
+          'position' => [
+            { 'id' => report_template_section3.id, 'position' => 0 },
+            { 'id' => report_template_section2.id, 'position' => 1 },
+            { 'id' => report_template_section1.id, 'position' => 2 }
+          ]
+        }
+      }
+    end
+    let(:reversed) { [report_template_section3.id, report_template_section2.id, report_template_section1.id] }
+
+    it 'returns the template with its sections in the new order and persists it' do
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data']['relationships']['sections']['data'].pluck('id')).to eq(reversed)
+      expect(report_template.sections.reorder(:position).pluck(:id)).to eq(reversed)
+    end
+  end
+
+  context 'when position is not a list' do
+    let!(:params) { { 'section' => { 'position' => 'x' } } }
+
+    it 'returns :bad_request and keeps the order' do
+      expect(response).to have_http_status(:bad_request)
+      expect(json_response).to include('message')
+      expect(report_template.sections.reorder(:position).pluck(:position)).to eq([0, 1, 2])
+    end
+  end
 end

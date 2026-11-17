@@ -57,7 +57,7 @@ RSpec.describe 'POST /v1/downloaded_report', type: :request do
 
         let!(:request) { post v1_downloaded_reports_path, params: params, headers: headers }
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq 'Validation failed: Generated report must exist'
