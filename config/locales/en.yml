@@ -282,7 +282,7 @@ en:
         invalid_payload: The SMS campaign is invalid
         no_recipients: There are no participants eligible for this SMS campaign
         campaign_in_progress: An SMS campaign of this kind is already in progress
-        daily_cap_exceeded: The daily SMS limit for this intervention has been reached
+        daily_cap_exceeded: The daily SMS limit has been reached
         not_cancellable: Only a scheduled SMS campaign can be cancelled
         rate_limited: Too many requests, try again later
     resend:
