@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -1009,6 +1009,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "team_group_identifiers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "team_id", null: false
+    t.string "identifier", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["identifier"], name: "index_team_group_identifiers_on_identifier", unique: true
+    t.index ["team_id"], name: "index_team_group_identifiers_on_team_id"
+  end
+
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "team_id"
@@ -1201,11 +1210,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
     t.index ["organizable_id", "organizable_type"], name: "index_users_on_organizable_id_and_organizable_type"
     t.index ["organizable_id"], name: "index_users_on_organizable_id"
     t.index ["preview_session_id"], name: "index_users_on_preview_session_id"
+    t.index ["provider", "uid_bidx"], name: "index_users_on_provider_and_uid_bidx", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
     t.index ["team_id"], name: "index_users_on_team_id"
     t.index ["test_run"], name: "index_users_on_test_run", where: "(test_run = true)"
-    t.index ["uid_bidx"], name: "index_users_on_uid_bidx", unique: true
   end
 
   create_table "versions", force: :cascade do |t|
@@ -1290,6 +1299,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_090000) do
   add_foreign_key "stars", "users"
   add_foreign_key "tag_interventions", "interventions"
   add_foreign_key "tag_interventions", "tags"
+  add_foreign_key "team_group_identifiers", "teams", on_delete: :cascade
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
