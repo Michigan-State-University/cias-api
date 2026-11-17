@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class V1::Intervention::Publish
+  AutoInvitationError = Class.new(StandardError)
+
   def initialize(intervention)
     @intervention = intervention
     @sessions = intervention.sessions.order(:position)
@@ -67,10 +69,15 @@ class V1::Intervention::Publish
 
   def invite(predefined_user_parameter, opted_out_user_ids)
     user = predefined_user_parameter.user
-    send_sms_invitation(predefined_user_parameter, user, opted_out_user_ids)
-    send_email_invitation(predefined_user_parameter, user)
+    send_sms_invitation(predefined_user_parameter, user, opted_out_user_ids) if predefined_user_parameter.sms_invitation_sent_at.nil?
+    send_email_invitation(predefined_user_parameter, user) if predefined_user_parameter.email_invitation_sent_at.nil?
   rescue ActiveRecord::ActiveRecordError => e
     Sentry.capture_exception(e)
+  rescue ApplicationJob::JobTimeoutError
+    raise
+  rescue StandardError => e
+    V1::PredefinedParticipants::ReportSmsError.call(AutoInvitationError, e.class.name,
+                                                    extra: { intervention_id: intervention.id }, backtrace: e.backtrace)
   end
 
   def send_sms_invitation(predefined_user_parameter, user, opted_out_user_ids)

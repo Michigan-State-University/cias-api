@@ -232,6 +232,42 @@ RSpec.describe V1::Intervention::Publish do
       end
     end
 
+    describe 'already-invited participants are not invited again (safe to retry)' do
+      let!(:invited) { participant }
+
+      before { parameter(invited).update!(sms_invitation_sent_at: 1.day.ago, email_invitation_sent_at: 1.day.ago) }
+
+      it 'sends no new SMS' do
+        expect { publish }.to avoid_changing(Message, :count)
+      end
+
+      it 'sends no new e-mail' do
+        expect { publish }.to avoid_changing { delivered_mail_count }
+      end
+    end
+
+    describe 'a non-ActiveRecord failure (e.g. SMTP) is reported, not raised to the job' do
+      let!(:invited) { participant }
+
+      before do
+        allow(V1::PredefinedParticipants::ReportSmsError).to receive(:call)
+        allow(V1::Intervention::PredefinedParticipants::SendEmailInvitation).to receive(:call).and_raise(StandardError, 'smtp down')
+      end
+
+      it 'does not raise, so PublishJob does not retry and re-send' do
+        expect { publish }.not_to raise_error
+      end
+
+      it 'reports it via ReportSmsError' do
+        publish
+        expect(V1::PredefinedParticipants::ReportSmsError).to have_received(:call)
+      end
+
+      it 'still sent the SMS for that participant' do
+        expect { publish }.to change(Message, :count).by(1)
+      end
+    end
+
     describe 'invitations leave the publishing transaction before anything is sent or enqueued' do
       it 'sends, mails and enqueues at the transaction depth the caller started with' do
         participant
