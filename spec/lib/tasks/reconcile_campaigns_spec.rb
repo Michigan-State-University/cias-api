@@ -79,12 +79,12 @@ RSpec.describe 'predefined_participants:reconcile_campaigns' do
       expect { invoke }.to have_enqueued_job(job_class).with(child.id)
     end
 
-    it 'does not fire a child reminder that is merely waiting for its future scheduled_at' do
+    it 're-enqueues a future reminder whose scheduled job Redis lost, at its scheduled_at' do
       parent = stranded_campaign(status: 'sent')
       waiting = stranded_campaign(kind: 'scheduled_reminder', parent_campaign: parent, intervention: parent.intervention,
                                   days_after: 3, scheduled_at: now + 3.days)
 
-      expect { invoke }.not_to have_enqueued_job(job_class).with(waiting.id)
+      expect { invoke }.to have_enqueued_job(job_class).with(waiting.id).at(now + 3.days)
     end
 
     it 'does not touch cancelled, sent, failed or skipped campaigns' do

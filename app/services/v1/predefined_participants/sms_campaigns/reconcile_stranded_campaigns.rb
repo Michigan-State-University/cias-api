@@ -3,6 +3,7 @@
 class V1::PredefinedParticipants::SmsCampaigns::ReconcileStrandedCampaigns
   BATCH_SIZE = 500
   MAX_CAMPAIGNS_PER_RUN = 100
+  JOB_CLASS = ::PredefinedParticipants::SendSmsCampaignJob.name
 
   Result = Struct.new(:found, :enqueued, :dry_run, :refused, :max_campaigns, :candidate_ids, keyword_init: true) do
     def dry_run?
@@ -26,10 +27,11 @@ class V1::PredefinedParticipants::SmsCampaigns::ReconcileStrandedCampaigns
 
   def call
     candidates = ::PredefinedParticipants::StrandedCampaignsQuery.call(now)
-    found = candidates.count
+    future = unqueued_future_campaigns
+    found = candidates.count + future.size
     refused = refuse?(found)
     dispatch = !dry_run && !refused
-    ids = collect_ids(candidates, dispatch: dispatch)
+    ids = collect_ids(candidates, dispatch: dispatch) + requeue_future(future, dispatch: dispatch)
 
     log(found, ids, refused)
 
@@ -43,6 +45,26 @@ class V1::PredefinedParticipants::SmsCampaigns::ReconcileStrandedCampaigns
 
   def refuse?(found)
     !dry_run && max_campaigns.present? && found > max_campaigns
+  end
+
+  # A campaign whose time has not come needs a job only if Redis lost the one it was given.
+  def unqueued_future_campaigns
+    ::PredefinedParticipants::SmsCampaign.where(status: 'scheduled').where('scheduled_at > ?', now)
+                                         .where.not(id: queued_campaign_ids.to_a).pluck(:id, :scheduled_at)
+  end
+
+  def queued_campaign_ids
+    Sidekiq::ScheduledSet.new.each_with_object(Set.new) do |entry, ids|
+      payload = entry.args.first
+      ids << Array(payload['arguments']).first if payload.is_a?(Hash) && payload['job_class'] == JOB_CLASS
+    end
+  end
+
+  def requeue_future(future, dispatch:)
+    future.map do |campaign_id, scheduled_at|
+      ::PredefinedParticipants::SendSmsCampaignJob.set(wait_until: scheduled_at).perform_later(campaign_id) if dispatch
+      campaign_id
+    end
   end
 
   def collect_ids(candidates, dispatch:)
