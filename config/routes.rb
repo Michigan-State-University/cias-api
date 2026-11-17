@@ -53,10 +53,12 @@ Rails.application.routes.draw do
     # Old path for the V1::Ehr actions below; /v1/henry_ford/* stays for one release.
     namespace :henry_ford, module: 'ehr' do
       post 'verify', to: 'patient_details#verify'
+      post 'verify_by_code', to: 'patient_details#verify_by_code'
       resources :clinic_locations, only: :index
     end
     namespace :ehr do
       post 'verify', to: 'patient_details#verify'
+      post 'verify_by_code', to: 'patient_details#verify_by_code'
       resources :clinic_locations, only: :index
     end
 

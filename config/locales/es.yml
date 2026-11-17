@@ -18,6 +18,16 @@ es:
       header: "Los nuevos informes del sistema están listos para usted"
       body: "Tiene %{number_of_generated_reports} nuevo(s) informe(s) disponible(s) para descargar en su panel. Haga clic en el siguiente enlace para visitar su panel de control."
       button_text: Visitar el panel
+  henry_ford:
+    error:
+      session:
+        not_allowed: "El escaneo de un código no está disponible en esta sesión."
+      patient:
+        identifier_missing: "El registro del paciente devuelto por la herramienta externa no incluye el identificador requerido. Póngase en contacto con nuestro equipo de soporte."
+        draft_not_found: "Este escaneo ya no se puede confirmar. Escanee el código de nuevo o introduzca sus datos manualmente."
+      barcode:
+        patient_id_empty: "El ID del paciente está vacío en el código de barras"
+        parsing_error: "No se puede analizar la identificación del paciente a partir del código de barras"
   bulk_import_mailer:
     bulk_import_result:
       subject: Importación masiva de Participantes Predefinidos CIAS completada

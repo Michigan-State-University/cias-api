@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
+class V1::Ehr::VerifyService
+  include V1::Ehr::EpicPatientResourceExtractor
+
   SYSTEM_IDENTIFIER = ENV.fetch('EPIC_ON_FHIR_SYSTEM_IDENTIFIER')
 
   def self.call(user, patient_params, session_id)
@@ -16,14 +18,21 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
   attr_reader :user, :patient_params, :patient, :appointments, :session_id
   attr_accessor :resource
 
+  # Confirm only after the appointment lookup succeeds, so a failed Continue can be retried.
   def call
-    @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code, mrn)
-    @appointments = Api::EpicOnFhir::Appointments.call(epic_patient_id)
+    if patient_params[:id].present?
+      load_confirmable_resource!
+      epic_id = @resource.epic_id
+    else
+      @patient = Api::EpicOnFhir::PatientVerification.call(first_name, last_name, parsed_dob, phone_number, phone_type, zip_code, mrn)
+      epic_id = epic_patient_id(@patient)
+    end
 
-    create_or_find_resource!
+    @appointments = Api::EpicOnFhir::Appointments.call(epic_id)
+    create_or_find_resource!(epic_id) if @resource.nil?
+    @resource.update!(visit_id: hfhs_visit_id, **confirmation_attributes)
     assign_patient_details!
-
-    resource
+    @resource
   end
 
   private
@@ -34,42 +43,10 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
     end
   end
 
-  def epic_first_name
-    @patient[:entry][0][:resource][:name][0][:given][0]
-  end
-
-  def epic_last_name
-    @patient[:entry][0][:resource][:name][0][:family]
-  end
-
-  def epic_sex
-    @patient[:entry][0][:resource][:gender][0].upcase
-  end
-
-  def epic_phone_number
-    @patient[:entry][0][:resource][:telecom][0][:value]
-  end
-
-  def epic_phone_type
-    @patient[:entry][0][:resource][:telecom][0][:use]
-  end
-
-  def epic_zip_code
-    @patient[:entry][0][:resource][:address].detect { |address| address[:use].eql?('home') }&.dig(:postalCode) || zip_code
-  end
-
-  def epic_dob
-    @patient[:entry][0][:resource][:birthDate]
-  end
-
   def parsed_dob
     return if dob.blank?
 
     Date.parse(dob).strftime('%Y-%m-%d')
-  end
-
-  def epic_patient_id
-    patient.dig(:entry, 0, :resource, :id)
   end
 
   def hfhs_patient_id
@@ -78,7 +55,7 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
 
   def system_identifier_details
     @system_identifier_details ||= patient.dig(:entry, 0, :resource, :identifier)
-                      .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
+                                          .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
   end
 
   def hfhs_visit_id
@@ -106,8 +83,8 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
                          &.downcase.to_s
 
     location = available_locations
-                   .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
-                   .first
+                 .where("regexp_replace(LOWER(CONCAT(department, ' ', external_name)), '^\s*', '') LIKE ?", appointment_name)
+                 .first
 
     appointment_location_id = location.epic_identifier
     location.update!(auxiliary_epic_identifier: location_identifer)
@@ -118,25 +95,41 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
 
   def verify_by_identifier(appointment)
     appointment_location_id = appointment
-                               .dig(:resource, :participant)
-                               .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
-                               &.dig(:actor, :reference)
-                               &.to_s
+                                .dig(:resource, :participant)
+                                .find { |participant| participant.dig(:actor, :reference).downcase.include?('location') }
+                                &.dig(:actor, :reference)
+                                &.to_s
 
     appointment_location_auxiliary_id = appointment_location_id.sub('Location/', '')
     [available_locations.where(auxiliary_epic_identifier: appointment_location_auxiliary_id).first, appointment_location_auxiliary_id]
   end
 
-  def create_or_find_resource!
+  def load_confirmable_resource!
+    @resource = HfhsPatientDetail.find_by(id: patient_params[:id])
+    return if @resource&.epic_id.present? && confirmable_by_user?
+
+    raise ActiveRecord::RecordNotFound, I18n.t('henry_ford.error.patient.draft_not_found')
+  end
+
+  def confirmable_by_user?
+    (@resource.pending? && @resource.drafted_by_id == user.id) || user.hfhs_patient_detail_id == @resource.id
+  end
+
+  def confirmation_attributes
+    user.preview_session? ? {} : { pending: false }
+  end
+
+  # epic_id stays out of the key so older rows without it are found, not duplicated.
+  def create_or_find_resource!(epic_id)
     @resource = HfhsPatientDetail.find_or_create_by!(
       patient_id: hfhs_patient_id,
-      first_name: epic_first_name,
-      last_name: epic_last_name,
-      dob: Date.parse(epic_dob),
-      sex: epic_sex,
-      zip_code: epic_zip_code,
-      phone_type: epic_phone_type,
-      phone_number: epic_phone_number,
+      first_name: epic_first_name(@patient),
+      last_name: epic_last_name(@patient),
+      dob: epic_dob(@patient),
+      sex: epic_sex(@patient),
+      zip_code: epic_zip_code(@patient) || zip_code,
+      phone_type: epic_phone_type(@patient),
+      phone_number: epic_phone_number(@patient),
       provided_first_name: first_name,
       provided_last_name: last_name,
       provided_dob: dob,
@@ -144,8 +137,8 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
       provided_zip: zip_code,
       provided_phone_type: phone_type,
       provided_phone_number: phone_number
-    )
-    resource.update!(visit_id: hfhs_visit_id)
+    ) { |record| record.epic_id = epic_id }
+    @resource.update!(epic_id: epic_id) if @resource.epic_id != epic_id
   end
 
   def assign_patient_details!
@@ -165,10 +158,10 @@ class V1::Ehr::VerifyService # rubocop:disable Metrics/ClassLength
                    &.dig(:actor, :display)
 
       location_identifier = appointment
-                               &.dig(:resource, :participant)
-                               &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }
-                               &.dig(:actor, :reference)
-                               &.sub('Location/', '')
+                              &.dig(:resource, :participant)
+                              &.find { |participant| participant.dig(:actor, :reference)&.downcase&.include?('location') }
+                              &.dig(:actor, :reference)
+                              &.sub('Location/', '')
 
       valid_appointment?(location, location_identifier, parsed_date)
     end
