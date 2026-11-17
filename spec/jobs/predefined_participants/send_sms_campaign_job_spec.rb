@@ -167,20 +167,7 @@ RSpec.describe PredefinedParticipants::SendSmsCampaignJob, type: :job do
     end
 
     describe 'intervention no longer published' do
-      context 'when the intervention is paused' do
-        let(:intervention) { create(:intervention, :paused) }
-
-        it 'reschedules the campaign instead of skipping it, so a re-publish can still send it' do
-          add_participant(0)
-          run_job
-          expect(campaign.reload.status).to eq('scheduled')
-          expect(provider_calls).to be_empty
-          expect(PredefinedParticipants::SmsDelivery.count).to eq(0)
-          expect(described_class).to have_been_enqueued.with(campaign.id).at(15.minutes.from_now)
-        end
-      end
-
-      %i[closed archived].each do |intervention_state|
+      %i[paused closed archived].each do |intervention_state|
         context "when the intervention is #{intervention_state}" do
           let(:intervention) { create(:intervention, intervention_state) }
 
@@ -256,12 +243,23 @@ RSpec.describe PredefinedParticipants::SendSmsCampaignJob, type: :job do
         expect(described_class).to have_been_enqueued.with(child.id).at(15.minutes.from_now)
       end
 
-      it 'does not count a paused intervention toward the deadline: it keeps waiting past 24h' do
+      it 'marks a rescheduled reminder fresh so reconcile does not start a second chain' do
+        child = reminder_with_parent(parent_status: 'sending', child_scheduled_at: frozen_now - 1.hour)
+        child.update_columns(updated_at: frozen_now - 1.hour)
+        expect(PredefinedParticipants::StrandedCampaignsQuery.call).to include(child)
+
+        run_job(child)
+
+        expect(child.reload.updated_at).to be_within(1.second).of(frozen_now)
+        expect(PredefinedParticipants::StrandedCampaignsQuery.call).not_to include(child)
+      end
+
+      it 'skips a reminder on a paused intervention instead of rescheduling it' do
         paused = create(:intervention, :paused)
         child = reminder_with_parent(parent_status: 'sent', child_scheduled_at: frozen_now - 25.hours, owner: paused)
         run_job(child)
-        expect(child.reload.status).to eq('scheduled')
-        expect(described_class).to have_been_enqueued.with(child.id).at(15.minutes.from_now)
+        expect(child.reload.status).to eq('skipped')
+        expect(campaign_jobs).to be_empty
       end
     end
 
@@ -1090,24 +1088,7 @@ RSpec.describe PredefinedParticipants::SendSmsCampaignJob, type: :job do
     end
 
     describe 'an intervention that is not published at fire time skips the campaign' do
-      context 'with a paused intervention' do
-        let(:intervention) { create(:intervention, :paused) }
-
-        it 'reschedules the campaign, sends nothing and stamps nobody, so a re-publish can still send it' do
-          campaign, pups = prepare
-
-          run_job(campaign)
-
-          expect(campaign.reload.status).to eq('scheduled')
-          expect(provider.calls).to be_empty
-          expect(campaign.deliveries).to be_empty
-          expect(campaign.scheduled_at).to eq(frozen_now - 1.minute)
-          expect(described_class).to have_been_enqueued.with(campaign.id).at(15.minutes.from_now)
-          expect(pups.map { |pup| pup.reload.sms_invitation_sent_at }).to all(be_nil)
-        end
-      end
-
-      { 'closed' => [:closed], 'archived' => [:archived], 'draft' => [] }.each do |name, traits|
+      { 'paused' => [:paused], 'closed' => [:closed], 'archived' => [:archived], 'draft' => [] }.each do |name, traits|
         context "with a #{name} intervention" do
           let(:intervention) { create(:intervention, *traits) }
 

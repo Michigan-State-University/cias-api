@@ -13,10 +13,9 @@ class PredefinedParticipants::SendSmsCampaignJob < ApplicationJob
   def perform(campaign_id)
     @campaign = PredefinedParticipants::SmsCampaign.find_by(id: campaign_id)
     return unless campaign && PredefinedParticipants::SmsCampaign::OPEN_STATUSES.include?(campaign.status)
-    return reschedule if campaign.intervention.paused?
     return fail_overdue if overdue?
     return reschedule if postponed?
-    return campaign.transition_to('skipped') if skip?
+    return halt if skip?
     return unless campaign.transition_to('sending').positive?
 
     run
@@ -36,7 +35,12 @@ class PredefinedParticipants::SendSmsCampaignJob < ApplicationJob
   end
 
   def reschedule
+    campaign.update_columns(updated_at: Time.current)
     self.class.set(wait: RESCHEDULE_IN).perform_later(campaign.id)
+  end
+
+  def halt
+    campaign.reload.accepted_count.positive? ? campaign.close! : campaign.transition_to('skipped')
   end
 
   def overdue?
@@ -73,7 +77,7 @@ class PredefinedParticipants::SendSmsCampaignJob < ApplicationJob
     campaign.record_recipients_count(total) if campaign.recipients_count.nil?
     return if total.positive?
 
-    campaign.accepted_count.positive? ? campaign.close! : campaign.transition_to('skipped')
+    halt
     :empty
   end
 
