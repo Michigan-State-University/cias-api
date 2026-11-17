@@ -232,6 +232,15 @@ RSpec.describe 'PredefinedParticipants::SmsRecipientsQuery' do
         create(:pdp_sms_delivery, campaign: campaign.parent_campaign, predefined_user_parameter: never_invited, status: 'failed')
         expect(recipients(campaign).to_a).to contain_exactly(kept)
       end
+
+      it 'excludes a participant whose parent delivery failed and whom a later invitation campaign reached' do
+        kept = eligible_for('scheduled_reminder', campaign, index: 0)
+        reinvited = make_participant(intervention, index: 1, invited_at: 1.day.ago)
+        create(:pdp_sms_delivery, campaign: campaign.parent_campaign, predefined_user_parameter: reinvited, status: 'failed')
+        later = create(:pdp_sms_campaign, intervention: intervention, kind: 'invitation', status: 'sent', sent_at: 1.day.ago)
+        create(:pdp_sms_delivery, campaign: later, predefined_user_parameter: reinvited, status: 'sent')
+        expect(recipients(campaign).to_a).to contain_exactly(kept)
+      end
     end
 
     describe 'preloading of user and phone' do

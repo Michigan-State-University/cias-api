@@ -46,7 +46,18 @@ class PredefinedParticipants::SmsRecipientsQuery
   def scheduled_reminder_scope
     reminder_interval_elapsed(
       base_scope.where(first_opened_at: nil).where.not(sms_invitation_sent_at: nil).joins(parent_deliveries_join)
+                .where.not(reinvited_by_another_invitation.arel.exists)
     )
+  end
+
+  # A failed delivery in the parent invitation still counts when the participant was invited anyway (a resend of that
+  # text), but not when another invitation campaign reached them: that invitation, and its own reminder, are theirs.
+  def reinvited_by_another_invitation
+    ::PredefinedParticipants::SmsDelivery.joins(:campaign)
+                                         .where(status: 'sent', campaign: { kind: 'invitation' })
+                                         .where('predefined_participants_sms_deliveries.predefined_user_parameter_id = predefined_user_parameters.id')
+                                         .where.not(campaign_id: campaign.parent_campaign_id)
+                                         .where("parent_deliveries.status <> 'sent'")
   end
 
   def parent_deliveries_join
