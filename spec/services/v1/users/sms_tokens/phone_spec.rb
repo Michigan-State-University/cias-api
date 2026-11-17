@@ -43,5 +43,15 @@ RSpec.describe V1::Users::SmsTokens::Phone do
         expect(user.reload.phone).to eql phone
       end
     end
+
+    context 'but the new number is rejected by validation' do
+      let!(:old_phone) { create(:phone, number: '512345678', prefix: prefix, iso: iso, user: user) }
+      let(:phone_number) { '1' }
+
+      it 'keeps the existing phone and raises instead of leaving the user phoneless' do
+        expect { subject }.to raise_error(ActiveRecord::RecordInvalid)
+        expect(user.reload.phone).to eq(old_phone)
+      end
+    end
   end
 end

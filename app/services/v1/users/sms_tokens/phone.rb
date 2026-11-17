@@ -25,9 +25,9 @@ class V1::Users::SmsTokens::Phone
   end
 
   def user_with_phone
-    if phone_not_changed?
-      user.phone
-    else
+    return user.phone if phone_not_changed?
+
+    ApplicationRecord.transaction do
       user.phone.delete
       new_phone
     end
