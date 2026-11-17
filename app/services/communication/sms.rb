@@ -70,13 +70,11 @@ class Communication::Sms
   end
 
   def recipient_user_ids
-    @recipient_user_ids ||= begin
-      parsed = Phonelib.parse(sms.phone)
-      if parsed.valid?
-        Phone.where(prefix: "+#{parsed.country_code}", number: parsed.raw_national).where.not(user_id: nil).pluck(:user_id)
+    @recipient_user_ids ||=
+      if Phonelib.parse(sms.phone).valid?
+        Phone.where(Phone::NumberAnalysis.lookup_parts(sms.phone)).where.not(user_id: nil).pluck(:user_id)
       else
         []
       end
-    end
   end
 end

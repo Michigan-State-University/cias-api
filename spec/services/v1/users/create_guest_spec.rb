@@ -24,4 +24,12 @@ RSpec.describe V1::Users::CreateGuest do
       expect(subject.phone.reload).to have_attributes(number: '7400123456', full_number: '+447400123456')
     end
   end
+
+  context 'with a NANP region whose country_code has leading digits (Puerto Rico)' do
+    subject { described_class.call('+17875551234') }
+
+    it 'stores +1 as the prefix, not +1787, so the number is valid and matches later lookups' do
+      expect(subject.phone.reload).to have_attributes(prefix: '+1', number: '7875551234', full_number: '+17875551234')
+    end
+  end
 end

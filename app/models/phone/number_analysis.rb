@@ -4,6 +4,14 @@ class Phone::NumberAnalysis
   SMS_TYPES = %i[mobile fixed_or_mobile].freeze
   EXCLUDED_TYPES = %i[premium_rate].freeze
 
+  # Lookup key for an E.164 string, split the way #parts stores it. Phonelib's country_code is "1787" for
+  # Puerto Rico and the other NANP regions with leading digits, which the model never stores separately.
+  def self.lookup_parts(e164)
+    parsed = Phonelib.parse(e164)
+    national = parsed.raw_national.to_s
+    { prefix: parsed.e164.to_s.delete_suffix(national), number: national }
+  end
+
   def initialize(prefix, number)
     @prefix = prefix.to_s
     @number = number.to_s

@@ -14,11 +14,10 @@ class V1::Users::CreateGuest
     end
 
     if phone_number
-      number_prefix = Phonelib.parse(phone_number).country_code
-      national_number = Phonelib.parse(phone_number).raw_national
+      parts = Phone::NumberAnalysis.lookup_parts(phone_number)
       iso = Phonelib.parse(phone_number).country
 
-      Phone.new(prefix: "+#{number_prefix}", number: national_number, iso: iso, user: new_user).save!
+      Phone.new(prefix: parts[:prefix], number: parts[:number], iso: iso, user: new_user).save!
     end
 
     new_user
