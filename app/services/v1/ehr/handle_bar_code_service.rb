@@ -48,7 +48,7 @@ class V1::Ehr::HandleBarCodeService
 
   # The rake task isn't scheduled anywhere, so each draft enqueues its own expiry.
   def schedule_draft_expiry
-    Hfhs::ClearAbandonedPatientDetailsJob.set(wait: Hfhs::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD + 1.hour).perform_later
+    Ehr::ClearAbandonedPatientDetailsJob.set(wait: Ehr::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD + 1.hour).perform_later
   end
 
   def hfhs_patient_id(epic_response)
@@ -56,7 +56,7 @@ class V1::Ehr::HandleBarCodeService
                  find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }&.
                  dig(:value)
 
-    raise HenryFord::PatientIdentifierMissingError if identifier.blank?
+    raise Ehr::PatientIdentifierMissingError if identifier.blank?
 
     identifier
   end

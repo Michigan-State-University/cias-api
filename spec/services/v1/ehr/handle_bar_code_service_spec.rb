@@ -3,6 +3,8 @@
 require 'webmock/rspec'
 
 RSpec.describe V1::Ehr::HandleBarCodeService do
+  include_context 'with barcode settings configured'
+
   describe '.call' do
     subject { described_class.call(user, params) }
 
@@ -87,8 +89,8 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
       end
 
       it 'schedules the expiry of the draft' do
-        expect { subject }.to have_enqueued_job(Hfhs::ClearAbandonedPatientDetailsJob).
-          at(a_value_within(1.minute).of(Hfhs::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD.from_now + 1.hour))
+        expect { subject }.to have_enqueued_job(Ehr::ClearAbandonedPatientDetailsJob).
+          at(a_value_within(1.minute).of(Ehr::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD.from_now + 1.hour))
       end
 
       it 'extracts and stores patient data correctly' do
@@ -242,7 +244,7 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
       end
 
       it 'raises PatientIdentifierMissingError' do
-        expect { subject }.to raise_error(HenryFord::PatientIdentifierMissingError)
+        expect { subject }.to raise_error(Ehr::PatientIdentifierMissingError)
       end
 
       it 'does not create any records' do
@@ -410,7 +412,7 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
 
         it 'raises PatientIdentifierMissingError' do
           expect { service.send(:hfhs_patient_id, epic_response_no_match) }.
-            to raise_error(HenryFord::PatientIdentifierMissingError)
+            to raise_error(Ehr::PatientIdentifierMissingError)
         end
       end
 
@@ -429,7 +431,7 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
 
         it 'raises PatientIdentifierMissingError' do
           expect { service.send(:hfhs_patient_id, epic_response_empty_identifiers) }.
-            to raise_error(HenryFord::PatientIdentifierMissingError)
+            to raise_error(Ehr::PatientIdentifierMissingError)
         end
       end
     end

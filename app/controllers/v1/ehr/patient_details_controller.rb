@@ -36,12 +36,14 @@ class V1::Ehr::PatientDetailsController < V1Controller
   end
 
   def authorize_hfhs_scan_session!
-    session = Session.find_by(id: params.require(:session_id))
-
-    return if session&.intervention&.hfhs_access? &&
-              session.questions.exists?(type: 'Question::HenryFordInitial') &&
-              session.user_sessions.exists?(user_id: current_v1_user.id)
+    return if Ehr::Settings.barcode_scan_available? && scan_allowed_in?(Session.find_by(id: params.require(:session_id)))
 
     raise CanCan::AccessDenied, I18n.t('henry_ford.error.session.not_allowed')
+  end
+
+  def scan_allowed_in?(session)
+    session&.intervention&.hfhs_access? &&
+      session.questions.exists?(type: 'Question::HenryFordInitial') &&
+      session.user_sessions.exists?(user_id: current_v1_user.id)
   end
 end

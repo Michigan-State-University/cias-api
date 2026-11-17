@@ -39,7 +39,7 @@ class Rack::Attack
   # Another common method of attack is to use a swarm of computers with
   # different IPs to try brute-forcing a password for a specific account.
 
-  ### Prevent Patient Enumeration Through The Aztec Code Endpoint ###
+  ### Prevent Patient Enumeration Through The Code Scan Endpoint ###
   # The per-account limit is `rate_limit` in V1::Ehr::PatientDetailsController.
   # Both paths share one count, so alternating them doesn't double the budget.
   throttle('ehr/verify_by_code/ip', limit: 10, period: 1.minute) do |req|

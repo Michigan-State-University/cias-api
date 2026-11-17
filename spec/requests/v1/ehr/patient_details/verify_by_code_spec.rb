@@ -5,6 +5,8 @@ require 'webmock/rspec'
 
 # /v1/ehr/verify_by_code is the site-neutral path of the same action; /v1/henry_ford/verify_by_code stays for one release.
 RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_code', type: :request do
+  include_context 'with barcode settings configured'
+
   %w[/v1/ehr/verify_by_code /v1/henry_ford/verify_by_code].each do |path|
     context "via #{path}" do
       let(:user) { create(:user, :confirmed, :participant) }
@@ -375,6 +377,88 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
           expect(response).to have_http_status(:unprocessable_content)
           expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.patient.identifier_missing'))
           expect(HfhsPatientDetail.count).to eq(0)
+        end
+      end
+
+      describe 'scan feature flag' do
+        before do
+          allow(Api::EpicOnFhir::PatientSearch).to receive(:call)
+          allow(Api::EpicOnFhir::Authentication).to receive(:call)
+          allow(Sentry).to receive(:capture_message)
+          allow(Rails.logger).to receive(:error).and_call_original
+        end
+
+        shared_examples 'a scan refused before Epic' do
+          it 'refuses like an unavailable session, with no Epic call, draft or expiry job' do
+            expect { request }.not_to have_enqueued_job(Ehr::ClearAbandonedPatientDetailsJob)
+            expect(response).to have_http_status(:forbidden)
+            expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.session.not_allowed'))
+            expect(Api::EpicOnFhir::PatientSearch).not_to have_received(:call)
+            expect(Api::EpicOnFhir::Authentication).not_to have_received(:call)
+            expect(HfhsPatientDetail.count).to eq(0)
+          end
+        end
+
+        [nil, '', '0', 'true'].each do |flag|
+          context "when the flag is #{flag.inspect}" do
+            include_context 'with environment variables', { 'EHR_BARCODE_SCAN_FEATURE_ENABLED' => flag }
+
+            it_behaves_like 'a scan refused before Epic'
+
+            it 'reports nothing: off is a normal state' do
+              request
+
+              expect(Sentry).not_to have_received(:capture_message)
+            end
+          end
+        end
+
+        # The flag is checked before the session lookup, so a request without session_id stays a silent 403
+        # instead of a ParameterMissing 400 that ExceptionHandler reports to Sentry.
+        context 'when the flag is off and the request has no session_id' do
+          include_context 'with environment variables', { 'EHR_BARCODE_SCAN_FEATURE_ENABLED' => nil }
+
+          let(:params) { { hfhs_patient_data: { barcode: valid_barcode } } }
+
+          before { allow(Sentry).to receive(:capture_exception) }
+
+          it 'refuses with the same 403 and reports nothing' do
+            request
+
+            expect(response).to have_http_status(:forbidden)
+            expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.session.not_allowed'))
+            expect(Sentry).not_to have_received(:capture_message)
+            expect(Sentry).not_to have_received(:capture_exception)
+          end
+        end
+
+        { 'EHR_BARCODE_PATIENT_ID_PATTERN' => '', 'EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM' => nil }.each do |setting, blank|
+          context "when the flag is on and #{setting} is blank" do
+            include_context 'with environment variables', { 'EHR_BARCODE_SCAN_FEATURE_ENABLED' => ' 1 ', setting => blank }
+
+            let(:report) { "[Ehr::Settings] code scanning is on but required settings are blank: #{setting}" }
+
+            it_behaves_like 'a scan refused before Epic'
+
+            it 'reports the missing setting by name to Sentry and the log' do
+              request
+
+              expect(Sentry).to have_received(:capture_message).with(report).once
+              expect(Rails.logger).to have_received(:error).with(report)
+            end
+          end
+        end
+      end
+
+      # Not rescued into a 4xx: sentry-rails reports it, and every scan fails until the setting is fixed.
+      context 'when a barcode setting is not a usable regular expression' do
+        include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => '[' }
+
+        it 'raises the setting error without asking Epic' do
+          allow(Api::EpicOnFhir::PatientSearch).to receive(:call)
+
+          expect { request }.to raise_error(Ehr::Settings::InvalidSettingError, /EHR_BARCODE_PATIENT_ID_FORMAT/)
+          expect(Api::EpicOnFhir::PatientSearch).not_to have_received(:call)
         end
       end
 

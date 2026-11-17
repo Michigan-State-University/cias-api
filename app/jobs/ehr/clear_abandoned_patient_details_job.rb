@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Removes unconfirmed scan drafts; each draft enqueues it (HandleBarCodeService).
-class Hfhs::ClearAbandonedPatientDetailsJob < ApplicationJob
+class Ehr::ClearAbandonedPatientDetailsJob < ApplicationJob
   queue_as :hfhs
 
   RETENTION_PERIOD = 1.day

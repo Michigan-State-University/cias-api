@@ -305,4 +305,190 @@ RSpec.describe Ehr::Settings do
       end
     end
   end
+
+  describe '.barcode_scan_enabled?' do
+    ['1', ' 1 ', "1\n"].each do |value|
+      context "when EHR_BARCODE_SCAN_FEATURE_ENABLED is #{value.inspect}" do
+        include_context 'with environment variables', { 'EHR_BARCODE_SCAN_FEATURE_ENABLED' => value }
+
+        it { expect(described_class.barcode_scan_enabled?).to be(true) }
+      end
+    end
+
+    [nil, '', '0', 'true', 'yes', '2', '01', 'on'].each do |value|
+      context "when EHR_BARCODE_SCAN_FEATURE_ENABLED is #{value.inspect}" do
+        include_context 'with environment variables', { 'EHR_BARCODE_SCAN_FEATURE_ENABLED' => value }
+
+        it { expect(described_class.barcode_scan_enabled?).to be(false) }
+      end
+    end
+  end
+
+  describe '.missing_barcode_scan_settings' do
+    include_context 'with barcode settings configured'
+
+    context 'without the format' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => nil }
+
+      it 'is empty: the format is optional' do
+        expect(described_class.missing_barcode_scan_settings).to eq([])
+      end
+    end
+
+    [nil, '', ' '].each do |blank|
+      context "when both are #{blank.inspect}" do
+        include_context 'with environment variables',
+                        { 'EHR_BARCODE_PATIENT_ID_PATTERN' => blank, 'EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM' => blank }
+
+        it 'names both' do
+          expect(described_class.missing_barcode_scan_settings)
+            .to eq(%w[EHR_BARCODE_PATIENT_ID_PATTERN EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM])
+        end
+      end
+    end
+  end
+
+  describe '.barcode_scan_available?' do
+    subject(:available) { described_class.barcode_scan_available? }
+
+    include_context 'with barcode settings configured'
+
+    before do
+      allow(Sentry).to receive(:capture_message)
+      allow(Rails.logger).to receive(:error)
+    end
+
+    it 'is true with the flag on and the required settings set, and reports nothing' do
+      expect(available).to be(true)
+      expect(Sentry).not_to have_received(:capture_message)
+    end
+
+    [nil, '0', 'true'].each do |flag|
+      context "when the flag is #{flag.inspect}" do
+        include_context 'with environment variables', {
+          'EHR_BARCODE_SCAN_FEATURE_ENABLED' => flag, 'EHR_BARCODE_PATIENT_ID_PATTERN' => nil
+        }
+
+        it 'is false and reports nothing, even with a required setting blank' do
+          expect(available).to be(false)
+          expect(Sentry).not_to have_received(:capture_message)
+          expect(Rails.logger).not_to have_received(:error)
+        end
+      end
+    end
+
+    {
+      'EHR_BARCODE_PATIENT_ID_PATTERN' => { 'EHR_BARCODE_PATIENT_ID_PATTERN' => '' },
+      'EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM' => { 'EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM' => nil },
+      'EHR_BARCODE_PATIENT_ID_PATTERN, EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM' => {
+        'EHR_BARCODE_PATIENT_ID_PATTERN' => ' ', 'EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM' => ''
+      }
+    }.each do |names, blanks|
+      context "when the flag is on and #{names} is blank" do
+        include_context 'with environment variables', blanks.merge('EHR_BARCODE_SCAN_FEATURE_ENABLED' => ' 1 ')
+
+        let(:expected_message) { "[Ehr::Settings] code scanning is on but required settings are blank: #{names}" }
+
+        it 'is false and reports the setting names to Sentry and the log' do
+          expect(available).to be(false)
+          expect(Sentry).to have_received(:capture_message).with(expected_message).once
+          expect(Rails.logger).to have_received(:error).with(expected_message)
+        end
+      end
+    end
+  end
+
+  # A stray space or line break would make every scan fail quietly (422), so it fails loudly instead.
+  shared_examples 'a barcode setting with surrounding whitespace' do |setting, value|
+    ["#{value} ", "#{value}\n", " #{value}"].each do |padded|
+      context "when it is #{padded.inspect}" do
+        include_context 'with environment variables', { setting => padded }
+
+        it 'raises an error naming the setting, never its value' do
+          expect { subject }.to raise_error(Ehr::Settings::InvalidSettingError, "#{setting} starts or ends with whitespace")
+        end
+      end
+    end
+  end
+
+  describe '.barcode_patient_id_pattern' do
+    subject(:pattern) { described_class.barcode_patient_id_pattern }
+
+    context 'when set' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => 'ID:(?<patient_id>\\d+)' }
+
+      it 'compiles it with a timeout' do
+        expect(pattern.match('ID:123')[:patient_id]).to eq('123')
+        expect(pattern.timeout).to eq(described_class::BARCODE_REGEXP_TIMEOUT)
+      end
+    end
+
+    [nil, '', ' '].each do |blank|
+      context "when #{blank.inspect}" do
+        include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => blank }
+
+        it 'raises an error naming the setting' do
+          expect { pattern }.to raise_error(Ehr::Settings::MissingSettingError, 'EHR_BARCODE_PATIENT_ID_PATTERN is not set')
+        end
+      end
+    end
+
+    it_behaves_like 'a barcode setting with surrounding whitespace', 'EHR_BARCODE_PATIENT_ID_PATTERN',
+                    '<PtID>(?<patient_id>.*?)</PtID>'
+
+    context 'when it has no named group patient_id' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => 'SECRET(?<id>\\d+)' }
+
+      it 'raises an error naming the setting, never its value' do
+        expect { pattern }.to raise_error(Ehr::Settings::InvalidSettingError, 'EHR_BARCODE_PATIENT_ID_PATTERN has no named group patient_id')
+      end
+    end
+
+    context 'when it does not compile' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => 'SECRET(?<patient_id>[' }
+
+      it 'raises an error naming the setting, never its value, also not through the cause' do
+        expect { pattern }.to raise_error(Ehr::Settings::InvalidSettingError) { |error|
+          expect(error.message).to eq('EHR_BARCODE_PATIENT_ID_PATTERN is not a valid regular expression')
+          expect(error.cause).to be_nil
+        }
+      end
+    end
+  end
+
+  describe '.barcode_patient_id_format' do
+    subject(:format) { described_class.barcode_patient_id_format }
+
+    context 'when set' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => '\\A[A-Z]\\d+\\z' }
+
+      it 'compiles it with a timeout' do
+        expect(format.match?('Z394')).to be(true)
+        expect(format.match?('Z394 ')).to be(false)
+        expect(format.timeout).to eq(described_class::BARCODE_REGEXP_TIMEOUT)
+      end
+    end
+
+    [nil, '', ' '].each do |blank|
+      context "when #{blank.inspect}" do
+        include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => blank }
+
+        it { expect(format).to be_nil }
+      end
+    end
+
+    it_behaves_like 'a barcode setting with surrounding whitespace', 'EHR_BARCODE_PATIENT_ID_FORMAT',
+                    '\A[A-Za-z0-9]{1,10}\z'
+
+    context 'when it does not compile' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => 'SECRET[' }
+
+      it 'raises an error naming the setting, never its value, also not through the cause' do
+        expect { format }.to raise_error(Ehr::Settings::InvalidSettingError) { |error|
+          expect(error.message).to eq('EHR_BARCODE_PATIENT_ID_FORMAT is not a valid regular expression')
+          expect(error.cause).to be_nil
+        }
+      end
+    end
+  end
 end

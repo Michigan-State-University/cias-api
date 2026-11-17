@@ -96,11 +96,11 @@ module ExceptionHandler
       render json: msg(exc), status: :forbidden
     end
 
-    rescue_from HenryFord::BarcodeParsingError do |exc|
+    rescue_from Ehr::BarcodeParsingError do |exc|
       render json: msg(exc), status: :unprocessable_content
     end
 
-    rescue_from HenryFord::PatientIdentifierMissingError do |exc|
+    rescue_from Ehr::PatientIdentifierMissingError do |exc|
       render json: msg(exc), status: :unprocessable_content
     end
 

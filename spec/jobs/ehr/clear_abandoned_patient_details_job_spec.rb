@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Hfhs::ClearAbandonedPatientDetailsJob, type: :job do
+RSpec.describe Ehr::ClearAbandonedPatientDetailsJob, type: :job do
   subject { described_class.perform_now }
 
   let(:retention) { described_class::RETENTION_PERIOD }

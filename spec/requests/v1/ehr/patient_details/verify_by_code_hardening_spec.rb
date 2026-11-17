@@ -8,6 +8,8 @@ require 'rails_helper'
 #   - only the scanning user can confirm the draft,
 #   - the draft stops being pending only once the appointment lookup succeeded.
 RSpec.describe 'Aztec code scan and confirm', type: :request do
+  include_context 'with barcode settings configured'
+
   let(:scanner) { create(:user, :confirmed, :guest) }
   let(:barcode) { '<PtID>      Z2550</PtID><PtDAT>54348</PtDAT><UID> ML337156</UID>' }
   let(:patient_resource) { JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys }
