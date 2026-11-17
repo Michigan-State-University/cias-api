@@ -89,7 +89,7 @@ RSpec.describe V1::Sms::Replay do
       end
     end
 
-    %w[YES END].each do |answer|
+    %w[YES].each do |answer|
       context "when a pending SMS question accepts #{answer}" do
         let!(:user) { create(:user, :with_phone, pending_sms_answer: true) }
         let(:from) { user.phone.full_number }
@@ -115,6 +115,19 @@ RSpec.describe V1::Sms::Replay do
           subject
           expect(SmsOptOut.where(user_id: user.id)).to be_empty
         end
+      end
+    end
+
+    context 'when END is received (a Twilio default opt-out keyword)' do
+      let!(:user) { create(:user, :with_phone, pending_sms_answer: true) }
+      let(:from) { user.phone.full_number }
+      let(:body) { 'END' }
+
+      before { allow(V1::AnswerService).to receive(:call) }
+
+      it 'does not record it as an answer' do
+        subject
+        expect(V1::AnswerService).not_to have_received(:call)
       end
     end
 
@@ -365,6 +378,14 @@ RSpec.describe V1::Sms::Replay do
         fake_jobs << job
         call_replay
         expect(job).to be_deleted
+      end
+    end
+
+    describe 'END (a Twilio default opt-out keyword)' do
+      let(:body) { 'END' }
+
+      it 'creates an SmsOptOut for the user found by the incoming number' do
+        expect { call_replay }.to change { SmsOptOut.where(user_id: user.id).count }.from(0).to(1)
       end
     end
 

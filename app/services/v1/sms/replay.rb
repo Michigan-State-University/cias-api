@@ -15,14 +15,15 @@ class V1::Sms::Replay
     @from_number = from
     @to_number = to
     @message = body.to_s.strip
-    @number_prefix = Phonelib.parse(from).country_code
-    @national_number = Phonelib.parse(from).raw_national
+    parts = Phone::NumberAnalysis.lookup_parts(from)
+    @number_prefix = parts[:prefix].delete_prefix('+')
+    @national_number = parts[:number]
   end
 
   def call
     return handle_stop if keyword?(SmsOptOut::OPT_OUT_KEYWORDS)
     return handle_start if keyword?(SmsOptOut::OPT_IN_KEYWORDS)
-    return handle_help if command?('help')
+    return handle_help if keyword?(%w[HELP])
 
     # Handle incoming message
     if message.length >= SmsCode::SMS_CODE_MIN_LENGTH
@@ -40,12 +41,8 @@ class V1::Sms::Replay
     @response_message ||= Twilio::TwiML::MessagingResponse.new
   end
 
-  def command?(keyword)
-    message.casecmp?(keyword)
-  end
-
   def keyword?(keywords)
-    word = message.sub(/\A[[:punct:][:space:]]++/, '').sub(/[[:punct:][:space:]]++\z/, '')
+    word = message.sub(/\A[[:punct:][:space:]]++/, '').sub(/[[:punct:][:space:]]++\z/, '').gsub(/[[:space:]-]++/, '')
     keywords.any? { |keyword| word.casecmp?(keyword) }
   end
 
