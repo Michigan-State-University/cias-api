@@ -98,6 +98,14 @@ module ExceptionHandler
       render json: msg(exc), status: :forbidden
     end
 
+    rescue_from HenryFord::BarcodeParsingError do |exc|
+      render json: msg(exc), status: :unprocessable_content
+    end
+
+    rescue_from HenryFord::PatientIdentifierMissingError do |exc|
+      render json: msg(exc), status: :unprocessable_content
+    end
+
     rescue_from ConcurrentEditException do |exc|
       render json: msg(exc), status: :unprocessable_content
     end

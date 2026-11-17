@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -452,6 +452,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
     t.string "provided_zip_bidx"
     t.string "provided_phone_type_bidx"
     t.string "provided_phone_number_bidx"
+    t.boolean "pending", default: false, null: false
+    t.text "epic_id_ciphertext"
+    t.uuid "drafted_by_id"
+    t.index ["drafted_by_id"], name: "index_hfhs_patient_details_on_drafted_by_id"
     t.index ["first_name_bidx", "last_name_bidx", "dob_bidx", "sex_bidx", "zip_code_bidx"], name: "index_basic_hfhs_patient_details"
     t.index ["patient_id_bidx"], name: "index_hfhs_patient_details_on_patient_id_bidx"
   end
@@ -1251,6 +1255,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_120000) do
   add_foreign_key "downloaded_reports", "users"
   add_foreign_key "events", "days"
   add_foreign_key "google_languages", "google_tts_languages"
+  add_foreign_key "hfhs_patient_details", "users", column: "drafted_by_id", on_delete: :nullify
   add_foreign_key "intervention_accesses", "interventions"
   add_foreign_key "interventions", "google_languages"
   add_foreign_key "interventions", "organizations"

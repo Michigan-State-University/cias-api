@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     end
     namespace :henry_ford do
       post 'verify', to: 'patient_details#verify'
+      post 'verify_by_code', to: 'patient_details#verify_by_code'
       resources :clinic_locations, only: :index
     end
 

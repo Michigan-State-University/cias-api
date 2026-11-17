@@ -9,6 +9,7 @@ Rails.application.config.filter_parameters += %i[
   first_name last_name email uid
   number
   body
+  barcode
   test_link_token
   slug token url phone
   dob sex zip mrn phone_type patient_id visit_id
