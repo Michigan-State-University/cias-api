@@ -80,23 +80,30 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/predefined_participants/s
     it_behaves_like 'users without access'
   end
 
-  describe 'current editor gate' do
+  describe 'editor lock does not gate this read' do
     let(:collaborator) { create(:user, :researcher, :confirmed) }
 
     before do
       create(:collaborator, intervention: intervention, user: collaborator, edit: true, view: true)
     end
 
-    it 'answers 403 to a collaborator with edit: true who is not the current editor' do
+    it 'answers 200 to an edit collaborator who is not the current editor' do
       intervention.update!(current_editor: researcher)
       get path, headers: collaborator.create_new_auth_token
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:ok)
     end
 
-    it 'the same collaborator gets 200 once they are the current editor' do
+    it 'answers 200 while the collaborator holds the editor lock' do
       intervention.update!(current_editor: collaborator)
       get path, headers: collaborator.create_new_auth_token
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'answers 403 to a view-only collaborator because reading still requires update access' do
+      view_only = create(:user, :researcher, :confirmed)
+      create(:collaborator, intervention: intervention, user: view_only, edit: false, view: true)
+      get path, headers: view_only.create_new_auth_token
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

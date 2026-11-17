@@ -5,7 +5,7 @@ class V1::Interventions::PredefinedParticipants::SmsCampaignsController < V1Cont
   include ::PredefinedParticipants::InterventionGate
 
   before_action :verify_access
-  before_action :require_current_editor
+  before_action :require_current_editor, only: %i[create cancel]
   before_action :throttle_campaign_request, only: %i[create cancel]
 
   def index

@@ -253,16 +253,29 @@ RSpec.describe 'GET /v1/interventions/:intervention_id/predefined_participants/s
         create(:collaborator, intervention: intervention, user: collaborator, edit: true, view: true)
       end
 
-      it 'answers 403 when the collaborator is not the current editor' do
+      it 'answers 200 when the collaborator is not the current editor' do
         intervention.update!(current_editor: researcher)
         get path, headers: collaborator.create_new_auth_token
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:ok)
       end
 
-      it 'the same collaborator gets 200 once they are the current editor' do
+      it 'answers 200 while the collaborator holds the editor lock' do
         intervention.update!(current_editor: collaborator)
         get path, headers: collaborator.create_new_auth_token
         expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'with a collaborator who has view: true, edit: false' do
+      let(:collaborator) { create(:user, :researcher, :confirmed) }
+
+      before do
+        create(:collaborator, intervention: intervention, user: collaborator, edit: false, view: true)
+      end
+
+      it 'answers 403 because reading still requires update access' do
+        get path, headers: collaborator.create_new_auth_token
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
