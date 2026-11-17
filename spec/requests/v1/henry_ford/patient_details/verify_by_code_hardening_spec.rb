@@ -32,10 +32,10 @@ RSpec.describe 'Aztec code scan and confirm', type: :request do
     )
   end
 
-  def scan(user)
+  def scan(user, **options)
     create(:user_session, user: user, session: session) unless UserSession.exists?(user: user, session: session)
     post v1_henry_ford_verify_by_code_path, params: { hfhs_patient_data: { barcode: barcode }, session_id: session.id },
-                                            headers: user.create_new_auth_token
+                                            headers: user.create_new_auth_token, **options
     expect(response).to have_http_status(:ok)
     response.parsed_body.dig('data', 'id')
   end
@@ -120,11 +120,14 @@ RSpec.describe 'Aztec code scan and confirm', type: :request do
       expect(filter.filter('hfhs_patient_data' => { 'barcode' => barcode })).to eq('hfhs_patient_data' => { 'barcode' => '[FILTERED]' })
     end
 
+    # Posted as JSON, like cias-web: ParamsWrapper then adds a second copy of the
+    # barcode under patient_detail, and both copies must be erased.
     it 'keeps the barcode out of the stored user request log' do
       allow(ENV).to receive(:[]).and_call_original
       allow(ENV).to receive(:[]).with('LOG_OFF').and_return('false')
 
-      expect { scan(scanner) }.to have_enqueued_job(LogJobs::UserRequest).with { |scope|
+      expect { scan(scanner, as: :json) }.to have_enqueued_job(LogJobs::UserRequest).with { |scope|
+        expect(scope.with_indifferent_access[:params]).to have_key(:patient_detail)
         expect(scope.to_json).not_to include('Z2550')
         expect(scope.to_json).not_to include('ML337156')
       }
@@ -138,27 +141,52 @@ RSpec.describe 'Aztec code scan and confirm', type: :request do
       throttle.block.call(Rack::Attack::Request.new(Rack::MockRequest.env_for(path, method: method, 'REMOTE_ADDR' => '1.2.3.4')))
     end
 
-    it 'covers the bare path and every format suffix' do
-      expect(discriminator('/v1/henry_ford/verify_by_code')).to eq('1.2.3.4')
-      expect(discriminator('/v1/henry_ford/verify_by_code.json')).to eq('1.2.3.4')
-      expect(discriminator('/v1/henry_ford/verify_by_code.xml')).to eq('1.2.3.4')
-    end
-
-    it 'also counts per account, on the uid header' do
-      user_throttle = Rack::Attack.throttles.fetch('henry_ford/verify_by_code/user')
-      request_for = lambda do |path, headers = {}|
-        Rack::Attack::Request.new(Rack::MockRequest.env_for(path, { method: 'POST', 'REMOTE_ADDR' => '1.2.3.4' }.merge(headers)))
+    # Rails' implicit `(.:format)` accepts any segment without a `/`, so every suffix
+    # the router sends to the action has to be counted, not only `\w+` ones.
+    it 'covers the bare path and every format suffix the router accepts' do
+      ['', '.json', '.xml', '.j-s', '.%7E', '.a+b'].each do |suffix|
+        path = "/v1/henry_ford/verify_by_code#{suffix}"
+        expect(Rails.application.routes.recognize_path(path, method: :post)).to include(action: 'verify_by_code')
+        expect(discriminator(path)).to eq('1.2.3.4'), "#{path} reaches the action but is not counted"
       end
-
-      expect(user_throttle.block.call(request_for.call('/v1/henry_ford/verify_by_code.json', 'HTTP_UID' => 'a@b.c'))).to eq('a@b.c')
-      expect(user_throttle.block.call(request_for.call('/v1/henry_ford/verify_by_code'))).to be_nil
-      expect(user_throttle.block.call(request_for.call('/v1/henry_ford/verify', 'HTTP_UID' => 'a@b.c'))).to be_nil
     end
 
     it 'leaves other paths and verbs alone' do
       expect(discriminator('/v1/henry_ford/verify')).to be_nil
       expect(discriminator('/v1/henry_ford/verify_by_code_other')).to be_nil
       expect(discriminator('/v1/henry_ford/verify_by_code', method: 'GET')).to be_nil
+    end
+  end
+
+  describe 'per-account limit' do
+    let(:store) { ActiveSupport::Cache::MemoryStore.new }
+
+    # rate_limit captured the test env's NullStore at class load; count in memory instead.
+    before do
+      create(:user_session, user: scanner, session: session)
+      allow(V1::HenryFord::PatientDetailsController.cache_store).to receive(:increment) do |*args, **options|
+        store.increment(*args, **options)
+      end
+    end
+
+    def scan_status(headers, ip:)
+      post v1_henry_ford_verify_by_code_path, params: { hfhs_patient_data: { barcode: barcode }, session_id: session.id },
+                                              headers: headers, env: { 'REMOTE_ADDR' => ip }
+      response.status
+    end
+
+    it 'counts the authenticated account, whatever IP or credential form it uses' do
+      statuses = Array.new(5) { |i| scan_status(scanner.create_new_auth_token, ip: "198.51.100.#{i + 1}") }
+      bearer_only = scanner.create_new_auth_token.select { |key, _| key.casecmp?('authorization') }
+
+      expect(statuses).to all(eq(200))
+      expect(scan_status(bearer_only, ip: '198.51.100.9')).to eq(429)
+    end
+
+    it 'does not charge unauthenticated requests to the account whose uid they carry' do
+      expect(Array.new(5) { scan_status({ 'Uid' => scanner.uid }, ip: '203.0.113.1') }).to all(eq(401))
+
+      expect(scan_status(scanner.create_new_auth_token, ip: '198.51.100.1')).to eq(200)
     end
   end
 end

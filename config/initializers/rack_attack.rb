@@ -45,17 +45,13 @@ class Rack::Attack
   # lookup against Epic. Scanning is a once-per-visit action, so a legitimate
   # user never comes close to this limit, while a scripted caller walking an
   # identifier space is stopped early.
+  # The per-account limit lives in V1::HenryFord::PatientDetailsController (`rate_limit`),
+  # where the authenticated user is known.
   throttle('henry_ford/verify_by_code/ip', limit: 10, period: 1.minute) do |req|
-    # The route also answers `.json`/`.xml`; rack-attack already normalises `//` and a trailing `/`.
-    req.ip if req.post? && req.path.match?(%r{\A/v1/henry_ford/verify_by_code(?:\.\w+)?\z})
-  end
-
-  # Per account as well, so one user cannot spread a scripted walk over several
-  # IPs. Keyed on the devise_token_auth `uid` header: a request with a forged
-  # uid fails authentication anyway, so only real accounts are counted.
-  throttle('henry_ford/verify_by_code/user', limit: 5, period: 10.minutes) do |req|
-    uid = req.get_header('HTTP_UID')
-    uid if uid.present? && req.post? && req.path.match?(%r{\A/v1/henry_ford/verify_by_code(?:\.\w+)?\z})
+    # Rails' implicit `(.:format)` routes any suffix without a `/` to the action - `.json`,
+    # but also `.j-s`, `.%7E` or `.a+b` - so all of them are counted. rack-attack already
+    # normalises `//` and a trailing `/`.
+    req.ip if req.post? && req.path.match?(%r{\A/v1/henry_ford/verify_by_code(?:\.[^/]+)?\z})
   end
 
   # Throttle POST requests to /login by IP address
