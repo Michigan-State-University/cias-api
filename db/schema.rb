@@ -1205,11 +1205,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
     t.index ["organizable_id", "organizable_type"], name: "index_users_on_organizable_id_and_organizable_type"
     t.index ["organizable_id"], name: "index_users_on_organizable_id"
     t.index ["preview_session_id"], name: "index_users_on_preview_session_id"
-    t.index ["provider", "uid_bidx"], name: "index_users_on_provider_and_uid_bidx", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
     t.index ["team_id"], name: "index_users_on_team_id"
     t.index ["test_run"], name: "index_users_on_test_run", where: "(test_run = true)"
+    t.index ["uid_bidx"], name: "index_users_on_uid_bidx", unique: true
   end
 
   create_table "versions", force: :cascade do |t|

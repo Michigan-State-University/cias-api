@@ -24,13 +24,15 @@ Sentry.init do |config|
   sql_values = /\bVALUES\b.*/im
   scrub_sql = ->(sql) { sql.is_a?(String) ? sql.sub(sql_values, 'VALUES [FILTERED]') : sql }
 
+  # before_send never runs for transaction events (sentry-ruby client.rb), yet the scope copies its breadcrumbs onto
+  # them, so SQL has to be scrubbed at capture to cover both kinds of event. Keys are symbols here.
+  config.before_breadcrumb = lambda do |crumb, _hint|
+    crumb.data[:sql] = scrub_sql.call(crumb.data[:sql]) if crumb.data.is_a?(Hash) && crumb.data.key?(:sql)
+    crumb
+  end
+
   config.before_send = lambda do |event, _hint|
-    filtered = filter.filter(event.to_hash)
-    Array(filtered.dig(:breadcrumbs, :values)).each do |crumb|
-      data = crumb[:data]
-      data['sql'] = scrub_sql.call(data['sql']) if data.is_a?(Hash) && data.key?('sql')
-    end
-    filtered
+    filter.filter(event.to_hash)
   end
 
   config.before_send_transaction = lambda do |event, _hint|

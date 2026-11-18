@@ -119,4 +119,55 @@ RSpec.describe Sentry do
       expect(sent[:breadcrumbs][:values].first[:data]['params']).to eq(masked_params)
     end
   end
+
+  # insert_all compiles its rows into the SQL text, so tracked-link slugs would otherwise be readable in Sentry.
+  # Transactions skip before_send, so the breadcrumb has to be scrubbed when it is recorded, not when it is sent.
+  describe '.configuration.before_breadcrumb' do
+    subject(:scrubbed) { described_class.configuration.before_breadcrumb.call(crumb, {}).data[:sql] }
+
+    let(:crumb) { Sentry::Breadcrumb.new(category: 'sql.active_record', data: data) }
+
+    context 'with an insert that carries its values' do
+      let(:data) { { sql: %(INSERT INTO "sms_links_users" ("slug") VALUES ('SENTINEL') RETURNING "id"), name: 'SmsLinksUser Insert' } }
+
+      it 'removes the values' do
+        expect(scrubbed).to eq('INSERT INTO "sms_links_users" ("slug") VALUES [FILTERED]')
+      end
+    end
+
+    context 'with a select' do
+      let(:data) { { sql: %(SELECT "users".* FROM "users" WHERE "users"."id" = $1), name: 'User Load' } }
+
+      it 'keeps it' do
+        expect(scrubbed).to eq('SELECT "users".* FROM "users" WHERE "users"."id" = $1')
+      end
+    end
+
+    context 'with a breadcrumb that carries no sql' do
+      let(:crumb) { Sentry::Breadcrumb.new(category: 'request', data: { url: 'https://api.twilio.com' }) }
+
+      it 'passes it through' do
+        expect(described_class.configuration.before_breadcrumb.call(crumb, {}).data).to eq(url: 'https://api.twilio.com')
+      end
+    end
+  end
+
+  describe '.configuration.before_send_transaction' do
+    subject(:sent) { described_class.configuration.before_send_transaction.call(event, {}) }
+
+    let(:event) do
+      instance_double(Sentry::TransactionEvent, spans: [
+                        { op: 'db.sql.active_record', description: %(INSERT INTO "sms_links_users" ("slug") VALUES ('SENTINEL')) },
+                        { op: 'http.client', description: 'POST https://api.twilio.com' }
+                      ])
+    end
+
+    it 'removes the values from database spans' do
+      expect(sent.spans.first[:description]).to eq('INSERT INTO "sms_links_users" ("slug") VALUES [FILTERED]')
+    end
+
+    it 'leaves other spans alone' do
+      expect(sent.spans.last[:description]).to eq('POST https://api.twilio.com')
+    end
+  end
 end
