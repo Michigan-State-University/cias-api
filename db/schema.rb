@@ -1013,15 +1013,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
-  create_table "team_group_identifiers", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
-    t.uuid "team_id", null: false
-    t.string "identifier", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["identifier"], name: "index_team_group_identifiers_on_identifier", unique: true
-    t.index ["team_id"], name: "index_team_group_identifiers_on_team_id"
-  end
-
   create_table "team_invitations", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.uuid "team_id"
@@ -1304,7 +1295,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
   add_foreign_key "stars", "users"
   add_foreign_key "tag_interventions", "interventions"
   add_foreign_key "tag_interventions", "tags"
-  add_foreign_key "team_group_identifiers", "teams", on_delete: :cascade
   add_foreign_key "user_log_requests", "users"
   add_foreign_key "user_sessions", "audios", column: "name_audio_id"
   add_foreign_key "user_sessions", "health_clinics"
