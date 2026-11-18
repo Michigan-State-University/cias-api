@@ -46,5 +46,25 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/position', type: :reque
         expect(question_group3.reload.position).to eq 8
       end
     end
+
+    context 'when position is sent as a single object instead of an array' do
+      let(:params) { { question_group: { position: { id: question_group1.id, position: 6 } } } }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:bad_request) }
+
+      it 'does not change position' do
+        expect(question_group1.reload.position).to eq 3
+      end
+    end
+
+    context 'when question_group key is missing' do
+      let(:params) { { position: [{ id: question_group1.id, position: 6 }] } }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:bad_request) }
+    end
   end
 end

@@ -68,7 +68,7 @@ RSpec.describe 'POST /v1/charts', type: :request do
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq 'Validation failed: Dashboard section must exist'
@@ -126,6 +126,22 @@ RSpec.describe 'POST /v1/charts', type: :request do
 
     it 'has its position value equal to 1' do
       expect(new_chart.position).to eq(1)
+    end
+  end
+
+  context 'when the chart params are a scalar' do
+    let(:params) { { chart: 'New Chart' } }
+
+    it_behaves_like 'rejects malformed params', -> { Chart.count }
+  end
+
+  context 'when the chart type is unknown' do
+    let(:params) { { chart: { name: 'Bad', dashboard_section_id: dashboard_section.id, chart_type: 'radar_chart' } } }
+
+    it 'does not create the chart, returns :unprocessable_content status' do
+      expect { request }.not_to change(Chart, :count)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json_response['message']).to include("'radar_chart' is not a valid chart_type")
     end
   end
 end

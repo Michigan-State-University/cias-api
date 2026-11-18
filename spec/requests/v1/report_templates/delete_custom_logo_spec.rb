@@ -27,10 +27,18 @@ RSpec.describe 'DELETE v1/sessions/:session_id/report_templates/:id/remove_cover
     it_behaves_like 'cannot delete attachment'
   end
 
-  context 'when a participant tries to delete the custom cover letter logo of their session' do
+  context 'when the owner deletes the custom cover letter logo of their session' do
     let!(:intervention) { create(:intervention, user: user) }
 
     it_behaves_like 'can delete attachment'
+
+    it 'purges the stored file' do
+      blob = report_template.cover_letter_custom_logo.blob
+
+      request
+
+      expect(ActiveStorage::Blob.exists?(blob.id)).to be(false)
+    end
   end
 
   context 'when the report is for a collaborative session' do

@@ -19,15 +19,15 @@ class V1::Tlfb::ConsumptionResultsController < V1Controller
   private
 
   def consumption_result_params
-    params.require(:consumption_result).permit(:user_session_id, :question_group_id, :exact_date, body: {})
+    params.expect(consumption_result: [:user_session_id, :question_group_id, :exact_date, { body: {} }])
   end
 
   def consumption_result_create_params
-    params.require(:consumption_result).permit(body: {}).merge({ day: day_for_substance })
+    params.expect(consumption_result: [body: {}]).merge({ day: day_for_substance })
   end
 
   def consumption_result_update_params
-    params.require(:consumption_result).permit(body: {})
+    params.expect(consumption_result: [body: {}])
   end
 
   def consumption_result_id

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Api::Hfhs::Authentication
+  include Api::Hfhs::TlsErrorReporter
+
   ENDPOINT = ENV.fetch('HFHS_TOKEN_URL')
 
   def self.call
@@ -8,7 +10,7 @@ class Api::Hfhs::Authentication
   end
 
   def call
-    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+    connection = Faraday.new ENDPOINT, ssl: Api::Hfhs::SslOptions.call
 
     response = connection.post do |request|
       request.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -16,6 +18,9 @@ class Api::Hfhs::Authentication
     end
 
     JSON.parse(response.body).symbolize_keys if response.status == 200
+  rescue Faraday::SSLError => e
+    report_tls_error(e, ENDPOINT)
+    raise
   end
 
   private

@@ -101,6 +101,13 @@ FactoryBot.define do
     end
   end
 
+  factory :ra_session, class: Session::ResearchAssistant do
+    sequence(:name) { |s| "ra_session_#{s}" }
+    sequence(:variable) { |s| "ra_session_#{s}_#{SecureRandom.hex}" }
+    position { 0 }
+    association :intervention
+  end
+
   factory :cat_mh_session, class: Session::CatMh do
     sequence(:name) { |s| "session_#{s}" }
     sequence(:variable) { |s| "session_#{s}" }

@@ -11,7 +11,7 @@ class Question::Narrator::Block::ReflectionBase < Question::Narrator::Block
 
   def self.swap_name(block, mp3url, name_text)
     block['reflections'].each do |reflection|
-      next reflection unless reflection['text'].include?(':name:.')
+      next reflection unless reflection['text']&.include?(':name:.')
 
       swap_name_into_block(reflection, mp3url, name_text)
     end

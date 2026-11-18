@@ -63,6 +63,15 @@ RSpec.describe 'PATCH /v1/report_templates/sections/:section_id/move_variants', 
     it 'returns Bad Request HTTP status code' do
       expect(response).to have_http_status(:bad_request)
     end
+
+    context 'when position is not a list' do
+      let(:params) { { variant: { position: 'x' } } }
+
+      it 'returns :bad_request and keeps the order' do
+        expect(response).to have_http_status(:bad_request)
+        expect(report_template_section.variants.reorder(:position).pluck(:position)).to eq([0, 2])
+      end
+    end
   end
 
   context 'when current user is the researcher who has not access to do this' do
@@ -74,4 +83,19 @@ RSpec.describe 'PATCH /v1/report_templates/sections/:section_id/move_variants', 
   end
 
   it_behaves_like 'correct behavior for the intervention with collaborators'
+
+  context 'when three variants are reordered' do
+    let(:report_template_section_variant3) do
+      create(:report_template_section_variant, report_template_section: report_template_section, position: 3)
+    end
+    let(:order) { [report_template_section_variant3, report_template_section_variant1, report_template_section_variant2] }
+    let(:params) { { variant: { position: order.each_with_index.map { |variant, index| { id: variant.id, position: index } } } } }
+
+    it 'returns the variants in the new order with consecutive positions and persists it' do
+      expect(response).to have_http_status(:ok)
+      expect(json_response['data'].pluck('id')).to eq(order.map(&:id))
+      expect(json_response['data'].map { |variant| variant['attributes']['position'] }).to eq([0, 1, 2])
+      expect(report_template_section.variants.reorder(:position).pluck(:id)).to eq(order.map(&:id))
+    end
+  end
 end

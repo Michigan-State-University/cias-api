@@ -6,6 +6,9 @@ Sidekiq.configure_server do |config|
   else
     config.redis = { url: ENV.fetch('REDIS_URL', nil) }
   end
+
+  # Route through Rails.logger so Logstop scrubs PII from job-args on retry; keep dev unchanged.
+  config.logger = Rails.logger unless Rails.env.development?
 end
 
 Sidekiq.configure_client do |config|

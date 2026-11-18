@@ -69,6 +69,23 @@ RSpec.describe 'POST /v1/henry_ford/verify', type: :request do
     end
   end
 
+  # sentry-rails copies these instrumented params into breadcrumbs and span data of every traced request
+  context 'when Rails instruments the request' do
+    let(:instrumented_params) { [] }
+    let(:params) { super().deep_merge(hfhs_patient_data: { mrn: '12345678' }) }
+    let(:request) do
+      ActiveSupport::Notifications.subscribed(->(event) { instrumented_params << event.payload[:params] }, 'process_action.action_controller') do
+        post v1_henry_ford_verify_path, params: params, headers: headers
+      end
+    end
+
+    it 'masks every patient field' do
+      expect(instrumented_params.last['hfhs_patient_data']).to eq(
+        %w[first_name last_name dob sex zip_code phone_number phone_type mrn].index_with { '[FILTERED]' }
+      )
+    end
+  end
+
   context 'when user is quest' do
     let(:user) { create(:user, :confirmed, :guest) }
 

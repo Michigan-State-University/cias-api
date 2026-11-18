@@ -47,13 +47,13 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
         it 'returned questions have no branching,variables and cleared speech blocks' do
           expect(json_response['included'][2]['attributes']['narrator']['blocks']).to eq question_ids.third.narrator['blocks']
           expect(json_response['included'][2]['attributes']['formulas']).not_to eq question_ids.third.formulas
-          expect(json_response['included'][2]['attributes']['body']['data']).to eq question_ids.third.body['data']
+          expect(json_response['included'][2]['attributes']['body']['data'].map { |r| r.except('id') }).to eq question_ids.third.body['data']
         end
 
         it 'shared_question_group questions have no branching,variables and cleared speech blocks' do
           expect(third_question.narrator['blocks']).to eq question_ids.third.narrator['blocks']
           expect(third_question.formulas).not_to eq question_ids.third.formulas
-          expect(third_question.body['data']).to eq question_ids.third.body['data']
+          expect(third_question.body['data'].map { |r| r.except('id') }).to eq question_ids.third.body['data']
         end
       end
 
@@ -366,38 +366,38 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
 
       it 'when Question::Name exist in session return BadRequest' do
         request1
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(question_group_with_name.reload.questions.size).to be(3)
       end
 
       it 'when Question::Name exit in other session and in a group' do
         request2
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(other_question_group_with_name.reload.questions.size).to be(1)
       end
 
       it 'when Question::Name exit in other session but not in a group' do
         request3
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
       end
 
       context 'testing rollback when in group is invalid question' do
         it 'when in group of shared questions is Question::Name and exit in group' do
           request4
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(question_group_with_name.reload.questions.size).to be(3)
         end
 
         it 'when in group of shared questions is Question::Name and Question::Name exit in other session and in a group' do
           request5
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(other_question_group_with_name.reload.questions.size).to be(1)
         end
 
         it 'when in group of shared questions is Question::Name and Question::Name exit in other session but not in a group' do
           request6
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
           expect(other_question_group_without_name_in_session_with_name.reload.questions.size).to be(0)
         end
       end

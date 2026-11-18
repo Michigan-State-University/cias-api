@@ -1,4 +1,4 @@
-require:
+plugins:
   - rubocop-performance
   - rubocop-rails
   - rubocop-rspec
@@ -150,12 +150,20 @@ Metrics/ClassLength:
     - 'app/models/question.rb'
     - 'app/services/v1/sms_plans/schedule_sms_for_user_session.rb'
     - 'app/models/intervention.rb'
+    - 'app/controllers/v1/interventions/predefined_participants_controller.rb'
+    - 'app/services/v1/chart_statistics/create.rb'
 
 Metrics/ParameterLists:
   Enabled: true
   Exclude:
     - 'app/services/api/epic_on_fhir/patient_verification.rb'
     - 'app/jobs/sms_plans/send_sms_job.rb'
+
+Metrics/ModuleLength:
+  Enabled: true
+  Exclude:
+    - 'app/services/concerns/sms_helper.rb'
+    - 'app/models/concerns/session/classic_behavior.rb'
 
 Performance/AncestorsInclude:
   Enabled: true
@@ -296,10 +304,6 @@ Style/StructInheritance:
   Exclude:
     - 'app/policies/**/*'
 
-Style/DocumentDynamicEvalDefinition:
-  Exclude:
-    - 'app/controllers/v1/auth_controller.rb'
-
 Rails/ActiveRecordCallbacksOrder:
   Enabled: true
 
@@ -378,6 +382,7 @@ RSpec/ContextWording:
 RSpec/DescribeClass:
   Exclude:
     - 'db/migrate/*'
+    - 'spec/lib/tasks/*'
 
 RSpec/ExampleLength:
   Enabled: false

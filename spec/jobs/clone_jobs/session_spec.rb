@@ -158,6 +158,19 @@ RSpec.describe CloneJobs::Session, type: :job do
         expect(cloned_session.attributes['days_after_date_variable_name']).to eq(session.attributes['days_after_date_variable_name'])
       end
 
+      context 'when source session has generated reports' do
+        let!(:user_session) { create(:user_session, session: session, user: create(:user, :confirmed, :participant)) }
+        let!(:generated_report) do
+          report = create(:generated_report, user_session: user_session, report_template: session.report_templates.first)
+          session.update_column(:generated_report_count, 1)
+          report
+        end
+
+        it 'resets generated_report_count on the clone' do
+          expect(cloned_session.generated_report_count).to eq(0)
+        end
+      end
+
       it 'has correct number of question groups' do
         expect(cloned_session.question_groups.size).to eq(3)
       end

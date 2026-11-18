@@ -5,8 +5,11 @@ class V1::SmsLinksController < V1Controller
 
   def index
     authorize! :read, sms_link_sms_plan
-
-    collection = sms_link_sms_plan.sms_links
+    collection = if sms_link_params[:variant_id].present?
+                   SmsPlan::Variant.find(sms_link_params[:variant_id]).sms_links
+                 else
+                   sms_link_sms_plan.no_formula_sms_links
+                 end
 
     render json: serialized_response(collection)
   end
@@ -34,7 +37,11 @@ class V1::SmsLinksController < V1Controller
   end
 
   def sms_link_sms_plan
-    @sms_link_sms_plan ||= SmsPlan.find(sms_link_params[:sms_plan_id])
+    @sms_link_sms_plan ||= if sms_link_params[:variant_id].present?
+                             SmsPlan::Variant.find(sms_link_params[:variant_id]).sms_plan
+                           else
+                             SmsPlan.find(sms_link_params[:sms_plan_id])
+                           end
   end
 
   def verify_response
@@ -51,15 +58,16 @@ class V1::SmsLinksController < V1Controller
   end
 
   def verify_params
-    params.require(:sms_link).permit(:slug)
+    params.expect(sms_link: [:slug])
   end
 
   def sms_link_params
-    params.require(:sms_link).permit(
-      :url,
-      :link_type,
-      :variable,
-      :sms_plan_id
+    params.expect(
+      sms_link: %i[url
+                   link_type
+                   variable
+                   sms_plan_id
+                   variant_id]
     )
   end
 end

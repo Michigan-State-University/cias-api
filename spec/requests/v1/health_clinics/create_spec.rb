@@ -70,7 +70,7 @@ RSpec.describe 'POST /v1/health_clinics', type: :request do
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq "Validation failed: Health system must exist, Name can't be blank"
@@ -113,5 +113,11 @@ RSpec.describe 'POST /v1/health_clinics', type: :request do
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
       end
     end
+  end
+
+  context 'when the health clinic params are a scalar' do
+    let(:params) { { health_clinic: 'New Health Clinic' } }
+
+    it_behaves_like 'rejects malformed params', -> { HealthClinic.count }
   end
 end

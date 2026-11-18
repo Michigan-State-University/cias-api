@@ -1,20 +1,21 @@
 # frozen_string_literal: true
 
 class V1::UserSessions::BaseService
-  def self.call(session_id, user_id, health_clinic_id)
-    new(session_id, user_id, health_clinic_id).call
+  def self.call(session_id, user_id, health_clinic_id, **)
+    new(session_id, user_id, health_clinic_id, **).call
   end
 
-  def initialize(session_id, user_id, health_clinic_id)
+  def initialize(session_id, user_id, health_clinic_id, **options)
     @session_id = session_id
     @user_id = user_id
     @health_clinic_id = health_clinic_id
     @session = Session.find(session_id)
     @type = session.user_session_type
     @intervention_id = session.intervention_id
+    @options = options
   end
 
-  attr_reader :health_clinic_id, :type, :intervention_id, :session_id, :user_id, :session
+  attr_reader :health_clinic_id, :type, :intervention_id, :session_id, :user_id, :session, :options
   attr_accessor :user_intervention
 
   def call
@@ -24,8 +25,7 @@ class V1::UserSessions::BaseService
   protected
 
   def new_user_session_for(create_method, counter = 1)
-    user_session = UserSession.send(
-      create_method,
+    user_session_attrs = {
       session_id: session_id,
       user_id: user_id,
       health_clinic_id: health_clinic_id,
@@ -33,7 +33,14 @@ class V1::UserSessions::BaseService
       user_intervention_id: user_intervention.id,
       number_of_attempts: counter,
       multiple_fill: session.multiple_fill
-    )
+    }
+
+    if type == 'UserSession::Sms'
+      user_session_attrs[:sms_phone_prefix] = options[:sms_phone_prefix] if options[:sms_phone_prefix].present?
+      user_session_attrs[:sms_phone_number] = options[:sms_phone_number] if options[:sms_phone_number].present?
+    end
+
+    user_session = UserSession.send(create_method, user_session_attrs)
     user_session.started = true
     user_session
   end

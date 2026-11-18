@@ -4,10 +4,15 @@ class SmsLink < ApplicationRecord
   # ASSOCIATIONS
   belongs_to :sms_plan
   belongs_to :session
+  belongs_to :variant, class_name: 'SmsPlan::Variant', optional: true
   has_many :sms_links_users, dependent: :destroy
 
   # VALIDATIONS
-  validates :url, :variable, presence: true, uniqueness: { scope: :sms_plan_id }
+  validates :url, :variable, presence: true
+  validates :url, :variable, uniqueness: { scope: :sms_plan_id, conditions: -> { where(variant_id: nil) } },
+                             if: -> { variant_id.nil? }
+  validates :url, :variable, uniqueness: { scope: :variant_id },
+                             if: -> { variant_id.present? }
 
   # ENUMS
   enum :link_type, {
@@ -16,12 +21,13 @@ class SmsLink < ApplicationRecord
   }
 
   # CALLBACKS
-  before_validation :set_session_id
+  before_validation :set_derived_ids
   before_validation :add_https_to_url
 
   # METHODS
-  def set_session_id
-    self.session_id ||= sms_plan&.session_id
+  def set_derived_ids
+    self.sms_plan_id ||= variant&.sms_plan_id
+    self.session_id  ||= sms_plan&.session_id
   end
 
   def add_https_to_url

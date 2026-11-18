@@ -11,6 +11,12 @@ RSpec.describe V1::GeneratedReports::Create do
       session = create(:session, intervention: intervention)
       @user_session = create(:user_session, session: session)
       @report_template = create(:report_template, session: session)
+      question_group = create(:question_group, session: session)
+      create(:question_free_response, question_group: question_group, body: { data: [{ payload: '' }], variable: { name: 'free_text' } })
+      create(:question_free_response, question_group: question_group, body: { data: [{ payload: '' }], variable: { name: 'other_text' } })
+      other_session = create(:session, intervention: intervention, variable: 's1')
+      create(:question_free_response, question_group: create(:question_group, session: other_session),
+                                      body: { data: [{ payload: '' }], variable: { name: 'free_text' } })
       section1 = create(:report_template_section, report_template: @report_template,
                                                   formula: 'var1+var2')
       section2 = create(:report_template_section, report_template: @report_template,
@@ -37,6 +43,8 @@ RSpec.describe V1::GeneratedReports::Create do
   let(:dentaku_calculator) { Dentaku::Calculator.new }
 
   before do
+    # Shared before_all records keep in-memory content from previous examples; reset them to the DB state.
+    [section1_variant1, section1_variant2, section2_variant1, section2_variant2].each(&:reload)
     allow(Dentaku::Calculator).to receive(:new).and_return(dentaku_calculator)
     dentaku_service.store_and_transform_values
     Timecop.freeze
@@ -172,6 +180,118 @@ RSpec.describe V1::GeneratedReports::Create do
           subject
         end
       end
+
+      context 'when the answer was skipped' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session, skipped: true,
+                                        body: { data: [{ 'var' => '', 'value' => '' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'omits the section that uses the variable' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [variant_with_content('Second section')]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when the answer value is blank' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session,
+                                        body: { data: [{ 'var' => 'free_text', 'value' => '' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'omits the section that uses the variable' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [variant_with_content('Second section')]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when a variable from another session has no value' do
+        before do
+          section1_variant1.update(content: 'Earlier you said: .:s1.free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'omits the section that uses the variable' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [variant_with_content('Second section')]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when the placeholder does not match any intervention variable' do
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_txt:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'keeps the section with the placeholder untouched' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [
+              variant_with_content('Your thoughts: .:free_txt:.'),
+              variant_with_content('Second section')
+            ]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when only some of the variables used in a section have values' do
+        let!(:answer_receive_report_true) do
+          create(:answer_free_response, user_session: user_session,
+                                        body: { data: [{ 'var' => 'free_text', 'value' => 'I feel great' }] })
+        end
+
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:., more: .:other_text:., earlier: .:s1.free_text:.')
+          section2_variant1.update(content: 'Second section')
+        end
+
+        it 'keeps the section and marks the unanswered variables as not answered' do
+          expect(V1::RenderPdfReport).to receive(:call).with(
+            report_template: report_template,
+            variants_to_generate: [
+              variant_with_content('Your thoughts: I feel great, more: Not answered, earlier: Not answered'),
+              variant_with_content('Second section')
+            ]
+          ).and_return('PDF TEMPLATE')
+
+          subject
+        end
+      end
+
+      context 'when every selected section uses a variable without value' do
+        before do
+          section1_variant1.update(content: 'Your thoughts: .:free_text:.')
+          section2_variant1.update(content: 'More thoughts: .:other_text:.')
+        end
+
+        it 'does not create a report' do
+          expect { subject }.to avoid_changing(GeneratedReport, :count)
+        end
+      end
     end
   end
 
@@ -192,6 +312,106 @@ RSpec.describe V1::GeneratedReports::Create do
       expect { subject }.to avoid_changing(GeneratedReport, :count).and \
         avoid_changing(ActiveStorage::Attachment, :count).and \
           avoid_changing(ActiveStorage::Blob, :count)
+    end
+  end
+
+  context 'when sections have invalid formulas' do
+    before_all do
+      RSpec::Mocks.with_temporary_scope do
+        allow_any_instance_of(Question).to receive(:execute_narrator).and_return(true)
+
+        intervention = create(:intervention)
+        session = create(:session, intervention: intervention)
+        @invalid_user_session = create(:user_session, session: session)
+        @invalid_report_template = create(:report_template, session: session)
+        @invalid_section = create(:report_template_section, report_template: @invalid_report_template,
+                                                            formula: 'var1 var2')
+        @valid_section = create(:report_template_section, report_template: @invalid_report_template,
+                                                          formula: 'var1+var2')
+        @invalid_variant = create(:report_template_section_variant, report_template_section: @invalid_section,
+                                                                    formula_match: '=10')
+        @valid_variant = create(:report_template_section_variant, report_template_section: @valid_section,
+                                                                  formula_match: '=10')
+      end
+    end
+
+    let(:user_session) { @invalid_user_session }
+    let(:report_template) { @invalid_report_template }
+    let(:invalid_section) { @invalid_section }
+    let(:valid_section) { @valid_section }
+    let(:invalid_variant) { @invalid_variant }
+    let(:valid_variant) { @valid_variant }
+
+    context 'when one section has an invalid formula but others are valid' do
+      it 'logs the error for invalid section' do
+        allow(V1::RenderPdfReport).to receive(:call).and_return('PDF TEMPLATE')
+
+        expect(Rails.logger).to receive(:error).with(/Invalid formula in section #{invalid_section.id}/)
+        expect(Rails.logger).to receive(:error).with(/Formula: var1 var2/)
+
+        subject
+      end
+
+      it 'creates report with valid sections only' do
+        allow(V1::RenderPdfReport).to receive(:call).with(
+          report_template: report_template,
+          variants_to_generate: [variant_with_content(valid_variant.content)]
+        ).and_return('PDF TEMPLATE')
+
+        expect { subject }.to change(GeneratedReport, :count).by(1)
+      end
+    end
+
+    context 'when all sections have invalid formulas' do
+      before_all do
+        RSpec::Mocks.with_temporary_scope do
+          @all_invalid_report = create(:report_template, session: @invalid_user_session.session)
+          @invalid_section1 = create(:report_template_section, report_template: @all_invalid_report,
+                                                               formula: 'var1 >= var2 >= var3')
+          @invalid_section2 = create(:report_template_section, report_template: @all_invalid_report,
+                                                               formula: 'invalid formula text')
+          create(:report_template_section_variant, report_template_section: @invalid_section1, formula_match: '=10')
+          create(:report_template_section_variant, report_template_section: @invalid_section2, formula_match: '=10')
+        end
+      end
+
+      let(:report_template) { @all_invalid_report }
+
+      it 'logs errors for all invalid sections' do
+        expect(Rails.logger).to receive(:error).at_least(:twice)
+
+        subject
+      end
+
+      it 'does not create a report' do
+        expect { subject }.to avoid_changing(GeneratedReport, :count).and \
+          avoid_changing(ActiveStorage::Attachment, :count).and \
+            avoid_changing(ActiveStorage::Blob, :count)
+      end
+    end
+
+    context 'when section has tokenizer error' do
+      before_all do
+        RSpec::Mocks.with_temporary_scope do
+          @tokenizer_report = create(:report_template, session: @invalid_user_session.session)
+          @tokenizer_section = create(:report_template_section, report_template: @tokenizer_report,
+                                                                formula: '(var1=1) . invalid text')
+          create(:report_template_section_variant, report_template_section: @tokenizer_section, formula_match: '=10')
+        end
+      end
+
+      let(:report_template) { @tokenizer_report }
+
+      it 'catches tokenizer error and logs it' do
+        expect(Rails.logger).to receive(:error).with(/Invalid formula/)
+        expect(Rails.logger).to receive(:error).with(/Formula:/)
+
+        subject
+      end
+
+      it 'does not create a report' do
+        expect { subject }.to avoid_changing(GeneratedReport, :count)
+      end
     end
   end
 end

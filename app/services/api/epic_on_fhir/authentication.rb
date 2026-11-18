@@ -13,7 +13,7 @@ class Api::EpicOnFhir::Authentication
   end
 
   def call
-    connection = Faraday.new ENDPOINT, ssl: { verify: false }
+    connection = Faraday.new ENDPOINT, ssl: Api::EpicOnFhir::SslOptions.call
 
     response = connection.post do |request|
       request.headers['Content-Type'] = 'application/x-www-form-urlencoded'

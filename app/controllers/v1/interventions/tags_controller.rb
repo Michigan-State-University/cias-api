@@ -32,7 +32,7 @@ class V1::Interventions::TagsController < V1Controller
   end
 
   def intervention_tags_assign_params
-    params.require(:tag).permit(tag_ids: [], names: [])
+    params.expect(tag: [tag_ids: [], names: []])
   end
 
   def tag_ids

@@ -29,7 +29,7 @@ class Question::Narrator::Block::Speech < Question::Narrator::Block
 
       block['sha256'][index_block] = audio.sha256 if block['sha256'].present?
       generate_url(audio, text)
-    end
+    end.compact
   end
 
   def generate_url(audio, text)

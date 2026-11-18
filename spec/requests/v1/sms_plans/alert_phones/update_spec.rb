@@ -39,5 +39,25 @@ RSpec.describe 'PATCH /v1/sms_plans/:sms_plan_id/alert_phones/:id', type: :reque
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when phone contains non-permitted attributes' do
+      let(:other_user) { create(:user, :confirmed, :participant) }
+      let!(:original_user_id) { phone.user_id }
+      let(:params) { { phone: { iso: 'US', user_id: other_user.id, confirmed: false } } }
+
+      it 'updates only permitted attributes' do
+        expect(response).to have_http_status(:ok)
+        expect(phone.reload).to have_attributes(iso: 'US', user_id: original_user_id, confirmed: true)
+      end
+    end
+
+    context 'when phone has no permitted attributes' do
+      let(:params) { { phone: { confirmed: false } } }
+
+      it 'returns bad request and does not change the phone' do
+        expect(response).to have_http_status(:bad_request)
+        expect(phone.reload.confirmed).to be true
+      end
+    end
   end
 end

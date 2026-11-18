@@ -179,4 +179,65 @@ RSpec.describe V1::Sms::Replay do
       end
     end
   end
+
+  describe '#create_new_user_session! phone number tracking' do
+    let(:intervention) { create(:intervention) }
+    let(:session) { create(:sms_session, intervention: intervention) }
+    let!(:sms_code) { create(:sms_code, session: session, sms_code: 'TESTCODE') }
+    let(:body) { 'TESTCODE' }
+    let(:from) { '+15551234567' }
+
+    before do
+      allow(SmsPlans::SendSmsJob).to receive(:perform_later)
+    end
+
+    context 'when creating a new user session for a new guest user' do
+      it 'stores the phone number prefix on the user session' do
+        expect { subject }.to change(UserSession::Sms, :count).by(1)
+
+        user_session = UserSession::Sms.last
+        expect(user_session.sms_phone_prefix).to eq('+1')
+      end
+
+      it 'stores the national phone number on the user session' do
+        expect { subject }.to change(UserSession::Sms, :count).by(1)
+
+        user_session = UserSession::Sms.last
+        expect(user_session.sms_phone_number).to eq('5551234567')
+      end
+
+      it 'returns correct sms_full_number' do
+        subject
+        user_session = UserSession::Sms.last
+        expect(user_session.sms_full_number).to eq('+15551234567')
+      end
+    end
+
+    context 'when creating a new user session for existing user' do
+      let!(:phone) { create(:phone, prefix: '+1', number: '5551234567', user: user, confirmed: true) }
+      let!(:user_intervention_record) { create(:user_intervention, user: user, intervention: intervention) }
+
+      it 'stores phone information on the user session' do
+        expect { subject }.to change(UserSession::Sms, :count).by(1)
+
+        user_session = UserSession::Sms.last
+        expect(user_session.sms_phone_prefix).to eq('+1')
+        expect(user_session.sms_phone_number).to eq('5551234567')
+        expect(user_session.sms_full_number).to eq('+15551234567')
+      end
+    end
+
+    context 'with international phone numbers' do
+      let(:from) { '+48555777888' }
+
+      it 'handles Polish phone numbers correctly' do
+        expect { subject }.to change(UserSession::Sms, :count).by(1)
+
+        user_session = UserSession::Sms.last
+        expect(user_session.sms_phone_prefix).to eq('+48')
+        expect(user_session.sms_phone_number).to eq('555777888')
+        expect(user_session.sms_full_number).to eq('+48555777888')
+      end
+    end
+  end
 end

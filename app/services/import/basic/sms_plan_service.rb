@@ -16,9 +16,13 @@ class Import::Basic::SmsPlanService
 
   def call
     variants = sms_plan_hash.delete(:variants)
+    sms_links = sms_plan_hash.delete(:sms_links)
     sms_plan = SmsPlan.create!(sms_plan_hash.merge({ session_id: session_id }))
     variants&.each do |variant_hash|
       get_import_service_class(variant_hash, SmsPlan::Variant).call(sms_plan.id, variant_hash)
+    end
+    sms_links&.each do |sms_link_hash|
+      Import::Basic::SmsLinkService.call(sms_plan.id, sms_link_hash)
     end
     sms_plan
   end

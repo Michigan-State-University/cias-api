@@ -228,4 +228,43 @@ RSpec.describe 'GET /v1/interventions/:id', type: :request do
       end
     end
   end
+
+  context 'when the owner opens the intervention' do
+    let(:intervention_user) { researcher }
+    let(:request) { get v1_intervention_path(intervention.id), headers: researcher.create_new_auth_token }
+    let(:attribute_keys) do
+      %w[
+        additional_text cat_mh_application_id cat_mh_organization_id cat_mh_pool clear_sensitive_data_scheduled_at
+        conversations_present conversations_transcript created_at created_cat_mh_session_count csv current_editor
+        current_narrator exported_data files first_session_language google_language_id has_cat_sessions has_collaborators
+        hfhs_access id is_access_revoked language_code language_name license_type live_chat_enabled logo name note
+        organization_id original_text published_at quick_exit sensitive_data_state sessions_size shared_to starred status
+        type updated_at user user_id
+      ]
+    end
+
+    it 'returns exactly the intervention attribute set and an empty included list without tags' do
+      request
+      expect(response).to have_http_status(:ok)
+      expect(attrs.keys).to match_array(attribute_keys)
+      expect(json_response['data']['relationships'].keys).to match_array(%w[clinic_locations sessions tags])
+      expect(json_response['included']).to eq([])
+    end
+
+    context 'when the intervention has tags' do
+      let!(:tags) { create_list(:tag_intervention, 2, intervention: intervention).map(&:tag) }
+
+      before { request }
+
+      it 'lists every tag in relationships' do
+        expect(json_response['data']['relationships']['tags']['data'])
+          .to match_array(tags.map { |tag| { 'id' => tag.id.to_s, 'type' => 'tag' } })
+      end
+
+      it 'includes every tag with its name' do
+        expect(json_response['included'].map { |item| [item['type'], item['attributes']['name']] })
+          .to match_array(tags.map { |tag| ['tag', tag.name] })
+      end
+    end
+  end
 end

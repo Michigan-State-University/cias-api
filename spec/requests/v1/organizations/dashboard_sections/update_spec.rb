@@ -111,7 +111,7 @@ RSpec.describe 'PATCH /v1/organizations/:organization_id/dashboard_sections/:id'
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq 'Validation failed: Name has already been taken'

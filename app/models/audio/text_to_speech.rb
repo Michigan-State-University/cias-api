@@ -19,6 +19,10 @@ class Audio::TextToSpeech < SimpleDelegator
     url
   end
 
+  def fetch_speech_from_text
+    provider.new(text, language, voice_type).synthesize
+  end
+
   private
 
   def require_provider
@@ -27,9 +31,5 @@ class Audio::TextToSpeech < SimpleDelegator
 
   def provider
     @provider ||= "Audio::TextToSpeech::#{require_provider.classify}".safe_constantize
-  end
-
-  def fetch_speech_from_text
-    provider.new(text, language, voice_type).synthesize
   end
 end

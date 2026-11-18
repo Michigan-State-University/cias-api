@@ -137,8 +137,12 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
                 'default_pattern' => {
                   'color' => '#E2B1F4',
                   'label' => 'NotMatched'
-                }
+                },
+                'min_answered_variables' => 0,
+                'positive_despite_missing_data' => false
               },
+              'formula_variable_count' => 0,
+              'regenerating' => false,
               'dashboard_section_id' => chart1.dashboard_section_id,
               'published_at' => nil
             }
@@ -171,8 +175,12 @@ RSpec.describe 'GET /v1/organizations/:organization_id/dashboard_sections', type
                 'default_pattern' => {
                   'color' => '#E2B1F4',
                   'label' => 'NotMatched'
-                }
+                },
+                'min_answered_variables' => 0,
+                'positive_despite_missing_data' => false
               },
+              'formula_variable_count' => 0,
+              'regenerating' => false,
               'dashboard_section_id' => chart2.dashboard_section_id,
               'published_at' => nil
             }

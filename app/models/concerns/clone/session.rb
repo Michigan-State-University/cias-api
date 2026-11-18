@@ -2,7 +2,12 @@
 
 class Clone::Session < Clone::Base
   def execute
-    outcome.position = position || outcome.intervention.sessions.size
+    if source.type == 'Session::ResearchAssistant'
+      outcome.position = 0
+    else
+      outcome.position = position || outcome.intervention.sessions.size
+    end
+    outcome.generated_report_count = 0
     outcome.clear_formulas if clean_formulas
     outcome.days_after_date_variable_name = nil if clean_formulas
     ActiveRecord::Base.transaction do
@@ -53,8 +58,14 @@ class Clone::Session < Clone::Base
   def outcome_questions_reassignment
     outcome_questions.find_each do |question|
       question = reassign_branching_question(question)
-      question = reassign_question_reflections(question)
-      question = remove_invalid_reflections(question) if clone_single_session?
+      # During a full-intervention clone, reflection re-pointing is deferred to
+      # Clone::Intervention#reassign_reflections — which runs after ALL sessions
+      # exist, so forward cross-session references can be resolved. Skipping it
+      # here keeps the source ids on the block for that later pass.
+      unless defer_reflection_reassignment
+        question = reassign_question_reflections(question)
+        question = remove_invalid_reflections(question) if clone_single_session?
+      end
       question.save!
     end
   end
@@ -110,14 +121,14 @@ class Clone::Session < Clone::Base
     target_session.questions
                       .joins(:question_group)
                       .where(question_groups: { position: target.question_group.position })
-                      .find_by!(position: target.position)
+                      .find_by(position: target.position)
   end
 
   def matching_session(target_id)
     target = check_if_session_exists(target_id)
     return unless target
 
-    outcome.intervention.sessions.find_by!(position: target.position)
+    outcome.intervention.sessions.find_by(position: target.position)
   end
 
   def check_if_session_exists(target_id)
@@ -166,14 +177,24 @@ class Clone::Session < Clone::Base
       new_sms_plan.no_formula_attachment.attach(plan.no_formula_attachment.blob) if plan.no_formula_attachment.attached?
       outcome.sms_plans << new_sms_plan
 
-      plan.variants.each { |variant| create_and_assign_variant(variant, new_sms_plan) }
+      variant_id_mapping = {}
+      plan.variants.each do |variant|
+        new_variant = create_and_assign_variant(variant, new_sms_plan)
+        variant_id_mapping[variant.id] = new_variant.id
+      end
 
       plan.alert_phones.each do |alert_phone|
         new_sms_plan.alert_phones << AlertPhone.new(sms_plan: new_sms_plan, phone: alert_phone.phone)
       end
 
       plan.sms_links.each do |sms_link|
-        new_sms_plan.sms_links << SmsLink.new(url: sms_link.url, link_type: sms_link.link_type, session: source, variable: sms_link.variable)
+        new_variant_id = sms_link.variant_id.present? ? variant_id_mapping[sms_link.variant_id] : nil
+        new_sms_plan.sms_links << SmsLink.new(
+          url: sms_link.url,
+          link_type: sms_link.link_type,
+          variable: sms_link.variable,
+          variant_id: new_variant_id
+        )
       end
     end
   end
@@ -206,7 +227,7 @@ class Clone::Session < Clone::Base
   end
 
   def reassign_tests
-    return if source.instance_of?(Session::Classic) || source.instance_of?(Session::Sms)
+    return if source.instance_of?(Session::Classic) || source.instance_of?(Session::Sms) || source.instance_of?(Session::ResearchAssistant)
 
     source.cat_mh_test_types.each do |test_type|
       outcome.cat_mh_test_types << test_type
@@ -217,5 +238,6 @@ class Clone::Session < Clone::Base
     new_variant = SmsPlan::Variant.new(variant.slice(SmsPlan::Variant::ATTR_NAMES_TO_COPY))
     new_variant.attachment.attach(variant.attachment.blob) if variant.attachment.attached?
     new_sms_plan.variants << new_variant
+    new_variant
   end
 end

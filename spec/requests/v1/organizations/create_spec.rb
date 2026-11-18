@@ -70,7 +70,7 @@ RSpec.describe 'POST /v1/organizations', type: :request do
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -106,5 +106,22 @@ RSpec.describe 'POST /v1/organizations', type: :request do
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
       end
     end
+  end
+
+  context 'when another organization already has the name' do
+    before do
+      create(:organization, name: 'New Organization')
+      request
+    end
+
+    it { expect(response).to have_http_status(:unprocessable_content) }
+
+    it { expect(json_response).to eq('message' => 'Validation failed: Name has already been taken') }
+  end
+
+  context 'when the organization params are a scalar' do
+    let(:params) { { organization: 'New Organization' } }
+
+    it_behaves_like 'rejects malformed params', -> { Organization.count }
   end
 end

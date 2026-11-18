@@ -67,7 +67,7 @@ RSpec.describe 'POST /v1/live_chat/intervention/:id/navigator_setups/files', typ
     let(:file) { FactoryHelpers.upload_file('spec/factories/text/big_file.txt', 'text/plain', false) }
 
     it 'returns correct status code (payload too large)' do
-      expect(response).to have_http_status(:payload_too_large)
+      expect(response).to have_http_status(:content_too_large)
     end
   end
 end

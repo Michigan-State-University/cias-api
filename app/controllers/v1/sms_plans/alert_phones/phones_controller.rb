@@ -2,7 +2,7 @@
 
 class V1::SmsPlans::AlertPhones::PhonesController < V1Controller
   def create
-    # this can even be empty, it will then be edited through update endpoint
+    # number can be blank, it will then be edited through update endpoint
     # also for alert phones they need to be confirmed by default
     phone = Phone.create!(phone_params.merge(confirmed: true))
     alert_load.phones << phone
@@ -23,11 +23,11 @@ class V1::SmsPlans::AlertPhones::PhonesController < V1Controller
   private
 
   def alert_params
-    params.permit(:sms_plan_id, :id, phone: {})
+    params.permit(:sms_plan_id, :id)
   end
 
   def phone_params
-    alert_params.require(:phone).permit(:iso, :prefix, :number)
+    params.expect(phone: %i[iso prefix number])
   end
 
   def sms_alert_id

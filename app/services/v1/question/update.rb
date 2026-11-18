@@ -61,9 +61,11 @@ class V1::Question::Update
         end
       end
 
+      extend_question_params(question_params)
       question.assign_attributes(question_params.except(:type))
       question.execute_narrator
       question.save!
+      validate_and_update_answer_images
 
       adjust_variable_references(changed_vars)
       adjust_answer_options_references(
@@ -99,6 +101,25 @@ class V1::Question::Update
 
   attr_reader :question_params
   attr_accessor :question
+
+  def validate_and_update_answer_images
+    return unless question.type.in?(%w[Question::Single Question::Multiple])
+
+    image_ids = question.body['data'].filter_map { |row| row['image_id'] }
+    question.answer_images.where.not(id: image_ids).find_each(&:purge)
+  end
+
+  def extend_question_params(question_params)
+    return unless question.type.in?(questions_with_multiple_simple_answer)
+
+    question_params.dig(:body, :data)&.each do |answer_params|
+      answer_params[:id] = SecureRandom.uuid if answer_params[:id].blank?
+    end
+  end
+
+  def questions_with_multiple_simple_answer
+    @questions_with_multiple_simple_answer ||= %w[Question::Single Question::Multiple]
+  end
 
   def adjust_variable_references(changed_vars)
     return if changed_vars.empty?

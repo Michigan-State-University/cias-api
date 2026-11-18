@@ -94,6 +94,10 @@ class Intervention < ApplicationRecord
   before_update :cascade_access_type_change, if: :shared_to_changed?
   after_update_commit :status_change, :hf_access_change
 
+  def ra_session
+    sessions.find_by(type: 'Session::ResearchAssistant')
+  end
+
   def assign_default_google_language
     self.google_language = GoogleLanguage.find_by(language_code: 'en') if google_language.nil?
   end

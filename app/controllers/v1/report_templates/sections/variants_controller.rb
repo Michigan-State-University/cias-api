@@ -77,7 +77,7 @@ class V1::ReportTemplates::Sections::VariantsController < V1Controller
   end
 
   def variant_params
-    params.require(:variant).permit(:preview, :formula_match, :title, :content, :image)
+    params.expect(variant: %i[preview formula_match title content image])
   end
 
   def reorder_data_scope

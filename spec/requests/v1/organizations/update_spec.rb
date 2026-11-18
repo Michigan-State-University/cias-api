@@ -133,7 +133,7 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
               }
             end
 
-            it { expect(response).to have_http_status(:unprocessable_entity) }
+            it { expect(response).to have_http_status(:unprocessable_content) }
 
             it 'response contains proper error message' do
               expect(json_response['message']).to eq 'Validation failed: Name has already been taken'
@@ -210,5 +210,15 @@ RSpec.describe 'PATCH /v1/organizations/:id', type: :request do
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
       end
     end
+  end
+
+  context 'when the organization params are a scalar' do
+    let(:params) { { organization: 'Oregano Public Health' } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:bad_request) }
+
+    it { expect(organization.reload.name).to eq 'Michigan Public Health' }
   end
 end

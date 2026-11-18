@@ -78,6 +78,9 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
 
         expect(service).to receive(:update_variable_references).with('pattern1', 'new_pattern1')
         expect(service).to receive(:update_variable_references).with('pattern2', 'new_pattern2')
+        # Relocated here from #update_variable_references: the call is loop-invariant and was hoisted
+        # out of the per-pattern loop, so it must fire exactly ONCE per #call, not once per pattern.
+        expect(service).to receive(:update_days_after_date_session_variable_references).once.with('old_session_var', 'new_session_var')
 
         service.call
       end
@@ -136,36 +139,14 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
     end
 
     describe '#patterns_to_update' do
-      it 'includes the session variable and combined patterns' do
-        allow(service).to receive(:question_variables).and_return(%w[var1 var2])
-
-        expected = ['old_session_var', 'old_session_var.var1', 'old_session_var.var2']
-        expect(service.patterns_to_update).to eq(expected)
-      end
-
-      it 'memoizes the result' do
-        allow(service).to receive(:question_variables).and_return([])
-
-        expect(service).to receive(:question_variables).once
-
-        2.times { service.patterns_to_update }
+      it 'is the bare session variable only — the qualified patterns were dead work' do
+        expect(service.patterns_to_update).to eq(['old_session_var'])
       end
     end
 
     describe '#new_patterns' do
-      it 'includes the new session variable and combined patterns' do
-        allow(service).to receive(:question_variables).and_return(%w[var1 var2])
-
-        expected = ['new_session_var', 'new_session_var.var1', 'new_session_var.var2']
-        expect(service.new_patterns).to eq(expected)
-      end
-
-      it 'memoizes the result' do
-        allow(service).to receive(:question_variables).and_return([])
-
-        expect(service).to receive(:question_variables).once
-
-        2.times { service.new_patterns }
+      it 'is the new session variable only' do
+        expect(service.new_patterns).to eq(['new_session_var'])
       end
     end
 
@@ -196,9 +177,9 @@ RSpec.describe V1::VariableReferences::SessionService, type: :service do
         expect(service).to receive(:update_question_group_formulas_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
         expect(service).to receive(:update_session_formulas_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
         expect(service).to receive(:update_report_template_formulas_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
+        expect(service).to receive(:update_report_template_sections_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
         expect(service).to receive(:update_sms_plan_formulas_scoped).with(session, 'old_pattern', 'new_pattern', exclude_source_session: true)
         expect(service).to receive(:update_chart_formulas).with(session.intervention_id, 'old_pattern', 'new_pattern')
-        expect(service).to receive(:update_days_after_date_session_variable_references).with('old_session_var', 'new_session_var')
 
         service.update_variable_references('old_pattern', 'new_pattern')
       end

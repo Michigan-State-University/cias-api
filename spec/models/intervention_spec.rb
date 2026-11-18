@@ -157,7 +157,7 @@ RSpec.describe Intervention, type: :model do
 
   context 'clone' do
     let(:user) { create(:user, :confirmed, :researcher) }
-    let(:intervention) { create(:intervention, :with_short_link) }
+    let(:intervention) { create(:intervention, :with_short_link, :with_attached_logo) }
     let!(:session) { create(:session, intervention: intervention, position: 1) }
     let!(:other_session) do
       create(:session, intervention: intervention, position: 2,
@@ -215,6 +215,15 @@ RSpec.describe Intervention, type: :model do
                                             'name')).to eq(cloned_intervention.attributes.except('id', 'created_at', 'updated_at', 'status', 'name'))
       expect(cloned_intervention.status).to eq('draft')
       expect(cloned_intervention.name).to include('Copy of')
+      expect(cloned_intervention.logo.attached?).to be true
+    end
+
+    it 'attachment in the copied intervention is independent from the original intervention' do
+      intervention.logo_blob.update!(description: 'example description')
+      cloned_intervention = intervention.clone
+      expect(cloned_intervention.logo_blob.description).to eq(intervention.logo_blob.description)
+      intervention.logo_blob.update!(description: 'changed description')
+      expect(cloned_intervention.logo_blob.description).not_to eq(intervention.logo_blob.description)
     end
 
     it 'reset cache counters' do
@@ -292,6 +301,7 @@ RSpec.describe Intervention, type: :model do
     end
 
     it 'correctly clones sessions with proper connections between other sessions' do
+      source_third_variable = third_session.variable
       cloned_intervention = intervention.clone
       cloned_sessions = cloned_intervention.sessions.order(:position)
       second_cloned_session = cloned_sessions.second
@@ -313,9 +323,12 @@ RSpec.describe Intervention, type: :model do
           'patterns' => [
             { 'match' => '', 'target' => [{ 'id' => '', 'type' => 'Session' }] }
           ]
-        }],
-        'variable' => third_session.variable.to_s
+        }]
       )
+      # Compared against a value captured BEFORE the clone: `x.reload.variable == x.variable` reads
+      # the same reloaded object on both sides and can never fail.
+      expect(third_cloned_session.variable).to eq("cloned_#{source_third_variable}_#{third_session.position}")
+      expect(third_session.reload.variable).to eq(source_third_variable)
     end
 
     context 'when researcher want to assign the intervention to other resarcher' do
@@ -326,6 +339,13 @@ RSpec.describe Intervention, type: :model do
         cloned_intervention = intervention.clone(params: params)
 
         expect(cloned_intervention.first.user_id).to eq(other_user.id)
+      end
+
+      # The multi-user branch passes a positional Hash rather than kwargs, so pin that the flag lands.
+      it 'renames the session variables on the multi-user branch too' do
+        cloned_intervention = intervention.clone(params: params)
+
+        expect(cloned_intervention.first.sessions.order(:position).pluck(:variable)).to all(start_with('cloned_'))
       end
     end
 
@@ -374,6 +394,14 @@ RSpec.describe Intervention, type: :model do
       it 'removes script tag and sanitizes remaining HTML' do
         intervention.name = '<script>alert(1)</script><b>Example name</b>'
         intervention.save!
+        expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
+      end
+    end
+
+    context 'when updating an existing intervention with script tag' do
+      it 'removes script tag and sanitizes remaining HTML' do
+        intervention.save!
+        intervention.update!(name: '<script>alert(1)</script><b>Example name</b>')
         expect(intervention.reload.name).to eq('&lt;b&gt;Example name&lt;/b&gt;')
       end
     end

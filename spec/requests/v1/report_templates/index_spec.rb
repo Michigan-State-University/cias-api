@@ -58,7 +58,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
                 ]
               },
               'variants' => {
-                'data' => [
+                'data' => contain_exactly(
                   include(
                     'id' => variant1.id,
                     'type' => 'variant'
@@ -67,7 +67,7 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
                     'id' => variant2.id,
                     'type' => 'variant'
                   )
-                ]
+                )
               }
             }
           ).and include(
@@ -108,6 +108,14 @@ RSpec.describe 'GET /v1/sessions/:session_id/report_templates', type: :request d
       let(:user) { users[role] }
 
       it_behaves_like 'permitted user'
+    end
+  end
+
+  context 'when a researcher reads the templates of a session that is not theirs' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+
+    it 'returns :forbidden' do
+      expect(response).to have_http_status(:forbidden)
     end
   end
 end

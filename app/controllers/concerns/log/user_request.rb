@@ -45,6 +45,7 @@ module Log::UserRequest
     params.delete(:registration)
     params.delete(:phone_number)
     params.delete(:email)
+    params.delete(:test_link_token)
     params[:user]&.delete(:first_name)
     params[:user]&.delete(:last_name)
     params[:user][:phone_attributes]&.delete(:number) if params[:user].present?
@@ -57,6 +58,15 @@ module Log::UserRequest
     params.delete(:current_password)
     params[:sms_plan]&.delete(:no_formula_attachment)
     params[:variant]&.delete(:attachment)
+    erase_hfhs_barcode
+  end
+
+  # JSON requests also carry a ParamsWrapper copy under :patient_detail.
+  def erase_hfhs_barcode
+    wrapped = params[:patient_detail]
+    [params[:hfhs_patient_data], (wrapped[:hfhs_patient_data] if wrapped.is_a?(ActionController::Parameters))].each do |data|
+      data.delete(:barcode) if data.is_a?(ActionController::Parameters)
+    end
   end
   # rubocop:enable all
 end

@@ -19,6 +19,7 @@ module Ability::Generic::CollaboratorsAccess
 
   def enable_edit_access(user)
     can %i[read create update delete add_logo], Intervention, collaborators: { user_id: user.id, edit: true }
+    can :fulfill_ra_session, Intervention, collaborators: { user_id: user.id, edit: true }
     can :manage, Session, intervention: { collaborators: { user_id: user.id, edit: true } }
     can :manage, InterventionAccess, intervention: { collaborators: { user_id: user.id, edit: true } }
     can :manage, QuestionGroup, session: { intervention: { collaborators: { user_id: user.id, edit: true } } }

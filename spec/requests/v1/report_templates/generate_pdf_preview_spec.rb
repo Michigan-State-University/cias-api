@@ -33,4 +33,15 @@ RSpec.describe 'POST /v1/report_templates/:report_template_id/generate_pdf_previ
       end
     end
   end
+
+  context 'when the owner researcher requests a preview of their template' do
+    let(:user) { create(:user, :confirmed, :researcher) }
+    let!(:report_template) { create(:report_template, session: create(:session, intervention: create(:intervention, user: user))) }
+
+    it 'enqueues the job and answers :created with an empty body' do
+      expect { request }.to have_enqueued_job(ReportTemplates::GeneratePdfPreviewJob).with(report_template.id, user.id)
+      expect(response).to have_http_status(:created)
+      expect(response.body).to be_blank
+    end
+  end
 end

@@ -1,0 +1,17 @@
+{
+  "sonarProperties": {
+    "sonar.ruby.coverage.reportPaths": "coverage/coverage.json"
+  },
+  "trivyExtends": {
+    "skipDirs": [
+      "tmp",
+      "log",
+      "coverage",
+      "node_modules",
+      "vendor/bundle",
+      "public/assets",
+      "public/packs",
+      "storage"
+    ]
+  }
+}

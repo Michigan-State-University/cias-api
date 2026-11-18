@@ -23,6 +23,21 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       it_behaves_like 'paused intervention'
     end
 
+    context 'when another participant asks for the previous question of this user session' do
+      let!(:answer) { create(:answer_single, question: question1, user_session: user_session) }
+      let(:other_participant) { create(:user, :confirmed, :participant) }
+      let(:request) do
+        get v1_user_session_previous_question_path(user_session.id), headers: other_participant.create_new_auth_token,
+                                                                     params: { current_question_id: question2.id }
+      end
+
+      it 'is forbidden and does not leak the stored answer' do
+        request
+        expect(response).to have_http_status(:forbidden)
+        expect(response.body).not_to include('decrypted_body')
+      end
+    end
+
     context 'when user session hasn\'t any answers' do
       it 'return empty body' do
         request
@@ -143,8 +158,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       request
       hfhs_patient_detail = participant.hfhs_patient_detail
       expect(json_response['hfhs_patient_detail']).to include(
-        { 'patient_id' => participant.hfhs_patient_detail.patient_id,
-          'zip_code' => hfhs_patient_detail.provided_zip,
+        { 'zip_code' => hfhs_patient_detail.provided_zip,
           'first_name' => hfhs_patient_detail.provided_first_name,
           'last_name' => hfhs_patient_detail.provided_last_name,
           'dob' => hfhs_patient_detail.provided_dob,
@@ -156,7 +170,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
 
     it 'have all expected kayes in hfh\'s section' do
       request
-      expect(json_response['hfhs_patient_detail'].keys).to match_array(%w[patient_id first_name last_name dob sex zip_code phone_number phone_type])
+      expect(json_response['hfhs_patient_detail'].keys).to match_array(%w[first_name last_name dob sex zip_code phone_number phone_type])
     end
   end
 
@@ -167,7 +181,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
 
     it 'returns correct status code (Unprocessable entity)' do
       request
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'sends validation error message' do

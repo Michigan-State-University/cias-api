@@ -3,23 +3,21 @@
 module Resource::Position
   extend ActiveSupport::Concern
 
-  included do
-    def position
-      authorize! :update, model_constant
+  def position
+    authorize! :update, model_constant
 
-      SqlQuery.new(
-        'resource/position_bulk_update',
-        values: position_params[:position],
-        table: controller_name
-      ).execute
-      render json: serialized_response(response_scope["#{controller_name.classify.underscore}s"])
-    end
+    SqlQuery.new(
+      'resource/position_bulk_update',
+      values: position_params[:position],
+      table: controller_name
+    ).execute
+    render json: serialized_response(response_scope["#{controller_name.classify.underscore}s"])
   end
 
   private
 
   def position_params
-    params.require(controller_name.classify.underscore.to_sym).permit(position: %i[id position])
+    params.expect(controller_name.classify.underscore.to_sym => [position: [%i[id position]]])
   end
 
   def response_scope

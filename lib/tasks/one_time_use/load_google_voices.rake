@@ -31,17 +31,18 @@ namespace :google_tts_languages do
 
         voices.each do |voice_type|
           voice_standard = voice_type.name.split('-')[2]&.downcase
+          next if voice_standard.nil?
+
           voice_gender = voice_type.ssml_gender.to_s.downcase
           voice_hash = "#{voice_standard}-#{voice_gender}"
           voice_name = "#{voice_hash}-#{usage_hash[voice_hash]}"
           usage_hash[voice_hash] += 1
 
           AuxiliaryGoogleTtsVoice.find_or_create_by!(
-            voice_label: voice_name.capitalize,
             voice_type: voice_type.name,
             language_code: language,
             google_tts_language: tts_language
-          )
+          ) { |v| v.voice_label = voice_name.capitalize }
         end
 
         p "Created #{language_name} with #{tts_language.google_tts_voices.count} voices"

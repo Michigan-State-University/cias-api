@@ -68,7 +68,7 @@ RSpec.describe 'POST /v1/organizations/:organization_id/dashboard_sections', typ
           }
         end
 
-        it { expect(response).to have_http_status(:unprocessable_entity) }
+        it { expect(response).to have_http_status(:unprocessable_content) }
 
         it 'response contains proper error message' do
           expect(json_response['message']).to eq "Validation failed: Name can't be blank"
@@ -111,5 +111,23 @@ RSpec.describe 'POST /v1/organizations/:organization_id/dashboard_sections', typ
         expect(json_response['message']).to eq('Couldn\'t find Session without an ID')
       end
     end
+  end
+
+  context 'when another section of the dashboard already has the name' do
+    before do
+      create(:dashboard_section, name: 'New Dashboard Section', reporting_dashboard: organization.reporting_dashboard)
+    end
+
+    it 'does not create the section, returns :unprocessable_content status' do
+      expect { request }.not_to change(DashboardSection, :count)
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json_response['message']).to include 'has already been taken'
+    end
+  end
+
+  context 'when the dashboard section params are a scalar' do
+    let(:params) { { dashboard_section: 'New Dashboard Section' } }
+
+    it_behaves_like 'rejects malformed params', -> { DashboardSection.count }
   end
 end

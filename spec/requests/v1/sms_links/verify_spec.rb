@@ -49,5 +49,60 @@ RSpec.describe 'POST /v1/sms_links', type: :request do
         expect(json_response).to eq({ 'link_type' => 'video', 'redirect_url' => sms_link.url })
       end
     end
+
+    context 'when user is a predefined participant' do
+      let(:user) { create(:user, :confirmed, :predefined_participant) }
+      let(:link_type) { 'website' }
+      let(:pid) { user.predefined_user_parameter.slug }
+
+      context 'when sms_link url is an intervention session fill link' do
+        let(:sms_link) do
+          create(:sms_link, sms_plan: sms_plan, session: sms_plan.session, link_type: link_type, variable: 'variable_1',
+                            url: "#{ENV.fetch('WEB_URL')}/interventions/#{intervention.id}/sessions/#{session.id}/fill")
+        end
+
+        it 'appends pid to the redirect url' do
+          request
+          expect(json_response['redirect_url']).to include("pid=#{pid}")
+        end
+      end
+
+      context 'when sms_link url is an intervention invite link' do
+        let(:sms_link) do
+          create(:sms_link, sms_plan: sms_plan, session: sms_plan.session, link_type: link_type, variable: 'variable_1',
+                            url: "#{ENV.fetch('WEB_URL')}/interventions/#{intervention.id}/invite")
+        end
+
+        it 'appends pid to the redirect url' do
+          request
+          expect(json_response['redirect_url']).to include("pid=#{pid}")
+        end
+      end
+
+      context 'when sms_link url is an external link' do
+        let(:sms_link) do
+          create(:sms_link, sms_plan: sms_plan, session: sms_plan.session, link_type: link_type, variable: 'variable_1',
+                            url: 'https://example.com/some-resource')
+        end
+
+        it 'does not append pid to the redirect url' do
+          request
+          expect(json_response['redirect_url']).to eq('https://example.com/some-resource')
+        end
+      end
+
+      context 'when sms_link url already has pid' do
+        let(:sms_link) do
+          create(:sms_link, sms_plan: sms_plan, session: sms_plan.session, link_type: link_type, variable: 'variable_1',
+                            url: "#{ENV.fetch('WEB_URL')}/interventions/#{intervention.id}/sessions/#{session.id}/fill?pid=existing")
+        end
+
+        it 'does not duplicate the pid parameter' do
+          request
+          expect(json_response['redirect_url']).to include('pid=existing')
+          expect(json_response['redirect_url']).not_to include(pid)
+        end
+      end
+    end
   end
 end
