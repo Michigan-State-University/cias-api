@@ -10,7 +10,7 @@ RSpec.describe AddSmsEligibleToPhones do
 
   # Simulate a pre-backfill row: valid phone whose flag was never computed (default false).
   def stranded(attrs)
-    create(:phone, user: user, **attrs).tap { |p| p.update_column(:sms_eligible, false) } # rubocop:disable Rails/SkipsModelValidations
+    create(:phone, user: user, **attrs).tap { |p| p.update_column(:sms_eligible, false) }
   end
 
   def eligible?(phone)
@@ -25,7 +25,7 @@ RSpec.describe AddSmsEligibleToPhones do
 
   it 'leaves a non-eligible phone at false even when the flag was forced true' do
     phone = create(:phone, user: user, **PhoneNumberFixtures::PL_LANDLINE)
-    phone.update_column(:sms_eligible, true) # rubocop:disable Rails/SkipsModelValidations
+    phone.update_column(:sms_eligible, true)
     run_migration
     expect(eligible?(phone)).to be(false)
   end
@@ -33,7 +33,7 @@ RSpec.describe AddSmsEligibleToPhones do
   it 'normalizes a legacy unnormalized number and marks it eligible' do
     phone = Phone.new(user: user, iso: 'US', prefix: '+1', number: '(201) 555-0123').tap do |p|
       p.save!(validate: false)
-      p.update_column(:sms_eligible, false) # rubocop:disable Rails/SkipsModelValidations
+      p.update_column(:sms_eligible, false)
     end
     run_migration
     expect(Phone.find(phone.id)).to have_attributes(number: '2015550123', sms_eligible: true)

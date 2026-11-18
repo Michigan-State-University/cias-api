@@ -7,6 +7,9 @@ plugins:
 AllCops:
   NewCops: enable
   TargetRubyVersion: 3.3.8
+  inherit_mode:
+    merge:
+      - Exclude
   Exclude:
     - 'bin/*'
     - 'db/schema.rb'
