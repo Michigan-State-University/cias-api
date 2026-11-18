@@ -174,6 +174,9 @@ GEM
       bigdecimal
       rexml
     crass (1.0.8)
+    cronex (0.15.0)
+      tzinfo
+      unicode (>= 0.4.4.5)
     csv (3.3.6)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
@@ -206,6 +209,8 @@ GEM
     drb (2.2.3)
     erb (6.0.7)
     erubi (1.13.1)
+    et-orbi (1.4.2)
+      tzinfo
     factory_bot (6.5.5)
       activesupport (>= 6.1.0)
     factory_bot_rails (6.5.1)
@@ -243,6 +248,9 @@ GEM
       ffi (>= 1.15.5)
       rake
     fiddle (1.1.8)
+    fugit (1.14.0)
+      et-orbi (~> 1.4)
+      raabro (~> 1.4)
     gapic-common (1.1.0)
       faraday (>= 1.9, < 3.a)
       faraday-retry (>= 1.0, < 3.a)
@@ -428,6 +436,7 @@ GEM
     public_suffix (7.0.5)
     puma (8.0.4)
       nio4r (~> 2.0)
+    raabro (1.5.0)
     racc (1.8.1)
     rack (3.2.8)
     rack-attack (6.8.0)
@@ -575,6 +584,11 @@ GEM
       logger
       rack (>= 2.2.4)
       redis-client (>= 0.22.2)
+    sidekiq-cron (2.4.0)
+      cronex (>= 0.13.0)
+      fugit (~> 1.8, >= 1.11.1)
+      globalid (>= 1.0.1)
+      sidekiq (>= 6.5.0)
     signet (0.21.0)
       addressable (~> 2.8)
       faraday (>= 0.17.5, < 3.a)
@@ -606,6 +620,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unaccent (0.4.0)
+    unicode (0.4.4.5)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
@@ -708,6 +723,7 @@ DEPENDENCIES
   sentry-ruby (~> 5.5)
   shoulda-matchers
   sidekiq (>= 7.3.3)
+  sidekiq-cron (~> 2.3)
   simplecov
   sql_query
   test-prof

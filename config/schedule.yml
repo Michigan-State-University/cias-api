@@ -1,0 +1,5 @@
+e2e_cleanup_job:
+  cron: "0 0 * * 0"
+  class: "E2e::CleanupJob"
+  queue: default
+  description: "Cleanup E2E Interventions every week on Sunday midnight"
