@@ -191,4 +191,52 @@ RSpec.describe V1::Intervention::PredefinedParticipants::ParticipantAttributesVa
       end
     end
   end
+
+  describe 'phone rows' do
+    subject(:call) { described_class.call(list) }
+
+    def row(email, phone)
+      ActionController::Parameters.new(first_name: 'Alice', last_name: 'Smith', email: email, phone_attributes: phone).permit!
+    end
+
+    let(:us_row) { row('us@example.test', iso: 'US', prefix: '+1', number: '(201) 555-0123') }
+    let(:gb_row) { row('gb@example.test', iso: 'GB', prefix: '+44', number: '7400123456') }
+    let(:landline_row) { row('landline@example.test', iso: 'PL', prefix: '+48', number: '123456789') }
+    let(:premium_row) { row('premium@example.test', iso: 'US', prefix: '+1', number: '9002221234') }
+
+    describe 'rows with valid but non-SMS numbers' do
+      let(:list) { [us_row, gb_row, landline_row, premium_row] }
+
+      it 'lets GB, landline and premium-rate rows through' do
+        expect { call }.not_to raise_error
+      end
+    end
+
+    describe 'the validator stays atomic' do
+      let(:bad_row) { row('bad@example.test', iso: 'PL', prefix: '+48', number: '111222331') }
+      let(:list) { [us_row, bad_row, gb_row] }
+
+      it 'raises a 422 ComplexException for the whole list' do
+        expect { call }.to raise_error(ComplexException) do |exc|
+          expect(exc.additional_information[:errors]).not_to be_empty
+        end
+      end
+
+      it 'points at phone.number of the offending row only' do
+        expect { call }.to raise_error(ComplexException) do |exc|
+          phone_errors = exc.additional_information[:errors].select { |e| e[:field] == 'phone.number' }
+          expect(phone_errors.map { |e| e[:row] }).to eq([1])
+        end
+      end
+
+      %w[notanumber 55555 116].each do |number|
+        it "rejects #{number.inspect} as phone.number" do
+          invalid = row('x@example.test', iso: 'US', prefix: '+1', number: number)
+          expect { described_class.call([invalid]) }.to raise_error(ComplexException) do |exc|
+            expect(exc.additional_information[:errors]).to include(a_hash_including(row: 0, field: 'phone.number'))
+          end
+        end
+      end
+    end
+  end
 end

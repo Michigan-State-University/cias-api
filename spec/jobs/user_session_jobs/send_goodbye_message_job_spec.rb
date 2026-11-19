@@ -106,7 +106,7 @@ RSpec.describe UserSessionJobs::SendGoodbyeMessageJob, type: :job do
     context 'with different phone number formats' do
       let(:user) do
         user = create(:user, :confirmed, :participant, sms_notification: true)
-        create(:phone, user: user, prefix: '+1', iso: 'US', number: '5551234567', confirmed: true)
+        create(:phone, user: user, prefix: '+1', iso: 'US', number: '2015550123', confirmed: true)
         user
       end
 
@@ -114,7 +114,7 @@ RSpec.describe UserSessionJobs::SendGoodbyeMessageJob, type: :job do
         perform_job
 
         message = Message.last
-        expect(message.phone).to eq('+15551234567')
+        expect(message.phone).to eq('+12015550123')
       end
     end
   end
