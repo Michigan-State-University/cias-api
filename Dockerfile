@@ -81,7 +81,10 @@ ADD --checksum=sha256:98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81
 
 # wkhtmltox.deb → /usr/local/bin/wkhtmltopdf, with the font and X libraries it needs;
 # libpq5 → pg; libjemalloc2 → memory allocator; tini → PID 1 signal handling
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+# upgrade: Debian fixes released since the base image was built (ruby:3.3.8 is no
+# longer rebuilt upstream, so its packages only get older).
+RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
         ca-certificates \
         fontconfig \
         libjemalloc2 \
