@@ -89,6 +89,12 @@ if [[ -n "$tree_status" ]]; then
 fi
 if [[ -z "$IMAGE_TAG" ]]; then
   IMAGE_TAG="$(git -C "$CIAS_API_DIR" rev-parse --short=8 HEAD)"
+elif tag_commit="$(git -C "$CIAS_API_DIR" rev-parse -q --verify "refs/tags/$IMAGE_TAG^{commit}")"; then
+  # Tags are mutable in ECR, so building another commit would replace the release image.
+  [[ "$tag_commit" == "$(git -C "$CIAS_API_DIR" rev-parse HEAD)" ]] ||
+    die "$CIAS_API_DIR isn't at $IMAGE_TAG ($tag_commit); check the tag out first"
+elif [[ "$IMAGE_TAG" =~ ^v[0-9] ]]; then
+  die "$IMAGE_TAG looks like a release tag but isn't a tag in $CIAS_API_DIR; fetch tags and check it out"
 fi
 IMAGE="$ECR_REPOSITORY_URI:$IMAGE_TAG"
 
@@ -120,12 +126,25 @@ register_revision() {
     --query taskDefinition.taskDefinitionArn --output text
 }
 
+# The migrate step only checks the exit code, so a copied revision running some
+# other command (e.g. db:migrate:status) would pass as "Migrations succeeded".
+check_migrate_command() {
+  local task_definition="$1"
+  aws ecs describe-task-definition --task-definition "$task_definition" \
+    --query taskDefinition.containerDefinitions |
+    jq -e --arg repo "$ECR_REPOSITORY_URI:" '
+      any(.[]; (.image | startswith($repo))
+        and ((.entryPoint // []) + (.command // []) | join(" ")
+             | test("(^|[ ;&|])db:migrate($|[ ;&|])")))' >/dev/null ||
+    die "could not confirm that $task_definition runs db:migrate in a $ECR_REPOSITORY_URI container"
+}
+
 # Waits until a service runs the given revision. Polls describe-services instead
 # of `aws ecs wait services-stable`, which gives up after 10 minutes and can't
 # tell a rollback from a slow rollout. Dies if ECS rolls the service back, marks
 # the rollout failed, or it hasn't finished within ROLLOUT_TIMEOUT_SECONDS.
 wait_for_rollout() {
-  local service="$1" revision="$2" state last=""
+  local service="$1" revision="$2" state last="" seen=""
   local deadline=$((SECONDS + ROLLOUT_TIMEOUT_SECONDS))
   while :; do
     state="$(
@@ -134,7 +153,9 @@ wait_for_rollout() {
         jq -r --arg rev "$revision" '
           (map(select(.status == "PRIMARY")) | first) as $primary
           | if $primary == null then "unknown"
-            elif $primary.taskDefinition != $rev then "rolled-back \($primary.taskDefinition)"
+            elif $primary.taskDefinition != $rev then
+              (if any(.[]; .taskDefinition == $rev) then "rolled-back" else "not-listed" end)
+              + " \($primary.taskDefinition)"
             elif $primary.rolloutState == "FAILED" then "failed \($primary.rolloutStateReason // "")"
             elif $primary.rolloutState == "COMPLETED"
               or ($primary.rolloutState == null and length == 1
@@ -146,6 +167,12 @@ wait_for_rollout() {
       completed) log "$service is running $revision"; return 0 ;;
       rolled-back*) die "$service was rolled back to ${state#rolled-back } instead of $revision" ;;
       failed*) die "the rollout of $revision on $service failed: ${state#failed }" ;;
+      # Right after update-service, a read can still show only the old deployment.
+      # Once the revision has been seen, its disappearance means a rollback.
+      not-listed*)
+        [[ -z "$seen" ]] || die "$service was rolled back to ${state#not-listed } instead of $revision"
+        state="waiting for ECS to list $revision" ;;
+      running*) seen=1 ;;
     esac
     if [[ "$state" != "$last" ]]; then
       log "$service: $state"
@@ -167,6 +194,11 @@ for service in "$API_SERVICE_ARN" "$WORKER_SERVICE_ARN"; do
   [[ "$found" == arn:* ]] || die "service $service not found in $ECS_CLUSTER_ARN"
 done
 
+# The family's latest revision is the one copied below, whatever :N the setting names.
+migrate_family="${MIGRATE_TASK_DEFINITION_ARN##*/}"
+migrate_family="${migrate_family%%:*}"
+check_migrate_command "$migrate_family"
+
 # --- Build and push -----------------------------------------------------------
 
 log "Building $IMAGE from $CIAS_API_DIR"
@@ -184,9 +216,8 @@ docker push "$IMAGE"
 
 # --- Migrate ------------------------------------------------------------------
 
-migrate_family="${MIGRATE_TASK_DEFINITION_ARN##*/}"
-migrate_family="${migrate_family%%:*}"
 migrate_task_definition="$(register_revision "$migrate_family")"
+check_migrate_command "$migrate_task_definition"
 
 # startedBy allows only letters, digits, '-', '_' and '/' (up to 128 characters),
 # and release tags contain dots.
