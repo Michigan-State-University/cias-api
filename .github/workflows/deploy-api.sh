@@ -57,8 +57,8 @@ if (( ${#missing[@]} > 0 )); then
 fi
 [[ "$MIGRATE_ASSIGN_PUBLIC_IP" == ENABLED || "$MIGRATE_ASSIGN_PUBLIC_IP" == DISABLED ]] ||
   die "MIGRATE_ASSIGN_PUBLIC_IP must be ENABLED or DISABLED"
-[[ "$ROLLOUT_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] ||
-  die "ROLLOUT_TIMEOUT_SECONDS must be a number of seconds"
+[[ "$ROLLOUT_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*$ ]] ||
+  die "ROLLOUT_TIMEOUT_SECONDS must be a whole number of seconds, without a leading zero"
 
 for cmd in aws docker jq git; do
   command -v "$cmd" >/dev/null || die "$cmd not found"
