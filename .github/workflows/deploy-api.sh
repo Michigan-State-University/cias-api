@@ -171,7 +171,8 @@ done
 
 log "Building $IMAGE from $CIAS_API_DIR"
 # SOURCE_VERSION is baked into /release-version for traceability.
-docker build --platform linux/amd64 --build-arg SOURCE_VERSION="$IMAGE_TAG" \
+# --pull: always start from the current base image, not a stale local copy.
+docker build --pull --platform linux/amd64 --build-arg SOURCE_VERSION="$IMAGE_TAG" \
   -t "$IMAGE" "$CIAS_API_DIR"
 
 # Only the release tag: environments share this repository, so a moving tag
