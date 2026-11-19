@@ -59,6 +59,20 @@ fi
   die "MIGRATE_ASSIGN_PUBLIC_IP must be ENABLED or DISABLED"
 [[ "$ROLLOUT_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*$ ]] ||
   die "ROLLOUT_TIMEOUT_SECONDS must be a whole number of seconds, without a leading zero"
+[[ "$MIGRATE_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*$ ]] ||
+  die "MIGRATE_TIMEOUT_SECONDS must be a whole number of seconds, without a leading zero"
+# These end up in AWS CLI arguments, the network ones as shorthand syntax, so only
+# the expected shapes get through (e.g. "subnets@=file://..." would read a file).
+[[ "${MIGRATE_SUBNET_IDS// /}" =~ ^subnet-[0-9a-f]+(,subnet-[0-9a-f]+)*$ ]] ||
+  die "MIGRATE_SUBNET_IDS must be comma-separated subnet-... IDs"
+[[ "${MIGRATE_SECURITY_GROUP_IDS// /}" =~ ^sg-[0-9a-f]+(,sg-[0-9a-f]+)*$ ]] ||
+  die "MIGRATE_SECURITY_GROUP_IDS must be comma-separated sg-... IDs"
+for var in ECS_CLUSTER_ARN API_SERVICE_ARN WORKER_SERVICE_ARN MIGRATE_TASK_DEFINITION_ARN; do
+  [[ "${!var}" =~ ^arn:aws:ecs:[a-z0-9-]+:[0-9]{12}:[a-z-]+/[A-Za-z0-9_./:-]+$ ]] ||
+    die "$var must be an ECS ARN"
+done
+[[ "$ECR_REPOSITORY_URI" =~ ^[0-9]{12}\.dkr\.ecr\.[a-z0-9-]+\.amazonaws\.com/[a-z0-9._/-]+$ ]] ||
+  die "ECR_REPOSITORY_URI must look like <account>.dkr.ecr.<region>.amazonaws.com/<repo>"
 
 for cmd in aws docker jq git; do
   command -v "$cmd" >/dev/null || die "$cmd not found"
