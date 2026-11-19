@@ -9,9 +9,9 @@
 #   IMAGE_TAG     tag to push and deploy
 #                 (default: 8-char git SHA of CIAS_API_DIR)
 #
-# Every setting in the config block can be overridden by an environment
-# variable of the same name. Run by .github/workflows/deploy-api.yml; can also
-# be run by hand.
+# Settings come from environment variables of the same name; only AWS_REGION and
+# the two timeouts have defaults, so a run can't land on another environment.
+# Run by .github/workflows/deploy-api.yml, or by hand.
 #
 # Requires aws (v2), docker, jq and git. The AWS caller needs:
 #   - ecr:GetAuthorizationToken, and push access to the ECR repository
@@ -25,16 +25,16 @@ set -euo pipefail
 # --- Config -------------------------------------------------------------------
 
 AWS_REGION="${AWS_REGION:-us-east-2}"
-ECR_REPOSITORY_URI="${ECR_REPOSITORY_URI:-905418359193.dkr.ecr.us-east-2.amazonaws.com/cias-api}"
-ECS_CLUSTER_ARN="${ECS_CLUSTER_ARN:-arn:aws:ecs:us-east-2:905418359193:cluster/cias-test}"
-API_SERVICE_ARN="${API_SERVICE_ARN:-arn:aws:ecs:us-east-2:905418359193:service/cias-test/cias-test-api}"
-WORKER_SERVICE_ARN="${WORKER_SERVICE_ARN:-arn:aws:ecs:us-east-2:905418359193:service/cias-test/cias-test-worker}"
-MIGRATE_TASK_DEFINITION_ARN="${MIGRATE_TASK_DEFINITION_ARN:-arn:aws:ecs:us-east-2:905418359193:task-definition/cias-test-api-migrate}"
-MIGRATE_SUBNET_IDS="${MIGRATE_SUBNET_IDS:-subnet-00c5413c5761a07a2,subnet-096c5f3aaa158d643}"
-MIGRATE_SECURITY_GROUP_IDS="${MIGRATE_SECURITY_GROUP_IDS:-sg-05aa018b8b58ad2e1}"
+ECR_REPOSITORY_URI="${ECR_REPOSITORY_URI:-}"
+ECS_CLUSTER_ARN="${ECS_CLUSTER_ARN:-}"
+API_SERVICE_ARN="${API_SERVICE_ARN:-}"
+WORKER_SERVICE_ARN="${WORKER_SERVICE_ARN:-}"
+MIGRATE_TASK_DEFINITION_ARN="${MIGRATE_TASK_DEFINITION_ARN:-}"
+MIGRATE_SUBNET_IDS="${MIGRATE_SUBNET_IDS:-}"
+MIGRATE_SECURITY_GROUP_IDS="${MIGRATE_SECURITY_GROUP_IDS:-}"
 # ENABLED for public subnets (the task needs a public IP to pull the image and
 # read SSM); DISABLED for private subnets with a NAT gateway or VPC endpoints.
-MIGRATE_ASSIGN_PUBLIC_IP="${MIGRATE_ASSIGN_PUBLIC_IP:-ENABLED}"
+MIGRATE_ASSIGN_PUBLIC_IP="${MIGRATE_ASSIGN_PUBLIC_IP:-}"
 MIGRATE_TIMEOUT_SECONDS="${MIGRATE_TIMEOUT_SECONDS:-1800}"
 # How long to wait for each service to roll out its new revision.
 ROLLOUT_TIMEOUT_SECONDS="${ROLLOUT_TIMEOUT_SECONDS:-1200}"
@@ -53,7 +53,7 @@ for var in AWS_REGION ECR_REPOSITORY_URI ECS_CLUSTER_ARN API_SERVICE_ARN \
   fi
 done
 if (( ${#missing[@]} > 0 )); then
-  die "set these in the config block or the environment: ${missing[*]}"
+  die "set these in the environment: ${missing[*]}"
 fi
 [[ "$MIGRATE_ASSIGN_PUBLIC_IP" == ENABLED || "$MIGRATE_ASSIGN_PUBLIC_IP" == DISABLED ]] ||
   die "MIGRATE_ASSIGN_PUBLIC_IP must be ENABLED or DISABLED"
@@ -156,6 +156,16 @@ wait_for_rollout() {
     sleep 15
   done
 }
+
+# --- Preflight ----------------------------------------------------------------
+
+# Check both services exist before building or migrating anything, so a wrong
+# ARN stops the deploy before the database is touched.
+for service in "$API_SERVICE_ARN" "$WORKER_SERVICE_ARN"; do
+  found="$(aws ecs describe-services --cluster "$ECS_CLUSTER_ARN" --services "$service" \
+    --query 'services[0].taskDefinition' --output text)" || die "could not describe $service"
+  [[ "$found" == arn:* ]] || die "service $service not found in $ECS_CLUSTER_ARN"
+done
 
 # --- Build and push -----------------------------------------------------------
 

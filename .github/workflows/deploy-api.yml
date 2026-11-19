@@ -108,8 +108,8 @@ jobs:
       # production (checked below), because some migrations are irreversible.
       RDS_DB_INSTANCE_ID: ${{ vars.RDS_DB_INSTANCE_ID }}
     steps:
-      # .github/workflows/deploy-api.sh falls back to cias-test values for unset settings, so
-      # an environment with a missing variable would deploy to test. Fail instead.
+      # Names the environment that's missing a variable. deploy-api.sh rejects the
+      # same gaps, but doesn't check the role or account settings.
       - name: Check environment variables
         run: |
           missing=()
