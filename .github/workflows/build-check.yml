@@ -43,7 +43,6 @@ jobs:
           cache-to: type=gha,mode=max
           build-args: |
             SOURCE_VERSION=build-check-${{ github.sha }}
-            RUBY_VERSION=3.3.8
             BUNDLER_VERSION=2.4.22
           tags: cias-api:build-check
 
