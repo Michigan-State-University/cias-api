@@ -11,7 +11,7 @@ ARG BUNDLER_VERSION=2.4.22
 # image names built from ARGs. Keep the Ruby version in step with .ruby-version.
 
 # ---------- builder ----------
-FROM ruby:3.3.8-slim-bookworm@sha256:307aed56240959e9cd3fcc10740ae8d0e6c461e9b42efc076100d4f8126b87b9 AS builder
+FROM ruby:3.3.14-slim-bookworm@sha256:a046772cf939ecd6def27b0d7a0239bbfcd2e8cd13bbb4d0e3748a9c2b81abf6 AS builder
 
 ARG BUNDLER_VERSION
 
@@ -51,7 +51,7 @@ COPY . .
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec bootsnap precompile --gemfile app/ lib/ config/
 
 # ---------- runtime ----------
-FROM ruby:3.3.8-slim-bookworm@sha256:307aed56240959e9cd3fcc10740ae8d0e6c461e9b42efc076100d4f8126b87b9 AS runtime
+FROM ruby:3.3.14-slim-bookworm@sha256:a046772cf939ecd6def27b0d7a0239bbfcd2e8cd13bbb4d0e3748a9c2b81abf6 AS runtime
 
 ARG BUNDLER_VERSION
 
@@ -81,8 +81,8 @@ ADD --checksum=sha256:98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81
 
 # wkhtmltox.deb → /usr/local/bin/wkhtmltopdf, with the font and X libraries it needs;
 # libpq5 → pg; libjemalloc2 → memory allocator; tini → PID 1 signal handling
-# upgrade: Debian fixes released since the base image was built (ruby:3.3.8 is no
-# longer rebuilt upstream, so its packages only get older).
+# upgrade: Debian fixes released since the base image was built (official images stop
+# rebuilding a Ruby patch tag once the next patch ships).
 RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
