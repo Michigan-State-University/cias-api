@@ -42,8 +42,8 @@ RSpec.describe 'GET /api/health', type: :request do
       request
     end
 
-    it 'returns service unavailable' do
-      expect(response).to have_http_status(:service_unavailable)
+    it 'still returns OK, so ECS keeps the tasks running' do
+      expect(response).to have_http_status(:ok)
     end
 
     it 'reports the failing check' do
