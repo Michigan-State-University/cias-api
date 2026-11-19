@@ -36,6 +36,8 @@ MIGRATE_SECURITY_GROUP_IDS="${MIGRATE_SECURITY_GROUP_IDS:-sg-05aa018b8b58ad2e1}"
 # read SSM); DISABLED for private subnets with a NAT gateway or VPC endpoints.
 MIGRATE_ASSIGN_PUBLIC_IP="${MIGRATE_ASSIGN_PUBLIC_IP:-ENABLED}"
 MIGRATE_TIMEOUT_SECONDS="${MIGRATE_TIMEOUT_SECONDS:-1800}"
+# How long to wait for each service to roll out its new revision.
+ROLLOUT_TIMEOUT_SECONDS="${ROLLOUT_TIMEOUT_SECONDS:-1200}"
 
 # ------------------------------------------------------------------------------
 
@@ -55,6 +57,8 @@ if (( ${#missing[@]} > 0 )); then
 fi
 [[ "$MIGRATE_ASSIGN_PUBLIC_IP" == ENABLED || "$MIGRATE_ASSIGN_PUBLIC_IP" == DISABLED ]] ||
   die "MIGRATE_ASSIGN_PUBLIC_IP must be ENABLED or DISABLED"
+[[ "$ROLLOUT_TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] ||
+  die "ROLLOUT_TIMEOUT_SECONDS must be a number of seconds"
 
 for cmd in aws docker jq git; do
   command -v "$cmd" >/dev/null || die "$cmd not found"
@@ -100,6 +104,43 @@ register_revision() {
     die "no container in $task_definition runs an image from $ECR_REPOSITORY_URI"
   aws ecs register-task-definition --cli-input-json "$definition" \
     --query taskDefinition.taskDefinitionArn --output text
+}
+
+# Waits until a service runs the given revision. Polls describe-services instead
+# of `aws ecs wait services-stable`, which gives up after 10 minutes and can't
+# tell a rollback from a slow rollout. Dies if ECS rolls the service back, marks
+# the rollout failed, or it hasn't finished within ROLLOUT_TIMEOUT_SECONDS.
+wait_for_rollout() {
+  local service="$1" revision="$2" state last=""
+  local deadline=$((SECONDS + ROLLOUT_TIMEOUT_SECONDS))
+  while :; do
+    state="$(
+      aws ecs describe-services --cluster "$ECS_CLUSTER_ARN" --services "$service" \
+        --query 'services[0].deployments' |
+        jq -r --arg rev "$revision" '
+          (map(select(.status == "PRIMARY")) | first) as $primary
+          | if $primary == null then "unknown"
+            elif $primary.taskDefinition != $rev then "rolled-back \($primary.taskDefinition)"
+            elif $primary.rolloutState == "FAILED" then "failed \($primary.rolloutStateReason // "")"
+            elif $primary.rolloutState == "COMPLETED"
+              or ($primary.rolloutState == null and length == 1
+                  and $primary.runningCount == $primary.desiredCount) then "completed"
+            else "running \($primary.runningCount)/\($primary.desiredCount), \($primary.failedTasks) failed"
+            end'
+    )" || die "could not describe $service"
+    case "$state" in
+      completed) log "$service is running $revision"; return 0 ;;
+      rolled-back*) die "$service was rolled back to ${state#rolled-back } instead of $revision" ;;
+      failed*) die "the rollout of $revision on $service failed: ${state#failed }" ;;
+    esac
+    if [[ "$state" != "$last" ]]; then
+      log "$service: $state"
+      last="$state"
+    fi
+    (( SECONDS < deadline )) ||
+      die "$service hasn't finished rolling out $revision after ${ROLLOUT_TIMEOUT_SECONDS}s ($state)"
+    sleep 15
+  done
 }
 
 # --- Build and push -----------------------------------------------------------
@@ -213,22 +254,10 @@ for i in "${!services[@]}"; do
     --task-definition "${revisions[$i]}" >/dev/null
 done
 
-log "Waiting for services to stabilize"
-aws ecs wait services-stable --cluster "$ECS_CLUSTER_ARN" --services "${services[@]}"
-
-# services-stable also returns after the deployment circuit breaker has rolled
-# a service back, so check each one really settled on its new revision.
-rolled_back=()
+log "Waiting for the rollouts (up to ${ROLLOUT_TIMEOUT_SECONDS}s each)"
 for i in "${!services[@]}"; do
-  running="$(aws ecs describe-services --cluster "$ECS_CLUSTER_ARN" --services "${services[$i]}" \
-    --query 'services[0].taskDefinition' --output text)"
-  [[ "$running" == "${revisions[$i]}" ]] ||
-    rolled_back+=("${services[$i]} is on $running instead of ${revisions[$i]}")
+  wait_for_rollout "${services[$i]}" "${revisions[$i]}"
 done
-if (( ${#rolled_back[@]} > 0 )); then
-  printf '%s\n' "${rolled_back[@]}" >&2
-  die "not every service settled on its new revision (rolled back?)"
-fi
 
 log "Deployed $IMAGE"
 for revision in "$migrate_task_definition" "${revisions[@]}"; do
