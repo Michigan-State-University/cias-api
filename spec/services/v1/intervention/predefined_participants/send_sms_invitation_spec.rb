@@ -52,4 +52,29 @@ RSpec.describe V1::Intervention::PredefinedParticipants::SendSmsInvitation do
       end
     end
   end
+
+  context 'when the SMS provider rejects the message' do
+    before do
+      user.create_phone(iso: 'PL', prefix: '+48', number: '777777777')
+      allow_any_instance_of(Twilio::REST::Api::V2010::AccountContext::MessageList).to receive(:create).and_raise(StandardError, 'rejected')
+    end
+
+    it 'does not stamp sms_invitation_sent_at, so a later invitation campaign still reaches the participant' do
+      subject
+      expect(Message.order(:created_at).last.status).to eq('error')
+      expect(user.predefined_user_parameter.reload.sms_invitation_sent_at).to be_nil
+    end
+  end
+
+  context 'when the SMS provider accepts the message' do
+    before do
+      user.create_phone(iso: 'PL', prefix: '+48', number: '777777777')
+      allow_any_instance_of(Communication::Sms).to receive(:send_message).and_return(true)
+    end
+
+    it 'stamps sms_invitation_sent_at' do
+      subject
+      expect(user.predefined_user_parameter.reload.sms_invitation_sent_at).to be_present
+    end
+  end
 end

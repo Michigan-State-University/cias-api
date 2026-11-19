@@ -20,7 +20,7 @@ class V1::Users::SmsTokens::Send
         I18n.t('phone_verification', verification_code: phone.confirmation_code)
       end
     )
-    service = Communication::Sms.new(sms.id)
+    service = Communication::Sms.new(sms.id, bypass_opt_out: true)
     service.send_message
     service
   end
