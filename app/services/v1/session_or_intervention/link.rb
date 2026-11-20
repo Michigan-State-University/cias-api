@@ -14,7 +14,7 @@ class V1::SessionOrIntervention::Link
   end
 
   def call
-    return "#{ENV.fetch('WEB_URL', nil)}/usr/#{user.predefined_user_parameter.slug}" if user&.roles&.include?('predefined_participant')
+    return PredefinedUserParameter.personal_link(user.predefined_user_parameter.slug) if user&.roles&.include?('predefined_participant')
 
     return session_link(session_or_intervention) if session_or_intervention.is_a?(Session)
 

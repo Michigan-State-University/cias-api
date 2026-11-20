@@ -176,4 +176,66 @@ RSpec.describe Message, type: :model do
       expect(message.question).to eq(question)
     end
   end
+
+  describe '#audit' do
+    let(:canary) { 'CIAS_TDD_CANARY_BODY' }
+    let(:forbidden) { %w[body body_ciphertext phone phone_ciphertext] }
+    let!(:known_audit_ids) { Audited::Audit.where(auditable_type: 'Message').pluck(:id) }
+
+    before do
+      message = described_class.create!(phone: '+12015550123', body: canary)
+      message.update!(status: 'sent')
+      message.destroy!
+    end
+
+    def audits
+      Audited::Audit.where(auditable_type: 'Message').where.not(id: known_audit_ids).order(:created_at).to_a
+    end
+
+    def versions
+      PaperTrail::Version.where(item_type: 'Message').to_a
+    end
+
+    def object_keys(version)
+      version.object.to_s.scan(/^(\w+):/).flatten
+    end
+
+    describe 'audited_changes' do
+      it 'records the create, update and destroy' do
+        expect(audits.map(&:action)).to eq(%w[create update destroy])
+      end
+
+      it 'records the status change so the check is not vacuous' do
+        expect(audits.second.audited_changes).to include('status' => %w[new sent])
+      end
+
+      it 'never carries body, body_ciphertext, phone or phone_ciphertext' do
+        audits.each do |audit|
+          expect(audit.audited_changes.keys & forbidden).to be_empty
+        end
+      end
+
+      it 'never carries the canary text' do
+        expect(audits.map { |audit| audit.audited_changes.to_json }.join).not_to include(canary)
+      end
+    end
+
+    describe 'versions.object' do
+      it 'serialises the record state on update and destroy' do
+        with_object = versions.select { |version| version.object.present? }
+        expect(with_object.map(&:event)).to contain_exactly('update', 'destroy')
+        expect(with_object.flat_map { |version| object_keys(version) }).to include('status')
+      end
+
+      it 'never carries body, body_ciphertext, phone or phone_ciphertext' do
+        versions.each do |version|
+          expect(object_keys(version) & forbidden).to be_empty
+        end
+      end
+
+      it 'never carries the canary text' do
+        expect(versions.map(&:object).join).not_to include(canary)
+      end
+    end
+  end
 end

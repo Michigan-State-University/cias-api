@@ -23,6 +23,9 @@
 
 # Build / test artifacts
 coverage/
+htd-cq-output/
+.htd-cq-coverage/
+db/structure.sql
 spec/
 test/
 tmp/
@@ -48,6 +51,8 @@ docker-compose*.yml
 .bundler-audit.yml
 .overcommit.yml
 .pgsync.yml
+.ruby-gemset
+.generators
 vendor/
 
 # Rails encrypted credentials — credentials.yml.enc CAN be in the image (it's encrypted),
@@ -56,6 +61,7 @@ config/master.key
 
 # Tooling / repo metadata
 .claude
+**/CLAUDE.md
 docs
 plans
 README.md
@@ -64,7 +70,7 @@ CODE_OF_CONDUCT.md
 CONTRIBUTING.md
 Procfile
 app.json
-dump.rdb
+**/*.rdb
 
 # Deployment manifests for other platforms (not ECS)
 container/

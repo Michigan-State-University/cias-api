@@ -47,7 +47,7 @@ module SmsHelper
     links = variant.present? ? variant.sms_links : plan.no_formula_sms_links
     links.each do |sms_link|
       sms_links_user = sms_link.sms_links_users.create!(user: user)
-      content.gsub!("::#{sms_link.variable}::", "#{ENV.fetch('WEB_URL')}/link/#{sms_links_user.slug}")
+      content.gsub!(SmsLink.token(sms_link.variable), SmsLinksUser.tracked_link(sms_links_user.slug, ENV.fetch('WEB_URL')))
     end
 
     content

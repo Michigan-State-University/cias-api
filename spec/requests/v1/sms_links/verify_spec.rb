@@ -105,4 +105,55 @@ RSpec.describe 'POST /v1/sms_links', type: :request do
       end
     end
   end
+
+  context 'when the link was sent by an SMS campaign' do
+    let(:campaign) { create(:pdp_sms_campaign, intervention: intervention) }
+    let(:sms_link) { create(:pdp_campaign_sms_link, campaign: campaign) }
+    let(:user) { create(:user, :confirmed, :predefined_participant) }
+    let(:headers) { {} }
+    let(:params) { { sms_link: { slug: sms_links_user.slug } } }
+
+    it 'resolves the slug although the link has no sms_plan and no session' do
+      expect([sms_link.sms_plan_id, sms_link.session_id]).to eq([nil, nil])
+      request
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns the campaign link target without authentication' do
+      request
+      expect(json_response).to eq({ 'link_type' => 'website', 'redirect_url' => 'https://example.test/canary-target' })
+    end
+
+    it 'records the entry on the participant row' do
+      expect { request }.to change { sms_links_user.reload.entered_timestamps.size }.from(0).to(1)
+    end
+  end
+
+  context 'when the same slug is entered twice' do
+    let(:no_formula_text) { 'Test link: ::variable_1::' }
+    let(:link_type) { 'website' }
+    let(:params) { { sms_link: { slug: sms_links_user.slug } } }
+
+    it 'counts both entries' do
+      expect { 2.times { post v1_verify_sms_link_path, params: params, headers: headers } }
+        .to change { sms_links_user.reload.entered_timestamps.size }.from(0).to(2)
+    end
+  end
+
+  context 'when the slug does not exist' do
+    let(:no_formula_text) { 'Test link: ::variable_1::' }
+    let(:link_type) { 'website' }
+    let(:params) { { sms_link: { slug: 'CIASTDDNOSUCHSLUG' } } }
+
+    it 'returns :ok with an empty payload instead of raising' do
+      request
+      expect(response).to have_http_status(:ok)
+      expect(json_response).to eq({ 'link_type' => nil, 'redirect_url' => nil })
+    end
+
+    it 'creates no tracking row' do
+      sms_links_user
+      expect { request }.not_to change(SmsLinksUser, :count)
+    end
+  end
 end

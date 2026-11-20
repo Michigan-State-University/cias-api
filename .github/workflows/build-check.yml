@@ -106,6 +106,18 @@ jobs:
           echo "Release version in image: $VERSION"
           [ "$VERSION" = "build-check-${{ github.sha }}" ] || (echo "Mismatch"; exit 1)
 
+      # The code and gems are owned by root; the app user may write only tmp/ and
+      # log/ (see the Dockerfile).
+      - name: Check the app user can't change the code
+        run: |
+          docker run --rm cias-api:build-check sh -c '
+            touch tmp/.write-check log/.write-check || { echo "tmp/ or log/ is not writable"; exit 1; }
+            for path in app/.write-check config/.write-check Gemfile.lock /usr/local/bundle/gems/.write-check; do
+              if touch "$path" 2>/dev/null; then echo "$path is writable by $(id -un)"; exit 1; fi
+            done
+            echo "Only tmp/ and log/ are writable by $(id -un)"
+          '
+
       # Lists vulnerabilities that have a fix (Debian packages, gems/npm packages, and
       # Ruby's/Node's own) in the job summary. On PRs and pushes a finding marks this step
       # failed without failing the job; the weekly run fails, so it sends a notification.

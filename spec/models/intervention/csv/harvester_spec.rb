@@ -1692,4 +1692,188 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
       end
     end
   end
+
+  describe 'sms link click tracking columns' do
+    subject(:harvester) { described_class.new(intervention.sessions, nil) }
+
+    let(:intervention) { create(:intervention) }
+    let(:session) { create(:session, intervention: intervention) }
+    let(:sms_plan) { create(:sms_plan, session: session) }
+    let!(:sms_link) { create(:sms_link, sms_plan: sms_plan, session: session, variable: 'canary_link', url: 'https://example.test/canary-target') }
+    let!(:user_session) { create(:user_session, user: user, session: session) }
+
+    def collected
+      @collected ||= harvester.collect
+    end
+
+    def index_ending_with(suffix)
+      collected.header.index { |column| column.to_s.end_with?(suffix) }
+    end
+
+    def value_ending_with(suffix)
+      collected.rows.first[index_ending_with(suffix)]
+    end
+
+    context 'when the participant entered the link twice' do
+      let!(:sms_links_user) do
+        create(:sms_links_user, sms_link: sms_link, user: user,
+                                entered_timestamps: ['2026-10-30 12:00:00 UTC', '2026-10-30 13:00:00 UTC'])
+      end
+
+      it 'adds a timestamps and a totalclicks column for the link' do
+        expect([index_ending_with('sms_messaging_1.link_canary_link.timestamps'),
+                index_ending_with('sms_messaging_1.link_canary_link.totalclicks')]).to all(be_present)
+      end
+
+      it 'exports every entry separated by a pipe' do
+        expect(value_ending_with('sms_messaging_1.link_canary_link.timestamps'))
+          .to eq('2026-10-30 12:00:00 UTC | 2026-10-30 13:00:00 UTC')
+      end
+
+      it 'exports the number of entries' do
+        expect(value_ending_with('sms_messaging_1.link_canary_link.totalclicks')).to eq(2)
+      end
+    end
+
+    context 'when the participant never entered the link' do
+      let!(:sms_links_user) { create(:sms_links_user, sms_link: sms_link, user: user) }
+
+      it 'exports an empty timestamps cell' do
+        expect(value_ending_with('sms_messaging_1.link_canary_link.timestamps')).to eq('')
+      end
+
+      it 'exports zero clicks' do
+        expect(value_ending_with('sms_messaging_1.link_canary_link.totalclicks')).to eq(0)
+      end
+    end
+
+    context 'when the link was sent by an SMS campaign instead of a session SMS plan' do
+      let(:intervention) { create(:intervention, :published) }
+      let(:campaign) { create(:pdp_sms_campaign, intervention: intervention, created_at: 2.days.ago) }
+      let!(:campaign_link) { create(:pdp_campaign_sms_link, campaign: campaign, variable: 'canary_link') }
+
+      let!(:campaign_row) do
+        create(:sms_links_user, sms_link: campaign_link, user: user,
+                                entered_timestamps: ['2026-10-30 12:00:00 UTC', '2026-10-30 13:00:00 UTC'])
+      end
+
+      it 'adds the columns next to the participant columns, without a session prefix' do
+        expect(collected.header).to include('sms_campaign_1.link_canary_link.timestamps', 'sms_campaign_1.link_canary_link.totalclicks')
+      end
+
+      it 'exports every entry separated by a pipe' do
+        expect(value_ending_with('sms_campaign_1.link_canary_link.timestamps'))
+          .to eq('2026-10-30 12:00:00 UTC | 2026-10-30 13:00:00 UTC')
+      end
+
+      it 'exports the number of entries' do
+        expect(value_ending_with('sms_campaign_1.link_canary_link.totalclicks')).to eq(2)
+      end
+
+      it 'does not attribute another participant entry to this participant' do
+        other_user = create(:user, :confirmed)
+        create(:sms_links_user, sms_link: campaign_link, user: other_user, entered_timestamps: ['2026-10-30 14:00:00 UTC'])
+        expect(value_ending_with('sms_campaign_1.link_canary_link.totalclicks')).to eq(2)
+      end
+
+      context 'when a reminder campaign carries its own link' do
+        let(:reminder) { create(:pdp_sms_campaign, intervention: intervention, kind: 'manual_reminder', created_at: 1.day.ago) }
+        let!(:reminder_link) { create(:pdp_campaign_sms_link, campaign: reminder, variable: 'canary_link') }
+
+        let!(:reminder_row) do
+          create(:sms_links_user, sms_link: reminder_link, user: user, entered_timestamps: ['2026-10-31 09:00:00 UTC'])
+        end
+
+        it 'numbers the campaigns by creation order' do
+          expect(collected.header).to include('sms_campaign_1.link_canary_link.timestamps', 'sms_campaign_2.link_canary_link.timestamps')
+        end
+
+        it 'keeps the entries of the invitation and of the reminder in separate columns' do
+          expect([value_ending_with('sms_campaign_1.link_canary_link.timestamps'),
+                  value_ending_with('sms_campaign_2.link_canary_link.timestamps')])
+            .to eq(['2026-10-30 12:00:00 UTC | 2026-10-30 13:00:00 UTC', '2026-10-31 09:00:00 UTC'])
+        end
+
+        it 'counts each campaign on its own' do
+          expect([value_ending_with('sms_campaign_1.link_canary_link.totalclicks'),
+                  value_ending_with('sms_campaign_2.link_canary_link.totalclicks')]).to eq([2, 1])
+        end
+      end
+    end
+
+    context 'with many participants' do
+      let(:campaign) { create(:pdp_sms_campaign, intervention: create(:intervention, :published)) }
+
+      def queries_during
+        queries = []
+        sub = ActiveSupport::Notifications.subscribe('sql.active_record') do |_, _, _, _, payload|
+          next if payload[:cached] || %w[SCHEMA TRANSACTION].include?(payload[:name])
+
+          queries << payload[:sql]
+        end
+        yield
+        queries
+      ensure
+        ActiveSupport::Notifications.unsubscribe(sub)
+      end
+
+      def export_with(participant_count)
+        world = create(:intervention, :published)
+        world_session = create(:session, intervention: world)
+        plan = create(:sms_plan, session: world_session)
+        plan_link = create(:sms_link, sms_plan: plan, session: world_session, variable: 'plan_canary', url: 'https://example.test/plan')
+        world_campaign = create(:pdp_sms_campaign, intervention: world)
+        campaign_link = create(:pdp_campaign_sms_link, campaign: world_campaign, variable: 'campaign_canary')
+
+        participant_count.times do
+          participant = create(:user, :confirmed)
+          create(:user_session, user: participant, session: world_session)
+          [plan_link, campaign_link].each do |link|
+            create(:sms_links_user, sms_link: link, user: participant, entered_timestamps: ['2026-10-30 12:00:00 UTC'])
+          end
+        end
+
+        queries_during { described_class.new(world.sessions, nil).collect }
+      end
+
+      it 'reads every click from one query no matter how many participants are exported' do
+        small = export_with(2).grep(/sms_links_users/).size
+        large = export_with(6).grep(/sms_links_users/).size
+
+        expect([small, large]).to eq([1, 1])
+      end
+
+      it 'does not read the sms links once per participant' do
+        small = export_with(2).grep(/FROM "sms_links"/).size
+        large = export_with(6).grep(/FROM "sms_links"/).size
+
+        expect(large).to eq(small)
+      end
+
+      it 'preloads the answers instead of querying them per participant' do
+        small = export_with(2).grep(/FROM "answers"/).size
+        large = export_with(6).grep(/FROM "answers"/).size
+
+        expect(large).to eq(small)
+      end
+    end
+
+    context 'when the intervention has no SMS campaign' do
+      it 'adds no campaign columns' do
+        expect(collected.header.grep(/\Asms_campaign_/)).to be_empty
+      end
+    end
+
+    context 'when another participant entered the same link' do
+      let(:other_user) { create(:user, :confirmed) }
+
+      let!(:other_row) do
+        create(:sms_links_user, sms_link: sms_link, user: other_user, entered_timestamps: ['2026-10-30 12:00:00 UTC'])
+      end
+
+      it 'does not attribute the other entry to this participant' do
+        expect(value_ending_with('sms_messaging_1.link_canary_link.totalclicks')).to eq(0)
+      end
+    end
+  end
 end

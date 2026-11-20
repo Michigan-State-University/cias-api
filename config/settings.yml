@@ -14,3 +14,14 @@ log:
 
 sidekiq:
   retries: 10
+
+sms_campaigns:
+  default_per_page: 25 
+  max_body_length: 1600 
+  max_segments: 24
+  throttle_ip_per_minute: 10
+  throttle_user_per_hour: 20
+  throttle_intervention_per_hour: 10
+  daily_sms_cap: 5000 
+  resend_min_interval_minutes: 60
+  max_reminder_days_after: 60

@@ -5,7 +5,7 @@ RSpec.describe V1::Users::SmsTokens::Send do
 
   let!(:user) { create(:user, :confirmed) }
   let!(:phone_number) { '123456789' }
-  let!(:prefix) { '48' }
+  let!(:prefix) { '+48' }
   let!(:iso) { 'PL' }
   let!(:phone_params) do
     {
@@ -42,6 +42,11 @@ RSpec.describe V1::Users::SmsTokens::Send do
       expect(subject).to be service
       expect(phone.reload.confirmation_code).not_to be_nil
       expect(user.phone.reload.confirmed?).to be false
+    end
+
+    it 'sends the code regardless of an SMS opt-out' do
+      subject
+      expect(Communication::Sms).to have_received(:new).with(Message.last.id, bypass_opt_out: true)
     end
   end
 end

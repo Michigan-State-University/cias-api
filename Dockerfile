@@ -118,14 +118,17 @@ ENV LD_PRELOAD=libjemalloc.so.2 \
     MALLOC_CONF=narenas:2,background_thread:true,metadata_thp:auto,dirty_decay_ms:1000,muzzy_decay_ms:0
 
 RUN groupadd --system --gid 1000 app \
-    && useradd  --system --uid 1000 --gid app --create-home --home-dir /home/app app \
-    && mkdir -p /api/tmp/pids /api/log \
-    && chown -R app:app /api
+    && useradd  --system --uid 1000 --gid app --create-home --home-dir /home/app app
 
 WORKDIR /api
 
-COPY --from=builder --chown=app:app /usr/local/bundle /usr/local/bundle
-COPY --from=builder --chown=app:app /api /api
+# The code and gems stay owned by root, so the app user can't change them. It can
+# write only where Rails does at runtime: tmp/ (Bootsnap cache, upload temp files)
+# and log/.
+COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY --from=builder /api /api
+RUN mkdir -p /api/tmp/pids /api/log \
+    && chown -R app:app /api/tmp /api/log
 
 # The release tag, readable at runtime with `cat /release-version`.
 ARG SOURCE_VERSION=unspecified

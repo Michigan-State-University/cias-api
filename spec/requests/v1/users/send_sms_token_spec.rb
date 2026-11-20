@@ -17,7 +17,7 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
   let(:question) { create(:question_phone, question_group: question_group) }
 
   let(:phone_number) { '123456789' }
-  let(:prefix) { '48' }
+  let(:prefix) { '+48' }
   let(:iso) { 'PL' }
   let(:params) do
     {
@@ -137,6 +137,47 @@ RSpec.describe 'PUT /v1/users/send_sms_token', type: :request do
         end
 
         it_behaves_like 'creates phone for user'
+      end
+
+      context 'user resends the stored number in another notation' do
+        let!(:phone) do
+          create(:phone, user: user, iso: 'US', prefix: '+1', number: '2025550143').tap do |stored|
+            stored.update_columns(confirmed: true, communication_way: 'message')
+          end
+        end
+
+        [
+          ['a formatted number', 'US', '+1', '(202) 555-0143'],
+          ['a lowercase iso', 'us', '+1', '2025550143']
+        ].each do |label, sent_iso, sent_prefix, sent_number|
+          context "with #{label}" do
+            let(:phone_number) { sent_number }
+            let(:prefix) { sent_prefix }
+            let(:iso) { sent_iso }
+
+            before { request_with_stubbed_service }
+
+            it 'keeps the existing phone' do
+              expect(user.reload.phone).to have_attributes(id: phone.id, communication_way: 'message')
+            end
+          end
+        end
+      end
+
+      context 'user resends a number with a trunk prefix as the national number without it' do
+        let!(:phone) { create(:phone, user: user, iso: 'GB', prefix: '+44', number: '7400123456') }
+        let(:phone_number) { '7400123456' }
+        let(:prefix) { '+44' }
+        let(:iso) { 'GB' }
+
+        before do
+          phone.update_columns(communication_way: 'message')
+          request_with_stubbed_service
+        end
+
+        it 'keeps the existing phone' do
+          expect(user.reload.phone).to have_attributes(id: phone.id, communication_way: 'message')
+        end
       end
 
       context 'sms service respond with error' do

@@ -2,6 +2,7 @@
 
 class SmsPlans::SendSmsJob < ApplicationJob
   queue_as :sms_plans
+  self.enqueue_after_transaction_commit = true
 
   def perform(number, content, attachment_url, user_id, is_alert = false, _session_id = nil)
     unless is_alert
