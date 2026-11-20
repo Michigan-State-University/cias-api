@@ -5,11 +5,13 @@
 # docker-compose.prod.yml runs it locally; docker-compose.yml (dev) can't, because the
 # image has no development or test gems.
 
-ARG RUBY_VERSION=3.3.8
 ARG BUNDLER_VERSION=2.4.22
 
+# The base image is pinned by digest and updated by Dependabot, which can't read
+# image names built from ARGs. Keep the Ruby version in step with .ruby-version.
+
 # ---------- builder ----------
-FROM ruby:${RUBY_VERSION}-slim-bookworm AS builder
+FROM ruby:3.3.8-slim-bookworm@sha256:307aed56240959e9cd3fcc10740ae8d0e6c461e9b42efc076100d4f8126b87b9 AS builder
 
 ARG BUNDLER_VERSION
 
@@ -49,7 +51,7 @@ COPY . .
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec bootsnap precompile --gemfile app/ lib/ config/
 
 # ---------- runtime ----------
-FROM ruby:${RUBY_VERSION}-slim-bookworm AS runtime
+FROM ruby:3.3.8-slim-bookworm@sha256:307aed56240959e9cd3fcc10740ae8d0e6c461e9b42efc076100d4f8126b87b9 AS runtime
 
 ARG BUNDLER_VERSION
 
@@ -79,7 +81,10 @@ ADD --checksum=sha256:98ba0d157b50d36f23bd0dedf4c0aa28c7b0c50fcdcdc54aa5b6bbba81
 
 # wkhtmltox.deb → /usr/local/bin/wkhtmltopdf, with the font and X libraries it needs;
 # libpq5 → pg; libjemalloc2 → memory allocator; tini → PID 1 signal handling
-RUN apt-get update -qq && apt-get install -y --no-install-recommends \
+# upgrade: Debian fixes released since the base image was built (ruby:3.3.8 is no
+# longer rebuilt upstream, so its packages only get older).
+RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
         ca-certificates \
         fontconfig \
         libjemalloc2 \
@@ -113,14 +118,17 @@ ENV LD_PRELOAD=libjemalloc.so.2 \
     MALLOC_CONF=narenas:2,background_thread:true,metadata_thp:auto,dirty_decay_ms:1000,muzzy_decay_ms:0
 
 RUN groupadd --system --gid 1000 app \
-    && useradd  --system --uid 1000 --gid app --create-home --home-dir /home/app app \
-    && mkdir -p /api/tmp/pids /api/log \
-    && chown -R app:app /api
+    && useradd  --system --uid 1000 --gid app --create-home --home-dir /home/app app
 
 WORKDIR /api
 
-COPY --from=builder --chown=app:app /usr/local/bundle /usr/local/bundle
-COPY --from=builder --chown=app:app /api /api
+# The code and gems stay owned by root, so the app user can't change them. It can
+# write only where Rails does at runtime: tmp/ (Bootsnap cache, upload temp files)
+# and log/.
+COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY --from=builder /api /api
+RUN mkdir -p /api/tmp/pids /api/log \
+    && chown -R app:app /api/tmp /api/log
 
 # The release tag, readable at runtime with `cat /release-version`.
 ARG SOURCE_VERSION=unspecified

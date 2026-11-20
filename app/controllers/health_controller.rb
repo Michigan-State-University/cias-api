@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 # Unauthenticated readiness endpoint for ALB / ECS health checks.
-# Returns 200 when the app can reach Postgres and Redis; 503 otherwise.
+# Returns 503 when Postgres is unreachable, 200 otherwise. Redis is reported but
+# doesn't fail the check: replacing every task wouldn't bring Redis back.
 class HealthController < ActionController::API
   def show
     checks = { db: db_check, redis: redis_check }
-    render json: checks, status: checks.values.all? ? :ok : :service_unavailable
+    render json: checks, status: checks[:db] ? :ok : :service_unavailable
   end
 
   private

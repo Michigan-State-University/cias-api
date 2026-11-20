@@ -7,3 +7,29 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  # Base images are pinned by digest, so this also brings rebuilt images with OS fixes.
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    exclude-paths:
+      - "docker-compose*.yml"
+    ignore:
+      # A Ruby minor or major upgrade is its own project. A patch bump needs the Gemfile,
+      # Gemfile.lock and .ruby-version changed in the same PR, or Build check fails.
+      - dependency-name: "ruby"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    # HTD's shared workflow; it isn't changed in this repo.
+    exclude-paths:
+      - ".github/workflows/code-quality.yml"
+    groups:
+      github-actions:
+        patterns: ["*"]
