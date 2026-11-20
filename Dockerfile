@@ -11,7 +11,7 @@ ARG BUNDLER_VERSION=2.4.22
 # image names built from ARGs. Keep the Ruby version in step with .ruby-version.
 
 # ---------- builder ----------
-FROM ruby:3.3.8-slim-bookworm@sha256:307aed56240959e9cd3fcc10740ae8d0e6c461e9b42efc076100d4f8126b87b9 AS builder
+FROM ruby:3.3.13-slim-bookworm@sha256:ff0602276269e3a8aa65fbe8e3b8f67b294c79a1419af4fd73b27f1d6b3fbfd9 AS builder
 
 ARG BUNDLER_VERSION
 
@@ -51,7 +51,7 @@ COPY . .
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec bootsnap precompile --gemfile app/ lib/ config/
 
 # ---------- runtime ----------
-FROM ruby:3.3.8-slim-bookworm@sha256:307aed56240959e9cd3fcc10740ae8d0e6c461e9b42efc076100d4f8126b87b9 AS runtime
+FROM ruby:3.3.13-slim-bookworm@sha256:ff0602276269e3a8aa65fbe8e3b8f67b294c79a1419af4fd73b27f1d6b3fbfd9 AS runtime
 
 ARG BUNDLER_VERSION
 
