@@ -15,13 +15,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.8
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -38,7 +38,7 @@ jobs:
         run: bundle exec rubocop
 
       - name: Restore test runtime log
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: tmp/parallel_runtime_rspec.log
           key: rspec-runtime-${{ github.run_id }}
@@ -57,7 +57,7 @@ jobs:
       # all test jobs must split by the same log, otherwise files could be skipped or run twice
       - name: Share test runtime log
         if: steps.set-group-by.outputs.group-by == 'runtime'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rspec-runtime-baseline
           path: tmp/parallel_runtime_rspec.log
@@ -74,7 +74,7 @@ jobs:
     name: Dependency security audit
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.8
@@ -113,14 +113,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
           ruby-version: 3.3.8
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -141,7 +141,7 @@ jobs:
           bundle exec rake "parallel:create[$TEST_PROCESSES]" "parallel:load_schema[$TEST_PROCESSES]"
       - name: Download test runtime log
         if: needs.setup_environment.outputs.group-by == 'runtime'
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: rspec-runtime-baseline
           path: tmp
@@ -156,7 +156,7 @@ jobs:
           --verbose-command
           -o '--profile 20 --format progress --format ParallelTests::RSpec::RuntimeLogger --out tmp/runtime_logs/group_${{ matrix.group }}.log'
       - name: Upload test runtimes
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rspec-runtime-group-${{ matrix.group }}
           path: tmp/runtime_logs/
@@ -177,7 +177,7 @@ jobs:
       # hidden-file exclusion below go unnoticed for a whole green run.
       - name: Upload coverage shard
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-shard-${{ matrix.group }}
           path: coverage/.resultset.json
@@ -215,14 +215,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3.8
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
@@ -244,7 +244,7 @@ jobs:
         run: bundle exec rspec spec/performance --profile 20 --format progress
       - name: Upload coverage shard
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-shard-performance
           path: coverage/.resultset.json
@@ -259,7 +259,7 @@ jobs:
 
     steps:
       - name: Download test runtimes
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: rspec-runtime-group-*
           path: tmp/runtime_logs
@@ -267,7 +267,7 @@ jobs:
       - name: Merge test runtimes
         run: cat tmp/runtime_logs/*.log | grep -E '^spec/.+_spec\.rb:[0-9.]+$' > tmp/parallel_runtime_rspec.log
       - name: Save test runtime log
-        uses: actions/cache/save@v5
+        uses: actions/cache/save@v6
         with:
           path: tmp/parallel_runtime_rspec.log
           key: rspec-runtime-${{ github.run_id }}
@@ -282,14 +282,14 @@ jobs:
     if: ${{ !cancelled() && needs.test.result != 'skipped' }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
         with:
           ruby-version: 3.3.8
 
       - name: Download coverage shards
         continue-on-error: true
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: coverage-shards
           pattern: coverage-shard-*
@@ -313,7 +313,7 @@ jobs:
           ruby script/collate_coverage.rb
 
       - name: Upload collated coverage report
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: coverage-report
           path: coverage/coverage.json
