@@ -19,7 +19,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.8
+          ruby-version: .ruby-version
 
       - uses: actions/cache@v5
         with:
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.8
+          ruby-version: .ruby-version
       - name: Audit dependencies
         run: |
           gem install bundler-audit
@@ -117,7 +117,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1 #the other ruby action was deprecated so we use a new one now
         with:
-          ruby-version: 3.3.8
+          ruby-version: .ruby-version
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
       - uses: actions/cache@v5
@@ -219,7 +219,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.8
+          ruby-version: .ruby-version
       - run: cp .env.template .env
       - run: cp ./config/database.docker.yml ./config/database.yml
       - uses: actions/cache@v5
@@ -283,9 +283,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+      - uses: ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0 # v1.342.0
         with:
-          ruby-version: 3.3.8
+          ruby-version: .ruby-version
 
       - name: Download coverage shards
         continue-on-error: true
