@@ -588,8 +588,6 @@ GEM
     simplecov_json_formatter (0.1.4)
     simpleidn (0.2.3)
     slop (4.10.1)
-    sql_query (0.7.4)
-      activerecord (>= 3.2)
     test-prof (1.6.4)
       logger
     thor (1.5.0)
@@ -709,7 +707,6 @@ DEPENDENCIES
   shoulda-matchers
   sidekiq (>= 7.3.3)
   simplecov
-  sql_query
   test-prof
   timecop
   twilio-ruby (~> 7.9.1)

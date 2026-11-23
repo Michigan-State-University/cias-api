@@ -61,6 +61,13 @@ class V1::ChartsController < V1Controller
     charts_scope.find(params[:id])
   end
 
+  def position_scope
+    dashboard_section = DashboardSection.find(params[:dashboard_section_id])
+    authorize! :update, dashboard_section
+
+    dashboard_section.charts
+  end
+
   def chart_params
     params.expect(chart: [:name, :description, :chart_type, :trend_line, :status, :dashboard_section_id,
                           :interval_type, :date_range_start, :date_range_end, { formula: {} }])

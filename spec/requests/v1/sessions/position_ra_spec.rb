@@ -49,7 +49,25 @@ RSpec.describe 'PATCH /v1/interventions/:intervention_id/sessions/position (RA g
     end
   end
 
-  # NOTE: Happy-path "returns ok" test omitted — the existing position_spec.rb
-  # also fails due to a pre-existing accessible_by/session_service issue unrelated
-  # to RA guards. The two rejection tests above confirm the RA guards work correctly.
+  context 'when the RA session id is sent in upper case' do
+    let(:params) { { session: { position: [{ id: ra_session.id.upcase, position: 5 }, { id: classic_session1.id, position: 1 }] } } }
+
+    it 'returns unprocessable_content and keeps the RA session at position 0' do
+      patch v1_intervention_sessions_position_path(intervention_id: intervention.id), params: params, headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(ra_session.reload.position).to eq 0
+    end
+  end
+
+  context 'when a position is not a whole number' do
+    it 'returns the invalid positions error' do
+      patch v1_intervention_sessions_position_path(intervention_id: intervention.id),
+            params: { session: { position: [{ id: classic_session1.id, position: true }] } }.to_json,
+            headers: headers.merge('Content-Type' => 'application/json')
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(json_response['message']).to eq I18n.t('exceptions.invalid_positions')
+    end
+  end
 end
