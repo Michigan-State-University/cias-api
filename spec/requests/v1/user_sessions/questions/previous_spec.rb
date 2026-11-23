@@ -158,8 +158,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
       request
       hfhs_patient_detail = participant.hfhs_patient_detail
       expect(json_response['hfhs_patient_detail']).to include(
-        { 'patient_id' => participant.hfhs_patient_detail.patient_id,
-          'zip_code' => hfhs_patient_detail.provided_zip,
+        { 'zip_code' => hfhs_patient_detail.provided_zip,
           'first_name' => hfhs_patient_detail.provided_first_name,
           'last_name' => hfhs_patient_detail.provided_last_name,
           'dob' => hfhs_patient_detail.provided_dob,
@@ -171,7 +170,7 @@ RSpec.describe 'GET /v1/user_sessions/:user_session_id/previous_question', type:
 
     it 'have all expected kayes in hfh\'s section' do
       request
-      expect(json_response['hfhs_patient_detail'].keys).to match_array(%w[patient_id first_name last_name dob sex zip_code phone_number phone_type])
+      expect(json_response['hfhs_patient_detail'].keys).to match_array(%w[first_name last_name dob sex zip_code phone_number phone_type])
     end
   end
 

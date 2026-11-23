@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable all
 class Rack::Attack
   ### Configure Cache ###
 
@@ -39,6 +38,13 @@ class Rack::Attack
   # Another common method of attack is to use a swarm of computers with
   # different IPs to try brute-forcing a password for a specific account.
 
+  ### Prevent Patient Enumeration Through The Aztec Code Endpoint ###
+  # The per-account limit is `rate_limit` in V1::HenryFord::PatientDetailsController.
+  throttle('henry_ford/verify_by_code/ip', limit: 10, period: 1.minute) do |req|
+    # Any format suffix routes here (.json, but also .j-s or .%7E), so count them all.
+    req.ip if req.post? && req.path.match?(%r{\A/v1/henry_ford/verify_by_code(?:\.[^/]+)?\z})
+  end
+
   # Throttle POST requests to /login by IP address
   #
   # Key: "rack::attack:#{Time.now.to_i/:period}:logins/ip:#{req.ip}"
@@ -62,6 +68,14 @@ class Rack::Attack
     end
   end
 
+  SMS_CAMPAIGN_WRITE_PATH = %r{\A/v1/interventions/[^/]+/predefined_participants/sms_campaigns(?:/[^/]+/cancel)?(?:\.\w+)?\z}
+
+  self.throttled_response_retry_after_header = true
+
+  throttle('sms_campaigns/ip', limit: ->(_req) { Settings.sms_campaigns.throttle_ip_per_minute }, period: 1.minute) do |req|
+    req.ip if req.post? && SMS_CAMPAIGN_WRITE_PATH.match?(req.path)
+  end
+
   ### Custom Throttle Response ###
 
   # By default, Rack::Attack returns an HTTP 429 for throttled responses,
@@ -79,6 +93,7 @@ class Rack::Attack
 
   # Block suspicious requests for '/etc/password' or wordpress specific paths.
   # After 3 blocked requests in 10 minutes, block all requests from that IP for 5 minutes.
+  # rubocop:disable Performance/StringInclude, Layout/MultilineOperationIndentation
   Rack::Attack.blocklist('fail2ban pentesters') do |req|
     # `filter` returns truthy value if request fails, or if it's from a previously banned IP
     # so the request is blocked
@@ -90,6 +105,7 @@ class Rack::Attack
       req.path.include?('wp-login')
     end
   end
+  # rubocop:enable Performance/StringInclude, Layout/MultilineOperationIndentation
 end
 
 ActiveSupport::Notifications.subscribe(/rack_attack/) do |name, start, finish, request_id, payload|
@@ -106,5 +122,3 @@ ActiveSupport::Notifications.subscribe(/rack_attack/) do |name, start, finish, r
     USER AGENT: #{request.env['HTTP_USER_AGENT']}
   LOG
 end
-
-# rubocop:enable all

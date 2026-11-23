@@ -25,15 +25,18 @@ class V1::Users::SmsTokens::Phone
   end
 
   def user_with_phone
-    if phone_not_changed?
-      user.phone
-    else
+    return user.phone if phone_not_changed?
+
+    ApplicationRecord.transaction do
       user.phone.delete
       new_phone
     end
   end
 
   def phone_not_changed?
+    stored = Phone::NumberAnalysis.new(user.phone.prefix, user.phone.number).e164
+    return stored == Phone::NumberAnalysis.new(prefix, phone_number).e164 if stored
+
     user.phone.number.eql?(phone_number) && user.phone.iso.eql?(iso) && user.phone.prefix.eql?(prefix)
   end
 

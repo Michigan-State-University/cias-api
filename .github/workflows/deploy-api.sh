@@ -1,0 +1,321 @@
+#!/usr/bin/env bash
+#
+# Build and push the cias-api image, run database migrations as a one-off ECS
+# task, and only if every container in that task exits 0, roll the api and
+# worker services onto the new image.
+#
+# Usage: .github/workflows/deploy-api.sh [CIAS_API_DIR] [IMAGE_TAG]
+#   CIAS_API_DIR  cias-api checkout to build (default: .)
+#   IMAGE_TAG     tag to push and deploy
+#                 (default: 8-char git SHA of CIAS_API_DIR)
+#
+# Settings come from environment variables of the same name; only AWS_REGION and
+# the two timeouts have defaults, so a run can't land on another environment.
+# Run by .github/workflows/deploy-api.yml, or by hand.
+#
+# Requires aws (v2), docker, jq and git. The AWS caller needs:
+#   - ecr:GetAuthorizationToken, and push access to the ECR repository
+#   - ecs:DescribeTaskDefinition, ecs:RegisterTaskDefinition, ecs:RunTask,
+#     ecs:DescribeTasks, ecs:DescribeServices, ecs:UpdateService
+#   - iam:PassRole on the execution and task roles of the migrate, api and
+#     worker task definitions
+
+set -euo pipefail
+
+# --- Config -------------------------------------------------------------------
+
+AWS_REGION="${AWS_REGION:-us-east-2}"
+ECR_REPOSITORY_URI="${ECR_REPOSITORY_URI:-}"
+ECS_CLUSTER_ARN="${ECS_CLUSTER_ARN:-}"
+API_SERVICE_ARN="${API_SERVICE_ARN:-}"
+WORKER_SERVICE_ARN="${WORKER_SERVICE_ARN:-}"
+MIGRATE_TASK_DEFINITION_ARN="${MIGRATE_TASK_DEFINITION_ARN:-}"
+MIGRATE_SUBNET_IDS="${MIGRATE_SUBNET_IDS:-}"
+MIGRATE_SECURITY_GROUP_IDS="${MIGRATE_SECURITY_GROUP_IDS:-}"
+# ENABLED for public subnets (the task needs a public IP to pull the image and
+# read SSM); DISABLED for private subnets with a NAT gateway or VPC endpoints.
+MIGRATE_ASSIGN_PUBLIC_IP="${MIGRATE_ASSIGN_PUBLIC_IP:-}"
+MIGRATE_TIMEOUT_SECONDS="${MIGRATE_TIMEOUT_SECONDS:-1800}"
+# How long to wait for each service to roll out its new revision.
+ROLLOUT_TIMEOUT_SECONDS="${ROLLOUT_TIMEOUT_SECONDS:-1200}"
+
+# ------------------------------------------------------------------------------
+
+log() { echo "==> $*" >&2; }
+die() { echo "ERROR: $*" >&2; exit 1; }
+
+missing=()
+for var in AWS_REGION ECR_REPOSITORY_URI ECS_CLUSTER_ARN API_SERVICE_ARN \
+  WORKER_SERVICE_ARN MIGRATE_TASK_DEFINITION_ARN MIGRATE_SUBNET_IDS \
+  MIGRATE_SECURITY_GROUP_IDS MIGRATE_ASSIGN_PUBLIC_IP MIGRATE_TIMEOUT_SECONDS; do
+  if [[ -z "${!var}" || "${!var}" == REPLACE_ME ]]; then
+    missing+=("$var")
+  fi
+done
+if (( ${#missing[@]} > 0 )); then
+  die "set these in the environment: ${missing[*]}"
+fi
+[[ "$MIGRATE_ASSIGN_PUBLIC_IP" == ENABLED || "$MIGRATE_ASSIGN_PUBLIC_IP" == DISABLED ]] ||
+  die "MIGRATE_ASSIGN_PUBLIC_IP must be ENABLED or DISABLED"
+[[ "$ROLLOUT_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*$ ]] ||
+  die "ROLLOUT_TIMEOUT_SECONDS must be a whole number of seconds, without a leading zero"
+[[ "$MIGRATE_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*$ ]] ||
+  die "MIGRATE_TIMEOUT_SECONDS must be a whole number of seconds, without a leading zero"
+# These end up in AWS CLI arguments, the network ones as shorthand syntax, so only
+# the expected shapes get through (e.g. "subnets@=file://..." would read a file).
+[[ "${MIGRATE_SUBNET_IDS// /}" =~ ^subnet-[0-9a-f]+(,subnet-[0-9a-f]+)*$ ]] ||
+  die "MIGRATE_SUBNET_IDS must be comma-separated subnet-... IDs"
+[[ "${MIGRATE_SECURITY_GROUP_IDS// /}" =~ ^sg-[0-9a-f]+(,sg-[0-9a-f]+)*$ ]] ||
+  die "MIGRATE_SECURITY_GROUP_IDS must be comma-separated sg-... IDs"
+for var in ECS_CLUSTER_ARN API_SERVICE_ARN WORKER_SERVICE_ARN MIGRATE_TASK_DEFINITION_ARN; do
+  [[ "${!var}" =~ ^arn:aws:ecs:[a-z0-9-]+:[0-9]{12}:[a-z-]+/[A-Za-z0-9_./:-]+$ ]] ||
+    die "$var must be an ECS ARN"
+done
+[[ "$ECR_REPOSITORY_URI" =~ ^[0-9]{12}\.dkr\.ecr\.[a-z0-9-]+\.amazonaws\.com/[a-z0-9._/-]+$ ]] ||
+  die "ECR_REPOSITORY_URI must look like <account>.dkr.ecr.<region>.amazonaws.com/<repo>"
+
+for cmd in aws docker jq git; do
+  command -v "$cmd" >/dev/null || die "$cmd not found"
+done
+
+CIAS_API_DIR="${1:-.}"
+IMAGE_TAG="${2:-}"
+# The build bakes the working tree, so uncommitted changes would ship under a
+# commit tag that doesn't contain them.
+tree_status="$(git -C "$CIAS_API_DIR" status --porcelain)" ||
+  die "$CIAS_API_DIR is not a git checkout"
+if [[ -n "$tree_status" ]]; then
+  die "$CIAS_API_DIR has uncommitted changes; commit or stash them first"
+fi
+if [[ -z "$IMAGE_TAG" ]]; then
+  IMAGE_TAG="$(git -C "$CIAS_API_DIR" rev-parse --short=8 HEAD)"
+elif tag_commit="$(git -C "$CIAS_API_DIR" rev-parse -q --verify "refs/tags/$IMAGE_TAG^{commit}")"; then
+  # Tags are mutable in ECR, so building another commit would replace the release image.
+  [[ "$tag_commit" == "$(git -C "$CIAS_API_DIR" rev-parse HEAD)" ]] ||
+    die "$CIAS_API_DIR isn't at $IMAGE_TAG ($tag_commit); check the tag out first"
+elif [[ "$IMAGE_TAG" =~ ^v[0-9] ]]; then
+  die "$IMAGE_TAG looks like a release tag but isn't a tag in $CIAS_API_DIR; fetch tags and check it out"
+fi
+IMAGE="$ECR_REPOSITORY_URI:$IMAGE_TAG"
+
+# Applies to every aws call below, regardless of the caller's CLI config.
+export AWS_REGION AWS_DEFAULT_REGION="$AWS_REGION" AWS_DEFAULT_OUTPUT=json AWS_PAGER=""
+
+# Registers a copy of a task definition with every container that runs an image
+# from ECR_REPOSITORY_URI switched to IMAGE, and prints the new revision's ARN.
+# Other containers (e.g. the nginx sidecar) are left as they are.
+# It runs inside $(...), where bash ignores set -e, so failures are checked by hand.
+register_revision() {
+  local task_definition="$1" definition
+  log "Registering a new revision of $task_definition with $IMAGE"
+  definition="$(
+    aws ecs describe-task-definition --task-definition "$task_definition" \
+      --query taskDefinition |
+      jq --arg repo "$ECR_REPOSITORY_URI:" --arg image "$IMAGE" '
+        .containerDefinitions |= map(
+          if (.image | startswith($repo)) then .image = $image else . end
+        )
+        | del(.taskDefinitionArn, .revision, .status, .requiresAttributes,
+              .compatibilities, .registeredAt, .registeredBy, .deregisteredAt)'
+  )" || die "could not read task definition $task_definition"
+  # Without a match the new revision would be identical and the deploy a no-op.
+  jq -e --arg image "$IMAGE" 'any(.containerDefinitions[]; .image == $image)' \
+    <<<"$definition" >/dev/null ||
+    die "no container in $task_definition runs an image from $ECR_REPOSITORY_URI"
+  aws ecs register-task-definition --cli-input-json "$definition" \
+    --query taskDefinition.taskDefinitionArn --output text
+}
+
+# The migrate step only checks the exit code, so a copied revision running some
+# other command (e.g. db:migrate:status) would pass as "Migrations succeeded".
+check_migrate_command() {
+  local task_definition="$1"
+  aws ecs describe-task-definition --task-definition "$task_definition" \
+    --query taskDefinition.containerDefinitions |
+    jq -e --arg repo "$ECR_REPOSITORY_URI:" '
+      any(.[]; (.image | startswith($repo))
+        and ((.entryPoint // []) + (.command // []) | join(" ")
+             | test("(^|[ ;&|])db:migrate($|[ ;&|])")))' >/dev/null ||
+    die "could not confirm that $task_definition runs db:migrate in a $ECR_REPOSITORY_URI container"
+}
+
+# Waits until a service runs the given revision. Polls describe-services instead
+# of `aws ecs wait services-stable`, which gives up after 10 minutes and can't
+# tell a rollback from a slow rollout. Dies if ECS rolls the service back, marks
+# the rollout failed, or it hasn't finished within ROLLOUT_TIMEOUT_SECONDS.
+wait_for_rollout() {
+  local service="$1" revision="$2" state last="" seen=""
+  local deadline=$((SECONDS + ROLLOUT_TIMEOUT_SECONDS))
+  while :; do
+    state="$(
+      aws ecs describe-services --cluster "$ECS_CLUSTER_ARN" --services "$service" \
+        --query 'services[0].deployments' |
+        jq -r --arg rev "$revision" '
+          (map(select(.status == "PRIMARY")) | first) as $primary
+          | if $primary == null then "unknown"
+            elif $primary.taskDefinition != $rev then
+              (if any(.[]; .taskDefinition == $rev) then "rolled-back" else "not-listed" end)
+              + " \($primary.taskDefinition)"
+            elif $primary.rolloutState == "FAILED" then "failed \($primary.rolloutStateReason // "")"
+            elif $primary.rolloutState == "COMPLETED"
+              or ($primary.rolloutState == null and length == 1
+                  and $primary.runningCount == $primary.desiredCount) then "completed"
+            else "running \($primary.runningCount)/\($primary.desiredCount), \($primary.failedTasks) failed"
+            end'
+    )" || die "could not describe $service"
+    case "$state" in
+      completed) log "$service is running $revision"; return 0 ;;
+      rolled-back*) die "$service was rolled back to ${state#rolled-back } instead of $revision" ;;
+      failed*) die "the rollout of $revision on $service failed: ${state#failed }" ;;
+      # Right after update-service, a read can still show only the old deployment.
+      # Once the revision has been seen, its disappearance means a rollback.
+      not-listed*)
+        [[ -z "$seen" ]] || die "$service was rolled back to ${state#not-listed } instead of $revision"
+        state="waiting for ECS to list $revision" ;;
+      running*) seen=1 ;;
+    esac
+    if [[ "$state" != "$last" ]]; then
+      log "$service: $state"
+      last="$state"
+    fi
+    (( SECONDS < deadline )) ||
+      die "$service hasn't finished rolling out $revision after ${ROLLOUT_TIMEOUT_SECONDS}s ($state)"
+    sleep 15
+  done
+}
+
+# --- Preflight ----------------------------------------------------------------
+
+# Check both services exist before building or migrating anything, so a wrong
+# ARN stops the deploy before the database is touched.
+for service in "$API_SERVICE_ARN" "$WORKER_SERVICE_ARN"; do
+  found="$(aws ecs describe-services --cluster "$ECS_CLUSTER_ARN" --services "$service" \
+    --query 'services[0].taskDefinition' --output text)" || die "could not describe $service"
+  [[ "$found" == arn:* ]] || die "service $service not found in $ECS_CLUSTER_ARN"
+done
+
+# The family's latest revision is the one copied below, whatever :N the setting names.
+migrate_family="${MIGRATE_TASK_DEFINITION_ARN##*/}"
+migrate_family="${migrate_family%%:*}"
+check_migrate_command "$migrate_family"
+
+# --- Build and push -----------------------------------------------------------
+
+log "Building $IMAGE from $CIAS_API_DIR"
+# SOURCE_VERSION is baked into /release-version for traceability.
+# --pull: always start from the current base image, not a stale local copy.
+docker build --pull --platform linux/amd64 --build-arg SOURCE_VERSION="$IMAGE_TAG" \
+  -t "$IMAGE" "$CIAS_API_DIR"
+
+# Only the release tag: environments share this repository, so a moving tag
+# like :latest would point at whichever of them deployed last.
+log "Pushing $IMAGE"
+aws ecr get-login-password |
+  docker login --username AWS --password-stdin "${ECR_REPOSITORY_URI%%/*}"
+docker push "$IMAGE"
+
+# --- Migrate ------------------------------------------------------------------
+
+migrate_task_definition="$(register_revision "$migrate_family")"
+check_migrate_command "$migrate_task_definition"
+
+# startedBy allows only letters, digits, '-', '_' and '/' (up to 128 characters),
+# and release tags contain dots.
+started_by="deploy-${IMAGE_TAG//[^A-Za-z0-9_-]/-}"
+started_by="${started_by:0:128}"
+
+log "Running migrations with $migrate_task_definition"
+run_output="$(
+  aws ecs run-task \
+    --cluster "$ECS_CLUSTER_ARN" \
+    --launch-type FARGATE \
+    --task-definition "$migrate_task_definition" \
+    --count 1 \
+    --started-by "$started_by" \
+    --network-configuration "awsvpcConfiguration={subnets=[${MIGRATE_SUBNET_IDS// /}],securityGroups=[${MIGRATE_SECURITY_GROUP_IDS// /}],assignPublicIp=$MIGRATE_ASSIGN_PUBLIC_IP}"
+)"
+task_arn="$(jq -r '.tasks[0].taskArn // empty' <<<"$run_output")"
+if [[ -z "$task_arn" ]]; then
+  jq '.failures' <<<"$run_output" >&2
+  die "run-task did not start the migrate task"
+fi
+
+log "Waiting for $task_arn to stop (timeout ${MIGRATE_TIMEOUT_SECONDS}s)"
+deadline=$((SECONDS + MIGRATE_TIMEOUT_SECONDS))
+last_status=""
+while :; do
+  task="$(aws ecs describe-tasks --cluster "$ECS_CLUSTER_ARN" --tasks "$task_arn" --query 'tasks[0]')"
+  status="$(jq -r '.lastStatus // "UNKNOWN"' <<<"$task")"
+  if [[ "$status" != "$last_status" ]]; then
+    log "Migrate task is $status"
+    last_status="$status"
+  fi
+  [[ "$status" == STOPPED ]] && break
+  # Don't stop the task on timeout: killing a migration partway is worse.
+  if (( SECONDS >= deadline )); then
+    die "migrate task still $status after ${MIGRATE_TIMEOUT_SECONDS}s and was left running: $task_arn"
+  fi
+  sleep 10
+done
+
+# The migrate output stays in CloudWatch. This job log is public, and a failing
+# migration's error can quote table rows (Postgres DETAIL lines).
+task_id="${task_arn##*/}"
+aws ecs describe-task-definition --task-definition "$migrate_task_definition" \
+  --query 'taskDefinition.containerDefinitions' |
+  jq -r --arg id "$task_id" '
+    .[] | select(.logConfiguration.logDriver == "awslogs")
+    | [.logConfiguration.options["awslogs-group"],
+       "\(.logConfiguration.options["awslogs-stream-prefix"])/\(.name)/\($id)"]
+    | @tsv' |
+  while IFS=$'\t' read -r log_group log_stream; do
+    log "Migrate output: CloudWatch log group $log_group, stream $log_stream"
+  done
+
+# A null exitCode means the container never ran (e.g. image pull or secrets
+# fetch failed), so anything but 0 fails the deploy.
+failed="$(jq -r '.containers[] | select(.exitCode != 0)
+  | "\(.name): exitCode=\(.exitCode // "none") \(.reason // "")"' <<<"$task")"
+if [[ -n "$failed" ]]; then
+  echo "$failed" >&2
+  jq -r '"stopCode=\(.stopCode // "") stoppedReason=\(.stoppedReason // "")"' <<<"$task" >&2
+  die "migrations failed; api and worker were not updated"
+fi
+log "Migrations succeeded"
+
+# --- Update services ----------------------------------------------------------
+
+# Register both revisions before updating either service, so a failure here
+# can't leave only one of them rolled forward.
+services=("$API_SERVICE_ARN" "$WORKER_SERVICE_ARN")
+previous=()
+revisions=()
+for service in "${services[@]}"; do
+  current="$(aws ecs describe-services --cluster "$ECS_CLUSTER_ARN" --services "$service" \
+    --query 'services[0].taskDefinition' --output text)"
+  [[ "$current" == arn:* ]] || die "could not find the task definition for $service"
+  previous+=("$current")
+  revisions+=("$(register_revision "$current")")
+done
+
+# Logged before updating, so they're in the output even if an update or the wait fails.
+log "To roll back (the database stays migrated):"
+for i in "${!services[@]}"; do
+  log "  aws ecs update-service --cluster $ECS_CLUSTER_ARN --service ${services[$i]} --task-definition ${previous[$i]}"
+done
+
+for i in "${!services[@]}"; do
+  log "Updating ${services[$i]} from ${previous[$i]} to ${revisions[$i]}"
+  aws ecs update-service --cluster "$ECS_CLUSTER_ARN" --service "${services[$i]}" \
+    --task-definition "${revisions[$i]}" >/dev/null
+done
+
+log "Waiting for the rollouts (up to ${ROLLOUT_TIMEOUT_SECONDS}s each)"
+for i in "${!services[@]}"; do
+  wait_for_rollout "${services[$i]}" "${revisions[$i]}"
+done
+
+log "Deployed $IMAGE"
+for revision in "$migrate_task_definition" "${revisions[@]}"; do
+  log "  $revision"
+done

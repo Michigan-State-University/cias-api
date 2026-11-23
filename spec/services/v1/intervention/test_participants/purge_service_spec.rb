@@ -182,6 +182,42 @@ RSpec.describe V1::Intervention::TestParticipants::PurgeService do
     end
   end
 
+  # A campaign link carries no session, so a purge that reaches links through `sessions` steps over it
+  # and the surviving row then blocks the user shell in `orphaned?`.
+  describe 'an sms link that belongs to a campaign instead of a session' do
+    let(:campaign) { create(:pdp_sms_campaign, intervention: intervention) }
+    let(:campaign_sms_link) { create(:pdp_campaign_sms_link, campaign: campaign) }
+    let(:campaign_sms_links_user) { create(:sms_links_user, user: guest, sms_link: campaign_sms_link) }
+
+    let(:foreign_campaign) { create(:pdp_sms_campaign) }
+    let(:foreign_sms_link) { create(:pdp_campaign_sms_link, campaign: foreign_campaign) }
+    let(:foreign_sms_links_user) { create(:sms_links_user, user: guest, sms_link: foreign_sms_link) }
+
+    before { campaign_sms_links_user }
+
+    it 'clears the link row alongside the session-bound one' do
+      result = purge
+
+      expect(SmsLinksUser.where(id: campaign_sms_links_user.id)).to be_empty
+      expect(result.counts[:sms_links_users]).to eq(2)
+    end
+
+    it 'destroys the user shell, because no link row is left to block it' do
+      result = purge
+
+      expect(result).to be_user_destroyed
+      expect(User.where(id: guest.id)).to be_empty
+    end
+
+    it "leaves another intervention's campaign link alone" do
+      foreign_sms_links_user
+
+      purge
+
+      expect(SmsLinksUser.where(id: foreign_sms_links_user.id)).to be_present
+    end
+  end
+
   # `test_run` is user-level, but the link that sets it is per-intervention and one guest identity spans several.
   describe 'a marked guest who also filled a different intervention' do
     let_it_be(:other_intervention) { create(:intervention, status: :published, shared_to: :anyone) }

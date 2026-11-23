@@ -64,7 +64,7 @@ FactoryBot.define do
 
     trait :with_phone do
       after(:build) do |user|
-        Phone.create!(user: user, iso: 'PL', prefix: '+48', number: '777888999', confirmed: true)
+        Phone.create!(user: user, iso: 'PL', prefix: '+48', number: '512345678', confirmed: true)
       end
     end
 

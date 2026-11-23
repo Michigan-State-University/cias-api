@@ -5,6 +5,5 @@ FactoryBot.define do
     association(:sms_link)
     association(:user)
     sequence(:entered_timestamps) { [] }
-    sequence(:slug) { Faker::Alphanumeric }
   end
 end

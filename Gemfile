@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '3.3.8'
+ruby '3.3.14'
 gem 'bundler', '~> 2.4.22'
 
 gem 'rails', '~> 8.1.4'

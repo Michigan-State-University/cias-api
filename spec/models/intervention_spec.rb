@@ -406,4 +406,25 @@ RSpec.describe Intervention, type: :model do
       end
     end
   end
+
+  describe 'sms_campaigns association' do
+    it 'has many sms_campaigns destroyed with the intervention' do
+      expect(described_class.new).to have_many(:sms_campaigns)
+        .class_name('PredefinedParticipants::SmsCampaign').dependent(:destroy)
+    end
+
+    it 'scopes campaigns to the intervention' do
+      intervention = create(:intervention, :published)
+      other = create(:intervention, :published)
+      own = create(:pdp_sms_campaign, intervention: intervention)
+      create(:pdp_sms_campaign, intervention: other)
+      expect(intervention.sms_campaigns).to contain_exactly(own)
+    end
+
+    it 'destroys campaigns with the intervention' do
+      campaign = create(:pdp_sms_campaign)
+      campaign.intervention.destroy!
+      expect(PredefinedParticipants::SmsCampaign.exists?(campaign.id)).to be(false)
+    end
+  end
 end

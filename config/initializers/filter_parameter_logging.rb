@@ -9,10 +9,14 @@ Rails.application.config.filter_parameters += %i[
   first_name last_name email uid
   number
   body
+  barcode
   test_link_token
+  slug token url phone
   dob sex zip mrn phone_type patient_id visit_id
   verification_code
 ]
 
-# Twilio SMS webhook sender fields (From, FromZip, ...).
-Rails.application.config.filter_parameters << /\AFrom/
+# Twilio SMS webhook sender/recipient fields (From, To, FromZip, ToCity, ...).
+twilio_phone_and_location_params = /\A(From|To)(?:[A-Z]|\z)/
+
+Rails.application.config.filter_parameters << twilio_phone_and_location_params

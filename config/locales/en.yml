@@ -276,6 +276,21 @@ en:
       bulk_import_validation_error: Bulk import validation failed
       empty_participants_error: CSV contains no participants
       ra_answers_require_published_intervention_error: RA session answers can only be imported when the intervention is published
+    sms_campaigns:
+      errors:
+        intervention_not_published: The intervention must be published to send SMS messages
+        invalid_payload: The SMS campaign is invalid
+        no_recipients: There are no participants eligible for this SMS campaign
+        campaign_in_progress: An SMS campaign of this kind is already in progress
+        daily_cap_exceeded: The daily SMS limit has been reached
+        not_cancellable: Only a scheduled SMS campaign can be cancelled
+        rate_limited: Too many requests, try again later
+    resend:
+      errors:
+        send_failed: The SMS could not be sent
+        too_soon: This participant was messaged recently, try again later
+        sms_not_eligible: The participant's phone number cannot receive text messages
+        sms_opted_out: The participant has opted out of text messages
   session_mailer:
     grant_access_to_a_user:
       subject: You got access and the session is available for completion!
@@ -461,10 +476,21 @@ en:
         not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
         not_found: "Insufficient information for further processing."
+  henry_ford:
+    error:
+      session:
+        not_allowed: "Scanning a code is not available in this session."
+      barcode:
+        patient_id_empty: "Patient ID is empty in barcode"
+        parsing_error: 'Unable to parse patient ID from barcode'
+      patient:
+        identifier_missing: "The patient record returned by the third-party tool is missing the required identifier. Please contact our support team."
+        draft_not_found: "This scan can no longer be confirmed. Please scan the code again or enter your details manually."
   phone_verification: "Your CIAS verification code is: %{verification_code}"
   sms:
     wrong_message: 'You have entered an incorrect code. Please try again.'
     already_signed: 'You are already enrolled in this campaign.'
+    help: 'CIAS: Reply STOP to stop receiving text messages and START to receive them again. Message and data rates may apply.'
     cannot_assign_to_many_campaigns: 'You cannot be enrolled to many SMS campaigns.'
     session_not_found: "Oops! That code doesn't match any of our text plans. Check the spelling and make sure the letters are in the correct case (uppercase/lowercase)"
   exceptions:

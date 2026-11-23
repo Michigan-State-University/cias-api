@@ -74,6 +74,8 @@ module ExceptionHandler
     rescue_from ComplexException do |exc|
       Sentry.capture_exception(exc)
       message = { message: exc.message, details: exc.additional_information }
+      retry_after = exc.additional_information[:retry_after] if exc.additional_information.is_a?(Hash)
+      response.set_header('Retry-After', retry_after.to_s) if retry_after
 
       render json: message, status: exc.status_code || :unprocessable_content
     end
@@ -94,6 +96,14 @@ module ExceptionHandler
     rescue_from ActiveModel::ForbiddenAttributesError do |exc|
       Sentry.capture_exception(exc)
       render json: msg(exc), status: :forbidden
+    end
+
+    rescue_from HenryFord::BarcodeParsingError do |exc|
+      render json: msg(exc), status: :unprocessable_content
+    end
+
+    rescue_from HenryFord::PatientIdentifierMissingError do |exc|
+      render json: msg(exc), status: :unprocessable_content
     end
 
     rescue_from ConcurrentEditException do |exc|
