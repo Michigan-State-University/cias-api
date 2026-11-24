@@ -15,6 +15,7 @@ class QuestionGroup < ApplicationRecord
   attribute :position, :integer, default: 1
   validates :title, :position, presence: true
   default_scope { order(:position) }
+  scope :empty_non_finish, -> { where.not(type: 'QuestionGroup::Finish').where.missing(:questions) }
 
   delegate :ability_to_update_for?, to: :session
 
