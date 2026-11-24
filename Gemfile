@@ -70,6 +70,7 @@ gem 'faraday-multipart'
 gem 'net-imap', '~> 0.5.14'
 gem 'audited'
 gem 'uri', '>= 1.1.1'
+gem 'tzinfo-data'
 
 group :development, :test do
   gem 'bundler-audit'
