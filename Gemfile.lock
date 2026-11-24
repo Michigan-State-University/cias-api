@@ -603,6 +603,8 @@ GEM
       nokogiri (>= 1.6, < 2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2026.6)
+      tzinfo (>= 1.0.0)
     unaccent (0.4.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
@@ -710,6 +712,7 @@ DEPENDENCIES
   test-prof
   timecop
   twilio-ruby (~> 7.9.1)
+  tzinfo-data
   uri (>= 1.1.1)
   webmock
   wicked_pdf
@@ -717,7 +720,7 @@ DEPENDENCIES
   wkhtmltopdf-heroku (= 3.0.0)
 
 RUBY VERSION
-   ruby 3.3.8p144
+   ruby 3.3.14p208
 
 BUNDLED WITH
    2.4.22
