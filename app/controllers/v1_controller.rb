@@ -5,6 +5,7 @@ class V1Controller < ApplicationController
   include ExceptionHandler
   include Pagination
   include Resource
+  include RedirectToWebApp
   include ActionController::Cookies
 
   before_action :authenticate_user!
@@ -65,11 +66,5 @@ class V1Controller < ApplicationController
 
   def invalidate_cache(obj)
     Rails.cache.delete(obj.cache_key)
-  end
-
-  def redirect_to_web_app(message)
-    message.transform_values! { |v| Base64.encode64(v) }
-
-    redirect_to "#{ENV.fetch('WEB_URL', nil)}?#{message.to_query}", allow_other_host: true
   end
 end

@@ -4,13 +4,14 @@ class V1::Auth::PasswordsController < DeviseTokenAuth::PasswordsController
   include Resource
   include Log
   include Auth::Default
+  include Auth::WebAppRedirectUrlCheck
+
+  # Runs after DTA's validate_redirect_url_param, which sets @redirect_url
+  # rubocop:disable Rails/LexicallyScopedActionFilter
+  before_action :validate_web_app_redirect_url, only: %i[create edit]
+  # rubocop:enable Rails/LexicallyScopedActionFilter
 
   protected
-
-  # Due to changes in Rails 7, we need to add allow_other_host while redirecting
-  def redirect_options
-    @redirect_url&.start_with?(ENV.fetch('WEB_URL', nil)) ? { allow_other_host: true } : {}
-  end
 
   def render_create_success
     head :created
@@ -18,5 +19,11 @@ class V1::Auth::PasswordsController < DeviseTokenAuth::PasswordsController
 
   def render_not_found_error
     head :created
+  end
+
+  private
+
+  def redirect_url_to_check
+    @redirect_url
   end
 end
