@@ -4,9 +4,11 @@ class V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsControll
   include Resource
   include Log
   include BlankParams
+  include Auth::WebAppRedirectUrlCheck
   prepend Auth::Default
 
   # rubocop:disable Rails/LexicallyScopedActionFilter
+  before_action :validate_web_app_redirect_url, only: :create
   before_action :check_for_blank_params, only: :create
   before_action :check_if_user_already_invited, only: :create
   # rubocop:enable Rails/LexicallyScopedActionFilter
@@ -29,5 +31,9 @@ class V1::Auth::RegistrationsController < DeviseTokenAuth::RegistrationsControll
 
   def pending_invitation?(user)
     !user.confirmed? && user.invitation_accepted_at.nil?
+  end
+
+  def redirect_url_to_check
+    params.fetch(:confirm_success_url, DeviseTokenAuth.default_confirm_success_url)
   end
 end
