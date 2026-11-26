@@ -14,8 +14,8 @@ RSpec.describe V1::Ehr::VerifyService do
                                                            external_name: 'brukowa'))
   end
   let!(:session) { create(:session, intervention: intervention) }
-  let(:patient_resource) { JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys }
-  let(:appointments_resource) { JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys }
+  let(:patient_resource) { JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys }
+  let(:appointments_resource) { JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys }
   let(:params) do
     {
       first_name: user.first_name,
@@ -33,10 +33,10 @@ RSpec.describe V1::Ehr::VerifyService do
       allow_any_instance_of(Date).to receive(:future?).and_return(true)
 
       allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys
       )
       allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
       )
     end
 
@@ -125,10 +125,10 @@ RSpec.describe V1::Ehr::VerifyService do
   context 'when patient doesn\'t have appointment in the future' do
     before do
       allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys
       )
       allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
       )
     end
 
@@ -175,10 +175,10 @@ RSpec.describe V1::Ehr::VerifyService do
       allow_any_instance_of(Date).to receive(:future?).and_return(true)
 
       allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys
       )
       allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
       )
     end
 
@@ -216,7 +216,7 @@ RSpec.describe V1::Ehr::VerifyService do
     let(:params) { { id: someone_elses_detail.id } }
 
     it 'refuses to confirm it' do
-      expect { subject }.to raise_error(ActiveRecord::RecordNotFound, I18n.t('henry_ford.error.patient.draft_not_found'))
+      expect { subject }.to raise_error(ActiveRecord::RecordNotFound, I18n.t('ehr.error.patient.draft_not_found'))
     end
 
     it 'does not match the user to it' do
@@ -234,7 +234,7 @@ RSpec.describe V1::Ehr::VerifyService do
 
     it 'refuses to confirm it without calling Epic' do
       expect_any_instance_of(Api::EpicOnFhir::Appointments).not_to receive(:call)
-      expect { subject }.to raise_error(ActiveRecord::RecordNotFound, I18n.t('henry_ford.error.patient.draft_not_found'))
+      expect { subject }.to raise_error(ActiveRecord::RecordNotFound, I18n.t('ehr.error.patient.draft_not_found'))
     end
 
     it 'leaves the draft pending and the user unmatched' do
@@ -309,7 +309,7 @@ RSpec.describe V1::Ehr::VerifyService do
       user.update!(hfhs_patient_detail: own_detail)
       allow_any_instance_of(Date).to receive(:future?).and_return(true)
       allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
       )
     end
 
@@ -335,15 +335,15 @@ RSpec.describe V1::Ehr::VerifyService do
       allow_any_instance_of(Date).to receive(:future?).and_return(true)
 
       allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys
       )
       allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-        JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+        JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
       )
     end
 
     it 'stores epic_id in patient detail' do
-      patient_resource = JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+      patient_resource = JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys
       epic_id = patient_resource.dig(:entry, 0, :resource, :id)
 
       result = subject

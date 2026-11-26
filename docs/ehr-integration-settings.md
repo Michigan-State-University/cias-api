@@ -73,7 +73,7 @@ Participants can scan the code printed on the site's patient labels instead of t
 
 | Setting | Value |
 |---|---|
-| `EHR_BARCODE_SCAN_FEATURE_ENABLED` | `1` turns scanning on. Anything else, blank included, leaves it off. |
+| `EHR_BARCODE_SCAN_FEATURE_ENABLED` | `1` (surrounding spaces ignored) turns scanning on. Anything else, blank included, leaves it off. |
 | `EHR_BARCODE_PATIENT_ID_PATTERN` | Where the patient ID sits in the scanned text: a regular expression with a named group `patient_id`. Required when scanning is on. |
 | `EHR_BARCODE_PATIENT_ID_FORMAT` | A regular expression the patient ID must also match. Optional. |
 | `EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM` | FHIR identifier system (OID) of that patient ID. Required when scanning is on. |

@@ -37,10 +37,10 @@ RSpec.describe 'POST /v1/henry_ford/verify and POST /v1/ehr/verify', type: :requ
         allow_any_instance_of(Date).to receive(:future?).and_return(true)
 
         allow_any_instance_of(Api::EpicOnFhir::PatientVerification).to receive(:call).and_return(
-          JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys
+          JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys
         )
         allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-          JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+          JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
         )
 
         request

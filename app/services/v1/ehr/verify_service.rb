@@ -30,7 +30,7 @@ class V1::Ehr::VerifyService
 
     @appointments = Api::EpicOnFhir::Appointments.call(epic_id)
     create_or_find_resource!(epic_id) if @resource.nil?
-    @resource.update!(visit_id: hfhs_visit_id, **confirmation_attributes)
+    @resource.update!(visit_id: ehr_visit_id, **confirmation_attributes)
     assign_patient_details!
     @resource
   end
@@ -49,7 +49,7 @@ class V1::Ehr::VerifyService
     Date.parse(dob).strftime('%Y-%m-%d')
   end
 
-  def hfhs_patient_id
+  def ehr_patient_id
     system_identifier_details&.dig(:value)
   end
 
@@ -58,7 +58,7 @@ class V1::Ehr::VerifyService
                                           .find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }
   end
 
-  def hfhs_visit_id
+  def ehr_visit_id
     appointment = filtered_appointments
                     .sort_by! { |encounter| DateTime.parse(encounter.dig(:resource, :start)) }
                     .first
@@ -108,7 +108,7 @@ class V1::Ehr::VerifyService
     @resource = HfhsPatientDetail.find_by(id: patient_params[:id])
     return if @resource&.epic_id.present? && confirmable_by_user?
 
-    raise ActiveRecord::RecordNotFound, I18n.t('henry_ford.error.patient.draft_not_found')
+    raise ActiveRecord::RecordNotFound, I18n.t('ehr.error.patient.draft_not_found')
   end
 
   def confirmable_by_user?
@@ -122,7 +122,7 @@ class V1::Ehr::VerifyService
   # epic_id stays out of the key so older rows without it are found, not duplicated.
   def create_or_find_resource!(epic_id)
     @resource = HfhsPatientDetail.find_or_create_by!(
-      patient_id: hfhs_patient_id,
+      patient_id: ehr_patient_id,
       first_name: epic_first_name(@patient),
       last_name: epic_last_name(@patient),
       dob: epic_dob(@patient),

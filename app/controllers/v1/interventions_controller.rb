@@ -141,8 +141,7 @@ class V1::InterventionsController < V1Controller
     end
   end
 
-  # ehr_access is the site-neutral name of the hfhs_access column; both are accepted for one release and
-  # ehr_access wins when both are sent.
+  # hfhs_access is still accepted for one release.
   def with_ehr_access_mapped(permitted)
     return permitted unless permitted.key?(:ehr_access)
 

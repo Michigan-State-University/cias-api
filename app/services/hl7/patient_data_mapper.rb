@@ -59,6 +59,6 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
 
   # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.10
   def message_count
-    user_session.answers.hfhs.count
+    user_session.answers.ehr.count
   end
 end

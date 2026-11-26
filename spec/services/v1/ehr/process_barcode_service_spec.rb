@@ -61,7 +61,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
         it 'raises BarcodeParsingError with the parsing error message' do
           expect { subject }.to raise_error(
             Ehr::BarcodeParsingError,
-            I18n.t('henry_ford.error.barcode.parsing_error')
+            I18n.t('ehr.error.barcode.parsing_error')
           )
         end
       end
@@ -73,7 +73,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -84,7 +84,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -95,7 +95,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -117,7 +117,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -128,7 +128,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -153,7 +153,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('henry_ford.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.patient_id_empty')
         )
       end
     end
@@ -185,12 +185,12 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
 
       it 'applies that site\'s format' do
         expect { described_class.call({ barcode: 'ID:Z394;' }) }
-          .to raise_error(Ehr::BarcodeParsingError, I18n.t('henry_ford.error.barcode.parsing_error'))
+          .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
       end
 
       it 'does not read Henry Ford\'s layout' do
         expect { described_class.call({ barcode: '<PtID>12345</PtID>' }) }
-          .to raise_error(Ehr::BarcodeParsingError, I18n.t('henry_ford.error.barcode.patient_id_empty'))
+          .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.patient_id_empty'))
       end
     end
 
@@ -214,7 +214,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       ['Z25|50', 'Z25,50', 'Z25\\50', 'Z25 50', 'Z' * 65].each do |rejected_id|
         it "rejects #{rejected_id.inspect} with the parsing error" do
           expect { described_class.call({ barcode: rejected_id }) }
-            .to raise_error(Ehr::BarcodeParsingError, I18n.t('henry_ford.error.barcode.parsing_error'))
+            .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
         end
       end
     end
@@ -236,7 +236,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       barcode = label.ljust(described_class::MAX_BARCODE_LENGTH + 1, 'x')
 
       expect { described_class.call({ barcode: barcode }) }
-        .to raise_error(Ehr::BarcodeParsingError, I18n.t('henry_ford.error.barcode.parsing_error'))
+        .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
       expect(pattern).not_to have_received(:match)
     end
   end
@@ -250,7 +250,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       allow(Ehr::Settings).to receive(:barcode_patient_id_pattern).and_return(pattern)
 
       expect { described_class.call({ barcode: barcode }) }
-        .to raise_error(Ehr::BarcodeParsingError, I18n.t('henry_ford.error.barcode.parsing_error'))
+        .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
     end
 
     it 'turns a timeout of the format into the parsing error' do
@@ -259,7 +259,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       allow(Ehr::Settings).to receive(:barcode_patient_id_format).and_return(format)
 
       expect { described_class.call({ barcode: barcode }) }
-        .to raise_error(Ehr::BarcodeParsingError, I18n.t('henry_ford.error.barcode.parsing_error'))
+        .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
     end
   end
 

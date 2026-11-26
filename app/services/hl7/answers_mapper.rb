@@ -12,7 +12,7 @@ class Hl7::AnswersMapper < Hl7::BaseMapper
   end
 
   def call
-    user_session.answers.hfhs.map.with_index do |answer, index|
+    user_session.answers.ehr.map.with_index do |answer, index|
       "#{SEGMENT_TYPE}|#{index + 1}|#{VALUE_TYPE}|#{code_desc(answer)}||#{answer_data(answer)}||||||#{OBSERVATION_RESULT_STATUS}|||#{date_of_answer}"
     end
   end

@@ -1,18 +1,7 @@
 # frozen_string_literal: true
 
-# Site-specific EHR values, read from the environment where they are used (never at boot or class
-# load, so a site without an EHR integration still boots).
-#
-# * HL7 values (MSH-4, MSH-6, MSH-11, TXA-2, the OBX-5 prefix) are required and have no defaults: each
-#   site's receiving system assigns its own. A blank value counts as missing, because CI's .env.template
-#   sets blanks. Reading a missing one raises MissingSettingError naming the setting; one that would break
-#   the message structure (see UNSAFE_HL7_VALUE) raises InvalidSettingError.
-# * Site identity (EHR_SITE_NAME, EHR_CSV_PREFIX) falls back to a generic value, never a site's own.
-# * Code scanning is off unless the feature flag EHR_BARCODE_SCAN_FEATURE_ENABLED is 1
-#   (barcode_scan_available?). The barcode values (where the patient ID sits in a scanned code and what a
-#   valid one looks like) have no defaults. A value that isn't a usable regular expression, or starts or
-#   ends with whitespace (it would silently match nothing), raises InvalidSettingError naming the setting,
-#   never its value.
+# Site-specific EHR settings, read when used so a site without an EHR integration still boots.
+# What each one means: docs/ehr-integration-settings.md
 class Ehr::Settings
   MissingSettingError = Class.new(StandardError)
   InvalidSettingError = Class.new(StandardError)
@@ -25,14 +14,11 @@ class Ehr::Settings
     HL7_OBSERVATION_VALUE_PREFIX
   ].freeze
 
-  # An HL7 value must not contain the field (|) or repetition (~) separator, a line break (the segment
-  # separator) or a double quote (HL7's null marker; usually a value pasted with its quotes), and must not
-  # start or end with whitespace. The component (^), subcomponent (&) and escape (\) characters stay
-  # allowed: HD/CWE values and the OBX-5 prefix (ED source application) use them.
+  # " is HL7's null marker (usually a value pasted with its quotes); ^, & and \ stay allowed: HD/CWE
+  # values and the OBX-5 prefix use them.
   UNSAFE_HL7_VALUE = /[|~\r\n"]|\A[[:space:]]|[[:space:]]\z/
 
   DEFAULT_SITE_NAME = 'EHR'
-  # Distinct from a likely session variable: CSV columns are "<session variable>.<question variable>".
   DEFAULT_CSV_PREFIX = 'ehr_patient'
 
   BARCODE_PATIENT_ID_PATTERN = 'EHR_BARCODE_PATIENT_ID_PATTERN'
@@ -41,22 +27,16 @@ class Ehr::Settings
   BARCODE_SCAN_FEATURE_FLAG = 'EHR_BARCODE_SCAN_FEATURE_ENABLED'
   BARCODE_SCAN_REQUIRED_SETTINGS = [BARCODE_PATIENT_ID_PATTERN, BARCODE_IDENTIFIER_SYSTEM].freeze
   BARCODE_PATIENT_ID_GROUP = 'patient_id'
-  # Seconds; the barcode regexes run on participant input.
+  # Seconds; the barcode regexes run on participant input (ReDoS).
   BARCODE_REGEXP_TIMEOUT = 0.1
-  # Like the HL7 values: a pasted value with a stray space or line break would quietly reject every scan.
   SURROUNDING_WHITESPACE = /\A[[:space:]]|[[:space:]]\z/
 
   class << self
-    # The setting's value; nil when it is blank or unset.
     def fetch(name)
       ENV.fetch(name, nil).presence
     end
 
-    # Like fetch, for a setting a send can't do without (the receiver URLs): reports to Sentry and the log,
-    # then raises MissingSettingError naming the setting instead of returning nil. A nil URL would
-    # otherwise reach Faraday, which connects to localhost and fails with an error that names no setting.
-    # The report is explicit for the same reason as in ensure_hl7_values!: the sending job retries and
-    # sentry-rails does not report retried job errors. Setting names only, never their values.
+    # Reported explicitly: the sending job retries, and sentry-rails skips retried job errors.
     def fetch!(name)
       value = fetch(name)
       return value if value
@@ -68,27 +48,22 @@ class Ehr::Settings
       raise MissingSettingError, error
     end
 
-    # MSH-4
     def hl7_sending_facility
       required('HL7_SENDING_FACILITY')
     end
 
-    # MSH-6
     def hl7_receiving_facility
       required('HL7_RECEIVING_FACILITY')
     end
 
-    # MSH-11 (P production, T training/test)
     def hl7_processing_id
       required('HL7_PROCESSING_ID')
     end
 
-    # TXA-2
     def hl7_document_type
       required('HL7_DOCUMENT_TYPE')
     end
 
-    # OBX-5 prefix of the encapsulated PDF report
     def hl7_observation_value_prefix
       required('HL7_OBSERVATION_VALUE_PREFIX')
     end
@@ -101,7 +76,6 @@ class Ehr::Settings
       ENV.fetch('EHR_CSV_PREFIX', nil).presence || DEFAULT_CSV_PREFIX
     end
 
-    # On only at exactly 1; surrounding whitespace is ignored, like the web build's flags.
     def barcode_scan_enabled?
       ENV.fetch(BARCODE_SCAN_FEATURE_FLAG, nil).to_s.strip == '1'
     end
@@ -110,8 +84,6 @@ class Ehr::Settings
       BARCODE_SCAN_REQUIRED_SETTINGS.select { |name| ENV.fetch(name, nil).blank? }
     end
 
-    # Flag off is a normal state and stays silent. Flag on with a required setting blank is a misconfiguration:
-    # logged and reported to Sentry by setting name, never value. Non-blank values are checked when read.
     def barcode_scan_available?
       return false unless barcode_scan_enabled?
 
@@ -124,7 +96,6 @@ class Ehr::Settings
       false
     end
 
-    # Where the patient ID sits in the scanned text: a regex with the named group patient_id.
     def barcode_patient_id_pattern
       pattern = barcode_regexp(BARCODE_PATIENT_ID_PATTERN)
       raise MissingSettingError, "#{BARCODE_PATIENT_ID_PATTERN} is not set" if pattern.nil?
@@ -135,7 +106,6 @@ class Ehr::Settings
       pattern
     end
 
-    # What a valid patient ID looks like; nil when blank.
     def barcode_patient_id_format
       barcode_regexp(BARCODE_PATIENT_ID_FORMAT)
     end
@@ -148,11 +118,7 @@ class Ehr::Settings
       HL7_REQUIRED_SETTINGS.select { |name| fetch(name)&.match?(UNSAFE_HL7_VALUE) }
     end
 
-    # Called once before anything is sent. The sending job retries (ApplicationJob: StandardError,
-    # 10 attempts 1 h apart) and sentry-rails does not report retried job errors, so without the explicit
-    # Sentry message a missing value stays invisible for about 9 hours; checking all values up front also
-    # stops a report-only value from failing after the answers message (PHI) has already gone out.
-    # Setting names only, never their values or message content.
+    # Checked before the answers (PHI) go out, so a report-only value can't fail halfway; reported like fetch!.
     def ensure_hl7_values!
       missing = missing_hl7_settings
       invalid = invalid_hl7_settings
@@ -177,7 +143,7 @@ class Ehr::Settings
       value
     end
 
-    # cause: nil keeps RegexpError, whose message quotes the value, out of Sentry's exception chain.
+    # cause: nil keeps RegexpError, whose message quotes the value, out of Sentry.
     def barcode_regexp(name)
       value = ENV.fetch(name, nil)
       return if value.blank?

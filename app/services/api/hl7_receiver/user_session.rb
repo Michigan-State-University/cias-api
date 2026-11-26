@@ -12,7 +12,7 @@ class Api::Hl7Receiver::UserSession
   end
 
   def call
-    return if no_data_to_hfhs?
+    return if no_ehr_answers?
 
     token = Api::Hl7Receiver::Authentication.call
     if token.nil?
@@ -66,7 +66,7 @@ class Api::Hl7Receiver::UserSession
     Hl7::UserSessionMapper.call(user_session_id)
   end
 
-  def no_data_to_hfhs?
-    user_session.answers.where(type: 'Answer::HenryFord').blank?
+  def no_ehr_answers?
+    user_session.answers.ehr.none?
   end
 end

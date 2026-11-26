@@ -14,7 +14,7 @@ class V1::Ehr::PatientDetailsController < V1Controller
 
   def verify_by_code
     authorize! :read, UserSession
-    authorize_hfhs_scan_session!
+    authorize_ehr_scan_session!
 
     result = V1::Ehr::HandleBarCodeService.call(current_v1_user, verify_code_params)
 
@@ -35,10 +35,10 @@ class V1::Ehr::PatientDetailsController < V1Controller
     params[:session_id]
   end
 
-  def authorize_hfhs_scan_session!
+  def authorize_ehr_scan_session!
     return if Ehr::Settings.barcode_scan_available? && scan_allowed_in?(Session.find_by(id: params.require(:session_id)))
 
-    raise CanCan::AccessDenied, I18n.t('henry_ford.error.session.not_allowed')
+    raise CanCan::AccessDenied, I18n.t('ehr.error.session.not_allowed')
   end
 
   def scan_allowed_in?(session)

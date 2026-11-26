@@ -30,7 +30,7 @@ class V1::Ehr::HandleBarCodeService
   # Always a new draft: a scanned label must never reach an existing record.
   def create_draft_patient_record(epic_response)
     draft = HfhsPatientDetail.create!(
-      patient_id: hfhs_patient_id(epic_response),
+      patient_id: ehr_patient_id(epic_response),
       first_name: epic_first_name(epic_response),
       last_name: epic_last_name(epic_response),
       dob: epic_dob(epic_response),
@@ -51,7 +51,7 @@ class V1::Ehr::HandleBarCodeService
     Ehr::ClearAbandonedPatientDetailsJob.set(wait: Ehr::ClearAbandonedPatientDetailsJob::RETENTION_PERIOD + 1.hour).perform_later
   end
 
-  def hfhs_patient_id(epic_response)
+  def ehr_patient_id(epic_response)
     identifier = epic_response.dig(:entry, 0, :resource, :identifier).to_a.
                  find { |system_identifier| system_identifier.dig(:type, :text) == SYSTEM_IDENTIFIER }&.
                  dig(:value)

@@ -23,7 +23,7 @@ class Hl7::ReportMapper < Hl7::BaseMapper
   def call
     %W[
       #{FIRST_SEGMENT_TYPE}||#{PATIENT_CLASS}|||||||||||||||||#{visit_id}
-      #{SECOND_SEGMENT_TYPE}||#{document_type}||#{finish_date}||||||||#{hfhs_patient_id}|||||#{DOCUMENT_COMPLETION_STATUS}||#{DOCUMENT_AVAILABILITY_STATUS}
+      #{SECOND_SEGMENT_TYPE}||#{document_type}||#{finish_date}||||||||#{ehr_patient_id}|||||#{DOCUMENT_COMPLETION_STATUS}||#{DOCUMENT_AVAILABILITY_STATUS}
       #{THIRD_SEGMENT_TYPE}|1|#{OBX_VALUE_TYPE}|||#{observation_value_prefix}^#{file_base64}
     ]
   end
@@ -32,12 +32,12 @@ class Hl7::ReportMapper < Hl7::BaseMapper
 
   private
 
-  # TXA-2, assigned by the receiving site -> https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/TXA.2
+  # TXA-2 -> https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/TXA.2
   def document_type
     Ehr::Settings.hl7_document_type
   end
 
-  # OBX-5 prefix before the base64 PDF, assigned by the receiving site -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/OBX
+  # OBX-5 prefix -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/OBX
   def observation_value_prefix
     Ehr::Settings.hl7_observation_value_prefix
   end
@@ -50,7 +50,7 @@ class Hl7::ReportMapper < Hl7::BaseMapper
     report.created_at.in_time_zone(report_timezone).strftime('%Y%m%d%H%M')
   end
 
-  def hfhs_patient_id
+  def ehr_patient_id
     user_session.user.hfhs_patient_detail.patient_id
   end
 

@@ -13,7 +13,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
       let(:headers) { user.create_new_auth_token }
       let(:valid_barcode) { '<PtID>Z394</PtID><PtDAT>54348</PtDAT><UID> ' }
       let(:hfhs_access) { true }
-      let(:hf_session) { create(:session, intervention: create(:intervention, hfhs_access: hfhs_access)) }
+      let(:ehr_session) { create(:session, intervention: create(:intervention, hfhs_access: hfhs_access)) }
       let(:with_initial_question) { true }
       let(:with_user_session) { true }
       let(:params) do
@@ -21,7 +21,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
           hfhs_patient_data: {
             barcode: valid_barcode
           },
-          session_id: hf_session.id
+          session_id: ehr_session.id
         }
       end
 
@@ -74,8 +74,8 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
       let(:request) { post path, params: params, headers: headers }
 
       before do
-        create(:question_henry_ford_initial_screen, question_group: create(:question_group, session: hf_session)) if with_initial_question
-        create(:user_session, user: user, session: hf_session) if with_user_session
+        create(:question_henry_ford_initial_screen, question_group: create(:question_group, session: ehr_session)) if with_initial_question
+        create(:user_session, user: user, session: ehr_session) if with_user_session
       end
 
       context 'when epic returns one patient' do
@@ -160,7 +160,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
                 hfhs_patient_data: {
                   barcode: ''
                 },
-                session_id: hf_session.id
+                session_id: ehr_session.id
               }
             end
 
@@ -175,7 +175,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
                 hfhs_patient_data: {
                   barcode: nil
                 },
-                session_id: hf_session.id
+                session_id: ehr_session.id
               }
             end
 
@@ -190,7 +190,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
                 hfhs_patient_data: {
                   barcode: 'invalid_barcode_format'
                 },
-                session_id: hf_session.id
+                session_id: ehr_session.id
               }
             end
 
@@ -205,7 +205,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
                 hfhs_patient_data: {
                   barcode: '<PtDAT>54348</PtDAT><UID> '
                 },
-                session_id: hf_session.id
+                session_id: ehr_session.id
               }
             end
 
@@ -269,7 +269,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
             let(:params) do
               {
                 hfhs_patient_data: {},
-                session_id: hf_session.id
+                session_id: ehr_session.id
               }
             end
 
@@ -308,7 +308,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
         shared_examples 'a refused scan' do
           it 'returns forbidden with the translated message and looks nobody up' do
             expect(response).to have_http_status(:forbidden)
-            expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.session.not_allowed'))
+            expect(response.parsed_body['message']).to eq(I18n.t('ehr.error.session.not_allowed'))
             expect(HfhsPatientDetail.count).to eq(0)
           end
         end
@@ -375,7 +375,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
 
         it 'returns unprocessable entity with the translated message' do
           expect(response).to have_http_status(:unprocessable_content)
-          expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.patient.identifier_missing'))
+          expect(response.parsed_body['message']).to eq(I18n.t('ehr.error.patient.identifier_missing'))
           expect(HfhsPatientDetail.count).to eq(0)
         end
       end
@@ -392,7 +392,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
           it 'refuses like an unavailable session, with no Epic call, draft or expiry job' do
             expect { request }.not_to have_enqueued_job(Ehr::ClearAbandonedPatientDetailsJob)
             expect(response).to have_http_status(:forbidden)
-            expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.session.not_allowed'))
+            expect(response.parsed_body['message']).to eq(I18n.t('ehr.error.session.not_allowed'))
             expect(Api::EpicOnFhir::PatientSearch).not_to have_received(:call)
             expect(Api::EpicOnFhir::Authentication).not_to have_received(:call)
             expect(HfhsPatientDetail.count).to eq(0)
@@ -426,7 +426,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
             request
 
             expect(response).to have_http_status(:forbidden)
-            expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.session.not_allowed'))
+            expect(response.parsed_body['message']).to eq(I18n.t('ehr.error.session.not_allowed'))
             expect(Sentry).not_to have_received(:capture_message)
             expect(Sentry).not_to have_received(:capture_exception)
           end
@@ -472,7 +472,7 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
 
         it 'is rejected before Epic is asked' do
           expect(response).to have_http_status(:unprocessable_content)
-          expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.barcode.parsing_error'))
+          expect(response.parsed_body['message']).to eq(I18n.t('ehr.error.barcode.parsing_error'))
           expect(HfhsPatientDetail.count).to eq(0)
         end
       end

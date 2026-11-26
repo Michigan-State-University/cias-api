@@ -386,9 +386,9 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
       }
     end
 
-    describe '#hfhs_patient_id' do
+    describe '#ehr_patient_id' do
       it 'extracts patient ID from EPIC response based on system identifier' do
-        result = service.send(:hfhs_patient_id, epic_response)
+        result = service.send(:ehr_patient_id, epic_response)
         expect(result).to eq('test-patient-id-123')
       end
 
@@ -411,7 +411,7 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
         end
 
         it 'raises PatientIdentifierMissingError' do
-          expect { service.send(:hfhs_patient_id, epic_response_no_match) }.
+          expect { service.send(:ehr_patient_id, epic_response_no_match) }.
             to raise_error(Ehr::PatientIdentifierMissingError)
         end
       end
@@ -430,7 +430,7 @@ RSpec.describe V1::Ehr::HandleBarCodeService do
         end
 
         it 'raises PatientIdentifierMissingError' do
-          expect { service.send(:hfhs_patient_id, epic_response_empty_identifiers) }.
+          expect { service.send(:ehr_patient_id, epic_response_empty_identifiers) }.
             to raise_error(Ehr::PatientIdentifierMissingError)
         end
       end

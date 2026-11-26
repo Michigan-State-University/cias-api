@@ -58,11 +58,11 @@ module Log::UserRequest
     params.delete(:current_password)
     params[:sms_plan]&.delete(:no_formula_attachment)
     params[:variant]&.delete(:attachment)
-    erase_hfhs_barcode
+    erase_ehr_barcode
   end
 
   # JSON requests also carry a ParamsWrapper copy under :patient_detail.
-  def erase_hfhs_barcode
+  def erase_ehr_barcode
     wrapped = params[:patient_detail]
     [params[:hfhs_patient_data], (wrapped[:hfhs_patient_data] if wrapped.is_a?(ActionController::Parameters))].each do |data|
       data.delete(:barcode) if data.is_a?(ActionController::Parameters)

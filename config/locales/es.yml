@@ -18,7 +18,7 @@ es:
       header: "Los nuevos informes del sistema están listos para usted"
       body: "Tiene %{number_of_generated_reports} nuevo(s) informe(s) disponible(s) para descargar en su panel. Haga clic en el siguiente enlace para visitar su panel de control."
       button_text: Visitar el panel
-  henry_ford:
+  ehr:
     error:
       session:
         not_allowed: "El escaneo de un código no está disponible en esta sesión."

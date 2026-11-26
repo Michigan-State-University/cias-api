@@ -12,7 +12,7 @@ RSpec.describe 'Aztec code scan and confirm', type: :request do
 
   let(:scanner) { create(:user, :confirmed, :guest) }
   let(:barcode) { '<PtID>      Z2550</PtID><PtDAT>54348</PtDAT><UID> ML337156</UID>' }
-  let(:patient_resource) { JSON.parse(File.read('spec/fixtures/integrations/henry_ford/patient_resource.json')).deep_symbolize_keys }
+  let(:patient_resource) { JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json')).deep_symbolize_keys }
   let(:epic_id) { patient_resource.dig(:entry, 0, :resource, :id) }
   let(:search_bundle) { patient_resource.merge(total: 1) }
   let!(:session) do
@@ -30,7 +30,7 @@ RSpec.describe 'Aztec code scan and confirm', type: :request do
     allow_any_instance_of(Date).to receive(:future?).and_return(true)
     allow_any_instance_of(Api::EpicOnFhir::PatientSearch).to receive(:call).and_return(search_bundle)
     allow_any_instance_of(Api::EpicOnFhir::Appointments).to receive(:call).and_return(
-      JSON.parse(File.read('spec/fixtures/integrations/henry_ford/appointments.json')).deep_symbolize_keys
+      JSON.parse(File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json')).deep_symbolize_keys
     )
   end
 
@@ -74,7 +74,7 @@ RSpec.describe 'Aztec code scan and confirm', type: :request do
     continue(intruder, draft_id)
 
     expect(response).to have_http_status(:not_found)
-    expect(response.parsed_body['message']).to eq(I18n.t('henry_ford.error.patient.draft_not_found'))
+    expect(response.parsed_body['message']).to eq(I18n.t('ehr.error.patient.draft_not_found'))
     expect(intruder.reload.hfhs_patient_detail).to be_nil
     expect(HfhsPatientDetail.find(draft_id).pending).to be true
   end
