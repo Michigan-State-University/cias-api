@@ -56,10 +56,7 @@ class V1::QuestionsController < V1Controller
 
     return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
-    SqlQuery.new(
-      'resource/question_bulk_update',
-      values: position_params[:position]
-    ).execute
+    V1::Question::Move.call(session_load, position_params[:position])
     render json: serialized_response(question_groups_scope, 'QuestionGroup')
   end
 

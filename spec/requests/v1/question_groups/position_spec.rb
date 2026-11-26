@@ -66,5 +66,97 @@ describe 'PATCH /v1/sessions/:session_id/question_groups/position', type: :reque
 
       it { expect(response).to have_http_status(:bad_request) }
     end
+
+    context 'when a group of another session is in the list' do
+      let(:other_group) { create(:question_group, session: create(:session, intervention: session.intervention), position: 9) }
+      let(:params) { { question_group: { position: [{ id: question_group1.id, position: 6 }, { id: other_group.id, position: 1 }] } } }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:not_found) }
+
+      it 'does not change positions' do
+        expect([question_group1.reload.position, other_group.reload.position]).to eq [3, 9]
+      end
+    end
+
+    context 'when a position is not a whole number' do
+      let(:params) { { question_group: { position: [{ id: question_group1.id, position: 'abc' }] } } }
+
+      before { request }
+
+      it { expect(response).to have_http_status(:unprocessable_content) }
+      it { expect(question_group1.reload.position).to eq 3 }
+    end
+
+    it 'updates the positions in one statement, without audits or versions' do
+      statements = []
+      callback = ->(*, payload) { statements << payload[:sql] if payload[:sql].start_with?('UPDATE "question_groups"') }
+
+      expect { ActiveSupport::Notifications.subscribed(callback, 'sql.active_record') { request } }.not_to(change do
+        [Audited::Audit.where(auditable_type: 'QuestionGroup').count, PaperTrail::Version.where(item_type: 'QuestionGroup').count]
+      end)
+      expect(statements.size).to eq 1
+    end
+  end
+
+  context 'when the session belongs to another researcher' do
+    let(:other_researcher) { create(:user, :researcher) }
+    let(:request) do
+      patch position_v1_session_question_groups_path(session_id: session.id), params: params,
+                                                                              headers: other_researcher.create_new_auth_token
+    end
+
+    before { request }
+
+    it { expect(response).to have_http_status(:not_found) }
+    it { expect(question_group1.reload.position).to eq 3 }
+  end
+
+  context 'when a collaborator can only view the intervention' do
+    let(:viewer) { create(:user, :researcher) }
+    let(:request) do
+      patch position_v1_session_question_groups_path(session_id: session.id), params: params,
+                                                                              headers: viewer.create_new_auth_token
+    end
+
+    before do
+      create(:collaborator, intervention: session.intervention, user: viewer, view: true, edit: false)
+      request
+    end
+
+    it { expect(response).to have_http_status(:forbidden) }
+    it { expect(question_group1.reload.position).to eq 3 }
+  end
+
+  context 'when an edit collaborator is not the current editor' do
+    let(:collaborator) { create(:user, :researcher) }
+    let(:request) do
+      patch position_v1_session_question_groups_path(session_id: session.id), params: params,
+                                                                              headers: collaborator.create_new_auth_token
+    end
+
+    before do
+      create(:collaborator, intervention: session.intervention, user: collaborator, edit: true)
+      request
+    end
+
+    it { expect(response).to have_http_status(:forbidden) }
+    it { expect(question_group1.reload.position).to eq 3 }
+  end
+
+  context 'when an e-intervention admin of the organization can read the session but cannot update it' do
+    let(:organization) { create(:organization) }
+    let!(:session) { create(:session, intervention: create(:intervention, user: user, organization: organization)) }
+    let(:e_intervention_admin) { create(:user, :confirmed, roles: %w[researcher e_intervention_admin], organizable: organization) }
+    let(:request) do
+      patch position_v1_session_question_groups_path(session_id: session.id), params: params,
+                                                                              headers: e_intervention_admin.create_new_auth_token
+    end
+
+    before { request }
+
+    it { expect(response).to have_http_status(:forbidden) }
+    it { expect(question_group1.reload.position).to eq 3 }
   end
 end

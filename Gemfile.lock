@@ -588,8 +588,6 @@ GEM
     simplecov_json_formatter (0.1.4)
     simpleidn (0.2.3)
     slop (4.10.1)
-    sql_query (0.7.4)
-      activerecord (>= 3.2)
     test-prof (1.6.4)
       logger
     thor (1.5.0)
@@ -605,6 +603,8 @@ GEM
       nokogiri (>= 1.6, < 2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2026.6)
+      tzinfo (>= 1.0.0)
     unaccent (0.4.0)
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
@@ -709,10 +709,10 @@ DEPENDENCIES
   shoulda-matchers
   sidekiq (>= 7.3.3)
   simplecov
-  sql_query
   test-prof
   timecop
   twilio-ruby (~> 7.9.1)
+  tzinfo-data
   uri (>= 1.1.1)
   webmock
   wicked_pdf
@@ -720,7 +720,7 @@ DEPENDENCIES
   wkhtmltopdf-heroku (= 3.0.0)
 
 RUBY VERSION
-   ruby 3.3.8p144
+   ruby 3.3.14p208
 
 BUNDLED WITH
    2.4.22

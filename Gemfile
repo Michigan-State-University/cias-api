@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-ruby '3.3.8'
+ruby '3.3.14'
 gem 'bundler', '~> 2.4.22'
 
 gem 'rails', '~> 8.1.4'
@@ -40,7 +40,6 @@ gem 'phonelib'
 gem 'rack-cors'
 gem 'redis', '~> 5.4'
 gem 'sidekiq', '>= 7.3.3'
-gem 'sql_query'
 gem 'twilio-ruby', '~> 7.9.1'
 gem 'wicked_pdf'
 gem 'rack', '>= 3.1.18'
@@ -70,6 +69,7 @@ gem 'faraday-multipart'
 gem 'net-imap', '~> 0.5.14'
 gem 'audited'
 gem 'uri', '>= 1.1.1'
+gem 'tzinfo-data'
 
 group :development, :test do
   gem 'bundler-audit'

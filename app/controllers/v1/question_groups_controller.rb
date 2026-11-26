@@ -22,7 +22,7 @@ class V1::QuestionGroupsController < V1Controller
     return head :forbidden unless session_load.ability_to_update_for?(current_v1_user)
 
     question_group = V1::QuestionGroup::CreateService.call(question_group_params, questions_scope, new_questions_params, session_load)
-    SqlQuery.new('question_group/question_group_pure_empty').execute
+    session_load.question_groups.empty_non_finish.delete_all
 
     render json: question_group_response(question_group.reload), action: :show,
            status: :created
@@ -140,6 +140,16 @@ class V1::QuestionGroupsController < V1Controller
 
   def session_load
     @session_load ||= Session.accessible_by(current_ability).find(session_id)
+  end
+
+  def position_scope
+    authorize! :update, session_load
+
+    session_load.question_groups
+  end
+
+  def ability_to_update?
+    session_load.ability_to_update_for?(current_v1_user)
   end
 
   def new_questions_params

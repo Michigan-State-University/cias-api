@@ -90,22 +90,26 @@ class V1::SessionsController < V1Controller
     render json: serialized_response(updated_sessions.reload)
   end
 
-  def position
-    position_values = position_params[:position]
+  private
 
-    ra_session_ids = intervention.sessions.where(type: 'Session::ResearchAssistant').pluck(:id)
-    if position_values.any? { |v| ra_session_ids.include?(v[:id]) }
-      raise ComplexException.new(I18n.t('sessions.ra_cannot_reposition'), {}, :unprocessable_content)
-    end
+  def position_scope
+    authorize! :update, intervention
 
-    if position_values.any? { |v| v[:position].to_i.zero? && ra_session_ids.exclude?(v[:id]) }
-      raise ComplexException.new(I18n.t('sessions.position_zero_reserved'), {}, :unprocessable_content)
-    end
-
-    super
+    intervention.sessions
   end
 
-  private
+  def ability_to_update?
+    intervention.ability_to_update_for?(current_v1_user)
+  end
+
+  def validate_positions!(position_values)
+    rows = V1::Positions::Rows.new(position_values)
+    ra_session_ids = intervention.sessions.where(type: 'Session::ResearchAssistant').pluck(:id)
+    raise ComplexException.new(I18n.t('sessions.ra_cannot_reposition'), {}, :unprocessable_content) if rows.ids.intersect?(ra_session_ids)
+    return unless rows.column(:position).include?(0)
+
+    raise ComplexException.new(I18n.t('sessions.position_zero_reserved'), {}, :unprocessable_content)
+  end
 
   def variable_filter_options
     params.permit(:only_digit_variables, :question_id, :include_current_question, allow_list: [])

@@ -170,4 +170,14 @@ describe 'POST /v1/sessions/:session_id/question_groups', type: :request do
       end
     end
   end
+
+  context 'when the new group takes all questions of an existing group' do
+    it 'deletes the emptied group of this session and keeps empty groups of other sessions' do
+      request
+
+      expect(response).to have_http_status(:created)
+      expect(QuestionGroup.exists?(question_group.id)).to be false
+      expect(QuestionGroup.exists?(other_question_group.id)).to be true
+    end
+  end
 end
