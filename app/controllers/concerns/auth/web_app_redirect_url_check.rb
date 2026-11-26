@@ -39,7 +39,6 @@ module Auth::WebAppRedirectUrlCheck
 
     Rails.logger.warn("Redirect URL rejected in #{controller_path}##{action_name}")
 
-    # GET actions are links opened from an e-mail, not API calls
     if request.get?
       redirect_to_web_app(error: I18n.t('users.redirect_url.invalid_link'))
     else
