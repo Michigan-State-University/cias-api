@@ -27,6 +27,15 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
 
   let(:request) { post v1_user_session_answers_path(user_session.id), headers: user.create_new_auth_token, params: params }
 
+  shared_examples 'a rejected answer' do |status|
+    it "returns #{status} and writes nothing" do
+      user_session
+      expect { request }.to avoid_changing { Answer.unscoped.order(:id).pluck(:id, :updated_at) }
+        .and avoid_changing { user_session.reload.last_answer_at }
+      expect(response).to have_http_status(status)
+    end
+  end
+
   context 'UserSession::Classic' do
     let(:session) { create(:session, intervention_id: intervention.id) }
     let(:question_group) { create(:question_group, session: session) }
@@ -163,6 +172,135 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
     end
   end
 
+  context 'when the owner answers' do
+    let(:intervention) { create(:intervention, :published, user_id: researcher.id) }
+    let(:session) { create(:session, intervention: intervention) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:question) { create(:question_single, question_group: question_group) }
+    let(:question_id) { question.id }
+    let(:user_session) { create(:user_session, user: user, session: session) }
+
+    %i[guest participant predefined_participant].each do |role|
+      context "as a #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+
+        it 'saves the answer' do
+          expect { request }.to change { user_session.answers.count }.by(1)
+          expect(response).to have_http_status(:created)
+        end
+      end
+    end
+
+    context 'as a preview user' do
+      let(:intervention) { create(:intervention, user_id: researcher.id) }
+      let(:user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+
+      it 'saves the answer' do
+        expect { request }.to change { user_session.answers.count }.by(1)
+        expect(response).to have_http_status(:created)
+      end
+    end
+  end
+
+  context 'when an admin answers a participant session' do
+    let(:session) { create(:session, intervention: intervention) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:question) { create(:question_single, question_group: question_group) }
+    let(:question_id) { question.id }
+    let(:user_session) { create(:user_session, user: participant, session: session) }
+    let(:user) { create(:user, :confirmed, :admin) }
+
+    it 'saves the answer' do
+      expect { request }.to change { user_session.answers.count }.by(1)
+      expect(response).to have_http_status(:created)
+    end
+  end
+
+  context 'when the caller does not own the user session' do
+    let(:team) { create(:team) }
+    let(:researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
+    let(:intervention) { create(:intervention, :published, user_id: researcher.id) }
+    let(:session) { create(:session, intervention: intervention, autofinish_enabled: true) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:question) { create(:question_single, question_group: question_group) }
+    let(:question_id) { question.id }
+    let(:owner) { participant }
+    let(:finished_at) { nil }
+    let(:user_session) do
+      create(:user_session, user: owner, session: session, last_answer_at: 1.day.ago, finished_at: finished_at)
+    end
+    let(:user) { create(:user, :confirmed, :participant) }
+
+    before { create(:answer_single, user_session: user_session, question: question, draft: true) }
+
+    %i[guest participant predefined_participant].each do |role|
+      context "and is a #{role}" do
+        let(:user) { create(:user, :confirmed, role) }
+
+        it_behaves_like 'a rejected answer', :forbidden
+      end
+    end
+
+    context 'and is the researcher who owns the intervention' do
+      let(:user) { researcher }
+
+      it_behaves_like 'a rejected answer', :forbidden
+    end
+
+    context 'and is a collaborator with data access to the intervention' do
+      let(:user) { create(:user, :confirmed, :researcher) }
+
+      before { create(:collaborator, user: user, intervention: intervention, data_access: true) }
+
+      it_behaves_like 'a rejected answer', :forbidden
+    end
+
+    context "and is the team admin of the intervention owner's team" do
+      let(:user) { team.team_admin }
+
+      it_behaves_like 'a rejected answer', :forbidden
+    end
+
+    context 'and both are preview users of the same session' do
+      let(:intervention) { create(:intervention, user_id: researcher.id) }
+      let(:owner) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+      let(:user) { create(:user, :confirmed, :preview_session, preview_session_id: session.id) }
+
+      it_behaves_like 'a rejected answer', :forbidden
+    end
+
+    context 'and the intervention is paused' do
+      let(:intervention) { create(:intervention, :paused, user_id: researcher.id) }
+
+      it_behaves_like 'a rejected answer', :forbidden
+    end
+
+    context 'and the user session is finished' do
+      let(:finished_at) { 1.hour.ago }
+
+      it_behaves_like 'a rejected answer', :forbidden
+    end
+  end
+
+  context 'when the question belongs to another session' do
+    let(:session) { create(:session, intervention: intervention, autofinish_enabled: true) }
+    let(:user_session) { create(:user_session, user: user, session: session, last_answer_at: 1.day.ago) }
+    let(:foreign_question) { create(:question_single, question_group: create(:question_group, session: other_session)) }
+    let(:question_id) { foreign_question.id }
+
+    context 'of the same intervention' do
+      let(:other_session) { create(:session, intervention: intervention) }
+
+      it_behaves_like 'a rejected answer', :not_found
+    end
+
+    context 'of another intervention' do
+      let(:other_session) { create(:session) }
+
+      it_behaves_like 'a rejected answer', :not_found
+    end
+  end
+
   context 'UserSession::CatMh' do
     let(:session) { create(:cat_mh_session, :with_cat_mh_info, intervention: intervention) }
     let(:user_int) { create(:user_intervention, intervention: intervention, user: user) }
@@ -178,6 +316,20 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
 
     it 'not add an answer to db' do
       expect { request }.not_to change(Answer, :count)
+    end
+
+    context 'when the caller does not own the user session' do
+      let(:user) { create(:user, :confirmed, :participant) }
+      let(:user_int) { create(:user_intervention, intervention: intervention, user: participant) }
+
+      before { allow(Api::CatMh::Answer).to receive(:call).and_call_original }
+
+      it_behaves_like 'a rejected answer', :forbidden
+
+      it 'does not send the answer to CAT-MH' do
+        request
+        expect(Api::CatMh::Answer).not_to have_received(:call)
+      end
     end
   end
 end

@@ -834,4 +834,39 @@ RSpec.describe 'GET /v1/user_session/:user_session_id/question', type: :request 
       expect(json_response['data']['attributes']['first_question']).to be(false)
     end
   end
+
+  context 'UserSession::ResearchAssistant' do
+    let(:researcher) { create(:user, :confirmed, :researcher) }
+    let(:participant) { create(:user, :confirmed, :predefined_participant) }
+    let(:intervention) { create(:intervention, :published, user: researcher) }
+    let(:ra_session) { create(:ra_session, intervention: intervention) }
+    let(:question) { create(:question_single, question_group: create(:question_group, session: ra_session)) }
+    let(:user_intervention) { create(:user_intervention, intervention: intervention, user: participant) }
+    let(:ra_user_session) do
+      create(:ra_user_session, session: ra_session, user: participant, fulfilled_by: researcher, user_intervention: user_intervention)
+    end
+
+    context 'when the next session starts immediately' do
+      let!(:next_session) { create(:session, intervention: intervention, position: 1, schedule: :immediately) }
+
+      before do
+        create(:question_single, question_group: create(:question_group, session: next_session))
+        create(:answer_single, question: question, user_session: ra_user_session)
+        get v1_user_session_questions_url(ra_user_session.id), headers: researcher.create_new_auth_token
+      end
+
+      it "shows the RA session's finish screen" do
+        expect(json_response['data']['attributes']['type']).to eq('Question::Finish')
+        expect(json_response).not_to have_key('next_user_session_id')
+      end
+
+      it "does not open the participant's next session" do
+        expect(UserSession.where(session: next_session)).to be_empty
+      end
+
+      it 'finishes the RA session' do
+        expect(ra_user_session.reload.finished_at).to be_present
+      end
+    end
+  end
 end

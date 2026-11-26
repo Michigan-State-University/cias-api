@@ -12,6 +12,8 @@ class V1::FlowService::ScheduleService
 
   def call(question)
     return question unless question.is_a?(Question::Finish) || (question.is_a?(Hash) && question.dig('data', 'attributes', 'type').eql?('Question::Finish'))
+    # Staff fill RA sessions; the participant's next session must not open in their browser.
+    return question if user_session.type == 'UserSession::ResearchAssistant'
     return question unless next_session.present? && next_session.schedule_immediately?
 
     next_user_session = next_user_session!(next_session)

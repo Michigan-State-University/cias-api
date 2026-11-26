@@ -13,7 +13,6 @@ class Ability::PreviewSession < Ability::Base
     can :read, Session, id: user.preview_session_id, intervention: { status: 'draft' }
     can :manage, UserSession, session: { intervention_id: intervention_id, intervention: { status: 'draft' } }
     can :manage, UserIntervention, intervention: { id: intervention_id, status: 'draft' }
-    can :create, Answer, user_session: { user_id: user.id }
     can :manage, Tlfb::Event, day: { user_session: { user_id: user.id } }
     can :manage, Tlfb::ConsumptionResult, day: { user_session: { user_id: user.id } }
     can :manage, Tlfb::Day, user_session: { user_id: user.id }
