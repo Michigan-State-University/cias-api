@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 RSpec.describe V1::Ehr::ProcessBarcodeService do
-  # Henry Ford's values: the cases up to 'service initialization' are the contract that HF's codes
-  # are read exactly as when its layout was hard-coded.
   include_context 'with barcode settings configured'
 
   describe '.call' do
@@ -22,6 +20,14 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       let(:barcode) { '<PtID>      Z394</PtID><PtDAT>54348</PtDAT><UID> ' }
 
       it 'strips the label padding' do
+        expect(subject).to eq('Z394')
+      end
+    end
+
+    context 'when the label pads the ID on both sides' do
+      let(:barcode) { '<PtID>  Z394   </PtID><PtDAT>54348</PtDAT><UID> ' }
+
+      it 'strips the padding' do
         expect(subject).to eq('Z394')
       end
     end
@@ -51,7 +57,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       'ABC-123_DEF',
       'Z 394',
       'Z1234567890',
-      # The fixed check allows "." and "-"; HF's format alone keeps rejecting them.
+      # The fixed check allows "." and "-"; HF's pattern rejects them.
       'Z.394',
       'Z-394'
     ].each do |rejected_id|
@@ -73,7 +79,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('ehr.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.parsing_error')
         )
       end
     end
@@ -84,7 +90,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('ehr.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.parsing_error')
         )
       end
     end
@@ -95,7 +101,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('ehr.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.parsing_error')
         )
       end
     end
@@ -106,7 +112,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('ehr.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.parsing_error')
         )
       end
     end
@@ -117,7 +123,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('ehr.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.parsing_error')
         )
       end
     end
@@ -153,7 +159,7 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       it 'raises BarcodeParsingError' do
         expect { subject }.to raise_error(
           Ehr::BarcodeParsingError,
-          I18n.t('ehr.error.barcode.patient_id_empty')
+          I18n.t('ehr.error.barcode.parsing_error')
         )
       end
     end
@@ -175,31 +181,49 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
   describe 'with another site\'s settings' do
     context 'when the ID follows a prefix and only digits are valid' do
       include_context 'with environment variables', {
-        'EHR_BARCODE_PATIENT_ID_PATTERN' => 'ID:(?<patient_id>[^;]*)',
-        'EHR_BARCODE_PATIENT_ID_FORMAT' => '\A\d{4,8}\z'
+        'EHR_BARCODE_PATIENT_ID_PATTERN' => 'ID:(?<patient_id>\d{4,8})(?:;|\z)'
       }
 
       it 'extracts the ID from that layout' do
         expect(described_class.call({ barcode: 'SITE;ID:12345;NAME:X' })).to eq('12345')
       end
 
-      it 'applies that site\'s format' do
+      it 'applies that site\'s ID rule' do
         expect { described_class.call({ barcode: 'ID:Z394;' }) }
           .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
       end
 
       it 'does not read Henry Ford\'s layout' do
         expect { described_class.call({ barcode: '<PtID>12345</PtID>' }) }
+          .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
+      end
+    end
+
+    context 'when the pattern leaves the ID open on one side' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => 'MRN:(?<patient_id>\d{6,8})' }
+
+      it 'reads an ID that ends where the code does' do
+        expect(described_class.call({ barcode: 'MRN:12345678;' })).to eq('12345678')
+      end
+
+      it 'refuses to cut a longer ID down to a valid-looking one' do
+        expect { described_class.call({ barcode: 'MRN:123456789;' }) }
+          .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
+      end
+    end
+
+    context 'when the pattern matches but the ID is only spaces' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => 'ID:(?<patient_id>[^;]*)(?:;|\z)' }
+
+      it 'raises the empty-ID error' do
+        expect { described_class.call({ barcode: 'ID:   ;' }) }
           .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.patient_id_empty'))
       end
     end
 
-    # The code holds only the ID, and the site sets no format: only the fixed check applies.
-    context 'when the code is the plain ID and no format is set' do
-      include_context 'with environment variables', {
-        'EHR_BARCODE_PATIENT_ID_PATTERN' => '\A(?<patient_id>.*)\z',
-        'EHR_BARCODE_PATIENT_ID_FORMAT' => nil
-      }
+    # The pattern takes anything, so only the fixed check applies.
+    context 'when the code is the plain ID' do
+      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => '\A(?<patient_id>.*)\z' }
 
       it 'accepts letters, digits, dots and hyphens' do
         expect(described_class.call({ barcode: ' Z25.50-1 ' })).to eq('Z25.50-1')
@@ -248,15 +272,6 @@ RSpec.describe V1::Ehr::ProcessBarcodeService do
       pattern = Ehr::Settings.barcode_patient_id_pattern
       allow(pattern).to receive(:match).and_raise(Regexp::TimeoutError)
       allow(Ehr::Settings).to receive(:barcode_patient_id_pattern).and_return(pattern)
-
-      expect { described_class.call({ barcode: barcode }) }
-        .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))
-    end
-
-    it 'turns a timeout of the format into the parsing error' do
-      format = Ehr::Settings.barcode_patient_id_format
-      allow(format).to receive(:match?).and_raise(Regexp::TimeoutError)
-      allow(Ehr::Settings).to receive(:barcode_patient_id_format).and_return(format)
 
       expect { described_class.call({ barcode: barcode }) }
         .to raise_error(Ehr::BarcodeParsingError, I18n.t('ehr.error.barcode.parsing_error'))

@@ -232,14 +232,6 @@ RSpec.describe Ehr::Settings do
   describe '.missing_barcode_scan_settings' do
     include_context 'with barcode settings configured'
 
-    context 'without the format' do
-      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => nil }
-
-      it 'is empty: the format is optional' do
-        expect(described_class.missing_barcode_scan_settings).to eq([])
-      end
-    end
-
     [nil, '', ' '].each do |blank|
       context "when both are #{blank.inspect}" do
         include_context 'with environment variables',
@@ -355,42 +347,6 @@ RSpec.describe Ehr::Settings do
       it 'raises an error naming the setting, never its value, also not through the cause' do
         expect { pattern }.to raise_error(Ehr::Settings::InvalidSettingError) { |error|
           expect(error.message).to eq('EHR_BARCODE_PATIENT_ID_PATTERN is not a valid regular expression')
-          expect(error.cause).to be_nil
-        }
-      end
-    end
-  end
-
-  describe '.barcode_patient_id_format' do
-    subject(:format) { described_class.barcode_patient_id_format }
-
-    context 'when set' do
-      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => '\\A[A-Z]\\d+\\z' }
-
-      it 'compiles it with a timeout' do
-        expect(format.match?('Z394')).to be(true)
-        expect(format.match?('Z394 ')).to be(false)
-        expect(format.timeout).to eq(described_class::BARCODE_REGEXP_TIMEOUT)
-      end
-    end
-
-    [nil, '', ' '].each do |blank|
-      context "when #{blank.inspect}" do
-        include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => blank }
-
-        it { expect(format).to be_nil }
-      end
-    end
-
-    it_behaves_like 'a barcode setting with surrounding whitespace', 'EHR_BARCODE_PATIENT_ID_FORMAT',
-                    '\A[A-Za-z0-9]{1,10}\z'
-
-    context 'when it does not compile' do
-      include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => 'SECRET[' }
-
-      it 'raises an error naming the setting, never its value, also not through the cause' do
-        expect { format }.to raise_error(Ehr::Settings::InvalidSettingError) { |error|
-          expect(error.message).to eq('EHR_BARCODE_PATIENT_ID_FORMAT is not a valid regular expression')
           expect(error.cause).to be_nil
         }
       end

@@ -7,8 +7,7 @@ used, never at boot, so a site without an EHR integration boots with them blank.
 The code is in `app/services/ehr/settings.rb` and `app/services/api/hl7_receiver/`.
 
 The web build has its own copies of `EHR_SITE_NAME` and `EHR_BARCODE_SCAN_FEATURE_ENABLED`, plus
-`EHR_INTEGRATION_FEATURE_ENABLED` and `EHR_BARCODE_FORMATS` (see cias-web's `.env.example`). Set both
-sides to match.
+`EHR_INTEGRATION_FEATURE_ENABLED` (see cias-web's `.env.example`). Set both sides to match.
 
 ## HL7 receiver
 
@@ -74,21 +73,21 @@ Participants can scan the code printed on the site's patient labels instead of t
 | Setting | Value |
 |---|---|
 | `EHR_BARCODE_SCAN_FEATURE_ENABLED` | `1` (surrounding spaces ignored) turns scanning on. Anything else, blank included, leaves it off. |
-| `EHR_BARCODE_PATIENT_ID_PATTERN` | Where the patient ID sits in the scanned text: a regular expression with a named group `patient_id`. Required when scanning is on. |
-| `EHR_BARCODE_PATIENT_ID_FORMAT` | A regular expression the patient ID must also match. Optional. |
+| `EHR_BARCODE_PATIENT_ID_PATTERN` | Where the patient ID sits in the scanned text and what it may contain: a regular expression with a named group `patient_id`. Required when scanning is on. |
 | `EPIC_ON_FHIR_BARCODE_IDENTIFIER_SYSTEM` | FHIR identifier system (OID) of that patient ID. Required when scanning is on. |
 
 With scanning on, a blank required setting refuses every scan and is reported to Sentry.
 
-Every scanned patient ID must be 1 to 64 letters, digits, `.` or `-`. `EHR_BARCODE_PATIENT_ID_FORMAT` adds to that
-check and is matched as written: anchor it with `\A` and `\z` (e.g. `\A\d{6,10}\z`), or it only has to
-match part of the ID.
+Put the ID's rules in the group itself. Henry Ford's labels carry `<PtID>Z394</PtID>`, with an ID of up to
+10 letters or digits: `<PtID> *(?<patient_id>[A-Za-z0-9]{1,10}) *</PtID>`. A code the pattern doesn't match is
+refused as unreadable. Close the group on both sides (a tag, a separator, `\A` or `\z`): an ID that runs
+into more letters, digits, `.` or `-` is refused, so the pattern can't cut a longer ID down to another one. Every ID must also be 1 to 64 letters, digits, `.` or `-`, whatever the pattern allows.
 
-Every scan fails, with an error naming the setting (reported to Sentry), when a pattern or format:
+Every scan fails, with an error naming the setting (reported to Sentry), when the pattern:
 
 - isn't a valid regular expression;
 - starts or ends with whitespace;
-- is the pattern and has no `patient_id` group.
+- has no `patient_id` group.
 
-In a local `.env`, single-quote a value with backslashes (`EHR_BARCODE_PATIENT_ID_FORMAT='\A\d+\z'`).
+In a local `.env`, single-quote a pattern with backslashes (`EHR_BARCODE_PATIENT_ID_PATTERN='\A(?<patient_id>\d+)\z'`).
 dotenv drops backslashes from unquoted and double-quoted values.

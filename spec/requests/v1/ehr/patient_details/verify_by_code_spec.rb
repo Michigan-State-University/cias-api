@@ -452,12 +452,12 @@ RSpec.describe 'POST /v1/ehr/verify_by_code and POST /v1/henry_ford/verify_by_co
 
       # Not rescued into a 4xx: sentry-rails reports it, and every scan fails until the setting is fixed.
       context 'when a barcode setting is not a usable regular expression' do
-        include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_FORMAT' => '[' }
+        include_context 'with environment variables', { 'EHR_BARCODE_PATIENT_ID_PATTERN' => '[' }
 
         it 'raises the setting error without asking Epic' do
           allow(Api::EpicOnFhir::PatientSearch).to receive(:call)
 
-          expect { request }.to raise_error(Ehr::Settings::InvalidSettingError, /EHR_BARCODE_PATIENT_ID_FORMAT/)
+          expect { request }.to raise_error(Ehr::Settings::InvalidSettingError, /EHR_BARCODE_PATIENT_ID_PATTERN/)
           expect(Api::EpicOnFhir::PatientSearch).not_to have_received(:call)
         end
       end
