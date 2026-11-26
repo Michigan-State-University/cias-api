@@ -28,7 +28,7 @@ class Api::Hl7Receiver::UserSession
   private
 
   def endpoint
-    Ehr::Settings.fetch!('HL7_RECEIVER_URL', legacy: 'HFHS_URL')
+    Ehr::Settings.fetch!('HL7_RECEIVER_URL')
   end
 
   def post_answers(bearer_token)

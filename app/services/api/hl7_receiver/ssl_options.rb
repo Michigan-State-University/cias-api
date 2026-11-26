@@ -13,12 +13,10 @@
 # from the system trust store (an up-to-date ca-certificates bundle - see the base-image
 # bump); only add the root to HL7_RECEIVER_CA_CERT too as a fallback for a host that lacks R46.
 #
-# Verification is gated by HL7_RECEIVER_SSL_VERIFY (default OFF) so the code deploys inert and
-# is switched on via env at a chosen window, with an env-only rollback (no redeploy).
-# Both settings fall back to their old names (HFHS_SSL_VERIFY, HFHS_CA_CERT) while blank, so blanking
-# the new name does not roll back while the old one is "true": roll back with HL7_RECEIVER_SSL_VERIFY=false.
+# Verification is on unless HL7_RECEIVER_SSL_VERIFY is false, 0 or off (the env-only rollback). Blank stays on,
+# so a missed setting fails the handshake loudly instead of sending PHI unverified.
 #
-#   * HL7_RECEIVER_SSL_VERIFY off (default) -> { verify: false } (unverified; inert until cutover).
+#   * HL7_RECEIVER_SSL_VERIFY false/0/off    -> { verify: false } (unverified; rollback only).
 #   * on + HL7_RECEIVER_CA_CERT set          -> verify against system roots + the added intermediate.
 #   * on + HL7_RECEIVER_CA_CERT blank        -> system store only; verifies :443 but FAILS :7443
 #                                               (incomplete chain) - so HL7_RECEIVER_CA_CERT must be set.
@@ -26,11 +24,10 @@ module Api::Hl7Receiver::SslOptions
   PEM_CERTIFICATE = /-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----/m
 
   def self.call
-    verify = ActiveModel::Type::Boolean.new.cast(Ehr::Settings.fetch('HL7_RECEIVER_SSL_VERIFY', legacy: 'HFHS_SSL_VERIFY'))
-    return { verify: false } unless verify
+    return { verify: false } if ActiveModel::Type::Boolean.new.cast(Ehr::Settings.fetch('HL7_RECEIVER_SSL_VERIFY')) == false
 
     options = { verify: true }
-    ca_cert = Ehr::Settings.fetch('HL7_RECEIVER_CA_CERT', legacy: 'HFHS_CA_CERT')
+    ca_cert = Ehr::Settings.fetch('HL7_RECEIVER_CA_CERT')
     options[:cert_store] = build_cert_store(ca_cert) if ca_cert.present?
     options
   end

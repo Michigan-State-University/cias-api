@@ -133,31 +133,18 @@ RSpec.describe V1::Ehr::VerifyService do
     end
 
     context 'when past appointments are not allowed' do
-      include_context 'with environment variables', { 'EHR_APPOINTMENTS_FROM_PAST' => '', 'HFHS_APPOINTMENTS_FROM_PAST' => nil }
+      include_context 'with environment variables', { 'EHR_APPOINTMENTS_FROM_PAST' => '' }
 
       it 'raise exception' do
         expect { subject }.to raise_error(EpicOnFhir::NotFound)
       end
     end
 
-    {
-      'EHR_APPOINTMENTS_FROM_PAST' => { 'EHR_APPOINTMENTS_FROM_PAST' => '1', 'HFHS_APPOINTMENTS_FROM_PAST' => nil },
-      'only the old HFHS_APPOINTMENTS_FROM_PAST' => { 'EHR_APPOINTMENTS_FROM_PAST' => '', 'HFHS_APPOINTMENTS_FROM_PAST' => '1' }
-    }.each do |description, settings|
-      context "when #{description} allows past appointments" do
-        include_context 'with environment variables', settings
+    context 'when EHR_APPOINTMENTS_FROM_PAST allows past appointments' do
+      include_context 'with environment variables', { 'EHR_APPOINTMENTS_FROM_PAST' => '1' }
 
-        it 'matches the past appointment' do
-          expect(subject.visit_id).to eql('_externalID_10022118420')
-        end
-      end
-    end
-
-    context 'when EHR_APPOINTMENTS_FROM_PAST is 0 and the old name is 1' do
-      include_context 'with environment variables', { 'EHR_APPOINTMENTS_FROM_PAST' => '0', 'HFHS_APPOINTMENTS_FROM_PAST' => '1' }
-
-      it 'follows the new name' do
-        expect { subject }.to raise_error(EpicOnFhir::NotFound)
+      it 'matches the past appointment' do
+        expect(subject.visit_id).to eql('_externalID_10022118420')
       end
     end
   end

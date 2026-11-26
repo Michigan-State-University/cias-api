@@ -22,7 +22,7 @@ module Api::Hl7Receiver::TlsErrorReporter
   def report_tls_error(error, endpoint)
     Rails.logger.error(
       "#{LOG_PREFIX} TLS verification failed calling #{endpoint}: #{error.message}. " \
-      'Check HL7_RECEIVER_CA_CERT (or HFHS_CA_CERT), or set HL7_RECEIVER_SSL_VERIFY=false to roll back.'
+      'Check HL7_RECEIVER_CA_CERT, or set HL7_RECEIVER_SSL_VERIFY=false to roll back.'
     )
 
     Sentry.capture_exception(error) do |scope|

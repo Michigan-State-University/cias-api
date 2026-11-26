@@ -13,8 +13,6 @@
 #   valid one looks like) have no defaults. A value that isn't a usable regular expression, or starts or
 #   ends with whitespace (it would silently match nothing), raises InvalidSettingError naming the setting,
 #   never its value.
-# * Settings that were renamed from Henry Ford-specific names are read with .fetch(new, legacy:): the old
-#   name still works while the new one is blank (expand and contract).
 class Ehr::Settings
   MissingSettingError = Class.new(StandardError)
   InvalidSettingError = Class.new(StandardError)
@@ -26,11 +24,6 @@ class Ehr::Settings
     HL7_DOCUMENT_TYPE
     HL7_OBSERVATION_VALUE_PREFIX
   ].freeze
-
-  # Required settings that replaced an older name; the old name is read while the new one is blank.
-  HL7_LEGACY_NAMES = {
-    'HL7_PROCESSING_ID' => 'PROCESSING'
-  }.freeze
 
   # An HL7 value must not contain the field (|) or repetition (~) separator, a line break (the segment
   # separator) or a double quote (HL7's null marker; usually a value pasted with its quotes), and must not
@@ -54,21 +47,21 @@ class Ehr::Settings
   SURROUNDING_WHITESPACE = /\A[[:space:]]|[[:space:]]\z/
 
   class << self
-    # The first non-blank value of the setting or its legacy name; nil when both are blank or unset.
-    def fetch(name, legacy:)
-      ENV.fetch(name, nil).presence || (legacy && ENV.fetch(legacy, nil).presence)
+    # The setting's value; nil when it is blank or unset.
+    def fetch(name)
+      ENV.fetch(name, nil).presence
     end
 
     # Like fetch, for a setting a send can't do without (the receiver URLs): reports to Sentry and the log,
-    # then raises MissingSettingError naming both settings instead of returning nil. A nil URL would
+    # then raises MissingSettingError naming the setting instead of returning nil. A nil URL would
     # otherwise reach Faraday, which connects to localhost and fails with an error that names no setting.
     # The report is explicit for the same reason as in ensure_hl7_values!: the sending job retries and
     # sentry-rails does not report retried job errors. Setting names only, never their values.
-    def fetch!(name, legacy:)
-      value = fetch(name, legacy: legacy)
+    def fetch!(name)
+      value = fetch(name)
       return value if value
 
-      error = "#{label(name, legacy)} is not set"
+      error = "#{name} is not set"
       message = "[Ehr::Settings] HL7 send stopped, #{error}"
       Rails.logger.error(message)
       Sentry.capture_message(message)
@@ -148,11 +141,11 @@ class Ehr::Settings
     end
 
     def missing_hl7_settings
-      HL7_REQUIRED_SETTINGS.select { |name| hl7_value(name).blank? }.map { |name| label(name) }
+      HL7_REQUIRED_SETTINGS.select { |name| fetch(name).nil? }
     end
 
     def invalid_hl7_settings
-      HL7_REQUIRED_SETTINGS.select { |name| hl7_value(name)&.match?(UNSAFE_HL7_VALUE) }.map { |name| label(name) }
+      HL7_REQUIRED_SETTINGS.select { |name| fetch(name)&.match?(UNSAFE_HL7_VALUE) }
     end
 
     # Called once before anything is sent. The sending job retries (ApplicationJob: StandardError,
@@ -177,15 +170,11 @@ class Ehr::Settings
     private
 
     def required(name)
-      value = hl7_value(name)
-      raise MissingSettingError, "#{label(name)} is not set" if value.blank?
-      raise InvalidSettingError, "#{label(name)} contains HL7 delimiters, quotes or surrounding whitespace" if value.match?(UNSAFE_HL7_VALUE)
+      value = fetch(name)
+      raise MissingSettingError, "#{name} is not set" if value.nil?
+      raise InvalidSettingError, "#{name} contains HL7 delimiters, quotes or surrounding whitespace" if value.match?(UNSAFE_HL7_VALUE)
 
       value
-    end
-
-    def hl7_value(name)
-      fetch(name, legacy: HL7_LEGACY_NAMES[name])
     end
 
     # cause: nil keeps RegexpError, whose message quotes the value, out of Sentry's exception chain.
@@ -199,11 +188,6 @@ class Ehr::Settings
       regexp
     rescue RegexpError
       raise InvalidSettingError, "#{name} is not a valid regular expression", cause: nil
-    end
-
-    # "HL7_PROCESSING_ID (or PROCESSING)": names the legacy setting too, so either can be fixed.
-    def label(name, legacy = HL7_LEGACY_NAMES[name])
-      legacy ? "#{name} (or #{legacy})" : name
     end
   end
 end

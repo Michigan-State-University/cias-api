@@ -46,11 +46,11 @@ describe Api::Hl7Receiver::Reports do
         allow(Api::Hl7Receiver::Authentication).to receive(:call).and_return(token_type: 'Bearer', access_token: 'abc')
       end
 
-      context 'when neither receiver URL name is set' do
-        include_context 'with environment variables', { 'HL7_RECEIVER_URL' => nil, 'HFHS_URL' => '' }
+      context 'when the receiver URL is not set' do
+        include_context 'with environment variables', { 'HL7_RECEIVER_URL' => nil }
 
-        it 'raises naming both settings without POSTing' do
-          expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_RECEIVER_URL (or HFHS_URL) is not set')
+        it 'raises naming the setting without POSTing' do
+          expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_RECEIVER_URL is not set')
           expect(a_request(:post, /.*/)).not_to have_been_made
         end
       end
@@ -59,16 +59,6 @@ describe Api::Hl7Receiver::Reports do
         stub = stub_request(:post, endpoint).to_return(status: 200, body: '')
         subject
         expect(stub).to have_been_requested
-      end
-
-      context 'when only the old HFHS_URL is set' do
-        include_context 'with environment variables', { 'HL7_RECEIVER_URL' => nil, 'HFHS_URL' => 'https://hfhs.test/data' }
-
-        it 'still POSTs to it' do
-          stub = stub_request(:post, endpoint).to_return(status: 200, body: '')
-          subject
-          expect(stub).to have_been_requested
-        end
       end
 
       it 'reports the TLS error and re-raises on handshake failure' do

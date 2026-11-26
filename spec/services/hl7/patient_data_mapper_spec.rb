@@ -25,19 +25,19 @@ describe Hl7::PatientDataMapper do
     }
   end
 
-  context 'when only the old PROCESSING is set' do
-    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => nil, 'PROCESSING' => 'P' }
+  context 'when HL7_PROCESSING_ID is P' do
+    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => 'P' }
 
     it 'puts it in MSH-11' do
       expect(subject.first.split('|')[10]).to eq('P')
     end
   end
 
-  context 'when HL7_PROCESSING_ID and the old PROCESSING are both blank' do
-    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => '', 'PROCESSING' => '' }
+  context 'when HL7_PROCESSING_ID is blank' do
+    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => '' }
 
-    it 'raises an error naming both settings instead of sending an empty MSH-11' do
-      expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_PROCESSING_ID (or PROCESSING) is not set')
+    it 'raises an error naming the setting instead of sending an empty MSH-11' do
+      expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_PROCESSING_ID is not set')
     end
   end
 

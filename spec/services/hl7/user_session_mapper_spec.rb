@@ -28,16 +28,16 @@ describe Hl7::UserSessionMapper do
   end
 
   # The patient factory's zone (Europe/Warsaw) is never Eastern, so these pin which zone was used.
-  context 'when only the old HFH_REPORT_TIMEZONE is set' do
-    include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => nil, 'HFH_REPORT_TIMEZONE' => 'Eastern Time (US & Canada)' }
+  context 'when HL7_REPORT_TIMEZONE is set' do
+    include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => 'Eastern Time (US & Canada)' }
 
     it 'uses it for the timestamps' do
       expect(subject).to include("OBR|||||||#{user_session.finished_at.in_time_zone('Eastern Time (US & Canada)').strftime('%Y%m%d%H%M')}||||||||||||||||||F")
     end
   end
 
-  context 'when HL7_REPORT_TIMEZONE and the old HFH_REPORT_TIMEZONE are blank' do
-    include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => '', 'HFH_REPORT_TIMEZONE' => '' }
+  context 'when HL7_REPORT_TIMEZONE is blank' do
+    include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => '' }
 
     it "falls back to the participant's time zone instead of raising" do
       expect(subject).to include("OBR|||||||#{user_session.finished_at.in_time_zone(patient.time_zone).strftime('%Y%m%d%H%M')}||||||||||||||||||F")

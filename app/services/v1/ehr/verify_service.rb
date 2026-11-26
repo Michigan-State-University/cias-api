@@ -168,7 +168,7 @@ class V1::Ehr::VerifyService
   end
 
   def valid_appointment?(location, location_identifier, parsed_date)
-    if Ehr::Settings.fetch('EHR_APPOINTMENTS_FROM_PAST', legacy: 'HFHS_APPOINTMENTS_FROM_PAST').to_i == 1
+    if Ehr::Settings.fetch('EHR_APPOINTMENTS_FROM_PAST').to_i == 1
       available_location?(location, location_identifier)
     else
       available_location?(location, location_identifier) && (parsed_date&.today? || parsed_date&.future?)

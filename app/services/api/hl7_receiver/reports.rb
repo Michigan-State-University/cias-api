@@ -33,7 +33,7 @@ class Api::Hl7Receiver::Reports
   private
 
   def endpoint
-    Ehr::Settings.fetch!('HL7_RECEIVER_URL', legacy: 'HFHS_URL')
+    Ehr::Settings.fetch!('HL7_RECEIVER_URL')
   end
 
   def generated_reports

@@ -83,11 +83,8 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
   end
 
   Ehr::Settings::HL7_REQUIRED_SETTINGS.each do |setting|
-    # HL7_PROCESSING_ID still falls back to PROCESSING, so both are blanked.
-    blank_names = [setting, Ehr::Settings::HL7_LEGACY_NAMES[setting]].compact
-
-    context "when #{blank_names.join(' and ')} #{blank_names.one? ? 'is' : 'are'} blank" do
-      include_context 'with environment variables', blank_names.index_with('')
+    context "when #{setting} is blank" do
+      include_context 'with environment variables', { setting => '' }
 
       let(:user) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
 
@@ -113,19 +110,6 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
       it 'fails the attempt so ActiveJob schedules a retry' do
         expect { perform_job }.to have_enqueued_job(described_class).with(user_session.id)
       end
-    end
-  end
-
-  context 'when only the old PROCESSING is set' do
-    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => '', 'PROCESSING' => 'P' }
-
-    let(:user) { create(:user, :confirmed, :participant, :with_hfhs_patient_detail) }
-
-    it 'sends the answers and the reports' do
-      perform_job
-
-      expect(api).to have_received(:send_answers).with(user_session.id)
-      expect(api).to have_received(:send_reports).with(user_session.id)
     end
   end
 

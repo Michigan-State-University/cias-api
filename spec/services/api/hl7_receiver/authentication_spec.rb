@@ -35,37 +35,22 @@ describe Api::Hl7Receiver::Authentication do
       expect(subject).to include(access_token: 'abc', token_type: 'Bearer')
       expect(token_request).to have_been_requested
     end
-
-    context 'when only the old HFHS_* names are set' do
-      include_context 'with environment variables', {
-        'HL7_RECEIVER_TOKEN_URL' => nil, 'HFHS_TOKEN_URL' => 'https://hfhs.test/token',
-        'HL7_RECEIVER_USERNAME' => '', 'HFHS_USERNAME' => 'cias-user',
-        'HL7_RECEIVER_CLIENT_ID' => nil, 'HFHS_CLIENT_ID' => 'cias-client',
-        'HL7_RECEIVER_CLIENT_SECRET' => nil, 'HFHS_CLIENT_SECRET' => 'client-secret',
-        'HL7_RECEIVER_PASSWORD' => nil, 'HFHS_PASSWORD' => 'user-password'
-      }
-
-      it 'still reaches the token endpoint with the same credentials' do
-        expect(subject).to include(access_token: 'abc')
-        expect(token_request).to have_been_requested
-      end
-    end
   end
 
-  context 'when neither token URL name is set' do
-    include_context 'with environment variables', { 'HL7_RECEIVER_TOKEN_URL' => nil, 'HFHS_TOKEN_URL' => '' }
+  context 'when the token URL is not set' do
+    include_context 'with environment variables', { 'HL7_RECEIVER_TOKEN_URL' => nil }
 
     before { allow(Sentry).to receive(:capture_message) }
 
-    it 'raises naming both settings before any request' do
-      expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_RECEIVER_TOKEN_URL (or HFHS_TOKEN_URL) is not set')
+    it 'raises naming the setting before any request' do
+      expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_RECEIVER_TOKEN_URL is not set')
       expect(a_request(:any, /.*/)).not_to have_been_made
     end
 
     it 'reports the missing setting to Sentry on this attempt' do
       expect { subject }.to raise_error(Ehr::Settings::MissingSettingError)
       expect(Sentry).to have_received(:capture_message)
-        .with('[Ehr::Settings] HL7 send stopped, HL7_RECEIVER_TOKEN_URL (or HFHS_TOKEN_URL) is not set').once
+        .with('[Ehr::Settings] HL7 send stopped, HL7_RECEIVER_TOKEN_URL is not set').once
     end
   end
 
@@ -92,7 +77,7 @@ describe Api::Hl7Receiver::Authentication do
       expect(Rails.logger).to have_received(:error).with(
         a_string_including(
           "[HL7 receiver] TLS verification failed calling #{endpoint}",
-          'Check HL7_RECEIVER_CA_CERT (or HFHS_CA_CERT), or set HL7_RECEIVER_SSL_VERIFY=false to roll back.'
+          'Check HL7_RECEIVER_CA_CERT, or set HL7_RECEIVER_SSL_VERIFY=false to roll back.'
         )
       )
       expect(scope).to have_received(:set_context).with('hl7_receiver_request', { endpoint: endpoint })

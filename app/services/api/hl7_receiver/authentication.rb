@@ -24,16 +24,16 @@ class Api::Hl7Receiver::Authentication
   private
 
   def endpoint
-    Ehr::Settings.fetch!('HL7_RECEIVER_TOKEN_URL', legacy: 'HFHS_TOKEN_URL')
+    Ehr::Settings.fetch!('HL7_RECEIVER_TOKEN_URL')
   end
 
   def params
     {
       grant_type: 'password',
-      username: Ehr::Settings.fetch('HL7_RECEIVER_USERNAME', legacy: 'HFHS_USERNAME'),
-      client_id: Ehr::Settings.fetch('HL7_RECEIVER_CLIENT_ID', legacy: 'HFHS_CLIENT_ID'),
-      client_secret: Ehr::Settings.fetch('HL7_RECEIVER_CLIENT_SECRET', legacy: 'HFHS_CLIENT_SECRET'),
-      password: Ehr::Settings.fetch('HL7_RECEIVER_PASSWORD', legacy: 'HFHS_PASSWORD')
+      username: Ehr::Settings.fetch('HL7_RECEIVER_USERNAME'),
+      client_id: Ehr::Settings.fetch('HL7_RECEIVER_CLIENT_ID'),
+      client_secret: Ehr::Settings.fetch('HL7_RECEIVER_CLIENT_SECRET'),
+      password: Ehr::Settings.fetch('HL7_RECEIVER_PASSWORD')
     }
   end
 end
