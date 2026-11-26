@@ -13,6 +13,8 @@ class Ability::Base
   def definition
     can %i[read update], User, id: user.id
     cannot :update, User, %i[deactivated roles]
+    can :create, Answer, user_session: { user_id: user.id }
+    can :create, Answer, user_session: { type: 'UserSession::ResearchAssistant', fulfilled_by_id: user.id }
   end
 
   private

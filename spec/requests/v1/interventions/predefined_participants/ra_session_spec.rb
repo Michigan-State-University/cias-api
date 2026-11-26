@@ -174,17 +174,20 @@ RSpec.describe 'RA session endpoints', type: :request do
   end
 
   describe 'POST /v1/user_sessions/:user_session_id/answers (RA fulfillment guard)' do
-    let(:researcher) { create(:user, :confirmed, :researcher) }
+    let(:team) { create(:team) }
+    let(:researcher) { create(:user, :confirmed, :researcher, team_id: team.id) }
     let(:intervention) { create(:intervention, :published, user: researcher) }
-    let!(:ra_session) { create(:ra_session, intervention: intervention) }
+    let!(:ra_session) { create(:ra_session, intervention: intervention, autofinish_enabled: true) }
     let(:question_group) { create(:question_group, session: ra_session) }
     let(:question) { create(:question_single, question_group: question_group) }
     let(:participant) { create(:user, :confirmed, :predefined_participant) }
     let(:user_intervention) { create(:user_intervention, user: participant, intervention: intervention) }
+    let(:fulfiller) { researcher }
     let!(:ra_user_session) do
-      create(:ra_user_session, session: ra_session, user: participant,
-                               user_intervention: user_intervention, fulfilled_by: researcher)
+      create(:ra_user_session, session: ra_session, user: participant, user_intervention: user_intervention,
+                               fulfilled_by: fulfiller, last_answer_at: 1.day.ago)
     end
+    let(:user) { fulfiller }
     let(:params) do
       {
         answer: {
@@ -194,21 +197,51 @@ RSpec.describe 'RA session endpoints', type: :request do
         question_id: question.id
       }
     end
+    let(:request) { post v1_user_session_answers_path(ra_user_session.id), params: params, headers: user.create_new_auth_token }
 
-    context 'when the fulfiller submits an answer' do
+    shared_examples 'an accepted RA answer' do
       it 'returns created status' do
-        post v1_user_session_answers_path(ra_user_session.id), params: params, headers: researcher.create_new_auth_token
+        expect { request }.to change { ra_user_session.answers.count }.by(1)
         expect(response).to have_http_status(:created)
       end
     end
 
-    context 'when a different researcher tries to submit an answer' do
-      let(:other_researcher) { create(:user, :confirmed, :researcher) }
-
-      it 'returns forbidden' do
-        post v1_user_session_answers_path(ra_user_session.id), params: params, headers: other_researcher.create_new_auth_token
+    shared_examples 'a rejected RA answer' do
+      it 'returns forbidden with NOT_RA_FULFILLER and writes nothing' do
+        expect { request }.to avoid_changing(Answer, :count).and avoid_changing { ra_user_session.reload.last_answer_at }
         expect(response).to have_http_status(:forbidden)
+        expect(json_response['details']).to eq('reason' => 'NOT_RA_FULFILLER')
       end
+    end
+
+    context 'when the fulfiller submits an answer' do
+      it_behaves_like 'an accepted RA answer'
+    end
+
+    context "when the fulfiller is the team admin of the intervention owner's team" do
+      let(:fulfiller) { team.team_admin }
+
+      it_behaves_like 'an accepted RA answer'
+    end
+
+    context 'when the fulfiller is a collaborator with data access' do
+      let(:fulfiller) { create(:user, :confirmed, :researcher) }
+
+      before { create(:collaborator, user: fulfiller, intervention: intervention, data_access: true) }
+
+      it_behaves_like 'an accepted RA answer'
+    end
+
+    context 'when a different researcher tries to submit an answer' do
+      let(:user) { create(:user, :confirmed, :researcher) }
+
+      it_behaves_like 'a rejected RA answer'
+    end
+
+    context 'when the predefined participant who owns the RA session submits an answer' do
+      let(:user) { participant }
+
+      it_behaves_like 'a rejected RA answer'
     end
   end
 end

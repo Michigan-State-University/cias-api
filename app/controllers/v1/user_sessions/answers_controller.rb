@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class V1::UserSessions::AnswersController < V1Controller
+  before_action :authorize_answer_creation, only: :create
   before_action :validate_intervention_status
 
   def index
@@ -16,7 +17,6 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   def create
-    validate_ra_fulfillment_access if user_session_load.type == 'UserSession::ResearchAssistant'
     raise ActiveRecord::RecordNotSaved, I18n.t('user_sessions.errors.already_finished') if user_session_load.finished_at?
 
     answer = V1::AnswerService.call(current_v1_user, user_session_id, question_id, answer_params)
@@ -26,6 +26,13 @@ class V1::UserSessions::AnswersController < V1Controller
   end
 
   private
+
+  def authorize_answer_creation
+    validate_ra_fulfillment_access if user_session_load.type == 'UserSession::ResearchAssistant'
+    authorize! :create, Answer.new(user_session: user_session_load)
+    # CAT-MH question ids are the vendor's question numbers, not CIAS questions.
+    user_session_load.session.questions.find(question_id) unless user_session_load.type == 'UserSession::CatMh'
+  end
 
   def user_session_load
     @user_session_load ||= UserSession.find(user_session_id)

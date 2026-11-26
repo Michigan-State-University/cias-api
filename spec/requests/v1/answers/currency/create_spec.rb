@@ -32,9 +32,9 @@ RSpec.describe 'POST /v1/user_sessions/:user_session_id/answers', type: :request
 
   context 'when creating an answer' do
     %i[admin researcher participant guest].each do |role|
-      let(:user) { create(:user, :confirmed, role) }
-
       context "when #{role} creates an answer" do
+        let(:user) { create(:user, :confirmed, role) }
+
         it 'returns correct http status' do
           expect(response).to have_http_status(:created)
         end

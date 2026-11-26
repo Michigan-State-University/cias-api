@@ -6,7 +6,6 @@ module Ability::Generic::FillInterventionAccess
     cannot :create, UserSession, session: { type: 'Session::ResearchAssistant' }
     can :create, UserIntervention, intervention: intervention_path
     can %i[read update], UserSession, user_id: user_id
-    can :create, Answer, user_session: { user_id: user_id }
     can :create, UserIntervention, user_id: user_id, intervention: intervention_path
     can :read, UserIntervention, user_id: user_id
     can :manage, Tlfb::Day, user_session: { user_id: user_id }
