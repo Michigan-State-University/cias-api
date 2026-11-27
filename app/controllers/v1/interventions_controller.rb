@@ -129,14 +129,23 @@ class V1::InterventionsController < V1Controller
     if params[:id].present? && intervention_load.published?
       params.expect(intervention: [:status, :cat_mh_pool, :is_access_revoked, :live_chat_enabled, { location_ids: [] }])
     elsif current_v1_user.admin?
-      params.expect(intervention: [:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id,
-                                   :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit,
-                                   :hfhs_access, :live_chat_enabled, :note, { location_ids: [] }])
+      with_ehr_access_mapped(
+        params.expect(intervention: [:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id,
+                                     :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :quick_exit,
+                                     :hfhs_access, :ehr_access, :live_chat_enabled, :note, { location_ids: [] }])
+      )
     else
       params.expect(intervention: [:name, :status, :type, :shared_to, :additional_text, :organization_id, :google_language_id,
                                    :cat_mh_application_id, :cat_mh_organization_id, :cat_mh_pool, :is_access_revoked, :license_type, :live_chat_enabled,
                                    :quick_exit, :note, { location_ids: [] }])
     end
+  end
+
+  # hfhs_access is still accepted for one release.
+  def with_ehr_access_mapped(permitted)
+    return permitted unless permitted.key?(:ehr_access)
+
+    permitted.merge(hfhs_access: permitted[:ehr_access]).except(:ehr_access)
   end
 
   def start_index

@@ -54,7 +54,7 @@ describe Api::EpicOnFhir::PatientVerification do
                                      }
                                    ]
                                  }))
-      .to_return(status: 200, body: File.read('spec/fixtures/integrations/henry_ford/patient_resource.json'))
+      .to_return(status: 200, body: File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json'))
 
     expect(subject.class).to be(Hash)
   end
@@ -105,7 +105,7 @@ describe Api::EpicOnFhir::PatientVerification do
                                        }
                                      ]
                                    }))
-        .to_return(status: 200, body: File.read('spec/fixtures/integrations/henry_ford/patient_resource.json'))
+        .to_return(status: 200, body: File.read('spec/fixtures/integrations/epic_on_fhir/patient_resource.json'))
 
       expect(subject.class).to be(Hash)
     end
@@ -113,7 +113,7 @@ describe Api::EpicOnFhir::PatientVerification do
 
   it 'when third part tool return 404' do
     stub_request(:post, "#{ENV.fetch('EPIC_ON_FHIR_PATIENT_ENDPOINT')}$match")
-      .to_return(status: 200, body: File.read('spec/fixtures/integrations/henry_ford/patient_not_found.json'))
+      .to_return(status: 200, body: File.read('spec/fixtures/integrations/epic_on_fhir/patient_not_found.json'))
 
     expect { subject }.to raise_error(EpicOnFhir::NotFound)
   end

@@ -4,8 +4,6 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
   FIRST_SEGMENT_TYPE = 'MSH' # Message Header -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/MSH
   ENCODING_CHARACTERS = '^~\\&' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.2
   MSH_SENDING_APPLICATION = 'HTD' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.3
-  MSH_SENDING_FACILITY = 'HFHS'
-  MSH_RECEIVING_FACILITY = 'HFH'
   MSH_VERSION_ID = '2.3' # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.12
 
   SECOND_SEGMENT_TYPE = 'PID' # Patient Identification -> https://hl7-definition.caristix.com/v2/HL7v2.5/Segments/PID
@@ -23,7 +21,7 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
 
   def call
     # rubocop:disable Layout/LineLength
-    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{MSH_SENDING_FACILITY}||#{MSH_RECEIVING_FACILITY}|#{date_now}||#{msh_message_type}^#{msh_trigger_event}|#{message_count}|#{ENV.fetch('PROCESSING')}|#{MSH_VERSION_ID}|||
+    %W[#{FIRST_SEGMENT_TYPE}|^~\\&|#{MSH_SENDING_APPLICATION}|#{sending_facility}||#{receiving_facility}|#{date_now}||#{msh_message_type}^#{msh_trigger_event}|#{message_count}|#{processing_id}|#{MSH_VERSION_ID}|||
        #{SECOND_SEGMENT_TYPE}|||#{user.hfhs_patient_detail.patient_id}||#{user.hfhs_patient_detail.last_name}^#{user.hfhs_patient_detail.first_name}||#{dob_in_correct_format}|#{sex}]
     # rubocop:enable Layout/LineLength
   end
@@ -31,6 +29,21 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
   attr_reader :user, :msh_message_type, :msh_trigger_event
 
   private
+
+  # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.4
+  def sending_facility
+    Ehr::Settings.hl7_sending_facility
+  end
+
+  # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.6
+  def receiving_facility
+    Ehr::Settings.hl7_receiving_facility
+  end
+
+  # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.11
+  def processing_id
+    Ehr::Settings.hl7_processing_id
+  end
 
   def date_now
     DateTime.now.in_time_zone(report_timezone).strftime('%Y%m%d%H%M')
@@ -46,6 +59,6 @@ class Hl7::PatientDataMapper < Hl7::BaseMapper
 
   # https://hl7-definition.caristix.com/v2/HL7v2.5/Fields/MSH.10
   def message_count
-    user_session.answers.hfhs.count
+    user_session.answers.ehr.count
   end
 end

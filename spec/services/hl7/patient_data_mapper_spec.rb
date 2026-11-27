@@ -5,6 +5,8 @@ require 'rails_helper'
 describe Hl7::PatientDataMapper do
   subject { described_class.call(patient.id, user_session.id, 'ORU', 'R01') }
 
+  include_context 'with HL7 settings configured'
+
   let!(:session) { create(:session) }
   let!(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
   let!(:user_session) { create(:user_session, user: patient) }
@@ -17,9 +19,35 @@ describe Hl7::PatientDataMapper do
   context 'return correct data' do
     it {
       expect(subject).to include(
-        "MSH|^~\\&|HTD|HFHS||HFH|#{DateTime.now.in_time_zone(ENV.fetch('HFH_REPORT_TIMEZONE', nil)).strftime('%Y%m%d%H%M')}||ORU^R01|2|#{ENV.fetch('PROCESSING')}|2.3|||",
+        "MSH|^~\\&|HTD|HFHS||HFH|#{DateTime.now.in_time_zone(ENV.fetch('HL7_REPORT_TIMEZONE')).strftime('%Y%m%d%H%M')}||ORU^R01|2|T|2.3|||",
         "PID|||#{patient.hfhs_patient_detail.patient_id}||#{patient.last_name}^#{patient.first_name}||#{patient.hfhs_patient_detail.dob.to_datetime.strftime('%Y%m%d')}|F"
       )
     }
+  end
+
+  context 'when HL7_PROCESSING_ID is P' do
+    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => 'P' }
+
+    it 'puts it in MSH-11' do
+      expect(subject.first.split('|')[10]).to eq('P')
+    end
+  end
+
+  context 'when HL7_PROCESSING_ID is blank' do
+    include_context 'with environment variables', { 'HL7_PROCESSING_ID' => '' }
+
+    it 'raises an error naming the setting instead of sending an empty MSH-11' do
+      expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_PROCESSING_ID is not set')
+    end
+  end
+
+  %w[HL7_SENDING_FACILITY HL7_RECEIVING_FACILITY].each do |setting|
+    context "when #{setting} is blank" do
+      include_context 'with environment variables', { setting => '' }
+
+      it 'raises an error naming the setting instead of building the header' do
+        expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, "#{setting} is not set")
+      end
+    end
   end
 end

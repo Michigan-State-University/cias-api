@@ -20,7 +20,7 @@ task purge_sms_inbound_receipts: :environment do
   SmsInboundReceipt.purge_stale
 end
 
-desc 'Expire Aztec-code drafts nobody confirmed'
-task hfhs_clear_abandoned_patient_details: :environment do
-  Hfhs::ClearAbandonedPatientDetailsJob.perform_later
+desc 'Expire scanned-code drafts nobody confirmed'
+task ehr_clear_abandoned_patient_details: :environment do
+  Ehr::ClearAbandonedPatientDetailsJob.perform_later
 end

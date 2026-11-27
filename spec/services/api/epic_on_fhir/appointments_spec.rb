@@ -11,7 +11,7 @@ describe Api::EpicOnFhir::Appointments do
   it 'when API return correct data' do
     stub_request(:get, ENV.fetch('EPIC_ON_FHIR_APPOINTMENTS_ENDPOINT').to_s)
       .with(query: { '_format' => 'json', 'patient' => patient_id, 'service-category' => 'appointment' })
-      .to_return(status: 200, body: File.read('spec/fixtures/integrations/henry_ford/appointments.json'))
+      .to_return(status: 200, body: File.read('spec/fixtures/integrations/epic_on_fhir/appointments.json'))
 
     expect(subject.class).to be(Hash)
   end

@@ -91,7 +91,7 @@ en:
             formulas:
               ra_cannot_branch_to_other_sessions: 'Question groups in Research Assistant sessions cannot branch to other sessions'
               cannot_branch_to_ra_session: 'Cannot branch to a Research Assistant session'
-          question: '%{question_type} can appear only once per session'
+          question: 'This question can appear only once per session'
           question_variable: 'Variable name is in invalid format'
         organization_invitation:
           attributes:
@@ -404,9 +404,9 @@ en:
     wrong_sessions: "Wrong argument. Can/'t found all passed sessions"
     wrong_package: "Wrong argument. You passed questions that cannot be duplicated"
     uniqueness_violation: 'Wrong argument. You cannot duplicate questions which should be unique'
-    hfhs:
-      uniqueness_violation: 'Wrong argument. You cannot duplicate unique questions (e.g. HenryFordInitial)'
-      access_violation: "You can't duplicate Henry Ford Initial Screen to an intervention without access to Henry Ford's system"
+    ehr:
+      uniqueness_violation: 'Wrong argument. You cannot duplicate unique questions (e.g. the %{site_name} Initial Screen)'
+      access_violation: "You can't duplicate the %{site_name} Initial Screen to an intervention without access to %{site_name}'s system"
     not_researcher: "Access denied. You pass user which can not have intervention"
   translation_mailer:
     subject: 'Translation of %{intervention_name}'
@@ -476,7 +476,7 @@ en:
         not_found: "Unable to identify data in the third-party tool. Verify provided data or contact our support team."
       appointments:
         not_found: "Insufficient information for further processing."
-  henry_ford:
+  ehr:
     error:
       session:
         not_allowed: "Scanning a code is not available in this session."

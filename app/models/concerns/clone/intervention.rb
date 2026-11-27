@@ -12,7 +12,7 @@ class Clone::Intervention < Clone::Base
     outcome.user_id = user_id if user_id.present?
     clear_organization!
     clear_cat_mh_settings!
-    clear_hfhs_settings!
+    clear_ehr_settings!
     outcome.save!
     assign_tags
     create_sessions
@@ -158,7 +158,7 @@ class Clone::Intervention < Clone::Base
     outcome.created_cat_mh_session_count = 0
   end
 
-  def clear_hfhs_settings!
+  def clear_ehr_settings!
     outcome.hfhs_access = false
   end
 

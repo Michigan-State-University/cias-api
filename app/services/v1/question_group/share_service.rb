@@ -60,7 +60,7 @@ class V1::QuestionGroup::ShareService
 
   def share_question(shared_questions, question, question_group)
     validate_uniqueness(question, question_group)
-    validate_hf_access(question)
+    validate_ehr_access(question)
     cloned = Clone::Question.new(question, { question_group_id: question_group.id, clean_formulas: true }).execute
     cloned.remove_blocks_with_types(%w[ReflectionFormula Reflection])
     cloned.position = shared_questions.last&.position.to_i + 1
@@ -72,15 +72,15 @@ class V1::QuestionGroup::ShareService
 
     return unless question_type_exist_in_session?(question, question_group)
 
-    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type)
+    raise ActiveRecord::RecordNotUnique, I18n.t('activerecord.errors.models.question_group.question')
   end
 
-  def validate_hf_access(question)
+  def validate_ehr_access(question)
     return unless question.is_a?(::Question::HenryFordInitial)
 
     return if intervention.hfhs_access
 
-    raise ActiveRecord::ActiveRecordError, (I18n.t 'duplication_with_structure.hfhs.access_violation')
+    raise ActiveRecord::ActiveRecordError, I18n.t('duplication_with_structure.ehr.access_violation', site_name: Ehr::Settings.site_name)
   end
 
   def question_type_exist_in_session?(question, question_group)

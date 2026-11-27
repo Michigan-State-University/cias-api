@@ -22,7 +22,7 @@ class Answer < ApplicationRecord
     relation
   }
 
-  scope :hfhs, -> { where(type: Answer::HenryFord.name) }
+  scope :ehr, -> { where(type: Answer::HenryFord.name) }
 
   audited except: %i[body body_ciphertext video_stats migrated_body decrypted_body]
   has_encrypted :body, type: :json, migrating: true

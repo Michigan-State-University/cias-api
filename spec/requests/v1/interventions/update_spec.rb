@@ -446,6 +446,74 @@ RSpec.describe 'PATCH /v1/interventions', type: :request do
     end
   end
 
+  # ehr_access is the site-neutral name of the hfhs_access column; both are accepted and serialized for one release.
+  context 'when an admin changes the EHR access flag' do
+    let(:intervention) { create(:intervention, user: admin, status: 'draft', hfhs_access: initial_access) }
+    let(:initial_access) { false }
+
+    before { request }
+
+    {
+      'hfhs_access' => { hfhs_access: true },
+      'ehr_access' => { ehr_access: true }
+    }.each do |param_name, flag_params|
+      context "with #{param_name}" do
+        let(:params) { { intervention: flag_params } }
+
+        it 'sets the column and returns the flag under both names' do
+          expect(response).to have_http_status(:ok)
+          expect(intervention.reload.hfhs_access).to be(true)
+          expect(json_response['data']['attributes']).to include('hfhs_access' => true, 'ehr_access' => true)
+        end
+      end
+    end
+
+    context 'with both names and different values' do
+      let(:params) { { intervention: { hfhs_access: false, ehr_access: true } } }
+
+      it 'takes ehr_access' do
+        expect(intervention.reload.hfhs_access).to be(true)
+        expect(json_response['data']['attributes']).to include('hfhs_access' => true, 'ehr_access' => true)
+      end
+    end
+
+    context 'with both names and ehr_access turning it off' do
+      let(:initial_access) { true }
+      let(:params) { { intervention: { hfhs_access: true, ehr_access: false } } }
+
+      it 'takes ehr_access' do
+        expect(intervention.reload.hfhs_access).to be(false)
+        expect(json_response['data']['attributes']).to include('hfhs_access' => false, 'ehr_access' => false)
+      end
+    end
+  end
+
+  context 'when a researcher sends the EHR access flag under either name' do
+    let(:user) { researcher }
+    let(:intervention) { create(:intervention, user: researcher, status: 'draft', hfhs_access: false) }
+    let(:params) { { intervention: { name: 'Renamed', hfhs_access: true, ehr_access: true } } }
+
+    before { request }
+
+    it 'ignores both: only admins may change it' do
+      expect(response).to have_http_status(:ok)
+      expect(intervention.reload).to have_attributes(name: 'Renamed', hfhs_access: false)
+    end
+  end
+
+  context 'when an admin sends the EHR access flag for a published intervention' do
+    let(:intervention) { create(:intervention, user: admin, status: 'published', hfhs_access: false) }
+    let(:params) { { intervention: { cat_mh_pool: 5, hfhs_access: true, ehr_access: true } } }
+
+    before { request }
+
+    it 'ignores both: a published intervention keeps its access' do
+      expect(response).to have_http_status(:ok)
+      expect(intervention.reload).to have_attributes(cat_mh_pool: 5, hfhs_access: false)
+      expect(json_response['data']['attributes']).to include('hfhs_access' => false, 'ehr_access' => false)
+    end
+  end
+
   context 'when the name and the note change' do
     let(:params) { { intervention: { name: 'Renamed intervention', note: 'A note' } } }
 

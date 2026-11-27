@@ -51,7 +51,7 @@ class Intervention < ApplicationRecord
   has_one :logo_blob, through: :logo_attachment, class_name: 'ActiveStorage::Blob', source: :blob
   has_one_attached :conversations_transcript, dependent: :purge_later
 
-  # Henry Ford integration
+  # EHR integration
   has_many :intervention_locations, dependent: :destroy
   has_many :clinic_locations, through: :intervention_locations
 
@@ -94,7 +94,7 @@ class Intervention < ApplicationRecord
   before_save :remove_short_links, if: :will_save_change_to_organization_id?
   before_save :sanitize_and_escape_name, if: :will_save_change_to_name?
   before_update :cascade_access_type_change, if: :shared_to_changed?
-  after_update_commit :status_change, :hf_access_change
+  after_update_commit :status_change, :ehr_access_change
 
   def ra_session
     sessions.find_by(type: 'Session::ResearchAssistant')
@@ -132,7 +132,7 @@ class Intervention < ApplicationRecord
     end
   end
 
-  def hf_access_change
+  def ehr_access_change
     return unless saved_change_to_attribute?(:hfhs_access)
     return if hfhs_access
 

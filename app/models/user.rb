@@ -103,7 +103,7 @@ class User < ApplicationRecord
   attribute :time_zone, :string, default: -> { ENV.fetch('USER_DEFAULT_TIME_ZONE', 'America/New_York') }
   attribute :roles, :string, array: true, default: -> { assign_default_values('roles') }
 
-  # HENRY FORDS
+  # EHR
   belongs_to :hfhs_patient_detail, optional: true
 
   # COLLABORATIONS

@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+class V1::Ehr::ClinicLocationsController < V1Controller
+  def index
+    authorize! :read, Intervention
+
+    render json: serialized_hash(ClinicLocation.order(:name))
+  end
+end

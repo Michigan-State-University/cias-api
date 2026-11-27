@@ -10,6 +10,6 @@ class Hl7::BaseMapper
   protected
 
   def report_timezone
-    ENV.fetch('HFH_REPORT_TIMEZONE', nil) || user_session&.user&.time_zone
+    Ehr::Settings.hl7_report_timezone
   end
 end

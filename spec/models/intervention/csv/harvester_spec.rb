@@ -1055,6 +1055,8 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
         let!(:patient_details) { user.hfhs_patient_detail }
 
         context 'initial screen' do
+          include_context 'with environment variables', { 'EHR_CSV_PREFIX' => 'henry_ford_health' }
+
           let!(:question) { create(:question_henry_ford_initial_screen, question_group: question_group) }
           let!(:answer) { create(:answer_henry_ford_initial, question: question, user_session: user_session) }
 
@@ -1092,6 +1094,27 @@ RSpec.describe Intervention::Csv::Harvester, type: :model do
               expect(subject.rows.first).to include(user.id, user.email, nil, nil, nil,
                                                     nil, nil, nil, nil, nil, nil, nil, nil, nil, user_session.answers.first.created_at, nil, nil)
             end
+          end
+        end
+
+        context 'initial screen without a configured CSV prefix' do
+          include_context 'with environment variables', { 'EHR_CSV_PREFIX' => '' }
+
+          let!(:question) { create(:question_henry_ford_initial_screen, question_group: question_group) }
+          let!(:answer) { create(:answer_henry_ford_initial, question: question, user_session: user_session) }
+
+          it 'names the patient-detail columns with the generic prefix and fills them' do
+            subject.collect
+
+            expect(subject.header).to include('ehr_patient.patient_id', 'ehr_patient.first_name', 'ehr_patient.last_name', 'ehr_patient.gender',
+                                              'ehr_patient.date_of_birth', 'ehr_patient.zip_code', 'ehr_patient.phone_number',
+                                              'ehr_patient.phone_type', 'ehr_patient.provided_first_name')
+            expect(subject.header.grep(/henry_ford_health/)).to be_empty
+
+            row = subject.rows.first
+            expect(row[subject.header.index('ehr_patient.patient_id')]).to eq(patient_details.patient_id)
+            expect(row[subject.header.index('ehr_patient.last_name')]).to eq(patient_details.last_name)
+            expect(row[subject.header.index('ehr_patient.zip_code')]).to eq(patient_details.zip_code)
           end
         end
 

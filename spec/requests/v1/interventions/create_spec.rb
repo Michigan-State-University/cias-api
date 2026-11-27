@@ -75,6 +75,16 @@ RSpec.describe 'POST /v1/interventions', type: :request do
       end
     end
 
+    context 'when the EHR access flag is sent as ehr_access' do
+      let(:params) { { intervention: { name: 'New Intervention', ehr_access: true } } }
+
+      it 'stores it in the hfhs_access column and returns it under both names' do
+        expect(response).to have_http_status(:created)
+        expect(Intervention.find(json_response['data']['id']).hfhs_access).to be(true)
+        expect(json_response['data']['attributes']).to include('hfhs_access' => true, 'ehr_access' => true)
+      end
+    end
+
     context 'when params are INVALID' do
       let(:params) do
         {
@@ -240,7 +250,7 @@ RSpec.describe 'POST /v1/interventions', type: :request do
       {
         intervention: {
           name: 'Unpermitted attributes', user_id: other_researcher.id, sensitive_data_state: 'removed',
-          created_cat_mh_session_count: 9, hfhs_access: true, published_at: '2020-01-01T00:00:00Z'
+          created_cat_mh_session_count: 9, hfhs_access: true, ehr_access: true, published_at: '2020-01-01T00:00:00Z'
         }
       }
     end

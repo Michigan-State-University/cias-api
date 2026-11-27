@@ -5,6 +5,8 @@ require 'rails_helper'
 describe Hl7::AnswersMapper do
   subject { described_class.call(user_session.id) }
 
+  include_context 'with HL7 settings configured'
+
   let!(:participant) { create(:user, :confirmed, :participant) }
   let!(:session) { create(:session) }
   let!(:user_session) { create(:user_session, finished_at: 2.days.ago) }
@@ -31,7 +33,7 @@ describe Hl7::AnswersMapper do
       }
     ] })
   end
-  let(:date_of_answer) { user_session.finished_at.in_time_zone(ENV.fetch('HFH_REPORT_TIMEZONE', nil)).strftime('%Y%m%d%H%M') }
+  let(:date_of_answer) { user_session.finished_at.in_time_zone(ENV.fetch('HL7_REPORT_TIMEZONE')).strftime('%Y%m%d%H%M') }
 
   context 'return correct data' do
     it {

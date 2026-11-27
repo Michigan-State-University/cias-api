@@ -1,0 +1,93 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+require 'webmock/rspec'
+
+describe Api::Hl7Receiver::UserSession do
+  include WebMock::API
+
+  WebMock.enable!
+
+  subject { described_class.call(user_session.id) }
+
+  let(:endpoint) { 'https://hfhs.test/data' }
+  let(:patient) { create(:user, :with_hfhs_patient_detail, :confirmed) }
+  let(:user_session) { create(:user_session, user: patient) }
+
+  include_context 'with environment variables', { 'HL7_RECEIVER_URL' => 'https://hfhs.test/data' }
+
+  before do
+    allow(Api::Hl7Receiver::SslOptions).to receive(:call).and_return(verify: false)
+    allow(Hl7::UserSessionMapper).to receive(:call).and_return('MSH|test')
+  end
+
+  context 'when there are no Answer::HenryFord answers' do
+    it 'returns without authenticating or POSTing' do
+      expect(Api::Hl7Receiver::Authentication).not_to receive(:call)
+      subject
+    end
+  end
+
+  context 'with a HenryFord answer' do
+    let(:session) { create(:session) }
+    let(:question_group) { create(:question_group, session: session) }
+    let(:question) { create(:question_henry_ford, question_group: question_group) }
+    let!(:answer) { create(:answer_henry_ford, user_session: user_session, question: question) }
+
+    context 'when no token is issued' do
+      before { allow(Api::Hl7Receiver::Authentication).to receive(:call).and_return(nil) }
+
+      it 'warns about the skipped delivery and does not POST' do
+        allow(Rails.logger).to receive(:warn)
+        subject
+        expect(Rails.logger).to have_received(:warn).with("[HL7 receiver] no token issued - skipping answers send for user_session #{user_session.id}")
+      end
+    end
+
+    context 'when a token is issued' do
+      before do
+        allow(Api::Hl7Receiver::Authentication).to receive(:call).and_return(token_type: 'Bearer', access_token: 'abc')
+      end
+
+      context 'when the receiver URL is not set' do
+        include_context 'with environment variables', { 'HL7_RECEIVER_URL' => nil }
+
+        before { allow(Sentry).to receive(:capture_message) }
+
+        it 'raises naming the setting without POSTing' do
+          expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_RECEIVER_URL is not set')
+          expect(a_request(:post, /.*/)).not_to have_been_made
+        end
+
+        it 'reports the missing setting to Sentry on this attempt' do
+          expect { subject }.to raise_error(Ehr::Settings::MissingSettingError)
+          expect(Sentry).to have_received(:capture_message)
+            .with('[Ehr::Settings] HL7 send stopped, HL7_RECEIVER_URL is not set').once
+        end
+      end
+
+      it 'POSTs the answers to the gateway' do
+        stub = stub_request(:post, endpoint).to_return(status: 200, body: '')
+        subject
+        expect(stub).to have_been_requested
+      end
+
+      it 'warns and reports to Sentry when the gateway rejects the send' do
+        stub_request(:post, endpoint).to_return(status: 500, body: '')
+        allow(Rails.logger).to receive(:warn)
+        allow(Sentry).to receive(:capture_message)
+        subject
+        expect(Rails.logger).to have_received(:warn)
+          .with("[HL7 receiver] POST #{endpoint} (answers user_session #{user_session.id}) -> 500 - delivery not accepted")
+        expect(Sentry).to have_received(:capture_message)
+      end
+
+      it 'reports the TLS error and re-raises on handshake failure' do
+        stub_request(:post, endpoint).to_raise(OpenSSL::SSL::SSLError.new('certificate verify failed'))
+        allow(Sentry).to receive(:capture_exception)
+        expect { subject }.to raise_error(Faraday::SSLError)
+        expect(Sentry).to have_received(:capture_exception)
+      end
+    end
+  end
+end

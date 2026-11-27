@@ -108,6 +108,35 @@ RSpec.describe V1::QuestionGroup::DuplicateWithStructureService do
       it 'raise exception' do
         expect { subject.call }.to raise_error(ArgumentError)
       end
+
+      # The generic uniqueness check runs first and already catches a second initial screen, so the
+      # site-specific message is reached by stubbing that check. This pins the message wording and that
+      # the raise site passes the site name.
+      context 'when the site-specific initial screen check is the one that fails' do
+        before do
+          allow_any_instance_of(described_class).to receive(:uniq_question_already_in_session?).and_return(false)
+        end
+
+        context 'with a configured site name' do
+          include_context 'with environment variables', { 'EHR_SITE_NAME' => 'Henry Ford' }
+
+          it 'names the site in the message' do
+            expect { subject.call }.to raise_error(
+              ArgumentError, 'Wrong argument. You cannot duplicate unique questions (e.g. the Henry Ford Initial Screen)'
+            )
+          end
+        end
+
+        context 'without a configured site name' do
+          include_context 'with environment variables', { 'EHR_SITE_NAME' => '' }
+
+          it 'uses the generic name' do
+            expect { subject.call }.to raise_error(
+              ArgumentError, 'Wrong argument. You cannot duplicate unique questions (e.g. the EHR Initial Screen)'
+            )
+          end
+        end
+      end
     end
   end
 end
