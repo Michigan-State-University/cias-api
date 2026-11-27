@@ -6,7 +6,7 @@ class V1::UserSessions::AnswersController < V1Controller
   def index
     authorize! :index, Answer
 
-    render json: serialized_response(answers_scope)
+    render json: serialized_response(Answer::FileUpload.preload_participant_uploads(answers_scope.to_a))
   end
 
   def show

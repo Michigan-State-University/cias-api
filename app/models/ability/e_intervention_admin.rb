@@ -34,6 +34,8 @@ class Ability::EInterventionAdmin < Ability::Base
     can :manage, Chart, dashboard_section: { reporting_dashboard: { organization: { id: user.accepted_organization_ids } } }
     can :read, ChartStatistic, organization_id: user.accepted_organization_ids
 
+    can :read_upload_config, ParticipantUpload
+
     enable_sms_plan_access(session_path(user))
   end
 
