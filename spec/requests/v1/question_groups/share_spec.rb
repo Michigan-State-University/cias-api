@@ -367,6 +367,7 @@ describe 'POST /v1/sessions/:session_id/question_groups/:id/share', type: :reque
       it 'when Question::Name exist in session return BadRequest' do
         request1
         expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body['message']).to eq('This question can appear only once per session')
         expect(question_group_with_name.reload.questions.size).to be(3)
       end
 

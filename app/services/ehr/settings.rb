@@ -12,11 +12,14 @@ class Ehr::Settings
     HL7_PROCESSING_ID
     HL7_DOCUMENT_TYPE
     HL7_OBSERVATION_VALUE_PREFIX
+    HL7_REPORT_TIMEZONE
   ].freeze
 
   # " is HL7's null marker (usually a value pasted with its quotes); ^, & and \ stay allowed: HD/CWE
   # values and the OBX-5 prefix use them.
   UNSAFE_HL7_VALUE = /[|~\r\n"]|\A[[:space:]]|[[:space:]]\z/
+
+  UNKNOWN_REPORT_TIMEZONE = 'HL7_REPORT_TIMEZONE is not a known time zone'
 
   DEFAULT_SITE_NAME = 'EHR'
   DEFAULT_CSV_PREFIX = 'ehr_patient'
@@ -57,6 +60,13 @@ class Ehr::Settings
 
     def hl7_processing_id
       required('HL7_PROCESSING_ID')
+    end
+
+    def hl7_report_timezone
+      zone = present!('HL7_REPORT_TIMEZONE')
+      raise InvalidSettingError, UNKNOWN_REPORT_TIMEZONE if Time.find_zone(zone).nil?
+
+      zone
     end
 
     def hl7_document_type
@@ -109,19 +119,22 @@ class Ehr::Settings
       HL7_REQUIRED_SETTINGS.select { |name| fetch(name).nil? }
     end
 
+    # The time zone is never written into a segment; it has its own check.
     def invalid_hl7_settings
-      HL7_REQUIRED_SETTINGS.select { |name| fetch(name)&.match?(UNSAFE_HL7_VALUE) }
+      (HL7_REQUIRED_SETTINGS - ['HL7_REPORT_TIMEZONE']).select { |name| fetch(name)&.match?(UNSAFE_HL7_VALUE) }
     end
 
     # Checked before the answers (PHI) go out, so a report-only value can't fail halfway; reported like fetch!.
     def ensure_hl7_values!
       missing = missing_hl7_settings
       invalid = invalid_hl7_settings
-      return if missing.empty? && invalid.empty?
+      unknown_zone = unknown_report_timezone?
+      return if missing.empty? && invalid.empty? && !unknown_zone
 
       problems = []
       problems << "required settings are blank: #{missing.join(', ')}" if missing.any?
       problems << "settings contain HL7 delimiters, quotes or surrounding whitespace: #{invalid.join(', ')}" if invalid.any?
+      problems << UNKNOWN_REPORT_TIMEZONE if unknown_zone
       message = "[Ehr::Settings] HL7 send stopped, #{problems.join('; ')}"
       Rails.logger.error(message)
       Sentry.capture_message(message)
@@ -130,9 +143,17 @@ class Ehr::Settings
 
     private
 
+    def unknown_report_timezone?
+      zone = fetch('HL7_REPORT_TIMEZONE')
+      zone.present? && Time.find_zone(zone).nil?
+    end
+
+    def present!(name)
+      fetch(name) || raise(MissingSettingError, "#{name} is not set")
+    end
+
     def required(name)
-      value = fetch(name)
-      raise MissingSettingError, "#{name} is not set" if value.nil?
+      value = present!(name)
       raise InvalidSettingError, "#{name} contains HL7 delimiters, quotes or surrounding whitespace" if value.match?(UNSAFE_HL7_VALUE)
 
       value

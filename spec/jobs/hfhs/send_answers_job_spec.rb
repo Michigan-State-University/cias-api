@@ -76,9 +76,10 @@ RSpec.describe Hfhs::SendAnswersJob, type: :job do
     end
   end
 
-  it 'checks the 5 HL7 values, MSH-11 included' do
+  it 'checks the 6 HL7 values, MSH-11 and the time zone included' do
     expect(Ehr::Settings::HL7_REQUIRED_SETTINGS).to contain_exactly(
-      'HL7_SENDING_FACILITY', 'HL7_RECEIVING_FACILITY', 'HL7_PROCESSING_ID', 'HL7_DOCUMENT_TYPE', 'HL7_OBSERVATION_VALUE_PREFIX'
+      'HL7_SENDING_FACILITY', 'HL7_RECEIVING_FACILITY', 'HL7_PROCESSING_ID', 'HL7_DOCUMENT_TYPE', 'HL7_OBSERVATION_VALUE_PREFIX',
+      'HL7_REPORT_TIMEZONE'
     )
   end
 

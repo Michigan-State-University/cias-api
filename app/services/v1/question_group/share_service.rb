@@ -72,7 +72,7 @@ class V1::QuestionGroup::ShareService
 
     return unless question_type_exist_in_session?(question, question_group)
 
-    raise ActiveRecord::RecordNotUnique, (I18n.t 'activerecord.errors.models.question_group.question', question_type: question.type)
+    raise ActiveRecord::RecordNotUnique, I18n.t('activerecord.errors.models.question_group.question')
   end
 
   def validate_ehr_access(question)

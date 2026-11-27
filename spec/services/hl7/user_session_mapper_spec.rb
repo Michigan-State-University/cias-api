@@ -39,8 +39,8 @@ describe Hl7::UserSessionMapper do
   context 'when HL7_REPORT_TIMEZONE is blank' do
     include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => '' }
 
-    it "falls back to the participant's time zone instead of raising" do
-      expect(subject).to include("OBR|||||||#{user_session.finished_at.in_time_zone(patient.time_zone).strftime('%Y%m%d%H%M')}||||||||||||||||||F")
+    it 'raises an error naming the setting instead of using the participant\'s time zone' do
+      expect { subject }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_REPORT_TIMEZONE is not set')
     end
   end
 end

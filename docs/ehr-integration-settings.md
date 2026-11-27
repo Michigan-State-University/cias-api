@@ -44,6 +44,7 @@ The site's receiving system assigns these. They have no defaults.
 | `HL7_PROCESSING_ID` | MSH-11: `P` in production, `T` elsewhere |
 | `HL7_DOCUMENT_TYPE` | TXA-2 |
 | `HL7_OBSERVATION_VALUE_PREFIX` | OBX-5 prefix of the PDF report |
+| `HL7_REPORT_TIMEZONE` | Time zone of every HL7 timestamp, e.g. `Eastern Time (US & Canada)` |
 
 All are checked before anything is sent. The send stops, and Sentry gets the setting names (never the
 values), when a value:
@@ -54,8 +55,10 @@ values), when a value:
 
 `^`, `&` and `\` are allowed, since composite values use them.
 
-`HL7_REPORT_TIMEZONE` is optional: the time zone of the HL7 timestamps.
-Blank: the participant's time zone.
+The timestamps carry no offset, so the receiver reads them in its own local time: set the zone the site's
+receiving system uses. A name Rails doesn't know stops the send like a blank value. Use a name that follows
+daylight saving time (`Eastern Time (US & Canada)`, `America/Chicago`): a fixed offset such as `EST` or
+`Etc/GMT+5` stays an hour off all summer, and links such as `US/Eastern` may be missing on newer hosts.
 
 ## Site identity
 

@@ -163,6 +163,34 @@ RSpec.describe Ehr::Settings do
     end
   end
 
+  describe '.hl7_report_timezone' do
+    subject(:zone) { described_class.hl7_report_timezone }
+
+    ['Eastern Time (US & Canada)', 'America/Chicago'].each do |value|
+      context "when HL7_REPORT_TIMEZONE is #{value.inspect}" do
+        include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => value }
+
+        it { expect(zone).to eq(value) }
+      end
+    end
+
+    [nil, ''].each do |blank|
+      context "when HL7_REPORT_TIMEZONE is #{blank.inspect}" do
+        include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => blank }
+
+        it { expect { zone }.to raise_error(Ehr::Settings::MissingSettingError, 'HL7_REPORT_TIMEZONE is not set') }
+      end
+    end
+
+    context 'when HL7_REPORT_TIMEZONE is not a time zone' do
+      include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => 'Eastern' }
+
+      it 'raises an error naming the setting, never its value' do
+        expect { zone }.to raise_error(Ehr::Settings::InvalidSettingError, 'HL7_REPORT_TIMEZONE is not a known time zone')
+      end
+    end
+  end
+
   describe '.ensure_hl7_values!' do
     before do
       allow(Sentry).to receive(:capture_message)
@@ -189,6 +217,20 @@ RSpec.describe Ehr::Settings do
       it 'reports the missing setting names to Sentry and the log, then raises' do
         expect { described_class.ensure_hl7_values! }
           .to raise_error(Ehr::Settings::MissingSettingError, expected_message)
+        expect(Sentry).to have_received(:capture_message).with(expected_message).once
+        expect(Rails.logger).to have_received(:error).with(expected_message)
+      end
+    end
+
+    context 'when HL7_REPORT_TIMEZONE is not a time zone' do
+      include_context 'with HL7 settings configured'
+      include_context 'with environment variables', { 'HL7_REPORT_TIMEZONE' => 'Eastern' }
+
+      let(:expected_message) { '[Ehr::Settings] HL7 send stopped, HL7_REPORT_TIMEZONE is not a known time zone' }
+
+      it 'reports the setting name to Sentry and the log, never its value, then raises' do
+        expect { described_class.ensure_hl7_values! }
+          .to raise_error(Ehr::Settings::InvalidSettingError, expected_message)
         expect(Sentry).to have_received(:capture_message).with(expected_message).once
         expect(Rails.logger).to have_received(:error).with(expected_message)
       end
