@@ -101,6 +101,8 @@ end
 group :test, :production do
   # only version that is working on AWS
   gem 'wkhtmltopdf-heroku', '3.0.0'
+  gem 'aws-sdk-rekognition', '>= 1.120.0'
+  gem 'aws-sdk-s3', '>= 1.208.0'
 end
 
 group :test do
@@ -114,8 +116,4 @@ group :test do
   gem 'rspec-benchmark'
   gem 'benchmark-ips'
   gem 'webmock'
-end
-
-group :production do
-  gem 'aws-sdk-s3', '>= 1.208.0'
 end

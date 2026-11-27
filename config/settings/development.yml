@@ -10,3 +10,8 @@ log:
 
 sidekiq:
   retries: 1
+
+participant_uploads:
+  scanner: accept_all
+  moderation:
+    enabled: false
