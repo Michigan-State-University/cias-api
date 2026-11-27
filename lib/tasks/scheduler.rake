@@ -15,6 +15,11 @@ task interventions_schedule: :environment do
   end
 end
 
+desc 'Purge SMS inbound receipts older than the retention window (called by the Heroku scheduler add-on)'
+task purge_sms_inbound_receipts: :environment do
+  SmsInboundReceipt.purge_stale
+end
+
 desc 'Expire scanned-code drafts nobody confirmed'
 task ehr_clear_abandoned_patient_details: :environment do
   Ehr::ClearAbandonedPatientDetailsJob.perform_later

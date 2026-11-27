@@ -13,18 +13,12 @@ class V1::Intervention::PredefinedParticipants::SendSmsInvitation
     return if user.phone.blank?
     raise ActiveRecord::ActiveRecordError, I18n.t('users.invite.predefined.not_active') unless user.active?
 
-    sms = Message.create(phone: number, body: content)
-    Communication::Sms.new(sms.id).send_message
+    return unless V1::PredefinedParticipants::DeliverSms.call(number, content).sent?
+
     user.predefined_user_parameter.update!(sms_invitation_sent_at: DateTime.now)
   end
 
   attr_accessor :user
-
-  private
-
-  def number
-    user.phone.full_number
-  end
 
   def content
     I18n.with_locale(intervention_language_code) do
@@ -32,8 +26,14 @@ class V1::Intervention::PredefinedParticipants::SendSmsInvitation
     end
   end
 
+  private
+
+  def number
+    user.phone.full_number
+  end
+
   def link
-    "#{ENV.fetch('WEB_URL', nil)}/usr/#{predefined_user_parameter.slug}"
+    PredefinedUserParameter.personal_link(predefined_user_parameter.slug)
   end
 
   def intervention_name

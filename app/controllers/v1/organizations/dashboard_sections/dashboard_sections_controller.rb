@@ -51,6 +51,13 @@ class V1::Organizations::DashboardSections::DashboardSectionsController < V1Cont
     @dashboard_section_load ||= dashboard_sections_scope.find(params[:id])
   end
 
+  def position_scope
+    reporting_dashboard = @organization.reporting_dashboard
+    authorize! :update, reporting_dashboard
+
+    reporting_dashboard.dashboard_sections
+  end
+
   def dashboard_section_params
     params.expect(dashboard_section: %i[name description])
   end

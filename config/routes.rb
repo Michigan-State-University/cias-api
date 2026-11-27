@@ -9,6 +9,8 @@ end
 Rails.application.routes.draw do
   root to: proc { [200, { 'content-type' => 'application/json' }, [{ message: 'system operational' }.to_json]] }
 
+  get 'api/health', to: 'health#show'
+
   namespace :v1 do
     mount_devise_token_auth_for 'User', at: 'auth', controllers: {
       confirmations: 'v1/auth/confirmations',
@@ -77,6 +79,11 @@ Rails.application.routes.draw do
       post 'test_link', on: :member
       delete 'user_data', to: 'interventions#clear_user_data', on: :member
       scope module: 'interventions' do
+        resources :sms_campaigns, only: %i[index create], path: 'predefined_participants/sms_campaigns',
+                                  module: 'predefined_participants' do
+          get 'meta', on: :collection
+          post 'cancel', on: :member
+        end
         resources :predefined_participants do
           post 'send_sms_invitation', on: :member
           post 'send_email_invitation', on: :member

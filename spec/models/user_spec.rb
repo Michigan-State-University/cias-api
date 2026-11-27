@@ -82,13 +82,38 @@ describe User, type: :model do
   end
 
   describe '#time_zone' do
-    %w[America/New_York Europe/Warsaw Europe/Vienna America/Chicago America/Denver
-       America/Detroit].each do |time_zone|
-      context "time zone is #{time_zone}" do
+    # Read from tzinfo-data, not from User::TIME_ZONES, so a zone missing from the OS can't hide
+    all_time_zones = TZInfo::DataSources::RubyDataSource.new.timezone_identifiers
+
+    it "accepts every IANA time zone, old aliases included (#{all_time_zones.size})" do
+      user = build_stubbed(:user, :confirmed, :researcher)
+      rejected = all_time_zones.select do |time_zone|
+        user.time_zone = time_zone
+        user.validate
+        user.errors[:time_zone].any?
+      end
+
+      expect(rejected).to be_empty
+    end
+
+    it 'can use every IANA time zone in ActiveSupport' do
+      expect(all_time_zones.reject { |time_zone| ActiveSupport::TimeZone[time_zone] }).to be_empty
+    end
+
+    it 'accepts every time zone Phonelib derives from a phone number' do
+      phonelib_time_zones = Phonelib.phone_ext_data[Phonelib::Core::EXT_TIMEZONES]
+                                    .flatten.flat_map { |zones| zones.to_s.split('&') }.compact_blank.uniq
+
+      expect(phonelib_time_zones - all_time_zones).to be_empty
+    end
+
+    ['Not/AZone', '', 'GMT+7', 'UTC+07:00', '+07:00'].each do |time_zone|
+      context "time zone is #{time_zone.inspect}" do
         let(:user) { build_stubbed(:user, :confirmed, :researcher, time_zone: time_zone) }
 
-        it 'user is valid with time zone' do
-          expect(user).to be_valid
+        it 'user is invalid because of the time zone' do
+          user.valid?
+          expect(user.errors[:time_zone]).to include('is not included in the list')
         end
       end
     end
@@ -270,6 +295,19 @@ describe User, type: :model do
       expect(described_class.columns_hash['test_run_marked_by_id'].null).to be(true)
       expect(guest.test_run_intervention_id).to be_nil
       expect(guest.test_run_marked_by_id).to be_nil
+    end
+  end
+
+  describe 'sms_links_users association' do
+    it 'has many sms_links_users with dependent: :delete_all' do
+      expect(described_class.new).to have_many(:sms_links_users).dependent(:delete_all)
+    end
+
+    it 'removes the join rows when the user is destroyed' do
+      user = create(:user)
+      row = SmsLinksUser.create!(user: user, sms_link: create(:sms_link))
+      expect { user.destroy! }.not_to raise_error
+      expect(SmsLinksUser.exists?(row.id)).to be(false)
     end
   end
 end

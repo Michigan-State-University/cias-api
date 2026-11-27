@@ -66,4 +66,46 @@ RSpec.describe 'PATCH /v1/dashboard_section/:dashboard_section/charts/position',
       end
     end
   end
+
+  context 'when an e-intervention admin of the organization reorders' do
+    let(:organization) { create(:organization, :with_e_intervention_admin) }
+    let(:dashboard_section) { create(:dashboard_section, reporting_dashboard: organization.reporting_dashboard) }
+    let(:user) { organization.e_intervention_admins.first }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:ok) }
+    it { expect(chart1.reload.position).to eq 11 }
+  end
+
+  context 'when an e-intervention admin of another organization reorders' do
+    let(:user) { create(:organization, :with_e_intervention_admin).e_intervention_admins.first }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:forbidden) }
+    it { expect(chart1.reload.position).to eq 5 }
+  end
+
+  context 'when a chart of another dashboard section is in the list' do
+    let(:other_chart) { create(:chart, position: 9, dashboard_section: create(:dashboard_section)) }
+    let(:params) { { chart: { position: [{ id: chart1.id, position: 11 }, { id: other_chart.id, position: 1 }] } } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:not_found) }
+
+    it 'does not change positions' do
+      expect([chart1.reload.position, other_chart.reload.position]).to eq [5, 9]
+    end
+  end
+
+  context 'when a position is not a whole number' do
+    let(:params) { { chart: { position: [{ id: chart1.id, position: 'abc' }] } } }
+
+    before { request }
+
+    it { expect(response).to have_http_status(:unprocessable_content) }
+    it { expect(chart1.reload.position).to eq 5 }
+  end
 end

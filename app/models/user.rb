@@ -48,6 +48,7 @@ class User < ApplicationRecord
 
   # ADDITIONAL PARAMETERS FOR PREDEFINED PARTICIPANTS
   has_one :predefined_user_parameter, dependent: :destroy
+  has_many :sms_links_users, dependent: :delete_all
   delegate :full_number, to: :phone, allow_nil: true
   delegate :external_id, to: :predefined_user_parameter, allow_nil: true
 

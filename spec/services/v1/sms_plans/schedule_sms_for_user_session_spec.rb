@@ -64,6 +64,7 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
         end
 
         context 'for Europe/Warsaw timezone' do
+          let!(:phone) { create(:phone, :confirmed, user: user, iso: 'PL', prefix: '+48', number: '512345678') }
           let(:start_of_time_range) do
             Time.use_zone('Europe/Warsaw') { Time.current.next_day(5).change({ hour: 12 }).to_i }
           end
@@ -205,6 +206,8 @@ RSpec.describe V1::SmsPlans::ScheduleSmsForUserSession do
     end
 
     context 'frequencies testing' do
+      let!(:phone) { create(:phone, :confirmed, user: user, iso: 'PL', prefix: '+48', number: '512345678') }
+
       context 'once a day' do
         let(:end_time) { Time.zone.parse('2021-07-22') }
         let!(:sms_plan) do
