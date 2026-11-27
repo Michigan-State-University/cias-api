@@ -76,6 +76,18 @@ class Rack::Attack
     req.ip if req.post? && SMS_CAMPAIGN_WRITE_PATH.match?(req.path)
   end
 
+  PARTICIPANT_UPLOAD_PATH = %r{\A/v1/user_sessions/[^/]+/participant_uploads(?:/presign)?(?:\.\w+)?\z}
+
+  throttle('participant_uploads/user', limit: ->(_req) { Settings.participant_uploads.throttle_per_minute }, period: 1.minute) do |req|
+    req.get_header('HTTP_UID').presence || req.ip if req.post? && PARTICIPANT_UPLOAD_PATH.match?(req.path)
+  end
+
+  PARTICIPANT_UPLOAD_READ_PATH = %r{\A/v1/participant_uploads/[^/]+/file(?:\.\w+)?\z}
+
+  throttle('participant_uploads/download', limit: ->(_req) { Settings.participant_uploads.download_throttle_per_minute }, period: 1.minute) do |req|
+    req.get_header('HTTP_UID').presence || req.ip if req.get? && PARTICIPANT_UPLOAD_READ_PATH.match?(req.path)
+  end
+
   ### Custom Throttle Response ###
 
   # By default, Rack::Attack returns an HTTP 429 for throttled responses,
