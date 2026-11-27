@@ -6,6 +6,7 @@ class UserSession < ApplicationRecord
   belongs_to :user_intervention, inverse_of: :user_sessions
   belongs_to :session, inverse_of: :user_sessions
   has_many :answers, dependent: :destroy
+  has_many :participant_uploads, dependent: :destroy, inverse_of: :user_session
   has_many :generated_reports, dependent: :destroy
   has_many :tlfb_days, class_name: 'Tlfb::Day', dependent: :destroy
   belongs_to :health_clinic, optional: true
@@ -30,7 +31,7 @@ class UserSession < ApplicationRecord
   end
 
   def map_to_numeric_value(obj, answer)
-    return obj['value'] unless answer.class.in? [Answer::ParticipantReport, Answer::Phone, Answer::ThirdParty]
+    return obj['value'] unless answer.class.in? [Answer::ParticipantReport, Answer::Phone, Answer::ThirdParty, Answer::FileUpload]
 
     case answer.class.name
     when 'Answer::ParticipantReport'
@@ -39,6 +40,8 @@ class UserSession < ApplicationRecord
       (obj['value']['confirmed'] && 1) || 0
     when 'Answer::ThirdParty'
       obj['numeric_value']
+    when 'Answer::FileUpload'
+      Array(obj['value']).compact_blank.size
     end
   end
 

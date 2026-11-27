@@ -52,6 +52,11 @@ en:
           attributes:
             user:
               already_exist: 'is already a collaborator in this intervention'
+        'answer/file_upload':
+          attributes:
+            body:
+              foreign_upload_referenced: 'references a file that does not belong to this answer'
+              duplicated_upload_referenced: 'references the same file more than once'
         intervention:
           attributes:
             cat_mh_resources: "Session with id=%{session_id} must contains cat_mh_language_id, cat_mh_population_id, cat_mh_time_frame_id, test_types, ERROR_FLAG:CatMhSessionInvalid"
@@ -174,6 +179,12 @@ en:
         not_active: 'Invitation cannot be sent to a deactivated user'
     preview:
       cat_mh: "User preview is unavailable for CAT-MH sessions"
+  participant_uploads:
+    errors:
+      rejected: 'The file was rejected'
+      pending_scan: 'The file is still being scanned'
+      removed_by_scanner: 'The file was removed by the security scanner'
+      session_finished: 'You cannot change files of a finished session'
   user_sessions:
     errors:
       already_finished: 'You cannot provide an answer for the finished session'

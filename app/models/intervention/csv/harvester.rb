@@ -20,6 +20,7 @@ class Intervention::Csv::Harvester
 
   def collect
     set_headers
+    preload_participant_uploads
     set_rows
     self
   end
@@ -127,6 +128,12 @@ class Intervention::Csv::Harvester
     variable = 'metadata.phonetic_name' if variable.eql?('.:name:.')
 
     column_name(multiple_fill, session, variable, index + 1)
+  end
+
+  def preload_participant_uploads
+    Answer::FileUpload.preload_participant_uploads(
+      grouped_and_sorted_user_sessions.flat_map { |grouped| grouped.second.flat_map { |user_session| user_session.answers.to_a } }
+    )
   end
 
   def set_rows

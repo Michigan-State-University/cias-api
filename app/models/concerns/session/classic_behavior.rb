@@ -111,7 +111,7 @@ module Session::ClassicBehavior
 
   def digit_variable_questions
     %w[Question::Single Question::Slider Question::Grid Question::Multiple Question::Number Question::ThirdParty Question::ParticipantReport Question::Phone
-       Question::HenryFord]
+       Question::HenryFord Question::FileUpload]
   end
 
   def present_variables(variables)

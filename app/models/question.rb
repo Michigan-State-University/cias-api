@@ -17,6 +17,7 @@ class Question < ApplicationRecord
 
   belongs_to :question_group, inverse_of: :questions, touch: true, counter_cache: true
   has_many :answers, dependent: :destroy, inverse_of: :question
+  has_many :participant_uploads, dependent: :destroy, inverse_of: :question
 
   attribute :narrator, :json, default: -> { assign_default_values('narrator') }
   attribute :position, :integer, default: 0
