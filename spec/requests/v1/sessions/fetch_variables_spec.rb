@@ -106,6 +106,32 @@ RSpec.describe 'GET /v1/sessions/:id/variables/(:question_id)', type: :request d
                         %w[single multi grid number participant_report henry_ford]
       end
 
+      context 'file upload question' do
+        let!(:file_upload_question) do
+          create(:question_file_upload, question_group: question_group, subtitle: 'file_upload', position: 7,
+                                        body: { data: [{ payload: '' }], variable: { name: 'file_upload_var' } })
+        end
+        let(:result) { json_response['variable_names'].flat_map { |h| h['variables'] } }
+
+        before { get v1_fetch_variables_path(id: session.id), headers: headers, params: params }
+
+        context 'with the digit only filter the branching screen uses' do
+          let(:params) { { only_digit_variables: true } }
+
+          it 'offers its variable, because the answer gives the formula a number' do
+            expect(result).to include('file_upload_var')
+          end
+        end
+
+        context 'without filters' do
+          let(:params) { {} }
+
+          it 'offers its variable as well' do
+            expect(result).to include('file_upload_var')
+          end
+        end
+      end
+
       context 'include current question' do
         let(:params) { { include_current_question: true, question_id: questions[2].id } }
         let(:request) do

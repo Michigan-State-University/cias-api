@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_23_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gin"
   enable_extension "pg_catalog.plpgsql"
@@ -663,6 +663,29 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
     t.index ["name"], name: "index_organizations_on_name", unique: true
   end
 
+  create_table "participant_uploads", id: :uuid, default: -> { "uuid_generate_v4()" }, force: :cascade do |t|
+    t.uuid "user_session_id", null: false
+    t.uuid "question_id", null: false
+    t.text "original_filename_ciphertext", null: false
+    t.text "description_ciphertext"
+    t.string "content_type_detected", null: false
+    t.bigint "byte_size", null: false
+    t.string "scan_status", default: "pending", null: false
+    t.integer "scan_attempts", default: 0, null: false
+    t.string "moderation_status", default: "pending", null: false
+    t.text "moderation_labels_ciphertext"
+    t.string "moderation_model_version"
+    t.string "moderation_skip_reason"
+    t.datetime "moderated_at"
+    t.datetime "deleted_at"
+    t.string "deletion_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["question_id"], name: "index_participant_uploads_on_question_id"
+    t.index ["scan_status"], name: "index_participant_uploads_on_scan_status"
+    t.index ["user_session_id", "question_id"], name: "index_participant_uploads_on_user_session_id_and_question_id"
+  end
+
   create_table "phones", force: :cascade do |t|
     t.uuid "user_id"
     t.string "iso", null: false
@@ -1263,6 +1286,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_16_120100) do
   add_foreign_key "live_chat_summoning_users", "interventions"
   add_foreign_key "live_chat_summoning_users", "users"
   add_foreign_key "messages", "questions"
+  add_foreign_key "participant_uploads", "questions"
+  add_foreign_key "participant_uploads", "user_sessions"
   add_foreign_key "phones", "live_chat_navigator_setups", column: "navigator_setup_id"
   add_foreign_key "predefined_participants_sms_campaigns", "interventions"
   add_foreign_key "predefined_participants_sms_campaigns", "predefined_participants_sms_campaigns", column: "parent_campaign_id"

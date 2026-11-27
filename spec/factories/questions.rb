@@ -609,6 +609,29 @@ FactoryBot.define do
     end
   end
 
+  factory :question_file_upload, class: Question::FileUpload do
+    title { 'File Upload' }
+    type { Question::FileUpload }
+    body do
+      {
+        data: [
+          {
+            payload: ''
+          }
+        ],
+        variable: {
+          name: 'file_upload_var'
+        }
+      }
+    end
+    sequence(:position) { |s| s }
+    association :question_group
+
+    trait :body_data_empty do
+      body { { data: [] } }
+    end
+  end
+
   factory :question_external_link, class: Question::ExternalLink do
     title { 'External Link' }
     type { Question::ExternalLink }

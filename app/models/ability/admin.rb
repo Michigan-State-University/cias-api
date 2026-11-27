@@ -22,8 +22,11 @@ class Ability::Admin < Ability::Base
       intervention.user_id != user.id
     end
     cannot :manage, GeneratedReport
+    cannot :manage, ParticipantUpload
     cannot :create, UserSession
     can :manage, GeneratedReport, user_session: { session: { intervention: { user_id: user.id } } }
+    can :read, ParticipantUpload, user_session: { session: { intervention: { user_id: user.id } } }
+    can :read_upload_config, ParticipantUpload
     enable_data_access(user)
   end
 end

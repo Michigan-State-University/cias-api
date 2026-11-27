@@ -25,3 +25,59 @@ sms_campaigns:
   daily_sms_cap: 5000 
   resend_min_interval_minutes: 60
   max_reminder_days_after: 60
+
+participant_uploads:
+  max_size_mb: 100
+  throttle_per_minute: 20
+  download_throttle_per_minute: 30
+  max_files_per_question: 1
+  scanner: guard_duty
+  allowed_content_types:
+    - image/jpeg
+    - image/png
+    - image/gif
+    - image/webp
+    - image/heic
+    - application/pdf
+    - application/msword
+    - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    - application/vnd.ms-excel
+    - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    - text/plain
+    - audio/mpeg
+    - audio/mp4
+    - audio/x-wav
+    - video/mp4
+    - video/quicktime
+  accepted_extensions:
+    - jpg
+    - jpeg
+    - png
+    - heic
+    - gif
+    - webp
+    - pdf
+    - doc
+    - docx
+    - xls
+    - xlsx
+    - csv
+    - txt
+    - mp3
+    - m4a
+    - wav
+    - mp4
+    - m4v
+    - mov
+  moderation:
+    enabled: true
+    min_confidence: 80
+    content_types:
+      - image/jpeg
+      - image/png
+  inline_preview_content_types:
+    - image/jpeg
+    - image/png
+    - image/gif
+    - image/webp
+    - application/pdf

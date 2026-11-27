@@ -196,8 +196,14 @@ Rails.application.routes.draw do
       resources :questions, only: %i[index], module: 'user_sessions'
       get 'previous_question', to: 'user_sessions/questions#previous'
       resources :answers, only: %i[index show create], module: 'user_sessions'
+      resources :participant_uploads, only: %i[index show create destroy], module: 'user_sessions' do
+        post :presign, on: :collection
+      end
       patch 'quick_exit', to: 'user_sessions#quick_exit'
     end
+    get 'participant_uploads/config', to: 'participant_uploads#upload_config', as: :participant_uploads_config
+    get 'participant_uploads/:id/file', to: 'participant_uploads#file', as: :participant_upload_file
+    get 'participant_uploads/:id', to: 'participant_uploads#show', as: :participant_upload
     get 'user_sessions', to: 'user_sessions#show'
     post 'fetch_or_create_user_sessions', to: 'user_sessions#show_or_create'
 

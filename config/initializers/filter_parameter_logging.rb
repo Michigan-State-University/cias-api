@@ -14,6 +14,9 @@ Rails.application.config.filter_parameters += %i[
   slug token url phone
   dob sex zip mrn phone_type patient_id visit_id
   verification_code
+  participant_upload.description
+  participant_upload.original_filename
+  blob.filename
 ]
 
 # Twilio SMS webhook sender/recipient fields (From, To, FromZip, ToCity, ...).

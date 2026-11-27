@@ -5,5 +5,6 @@ module Ability::Generic::QuestionAccess
     can :manage, QuestionGroup, session: { intervention: { user_id: ids } }
     can :manage, Question, question_group: { session: { intervention: { user_id: ids } } }
     can :manage, Answer, question: { question_group: { session: { intervention: { user_id: ids } } } }
+    can :read_upload_config, ParticipantUpload
   end
 end
